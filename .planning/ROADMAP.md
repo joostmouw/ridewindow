@@ -102,7 +102,23 @@ Plans:
   4. When no slots qualify (bad-weather or fully-blocked week), the provider exposes an explicit empty state rather than an empty list with no context
   5. Scalar user settings (tolerances, ride-length prefs, location override, notification toggles, theme) are read from `shared_preferences` on cold start and survive a `ProviderContainer` dispose/re-create cycle
 
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 1**
+
+- [x] 03-01-PLAN.md — WeatherNotifier + infrastructuur-providers (appDatabase, openMeteoClient, weatherRepository)
+
+**Wave 2** *(onafhankelijk van Wave 1 — kan parallel uitgevoerd worden)*
+
+- [ ] 03-02-PLAN.md — ProfileNotifier + shared_preferences instellingen (toleranties, rijlengte, thema, etc.)
+
+**Wave 3** *(geblokkeerd op Wave 1 + Wave 2)*
+
+- [ ] 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve keten
+
+**Wave 4** *(geblokkeerd op Wave 3)*
+
+- [ ] 03-04-PLAN.md — End-to-end keten-integratietest + ProviderScope in main.dart + volledige suite gate
 
 ### Phase 4: UI Phase A — Onboarding + Home + Welcome
 
@@ -223,10 +239,10 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project skeleton + test infrastructure | 3/3 | ✅ Complete | 2026-06-02 |
+| 1. Project skeleton + test infrastructure | 3/3 | Complete | 2026-06-02 |
 | 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
-| 2. Data layer — Drift + Open-Meteo | 3/3 | ✅ Complete | 2026-06-02 |
-| 3. Riverpod providers + state graph | 0/TBD | Not started | - |
+| 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
+| 3. Riverpod providers + state graph | 1/4 | In Progress|  |
 | 4. UI Phase A — Onboarding + Home + Welcome | 0/TBD | Not started | - |
 | 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |

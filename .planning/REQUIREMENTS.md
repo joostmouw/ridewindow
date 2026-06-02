@@ -30,13 +30,13 @@
 - [ ] **SLOT-02**: Slot boundaries use exclusive end convention `[start, end)`; documented and unit-tested with property tests
 - [ ] **SLOT-03**: `AvailabilityFilter` removes slots that overlap user's blocked hours (work + custom) before display
 - [ ] **SLOT-04**: Slots are categorized into tiers: Perfect (≥85), Great (70–84), Acceptable (50–69), Poor (<50, hidden)
-- [ ] **SLOT-05**: Slot generation surfaces an explicit empty state when no slots qualify (bad weather week or fully blocked) — *gap-fix*
+- [x] **SLOT-05**: Slot generation surfaces an explicit empty state when no slots qualify (bad weather week or fully blocked) — *gap-fix*
 
 ### Profile (PROF) — User preferences
 
 - [ ] **PROF-01**: User can adjust 3 weather tolerance sliders (temperature, rain, wind) in Profile screen
 - [ ] **PROF-02**: User can toggle ride length preferences (2h / 3h / 4–5h chips) — at least one must be selected
-- [ ] **PROF-03**: Tolerance and ride-length changes trigger automatic slot recomputation (reactive via Riverpod)
+- [x] **PROF-03**: Tolerance and ride-length changes trigger automatic slot recomputation (reactive via Riverpod)
 - [ ] **PROF-04**: User can pick a Material 3 light/dark theme preference (system default acceptable)
 
 ### Availability (AVAIL) — Weekly calendar

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 2 complete — WeatherRepository with cache policy; all 3 plans done; 78 tests green; dart analyze clean; ready for Phase 3 (Riverpod providers)
-last_updated: "2026-06-02T20:12:00.000Z"
+status: "Executing Phase 3 — plan 03-01 complete, 03-02 next"
+stopped_at: "Completed 03-01-PLAN.md — WeatherNotifier + infrastructure providers"
+last_updated: "2026-06-02T21:40:03.890Z"
 last_activity: 2026-06-02
 progress:
   total_phases: 11
   completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 14
+  completed_plans: 11
   percent: 27
 ---
 
@@ -21,24 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 1.5 — Scoring domain (Freezed models + ScoringEngine + SlotGenerator + AvailabilityFilter)
+**Current focus:** Phase 3 — Riverpod providers + state graph (planning complete, uitvoering volgende stap)
 
 ## Current Position
 
-Phase: 2 of 11 (Data layer — Drift + Open-Meteo) — COMPLETE
-Plan: 3 of 3 complete
-Status: Ready for Phase 3 (Riverpod providers + state graph)
+Phase: 3 van 11 (Riverpod providers + state graph) — IN UITVOERING
+Plan: 1 van 4 complete
+Status: Executing — 03-01 gedaan, 03-02 volgende
 Last activity: 2026-06-02
 
-Progress: [████████░░] 80% (Phase 2 complete, Phase 3 next)
+Progress: [████████░░] 79%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4 (incl. Phase 1.5 plans)
-- Average duration: ~15min for mechanical tasks (automated executor mode)
-- Total execution time: ~3h (Phase 1) + ~15min (02-01)
+- Total plans completed: 10 (Phases 1, 1.5, 2)
+- Average duration: ~15min voor mechanische taken (geautomatiseerd executor-modus)
+- Total execution time: ~3h (Phase 1) + ~45min (Phase 1.5) + ~40min (Phase 2)
 
 **By Phase:**
 
@@ -46,40 +46,45 @@ Progress: [████████░░] 80% (Phase 2 complete, Phase 3 next)
 |-------|-------|-------|----------|
 | 1 | 3 | ~3h | ~1h |
 | 1.5 | 4 | ~45min | ~11min |
-| 2 | 1/3 done | ~15min | ~15min |
+| 2 | 3 | ~40min | ~13min |
 
 **Recent Trend:**
 
-- Last plan: 02-01 — green, single-attempt, 2 auto-fixes (version conflict + missing dep)
-- Trend: Automated executor handles mechanical infra work well
+- Last plan: 02-03 — groen, single-attempt, WeatherRepository cache policy
+- Trend: Geautomatiseerde executor verwerkt mechanische infra-taken goed
 
-*Updated after each plan completion*
-| Phase 02 P02 | 20 | 2 tasks | 9 files |
+| Phase 03-riverpod-providers-state-graph P01 | 25 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Beslissingen zijn gelogd in PROJECT.md Key Decisions tabel.
+Recente beslissingen die het huidige werk beinvloeden:
 
-- Roadmap restructured 2026-06-02: original Phase 1 (skeleton + scoring) split into Phase 1 (skeleton only, ✓ done) + Phase 1.5 (scoring domain). Driver: planner was interrupted after 3 of estimated 5–8 plans; rather than re-running expensive planner, scope realigned with what was built.
-- GSD config to be trimmed before Phase 1.5 planning (security_enforcement, research, plan_check, etc. off) — see open todo below.
-- Android Studio install deferred to Phase 10 — Phases 1–9 use `dart test` exclusively, no `flutter run` required.
-- Package legitimacy audit (Plan 01-01 Task 2) skipped — CLAUDE.md verified-publisher table covers the same data.
-- Plan 02-01 (2026-06-02): mockito downgraded ^5.7.0 → ^5.6.4 (analyzer version conflict with drift_dev 2.33.0); path_provider added as direct dep; part directives removed from table files (Drift 2.x pattern).
-- Plan 02-03 (2026-06-02): flutter test required (not dart test) for tests importing AppDatabase — drift_flutter pulls dart:ui; NativeDatabase.memory() passed directly as QueryExecutor (DatabaseConnection wrapper not needed in Drift 2.x).
+- Roadmap geherstructureerd 2026-06-02: originele Phase 1 (skeleton + scoring) gesplitst in Phase 1 (skeleton only) + Phase 1.5 (scoring domain).
+- Flutter test vereist (niet dart test) voor tests die AppDatabase importeren — drift_flutter trekt dart:ui mee; NativeDatabase.memory() direct doorgeven als QueryExecutor (DatabaseConnection wrapper niet nodig in Drift 2.x).
+- Plan 02-03: mockito ^5.6.4 (niet ^5.7.0 — analyzer-versieconflict met drift_dev 2.33.0).
+- Phase 3 planning (2026-06-02): riverpod_generator ^2.6.5 + riverpod_annotation ^4.0.2 + flutter_riverpod ^3.3.1 toegevoegd; shared_preferences ^2.5.5 voor ProfileNotifier en AvailabilityNotifier.
+- Riverpod 3.0 patroon: gebruik @riverpod annotatie (code-gen), AutoDisposeNotifier is nu gewoon Notifier (auto-dispose is default), StateProvider/StateNotifierProvider zijn legacy — niet gebruiken.
+- SlotsEmptyReason sealed enum gekozen voor SLOT-05 expliciete empty state (badWeather | allBlocked).
+- AvailabilityNotifier: SharedPreferences-aanpak als fallback als Drift-tabel ontbreekt (te controleren in 03-03).
+- 03-01 (2026-06-02): riverpod_generator ^4.0.4-dev.1 vereist (plan: ^2.6.5) — 2.x reeks incompatibel met riverpod_annotation 4.0.2.
+- 03-01 (2026-06-02): Riverpod 3.x gegenereerde provider-naam voor WeatherNotifier is weatherProvider (Notifier-suffix gestript door code-gen).
+- 03-01 (2026-06-02): Riverpod 3.x error-staat is AsyncLoading(hasError: true) door auto-retry — test checkt state.hasError ipv isA<AsyncError>().
+- 03-01 (2026-06-02): Ref-parameter in Riverpod 3.x provider-functies is plain Ref (niet typed XxxRef).
 
 ### Pending Todos
 
-- **Trim GSD config before Phase 1.5 planning** — turn off `research`, `plan_check`, `verifier`, `nyquist_validation`, `ai_integration_phase`, `ui_phase`, `ui_safety_gate`, `context_coverage_gate`, `code_review`, `pattern_mapper`, `post_planning_gaps`, `security_enforcement` in `.planning/config.json`. Discussed with user; deferred until after Phase 1 closed.
-- **GitHub remote setup** — push the project to a private GitHub repo so it can be worked on from a second computer. Discussed; deferred to after roadmap restructure.
+- **Trim GSD config voor Phase 1.5 planning** — zet research, plan_check, verifier, etc. uit in .planning/config.json. Besproken met gebruiker; uitgesteld.
+- **GitHub remote setup** — push project naar private GitHub-repo voor tweede computer. Uitgesteld.
 
 ### Blockers/Concerns
 
-- Phase 9 (Google Calendar): Requires Google Cloud project setup, OAuth consent screen, and SHA-1 fingerprint registration before any Calendar code can be written. Flag this at Phase 8 completion.
-- Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability — Pixel emulator is not sufficient.
-- Phase 10 (Release): Android Studio + accepted SDK licenses must be installed before `flutter build appbundle` works. Currently missing.
+- Phase 9 (Google Calendar): Vereist Google Cloud project setup, OAuth consent screen, en SHA-1 fingerprint registratie. Flag dit bij afsluiting Phase 8.
+- Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
+- Phase 10 (Release): Android Studio + accepted SDK licenses must be installed before `flutter build appbundle` works.
+- Phase 3 notitie: Als AvailabilityEntries-tabel ontbreekt in Drift-schema (plan 02-01 heeft die niet aangemaakt), dan gebruikt AvailabilityNotifier SharedPreferences als opslag. Plan 03-03 controleert dit en handelt dienovereenkomstig.
 
 ## Deferred Items
 
@@ -91,6 +96,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-02T20:12:00.000Z
-Stopped at: Phase 2 complete (plan 02-03 done) — WeatherRepository cache policy implemented; 78 tests green; dart analyze clean
+Last session: 2026-06-02T22:00:00Z
+Stopped at: Completed 03-01-PLAN.md — WeatherNotifier + infrastructure providers (commits b0caf28, 67ddc86)
 Resume file: None
+Next action: `/gsd:execute-phase 03` — ga verder met 03-02-PLAN.md (ProfileNotifier + AvailabilityNotifier)
