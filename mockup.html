@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RideWindow — Mockup</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0f1117;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+  padding: 32px 20px 60px;
+}
+
+.mockup-header { text-align: center; margin-bottom: 24px; }
+.mockup-header h1 { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.mockup-header p  { color: #666; font-size: 13px; }
+
+.screen-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.screen-nav button {
+  background: #1e1e2e;
+  color: #888;
+  border: 1px solid #2a2a3a;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.screen-nav button:hover { color: #ccc; border-color: #444; }
+.screen-nav button.active { background: #2E7D32; color: white; border-color: #2E7D32; }
+
+/* Phone */
+.phone {
+  width: 375px;
+  height: 780px;
+  background: #fff;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px #222, inset 0 0 0 1px #444;
+}
+
+.status-bar {
+  height: 44px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.status-bar .notch {
+  width: 110px;
+  height: 26px;
+  background: #000;
+  border-radius: 13px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 9px;
+}
+
+.screens {
+  height: calc(780px - 44px);
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  background: #F5F5F5;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.screen.active { display: flex; }
+.has-bottom-nav { padding-bottom: 64px; }
+
+:root {
+  --green:    #2E7D32;
+  --green-bg: #E8F5E9;
+  --amber:    #E65100;
+  --amber-bg: #FFF3E0;
+  --red-bg:   #FFEBEE;
+  --blue-bg:  #E3F2FD;
+  --blue:     #1565C0;
+  --surface:  #FFFFFF;
+  --bg:       #F5F5F5;
+  --text:     #1A1A1A;
+  --text-2:   #666;
+  --text-3:   #999;
+  --border:   #F0F0F0;
+}
+
+/* ── WELCOME ── */
+.welcome-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+  background: #fff;
+}
+.welcome-icon  { font-size: 80px; margin-bottom: 28px; line-height: 1; }
+.welcome-title { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1.15; margin-bottom: 14px; }
+.welcome-sub   { font-size: 15px; color: var(--text-2); line-height: 1.6; margin-bottom: 44px; }
+.welcome-btn   {
+  background: var(--green); color: white; border: none;
+  padding: 16px 0; border-radius: 28px; font-size: 16px;
+  font-weight: 700; cursor: pointer; width: 100%;
+  font-family: inherit; transition: background 0.15s;
+}
+.welcome-btn:hover { background: #1B5E20; }
+
+/* ── ONBOARDING ── */
+.ob-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 28px 24px 32px; background: #fff;
+}
+.ob-title { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+.ob-sub   { font-size: 14px; color: var(--text-2); line-height: 1.55; margin-bottom: 28px; }
+.ob-options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.ob-option {
+  padding: 15px 18px; border-radius: 14px; border: 2px solid #E8E8E8;
+  font-size: 15px; color: var(--text); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; font-family: inherit; text-align: left;
+}
+.ob-option.selected { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 600; }
+.ob-check {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #E0E0E0;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; transition: all 0.15s;
+}
+.ob-option.selected .ob-check { background: var(--green); border-color: var(--green); color: white; }
+.ob-custom { border-style: dashed; }
+.ob-next {
+  margin-top: 24px; background: var(--green); color: white; border: none;
+  padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700;
+  cursor: pointer; width: 100%; font-family: inherit; transition: background 0.15s;
+}
+.ob-next:hover { background: #1B5E20; }
+
+/* ── SHARED HEADER ── */
+.screen-header {
+  background: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.back-btn {
+  background: var(--bg); border: none; width: 36px; height: 36px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; flex-shrink: 0; transition: background 0.15s;
+}
+.back-btn:hover { background: #E8E8E8; }
+.sh-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.sh-sub   { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+/* ── HOME ── */
+.home-header {
+  background: #fff; padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.home-header h1 { font-size: 20px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.home-location { font-size: 13px; color: var(--text-3); margin-top: 3px; }
+
+.week-strip {
+  background: #fff; padding: 14px 20px 16px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.week-label { font-size: 10px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
+.week-days  { display: flex; justify-content: space-between; }
+.week-day   { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+.day-label  { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.3px; }
+.day-dot    {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; transition: transform 0.15s; user-select: none;
+}
+.week-day:hover .day-dot { transform: scale(1.08); }
+.week-day.bad  .day-dot { background: var(--red-bg);   color: #C62828; }
+.week-day.ok   .day-dot { background: var(--amber-bg); color: var(--amber); }
+.week-day.good .day-dot { background: var(--green-bg); color: var(--green); }
+.week-day.selected .day-dot { box-shadow: 0 0 0 2.5px var(--green); }
+
+.cards-wrap { padding: 16px 16px 8px; flex: 1; }
+.section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; padding: 0 4px; }
+
+.ride-card {
+  background: #fff; border-radius: 18px; padding: 16px 16px 14px;
+  margin-bottom: 12px; border-left: 4px solid transparent;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07); cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ride-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.11); }
+.ride-card.perfect { border-left-color: #2E7D32; }
+.ride-card.great   { border-left-color: #66BB6A; }
+.ride-card.ok      { border-left-color: #FFA726; }
+
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.card-day  { font-size: 16px; font-weight: 700; color: var(--text); }
+.card-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.2px; }
+.perfect .card-badge { background: var(--green-bg); color: #1B5E20; }
+.great   .card-badge { background: #F1F8E9;          color: #33691E; }
+.ok      .card-badge { background: var(--amber-bg);  color: var(--amber); }
+.card-time    { font-size: 14px; color: #444; font-weight: 500; margin-bottom: 10px; }
+.card-weather { display: flex; gap: 14px; margin-bottom: 12px; }
+.w-chip       { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 4px; }
+.card-footer  { display: flex; justify-content: flex-end; }
+.btn-plan {
+  border: none; padding: 8px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background 0.15s; color: white;
+}
+.perfect .btn-plan, .great .btn-plan { background: var(--green); }
+.perfect .btn-plan:hover, .great .btn-plan:hover { background: #1B5E20; }
+.ok .btn-plan { background: var(--amber); }
+.ok .btn-plan:hover { background: #BF360C; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 64px; background: #fff; border-top: 1px solid var(--border);
+  display: flex; z-index: 20;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  cursor: pointer; font-size: 11px; font-weight: 600;
+  color: var(--text-3); border: none; background: none;
+  font-family: inherit; transition: color 0.15s;
+}
+.nav-item.active { color: var(--green); }
+.nav-icon { font-size: 20px; }
+
+/* ── OVERLAY / SHEET ── */
+.overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); z-index: 40; display: none; align-items: flex-end; }
+.overlay.active { display: flex; }
+.sheet {
+  background: #fff; border-radius: 24px 24px 0 0;
+  padding: 10px 20px 32px; width: 100%;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.sheet-handle { width: 36px; height: 4px; background: #DDD; border-radius: 2px; margin: 6px auto 20px; }
+.sheet-title  { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.sheet-sub    { font-size: 13px; color: var(--text-2); margin-bottom: 22px; }
+.sheet-btn {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 14px 18px; border-radius: 14px; border: none;
+  font-size: 14px; font-weight: 600; margin-bottom: 10px;
+  cursor: pointer; text-align: left; font-family: inherit; transition: background 0.15s;
+}
+.sheet-btn.primary   { background: var(--green); color: white; }
+.sheet-btn.primary:hover { background: #1B5E20; }
+.sheet-btn.secondary { background: var(--bg); color: var(--text); }
+.sheet-btn.secondary:hover { background: #EBEBEB; }
+.sheet-btn.ghost     { background: none; color: var(--text-3); font-weight: 500; justify-content: center; }
+
+/* ── RIDE DETAIL ── */
+.score-banner { background: var(--green-bg); padding: 12px 20px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.score-banner-text { font-size: 14px; font-weight: 700; color: var(--green); }
+.info-card { background: #fff; margin: 12px 16px 0; border-radius: 18px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.06); }
+.info-card-title { font-size: 10px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase; color: var(--text-3); padding: 14px 16px 8px; }
+.info-row { display: flex; align-items: center; padding: 10px 16px; gap: 12px; border-top: 1px solid var(--border); }
+.info-icon  { font-size: 17px; width: 22px; text-align: center; }
+.info-label { font-size: 14px; color: var(--text); flex: 1; }
+.info-value { font-size: 14px; font-weight: 600; color: #444; }
+.hourly-row { display: flex; align-items: center; padding: 9px 16px; gap: 0; border-top: 1px solid var(--border); }
+.h-time { font-size: 13px; color: var(--text-3); width: 48px; }
+.h-temp { font-size: 13px; font-weight: 700; color: var(--text); width: 46px; }
+.h-rain { font-size: 12px; color: #1565C0; flex: 1; }
+.h-wind { font-size: 12px; color: var(--text-2); }
+.detail-actions { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.btn-block { width: 100%; padding: 14px; border-radius: 14px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.btn-block.primary   { background: var(--green); color: white; }
+.btn-block.primary:hover { background: #1B5E20; }
+.btn-block.secondary { background: var(--bg); color: var(--text); }
+.btn-block.secondary:hover { background: #EBEBEB; }
+
+/* ── PROFILE ── */
+.profile-header { background: #fff; padding: 18px 20px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.profile-header h1 { font-size: 22px; font-weight: 800; color: var(--text); }
+.settings-section { margin: 16px 16px 0; }
+.settings-label { font-size: 10px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase; color: var(--text-3); padding: 0 4px; margin-bottom: 8px; }
+.settings-card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.06); }
+.s-row { display: flex; align-items: center; padding: 13px 16px; gap: 12px; border-top: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
+.s-row:first-child { border-top: none; }
+.s-row:hover { background: #FAFAFA; }
+.s-icon    { font-size: 17px; width: 24px; text-align: center; flex-shrink: 0; }
+.s-content { flex: 1; }
+.s-label   { font-size: 14px; color: var(--text); font-weight: 500; }
+.s-value   { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.s-arrow   { font-size: 16px; color: #CCC; }
+.toggle { width: 44px; height: 26px; background: #E0E0E0; border-radius: 13px; position: relative; cursor: pointer; transition: background 0.25s; flex-shrink: 0; }
+.toggle.on { background: var(--green); }
+.toggle::after { content: ''; position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+.toggle.on::after { transform: translateX(18px); }
+.chip-row { display: flex; gap: 8px; padding: 12px 16px; }
+.chip { padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; font-family: inherit; }
+.chip.on  { background: var(--green); color: white; }
+.chip.off { background: var(--bg); color: var(--text-2); }
+.cal-row { display: flex; align-items: center; gap: 6px; }
+.cal-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; }
+
+/* ── AVAILABILITY CALENDAR ── */
+.avail-hint {
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-3);
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.avail-legend {
+  display: flex;
+  gap: 14px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-dot.work    { background: var(--blue-bg); border: 1px solid #90CAF9; }
+.legend-dot.blocked { background: #ECEFF1; border: 1px solid #CFD8DC; }
+.legend-dot.free    { background: var(--green-bg); border: 1px solid #A5D6A7; }
+
+.cal-grid-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 10px;
+  background: var(--bg);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: 36px repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cal-header-cell {
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-3);
+  text-transform: uppercase;
+  padding: 4px 0;
+  letter-spacing: 0.3px;
+}
+
+.cal-hour-label {
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: right;
+  padding-right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-weight: 500;
+}
+
+.cal-cell {
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+.cal-cell.free {
+  background: var(--green-bg);
+  border-color: #A5D6A7;
+}
+
+.cal-cell.free:hover {
+  background: #C8E6C9;
+}
+
+.cal-cell.work {
+  background: var(--blue-bg);
+  border-color: #90CAF9;
+  cursor: default;
+}
+
+.cal-cell.blocked {
+  background: #ECEFF1;
+  border-color: #CFD8DC;
+}
+
+.cal-cell.blocked:hover {
+  background: #E0E0E0;
+}
+
+.cal-cell.user-blocked {
+  background: #ECEFF1;
+  border-color: #CFD8DC;
+}
+
+.cal-cell.user-blocked:hover {
+  background: #E0E0E0;
+}
+
+.avail-footer {
+  padding: 14px 16px;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.avail-save {
+  width: 100%;
+  padding: 14px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.avail-save:hover { background: #1B5E20; }
+
+/* ── ONBOARDING BACK ── */
+.ob-back-btn {
+  background: none; border: none; font-size: 22px;
+  color: var(--text-3); cursor: pointer; padding: 0;
+  margin-bottom: 16px; width: 36px; height: 36px;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; transition: background 0.15s;
+  font-family: inherit; align-self: flex-start;
+}
+.ob-back-btn:hover { background: var(--bg); color: var(--text); }
+
+/* ── TODAY PILL on week strip ── */
+.week-day { position: relative; }
+.today-pill {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--green);
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(46,125,50,0.35);
+}
+
+/* ── INFO (i) BUTTON ── */
+.card-badge-wrap { display: flex; align-items: center; gap: 6px; }
+.info-btn {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--bg); border: 1px solid #DDD;
+  color: var(--text-2); font-size: 12px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-family: 'Georgia', serif;
+  font-style: italic; transition: all 0.15s;
+  padding: 0; line-height: 1;
+}
+.info-btn:hover { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.score-banner-info { margin-left: auto; }
+
+/* ── INSIGHTS SHEET ── */
+.insights-content { padding-top: 4px; }
+.insights-sub-meta {
+  font-size: 13px; color: var(--text-2);
+  margin-bottom: 20px;
+}
+.insight-row { margin-bottom: 18px; }
+.insight-top {
+  display: flex; justify-content: space-between;
+  align-items: baseline; margin-bottom: 6px;
+}
+.insight-label { font-size: 14px; font-weight: 700; color: var(--text); }
+.insight-score { font-size: 13px; font-weight: 700; color: var(--text-2); }
+.insight-bar {
+  height: 8px; background: #ECEFF1;
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 7px;
+}
+.insight-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.insight-fill.good { background: linear-gradient(90deg, #66BB6A, #2E7D32); }
+.insight-fill.ok   { background: linear-gradient(90deg, #FFB74D, #E65100); }
+.insight-fill.poor { background: linear-gradient(90deg, #EF5350, #C62828); }
+.insight-note {
+  font-size: 12.5px; color: var(--text-2); line-height: 1.45;
+}
+.insights-total {
+  background: var(--bg); border-radius: 12px;
+  padding: 12px 16px; margin-top: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 14px; font-weight: 700; color: var(--text);
+}
+.insights-total-score { color: var(--green); font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="mockup-header">
+  <h1>🚲 RideWindow</h1>
+  <p>Interactive app mockup — click to navigate between screens</p>
+</div>
+
+<div class="screen-nav">
+  <button class="active" onclick="go('welcome')">Welcome</button>
+  <button onclick="go('onboard')">Onboarding</button>
+  <button onclick="go('home')">Home</button>
+  <button onclick="go('detail')">Ride Detail</button>
+  <button onclick="go('profile')">Profile</button>
+  <button onclick="go('availability')">Availability</button>
+</div>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="notch"></div>
+    <span>●●● 100%</span>
+  </div>
+
+  <div class="screens">
+
+    <!-- ── WELCOME ── -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-wrap">
+        <div class="welcome-icon">🚲</div>
+        <h1 class="welcome-title">Find your perfect ride window</h1>
+        <p class="welcome-sub">Smart planning around your schedule and the weather. No more guessing when to go.</p>
+        <button class="welcome-btn" onclick="go('onboard')">Get started →</button>
+      </div>
+    </div>
+
+    <!-- ── ONBOARDING ── -->
+    <div class="screen" id="screen-onboard">
+      <div class="ob-wrap">
+        <button class="ob-back-btn" onclick="go('welcome')" aria-label="Back">←</button>
+        <h2 class="ob-title">When are you usually free?</h2>
+        <p class="ob-sub">We'll suggest rides outside your busy hours. Pick what fits, or set your own schedule.</p>
+        <div class="ob-options">
+          <button class="ob-option selected" onclick="pickOb(this, false)">
+            <div class="ob-check">✓</div>
+            <div>
+              <div style="font-weight:700">Evenings &amp; weekends</div>
+              <div style="font-size:12px;font-weight:400;margin-top:2px;opacity:0.75">After 17:00 on weekdays · all day Sa &amp; Su</div>
+            </div>
+          </button>
+          <button class="ob-option" onclick="pickOb(this, false)">
+            <div class="ob-check"></div>
+            <div>
+              <div style="font-weight:700">Mornings &amp; weekends</div>
+              <div style="font-size:12px;font-weight:400;margin-top:2px;opacity:0.75">Before 09:00 on weekdays · all day Sa &amp; Su</div>
+            </div>
+          </button>
+          <button class="ob-option" onclick="pickOb(this, false)">
+            <div class="ob-check"></div>
+            <div>
+              <div style="font-weight:700">Weekends only</div>
+              <div style="font-size:12px;font-weight:400;margin-top:2px;opacity:0.75">Saturday &amp; Sunday, all day</div>
+            </div>
+          </button>
+          <button class="ob-option ob-custom" onclick="pickOb(this, true)">
+            <div class="ob-check"></div>
+            <div>
+              <div style="font-weight:700">Set my own schedule →</div>
+              <div style="font-size:12px;font-weight:400;margin-top:2px;opacity:0.75">Choose your free hours on a weekly calendar</div>
+            </div>
+          </button>
+        </div>
+        <button class="ob-next" id="ob-next-btn" onclick="go('home')">Next →</button>
+      </div>
+    </div>
+
+    <!-- ── HOME ── -->
+    <div class="screen has-bottom-nav" id="screen-home">
+      <div class="home-header">
+        <h1>🚲 RideWindow</h1>
+        <div class="home-location">📍 Amsterdam &nbsp;·&nbsp; This week</div>
+      </div>
+
+      <div class="week-strip">
+        <div class="week-label">This week</div>
+        <div class="week-days">
+          <div class="week-day bad" onclick="pickDay(this)">
+            <div class="today-pill">Today</div>
+            <span class="day-label">Mo</span><div class="day-dot">✗</div>
+          </div>
+          <div class="week-day bad"           onclick="pickDay(this)"><span class="day-label">Tu</span><div class="day-dot">✗</div></div>
+          <div class="week-day bad"           onclick="pickDay(this)"><span class="day-label">We</span><div class="day-dot">✗</div></div>
+          <div class="week-day ok"            onclick="pickDay(this)"><span class="day-label">Th</span><div class="day-dot">~</div></div>
+          <div class="week-day ok"            onclick="pickDay(this)"><span class="day-label">Fr</span><div class="day-dot">~</div></div>
+          <div class="week-day good selected" onclick="pickDay(this)"><span class="day-label">Sa</span><div class="day-dot">✓</div></div>
+          <div class="week-day good"          onclick="pickDay(this)"><span class="day-label">Su</span><div class="day-dot">✓</div></div>
+        </div>
+      </div>
+
+      <div class="cards-wrap">
+        <div class="section-title">Your best rides this week</div>
+
+        <!-- Weekend: full-day available, great weather -->
+        <div class="ride-card perfect" onclick="go('detail','sat')">
+          <div class="card-top">
+            <span class="card-day">Saturday</span>
+            <div class="card-badge-wrap">
+              <span class="card-badge">Perfect</span>
+              <button class="info-btn" onclick="event.stopPropagation(); openInsights('sat')" title="Why this score?">i</button>
+            </div>
+          </div>
+          <div class="card-time">09:00 – 13:00 &nbsp;·&nbsp; 4h</div>
+          <div class="card-weather">
+            <span class="w-chip">🌡 22°C</span>
+            <span class="w-chip">🌧 Dry</span>
+            <span class="w-chip">💨 10 km/h</span>
+          </div>
+          <div class="card-footer">
+            <button class="btn-plan" onclick="event.stopPropagation(); openSheet('Saturday','09:00 – 13:00','4h · 22°C · Dry · Light wind')">Plan it</button>
+          </div>
+        </div>
+
+        <!-- Weekend: shorter option -->
+        <div class="ride-card great" onclick="go('detail','sun')">
+          <div class="card-top">
+            <span class="card-day">Sunday</span>
+            <div class="card-badge-wrap">
+              <span class="card-badge">Great</span>
+              <button class="info-btn" onclick="event.stopPropagation(); openInsights('sun')" title="Why this score?">i</button>
+            </div>
+          </div>
+          <div class="card-time">08:00 – 11:00 &nbsp;·&nbsp; 3h</div>
+          <div class="card-weather">
+            <span class="w-chip">🌡 19°C</span>
+            <span class="w-chip">🌧 Dry</span>
+            <span class="w-chip">💨 Calm</span>
+          </div>
+          <div class="card-footer">
+            <button class="btn-plan" onclick="event.stopPropagation(); openSheet('Sunday','08:00 – 11:00','3h · 19°C · Dry · Calm')">Plan it</button>
+          </div>
+        </div>
+
+        <!-- After-work weekday -->
+        <div class="ride-card ok" onclick="go('detail','thu')">
+          <div class="card-top">
+            <span class="card-day">Thursday &nbsp;<span style="font-size:11px;font-weight:500;color:#999">after work</span></span>
+            <div class="card-badge-wrap">
+              <span class="card-badge">Acceptable</span>
+              <button class="info-btn" onclick="event.stopPropagation(); openInsights('thu')" title="Why this score?">i</button>
+            </div>
+          </div>
+          <div class="card-time">17:30 – 19:30 &nbsp;·&nbsp; 2h</div>
+          <div class="card-weather">
+            <span class="w-chip">🌡 17°C</span>
+            <span class="w-chip">🌧 Dry</span>
+            <span class="w-chip">💨 20 km/h</span>
+          </div>
+          <div class="card-footer">
+            <button class="btn-plan" onclick="event.stopPropagation(); openSheet('Thursday','17:30 – 19:30','2h · 17°C · Dry · Moderate wind')">Plan it</button>
+          </div>
+        </div>
+
+        <!-- After-work Friday -->
+        <div class="ride-card ok" onclick="go('detail','fri')">
+          <div class="card-top">
+            <span class="card-day">Friday &nbsp;<span style="font-size:11px;font-weight:500;color:#999">after work</span></span>
+            <div class="card-badge-wrap">
+              <span class="card-badge">Acceptable</span>
+              <button class="info-btn" onclick="event.stopPropagation(); openInsights('fri')" title="Why this score?">i</button>
+            </div>
+          </div>
+          <div class="card-time">17:00 – 19:00 &nbsp;·&nbsp; 2h</div>
+          <div class="card-weather">
+            <span class="w-chip">🌡 16°C</span>
+            <span class="w-chip">🌧 Dry</span>
+            <span class="w-chip">💨 Windy</span>
+          </div>
+          <div class="card-footer">
+            <button class="btn-plan" onclick="event.stopPropagation(); openSheet('Friday','17:00 – 19:00','2h · 16°C · Dry · Windy')">Plan it</button>
+          </div>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" onclick="go('home')"><span class="nav-icon">🏠</span>Home</button>
+        <button class="nav-item" onclick="go('profile')"><span class="nav-icon">👤</span>Profile</button>
+      </nav>
+    </div>
+
+    <!-- ── RIDE DETAIL ── -->
+    <div class="screen has-bottom-nav" id="screen-detail">
+      <div class="screen-header">
+        <button class="back-btn" onclick="go('home')">←</button>
+        <div>
+          <div class="sh-title" id="detail-title">Saturday 09:00 – 13:00</div>
+          <div class="sh-sub" id="detail-subtitle">4 hours · Perfect conditions</div>
+        </div>
+      </div>
+
+      <div class="score-banner" id="detail-score-banner">
+        <span style="font-size:18px" id="detail-score-emoji">🟢</span>
+        <span class="score-banner-text" id="detail-score-text">Perfect — best window this week</span>
+        <button class="info-btn score-banner-info" onclick="openInsights(window._currentRide || 'sat')" title="Why this score?">i</button>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">Weather</div>
+        <div class="info-row"><span class="info-icon">🌡</span><span class="info-label">Temperature</span><span class="info-value" id="dw-temp">22°C, feels 21°C</span></div>
+        <div class="info-row"><span class="info-icon">🌧</span><span class="info-label">Rain</span><span class="info-value" id="dw-rain">None expected</span></div>
+        <div class="info-row"><span class="info-icon">💨</span><span class="info-label">Wind</span><span class="info-value" id="dw-wind">10 km/h SW</span></div>
+        <div class="info-row"><span class="info-icon">☀️</span><span class="info-label">Conditions</span><span class="info-value" id="dw-cond">Mostly sunny</span></div>
+      </div>
+
+      <div class="info-card" style="margin-top:12px">
+        <div class="info-card-title">Hourly</div>
+        <div id="hourly-rows"></div>
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn-block primary" onclick="openDetailSheet()">Add to calendar</button>
+        <button class="btn-block secondary">Remind me the night before</button>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" onclick="go('home')"><span class="nav-icon">🏠</span>Home</button>
+        <button class="nav-item" onclick="go('profile')"><span class="nav-icon">👤</span>Profile</button>
+      </nav>
+    </div>
+
+    <!-- ── PROFILE ── -->
+    <div class="screen has-bottom-nav" id="screen-profile">
+      <div class="profile-header"><h1>Profile</h1></div>
+
+      <div class="settings-section">
+        <div class="settings-label">Location</div>
+        <div class="settings-card">
+          <div class="s-row">
+            <span class="s-icon">📍</span>
+            <div class="s-content"><div class="s-label">Amsterdam</div><div class="s-value">Netherlands</div></div>
+            <span class="s-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Availability</div>
+        <div class="settings-card">
+          <div class="s-row" onclick="go('availability')">
+            <span class="s-icon">🗓</span>
+            <div class="s-content"><div class="s-label">Weekly schedule</div><div class="s-value">Weekdays 9–17 blocked · tap to customise</div></div>
+            <span class="s-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Ride length</div>
+        <div class="settings-card">
+          <div class="chip-row">
+            <button class="chip on"  onclick="toggleChip(this)">2h</button>
+            <button class="chip on"  onclick="toggleChip(this)">3h</button>
+            <button class="chip on"  onclick="toggleChip(this)">4–5h</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Notifications</div>
+        <div class="settings-card">
+          <div class="s-row">
+            <span class="s-icon">🌙</span>
+            <div class="s-content"><div class="s-label">Evening before</div><div class="s-value">"Great ride tomorrow at 9am"</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="s-row">
+            <span class="s-icon">☀️</span>
+            <div class="s-content"><div class="s-label">Morning of</div><div class="s-value">"Window opens in 2 hours"</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="s-row">
+            <span class="s-icon">📋</span>
+            <div class="s-content"><div class="s-label">Weekly digest</div><div class="s-value">Every Sunday evening</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Calendar</div>
+        <div class="settings-card">
+          <div class="s-row">
+            <span class="s-icon">📅</span>
+            <div class="s-content">
+              <div class="s-label"><span class="cal-row"><span class="cal-dot"></span>joost@gmail.com</span></div>
+              <div class="s-value">Connected · tap to manage</div>
+            </div>
+            <span class="s-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section" style="margin-bottom:16px">
+        <div class="settings-label">Advanced</div>
+        <div class="settings-card">
+          <div class="s-row">
+            <span class="s-icon">⚙️</span>
+            <div class="s-content"><div class="s-label">Weather sensitivity</div><div class="s-value">Temperature, rain & wind tolerances</div></div>
+            <span class="s-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" onclick="go('home')"><span class="nav-icon">🏠</span>Home</button>
+        <button class="nav-item active" onclick="go('profile')"><span class="nav-icon">👤</span>Profile</button>
+      </nav>
+    </div>
+
+    <!-- ── AVAILABILITY CALENDAR ── -->
+    <div class="screen" id="screen-availability">
+      <div class="screen-header">
+        <button class="back-btn" onclick="go('profile')">←</button>
+        <div>
+          <div class="sh-title">Weekly availability</div>
+          <div class="sh-sub">Tap to block or unblock time slots</div>
+        </div>
+      </div>
+
+      <div class="avail-legend">
+        <div class="legend-item"><div class="legend-dot work"></div>Work hours</div>
+        <div class="legend-item"><div class="legend-dot free"></div>Available</div>
+        <div class="legend-item"><div class="legend-dot blocked"></div>Blocked</div>
+      </div>
+
+      <div class="cal-grid-wrap">
+        <div class="cal-grid" id="cal-grid">
+          <!-- Built by JS -->
+        </div>
+      </div>
+
+      <div class="avail-footer">
+        <button class="avail-save" onclick="window._obCustom ? go('home') : go('profile')">Save changes</button>
+      </div>
+    </div>
+
+    <!-- ── PLAN OVERLAY (global) ── -->
+    <div class="overlay" id="plan-overlay" onclick="closeSheet()">
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title" id="sheet-title">Saturday 09:00 – 13:00</div>
+        <div class="sheet-sub"   id="sheet-sub">4h · 22°C · Dry · Light wind</div>
+        <button class="sheet-btn primary">📅 &nbsp;Add to Google Calendar</button>
+        <button class="sheet-btn secondary">🔔 &nbsp;Remind me the night before</button>
+        <button class="sheet-btn ghost" onclick="closeSheet()">Skip</button>
+      </div>
+    </div>
+
+    <!-- ── INSIGHTS OVERLAY (global) ── -->
+    <div class="overlay" id="insights-overlay" onclick="closeInsights()">
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div class="insights-content">
+          <div class="sheet-title" id="insights-title">Why "Perfect" — 93/100</div>
+          <div class="insights-sub-meta" id="insights-meta">Saturday 09:00 – 13:00 · 4h</div>
+          <div id="insights-rows"></div>
+          <div class="insights-total">
+            <span>Overall score</span>
+            <span class="insights-total-score" id="insights-total-score">93/100</span>
+          </div>
+          <button class="sheet-btn ghost" style="margin-top:14px" onclick="closeInsights()">Got it</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+</div><!-- /phone -->
+
+<script>
+const SCREENS = ['welcome','onboard','home','detail','profile','availability'];
+
+/* ── RIDE DATA ── */
+const RIDES = {
+  sat: {
+    day: 'Saturday', time: '09:00 – 13:00', duration: '4h',
+    label: 'Perfect', color: 'perfect', emoji: '🟢',
+    bannerText: 'Perfect — best window this week',
+    weather: { temp: '22°C, feels 21°C', rain: 'None expected', wind: '10 km/h SW', cond: 'Mostly sunny' },
+    hourly: [
+      ['09:00','20°C','dry','10 km/h'],
+      ['10:00','21°C','dry','9 km/h'],
+      ['11:00','22°C','dry','10 km/h'],
+      ['12:00','23°C','dry','11 km/h'],
+      ['13:00','22°C','dry','10 km/h'],
+    ],
+    metaShort: '4h · 22°C · Dry · Light wind',
+    insights: {
+      total: 93,
+      temp: { score: 95, label: 'Ideal',  note: '22°C is the sweet spot — warm enough to skip layers, cool enough to ride hard without overheating.' },
+      rain: { score: 100, label: 'Dry',   note: 'No precipitation across the full window. Roads stay dry.' },
+      wind: { score: 85, label: 'Light',  note: '10 km/h SW — gentle tailwind on the return leg, barely noticeable headwind out.' },
+    },
+  },
+  sun: {
+    day: 'Sunday', time: '08:00 – 11:00', duration: '3h',
+    label: 'Great', color: 'great', emoji: '🟢',
+    bannerText: 'Great — clear morning window',
+    weather: { temp: '19°C, feels 18°C', rain: 'None expected', wind: 'Calm (5 km/h)', cond: 'Partly cloudy' },
+    hourly: [
+      ['08:00','16°C','dry','5 km/h'],
+      ['09:00','18°C','dry','6 km/h'],
+      ['10:00','19°C','dry','7 km/h'],
+      ['11:00','20°C','dry','8 km/h'],
+    ],
+    metaShort: '3h · 19°C · Dry · Calm',
+    insights: {
+      total: 88,
+      temp: { score: 82, label: 'Cool start', note: '19°C is pleasant but 08:00 is cooler — bring arm warmers for the first half hour.' },
+      rain: { score: 100, label: 'Dry',       note: 'No rain expected. Cloud cover keeps the sun off you early.' },
+      wind: { score: 92, label: 'Calm',       note: 'Under 8 km/h — barely any wind to fight in either direction.' },
+    },
+  },
+  thu: {
+    day: 'Thursday', time: '17:30 – 19:30', duration: '2h',
+    label: 'Acceptable', color: 'ok', emoji: '🟡',
+    bannerText: 'Acceptable — short after-work window',
+    weather: { temp: '17°C, feels 15°C', rain: 'None expected', wind: '20 km/h W', cond: 'Cloudy' },
+    hourly: [
+      ['17:00','17°C','dry','19 km/h'],
+      ['18:00','17°C','dry','20 km/h'],
+      ['19:00','16°C','dry','21 km/h'],
+    ],
+    metaShort: '2h · 17°C · Dry · Moderate wind',
+    insights: {
+      total: 65,
+      temp: { score: 72, label: 'Cool',    note: '17°C drops to 16°C as the sun sets — long sleeves recommended.' },
+      rain: { score: 100, label: 'Dry',    note: 'No rain forecast. Skies stay cloudy but dry.' },
+      wind: { score: 55, label: 'Breezy',  note: '20 km/h westerly. You\'ll feel it on exposed sections — plan the route around it.' },
+    },
+  },
+  fri: {
+    day: 'Friday', time: '17:00 – 19:00', duration: '2h',
+    label: 'Acceptable', color: 'ok', emoji: '🟡',
+    bannerText: 'Acceptable — windy but rideable',
+    weather: { temp: '16°C, feels 13°C', rain: 'None expected', wind: '28 km/h SW', cond: 'Mostly cloudy' },
+    hourly: [
+      ['17:00','16°C','dry','27 km/h'],
+      ['18:00','16°C','dry','28 km/h'],
+      ['19:00','15°C','dry','28 km/h'],
+    ],
+    metaShort: '2h · 16°C · Dry · Windy',
+    insights: {
+      total: 60,
+      temp: { score: 68, label: 'Cool',    note: '16°C with windchill feels like 13°C. Layer up.' },
+      rain: { score: 100, label: 'Dry',    note: 'No rain expected through the evening.' },
+      wind: { score: 42, label: 'Strong',  note: '28 km/h SW gusts — strong headwind on outbound legs. Pick a sheltered route.' },
+    },
+  },
+};
+
+let _currentRide = 'sat';
+
+function go(name, rideKey) {
+  if (rideKey) _currentRide = rideKey;
+  window._currentRide = _currentRide;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.screen-nav button').forEach((b, i) => {
+    b.classList.toggle('active', SCREENS[i] === name);
+  });
+  if (name === 'detail') populateDetail(_currentRide);
+}
+
+function populateDetail(key) {
+  const r = RIDES[key];
+  if (!r) return;
+  document.getElementById('detail-title').textContent    = r.day + ' ' + r.time;
+  document.getElementById('detail-subtitle').textContent = r.duration + ' · ' + r.label + ' conditions';
+  document.getElementById('detail-score-emoji').textContent = r.emoji;
+  document.getElementById('detail-score-text').textContent  = r.bannerText;
+  document.getElementById('dw-temp').textContent = r.weather.temp;
+  document.getElementById('dw-rain').textContent = r.weather.rain;
+  document.getElementById('dw-wind').textContent = r.weather.wind;
+  document.getElementById('dw-cond').textContent = r.weather.cond;
+
+  // Recolor banner for ok/perfect/great
+  const banner = document.getElementById('detail-score-banner');
+  const text   = document.getElementById('detail-score-text');
+  if (r.color === 'ok') {
+    banner.style.background = '#FFF3E0';
+    text.style.color = 'var(--amber)';
+  } else {
+    banner.style.background = 'var(--green-bg)';
+    text.style.color = 'var(--green)';
+  }
+
+  document.getElementById('hourly-rows').innerHTML = r.hourly.map(h => `
+    <div class="hourly-row">
+      <span class="h-time">${h[0]}</span>
+      <span class="h-temp">${h[1]}</span>
+      <span class="h-rain">🌧 ${h[2]}</span>
+      <span class="h-wind">💨 ${h[3]}</span>
+    </div>
+  `).join('');
+}
+
+function openSheet(day, time, meta) {
+  document.getElementById('sheet-title').textContent = day + ' ' + time;
+  document.getElementById('sheet-sub').textContent   = meta;
+  document.getElementById('plan-overlay').classList.add('active');
+}
+
+function openDetailSheet() {
+  const r = RIDES[_currentRide];
+  openSheet(r.day, r.time, r.metaShort);
+}
+
+function closeSheet() {
+  document.getElementById('plan-overlay').classList.remove('active');
+}
+
+/* ── INSIGHTS ── */
+function tierClass(score) {
+  if (score >= 80) return 'good';
+  if (score >= 60) return 'ok';
+  return 'poor';
+}
+
+function openInsights(key) {
+  const r = RIDES[key];
+  if (!r) return;
+  document.getElementById('insights-title').textContent = `Why "${r.label}" — ${r.insights.total}/100`;
+  document.getElementById('insights-meta').textContent  = `${r.day} ${r.time} · ${r.duration}`;
+  const totalEl = document.getElementById('insights-total-score');
+  totalEl.textContent = `${r.insights.total}/100`;
+  totalEl.style.color =
+    r.insights.total >= 80 ? 'var(--green)' :
+    r.insights.total >= 60 ? 'var(--amber)' : '#C62828';
+
+  const factors = [
+    ['🌡 Temperature', r.insights.temp],
+    ['🌧 Rain',         r.insights.rain],
+    ['💨 Wind',         r.insights.wind],
+  ];
+  document.getElementById('insights-rows').innerHTML = factors.map(([label, f]) => `
+    <div class="insight-row">
+      <div class="insight-top">
+        <span class="insight-label">${label}</span>
+        <span class="insight-score">${f.score} · ${f.label}</span>
+      </div>
+      <div class="insight-bar">
+        <div class="insight-fill ${tierClass(f.score)}" style="width:${f.score}%"></div>
+      </div>
+      <div class="insight-note">${f.note}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('insights-overlay').classList.add('active');
+}
+
+function closeInsights() {
+  document.getElementById('insights-overlay').classList.remove('active');
+}
+
+function pickDay(el) {
+  document.querySelectorAll('.week-day').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function pickOb(el, isCustom) {
+  document.querySelectorAll('.ob-option').forEach(o => {
+    o.classList.remove('selected');
+    o.querySelector('.ob-check').textContent = '';
+  });
+  el.classList.add('selected');
+  el.querySelector('.ob-check').textContent = '✓';
+
+  if (isCustom) {
+    window._obCustom = true;
+    go('availability');
+  } else {
+    window._obCustom = false;
+  }
+}
+
+function toggleChip(el) {
+  const on = el.classList.contains('on');
+  el.classList.toggle('on', !on);
+  el.classList.toggle('off', on);
+}
+
+/* ── AVAILABILITY GRID ── */
+const DAYS  = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+const HOURS = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+
+function isWork(dayIdx, hour) {
+  return dayIdx < 5 && hour >= 9 && hour < 17;
+}
+
+const userBlocked = new Set();
+
+function buildGrid() {
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  grid.appendChild(document.createElement('div'));
+
+  DAYS.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-header-cell';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  HOURS.forEach(hour => {
+    const label = document.createElement('div');
+    label.className = 'cal-hour-label';
+    label.textContent = hour + ':00';
+    grid.appendChild(label);
+
+    DAYS.forEach((d, di) => {
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      const key = `${di}-${hour}`;
+
+      if (isWork(di, hour)) {
+        cell.classList.add('work');
+      } else if (userBlocked.has(key)) {
+        cell.classList.add('user-blocked');
+      } else {
+        cell.classList.add('free');
+      }
+
+      if (!isWork(di, hour)) {
+        cell.onclick = () => toggleCell(cell, key);
+      }
+
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function toggleCell(cell, key) {
+  if (cell.classList.contains('free')) {
+    cell.classList.replace('free', 'user-blocked');
+    userBlocked.add(key);
+  } else if (cell.classList.contains('user-blocked')) {
+    cell.classList.replace('user-blocked', 'free');
+    userBlocked.delete(key);
+  }
+}
+
+buildGrid();
+populateDetail('sat');
+</script>
+</body>
+</html>
