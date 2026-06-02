@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1.5 complete; ready for Phase 2 (Data layer — Drift + Open-Meteo)
-last_updated: "2026-06-02T18:00:00.000Z"
-last_activity: 2026-06-02 -- Phase 1.5 execution complete
+stopped_at: Phase 1 complete + roadmap restructured; ready for either GitHub setup or Phase 1.5 planning
+last_updated: "2026-06-02T19:40:59.723Z"
+last_activity: 2026-06-02 -- Phase 2 planning complete
 progress:
   total_phases: 11
   completed_phases: 2
-  total_plans: 11
+  total_plans: 10
   completed_plans: 7
   percent: 18
 ---
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 Phase: 1.5 of 10 (Scoring domain — Freezed models + ScoringEngine + SlotGenerator)
 Plan: 0 of TBD in current phase
 Status: Ready to execute
-Last activity: 2026-06-02 -- Phase 1.5 planning complete
+Last activity: 2026-06-02 -- Phase 2 planning complete
 
 Progress: [█░░░░░░░░░░] 9%  (1 of 11 phases incl. 1.5)
 
