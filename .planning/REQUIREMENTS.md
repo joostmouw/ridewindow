@@ -10,11 +10,11 @@
 
 ### Forecast (FORE) — Weather data acquisition
 
-- [ ] **FORE-01**: App fetches 7-day hourly weather forecast from Open-Meteo for the user's location (lat/lon)
-- [ ] **FORE-02**: Forecast requests pass `timezone=auto&timeformat=unixtime` so timestamps are local-correct
-- [ ] **FORE-03**: Forecast response includes `temperature_2m`, `apparent_temperature`, `precipitation`, `precipitation_probability`, `windspeed_10m`, `winddirection_10m`
+- [x] **FORE-01**: App fetches 7-day hourly weather forecast from Open-Meteo for the user's location (lat/lon)
+- [x] **FORE-02**: Forecast requests pass `timezone=auto&timeformat=unixtime` so timestamps are local-correct
+- [x] **FORE-03**: Forecast response includes `temperature_2m`, `apparent_temperature`, `precipitation`, `precipitation_probability`, `windspeed_10m`, `winddirection_10m`
 - [ ] **FORE-04**: Forecast results are cached locally (Drift) with `fetched_at` timestamp; cache is reused within 1h, refetched after
-- [ ] **FORE-05**: All forecast fields are modeled as nullable; missing data is surfaced (not silently treated as 0) — *gap-fix*
+- [x] **FORE-05**: All forecast fields are modeled as nullable; missing data is surfaced (not silently treated as 0) — *gap-fix*
 
 ### Scoring (SCOR) — Cyclist-specific weather score
 

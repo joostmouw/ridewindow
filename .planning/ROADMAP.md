@@ -82,7 +82,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — OpenMeteoClient + ForecastDao + unit tests (null preservation, URL params)
+- [x] 02-02-PLAN.md — OpenMeteoClient + ForecastDao + unit tests (null preservation, URL params)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -225,7 +225,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 |-------|----------------|--------|-----------|
 | 1. Project skeleton + test infrastructure | 3/3 | ✅ Complete | 2026-06-02 |
 | 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
-| 2. Data layer — Drift + Open-Meteo | 0/3 | Planned | - |
+| 2. Data layer — Drift + Open-Meteo | 2/3 | In Progress|  |
 | 3. Riverpod providers + state graph | 0/TBD | Not started | - |
 | 4. UI Phase A — Onboarding + Home + Welcome | 0/TBD | Not started | - |
 | 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
