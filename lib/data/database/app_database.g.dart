@@ -1054,6 +1054,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $HourlyForecastEntriesTable(this);
   late final $AvailabilityGridEntriesTable availabilityGridEntries =
       $AvailabilityGridEntriesTable(this);
+  late final ForecastDao forecastDao = ForecastDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

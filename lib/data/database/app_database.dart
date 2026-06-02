@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'daos/forecast_dao.dart';
 import 'tables/availability_grid_entries.dart';
 import 'tables/forecast_cache_entries.dart';
 import 'tables/hourly_forecast_entries.dart';
@@ -10,6 +11,7 @@ part 'app_database.g.dart';
 
 @DriftDatabase(
   tables: [ForecastCacheEntries, HourlyForecastEntries, AvailabilityGridEntries],
+  daos: [ForecastDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
@@ -27,6 +29,9 @@ class AppDatabase extends _$AppDatabase {
           // v1 -> future: add columns here
         },
       );
+
+  @override
+  ForecastDao get forecastDao => ForecastDao(this);
 
   static QueryExecutor _openConnection() {
     return driftDatabase(
