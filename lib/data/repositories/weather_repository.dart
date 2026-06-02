@@ -16,6 +16,20 @@ class WeatherRepository {
         _client = client;
 
   Future<List<HourlyForecast>> getForecast() async {
-    throw UnimplementedError('WeatherRepository.getForecast() not yet implemented');
+    final cache = await _db.forecastDao.latestCache(
+      lat: _amsterdamLat,
+      lon: _amsterdamLon,
+    );
+    if (cache != null &&
+        DateTime.now().difference(cache.fetchedAt) < _cacheDuration) {
+      return _db.forecastDao.hourlyForecasts(cacheId: cache.id);
+    }
+    final fresh = await _client.fetch(_amsterdamLat, _amsterdamLon);
+    await _db.forecastDao.replaceAll(
+      lat: _amsterdamLat,
+      lon: _amsterdamLon,
+      forecasts: fresh,
+    );
+    return fresh;
   }
 }
