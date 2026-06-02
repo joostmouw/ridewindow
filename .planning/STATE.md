@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 complete + roadmap restructured; ready for either GitHub setup or Phase 1.5 planning
-last_updated: "2026-06-02T19:40:59.723Z"
-last_activity: 2026-06-02 -- Phase 2 planning complete
+stopped_at: Phase 2 Plan 02-01 complete — Drift schema + AppDatabase generated
+last_updated: "2026-06-02T19:54:50Z"
+last_activity: 2026-06-02 -- Phase 2 Plan 02-01 complete (Drift schema + build_runner generation)
 progress:
   total_phases: 11
   completed_phases: 2
   total_plans: 10
-  completed_plans: 7
-  percent: 18
+  completed_plans: 9
+  percent: 22
 ---
 
 # Project State
@@ -25,31 +25,33 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 1.5 of 10 (Scoring domain — Freezed models + ScoringEngine + SlotGenerator)
-Plan: 0 of TBD in current phase
-Status: Ready to execute
-Last activity: 2026-06-02 -- Phase 2 planning complete
+Phase: 2 of 11 (Data layer — Drift + Open-Meteo)
+Plan: 1 of 3 in current phase (02-01 complete)
+Status: Executing
+Last activity: 2026-06-02 -- Plan 02-01 complete (Drift schema + AppDatabase)
 
-Progress: [█░░░░░░░░░░] 9%  (1 of 11 phases incl. 1.5)
+Progress: [██░░░░░░░░░] 22%  (plan 02-01 complete; 02-02 next)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
-- Average duration: ~3h (Phase 1, interactive mode)
-- Total execution time: ~3h (incl. Flutter SDK install + spike + bootstrap + structural test)
+- Total plans completed: 4 (incl. Phase 1.5 plans)
+- Average duration: ~15min for mechanical tasks (automated executor mode)
+- Total execution time: ~3h (Phase 1) + ~15min (02-01)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 3 | ~3h | ~1h |
+| 1.5 | 4 | ~45min | ~11min |
+| 2 | 1/3 done | ~15min | ~15min |
 
 **Recent Trend:**
 
-- Last 3 plans: 01-01, 01-02, 01-03 — all green, all single-attempt
-- Trend: Interactive mode worked well for mechanical bootstrap work
+- Last plan: 02-01 — green, single-attempt, 2 auto-fixes (version conflict + missing dep)
+- Trend: Automated executor handles mechanical infra work well
 
 *Updated after each plan completion*
 
@@ -64,6 +66,7 @@ Recent decisions affecting current work:
 - GSD config to be trimmed before Phase 1.5 planning (security_enforcement, research, plan_check, etc. off) — see open todo below.
 - Android Studio install deferred to Phase 10 — Phases 1–9 use `dart test` exclusively, no `flutter run` required.
 - Package legitimacy audit (Plan 01-01 Task 2) skipped — CLAUDE.md verified-publisher table covers the same data.
+- Plan 02-01 (2026-06-02): mockito downgraded ^5.7.0 → ^5.6.4 (analyzer version conflict with drift_dev 2.33.0); path_provider added as direct dep; part directives removed from table files (Drift 2.x pattern).
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-02T13:30:00.000Z
-Stopped at: Phase 1 complete + roadmap restructured; ready for either GitHub setup or Phase 1.5 planning
-Resume file: .planning/ROADMAP.md (review Phase 1.5 success criteria before planning)
+Last session: 2026-06-02T19:54:50Z
+Stopped at: Phase 2 Plan 02-01 complete — Drift schema + AppDatabase generated; ready for 02-02 (OpenMeteoClient + WeatherRepository)
+Resume file: .planning/phases/02-data-layer-drift-open-meteo/02-01-SUMMARY.md

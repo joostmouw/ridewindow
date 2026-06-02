@@ -82,7 +82,7 @@
 
 - [ ] **PERS-01**: User profile (tolerances, ride-length prefs, location override, notification toggles, theme) persists in `shared_preferences`
 - [ ] **PERS-02**: Availability grid and forecast cache persist in Drift (SQLite)
-- [ ] **PERS-03**: Drift schema is versioned with explicit migrations for v1→v1.x upgrades
+- [x] **PERS-03**: Drift schema is versioned with explicit migrations for v1→v1.x upgrades
 - [ ] **PERS-04**: No personal data leaves the device unless user explicitly signs into Google Calendar
 
 ### Release (REL) — Play Store internal track
@@ -141,7 +141,7 @@ Generic acceptance criteria applied to every phase:
 | FORE-04 | Phase 2 | TBD |
 | FORE-05 | Phase 2 | TBD |
 | PERS-02 | Phase 2 | TBD |
-| PERS-03 | Phase 2 | TBD |
+| PERS-03 | Phase 2 | 02-01 (schemaVersion=1 + MigrationStrategy) |
 | PROF-03 | Phase 3 | TBD |
 | AVAIL-04 | Phase 3 | TBD |
 | SLOT-05 | Phase 3 | TBD |

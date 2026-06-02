@@ -78,7 +78,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Drift schema + pubspec additions (tables, AppDatabase, schemaVersion=1, build_runner)
+- [x] 02-01-PLAN.md — Drift schema + pubspec additions (tables, AppDatabase, schemaVersion=1, build_runner)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
