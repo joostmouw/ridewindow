@@ -2,13 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-last_updated: "2026-06-02T13:30:00.000Z"
-last_activity: 2026-06-02 — Phase 1 complete (3/3 plans); roadmap split into Phase 1 (skeleton ✓) + Phase 1.5 (scoring domain, plans TBD)
+status: executing
+stopped_at: Phase 1 complete + roadmap restructured; ready for either GitHub setup or Phase 1.5 planning
+last_updated: "2026-06-02T15:06:15.673Z"
+last_activity: 2026-06-02 -- Phase 1.5 planning complete
 progress:
   total_phases: 11
   completed_phases: 1
-  total_plans: 3
+  total_plans: 7
   completed_plans: 3
   percent: 9
 ---
@@ -26,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 Phase: 1.5 of 10 (Scoring domain — Freezed models + ScoringEngine + SlotGenerator)
 Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-06-02 — Phase 1 complete; roadmap restructured (Phase 1 = skeleton done, Phase 1.5 = scoring domain inserted)
+Status: Ready to execute
+Last activity: 2026-06-02 -- Phase 1.5 planning complete
 
 Progress: [█░░░░░░░░░░] 9%  (1 of 11 phases incl. 1.5)
 
