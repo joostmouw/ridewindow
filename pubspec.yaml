@@ -20,6 +20,9 @@ dependencies:
   drift_flutter: ^0.3.0
   path_provider: ^2.1.0
 
+  # Phase 2 — HTTP networking
+  http: ^1.6.0
+
   # Phase 2+ deps (http, flutter_riverpod, geolocator, workmanager,
   # flutter_local_notifications, go_router, google_sign_in, googleapis,
   # fl_chart, shared_preferences) arrive in their own phases — not here.
