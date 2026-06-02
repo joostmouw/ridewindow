@@ -8,9 +8,10 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 
 **Phase Numbering:**
 - Integer phases (1–10): Planned milestone work
-- Decimal phases (e.g., 2.1): Urgent insertions between integers
+- Decimal phases (e.g., 1.5, 2.1): Urgent insertions between integers
 
-- [ ] **Phase 1: Project skeleton + scoring domain** - Flutter project + pure-Dart scoring engine with 100% unit tests
+- [x] **Phase 1: Project skeleton + test infrastructure** - Flutter project boots, locked deps, canonical lib/ tree, structural test enforcing pure-Dart domain boundary
+- [ ] **Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator** - Pure-Dart domain code with 100% unit test coverage of lib/domain/
 - [ ] **Phase 2: Data layer — Drift + Open-Meteo** - Drift schema, OpenMeteoClient, WeatherRepository, forecast cache
 - [ ] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
 - [ ] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
@@ -23,23 +24,39 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 
 ## Phase Details
 
-### Phase 1: Project skeleton + scoring domain
-**Goal**: A Flutter project exists with a pure-Dart scoring engine that is provably correct before any network, device, or UI code is written
+### Phase 1: Project skeleton + test infrastructure
+**Goal**: A Flutter project boots, Phase 1 dependencies resolve, canonical `lib/` tree exists, and a structural test enforces that `lib/domain/` stays pure Dart
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
-**Requirements**: SCOR-01, SCOR-02, SCOR-03, SCOR-04, SCOR-05, SLOT-01, SLOT-02, SLOT-03, SLOT-04
+**Requirements**: SCOR-03
 **Success Criteria** (what must be TRUE):
-  1. `dart test` runs the full suite and all tests pass with zero Flutter or I/O imports in the domain layer
-  2. `ScoringEngine.score()` returns a 0–100 overall score plus three sub-scores; documented edge cases (cold, hot, heavy rain, strong wind, mixed nulls) each have a passing unit test
-  3. `SlotGenerator` produces slots of 2h, 3h, and 4–5h from a hardcoded fixture; off-by-one boundary tests pass using the exclusive `[start, end)` convention
-  4. `AvailabilityFilter` removes slots overlapping a blocked-hours fixture; all four slot quality tiers (Perfect / Great / Acceptable / hidden Poor) are covered by unit tests
-  5. Null weather inputs clamp to 50/100 "uncertain" rather than crash or coerce to 0; this is unit-tested explicitly
+  1. `flutter --version` ≥ 3.27.0, `dart --version` ≥ 3.6.0, `dart test` proven to run on a Flutter-bootstrapped package (RESEARCH Open Question #2 resolved)
+  2. `flutter pub get` resolves the locked Phase 1 dependency set with no errors and no discontinued markers
+  3. The canonical `lib/{core,domain,data,features,platform}/` tree exists with `lib/domain/{models,services}/` ready for code; only Android platform is scaffolded (no `ios/`, `web/`, `linux/`, `macos/`, `windows/`)
+  4. `lib/main.dart` is a minimal Material 3 boot using `ColorScheme.fromSeed` (cycling green); `dart analyze` is clean
+  5. `dart test` runs both the smoke test and the structural import test (`test/structure/no_flutter_imports_test.dart`) green; the structural test demonstrably fails when a violating import is planted under `lib/domain/` (negative verification performed)
+**Plans**: 3 plans complete (01-01 env+spike, 01-02 bootstrap, 01-03 structural test)
+**Status**: ✅ Completed 2026-06-02
+
+### Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator
+**Goal**: A pure-Dart scoring engine, slot generator, and availability filter live under `lib/domain/` with 100% line coverage, ready for Phase 2 data integration
+**Mode:** mvp
+**Depends on**: Phase 1
+**Requirements**: SCOR-01, SCOR-02, SCOR-04, SCOR-05, SLOT-01, SLOT-02, SLOT-03, SLOT-04
+**Success Criteria** (what must be TRUE):
+  1. Freezed models exist in `lib/domain/models/` for `HourlyForecast`, `HourlyScore`, `RideSlot`, `WeatherTolerances`, and the sealed `RideTier` (`Perfect`/`Great`/`Acceptable`/`Poor`); `*.freezed.dart` and `*.g.dart` files are committed
+  2. `ScoringEngine.score()` returns a 0–100 overall score plus three sub-scores (temperature, rain, wind); documented edge cases (cold, hot, heavy rain, strong wind, mixed nulls) each have a passing unit test
+  3. Aggregation follows `overall = 0.6·min(t,r,w) + 0.4·mean(t,r,w)` per decision D-14; verified by fixture tests
+  4. `SlotGenerator` produces slots of 2h, 3h, and 4–5h from a hardcoded forecast fixture; off-by-one boundary tests pass using the exclusive `[start, end)` convention
+  5. `AvailabilityFilter` removes slots overlapping a blocked-hours fixture; all four slot quality tiers (Perfect / Great / Acceptable / hidden Poor) are covered by unit tests
+  6. Null weather inputs clamp to 50/100 "uncertain" rather than crash or coerce to 0; this is unit-tested explicitly
+  7. `build_runner` pipeline produces committed generated files; `dart test --coverage=coverage` shows 100% line coverage of `lib/domain/` (excluding `*.freezed.dart` / `*.g.dart`)
 **Plans**: TBD
 
 ### Phase 2: Data layer — Drift + Open-Meteo
 **Goal**: Forecast data can be fetched from Open-Meteo, stored in Drift, and served from cache — with Amsterdam hardcoded as the development location
 **Mode:** mvp
-**Depends on**: Phase 1
+**Depends on**: Phase 1.5
 **Requirements**: FORE-01, FORE-02, FORE-03, FORE-04, FORE-05, PERS-02, PERS-03
 **Success Criteria** (what must be TRUE):
   1. `OpenMeteoClient.fetch()` returns a typed `List<HourlyForecast>` for Amsterdam coordinates; all six required fields (`temperature_2m`, `apparent_temperature`, `precipitation`, `precipitation_probability`, `windspeed_10m`, `winddirection_10m`) are modeled as `double?`
@@ -157,11 +174,12 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project skeleton + scoring domain | 0/TBD | Not started | - |
+| 1. Project skeleton + test infrastructure | 3/3 | ✅ Complete | 2026-06-02 |
+| 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
 | 2. Data layer — Drift + Open-Meteo | 0/TBD | Not started | - |
 | 3. Riverpod providers + state graph | 0/TBD | Not started | - |
 | 4. UI Phase A — Onboarding + Home + Welcome | 0/TBD | Not started | - |
