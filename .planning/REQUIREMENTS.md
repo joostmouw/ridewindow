@@ -124,11 +124,61 @@ Generic acceptance criteria applied to every phase:
 
 ## Traceability
 
-<!-- Filled in by gsd-roadmapper during roadmap creation -->
-
 | REQ-ID | Phase | Plan(s) |
 |--------|-------|---------|
-| _to be filled by roadmapper_ | | |
+| SCOR-01 | Phase 1 | TBD |
+| SCOR-02 | Phase 1 | TBD |
+| SCOR-03 | Phase 1 | TBD |
+| SCOR-04 | Phase 1 | TBD |
+| SCOR-05 | Phase 1 | TBD |
+| SLOT-01 | Phase 1 | TBD |
+| SLOT-02 | Phase 1 | TBD |
+| SLOT-03 | Phase 1 | TBD |
+| SLOT-04 | Phase 1 | TBD |
+| FORE-01 | Phase 2 | TBD |
+| FORE-02 | Phase 2 | TBD |
+| FORE-03 | Phase 2 | TBD |
+| FORE-04 | Phase 2 | TBD |
+| FORE-05 | Phase 2 | TBD |
+| PERS-02 | Phase 2 | TBD |
+| PERS-03 | Phase 2 | TBD |
+| PROF-03 | Phase 3 | TBD |
+| AVAIL-04 | Phase 3 | TBD |
+| SLOT-05 | Phase 3 | TBD |
+| PERS-01 | Phase 3 | TBD |
+| ONB-01 | Phase 4 | TBD |
+| ONB-02 | Phase 4 | TBD |
+| ONB-03 | Phase 4 | TBD |
+| ONB-04 | Phase 4 | TBD |
+| PROF-01 | Phase 6 | TBD |
+| PROF-02 | Phase 6 | TBD |
+| PROF-04 | Phase 6 | TBD |
+| AVAIL-01 | Phase 6 | TBD |
+| AVAIL-02 | Phase 6 | TBD |
+| AVAIL-03 | Phase 6 | TBD |
+| LOC-01 | Phase 7 | TBD |
+| LOC-02 | Phase 7 | TBD |
+| LOC-03 | Phase 7 | TBD |
+| LOC-04 | Phase 7 | TBD |
+| LOC-05 | Phase 7 | TBD |
+| NOTIF-01 | Phase 8 | TBD |
+| NOTIF-02 | Phase 8 | TBD |
+| NOTIF-03 | Phase 8 | TBD |
+| NOTIF-04 | Phase 8 | TBD |
+| NOTIF-05 | Phase 8 | TBD |
+| NOTIF-06 | Phase 8 | TBD |
+| CAL-01 | Phase 9 | TBD |
+| CAL-02 | Phase 9 | TBD |
+| CAL-03 | Phase 9 | TBD |
+| CAL-04 | Phase 9 | TBD |
+| CAL-05 | Phase 9 | TBD |
+| PERS-04 | Phase 9 | TBD |
+| REL-01 | Phase 10 | TBD |
+| REL-02 | Phase 10 | TBD |
+| REL-03 | Phase 10 | TBD |
+| REL-04 | Phase 10 | TBD |
+| REL-05 | Phase 10 | TBD |
+| REL-06 | Phase 10 | TBD |
 
 ---
 
