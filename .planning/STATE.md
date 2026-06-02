@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 Plan 02-01 complete — Drift schema + AppDatabase generated; ready for 02-02 (OpenMeteoClient + WeatherRepository)
-last_updated: "2026-06-02T20:04:36.408Z"
+stopped_at: Phase 2 complete — WeatherRepository with cache policy; all 3 plans done; 78 tests green; dart analyze clean; ready for Phase 3 (Riverpod providers)
+last_updated: "2026-06-02T20:12:00.000Z"
 last_activity: 2026-06-02
 progress:
   total_phases: 11
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 9
-  percent: 18
+  completed_plans: 10
+  percent: 27
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 2 of 11 (Data layer — Drift + Open-Meteo)
-Plan: 2 of 3 in current phase (02-01 complete)
-Status: Ready to execute
+Phase: 2 of 11 (Data layer — Drift + Open-Meteo) — COMPLETE
+Plan: 3 of 3 complete
+Status: Ready for Phase 3 (Riverpod providers + state graph)
 Last activity: 2026-06-02
 
-Progress: [█████████░] 90%
+Progress: [████████░░] 80% (Phase 2 complete, Phase 3 next)
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Recent decisions affecting current work:
 - Android Studio install deferred to Phase 10 — Phases 1–9 use `dart test` exclusively, no `flutter run` required.
 - Package legitimacy audit (Plan 01-01 Task 2) skipped — CLAUDE.md verified-publisher table covers the same data.
 - Plan 02-01 (2026-06-02): mockito downgraded ^5.7.0 → ^5.6.4 (analyzer version conflict with drift_dev 2.33.0); path_provider added as direct dep; part directives removed from table files (Drift 2.x pattern).
+- Plan 02-03 (2026-06-02): flutter test required (not dart test) for tests importing AppDatabase — drift_flutter pulls dart:ui; NativeDatabase.memory() passed directly as QueryExecutor (DatabaseConnection wrapper not needed in Drift 2.x).
 
 ### Pending Todos
 
@@ -90,6 +91,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-06-02T20:04:36.405Z
-Stopped at: Phase 2 Plan 02-01 complete — Drift schema + AppDatabase generated; ready for 02-02 (OpenMeteoClient + WeatherRepository)
+Last session: 2026-06-02T20:12:00.000Z
+Stopped at: Phase 2 complete (plan 02-03 done) — WeatherRepository cache policy implemented; 78 tests green; dart analyze clean
 Resume file: None
