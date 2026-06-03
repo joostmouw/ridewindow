@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 04-05-PLAN.md — Widget tests WelcomeScreen + OnboardingScreen + HomeScreen (commit 9beae16)"
-last_updated: "2026-06-03T08:30:00.000Z"
-last_activity: 2026-06-03 -- Phase 04 COMPLETE (all 5 plans done, 9 widget tests green)
+stopped_at: Completed 05-01-PLAN.md — HourlyRow + DetailArgs + ScoreBadge + /detail route + HomeScreen tap-navigation (commit fc72d22)
+last_updated: "2026-06-03T09:00:00.000Z"
+last_activity: 2026-06-03 -- Phase 05 Plan 01 completed
 progress:
   total_phases: 11
   completed_phases: 5
-  total_plans: 19
-  completed_plans: 18
+  total_plans: 23
+  completed_plans: 20
   percent: 47
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 04 — ui-phase-a-onboarding-home-welcome
+**Current focus:** Phase 05 — ui-phase-b-ride-detail-insights-sheet
 
 ## Current Position
 
-Phase: 04 (ui-phase-a-onboarding-home-welcome) — COMPLETE
-Plan: 5 of 5
-Status: Phase 04 complete — next: Phase 05 (UI Phase B — Ride Detail + Insights sheet)
-Last activity: 2026-06-03 -- Phase 04 COMPLETE (widget tests green, 115/115 suite passes)
+Phase: 05 (ui-phase-b-ride-detail-insights-sheet) — EXECUTING
+Plan: 2 of 4
+Status: Executing Phase 05 (Plan 01 complete)
+Last activity: 2026-06-03 -- 05-01 complete: HourlyRow + DetailArgs + ScoreBadge + /detail route + HomeScreen tap-navigation
 
 Progress: [████████████░] 47%
 
@@ -99,6 +99,11 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 04-05 (2026-06-03): tester.pump(Duration) used instead of pumpAndSettle in HomeScreen tests — AnimationController.repeat() causes pumpAndSettle to timeout.
 - 04-05 (2026-06-03): FakeStaticSlotsNotifier omits ref.watch calls to bypass upstream provider initialization in widget tests.
 - 04-05 (2026-06-03): HomeScreen._buildHeader Container color+decoration bug fixed — Container cannot have both color and decoration properties simultaneously.
+- 05-01 (2026-06-03): HourlyRow is plain Dart class (no Freezed) — Phase-5-only view model merging HourlyScore + HourlyForecast by time.
+- 05-01 (2026-06-03): DetailArgs uses const constructor — immutable DTO safe for go_router extra.
+- 05-01 (2026-06-03): T-05-01 mitigated: router uses 'is! DetailArgs' guard before cast, returns error Scaffold for invalid navigation.
+- 05-01 (2026-06-03): Weather chips show avg temp (1 decimal), total precip (1 decimal), avg wind (0 decimal); '—' when no data.
+- 05-01 (2026-06-03): Forecast filtering uses !f.time.isBefore(slot.start) && f.time.isBefore(slot.end) per SLOT-02 [start, end) convention.
 
 ### Pending Todos
 

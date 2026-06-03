@@ -175,7 +175,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — HourlyRow model + DetailArgs DTO + ScoreBadge widget + /detail route + HomeScreen tap-navigatie + echte weather chips
+- [x] 05-01-PLAN.md — HourlyRow model + DetailArgs DTO + ScoreBadge widget + /detail route + HomeScreen tap-navigatie + echte weather chips
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
@@ -282,7 +282,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
-| 5. UI Phase B — Ride Detail + Insights sheet | 0/4 | Not started | - |
+| 5. UI Phase B — Ride Detail + Insights sheet | 1/4 | Executing | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
 | 8. Background refresh + Notifications | 0/TBD | Not started | - |
