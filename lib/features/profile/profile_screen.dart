@@ -1,11 +1,15 @@
 // lib/features/profile/profile_screen.dart
 // ProfileScreen: Wave 2 — vier tolerantie-sliders, rijlengte-chips, thema-SegmentedButton.
+// Wave 3 — LOCATIE sectie: stad-picker, GPS-banner (D-07-06).
 // D-06-02: onChangeEnd persisteert, onChanged update lokale state.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -33,6 +37,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _windMax = profile?.tolerances.windMaxIdealKmh ?? 15.0;
   }
 
+  void _openCityPicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: ListView.builder(
+            itemCount: kNlCities.length,
+            itemBuilder: (_, i) {
+              final city = kNlCities[i];
+              return ListTile(
+                title: Text(city.name),
+                onTap: () {
+                  ref
+                      .read(profileProvider.notifier)
+                      .setLocationOverride(city.name);
+                  Navigator.of(ctx).pop();
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider).value;
@@ -42,11 +73,78 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       );
     }
 
+    final permissionAsync = ref.watch(gpsPermissionProvider);
+    final permission = permissionAsync.value;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Profiel')),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
+          // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
+          const _SectionHeader('LOCATIE'),
+
+          // ELEMENT 1 — GPS-geblokkeerd banner (deniedForever)
+          if (permission == LocationPermission.deniedForever)
+            Card(
+              color: Theme.of(context).colorScheme.errorContainer,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Locatie-toegang geblokkeerd',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Kies een stad of open instellingen om GPS opnieuw in te schakelen.',
+                    ),
+                    TextButton(
+                      onPressed: () => ref
+                          .read(gpsPermissionProvider.notifier)
+                          .openSettings(),
+                      child: const Text('Instellingen openen'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // ELEMENT 2 — GPS toestemming vragen (denied, niet deniedForever)
+          if (permission == LocationPermission.denied)
+            ListTile(
+              leading: const Icon(Icons.location_searching),
+              title: const Text('GPS-locatie gebruiken'),
+              trailing: TextButton(
+                onPressed: () => ref
+                    .read(gpsPermissionProvider.notifier)
+                    .requestPermission(),
+                child: const Text('Toestemming geven'),
+              ),
+            ),
+
+          // ELEMENT 3 — Actieve locatie + stad-picker
+          ListTile(
+            leading: const Icon(Icons.location_city),
+            title: Text(profile.locationOverride ?? 'GPS (automatisch)'),
+            subtitle: const Text('Tik om stad te kiezen'),
+            trailing: profile.locationOverride != null
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () => ref
+                        .read(profileProvider.notifier)
+                        .setLocationOverride(null),
+                  )
+                : null,
+            onTap: () => _openCityPicker(context),
+          ),
+
           // Sectie: THEMA (D-06-09: SegmentedButton, PROF-04)
           const _SectionHeader('THEMA'),
           Padding(
