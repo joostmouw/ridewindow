@@ -17,7 +17,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - [x] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
 - [x] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
 - [x] **Phase 5: UI Phase B — Ride Detail + Insights sheet** - Ride Detail screen + "Why this score?" insights bottom sheet
-- [ ] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips
+- [x] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips (completed 2026-06-03)
 - [ ] **Phase 7: Location — GPS + manual city + permission state machine** - geolocator, permission_handler, city picker fallback
 - [ ] **Phase 8: Background refresh + Notifications** - WorkManager, flutter_local_notifications, 3 notification types
 - [ ] **Phase 9: Google Calendar integration** - Lazy OAuth, AutoRefreshingAuthClient, calendar.events scope
@@ -221,7 +221,7 @@ Plans:
 
 **Wave 4** *(geblokkeerd op Wave 2 + Wave 3)*
 
-- [ ] 06-04-PLAN.md — Widget tests: ProfileScreen (sliders, chips, thema) + AvailabilityScreen (celstaten, tap-guard)
+- [x] 06-04-PLAN.md — Widget tests: ProfileScreen (sliders, chips, thema) + AvailabilityScreen (celstaten, tap-guard)
 
 **UI hint**: yes
 
@@ -300,7 +300,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
-| 6. UI Phase C — Profile + Availability + Tolerance sliders | 3/4 | In Progress|  |
+| 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
 | 8. Background refresh + Notifications | 0/TBD | Not started | - |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
