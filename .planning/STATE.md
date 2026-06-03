@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 08-02-PLAN.md — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed
-last_updated: "2026-06-03T18:24:01.104Z"
+last_updated: "2026-06-03T18:27:38.761Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 8
   total_plans: 37
-  completed_plans: 35
+  completed_plans: 36
   percent: 73
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 08 (background-refresh-notifications) — IN PROGRESS
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-03
 
-Progress: [██████████] 95%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [██████████] 95%
 | Phase 06 P02 | 3min | 2 tasks | 1 files |
 | Phase 06 P04 | 8 | 2 tasks | 2 files |
 | Phase 08-background-refresh-notifications P03 | 8 | 1 tasks | 1 files |
+| Phase 08-background-refresh-notifications P04 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 08-02 (2026-06-03): isInDebugMode parameter deprecated in workmanager 0.9.x — verwijderd; Workmanager().initialize(callbackDispatcher) volstaat
 - 08-02 (2026-06-03): AppDatabase in WorkManager isolate geinitialiseerd met driftDatabase(name: 'ridewindow') — zelfde naam als foreground DB; Drift WAL-modus handelt gelijktijdige toegang af (T-08-02-02)
 - 08-02 (2026-06-03): NetworkType.connected constraint in registerPeriodicTask — voorkomt zinloze network-retries (T-08-02-01 mitigatie)
+- [Phase ?]: UI toggle placement
+- [Phase ?]: Lifecycle observer teardown
 
 ### Pending Todos
 
@@ -170,7 +173,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T18:24:01.100Z
+Last session: 2026-06-03T18:27:35.262Z
 Stopped at: Completed 08-02-PLAN.md — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed
 Resume file: None
 Next action: Execute Phase 08 Plan 03 (NotificationService platform-service)

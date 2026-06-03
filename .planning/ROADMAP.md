@@ -291,7 +291,7 @@ Plans:
 
 **Wave 4** *(geblokkeerd op Wave 3)*
 
-- [ ] 08-04-PLAN.md — ProfileScreen NOTIFICATIES sectie (3 SwitchListTile toggles) + HomeScreen lastRefreshed header + WidgetsBindingObserver
+- [x] 08-04-PLAN.md — ProfileScreen NOTIFICATIES sectie (3 SwitchListTile toggles) + HomeScreen lastRefreshed header + WidgetsBindingObserver
 
 **Wave 5** *(geblokkeerd op Wave 4)*
 
@@ -342,6 +342,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 3/5 | In Progress|  |
+| 8. Background refresh + Notifications | 4/5 | In Progress|  |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |
