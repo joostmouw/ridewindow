@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-04-PLAN.md — Phase 3 volledig: integratietest + ProviderScope (commits b050fd9, dbc0e58)"
-last_updated: "2026-06-03T00:30:00.000Z"
-last_activity: 2026-06-03
+stopped_at: "Completed 04-01-PLAN.md — AvailabilityNotifier upgrade Set→Map<DateTime,BlockType>, AvailabilityFilter+SlotsNotifier updated (commits f1d01ea, 8e3232d)"
+last_updated: "2026-06-03T07:30:00.000Z"
+last_activity: 2026-06-03 -- Phase 04 Plan 01 complete
 progress:
   total_phases: 11
-  completed_phases: 3
-  total_plans: 14
+  completed_phases: 4
+  total_plans: 19
   completed_plans: 14
-  percent: 32
+  percent: 36
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 3 — Riverpod providers + state graph (planning complete, uitvoering volgende stap)
+**Current focus:** Phase 04 — ui-phase-a-onboarding-home-welcome
 
 ## Current Position
 
-Phase: 3 van 11 (Riverpod providers + state graph) — AFGEROND
-Plan: 4 van 4 complete
-Status: Phase 3 volledig klaar — gereed voor Phase 4 (Onboarding + Home UI)
-Last activity: 2026-06-03
+Phase: 04 (ui-phase-a-onboarding-home-welcome) — EXECUTING
+Plan: 2 of 5
+Status: Executing Phase 04
+Last activity: 2026-06-03 -- Phase 04 Plan 01 complete
 
 Progress: [████████░░] 80%
 
@@ -84,6 +84,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 03-03 (2026-06-03): SlotsNotifier als synchrone Notifier<SlotsState> — build() gebruikt ref.watch() synchroon; geen AsyncNotifier nodig.
 - 03-04 (2026-06-03): FakeNotifier-subclasses (extends WeatherNotifier) gekozen boven mockito voor integratietests — simpeler, state direct injecteerbaar via .state = AsyncData(...).
 - 03-04 (2026-06-03): ProviderScope op buitenste runApp-niveau — gereed voor ConsumerWidget gebruik in Phase 4.
+- 04-01 (2026-06-03): BlockType enum in availability_notifier.dart (niet apart bestand) — eenvoudiger voor Phase 4; refactor in Phase 6 indien nodig.
+- 04-01 (2026-06-03): domain→providers import richting in availability_filter.dart geaccepteerd per PATTERNS.md notitie (tijdelijk, Phase 6 refactor).
+- 04-01 (2026-06-03): try-catch around SharedPreferences deserialization voor T-04-01: corrupt entries worden overgeslagen (log + skip).
 
 ### Pending Todos
 
@@ -107,7 +110,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T00:30:00Z
-Stopped at: Completed 03-04-PLAN.md — Phase 3 volledig afgerond: integratietest + ProviderScope (commits b050fd9, dbc0e58)
+Last session: 2026-06-03T07:30:00Z
+Stopped at: Completed 04-01-PLAN.md — AvailabilityNotifier upgrade Set→Map<DateTime,BlockType>, AvailabilityFilter+SlotsNotifier updated (commits f1d01ea, 8e3232d)
 Resume file: None
-Next action: `/gsd:execute-phase 04` — Phase 4: Onboarding + Home UI
+Next action: Execute 04-02-PLAN.md — go_router pubspec + config + availability_presets + GoRouter onboarding redirect

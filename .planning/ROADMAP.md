@@ -134,7 +134,28 @@ Plans:
   4. When no slots qualify, HomeScreen displays a meaningful empty state (not a blank screen) — verified by pointing the provider at an all-bad-weather fixture
   5. All six `go_router` routes are defined and navigable; the NavigationBar switches between Home and Profile tabs without losing scroll state
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [x] 04-01-PLAN.md — AvailabilityNotifier upgrade: Set<DateTime> → Map<DateTime, BlockType> + AvailabilityFilter aanpassing + tests update
+
+**Wave 2** *(geblokkeerd op Wave 1)*
+
+- [ ] 04-02-PLAN.md — go_router pubspec + config.dart + LocationProvider stub + availability_presets.dart + GoRouter met onboarding redirect
+
+**Wave 3** *(geblokkeerd op Wave 2)*
+
+- [ ] 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router echte imports
+
+**Wave 4** *(geblokkeerd op Wave 3)*
+
+- [ ] 04-04-PLAN.md — HomeScreen (week strip + ride cards + skeleton + lege staat) + main.dart MaterialApp.router
+
+**Wave 5** *(geblokkeerd op Wave 4)*
+
+- [ ] 04-05-PLAN.md — Widget tests: WelcomeScreen, OnboardingScreen, HomeScreen (loading/data/leeg)
+
 **UI hint**: yes
 
 ### Phase 5: UI Phase B — Ride Detail + Insights sheet
@@ -242,8 +263,8 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 1. Project skeleton + test infrastructure | 3/3 | Complete | 2026-06-02 |
 | 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
-| 3. Riverpod providers + state graph | 1/4 | In Progress|  |
-| 4. UI Phase A — Onboarding + Home + Welcome | 0/TBD | Not started | - |
+| 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
+| 4. UI Phase A — Onboarding + Home + Welcome | 1/5 | In Progress | - |
 | 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
