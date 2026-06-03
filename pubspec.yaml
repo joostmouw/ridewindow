@@ -43,8 +43,12 @@ dependencies:
   timezone: ^0.11.0
   flutter_timezone: ^5.1.0
 
-  # Phase 2+ deps (google_sign_in, googleapis,
-  # fl_chart) arrive in their own phases — not here.
+  # Phase 9 — Google Calendar integratie
+  google_sign_in: ^7.2.0
+  extension_google_sign_in_as_googleapis_auth: ^3.0.0
+  googleapis: ^16.0.0
+
+  # fl_chart arriveert in een latere fase
 
 dev_dependencies:
   flutter_test:
