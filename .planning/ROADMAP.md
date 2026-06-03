@@ -283,7 +283,7 @@ Plans:
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
-- [ ] 08-02-PLAN.md — background_task.dart (WorkManager isolate-worker) + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed schrijven
+- [x] 08-02-PLAN.md — background_task.dart (WorkManager isolate-worker) + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed schrijven
 
 **Wave 3** *(geblokkeerd op Wave 2)*
 
@@ -342,6 +342,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 1/5 | In progress | 2026-06-03 |
+| 8. Background refresh + Notifications | 2/5 | In progress | 2026-06-03 |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |

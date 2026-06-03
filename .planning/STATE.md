@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-01-PLAN.md — pubspec.yaml 4 nieuwe deps + AndroidManifest permissies + WorkManager-entries
-last_updated: "2026-06-03T18:23:00Z"
+stopped_at: Completed 08-02-PLAN.md — background_task.dart + LastRefreshedNotifier + main.dart WorkManager/tz + WeatherRepository lastRefreshed
+last_updated: "2026-06-03T18:35:00Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 32
-  completed_plans: 33
-  percent: 69
+  completed_plans: 34
+  percent: 72
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 08 (background-refresh-notifications) — IN PROGRESS
-Plan: 1 of 5
-Status: Plan 01 complete — pubspec.yaml 4 nieuwe deps + AndroidManifest permissies/WorkManager-entries
+Plan: 2 of 5
+Status: Plan 02 complete — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart init + WeatherRepository lastRefreshed
 Last activity: 2026-06-03
 
 Progress: [██████████] 100% (Phase 7)
@@ -142,6 +142,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 08-01 (2026-06-03): workmanager ^0.9.0+3 + flutter_local_notifications ^21.0.0 + timezone ^0.11.0 + flutter_timezone ^5.1.0 toegevoegd aan pubspec.yaml; flutter pub get geslaagd
 - 08-01 (2026-06-03): AndroidManifest.xml: RECEIVE_BOOT_COMPLETED + SCHEDULE_EXACT_ALARM + POST_NOTIFICATIONS + FOREGROUND_SERVICE + WAKE_LOCK permissies; WorkManager SystemForegroundService + RescheduleOnBootReceiver; ride_alerts notificatiekanaal meta-data
 - 08-01 (2026-06-03): SCHEDULE_EXACT_ALARM gedeclareerd — Android 12+ vereist expliciete gebruikerstoestemming via systeeminstellingen (T-08-01-02)
+- 08-02 (2026-06-03): FlutterTimezone 5.1.0 retourneert TimezoneInfo object (niet String) — gebruik .identifier property voor tz.getLocation()
+- 08-02 (2026-06-03): isInDebugMode parameter deprecated in workmanager 0.9.x — verwijderd; Workmanager().initialize(callbackDispatcher) volstaat
+- 08-02 (2026-06-03): AppDatabase in WorkManager isolate geinitialiseerd met driftDatabase(name: 'ridewindow') — zelfde naam als foreground DB; Drift WAL-modus handelt gelijktijdige toegang af (T-08-02-02)
+- 08-02 (2026-06-03): NetworkType.connected constraint in registerPeriodicTask — voorkomt zinloze network-retries (T-08-02-01 mitigatie)
 
 ### Pending Todos
 
@@ -165,7 +169,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T18:23:00Z
-Stopped at: Completed 08-01-PLAN.md — pubspec.yaml 4 nieuwe deps + AndroidManifest permissies + WorkManager-entries
+Last session: 2026-06-03T18:35:00Z
+Stopped at: Completed 08-02-PLAN.md — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed
 Resume file: None
-Next action: Execute Phase 08 Plan 02 (background_task.dart WorkManager isolate-worker)
+Next action: Execute Phase 08 Plan 03 (NotificationService platform-service)
