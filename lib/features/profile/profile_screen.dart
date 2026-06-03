@@ -191,18 +191,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               spacing: 8,
               children: [
                 // PROF-02: last-chip-guard zit in ProfileNotifier.toggleDuration()
-                for (final entry in [
-                  (2, '2u'),
-                  (3, '3u'),
-                  (5, '4-5u'),
-                ])
-                  FilterChip(
-                    label: Text(entry.$2),
-                    selected: profile.allowedDurations.contains(entry.$1),
-                    onSelected: (_) => ref
-                        .read(profileProvider.notifier)
-                        .toggleDuration(entry.$1),
-                  ),
+                FilterChip(
+                  label: const Text('2u'),
+                  selected: profile.allowedDurations.contains(2),
+                  onSelected: (_) =>
+                      ref.read(profileProvider.notifier).toggleDuration(2),
+                ),
+                FilterChip(
+                  label: const Text('3u'),
+                  selected: profile.allowedDurations.contains(3),
+                  onSelected: (_) =>
+                      ref.read(profileProvider.notifier).toggleDuration(3),
+                ),
+                FilterChip(
+                  label: const Text('4-5u'),
+                  selected: profile.allowedDurations.contains(5),
+                  onSelected: (_) =>
+                      ref.read(profileProvider.notifier).toggleDuration(5),
+                ),
               ],
             ),
           ),
