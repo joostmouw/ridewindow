@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/data/remote/open_meteo_client.dart';
@@ -31,6 +33,12 @@ class WeatherRepository {
       lat: lat,
       lon: lon,
       forecasts: fresh,
+    );
+    // Schrijf lastRefreshed timestamp na succesvolle fetch (D-08-12).
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(
+      'weather.lastRefreshed',
+      DateTime.now().millisecondsSinceEpoch,
     );
     return fresh;
   }

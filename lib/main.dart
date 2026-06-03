@@ -1,14 +1,41 @@
 /// Phase 4: MaterialApp.router wired to routerProvider via ConsumerWidget.
 /// Phase 6: darkTheme + themeMode added; reacts to themeModeProvider.
+/// Phase 8: tz.initializeTimeZones() + WorkManager initialisatie vóór runApp().
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
+import 'package:ridewindow/platform/background_task.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Laad timezone-data synchroon in geheugen (vereist voor flutter_local_notifications).
+  tz.initializeTimeZones();
+
+  // Stel lokale tijdzone in op basis van het apparaat.
+  final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+
+  // Initialiseer WorkManager met de isolate-safe callbackDispatcher.
+  await Workmanager().initialize(callbackDispatcher);
+
+  // Registreer periodieke achtergrondtaak (3 uur interval, minimaal 3h flex).
+  await Workmanager().registerPeriodicTask(
+    kWeatherRefreshTaskTag,
+    kWeatherRefreshTaskName,
+    frequency: const Duration(hours: 3),
+    flexInterval: const Duration(hours: 3),
+    constraints: Constraints(networkType: NetworkType.connected),
+  );
+
   runApp(const ProviderScope(child: RideWindowApp()));
 }
 
