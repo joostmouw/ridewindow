@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-04-PLAN.md — Phase 05 COMPLETE — ScoringEngine fixture pin test + 145 tests green (commit 4de00f1)
-last_updated: "2026-06-03T09:08:00.000Z"
-last_activity: 2026-06-03 -- Phase 05 ALL 4 PLANS COMPLETE
+stopped_at: Completed 06-01-PLAN.md — ThemeModeProvider + /profile route + ProfileScreen skeleton (commits 4ae477f, e3a130d)
+last_updated: "2026-06-03T09:15:46Z"
+last_activity: 2026-06-03 -- Completed Phase 06 Plan 01
 progress:
   total_phases: 11
   completed_phases: 6
-  total_plans: 24
-  completed_plans: 22
-  percent: 52
+  total_plans: 27
+  completed_plans: 24
+  percent: 57
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 05 (ui-phase-b-ride-detail-insights-sheet) — COMPLETE
-Plan: 4 of 4 — ALL COMPLETE
-Status: Phase 05 complete. Ready to start Phase 06.
-Last activity: 2026-06-03 -- 05-04 complete: ScoringEngine fixture pin + 145 widget tests green
+Phase: 06 (ui-phase-c-profile-availability-tolerance-sliders) — EXECUTING
+Plan: 2 of 4
+Status: Executing Phase 06 (Plan 01 complete)
+Last activity: 2026-06-03 -- Completed 06-01: ThemeModeProvider + /profile route + ProfileScreen skeleton
 
-Progress: [██████████████░] 52%
+Progress: [███████████████░] 57%
 
 ## Performance Metrics
 
@@ -112,6 +112,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 05-03 (2026-06-03): LinearProgressIndicator value uses .clamp(0.0, 1.0) as defense-in-depth per T-05-03-02.
 - 05-04 (2026-06-03): Existing test files from Waves 2+3 already covered plan requirements; only the SC-4 ScoringEngine fixture pin was missing — added 1 targeted test to insights_sheet_test.dart.
 - 05-04 (2026-06-03): ScoringEngine fixture pin uses closeTo(1.0, 0.0001) for double comparison safety; calls ScoringEngine().score() directly (no mocks) to prove domain-widget wiring.
+- 06-01 (2026-06-03): AsyncValue.value (not .valueOrNull) is the correct nullable getter in Riverpod 3.x — valueOrNull does not exist in the 3.x API.
+- 06-01 (2026-06-03): ProfileScreen Wave 1 skeleton uses // ignore: unused_field on late double slider fields — Wave 2 will fill them; suppress avoids analyzer warnings.
+- 06-01 (2026-06-03): darkTheme uses same seedColor 0xFF2E7D32 with brightness: Brightness.dark; MaterialApp.router now has darkTheme + themeMode: ref.watch(themeModeProvider).
 
 ### Pending Todos
 
@@ -135,7 +138,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T09:08:00Z
-Stopped at: Completed 05-04-PLAN.md — Phase 05 COMPLETE — ScoringEngine fixture pin test + 145 tests green (commit 4de00f1)
+Last session: 2026-06-03T09:15:46Z
+Stopped at: Completed 06-01-PLAN.md — ThemeModeProvider + /profile route + ProfileScreen skeleton (commits 4ae477f, e3a130d)
 Resume file: None
-Next action: Plan and execute Phase 06 — UI Phase C: Profile + Availability + Tolerance sliders
+Next action: Execute Phase 06 Plan 02 — ProfileScreen Wave 2 (tolerance sliders + theme SegmentedButton + duration chips)

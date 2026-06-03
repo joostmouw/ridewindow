@@ -209,7 +209,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — ThemeModeProvider + /profile route + HomeScreen bottomNav wiring + ProfileScreen skeleton
+- [x] 06-01-PLAN.md — ThemeModeProvider + /profile route + HomeScreen bottomNav wiring + ProfileScreen skeleton
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
