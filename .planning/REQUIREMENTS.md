@@ -34,10 +34,10 @@
 
 ### Profile (PROF) — User preferences
 
-- [ ] **PROF-01**: User can adjust 3 weather tolerance sliders (temperature, rain, wind) in Profile screen
-- [ ] **PROF-02**: User can toggle ride length preferences (2h / 3h / 4–5h chips) — at least one must be selected
+- [x] **PROF-01**: User can adjust 3 weather tolerance sliders (temperature, rain, wind) in Profile screen
+- [x] **PROF-02**: User can toggle ride length preferences (2h / 3h / 4–5h chips) — at least one must be selected
 - [x] **PROF-03**: Tolerance and ride-length changes trigger automatic slot recomputation (reactive via Riverpod)
-- [ ] **PROF-04**: User can pick a Material 3 light/dark theme preference (system default acceptable)
+- [x] **PROF-04**: User can pick a Material 3 light/dark theme preference (system default acceptable)
 
 ### Availability (AVAIL) — Weekly calendar
 

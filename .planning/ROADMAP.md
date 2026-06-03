@@ -213,7 +213,7 @@ Plans:
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
-- [ ] 06-02-PLAN.md — ProfileScreen volledig: tolerantie-sliders (4×) + rijlengte-chips (3×) + thema-SegmentedButton
+- [x] 06-02-PLAN.md — ProfileScreen volledig: tolerantie-sliders (4×) + rijlengte-chips (3×) + thema-SegmentedButton
 
 **Wave 3** *(onafhankelijk van Wave 2 — kan parallel uitgevoerd worden)*
 
@@ -300,7 +300,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
-| 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/4 | Not started | - |
+| 6. UI Phase C — Profile + Availability + Tolerance sliders | 2/4 | In Progress|  |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
 | 8. Background refresh + Notifications | 0/TBD | Not started | - |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
