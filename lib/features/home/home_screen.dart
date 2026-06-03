@@ -11,6 +11,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -56,7 +57,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     final weatherState = ref.watch(weatherProvider);
     final slotsState = ref.watch(slotsProvider);
-    final location = ref.watch(locationProvider);
+    final locationAsync = ref.watch(locationProvider);
+    final cityName = locationAsync.value?.city ?? kDefaultCity;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -64,7 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(location.city, weatherState),
+            _buildHeader(cityName, weatherState),
             _buildWeekStrip(slotsState),
             Expanded(child: _buildCardsSection(weatherState, slotsState)),
           ],
