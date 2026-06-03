@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-03-PLAN.md — InsightsSheet full bottom-sheet with 3 LinearProgressIndicator bars (commit 456c67a)
-last_updated: "2026-06-03T08:49:49.000Z"
-last_activity: 2026-06-03 -- Phase 05 Plan 03 completed
+stopped_at: Completed 05-04-PLAN.md — Phase 05 COMPLETE — ScoringEngine fixture pin test + 145 tests green (commit 4de00f1)
+last_updated: "2026-06-03T09:08:00.000Z"
+last_activity: 2026-06-03 -- Phase 05 ALL 4 PLANS COMPLETE
 progress:
   total_phases: 11
-  completed_phases: 5
-  total_plans: 23
-  completed_plans: 21
-  percent: 48
+  completed_phases: 6
+  total_plans: 24
+  completed_plans: 22
+  percent: 52
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 05 — ui-phase-b-ride-detail-insights-sheet
+**Current focus:** Phase 06 — ui-phase-c-profile-availability-tolerance-sliders
 
 ## Current Position
 
-Phase: 05 (ui-phase-b-ride-detail-insights-sheet) — EXECUTING
-Plan: 4 of 4
-Status: Executing Phase 05 (Plans 01-03 complete)
-Last activity: 2026-06-03 -- 05-03 complete: InsightsSheet full bottom-sheet with 3 LinearProgressIndicator bars + 12 widget tests
+Phase: 05 (ui-phase-b-ride-detail-insights-sheet) — COMPLETE
+Plan: 4 of 4 — ALL COMPLETE
+Status: Phase 05 complete. Ready to start Phase 06.
+Last activity: 2026-06-03 -- 05-04 complete: ScoringEngine fixture pin + 145 widget tests green
 
-Progress: [████████████░] 48%
+Progress: [██████████████░] 52%
 
 ## Performance Metrics
 
@@ -110,6 +110,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 05-03 (2026-06-03): SingleChildScrollView wraps InsightsSheet Column to prevent RenderFlex overflow in constrained viewports (bottom sheet height varies by device/test).
 - 05-03 (2026-06-03): _avg() returns 50.0 for empty hours list — divide-by-zero prevented per T-05-03-01.
 - 05-03 (2026-06-03): LinearProgressIndicator value uses .clamp(0.0, 1.0) as defense-in-depth per T-05-03-02.
+- 05-04 (2026-06-03): Existing test files from Waves 2+3 already covered plan requirements; only the SC-4 ScoringEngine fixture pin was missing — added 1 targeted test to insights_sheet_test.dart.
+- 05-04 (2026-06-03): ScoringEngine fixture pin uses closeTo(1.0, 0.0001) for double comparison safety; calls ScoringEngine().score() directly (no mocks) to prove domain-widget wiring.
 
 ### Pending Todos
 
@@ -133,7 +135,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T08:49:49Z
-Stopped at: Completed 05-03-PLAN.md — InsightsSheet full bottom-sheet with 3 LinearProgressIndicator bars (commit 456c67a)
+Last session: 2026-06-03T09:08:00Z
+Stopped at: Completed 05-04-PLAN.md — Phase 05 COMPLETE — ScoringEngine fixture pin test + 145 tests green (commit 4de00f1)
 Resume file: None
-Next action: Execute Phase 05 Plan 04 — Widget tests: RideDetailScreen (5 tests) + InsightsSheet fixture-test (4 tests)
+Next action: Plan and execute Phase 06 — UI Phase C: Profile + Availability + Tolerance sliders
