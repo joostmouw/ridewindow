@@ -13,9 +13,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/models/weather_tolerances.dart';
+import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 
 Widget wrapInMaterial(Widget child) {
@@ -216,6 +219,70 @@ void main() {
       await tester.pump();
 
       expect(find.textContaining('Lichte wind'), findsWidgets);
+    });
+
+    // Phase 5 SC-4: ScoringEngine fixture pin test
+    // Bewijst dat LinearProgressIndicator.value == 1.0 voor alle drie balken
+    // wanneer sub-scores berekend via ScoringEngine 100/100 zijn.
+    testWidgets(
+        'SC-4 fixture-pin: LinearProgressIndicator.value == 1.0 voor alle drie balken bij perfecte score',
+        (tester) async {
+      // Bekende invoer: alle sub-scores worden 100.0 door ScoringEngine
+      // temp=22°C in [12,26] → 100; precip=0.0mm ≤ 0.5mm → 100; wind=10km/u ≤ 15km/u → 100
+      const tolerances = WeatherTolerances(
+        tempMinIdealC: 12.0,
+        tempMaxIdealC: 26.0,
+        rainMaxIdealMm: 0.5,
+        windMaxIdealKmh: 15.0,
+      );
+      final forecast = HourlyForecast(
+        temperatureC: 22.0,
+        apparentTemperatureC: 21.0,
+        precipitationMm: 0.0,
+        precipitationProbability: 0.0,
+        windspeedKmh: 10.0,
+        winddirectionDeg: 225.0,
+        time: DateTime(2026, 6, 7, 9),
+      );
+
+      // Bereken de score via ScoringEngine — deterministisch, geen mocks
+      final hourlyScore = ScoringEngine().score(forecast, tolerances);
+
+      // Bevestig sub-scores zijn 100.0 (fixture-pin)
+      expect(hourlyScore.temperatureScore, equals(100.0),
+          reason: 'temperatureScore moet 100.0 zijn voor temp=22°C in [12,26]');
+      expect(hourlyScore.rainScore, equals(100.0),
+          reason: 'rainScore moet 100.0 zijn voor precip=0.0mm ≤ 0.5mm');
+      expect(hourlyScore.windScore, equals(100.0),
+          reason: 'windScore moet 100.0 zijn voor wind=10km/u ≤ 15km/u');
+
+      // Bouw het fixture-slot
+      final fixtureSlot = RideSlot(
+        start: DateTime(2026, 6, 7, 9),
+        end: DateTime(2026, 6, 7, 10),
+        overallScore: hourlyScore.overall,
+        tier: rideTierFromScore(hourlyScore.overall),
+        hours: [hourlyScore],
+      );
+
+      // Render InsightsSheet
+      await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: fixtureSlot)));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Bevestig dat alle drie LinearProgressIndicator widgets value == 1.0 hebben
+      final indicators = tester.widgetList<LinearProgressIndicator>(
+        find.byType(LinearProgressIndicator),
+      ).toList();
+
+      expect(indicators, hasLength(3),
+          reason: 'Exact 3 LinearProgressIndicator widgets verwacht');
+
+      for (final indicator in indicators) {
+        expect(indicator.value, closeTo(1.0, 0.0001),
+            reason:
+                'LinearProgressIndicator.value moet 1.0 zijn (sub-score=100/100) voor de fixture-invoer');
+      }
     });
   });
 }
