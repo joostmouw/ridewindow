@@ -1,44 +1,25 @@
 // lib/app/router.dart
 // go_router configuratie met onboarding redirect.
-// Scherm-classes worden geimporteerd nadat Wave 3 ze aanmaakt.
-// Tijdelijk: stub imports voor WelcomeScreen, OnboardingScreen, HomeScreen,
-// AvailabilityScreen — vervang door echte imports in Wave 3/4.
+// Wave 3: WelcomeScreen, OnboardingScreen en AvailabilityScreen zijn echte imports.
+// Wave 4 voegt HomeScreen toe — tot die tijd is _HomeScreenPlaceholder tijdelijk.
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ridewindow/features/welcome/welcome_screen.dart';
+import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
+import 'package:ridewindow/features/availability/availability_screen.dart';
 
 part 'router.g.dart';
 
-// Tijdelijke stubs zodat dit bestand compileert vóór Wave 3 de echte schermen aanmaakt.
-// Wave 3 vervangt deze met echte imports.
-class _WelcomeScreenStub extends StatelessWidget {
-  const _WelcomeScreenStub();
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Welcome (stub)')));
-}
+// TODO(wave-4): vervang door echte HomeScreen import
+class _HomeScreenPlaceholder extends StatelessWidget {
+  const _HomeScreenPlaceholder();
 
-class _OnboardingScreenStub extends StatelessWidget {
-  const _OnboardingScreenStub();
   @override
   Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Onboarding (stub)')));
-}
-
-class _HomeScreenStub extends StatelessWidget {
-  const _HomeScreenStub();
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Home (stub)')));
-}
-
-class _AvailabilityScreenStub extends StatelessWidget {
-  const _AvailabilityScreenStub();
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Mijn schema (stub)')));
+      const Scaffold(body: Center(child: Text('Home \u2014 komt in Wave 4')));
 }
 
 /// GoRouter met onboarding-redirect en vier Phase 4 routes.
@@ -58,19 +39,19 @@ GoRouter router(Ref ref) {
     routes: [
       GoRoute(
         path: '/welcome',
-        builder: (context, state) => const _WelcomeScreenStub(),
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: '/onboard',
-        builder: (context, state) => const _OnboardingScreenStub(),
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const _HomeScreenStub(),
+        builder: (context, state) => const _HomeScreenPlaceholder(),
       ),
       GoRoute(
         path: '/availability',
-        builder: (context, state) => const _AvailabilityScreenStub(),
+        builder: (context, state) => const AvailabilityScreen(),
       ),
     ],
   );
