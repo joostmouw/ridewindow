@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 08-02-PLAN.md — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed
-last_updated: "2026-06-03T19:35:58.038Z"
+status: ready_to_plan
+stopped_at: Phase 9 complete (2/2) — ready to discuss Phase 10
+last_updated: 2026-06-03T19:36:34.056Z
 last_activity: 2026-06-03
 progress:
   total_phases: 11
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 9 — Google Calendar integration
+**Current focus:** Phase 10 — release — internal track only
 
 ## Current Position
 
-Phase: 9 (Google Calendar integration) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Phase: 10
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-03
 
 Progress: [██████████] 100%
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 10 (Phases 1, 1.5, 2)
+- Total plans completed: 12 (Phases 1, 1.5, 2)
 - Average duration: ~15min voor mechanische taken (geautomatiseerd executor-modus)
 - Total execution time: ~3h (Phase 1) + ~45min (Phase 1.5) + ~40min (Phase 2)
 
@@ -47,6 +47,7 @@ Progress: [██████████] 100%
 | 1 | 3 | ~3h | ~1h |
 | 1.5 | 4 | ~45min | ~11min |
 | 2 | 3 | ~40min | ~13min |
+| 9 | 2 | - | - |
 
 **Recent Trend:**
 
