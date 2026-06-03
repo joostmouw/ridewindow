@@ -33,6 +33,10 @@ dependencies:
   # Phase 4 — Routing
   go_router: ^17.2.3
 
+  # Phase 7 — GPS + locatie-toestemmingen
+  geolocator: ^14.0.2
+  permission_handler: ^12.0.3
+
   # Phase 2+ deps (geolocator, workmanager,
   # flutter_local_notifications, google_sign_in, googleapis,
   # fl_chart) arrive in their own phases — not here.
