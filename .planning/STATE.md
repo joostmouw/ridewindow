@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-02-PLAN.md — RideDetailScreen full screen + InsightsSheet stub (commit ec41471)
-last_updated: "2026-06-03T08:47:00.000Z"
-last_activity: 2026-06-03 -- Phase 05 Plan 02 completed
+stopped_at: Completed 05-03-PLAN.md — InsightsSheet full bottom-sheet with 3 LinearProgressIndicator bars (commit 456c67a)
+last_updated: "2026-06-03T08:49:49.000Z"
+last_activity: 2026-06-03 -- Phase 05 Plan 03 completed
 progress:
   total_phases: 11
   completed_phases: 5
   total_plans: 23
-  completed_plans: 20
-  percent: 47
+  completed_plans: 21
+  percent: 48
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 05 (ui-phase-b-ride-detail-insights-sheet) — EXECUTING
-Plan: 3 of 4
-Status: Executing Phase 05 (Plans 01-02 complete)
-Last activity: 2026-06-03 -- 05-02 complete: RideDetailScreen full screen + InsightsSheet stub + 13 widget tests
+Plan: 4 of 4
+Status: Executing Phase 05 (Plans 01-03 complete)
+Last activity: 2026-06-03 -- 05-03 complete: InsightsSheet full bottom-sheet with 3 LinearProgressIndicator bars + 12 widget tests
 
-Progress: [████████████░] 47%
+Progress: [████████████░] 48%
 
 ## Performance Metrics
 
@@ -107,6 +107,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 05-02 (2026-06-03): ScoreBadge widget embedded in score-banner alongside tier emoji + description text (key_links requirement in plan).
 - 05-02 (2026-06-03): Inline tier switch expressions for banner colors/emoji/description — no separate helper class needed.
 - 05-02 (2026-06-03): Empty-slot guard returns '—' for all avg fields when forecasts list is empty (T-05-02-02 mitigated).
+- 05-03 (2026-06-03): SingleChildScrollView wraps InsightsSheet Column to prevent RenderFlex overflow in constrained viewports (bottom sheet height varies by device/test).
+- 05-03 (2026-06-03): _avg() returns 50.0 for empty hours list — divide-by-zero prevented per T-05-03-01.
+- 05-03 (2026-06-03): LinearProgressIndicator value uses .clamp(0.0, 1.0) as defense-in-depth per T-05-03-02.
 
 ### Pending Todos
 
@@ -130,7 +133,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T08:47:00Z
-Stopped at: Completed 05-02-PLAN.md — RideDetailScreen full screen + InsightsSheet stub (commit ec41471)
+Last session: 2026-06-03T08:49:49Z
+Stopped at: Completed 05-03-PLAN.md — InsightsSheet full bottom-sheet with 3 LinearProgressIndicator bars (commit 456c67a)
 Resume file: None
-Next action: Execute Phase 05 Plan 03 — InsightsSheet full bottom-sheet (3 LinearProgressIndicator bars)
+Next action: Execute Phase 05 Plan 04 — Widget tests: RideDetailScreen (5 tests) + InsightsSheet fixture-test (4 tests)
