@@ -343,5 +343,5 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
 | 8. Background refresh + Notifications | 5/5 | Complete   | 2026-06-03 |
-| 9. Google Calendar integration | 0/TBD | Not started | - |
+| 9. Google Calendar integration | 1/2 | In Progress|  |
 | 10. Release — Internal track only | 0/TBD | Not started | - |

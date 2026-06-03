@@ -72,18 +72,18 @@
 
 ### Calendar (CAL) — Google Calendar integration
 
-- [ ] **CAL-01**: User can tap "Add to calendar" on a slot to create a Google Calendar event
-- [ ] **CAL-02**: Google Sign-In is initialized lazily (only when user taps "Add to calendar"), requesting `calendar.events` scope only
-- [ ] **CAL-03**: Calendar event includes slot start, end, and a one-line weather summary as event description
-- [ ] **CAL-04**: Auth uses `AutoRefreshingAuthClient` so token expiry is handled silently
-- [ ] **CAL-05**: Calendar feature is fully optional — app is 100% functional without ever signing in
+- [x] **CAL-01**: User can tap "Add to calendar" on a slot to create a Google Calendar event
+- [x] **CAL-02**: Google Sign-In is initialized lazily (only when user taps "Add to calendar"), requesting `calendar.events` scope only
+- [x] **CAL-03**: Calendar event includes slot start, end, and a one-line weather summary as event description
+- [x] **CAL-04**: Auth uses `AutoRefreshingAuthClient` so token expiry is handled silently
+- [x] **CAL-05**: Calendar feature is fully optional — app is 100% functional without ever signing in
 
 ### Persistence (PERS) — Local storage
 
 - [ ] **PERS-01**: User profile (tolerances, ride-length prefs, location override, notification toggles, theme) persists in `shared_preferences`
 - [ ] **PERS-02**: Availability grid and forecast cache persist in Drift (SQLite)
 - [x] **PERS-03**: Drift schema is versioned with explicit migrations for v1→v1.x upgrades
-- [ ] **PERS-04**: No personal data leaves the device unless user explicitly signs into Google Calendar
+- [x] **PERS-04**: No personal data leaves the device unless user explicitly signs into Google Calendar
 
 ### Release (REL) — Play Store internal track
 
