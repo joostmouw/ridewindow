@@ -30,9 +30,12 @@ dependencies:
   # Phase 3 — Settings persistence
   shared_preferences: ^2.5.5
 
+  # Phase 4 — Routing
+  go_router: ^17.2.3
+
   # Phase 2+ deps (geolocator, workmanager,
-  # flutter_local_notifications, go_router, google_sign_in, googleapis,
-  # fl_chart, shared_preferences) arrive in their own phases — not here.
+  # flutter_local_notifications, google_sign_in, googleapis,
+  # fl_chart) arrive in their own phases — not here.
 
 dev_dependencies:
   flutter_test:
