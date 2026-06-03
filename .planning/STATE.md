@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-02-PLAN.md — ProfileNotifier + UserProfile with SharedPreferences (commit e49e116)"
-last_updated: "2026-06-03T08:20:00.000Z"
+stopped_at: "Completed 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve provider chain (commits 1d8f946, df8df6b)"
+last_updated: "2026-06-03T00:46:00.000Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 3
   total_plans: 14
-  completed_plans: 12
-  percent: 27
+  completed_plans: 13
+  percent: 29
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 3 van 11 (Riverpod providers + state graph) — IN UITVOERING
-Plan: 2 van 4 complete
-Status: Executing — 03-02 gedaan, 03-03 volgende
+Plan: 3 van 4 complete
+Status: Executing — 03-03 gedaan, 03-04 volgende
 Last activity: 2026-06-03
 
 Progress: [████████░░] 79%
@@ -55,6 +55,7 @@ Progress: [████████░░] 79%
 
 | Phase 03-riverpod-providers-state-graph P01 | 25 | 2 tasks | 8 files |
 | Phase 03-riverpod-providers-state-graph P02 | 20 | 1 task | 5 files |
+| Phase 03-riverpod-providers-state-graph P03 | 35 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 03-01 (2026-06-02): Ref-parameter in Riverpod 3.x provider-functies is plain Ref (niet typed XxxRef).
 - 03-02 (2026-06-03): UserProfile als plain Dart class met _sentinel-pattern voor nullable copyWith — geen Freezed benodigd voor scalar settings dataklasse.
 - 03-02 (2026-06-03): profileProvider is de gegenereerde naam voor ProfileNotifier (Notifier-suffix gestript door Riverpod 3.x code-gen).
+- 03-03 (2026-06-03): AvailabilityNotifier gebruikt SharedPreferences — AvailabilityGridEntries tabel slaat dayOfWeek+hour weekpatroon op, niet DateTime-instanties.
+- 03-03 (2026-06-03): availabilityProvider en slotsProvider zijn de gegenereerde namen (Notifier-suffix gestript door code-gen).
+- 03-03 (2026-06-03): Fake notifiers in ProviderContainer-tests moeten concrete klassen extenden (WeatherNotifier), niet de _$-abstracte klassen.
+- 03-03 (2026-06-03): SlotsNotifier als synchrone Notifier<SlotsState> — build() gebruikt ref.watch() synchroon; geen AsyncNotifier nodig.
 
 ### Pending Todos
 
@@ -87,7 +92,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 - Phase 9 (Google Calendar): Vereist Google Cloud project setup, OAuth consent screen, en SHA-1 fingerprint registratie. Flag dit bij afsluiting Phase 8.
 - Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
 - Phase 10 (Release): Android Studio + accepted SDK licenses must be installed before `flutter build appbundle` works.
-- Phase 3 notitie: Als AvailabilityEntries-tabel ontbreekt in Drift-schema (plan 02-01 heeft die niet aangemaakt), dan gebruikt AvailabilityNotifier SharedPreferences als opslag. Plan 03-03 controleert dit en handelt dienovereenkomstig.
+- Phase 3 notitie (opgelost 03-03): AvailabilityNotifier gebruikt SharedPreferences — de Drift AvailabilityGridEntries tabel slaat een weekpatroon op (dayOfWeek+hour), niet DateTime-instanties. SharedPreferences met ISO-8601 serialisatie is de juiste aanpak.
 
 ## Deferred Items
 
@@ -99,7 +104,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T08:20:00Z
-Stopped at: Completed 03-02-PLAN.md — ProfileNotifier + UserProfile with SharedPreferences (commit e49e116)
+Last session: 2026-06-03T00:46:00Z
+Stopped at: Completed 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve provider chain (commits 1d8f946, df8df6b)
 Resume file: None
-Next action: `/gsd:execute-phase 03` — ga verder met 03-03-PLAN.md (SlotsNotifier + AvailabilityNotifier)
+Next action: `/gsd:execute-phase 03` — ga verder met 03-04-PLAN.md (volgende plan in Phase 3)
