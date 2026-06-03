@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md — HourlyRow + DetailArgs + ScoreBadge + /detail route + HomeScreen tap-navigation (commit fc72d22)
-last_updated: "2026-06-03T09:00:00.000Z"
-last_activity: 2026-06-03 -- Phase 05 Plan 01 completed
+stopped_at: Completed 05-02-PLAN.md — RideDetailScreen full screen + InsightsSheet stub (commit ec41471)
+last_updated: "2026-06-03T08:47:00.000Z"
+last_activity: 2026-06-03 -- Phase 05 Plan 02 completed
 progress:
   total_phases: 11
   completed_phases: 5
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 05 (ui-phase-b-ride-detail-insights-sheet) — EXECUTING
-Plan: 2 of 4
-Status: Executing Phase 05 (Plan 01 complete)
-Last activity: 2026-06-03 -- 05-01 complete: HourlyRow + DetailArgs + ScoreBadge + /detail route + HomeScreen tap-navigation
+Plan: 3 of 4
+Status: Executing Phase 05 (Plans 01-02 complete)
+Last activity: 2026-06-03 -- 05-02 complete: RideDetailScreen full screen + InsightsSheet stub + 13 widget tests
 
 Progress: [████████████░] 47%
 
@@ -104,6 +104,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 05-01 (2026-06-03): T-05-01 mitigated: router uses 'is! DetailArgs' guard before cast, returns error Scaffold for invalid navigation.
 - 05-01 (2026-06-03): Weather chips show avg temp (1 decimal), total precip (1 decimal), avg wind (0 decimal); '—' when no data.
 - 05-01 (2026-06-03): Forecast filtering uses !f.time.isBefore(slot.start) && f.time.isBefore(slot.end) per SLOT-02 [start, end) convention.
+- 05-02 (2026-06-03): ScoreBadge widget embedded in score-banner alongside tier emoji + description text (key_links requirement in plan).
+- 05-02 (2026-06-03): Inline tier switch expressions for banner colors/emoji/description — no separate helper class needed.
+- 05-02 (2026-06-03): Empty-slot guard returns '—' for all avg fields when forecasts list is empty (T-05-02-02 mitigated).
 
 ### Pending Todos
 
@@ -127,7 +130,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T08:30:00Z
-Stopped at: Completed 04-05-PLAN.md — Widget tests WelcomeScreen + OnboardingScreen + HomeScreen (commit 9beae16)
+Last session: 2026-06-03T08:47:00Z
+Stopped at: Completed 05-02-PLAN.md — RideDetailScreen full screen + InsightsSheet stub (commit ec41471)
 Resume file: None
-Next action: Plan Phase 05 — UI Phase B: Ride Detail screen + Insights bottom sheet
+Next action: Execute Phase 05 Plan 03 — InsightsSheet full bottom-sheet (3 LinearProgressIndicator bars)
