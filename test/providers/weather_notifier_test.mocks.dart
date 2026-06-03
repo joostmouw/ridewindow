@@ -33,10 +33,18 @@ class MockWeatherRepository extends _i1.Mock implements _i2.WeatherRepository {
   }
 
   @override
-  _i3.Future<List<_i4.HourlyForecast>> getForecast() => (super.noSuchMethod(
+  _i3.Future<List<_i4.HourlyForecast>> getForecast({
+    double? lat = 52.3676,
+    double? lon = 4.9041,
+  }) =>
+      (super.noSuchMethod(
         Invocation.method(
           #getForecast,
           [],
+          {
+            #lat: lat,
+            #lon: lon,
+          },
         ),
         returnValue:
             _i3.Future<List<_i4.HourlyForecast>>.value(<_i4.HourlyForecast>[]),

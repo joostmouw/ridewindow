@@ -12,6 +12,9 @@ part of 'weather_notifier.dart';
 /// as `AsyncValue<List<HourlyForecast>>`. Riverpod wraps the Future in AsyncValue
 /// automatically, providing loading / data / error states out of the box.
 ///
+/// Watches locationProvider so that when the location changes (GPS or city override),
+/// the forecast is automatically re-fetched for the new location.
+///
 /// No BuildContext dependency — fully testable in isolation via ProviderContainer.
 
 @ProviderFor(WeatherNotifier)
@@ -21,12 +24,18 @@ final weatherProvider = WeatherNotifierProvider._();
 /// as `AsyncValue<List<HourlyForecast>>`. Riverpod wraps the Future in AsyncValue
 /// automatically, providing loading / data / error states out of the box.
 ///
+/// Watches locationProvider so that when the location changes (GPS or city override),
+/// the forecast is automatically re-fetched for the new location.
+///
 /// No BuildContext dependency — fully testable in isolation via ProviderContainer.
 final class WeatherNotifierProvider
     extends $AsyncNotifierProvider<WeatherNotifier, List<HourlyForecast>> {
   /// WeatherNotifier fetches the forecast via WeatherRepository and exposes it
   /// as `AsyncValue<List<HourlyForecast>>`. Riverpod wraps the Future in AsyncValue
   /// automatically, providing loading / data / error states out of the box.
+  ///
+  /// Watches locationProvider so that when the location changes (GPS or city override),
+  /// the forecast is automatically re-fetched for the new location.
   ///
   /// No BuildContext dependency — fully testable in isolation via ProviderContainer.
   WeatherNotifierProvider._()
@@ -48,11 +57,14 @@ final class WeatherNotifierProvider
   WeatherNotifier create() => WeatherNotifier();
 }
 
-String _$weatherNotifierHash() => r'0063f0f1519a3569cfada8abf88e44767be28839';
+String _$weatherNotifierHash() => r'28d97e2ae3a24e6dce839c89cc63f8ada1da0f89';
 
 /// WeatherNotifier fetches the forecast via WeatherRepository and exposes it
 /// as `AsyncValue<List<HourlyForecast>>`. Riverpod wraps the Future in AsyncValue
 /// automatically, providing loading / data / error states out of the box.
+///
+/// Watches locationProvider so that when the location changes (GPS or city override),
+/// the forecast is automatically re-fetched for the new location.
 ///
 /// No BuildContext dependency — fully testable in isolation via ProviderContainer.
 

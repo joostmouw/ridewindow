@@ -8,11 +8,23 @@ import 'package:mockito/mockito.dart';
 import 'package:ridewindow/data/repositories/weather_repository.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 
 import 'weather_notifier_test.mocks.dart';
 
 @GenerateMocks([WeatherRepository])
+
+/// FakeLocationNotifier retourneert een vaste locatie (Amsterdam) voor tests.
+class FakeLocationNotifier extends LocationNotifier {
+  @override
+  Future<LocationData> build() async => const LocationData(
+        lat: 52.3676,
+        lon: 4.9041,
+        city: 'Amsterdam',
+      );
+}
+
 void main() {
   final testForecast = HourlyForecast(
     temperatureC: 18.0,
@@ -28,11 +40,13 @@ void main() {
     test('starts in loading state', () {
       final mock = MockWeatherRepository();
       final completer = Completer<List<HourlyForecast>>();
-      when(mock.getForecast()).thenAnswer((_) => completer.future);
+      when(mock.getForecast(lat: anyNamed('lat'), lon: anyNamed('lon')))
+          .thenAnswer((_) => completer.future);
 
       final container = ProviderContainer(
         overrides: [
           weatherRepositoryProvider.overrideWithValue(mock),
+          locationProvider.overrideWith(FakeLocationNotifier.new),
         ],
       );
       addTearDown(container.dispose);
@@ -44,11 +58,13 @@ void main() {
 
     test('transitions to data on success', () async {
       final mock = MockWeatherRepository();
-      when(mock.getForecast()).thenAnswer((_) => Future.value([testForecast]));
+      when(mock.getForecast(lat: anyNamed('lat'), lon: anyNamed('lon')))
+          .thenAnswer((_) => Future.value([testForecast]));
 
       final container = ProviderContainer(
         overrides: [
           weatherRepositoryProvider.overrideWithValue(mock),
+          locationProvider.overrideWith(FakeLocationNotifier.new),
         ],
       );
       addTearDown(container.dispose);
@@ -61,13 +77,15 @@ void main() {
     test('transitions to error state on failure', () async {
       final mock = MockWeatherRepository();
       // Use async throw so the error goes through the Future pipeline
-      when(mock.getForecast()).thenAnswer((_) async {
+      when(mock.getForecast(lat: anyNamed('lat'), lon: anyNamed('lon')))
+          .thenAnswer((_) async {
         throw Exception('network');
       });
 
       final container = ProviderContainer(
         overrides: [
           weatherRepositoryProvider.overrideWithValue(mock),
+          locationProvider.overrideWith(FakeLocationNotifier.new),
         ],
       );
       addTearDown(container.dispose);

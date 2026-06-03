@@ -2,7 +2,7 @@
 ///
 /// Dekt Phase 6 Plan 04 success criteria:
 ///   1. ProfileScreen toont vier Slider-widgets bij een geladen profiel
-///   2. Sectiekopteksten 'TOLERANTIES', 'RIJLENGTE' en 'THEMA' aanwezig
+///   2. Sectiekopteksten TOLERANTIES, RIJLENGTE, THEMA en LOCATIE aanwezig
 ///   3. Drie FilterChip-widgets aanwezig; chip '2u' is selected
 ///   4. SegmentedButton aanwezig; segment 'Systeem' is geselecteerd
 ///   5. Knop/tegel 'Mijn schema bewerken' aanwezig
@@ -10,10 +10,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
+import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 
 // ---------------------------------------------------------------------------
@@ -35,7 +37,7 @@ const testProfile = UserProfile(
 );
 
 // ---------------------------------------------------------------------------
-// Fake Notifier
+// Fake Notifiers
 // ---------------------------------------------------------------------------
 
 class FakeProfileNotifier extends ProfileNotifier {
@@ -46,15 +48,28 @@ class FakeProfileNotifier extends ProfileNotifier {
   Future<UserProfile> build() async => fakeProfile;
 }
 
+/// Fake GPS-toestemmingsnotifier voor widget-tests — geen Geolocator nodig.
+class FakeGpsPermissionNotifier extends GpsPermissionNotifier {
+  final LocationPermission fakePermission;
+  FakeGpsPermissionNotifier(this.fakePermission);
+
+  @override
+  Future<LocationPermission> build() async => fakePermission;
+}
+
 // ---------------------------------------------------------------------------
 // Helper
 // ---------------------------------------------------------------------------
 
-Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile) async {
+Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile,
+    {LocationPermission permission = LocationPermission.denied}) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         profileProvider.overrideWith(() => FakeProfileNotifier(profile)),
+        gpsPermissionProvider.overrideWith(
+          () => FakeGpsPermissionNotifier(permission),
+        ),
       ],
       child: const MaterialApp(home: ProfileScreen()),
     ),
@@ -77,17 +92,20 @@ void main() {
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
-    expect(find.byType(Slider), findsNWidgets(4));
+    // skipOffstage: false — ListView rendert alleen zichtbare items in viewport.
+    expect(find.byType(Slider, skipOffstage: false), findsNWidgets(4));
   });
 
   testWidgets(
-      'Test 2: Sectiekopteksten TOLERANTIES, RIJLENGTE en THEMA aanwezig',
+      'Test 2: Sectiekopteksten TOLERANTIES, RIJLENGTE, THEMA en LOCATIE aanwezig',
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
-    expect(find.text('TOLERANTIES'), findsOneWidget);
-    expect(find.text('RIJLENGTE'), findsOneWidget);
-    expect(find.text('THEMA'), findsOneWidget);
+    // skipOffstage: false — secties buiten het viewport zijn nog in de widget tree.
+    expect(find.text('LOCATIE', skipOffstage: false), findsOneWidget);
+    expect(find.text('TOLERANTIES', skipOffstage: false), findsOneWidget);
+    expect(find.text('RIJLENGTE', skipOffstage: false), findsOneWidget);
+    expect(find.text('THEMA', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets(
@@ -95,8 +113,8 @@ void main() {
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
-    // Drie FilterChip widgets aanwezig
-    expect(find.byType(FilterChip), findsNWidgets(3));
+    // Drie FilterChip widgets aanwezig (skipOffstage: false — RIJLENGTE buiten viewport)
+    expect(find.byType(FilterChip, skipOffstage: false), findsNWidgets(3));
 
     // Chip '2u' is geselecteerd (testProfile.allowedDurations bevat 2)
     expect(
@@ -106,6 +124,7 @@ void main() {
             w.label is Text &&
             (w.label as Text).data == '2u' &&
             w.selected == true,
+        skipOffstage: false,
       ),
       findsOneWidget,
       reason: 'FilterChip "2u" moet selected zijn',
@@ -118,11 +137,11 @@ void main() {
     await pumpProfileScreen(tester, testProfile);
 
     expect(
-      find.byType(SegmentedButton<String>),
+      find.byType(SegmentedButton<String>, skipOffstage: false),
       findsOneWidget,
     );
     // 'Systeem' is zichtbaar als segment label
-    expect(find.text('Systeem'), findsOneWidget);
+    expect(find.text('Systeem', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets(
@@ -130,6 +149,6 @@ void main() {
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
-    expect(find.text('Mijn schema bewerken'), findsOneWidget);
+    expect(find.text('Mijn schema bewerken', skipOffstage: false), findsOneWidget);
   });
 }
