@@ -80,7 +80,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     AsyncValue<List<HourlyForecast>> weatherState,
   ) {
     return Container(
-      color: Colors.white,
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
       decoration: const BoxDecoration(
         color: Colors.white,
