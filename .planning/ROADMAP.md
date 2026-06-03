@@ -150,7 +150,7 @@ Plans:
 
 **Wave 4** *(geblokkeerd op Wave 3)*
 
-- [ ] 04-04-PLAN.md — HomeScreen (week strip + ride cards + skeleton + lege staat) + main.dart MaterialApp.router
+- [x] 04-04-PLAN.md — HomeScreen (week strip + ride cards + skeleton + lege staat) + main.dart MaterialApp.router
 
 **Wave 5** *(geblokkeerd op Wave 4)*
 
@@ -264,7 +264,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
-| 4. UI Phase A — Onboarding + Home + Welcome | 3/5 | In Progress | - |
+| 4. UI Phase A — Onboarding + Home + Welcome | 4/5 | In Progress | - |
 | 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |

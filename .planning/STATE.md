@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router real imports (commits 7f18b68, 84dfe0a)"
-last_updated: "2026-06-03T07:39:20.000Z"
-last_activity: 2026-06-03 -- Phase 04 Plan 03 complete
+stopped_at: "Completed 04-04-PLAN.md — HomeScreen week strip + ride cards + skeleton + MaterialApp.router (commits c9835c1, 7db99e3)"
+last_updated: "2026-06-03T07:47:25.000Z"
+last_activity: 2026-06-03 -- Phase 04 Plan 04 complete
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 19
-  completed_plans: 16
-  percent: 39
+  completed_plans: 17
+  percent: 42
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 04 (ui-phase-a-onboarding-home-welcome) — EXECUTING
-Plan: 4 of 5
-Status: Executing Phase 04
-Last activity: 2026-06-03 -- Phase 04 Plan 03 complete
+Plan: 5 of 5
+Status: Executing Phase 04 (final plan pending: 04-05 widget tests)
+Last activity: 2026-06-03 -- Phase 04 Plan 04 complete
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -93,6 +93,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 04-03 (2026-06-03): _PresetOption plain Dart class chosen over Dart 3 records — simpler, named fields, avoids positional access syntax.
 - 04-03 (2026-06-03): Dashed border for custom preset via _DashedBorderPainter CustomPainter — Flutter Border API does not support BorderStyle.dashed.
 - 04-03 (2026-06-03): _HomeScreenPlaceholder retained in router.dart; Wave 4 (04-04) replaces with real HomeScreen import.
+- 04-04 (2026-06-03): Weather chip values are placeholder "?°C / ?mm / ?km/u" — HourlyForecast data not directly accessible from RideSlot; Phase 5 will wire real data.
+- 04-04 (2026-06-03): HomeScreen uses SingleTickerProviderStateMixin for skeleton pulse AnimationController — no shimmer package needed.
+- 04-04 (2026-06-03): Day selection uses year+month+day triple comparison to avoid cross-month false matches.
 
 ### Pending Todos
 
@@ -116,7 +119,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T07:39:20Z
-Stopped at: Completed 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router real imports (commits 7f18b68, 84dfe0a)
+Last session: 2026-06-03T07:47:25Z
+Stopped at: Completed 04-04-PLAN.md — HomeScreen week strip + ride cards + skeleton + MaterialApp.router (commits c9835c1, 7db99e3)
 Resume file: None
-Next action: Execute 04-04-PLAN.md — HomeScreen (week strip + ride cards + skeleton + lege staat) + main.dart MaterialApp.router
+Next action: Execute 04-05-PLAN.md — Widget tests for WelcomeScreen, OnboardingScreen, HomeScreen (loading/data/empty)
