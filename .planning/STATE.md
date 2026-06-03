@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 04-01-PLAN.md — AvailabilityNotifier upgrade Set→Map<DateTime,BlockType>, AvailabilityFilter+SlotsNotifier updated (commits f1d01ea, 8e3232d)"
-last_updated: "2026-06-03T07:30:00.000Z"
-last_activity: 2026-06-03 -- Phase 04 Plan 01 complete
+stopped_at: "Completed 04-02-PLAN.md — go_router 17.3.0 + config.dart + LocationProvider stub + availability_presets + GoRouter onboarding redirect (commits f859557, 675c25f)"
+last_updated: "2026-06-03T07:28:00.000Z"
+last_activity: 2026-06-03 -- Phase 04 Plan 02 complete
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 19
-  completed_plans: 14
-  percent: 36
+  completed_plans: 15
+  percent: 37
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 04 (ui-phase-a-onboarding-home-welcome) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Executing Phase 04
-Last activity: 2026-06-03 -- Phase 04 Plan 01 complete
+Last activity: 2026-06-03 -- Phase 04 Plan 02 complete
 
 Progress: [████████░░] 80%
 
@@ -87,6 +87,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 04-01 (2026-06-03): BlockType enum in availability_notifier.dart (niet apart bestand) — eenvoudiger voor Phase 4; refactor in Phase 6 indien nodig.
 - 04-01 (2026-06-03): domain→providers import richting in availability_filter.dart geaccepteerd per PATTERNS.md notitie (tijdelijk, Phase 6 refactor).
 - 04-01 (2026-06-03): try-catch around SharedPreferences deserialization voor T-04-01: corrupt entries worden overgeslagen (log + skip).
+- 04-02 (2026-06-03): go_router resolved to 17.3.0 (plan specified ^17.2.3 — semver compatible, accepted).
+- 04-02 (2026-06-03): buildPreset assert enforces weekStart.weekday == DateTime.monday; test date fixed from DateTime(2026,6,9) [Tuesday] to DateTime(2026,6,8) [Monday].
+- 04-02 (2026-06-03): Stub screen classes (_WelcomeScreenStub etc.) in router.dart allow file to compile before Wave 3 creates real screens; replace in 04-03.
 
 ### Pending Todos
 
@@ -110,7 +113,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T07:30:00Z
-Stopped at: Completed 04-01-PLAN.md — AvailabilityNotifier upgrade Set→Map<DateTime,BlockType>, AvailabilityFilter+SlotsNotifier updated (commits f1d01ea, 8e3232d)
+Last session: 2026-06-03T07:28:00Z
+Stopped at: Completed 04-02-PLAN.md — go_router 17.3.0 + config.dart + LocationProvider stub + availability_presets + GoRouter onboarding redirect (commits f859557, 675c25f)
 Resume file: None
-Next action: Execute 04-02-PLAN.md — go_router pubspec + config + availability_presets + GoRouter onboarding redirect
+Next action: Execute 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router real imports

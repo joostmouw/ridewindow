@@ -142,7 +142,7 @@ Plans:
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
-- [ ] 04-02-PLAN.md — go_router pubspec + config.dart + LocationProvider stub + availability_presets.dart + GoRouter met onboarding redirect
+- [x] 04-02-PLAN.md — go_router pubspec + config.dart + LocationProvider stub + availability_presets.dart + GoRouter met onboarding redirect
 
 **Wave 3** *(geblokkeerd op Wave 2)*
 
@@ -264,7 +264,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
-| 4. UI Phase A — Onboarding + Home + Welcome | 1/5 | In Progress | - |
+| 4. UI Phase A — Onboarding + Home + Welcome | 2/5 | In Progress | - |
 | 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
