@@ -171,7 +171,24 @@ Plans:
   3. Tapping the "Why this score?" trigger opens the InsightsSheet as a bottom sheet with three `LinearProgressIndicator` bars (temp, rain, wind) and a one-line explanation per factor
   4. Each progress bar in the InsightsSheet reflects the actual sub-score values from `ScoringEngine` — confirmed by matching against a known fixture
 
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — HourlyRow model + DetailArgs DTO + ScoreBadge widget + /detail route + HomeScreen tap-navigatie + echte weather chips
+
+**Wave 2** *(geblokkeerd op Wave 1)*
+
+- [ ] 05-02-PLAN.md — RideDetailScreen volledig scherm (score-banner, info-kaarten, uurlijkse tabel, InsightsSheet stub)
+
+**Wave 3** *(geblokkeerd op Wave 2)*
+
+- [ ] 05-03-PLAN.md — InsightsSheet volledige bottom-sheet (3 LinearProgressIndicator balken, sub-scores, uitleg per factor)
+
+**Wave 4** *(geblokkeerd op Wave 3)*
+
+- [ ] 05-04-PLAN.md — Widget tests: RideDetailScreen (5 tests) + InsightsSheet fixture-test (4 tests)
+
 **UI hint**: yes
 
 ### Phase 6: UI Phase C — Profile + Availability + Tolerance sliders
@@ -265,7 +282,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
-| 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
+| 5. UI Phase B — Ride Detail + Insights sheet | 0/4 | Not started | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
 | 8. Background refresh + Notifications | 0/TBD | Not started | - |
