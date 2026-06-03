@@ -1,26 +1,17 @@
 // lib/app/router.dart
 // go_router configuratie met onboarding redirect.
 // Wave 3: WelcomeScreen, OnboardingScreen en AvailabilityScreen zijn echte imports.
-// Wave 4 voegt HomeScreen toe — tot die tijd is _HomeScreenPlaceholder tijdelijk.
+// Wave 4: HomeScreen is echte import (Wave 4 voltooid).
 
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
+import 'package:ridewindow/features/home/home_screen.dart';
 
 part 'router.g.dart';
-
-// TODO(wave-4): vervang door echte HomeScreen import
-class _HomeScreenPlaceholder extends StatelessWidget {
-  const _HomeScreenPlaceholder();
-
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Home \u2014 komt in Wave 4')));
-}
 
 /// GoRouter met onboarding-redirect en vier Phase 4 routes.
 ///
@@ -47,7 +38,7 @@ GoRouter router(Ref ref) {
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const _HomeScreenPlaceholder(),
+        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: '/availability',
