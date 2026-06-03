@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 04-04-PLAN.md — HomeScreen week strip + ride cards + skeleton + MaterialApp.router (commits c9835c1, 7db99e3)"
-last_updated: "2026-06-03T07:47:25.000Z"
-last_activity: 2026-06-03 -- Phase 04 Plan 04 complete
+stopped_at: "Completed 04-05-PLAN.md — Widget tests WelcomeScreen + OnboardingScreen + HomeScreen (commit 9beae16)"
+last_updated: "2026-06-03T08:30:00.000Z"
+last_activity: 2026-06-03 -- Phase 04 COMPLETE (all 5 plans done, 9 widget tests green)
 progress:
   total_phases: 11
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 19
-  completed_plans: 17
-  percent: 42
+  completed_plans: 18
+  percent: 47
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 04 (ui-phase-a-onboarding-home-welcome) — EXECUTING
+Phase: 04 (ui-phase-a-onboarding-home-welcome) — COMPLETE
 Plan: 5 of 5
-Status: Executing Phase 04 (final plan pending: 04-05 widget tests)
-Last activity: 2026-06-03 -- Phase 04 Plan 04 complete
+Status: Phase 04 complete — next: Phase 05 (UI Phase B — Ride Detail + Insights sheet)
+Last activity: 2026-06-03 -- Phase 04 COMPLETE (widget tests green, 115/115 suite passes)
 
-Progress: [█████████░] 90%
+Progress: [████████████░] 47%
 
 ## Performance Metrics
 
@@ -96,6 +96,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 04-04 (2026-06-03): Weather chip values are placeholder "?°C / ?mm / ?km/u" — HourlyForecast data not directly accessible from RideSlot; Phase 5 will wire real data.
 - 04-04 (2026-06-03): HomeScreen uses SingleTickerProviderStateMixin for skeleton pulse AnimationController — no shimmer package needed.
 - 04-04 (2026-06-03): Day selection uses year+month+day triple comparison to avoid cross-month false matches.
+- 04-05 (2026-06-03): tester.pump(Duration) used instead of pumpAndSettle in HomeScreen tests — AnimationController.repeat() causes pumpAndSettle to timeout.
+- 04-05 (2026-06-03): FakeStaticSlotsNotifier omits ref.watch calls to bypass upstream provider initialization in widget tests.
+- 04-05 (2026-06-03): HomeScreen._buildHeader Container color+decoration bug fixed — Container cannot have both color and decoration properties simultaneously.
 
 ### Pending Todos
 
@@ -119,7 +122,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T07:47:25Z
-Stopped at: Completed 04-04-PLAN.md — HomeScreen week strip + ride cards + skeleton + MaterialApp.router (commits c9835c1, 7db99e3)
+Last session: 2026-06-03T08:30:00Z
+Stopped at: Completed 04-05-PLAN.md — Widget tests WelcomeScreen + OnboardingScreen + HomeScreen (commit 9beae16)
 Resume file: None
-Next action: Execute 04-05-PLAN.md — Widget tests for WelcomeScreen, OnboardingScreen, HomeScreen (loading/data/empty)
+Next action: Plan Phase 05 — UI Phase B: Ride Detail screen + Insights bottom sheet

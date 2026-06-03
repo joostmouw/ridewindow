@@ -15,7 +15,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - [ ] **Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator** - Pure-Dart domain code with 100% unit test coverage of lib/domain/
 - [x] **Phase 2: Data layer — Drift + Open-Meteo** - Drift schema, OpenMeteoClient, WeatherRepository, forecast cache
 - [x] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
-- [ ] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
+- [x] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
 - [ ] **Phase 5: UI Phase B — Ride Detail + Insights sheet** - Ride Detail screen + "Why this score?" insights bottom sheet
 - [ ] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips
 - [ ] **Phase 7: Location — GPS + manual city + permission state machine** - geolocator, permission_handler, city picker fallback
@@ -264,7 +264,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
-| 4. UI Phase A — Onboarding + Home + Welcome | 4/5 | In Progress | - |
+| 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
 | 5. UI Phase B — Ride Detail + Insights sheet | 0/TBD | Not started | - |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 0/TBD | Not started | - |
 | 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
