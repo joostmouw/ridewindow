@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Executing Phase 3 — plan 03-01 complete, 03-02 next"
-stopped_at: "Completed 03-01-PLAN.md — WeatherNotifier + infrastructure providers"
-last_updated: "2026-06-02T21:40:03.890Z"
-last_activity: 2026-06-02
+status: executing
+stopped_at: "Completed 03-02-PLAN.md — ProfileNotifier + UserProfile with SharedPreferences (commit e49e116)"
+last_updated: "2026-06-03T08:20:00.000Z"
+last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 3
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
   percent: 27
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 3 van 11 (Riverpod providers + state graph) — IN UITVOERING
-Plan: 1 van 4 complete
-Status: Executing — 03-01 gedaan, 03-02 volgende
-Last activity: 2026-06-02
+Plan: 2 van 4 complete
+Status: Executing — 03-02 gedaan, 03-03 volgende
+Last activity: 2026-06-03
 
 Progress: [████████░░] 79%
 
@@ -54,6 +54,7 @@ Progress: [████████░░] 79%
 - Trend: Geautomatiseerde executor verwerkt mechanische infra-taken goed
 
 | Phase 03-riverpod-providers-state-graph P01 | 25 | 2 tasks | 8 files |
+| Phase 03-riverpod-providers-state-graph P02 | 20 | 1 task | 5 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 03-01 (2026-06-02): Riverpod 3.x gegenereerde provider-naam voor WeatherNotifier is weatherProvider (Notifier-suffix gestript door code-gen).
 - 03-01 (2026-06-02): Riverpod 3.x error-staat is AsyncLoading(hasError: true) door auto-retry — test checkt state.hasError ipv isA<AsyncError>().
 - 03-01 (2026-06-02): Ref-parameter in Riverpod 3.x provider-functies is plain Ref (niet typed XxxRef).
+- 03-02 (2026-06-03): UserProfile als plain Dart class met _sentinel-pattern voor nullable copyWith — geen Freezed benodigd voor scalar settings dataklasse.
+- 03-02 (2026-06-03): profileProvider is de gegenereerde naam voor ProfileNotifier (Notifier-suffix gestript door Riverpod 3.x code-gen).
 
 ### Pending Todos
 
@@ -96,7 +99,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-02T22:00:00Z
-Stopped at: Completed 03-01-PLAN.md — WeatherNotifier + infrastructure providers (commits b0caf28, 67ddc86)
+Last session: 2026-06-03T08:20:00Z
+Stopped at: Completed 03-02-PLAN.md — ProfileNotifier + UserProfile with SharedPreferences (commit e49e116)
 Resume file: None
-Next action: `/gsd:execute-phase 03` — ga verder met 03-02-PLAN.md (ProfileNotifier + AvailabilityNotifier)
+Next action: `/gsd:execute-phase 03` — ga verder met 03-03-PLAN.md (SlotsNotifier + AvailabilityNotifier)
