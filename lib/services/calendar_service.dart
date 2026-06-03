@@ -30,7 +30,7 @@ class CalendarService {
     RideSlot slot,
     List<HourlyForecast> forecasts,
   ) async {
-    // Stap 1: Zorg dat GoogleSignIn is geïnitialiseerd (lazy).
+    // Stap 1: Zorg dat GoogleSignIn is geinitialiseerd (lazy).
     await _ensureInitialized();
 
     // Stap 2: Vraag OAuth-autorisatie voor calendarEventsScope (CAL-04).
@@ -55,10 +55,11 @@ class CalendarService {
       final calendarApi = CalendarApi(client);
 
       // Stap 5: Weersamenvatting opbouwen (CAL-03).
-      final description = _buildWeatherSummary(forecasts);
+      final description = buildWeatherSummary(forecasts);
 
       // Stap 6: Event-titel en Event-object samenstellen.
-      final title = 'Fietsrit ${_fmtTime(slot.start)}–${_fmtTime(slot.end)}';
+      final title =
+          'Fietsrit ${_fmtTime(slot.start)}\u2013${_fmtTime(slot.end)}';
 
       final event = Event(
         summary: title,
@@ -82,13 +83,13 @@ class CalendarService {
   }
 
   // ---------------------------------------------------------------------------
-  // Private helpers
+  // Public helpers (testbaar)
   // ---------------------------------------------------------------------------
 
-  String _fmtTime(DateTime dt) =>
-      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-
-  String _buildWeatherSummary(List<HourlyForecast> forecasts) {
+  /// Bouwt een één-regel weersamenvatting van forecast-data (CAL-03).
+  /// Voorbeeld: "~18°C, droog, 12km/u wind"
+  /// Geeft "Geen weerdata beschikbaar" terug als [forecasts] leeg is.
+  static String buildWeatherSummary(List<HourlyForecast> forecasts) {
     if (forecasts.isEmpty) return 'Geen weerdata beschikbaar';
 
     // Gemiddelde temperatuur.
@@ -121,4 +122,11 @@ class CalendarService {
 
     return '$tempStr, $precipStr, $windStr';
   }
+
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
+  String _fmtTime(DateTime dt) =>
+      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }
