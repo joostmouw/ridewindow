@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-03-PLAN.md — ProfileScreen LOCATIE sectie + WeatherNotifier echte locatie (commits d237d6c, 8b18af5)
-last_updated: "2026-06-03T17:43:41.536Z"
+stopped_at: Completed 07-04-PLAN.md — HomeScreen dynamische locatienaam (pre-implemented in Wave 2 commit 9850f0f)
+last_updated: "2026-06-03T17:46:00Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 32
-  completed_plans: 30
-  percent: 64
+  completed_plans: 31
+  percent: 66
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 07 (location-gps-manual-city-permission-state-machine) — EXECUTING
-Plan: 3 of 5
-Status: Plan 03 complete — ProfileScreen LOCATIE sectie + WeatherNotifier echte locatie
+Plan: 4 of 5
+Status: Plan 04 complete — HomeScreen dynamische locatienaam (reeds geimplementeerd in Wave 2)
 Last activity: 2026-06-03
 
 Progress: [█████████░] 94%
@@ -134,6 +134,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 07-03 (2026-06-03): skipOffstage: false vereist in ProfileScreen widget tests — LOCATIE sectie zorgt dat RIJLENGTE/THEMA buiten test-viewport rolt in scrollbare ListView
 - 07-03 (2026-06-03): FakeLocationNotifier extends LocationNotifier toegevoegd aan weather_notifier_test — WeatherNotifier watchet locationProvider; ProviderContainer tests vereisen override
 - 07-03 (2026-06-03): anyNamed() matcher in mockito voor named parameters na getForecast({lat, lon}) signature uitbreiding
+- 07-04 (2026-06-03): HomeScreen dynamische locatienaam reeds geimplementeerd in Wave 2 als Rule 3 auto-fix — locationAsync.value?.city ?? kDefaultCity
+- 07-04 (2026-06-03): kDefaultCity ('Amsterdam') als fallback tijdens AsyncLoading — consistenter dan literal '...' uit plan specificatie
 
 ### Pending Todos
 
@@ -157,7 +159,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:43:41.532Z
-Stopped at: Completed 07-02-PLAN.md — GpsPermissionNotifier + LocationNotifier (commits a7a5961, 29a642e, 9a269e0, 9850f0f)
+Last session: 2026-06-03T17:46:00Z
+Stopped at: Completed 07-04-PLAN.md — HomeScreen dynamische locatienaam (pre-implemented commit 9850f0f)
 Resume file: None
-Next action: Execute Phase 07 Plan 03
+Next action: Execute Phase 07 Plan 05
