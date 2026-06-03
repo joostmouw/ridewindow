@@ -63,11 +63,11 @@
 
 ### Notifications (NOTIF) — Heads-up alerts
 
-- [ ] **NOTIF-01**: User can toggle "Evening before" notification (19:00 prior day, if next-day slot is Great or Perfect)
-- [ ] **NOTIF-02**: User can toggle "Morning of" notification (slot start - 2h, if today's slot is Great or Perfect)
-- [ ] **NOTIF-03**: User can toggle "Weekly digest" notification (Sunday 19:00, summary of week's best slots)
-- [ ] **NOTIF-04**: App requests Android 13+ `POST_NOTIFICATIONS` permission via the standard runtime prompt
-- [ ] **NOTIF-05**: App requests Android 12+ `SCHEDULE_EXACT_ALARM` permission via system settings deep-link, with fallback to inexact scheduling if denied
+- [x] **NOTIF-01**: User can toggle "Evening before" notification (19:00 prior day, if next-day slot is Great or Perfect)
+- [x] **NOTIF-02**: User can toggle "Morning of" notification (slot start - 2h, if today's slot is Great or Perfect)
+- [x] **NOTIF-03**: User can toggle "Weekly digest" notification (Sunday 19:00, summary of week's best slots)
+- [x] **NOTIF-04**: App requests Android 13+ `POST_NOTIFICATIONS` permission via the standard runtime prompt
+- [x] **NOTIF-05**: App requests Android 12+ `SCHEDULE_EXACT_ALARM` permission via system settings deep-link, with fallback to inexact scheduling if denied
 - [x] **NOTIF-06**: Background refresh uses `workmanager` with 3–6h periodic interval and shows `lastRefreshed` timestamp in the UI
 
 ### Calendar (CAL) — Google Calendar integration

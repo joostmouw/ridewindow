@@ -287,7 +287,7 @@ Plans:
 
 **Wave 3** *(geblokkeerd op Wave 2)*
 
-- [ ] 08-03-PLAN.md — NotificationService (flutter_local_notifications + timezone + 3 schedulers + permissie-flow)
+- [x] 08-03-PLAN.md — NotificationService (flutter_local_notifications + timezone + 3 schedulers + permissie-flow)
 
 **Wave 4** *(geblokkeerd op Wave 3)*
 
@@ -342,6 +342,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 2/5 | In progress | 2026-06-03 |
+| 8. Background refresh + Notifications | 3/5 | In Progress|  |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |
