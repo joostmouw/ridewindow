@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 04-02-PLAN.md — go_router 17.3.0 + config.dart + LocationProvider stub + availability_presets + GoRouter onboarding redirect (commits f859557, 675c25f)"
-last_updated: "2026-06-03T07:28:00.000Z"
-last_activity: 2026-06-03 -- Phase 04 Plan 02 complete
+stopped_at: "Completed 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router real imports (commits 7f18b68, 84dfe0a)"
+last_updated: "2026-06-03T07:39:20.000Z"
+last_activity: 2026-06-03 -- Phase 04 Plan 03 complete
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 19
-  completed_plans: 15
-  percent: 37
+  completed_plans: 16
+  percent: 39
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 04 (ui-phase-a-onboarding-home-welcome) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Executing Phase 04
-Last activity: 2026-06-03 -- Phase 04 Plan 02 complete
+Last activity: 2026-06-03 -- Phase 04 Plan 03 complete
 
 Progress: [████████░░] 80%
 
@@ -90,6 +90,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 04-02 (2026-06-03): go_router resolved to 17.3.0 (plan specified ^17.2.3 — semver compatible, accepted).
 - 04-02 (2026-06-03): buildPreset assert enforces weekStart.weekday == DateTime.monday; test date fixed from DateTime(2026,6,9) [Tuesday] to DateTime(2026,6,8) [Monday].
 - 04-02 (2026-06-03): Stub screen classes (_WelcomeScreenStub etc.) in router.dart allow file to compile before Wave 3 creates real screens; replace in 04-03.
+- 04-03 (2026-06-03): _PresetOption plain Dart class chosen over Dart 3 records — simpler, named fields, avoids positional access syntax.
+- 04-03 (2026-06-03): Dashed border for custom preset via _DashedBorderPainter CustomPainter — Flutter Border API does not support BorderStyle.dashed.
+- 04-03 (2026-06-03): _HomeScreenPlaceholder retained in router.dart; Wave 4 (04-04) replaces with real HomeScreen import.
 
 ### Pending Todos
 
@@ -113,7 +116,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T07:28:00Z
-Stopped at: Completed 04-02-PLAN.md — go_router 17.3.0 + config.dart + LocationProvider stub + availability_presets + GoRouter onboarding redirect (commits f859557, 675c25f)
+Last session: 2026-06-03T07:39:20Z
+Stopped at: Completed 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router real imports (commits 7f18b68, 84dfe0a)
 Resume file: None
-Next action: Execute 04-03-PLAN.md — WelcomeScreen + OnboardingScreen + AvailabilityScreen stub + router real imports
+Next action: Execute 04-04-PLAN.md — HomeScreen (week strip + ride cards + skeleton + lege staat) + main.dart MaterialApp.router
