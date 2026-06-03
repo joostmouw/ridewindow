@@ -239,7 +239,27 @@ Plans:
   4. If location permission is permanently denied, the app detects this, shows a clear explanation, offers a deep-link to app settings, and automatically falls back to the city picker as the primary location source
   5. A manually set location override persists across app restarts and takes precedence over GPS until the user explicitly clears it
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — pubspec.yaml (geolocator + permission_handler) + build.gradle.kts compileSdk=35 + AndroidManifest locatie-permissies + lib/core/nl_cities.dart
+
+**Wave 2** *(geblokkeerd op Wave 1)*
+
+- [ ] 07-02-PLAN.md — GpsPermissionNotifier (state machine) + LocationNotifier (vervangt stub, prioriteitslogica: override > GPS > default)
+
+**Wave 3** *(geblokkeerd op Wave 2)*
+
+- [ ] 07-03-PLAN.md — ProfileScreen LOCATIE sectie (stad-picker bottom sheet + GPS-geblokkeerd banner) + WeatherRepository lat/lon params + WeatherNotifier locatie-koppeling
+
+**Wave 4** *(geblokkeerd op Wave 3)*
+
+- [ ] 07-04-PLAN.md — HomeScreen header dynamische locatienaam (locationProvider als AsyncValue)
+
+**Wave 5** *(geblokkeerd op Wave 4)*
+
+- [ ] 07-05-PLAN.md — Widget-tests: ProfileScreen locatie (5 tests) + HomeScreen locatienaam (2 tests) + volledige suite gate
 
 ### Phase 8: Background refresh + Notifications
 
@@ -301,7 +321,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
-| 7. Location — GPS + manual city + permission state machine | 0/TBD | Not started | - |
+| 7. Location — GPS + manual city + permission state machine | 0/5 | Not started | - |
 | 8. Background refresh + Notifications | 0/TBD | Not started | - |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |
