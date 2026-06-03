@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-04-PLAN.md — HomeScreen dynamische locatienaam (pre-implemented in Wave 2 commit 9850f0f)
-last_updated: "2026-06-03T17:46:00Z"
+stopped_at: Completed 07-05-PLAN.md — Widget-tests locatie-UI ProfileScreen + HomeScreen — Phase 7 afgerond
+last_updated: "2026-06-03T18:10:00Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 32
-  completed_plans: 31
-  percent: 66
+  completed_plans: 32
+  percent: 69
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 07 (location-gps-manual-city-permission-state-machine) — EXECUTING
-Plan: 4 of 5
-Status: Plan 04 complete — HomeScreen dynamische locatienaam (reeds geimplementeerd in Wave 2)
+Phase: 07 (location-gps-manual-city-permission-state-machine) — COMPLETE
+Plan: 5 of 5
+Status: Plan 05 complete — Widget-tests locatie-UI (7 tests, 173 totaal in suite) — Phase 7 volledig afgerond
 Last activity: 2026-06-03
 
-Progress: [█████████░] 94%
+Progress: [██████████] 100% (Phase 7)
 
 ## Performance Metrics
 
@@ -136,6 +136,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 07-03 (2026-06-03): anyNamed() matcher in mockito voor named parameters na getForecast({lat, lon}) signature uitbreiding
 - 07-04 (2026-06-03): HomeScreen dynamische locatienaam reeds geimplementeerd in Wave 2 als Rule 3 auto-fix — locationAsync.value?.city ?? kDefaultCity
 - 07-04 (2026-06-03): kDefaultCity ('Amsterdam') als fallback tijdens AsyncLoading — consistenter dan literal '...' uit plan specificatie
+- 07-05 (2026-06-03): FakeWeatherNotifier lokaal gedefinieerd in profile_screen_location_test — ProfileScreen vereist weatherProvider override om te bouwen
+- 07-05 (2026-06-03): HomeScreen Test 2 verifieert 'Amsterdam' (kDefaultCity) i.p.v. '...' — conform implementatie beslissing 07-04
+- 07-05 (2026-06-03): Completer<void>().future voor permanente AsyncLoading simulatie — betrouwbaarder dan Future.delayed
 
 ### Pending Todos
 
@@ -159,7 +162,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:46:00Z
-Stopped at: Completed 07-04-PLAN.md — HomeScreen dynamische locatienaam (pre-implemented commit 9850f0f)
+Last session: 2026-06-03T18:10:00Z
+Stopped at: Completed 07-05-PLAN.md — Widget-tests locatie-UI (7 tests: 5 ProfileScreen + 2 HomeScreen) — Phase 7 afgerond
 Resume file: None
-Next action: Execute Phase 07 Plan 05
+Next action: Execute Phase 08 (Background refresh + Notifications)
