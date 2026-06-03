@@ -1,6 +1,6 @@
 // lib/features/detail/ride_detail_screen.dart
-// RideDetailScreen: full Wave 2 implementation.
-// Toont score-banner, info-kaart "Weer", uurlijkse tabel en placeholder-acties.
+// RideDetailScreen: full Wave 2 implementation + Phase 9 Google Calendar integratie.
+// Toont score-banner, info-kaart "Weer", uurlijkse tabel en werkende agenda-knop.
 
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
@@ -9,8 +9,9 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/services/calendar_service.dart';
 
-class RideDetailScreen extends StatelessWidget {
+class RideDetailScreen extends StatefulWidget {
   final RideSlot slot;
   final List<HourlyForecast> forecasts;
 
@@ -19,6 +20,13 @@ class RideDetailScreen extends StatelessWidget {
     required this.slot,
     required this.forecasts,
   });
+
+  @override
+  State<RideDetailScreen> createState() => _RideDetailScreenState();
+}
+
+class _RideDetailScreenState extends State<RideDetailScreen> {
+  bool _isLoading = false;
 
   // ---------------------------------------------------------------------------
   // Helpers: tier-afhankelijke waarden
@@ -71,7 +79,7 @@ class RideDetailScreen extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   String _avgTempString() {
-    final temps = forecasts
+    final temps = widget.forecasts
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
         .toList();
@@ -79,17 +87,18 @@ class RideDetailScreen extends StatelessWidget {
     final avg = temps.reduce((a, b) => a + b) / temps.length;
     final avgRounded = avg.round();
 
-    final apparent = forecasts
+    final apparent = widget.forecasts
         .where((f) => f.apparentTemperatureC != null)
         .map((f) => f.apparentTemperatureC!)
         .toList();
     if (apparent.isEmpty) return '$avgRounded°C';
-    final avgApparent = (apparent.reduce((a, b) => a + b) / apparent.length).round();
+    final avgApparent =
+        (apparent.reduce((a, b) => a + b) / apparent.length).round();
     return '$avgRounded°C, voelt als $avgApparent°C';
   }
 
   String _totalPrecipString() {
-    final vals = forecasts
+    final vals = widget.forecasts
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .toList();
@@ -100,7 +109,7 @@ class RideDetailScreen extends StatelessWidget {
   }
 
   String _avgWindString() {
-    final vals = forecasts
+    final vals = widget.forecasts
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
@@ -110,12 +119,46 @@ class RideDetailScreen extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------------------
+  // Agenda-actie
+  // ---------------------------------------------------------------------------
+
+  Future<void> _addToCalendar() async {
+    setState(() => _isLoading = true);
+    try {
+      // CalendarService wordt uitsluitend on-demand aangemaakt in onPressed (CAL-02).
+      await CalendarService().addRideSlotToCalendar(
+        widget.slot,
+        widget.forecasts,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Rijvenster toegevoegd aan Google Agenda!'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Kon niet toevoegen: ${e.toString()}'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Widgets
   // ---------------------------------------------------------------------------
 
   Widget _buildAppBar(BuildContext context) {
-    final duration = _fmtDuration(slot.start, slot.end);
-    final tierLabel = switch (slot.tier) {
+    final duration = _fmtDuration(widget.slot.start, widget.slot.end);
+    final tierLabel = switch (widget.slot.tier) {
       Perfect() => 'Perfect',
       Great() => 'Goed',
       Acceptable() => 'Acceptabel',
@@ -127,7 +170,7 @@ class RideDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${_fmtTime(slot.start)} – ${_fmtTime(slot.end)}',
+            '${_fmtTime(widget.slot.start)} – ${_fmtTime(widget.slot.end)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           Text(
@@ -143,10 +186,10 @@ class RideDetailScreen extends StatelessWidget {
   }
 
   Widget _buildScoreBanner(BuildContext context) {
-    final bg = _bannerBg(slot.tier);
-    final fg = _bannerFg(slot.tier);
-    final emoji = _tierEmoji(slot.tier);
-    final description = _tierDescription(slot.tier);
+    final bg = _bannerBg(widget.slot.tier);
+    final fg = _bannerFg(widget.slot.tier);
+    final emoji = _tierEmoji(widget.slot.tier);
+    final description = _tierDescription(widget.slot.tier);
 
     return Container(
       width: double.infinity,
@@ -160,7 +203,7 @@ class RideDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ScoreBadge(tier: slot.tier),
+                ScoreBadge(tier: widget.slot.tier),
                 const SizedBox(height: 4),
                 Text(
                   description,
@@ -178,7 +221,7 @@ class RideDetailScreen extends StatelessWidget {
             onPressed: () {
               showModalBottomSheet<void>(
                 context: context,
-                builder: (_) => InsightsSheet(slot: slot),
+                builder: (_) => InsightsSheet(slot: widget.slot),
               );
             },
           ),
@@ -329,16 +372,10 @@ class RideDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Google Agenda integratie komt in een volgende update.',
-                  ),
-                ),
-              );
-            },
-            child: const Text('Toevoegen aan agenda'),
+            onPressed: _isLoading ? null : _addToCalendar,
+            child: _isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text('Toevoegen aan agenda'),
           ),
           const SizedBox(height: 10),
           ElevatedButton(
@@ -367,7 +404,7 @@ class RideDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hourlyRows = buildHourlyRows(slot, forecasts);
+    final hourlyRows = buildHourlyRows(widget.slot, widget.forecasts);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
