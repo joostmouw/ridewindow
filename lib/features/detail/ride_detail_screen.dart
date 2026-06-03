@@ -11,14 +11,24 @@ import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
+/// Factory typedef voor CalendarService — maakt dependency injection
+/// in widget tests mogelijk zonder complexe DI-infrastructuur (PERS-04).
+typedef CalendarServiceFactory = CalendarService Function();
+
+CalendarService _defaultCalendarServiceFactory() => CalendarService();
+
 class RideDetailScreen extends StatefulWidget {
   final RideSlot slot;
   final List<HourlyForecast> forecasts;
+
+  /// Optionele factory voor testinjectie. Default maakt een echte CalendarService.
+  final CalendarServiceFactory calendarServiceFactory;
 
   const RideDetailScreen({
     super.key,
     required this.slot,
     required this.forecasts,
+    this.calendarServiceFactory = _defaultCalendarServiceFactory,
   });
 
   @override
@@ -47,17 +57,17 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
       };
 
   String _tierEmoji(RideTier tier) => switch (tier) {
-        Perfect() => '🟢',
-        Great() => '🟢',
-        Acceptable() => '🟡',
-        Poor() => '⚪',
+        Perfect() => '\u{1F7E2}',
+        Great() => '\u{1F7E2}',
+        Acceptable() => '\u{1F7E1}',
+        Poor() => '\u26AA',
       };
 
   String _tierDescription(RideTier tier) => switch (tier) {
-        Perfect() => 'Perfect — het beste venster deze week',
-        Great() => 'Goed — prettige rijomstandigheden',
-        Acceptable() => 'Acceptabel — te doen, pak een extra laag',
-        Poor() => 'Slecht — niet ideaal, maar mogelijk',
+        Perfect() => 'Perfect \u2014 het beste venster deze week',
+        Great() => 'Goed \u2014 prettige rijomstandigheden',
+        Acceptable() => 'Acceptabel \u2014 te doen, pak een extra laag',
+        Poor() => 'Slecht \u2014 niet ideaal, maar mogelijk',
       };
 
   // ---------------------------------------------------------------------------
@@ -83,7 +93,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
         .toList();
-    if (temps.isEmpty) return '—';
+    if (temps.isEmpty) return '\u2014';
     final avg = temps.reduce((a, b) => a + b) / temps.length;
     final avgRounded = avg.round();
 
@@ -91,10 +101,10 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
         .where((f) => f.apparentTemperatureC != null)
         .map((f) => f.apparentTemperatureC!)
         .toList();
-    if (apparent.isEmpty) return '$avgRounded°C';
+    if (apparent.isEmpty) return '$avgRounded\u00B0C';
     final avgApparent =
         (apparent.reduce((a, b) => a + b) / apparent.length).round();
-    return '$avgRounded°C, voelt als $avgApparent°C';
+    return '$avgRounded\u00B0C, voelt als $avgApparent\u00B0C';
   }
 
   String _totalPrecipString() {
@@ -102,7 +112,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .toList();
-    if (vals.isEmpty) return '—';
+    if (vals.isEmpty) return '\u2014';
     final total = vals.reduce((a, b) => a + b);
     if (total == 0.0) return 'Droog';
     return '${total.toStringAsFixed(1)}mm';
@@ -113,7 +123,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
-    if (vals.isEmpty) return '—';
+    if (vals.isEmpty) return '\u2014';
     final avg = vals.reduce((a, b) => a + b) / vals.length;
     return '${avg.round()}km/u';
   }
@@ -125,8 +135,9 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
   Future<void> _addToCalendar() async {
     setState(() => _isLoading = true);
     try {
-      // CalendarService wordt uitsluitend on-demand aangemaakt in onPressed (CAL-02).
-      await CalendarService().addRideSlotToCalendar(
+      // CalendarService wordt uitsluitend on-demand aangemaakt via de factory
+      // in onPressed (CAL-02). De factory is injecteerbaar voor tests (PERS-04).
+      await widget.calendarServiceFactory().addRideSlotToCalendar(
         widget.slot,
         widget.forecasts,
       );
@@ -170,11 +181,11 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${_fmtTime(widget.slot.start)} – ${_fmtTime(widget.slot.end)}',
+            '${_fmtTime(widget.slot.start)} \u2013 ${_fmtTime(widget.slot.end)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           Text(
-            '$duration · $tierLabel omstandigheden',
+            '$duration \u00B7 $tierLabel omstandigheden',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
           ),
         ],
@@ -298,19 +309,19 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
   Widget _buildHourlyRowWidget(HourlyRow row) {
     final time = _fmtTime(row.time);
     final temp = row.temperatureC != null
-        ? '${row.temperatureC!.round()}°C'
-        : '—';
+        ? '${row.temperatureC!.round()}\u00B0C'
+        : '\u2014';
     final apparent = row.apparentTemperatureC != null
-        ? 'v.a. ${row.apparentTemperatureC!.round()}°C'
+        ? 'v.a. ${row.apparentTemperatureC!.round()}\u00B0C'
         : '';
     final precip = row.precipitationMm != null
         ? (row.precipitationMm! == 0.0
-            ? '🌧 droog'
-            : '🌧 ${row.precipitationMm!.toStringAsFixed(1)}mm')
-        : '🌧 —';
+            ? '\u{1F327} droog'
+            : '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm')
+        : '\u{1F327} \u2014';
     final wind = row.windspeedKmh != null
-        ? '💨 ${row.windspeedKmh!.round()}km/u'
-        : '💨 —';
+        ? '\u{1F4A8} ${row.windspeedKmh!.round()}km/u'
+        : '\u{1F4A8} \u2014';
 
     return Container(
       decoration: const BoxDecoration(
