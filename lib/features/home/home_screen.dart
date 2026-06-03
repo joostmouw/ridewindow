@@ -617,7 +617,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return NavigationBar(
       selectedIndex: 0,
       onDestinationSelected: (i) {
-        // Profiel-navigatie komt in Phase 6.
+        if (i == 1) context.go('/profile');
       },
       destinations: const [
         NavigationDestination(

@@ -3,6 +3,7 @@
 // Wave 3: WelcomeScreen, OnboardingScreen en AvailabilityScreen zijn echte imports.
 // Wave 4: HomeScreen is echte import (Wave 4 voltooid).
 // Wave 5: /detail route toegevoegd met DetailArgs via state.extra.
+// Phase 6: /profile route toegevoegd; ProfileScreen navigeerbaar via bottomNav.
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'package:ridewindow/features/availability/availability_screen.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
+import 'package:ridewindow/features/profile/profile_screen.dart';
 
 part 'router.g.dart';
 
@@ -60,6 +62,11 @@ GoRouter router(Ref ref) {
           final args = state.extra as DetailArgs;
           return RideDetailScreen(slot: args.slot, forecasts: args.forecasts);
         },
+      ),
+      // Phase 6: ProfileScreen — toleranties, rijlengte, thema
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );
