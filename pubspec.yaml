@@ -37,8 +37,13 @@ dependencies:
   geolocator: ^14.0.2
   permission_handler: ^12.0.3
 
-  # Phase 2+ deps (geolocator, workmanager,
-  # flutter_local_notifications, google_sign_in, googleapis,
+  # Phase 8 — Achtergrond + Notificaties
+  workmanager: ^0.9.0+3
+  flutter_local_notifications: ^21.0.0
+  timezone: ^0.11.0
+  flutter_timezone: ^5.1.0
+
+  # Phase 2+ deps (google_sign_in, googleapis,
   # fl_chart) arrive in their own phases — not here.
 
 dev_dependencies:
