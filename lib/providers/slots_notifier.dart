@@ -106,7 +106,7 @@ class SlotsNotifier extends _$SlotsNotifier {
   /// - Als er wel slots waren maar alle geblokkeerd: [SlotsEmptyReason.allBlocked].
   SlotsEmptyReason? _determineReason(
     List<RideSlot> allSlots,
-    Set<DateTime> blockedHours,
+    Map<DateTime, BlockType> blockedHours,
   ) {
     if (allSlots.isEmpty) return SlotsEmptyReason.badWeather;
 

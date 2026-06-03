@@ -94,10 +94,10 @@ class FakeProfileNotifier extends ProfileNotifier {
       );
 }
 
-/// Fake AvailabilityNotifier met initieel lege blocked-set.
+/// Fake AvailabilityNotifier met initieel lege blocked-map.
 class EmptyAvailabilityNotifier extends AvailabilityNotifier {
   @override
-  Future<Set<DateTime>> build() async => {};
+  Future<Map<DateTime, BlockType>> build() async => const {};
 }
 
 // ---------------------------------------------------------------------------
@@ -254,10 +254,10 @@ void main() {
     expect(initial, isA<SlotsLoaded>());
     expect((initial as SlotsLoaded).slots, isNotEmpty);
 
-    // Blokkeer alle uren in de forecast-window via toggleHour
+    // Blokkeer alle uren in de forecast-window via toggleCustomHour
     final notifier = container.read(availabilityProvider.notifier);
     for (final fc in goodForecasts) {
-      await notifier.toggleHour(fc.time);
+      await notifier.toggleCustomHour(fc.time);
     }
 
     // SlotsNotifier hercomputed na availability-update

@@ -80,11 +80,11 @@ class FakeProfileNotifier extends ProfileNotifier {
 }
 
 class FakeAvailabilityNotifier extends AvailabilityNotifier {
-  Set<DateTime> initial;
+  Map<DateTime, BlockType> initial;
   FakeAvailabilityNotifier(this.initial);
 
   @override
-  Future<Set<DateTime>> build() async => initial;
+  Future<Map<DateTime, BlockType>> build() async => initial;
 }
 
 // ---------------------------------------------------------------------------
@@ -118,6 +118,7 @@ void main() {
 
       // Wacht tot de state beschikbaar is
       await container.read(weatherProvider.future);
+
       await container.read(profileProvider.future);
       await container.read(availabilityProvider.future);
 
@@ -214,7 +215,9 @@ void main() {
       final goodForecasts = _forecasts(baseTime, 6);
 
       // Blokkeer alle uren in de forecast-window
-      final blockedHours = goodForecasts.map((f) => f.time).toSet();
+      final blockedHours = Map.fromEntries(
+        goodForecasts.map((f) => MapEntry(f.time, BlockType.custom)),
+      );
 
       final container = ProviderContainer(
         overrides: [
