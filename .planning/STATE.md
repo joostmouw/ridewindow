@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 07-02-PLAN.md — GpsPermissionNotifier + LocationNotifier (commits a7a5961, 29a642e, 9a269e0, 9850f0f)
-last_updated: "2026-06-03T17:34:14Z"
+status: executing
+stopped_at: Completed 07-03-PLAN.md — ProfileScreen LOCATIE sectie + WeatherNotifier echte locatie (commits d237d6c, 8b18af5)
+last_updated: "2026-06-03T17:43:41.536Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 32
-  completed_plans: 29
-  percent: 66
+  completed_plans: 30
+  percent: 64
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 07 (location-gps-manual-city-permission-state-machine) — EXECUTING
-Plan: 2 of 5
-Status: Plan 02 complete — GpsPermissionNotifier + LocationNotifier priority logic
+Plan: 3 of 5
+Status: Plan 03 complete — ProfileScreen LOCATIE sectie + WeatherNotifier echte locatie
 Last activity: 2026-06-03
 
-Progress: [██████████] 100%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -130,6 +130,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 07-02 (2026-06-03): GpsPermissionNotifier as AsyncNotifier<LocationPermission> with gpsPermissionProvider generated name (D-07-03)
 - 07-02 (2026-06-03): LocationNotifier replaces stub — three-step priority: profile override > GPS > Amsterdam default (LOC-02, LOC-04, LOC-05)
 - 07-02 (2026-06-03): HomeScreen updated to handle AsyncValue<LocationData> via .value?.city — locationProvider changed from sync to async (Rule 3 fix)
+- 07-03 (2026-06-03): .value (niet .valueOrNull) is correcte nullable getter in Riverpod 3.x; bevestigt STATE.md 06-01 beslissing
+- 07-03 (2026-06-03): skipOffstage: false vereist in ProfileScreen widget tests — LOCATIE sectie zorgt dat RIJLENGTE/THEMA buiten test-viewport rolt in scrollbare ListView
+- 07-03 (2026-06-03): FakeLocationNotifier extends LocationNotifier toegevoegd aan weather_notifier_test — WeatherNotifier watchet locationProvider; ProviderContainer tests vereisen override
+- 07-03 (2026-06-03): anyNamed() matcher in mockito voor named parameters na getForecast({lat, lon}) signature uitbreiding
 
 ### Pending Todos
 
@@ -153,7 +157,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:34:14Z
+Last session: 2026-06-03T17:43:41.532Z
 Stopped at: Completed 07-02-PLAN.md — GpsPermissionNotifier + LocationNotifier (commits a7a5961, 29a642e, 9a269e0, 9850f0f)
 Resume file: None
 Next action: Execute Phase 07 Plan 03

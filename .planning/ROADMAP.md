@@ -251,7 +251,7 @@ Plans:
 
 **Wave 3** *(geblokkeerd op Wave 2)*
 
-- [ ] 07-03-PLAN.md — ProfileScreen LOCATIE sectie (stad-picker bottom sheet + GPS-geblokkeerd banner) + WeatherRepository lat/lon params + WeatherNotifier locatie-koppeling
+- [x] 07-03-PLAN.md — ProfileScreen LOCATIE sectie (stad-picker bottom sheet + GPS-geblokkeerd banner) + WeatherRepository lat/lon params + WeatherNotifier locatie-koppeling
 
 **Wave 4** *(geblokkeerd op Wave 3)*
 
@@ -321,7 +321,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
-| 7. Location — GPS + manual city + permission state machine | 1/5 | In Progress|  |
+| 7. Location — GPS + manual city + permission state machine | 3/5 | In Progress|  |
 | 8. Background refresh + Notifications | 0/TBD | Not started | - |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |
