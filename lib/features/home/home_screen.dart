@@ -12,6 +12,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/core/config.dart';
+import 'package:ridewindow/providers/last_refreshed_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   /// null = toon alle slots; non-null = filter op dag.
   DateTime? _selectedDay;
 
@@ -34,6 +35,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -45,8 +47,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pulseController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Herlaad lastRefreshed timestamp bij terugkeer naar foreground (NOTIF-06)
+      ref.read(lastRefreshedProvider.notifier).refresh();
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -59,6 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final slotsState = ref.watch(slotsProvider);
     final locationAsync = ref.watch(locationProvider);
     final cityName = locationAsync.value?.city ?? kDefaultCity;
+    final lastRefreshedAsync = ref.watch(lastRefreshedProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -66,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(cityName, weatherState),
+            _buildHeader(cityName, weatherState, lastRefreshedAsync),
             _buildWeekStrip(slotsState),
             Expanded(child: _buildCardsSection(weatherState, slotsState)),
           ],
@@ -83,6 +95,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildHeader(
     String city,
     AsyncValue<List<HourlyForecast>> weatherState,
+    AsyncValue<DateTime?> lastRefreshedAsync,
   ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
@@ -115,9 +128,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ],
               ),
               const SizedBox(height: 2),
-              const Text(
-                'This week',
-                style: TextStyle(fontSize: 13, color: Color(0xFF999999)),
+              Text(
+                lastRefreshedAsync.when(
+                  data: (ts) => ts == null
+                      ? 'Bijgewerkt: —'
+                      : 'Bijgewerkt: ${_formatTime(ts)}',
+                  loading: () => 'Bijgewerkt: —',
+                  error: (_, __) => 'Bijgewerkt: —',
+                ),
+                style: const TextStyle(fontSize: 13, color: Color(0xFF999999)),
               ),
             ],
           ),
