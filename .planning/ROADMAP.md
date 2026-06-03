@@ -279,7 +279,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — pubspec.yaml (4 nieuwe deps) + AndroidManifest (permissies + WorkManager service/receiver)
+- [x] 08-01-PLAN.md — pubspec.yaml (4 nieuwe deps) + AndroidManifest (permissies + WorkManager service/receiver)
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
@@ -342,6 +342,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 0/5 | Not started | - |
+| 8. Background refresh + Notifications | 1/5 | In progress | 2026-06-03 |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |

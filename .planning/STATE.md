@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-05-PLAN.md — Widget-tests locatie-UI ProfileScreen + HomeScreen — Phase 7 afgerond
-last_updated: "2026-06-03T18:10:00Z"
+stopped_at: Completed 08-01-PLAN.md — pubspec.yaml 4 nieuwe deps + AndroidManifest permissies + WorkManager-entries
+last_updated: "2026-06-03T18:23:00Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 32
-  completed_plans: 32
+  completed_plans: 33
   percent: 69
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 07 — location-gps-manual-city-permission-state-machine
+**Current focus:** Phase 08 — background-refresh-notifications
 
 ## Current Position
 
-Phase: 07 (location-gps-manual-city-permission-state-machine) — COMPLETE
-Plan: 5 of 5
-Status: Plan 05 complete — Widget-tests locatie-UI (7 tests, 173 totaal in suite) — Phase 7 volledig afgerond
+Phase: 08 (background-refresh-notifications) — IN PROGRESS
+Plan: 1 of 5
+Status: Plan 01 complete — pubspec.yaml 4 nieuwe deps + AndroidManifest permissies/WorkManager-entries
 Last activity: 2026-06-03
 
 Progress: [██████████] 100% (Phase 7)
@@ -139,6 +139,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 07-05 (2026-06-03): FakeWeatherNotifier lokaal gedefinieerd in profile_screen_location_test — ProfileScreen vereist weatherProvider override om te bouwen
 - 07-05 (2026-06-03): HomeScreen Test 2 verifieert 'Amsterdam' (kDefaultCity) i.p.v. '...' — conform implementatie beslissing 07-04
 - 07-05 (2026-06-03): Completer<void>().future voor permanente AsyncLoading simulatie — betrouwbaarder dan Future.delayed
+- 08-01 (2026-06-03): workmanager ^0.9.0+3 + flutter_local_notifications ^21.0.0 + timezone ^0.11.0 + flutter_timezone ^5.1.0 toegevoegd aan pubspec.yaml; flutter pub get geslaagd
+- 08-01 (2026-06-03): AndroidManifest.xml: RECEIVE_BOOT_COMPLETED + SCHEDULE_EXACT_ALARM + POST_NOTIFICATIONS + FOREGROUND_SERVICE + WAKE_LOCK permissies; WorkManager SystemForegroundService + RescheduleOnBootReceiver; ride_alerts notificatiekanaal meta-data
+- 08-01 (2026-06-03): SCHEDULE_EXACT_ALARM gedeclareerd — Android 12+ vereist expliciete gebruikerstoestemming via systeeminstellingen (T-08-01-02)
 
 ### Pending Todos
 
@@ -162,7 +165,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T18:10:00Z
-Stopped at: Completed 07-05-PLAN.md — Widget-tests locatie-UI (7 tests: 5 ProfileScreen + 2 HomeScreen) — Phase 7 afgerond
+Last session: 2026-06-03T18:23:00Z
+Stopped at: Completed 08-01-PLAN.md — pubspec.yaml 4 nieuwe deps + AndroidManifest permissies + WorkManager-entries
 Resume file: None
-Next action: Execute Phase 08 (Background refresh + Notifications)
+Next action: Execute Phase 08 Plan 02 (background_task.dart WorkManager isolate-worker)
