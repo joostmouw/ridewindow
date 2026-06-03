@@ -8,28 +8,31 @@ part of 'availability_notifier.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// AvailabilityNotifier beheert de set geblokkeerde uren als `Set<DateTime>`.
+/// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
-/// Persistentie via SharedPreferences: DateTime-waarden worden opgeslagen als
-/// ISO-8601 strings onder de sleutel 'availability.blockedHours'.
+/// Persistentie via SharedPreferences: entries worden opgeslagen als
+/// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
+/// onder de sleutel 'availability.blockedHours'.
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
 
 @ProviderFor(AvailabilityNotifier)
 final availabilityProvider = AvailabilityNotifierProvider._();
 
-/// AvailabilityNotifier beheert de set geblokkeerde uren als `Set<DateTime>`.
+/// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
-/// Persistentie via SharedPreferences: DateTime-waarden worden opgeslagen als
-/// ISO-8601 strings onder de sleutel 'availability.blockedHours'.
+/// Persistentie via SharedPreferences: entries worden opgeslagen als
+/// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
+/// onder de sleutel 'availability.blockedHours'.
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
-final class AvailabilityNotifierProvider
-    extends $AsyncNotifierProvider<AvailabilityNotifier, Set<DateTime>> {
-  /// AvailabilityNotifier beheert de set geblokkeerde uren als `Set<DateTime>`.
+final class AvailabilityNotifierProvider extends $AsyncNotifierProvider<
+    AvailabilityNotifier, Map<DateTime, BlockType>> {
+  /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
   ///
-  /// Persistentie via SharedPreferences: DateTime-waarden worden opgeslagen als
-  /// ISO-8601 strings onder de sleutel 'availability.blockedHours'.
+  /// Persistentie via SharedPreferences: entries worden opgeslagen als
+  /// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
+  /// onder de sleutel 'availability.blockedHours'.
   ///
   /// Volledig context-loos en testbaar via ProviderContainer.
   AvailabilityNotifierProvider._()
@@ -52,24 +55,28 @@ final class AvailabilityNotifierProvider
 }
 
 String _$availabilityNotifierHash() =>
-    r'96b09c52562235bbb95c2790c17f829cddeaa532';
+    r'bdb0a3c743ccb3acba8e7b2a53b878324261c86b';
 
-/// AvailabilityNotifier beheert de set geblokkeerde uren als `Set<DateTime>`.
+/// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
-/// Persistentie via SharedPreferences: DateTime-waarden worden opgeslagen als
-/// ISO-8601 strings onder de sleutel 'availability.blockedHours'.
+/// Persistentie via SharedPreferences: entries worden opgeslagen als
+/// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
+/// onder de sleutel 'availability.blockedHours'.
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
 
-abstract class _$AvailabilityNotifier extends $AsyncNotifier<Set<DateTime>> {
-  FutureOr<Set<DateTime>> build();
+abstract class _$AvailabilityNotifier
+    extends $AsyncNotifier<Map<DateTime, BlockType>> {
+  FutureOr<Map<DateTime, BlockType>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<Set<DateTime>>, Set<DateTime>>;
+    final ref = this.ref
+        as $Ref<AsyncValue<Map<DateTime, BlockType>>, Map<DateTime, BlockType>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<Set<DateTime>>, Set<DateTime>>,
-        AsyncValue<Set<DateTime>>,
+        AnyNotifier<AsyncValue<Map<DateTime, BlockType>>,
+            Map<DateTime, BlockType>>,
+        AsyncValue<Map<DateTime, BlockType>>,
         Object?,
         Object?>;
     element.handleCreate(ref, build);
