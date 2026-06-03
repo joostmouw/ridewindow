@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: verifying
 stopped_at: Completed 06-03-PLAN.md — AvailabilityScreen 7x24 interactive grid (commit 13f6476)
-last_updated: "2026-06-03T17:12:51.283Z"
+last_updated: "2026-06-03T17:29:18.411Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
-  total_plans: 27
-  completed_plans: 27
+  total_plans: 32
+  completed_plans: 28
   percent: 64
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 06 — ui-phase-c-profile-availability-tolerance-sliders
+**Current focus:** Phase 07 — location-gps-manual-city-permission-state-machine
 
 ## Current Position
 
-Phase: 06 (ui-phase-c-profile-availability-tolerance-sliders) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
+Phase: 07 (location-gps-manual-city-permission-state-machine) — EXECUTING
+Plan: 1 of 5
+Status: Plan 01 complete — GPS foundation packages + NL cities
 Last activity: 2026-06-03
 
 Progress: [██████████] 100%
@@ -124,6 +124,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 06-03 (2026-06-03): SharedPreferences mock resolves synchronously in Flutter tests — AvailabilityNotifier never stays AsyncLoading; loading-state CircularProgressIndicator test is unreliable.
 - [Phase ?]: 06-04: skipOffstage: false required for cell-color container search in scrollable availability grid
 - [Phase ?]: 06-04: Tap-guard test uses hour 0 cell (visible in viewport) instead of hour 9 (off-screen) for reliable tester.tap() interaction
+- 07-01 (2026-06-03): geolocator 14.0.2 + permission_handler 12.0.3 added; compileSdk = 35 override in build.gradle.kts (D-07-11)
+- 07-01 (2026-06-03): kNlCities const list with 12 NL cities in lib/core/nl_cities.dart (D-07-05)
+- 07-01 (2026-06-03): Used // comment (not ///) for nl_cities.dart header to avoid dangling_library_doc_comments lint info
 
 ### Pending Todos
 
@@ -147,7 +150,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:12:51.278Z
-Stopped at: Completed 06-03-PLAN.md — AvailabilityScreen 7x24 interactive grid (commit 13f6476)
+Last session: 2026-06-03T17:29:18.407Z
+Stopped at: Completed 07-01-PLAN.md — GPS foundation: geolocator + permission_handler + NL cities (commits 4a5647a, d83de44)
 Resume file: None
-Next action: Execute Phase 06 Plan 04 (final plan of phase 06)
+Next action: Execute Phase 07 Plan 02

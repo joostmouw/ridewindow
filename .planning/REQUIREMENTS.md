@@ -55,9 +55,9 @@
 
 ### Location (LOC) — GPS + manual override
 
-- [ ] **LOC-01**: App requests location permission on first run via `geolocator` + `permission_handler`
+- [x] **LOC-01**: App requests location permission on first run via `geolocator` + `permission_handler`
 - [ ] **LOC-02**: If GPS permission granted, use device GPS for forecast location
-- [ ] **LOC-03**: User can override location manually with a city picker (curated short-list of NL cities for v1)
+- [x] **LOC-03**: User can override location manually with a city picker (curated short-list of NL cities for v1)
 - [ ] **LOC-04**: If GPS permanently denied, automatically fall back to manual city picker with clear explanation — *gap-fix*
 - [ ] **LOC-05**: Manual override persists in shared_preferences and takes precedence over GPS until cleared
 
