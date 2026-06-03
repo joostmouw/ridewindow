@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve provider chain (commits 1d8f946, df8df6b)"
-last_updated: "2026-06-03T00:46:00.000Z"
+stopped_at: "Completed 03-04-PLAN.md — Phase 3 volledig: integratietest + ProviderScope (commits b050fd9, dbc0e58)"
+last_updated: "2026-06-03T00:30:00.000Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 3
   total_plans: 14
-  completed_plans: 13
-  percent: 29
+  completed_plans: 14
+  percent: 32
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 3 van 11 (Riverpod providers + state graph) — IN UITVOERING
-Plan: 3 van 4 complete
-Status: Executing — 03-03 gedaan, 03-04 volgende
+Phase: 3 van 11 (Riverpod providers + state graph) — AFGEROND
+Plan: 4 van 4 complete
+Status: Phase 3 volledig klaar — gereed voor Phase 4 (Onboarding + Home UI)
 Last activity: 2026-06-03
 
-Progress: [████████░░] 79%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [████████░░] 79%
 | Phase 03-riverpod-providers-state-graph P01 | 25 | 2 tasks | 8 files |
 | Phase 03-riverpod-providers-state-graph P02 | 20 | 1 task | 5 files |
 | Phase 03-riverpod-providers-state-graph P03 | 35 | 2 tasks | 6 files |
+| Phase 03-riverpod-providers-state-graph P04 | 15 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 03-03 (2026-06-03): availabilityProvider en slotsProvider zijn de gegenereerde namen (Notifier-suffix gestript door code-gen).
 - 03-03 (2026-06-03): Fake notifiers in ProviderContainer-tests moeten concrete klassen extenden (WeatherNotifier), niet de _$-abstracte klassen.
 - 03-03 (2026-06-03): SlotsNotifier als synchrone Notifier<SlotsState> — build() gebruikt ref.watch() synchroon; geen AsyncNotifier nodig.
+- 03-04 (2026-06-03): FakeNotifier-subclasses (extends WeatherNotifier) gekozen boven mockito voor integratietests — simpeler, state direct injecteerbaar via .state = AsyncData(...).
+- 03-04 (2026-06-03): ProviderScope op buitenste runApp-niveau — gereed voor ConsumerWidget gebruik in Phase 4.
 
 ### Pending Todos
 
@@ -104,7 +107,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T00:46:00Z
-Stopped at: Completed 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve provider chain (commits 1d8f946, df8df6b)
+Last session: 2026-06-03T00:30:00Z
+Stopped at: Completed 03-04-PLAN.md — Phase 3 volledig afgerond: integratietest + ProviderScope (commits b050fd9, dbc0e58)
 Resume file: None
-Next action: `/gsd:execute-phase 03` — ga verder met 03-04-PLAN.md (volgende plan in Phase 3)
+Next action: `/gsd:execute-phase 04` — Phase 4: Onboarding + Home UI

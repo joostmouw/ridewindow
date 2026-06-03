@@ -14,7 +14,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - [x] **Phase 1: Project skeleton + test infrastructure** - Flutter project boots, locked deps, canonical lib/ tree, structural test enforcing pure-Dart domain boundary
 - [ ] **Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator** - Pure-Dart domain code with 100% unit test coverage of lib/domain/
 - [x] **Phase 2: Data layer — Drift + Open-Meteo** - Drift schema, OpenMeteoClient, WeatherRepository, forecast cache
-- [ ] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
+- [x] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
 - [ ] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
 - [ ] **Phase 5: UI Phase B — Ride Detail + Insights sheet** - Ride Detail screen + "Why this score?" insights bottom sheet
 - [ ] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips
@@ -110,15 +110,15 @@ Plans:
 
 **Wave 2** *(onafhankelijk van Wave 1 — kan parallel uitgevoerd worden)*
 
-- [ ] 03-02-PLAN.md — ProfileNotifier + shared_preferences instellingen (toleranties, rijlengte, thema, etc.)
+- [x] 03-02-PLAN.md — ProfileNotifier + shared_preferences instellingen (toleranties, rijlengte, thema, etc.)
 
 **Wave 3** *(geblokkeerd op Wave 1 + Wave 2)*
 
-- [ ] 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve keten
+- [x] 03-03-PLAN.md — SlotsNotifier + AvailabilityNotifier reactieve keten
 
 **Wave 4** *(geblokkeerd op Wave 3)*
 
-- [ ] 03-04-PLAN.md — End-to-end keten-integratietest + ProviderScope in main.dart + volledige suite gate
+- [x] 03-04-PLAN.md — End-to-end keten-integratietest + ProviderScope in main.dart + volledige suite gate
 
 ### Phase 4: UI Phase A — Onboarding + Home + Welcome
 
