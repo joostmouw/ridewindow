@@ -4,10 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/features/detail/detail_args.dart';
+import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -425,129 +428,139 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildRideCard(RideSlot slot) {
     final borderColor = _tierBorderColor(slot.tier);
+    final weatherState = ref.watch(weatherProvider);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border(
-          left: BorderSide(color: borderColor, width: 4),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 6,
-            offset: Offset(0, 1),
+    // Bereken slot-gefilterde forecast-uren voor weather chips en tap-navigatie.
+    // Filter op [slot.start, slot.end) — exclusief eindpunt (SLOT-02 conventie).
+    final allForecasts = weatherState.hasValue ? weatherState.requireValue : <HourlyForecast>[];
+    final slotForecasts = allForecasts
+        .where((f) => !f.time.isBefore(slot.start) && f.time.isBefore(slot.end))
+        .toList();
+
+    // Bereken gemiddelde temperatuur, totale neerslag en gemiddelde windsnelheid.
+    final temps = slotForecasts
+        .map((f) => f.temperatureC)
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+    final precips = slotForecasts
+        .map((f) => f.precipitationMm)
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+    final winds = slotForecasts
+        .map((f) => f.windspeedKmh)
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+
+    final avgTemp = temps.isEmpty
+        ? null
+        : temps.reduce((a, b) => a + b) / temps.length;
+    final totalPrecip =
+        precips.isEmpty ? null : precips.reduce((a, b) => a + b);
+    final avgWind = winds.isEmpty
+        ? null
+        : winds.reduce((a, b) => a + b) / winds.length;
+
+    final tempLabel = avgTemp == null ? '—' : '${avgTemp.toStringAsFixed(1)}°C';
+    final precipLabel =
+        totalPrecip == null ? '—' : '${totalPrecip.toStringAsFixed(1)}mm';
+    final windLabel =
+        avgWind == null ? '—' : '${avgWind.toStringAsFixed(0)}km/u';
+
+    return GestureDetector(
+      onTap: () {
+        context.go('/detail', extra: DetailArgs(slot: slot, forecasts: slotForecasts));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border(
+            left: BorderSide(color: borderColor, width: 4),
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Card top: dag + badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _formatDayName(slot.start),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-                _buildBadge(slot.tier),
-              ],
-            ),
-            const SizedBox(height: 6),
-            // Tijdreeks
-            Text(
-              '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF444444),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Weather chips placeholder (Phase 5 zal echte data vullen)
-            Row(
-              children: [
-                _buildWeatherChip('🌡', '?°C'),
-                const SizedBox(width: 6),
-                _buildWeatherChip('🌧', '?mm'),
-                const SizedBox(width: 6),
-                _buildWeatherChip('💨', '?km/u'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Footer: Plan het knop
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: _showPlanItSnackBar,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: slot.tier is Acceptable
-                        ? const Color(0xFFFFA726)
-                        : const Color(0xFF2E7D32),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Plan het',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ],
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x12000000),
+              blurRadius: 6,
+              offset: Offset(0, 1),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(RideTier tier) {
-    final Color bg;
-    final Color fg;
-    switch (tier) {
-      case Perfect():
-        bg = const Color(0xFFE8F5E9);
-        fg = const Color(0xFF1B5E20);
-      case Great():
-        bg = const Color(0xFFF1F8E9);
-        fg = const Color(0xFF33691E);
-      case Acceptable():
-        bg = const Color(0xFFFFF3E0);
-        fg = const Color(0xFFE65100);
-      case Poor():
-        bg = const Color(0xFFF5F5F5);
-        fg = const Color(0xFF757575);
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        _tierLabel(tier),
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: fg,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Card top: dag + badge
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _formatDayName(slot.start),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  ScoreBadge(tier: slot.tier),
+                ],
+              ),
+              const SizedBox(height: 6),
+              // Tijdreeks
+              Text(
+                '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF444444),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Weather chips met echte gemiddelde weersdata
+              Row(
+                children: [
+                  _buildWeatherChip('🌡', tempLabel),
+                  const SizedBox(width: 6),
+                  _buildWeatherChip('🌧', precipLabel),
+                  const SizedBox(width: 6),
+                  _buildWeatherChip('💨', windLabel),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Footer: Plan het knop
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: _showPlanItSnackBar,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: slot.tier is Acceptable
+                          ? const Color(0xFFFFA726)
+                          : const Color(0xFF2E7D32),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Plan het',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -678,12 +691,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         Poor() => const Color(0xFFBDBDBD),
       };
 
-  String _tierLabel(RideTier tier) => switch (tier) {
-        Perfect() => 'Perfect',
-        Great() => 'Goed',
-        Acceptable() => 'Acceptabel',
-        Poor() => 'Slecht',
-      };
 }
 
 // ---------------------------------------------------------------------------

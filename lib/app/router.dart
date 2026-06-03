@@ -2,7 +2,9 @@
 // go_router configuratie met onboarding redirect.
 // Wave 3: WelcomeScreen, OnboardingScreen en AvailabilityScreen zijn echte imports.
 // Wave 4: HomeScreen is echte import (Wave 4 voltooid).
+// Wave 5: /detail route toegevoegd met DetailArgs via state.extra.
 
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +12,8 @@ import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
+import 'package:ridewindow/features/detail/detail_args.dart';
+import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 
 part 'router.g.dart';
 
@@ -43,6 +47,19 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/availability',
         builder: (context, state) => const AvailabilityScreen(),
+      ),
+      GoRoute(
+        path: '/detail',
+        builder: (context, state) {
+          // T-05-01: null-safe cast — guard against invalid navigation calls.
+          if (state.extra is! DetailArgs) {
+            return const Scaffold(
+              body: Center(child: Text('Ongeldige navigatieargumenten.')),
+            );
+          }
+          final args = state.extra as DetailArgs;
+          return RideDetailScreen(slot: args.slot, forecasts: args.forecasts);
+        },
       ),
     ],
   );
