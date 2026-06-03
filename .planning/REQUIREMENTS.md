@@ -41,9 +41,9 @@
 
 ### Availability (AVAIL) — Weekly calendar
 
-- [ ] **AVAIL-01**: User can view and edit a 7-day × 24-hour availability grid (each cell = 1 hour)
-- [ ] **AVAIL-02**: Grid cells show 3 states: free (default after preset), blocked (user-toggled), work (system-blocked from onboarding preset)
-- [ ] **AVAIL-03**: Availability changes persist immediately to local storage
+- [x] **AVAIL-01**: User can view and edit a 7-day × 24-hour availability grid (each cell = 1 hour)
+- [x] **AVAIL-02**: Grid cells show 3 states: free (default after preset), blocked (user-toggled), work (system-blocked from onboarding preset)
+- [x] **AVAIL-03**: Availability changes persist immediately to local storage
 - [ ] **AVAIL-04**: Availability changes trigger slot recomputation
 
 ### Onboarding (ONB) — First-run flow
