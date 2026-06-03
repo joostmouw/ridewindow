@@ -7,6 +7,13 @@
 ///   4. Tappen op vrije/custom-cellen roept toggleCustomHour aan
 ///   5. Tappen op werk-cellen heeft geen effect (guard aanwezig)
 ///   6. AppBar 'Mijn schema' met terugpijl aanwezig
+///
+/// Dekt Phase 6 Plan 04 success criteria:
+///   P04-1: AppBar toont 'Mijn schema'
+///   P04-2: Dag-kopteksten 'Ma' aanwezig
+///   P04-3: Werk-cel heeft kleur 0xFFB0BEC5 (grijs-blauw)
+///   P04-4: Custom-cel heeft kleur 0xFFFF9800 (oranje)
+///   P04-5: Tappen op werk-cel wijzigt celkleur niet (tap-tap-guard)
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -157,5 +164,177 @@ void main() {
     expect(find.text('Mijn schema'), findsOneWidget);
     // 168 cellen aanwezig
     expect(find.byType(GestureDetector), findsAtLeastNWidgets(168));
+  });
+
+  // ---------------------------------------------------------------------------
+  // Phase 6 Plan 04 tests — celkleur verificatie en tap-guard
+  // ---------------------------------------------------------------------------
+
+  testWidgets('P04-1: AppBar toont "Mijn schema"', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
+        ],
+        child: const MaterialApp(home: AvailabilityScreen()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Mijn schema'), findsOneWidget);
+  });
+
+  testWidgets('P04-2: Dag-kopteksten inclusief "Ma" aanwezig', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
+        ],
+        child: const MaterialApp(home: AvailabilityScreen()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Ma'), findsOneWidget);
+  });
+
+  testWidgets(
+      'P04-3: Werk-cel (uur 9, dag 0) heeft werk-kleur 0xFFB0BEC5',
+      (tester) async {
+    final now = DateTime.now();
+    final weekStart =
+        now.subtract(Duration(days: now.weekday - DateTime.monday));
+    final mapWithWork = {
+      DateTime.utc(weekStart.year, weekStart.month, weekStart.day, 9):
+          BlockType.work,
+    };
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availabilityProvider.overrideWith(
+            () => FakeFilledAvailabilityNotifier(mapWithWork),
+          ),
+        ],
+        child: const MaterialApp(home: AvailabilityScreen()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Minstens één Container met werk-kleur aanwezig (inclusief off-screen cellen)
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            (w.decoration as BoxDecoration?)?.color ==
+                const Color(0xFFB0BEC5),
+        skipOffstage: false,
+      ),
+      findsWidgets,
+      reason: 'Minstens één cel met werk-kleur (0xFFB0BEC5) verwacht',
+    );
+  });
+
+  testWidgets(
+      'P04-4: Custom-cel (uur 10, dag 0) heeft custom-kleur 0xFFFF9800',
+      (tester) async {
+    final now = DateTime.now();
+    final weekStart =
+        now.subtract(Duration(days: now.weekday - DateTime.monday));
+    final mapWithCustom = {
+      DateTime.utc(weekStart.year, weekStart.month, weekStart.day, 10):
+          BlockType.custom,
+    };
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availabilityProvider.overrideWith(
+            () => FakeFilledAvailabilityNotifier(mapWithCustom),
+          ),
+        ],
+        child: const MaterialApp(home: AvailabilityScreen()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Minstens één Container met custom-kleur aanwezig (inclusief off-screen cellen)
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            (w.decoration as BoxDecoration?)?.color ==
+                const Color(0xFFFF9800),
+        skipOffstage: false,
+      ),
+      findsWidgets,
+      reason: 'Minstens één cel met custom-kleur (0xFFFF9800) verwacht',
+    );
+  });
+
+  testWidgets(
+      'P04-5: Werk-tap-guard: tappen op werk-cel wijzigt celkleur niet',
+      (tester) async {
+    final now = DateTime.now();
+    final weekStart =
+        now.subtract(Duration(days: now.weekday - DateTime.monday));
+    // Uur 0, dag 0 = werk-cel (zichtbaar zonder scrollen)
+    final mapWithWork = {
+      DateTime.utc(weekStart.year, weekStart.month, weekStart.day, 0):
+          BlockType.work,
+    };
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          availabilityProvider.overrideWith(
+            () => FakeFilledAvailabilityNotifier(mapWithWork),
+          ),
+        ],
+        child: const MaterialApp(home: AvailabilityScreen()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Zoek de werk-kleur cel (uur 0, dag 0 — zichtbaar in viewport)
+    final werkCelFinder = find.byWidgetPredicate(
+      (w) =>
+          w is Container &&
+          (w.decoration as BoxDecoration?)?.color == const Color(0xFFB0BEC5),
+      skipOffstage: false,
+    );
+    expect(werkCelFinder, findsWidgets,
+        reason: 'Werk-cel (0xFFB0BEC5) aanwezig vóór tap');
+
+    // Tap de eerste GestureDetector in de werk-cel-rij
+    // (Cel uur 0 staat bovenaan het rooster — zichtbaar in viewport)
+    final werkGestureDetectors = find.byWidgetPredicate(
+      (w) => w is GestureDetector,
+    );
+    // Er zijn minstens 7 GestureDetectors in rij 0 (één per dag)
+    expect(werkGestureDetectors, findsWidgets);
+
+    // Tik op de eerste zichtbare GestureDetector in het rooster
+    await tester.tap(werkGestureDetectors.first);
+    await tester.pump();
+
+    // Na tap: werk-kleur cel nog steeds aanwezig (tap had geen effect)
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            (w.decoration as BoxDecoration?)?.color == const Color(0xFFB0BEC5),
+        skipOffstage: false,
+      ),
+      findsWidgets,
+      reason: 'Werk-cel (0xFFB0BEC5) moet na tap ongewijzigd blijven',
+    );
   });
 }
