@@ -19,7 +19,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - [x] **Phase 5: UI Phase B — Ride Detail + Insights sheet** - Ride Detail screen + "Why this score?" insights bottom sheet
 - [x] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips (completed 2026-06-03)
 - [ ] **Phase 7: Location — GPS + manual city + permission state machine** - geolocator, permission_handler, city picker fallback
-- [ ] **Phase 8: Background refresh + Notifications** - WorkManager, flutter_local_notifications, 3 notification types
+- [x] **Phase 8: Background refresh + Notifications** - WorkManager, flutter_local_notifications, 3 notification types (completed 2026-06-03)
 - [ ] **Phase 9: Google Calendar integration** - Lazy OAuth, AutoRefreshingAuthClient, calendar.events scope
 - [ ] **Phase 10: Release — Internal track only** - Signed AAB, Play App Signing, privacy policy, Data Safety form, Internal testing track
 
@@ -295,7 +295,7 @@ Plans:
 
 **Wave 5** *(geblokkeerd op Wave 4)*
 
-- [ ] 08-05-PLAN.md — Unit/widget tests (15 tests) + volledige suite gate
+- [x] 08-05-PLAN.md — Unit/widget tests (15 tests) + volledige suite gate
 
 ### Phase 9: Google Calendar integration
 
@@ -342,6 +342,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 4/5 | In Progress|  |
+| 8. Background refresh + Notifications | 5/5 | Complete   | 2026-06-03 |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |
