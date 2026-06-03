@@ -275,7 +275,27 @@ Plans:
   4. App requests Android 13+ `POST_NOTIFICATIONS` permission via the standard runtime prompt before scheduling any notification
   5. App requests Android 12+ `SCHEDULE_EXACT_ALARM` via system settings deep-link and falls back to inexact scheduling with a user-visible note if denied
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — pubspec.yaml (4 nieuwe deps) + AndroidManifest (permissies + WorkManager service/receiver)
+
+**Wave 2** *(geblokkeerd op Wave 1)*
+
+- [ ] 08-02-PLAN.md — background_task.dart (WorkManager isolate-worker) + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed schrijven
+
+**Wave 3** *(geblokkeerd op Wave 2)*
+
+- [ ] 08-03-PLAN.md — NotificationService (flutter_local_notifications + timezone + 3 schedulers + permissie-flow)
+
+**Wave 4** *(geblokkeerd op Wave 3)*
+
+- [ ] 08-04-PLAN.md — ProfileScreen NOTIFICATIES sectie (3 SwitchListTile toggles) + HomeScreen lastRefreshed header + WidgetsBindingObserver
+
+**Wave 5** *(geblokkeerd op Wave 4)*
+
+- [ ] 08-05-PLAN.md — Unit/widget tests (15 tests) + volledige suite gate
 
 ### Phase 9: Google Calendar integration
 
@@ -322,6 +342,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
 | 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 0/TBD | Not started | - |
+| 8. Background refresh + Notifications | 0/5 | Not started | - |
 | 9. Google Calendar integration | 0/TBD | Not started | - |
 | 10. Release — Internal track only | 0/TBD | Not started | - |
