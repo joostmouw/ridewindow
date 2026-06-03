@@ -1,6 +1,7 @@
 // lib/features/profile/profile_screen.dart
 // ProfileScreen: Wave 2 — vier tolerantie-sliders, rijlengte-chips, thema-SegmentedButton.
 // Wave 3 — LOCATIE sectie: stad-picker, GPS-banner (D-07-06).
+// Wave 4 — NOTIFICATIES sectie: drie SwitchListTile widgets (NOTIF-01/02/03).
 // D-06-02: onChangeEnd persisteert, onChanged update lokale state.
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 
@@ -25,6 +27,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late double _tempMax;
   late double _rainMax;
   late double _windMax;
+
+  final _notifService = NotificationService();
+
+  /// Vraag POST_NOTIFICATIONS op en toon SnackBar als SCHEDULE_EXACT_ALARM niet beschikbaar is.
+  /// Aanroepen bij inschakelen van een notificatie-toggle (NOTIF-04, NOTIF-05).
+  Future<void> _scheduleNotificationsIfPermitted(BuildContext context) async {
+    // 1. Vraag POST_NOTIFICATIONS op
+    final granted = await _notifService.requestPostNotificationsPermission();
+    if (!granted) return;
+
+    // 2. Controleer SCHEDULE_EXACT_ALARM
+    final canExact = await _notifService.canScheduleExact();
+    if (!canExact) {
+      // Toon SnackBar met uitleg (per NOTIF-05 fallback, D-08-09)
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Exacte timing niet gegarandeerd. Sta exacte alarmen toe in Instellingen voor betrouwbaarheid.',
+            ),
+            action: SnackBarAction(
+              label: 'Instellingen',
+              onPressed: () => _notifService.openExactAlarmSettings(),
+            ),
+            duration: const Duration(seconds: 6),
+          ),
+        );
+      }
+    }
+    // Verdere scheduling vindt plaats via SlotsNotifier data in de toekomst (Phase 8 scope: permissie-flow)
+  }
 
   @override
   void initState() {
@@ -143,6 +176,39 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   )
                 : null,
             onTap: () => _openCityPicker(context),
+          ),
+
+          // Sectie: NOTIFICATIES (NOTIF-01, NOTIF-02, NOTIF-03)
+          const _SectionHeader('NOTIFICATIES'),
+
+          SwitchListTile(
+            title: const Text('Avond van tevoren'),
+            subtitle: const Text('19:00 de vorige dag als er een top-slot is'),
+            value: profile.notifEveningBefore,
+            onChanged: (v) async {
+              await ref.read(profileProvider.notifier).setNotifEveningBefore(v);
+              if (v && context.mounted) await _scheduleNotificationsIfPermitted(context);
+            },
+          ),
+
+          SwitchListTile(
+            title: const Text('Ochtend van de dag'),
+            subtitle: const Text('2 uur voor het slot begint'),
+            value: profile.notifMorningOf,
+            onChanged: (v) async {
+              await ref.read(profileProvider.notifier).setNotifMorningOf(v);
+              if (v && context.mounted) await _scheduleNotificationsIfPermitted(context);
+            },
+          ),
+
+          SwitchListTile(
+            title: const Text('Wekelijks overzicht'),
+            subtitle: const Text('Zondagavond 19:00 — beste momenten van de week'),
+            value: profile.notifWeeklyDigest,
+            onChanged: (v) async {
+              await ref.read(profileProvider.notifier).setNotifWeeklyDigest(v);
+              if (v && context.mounted) await _scheduleNotificationsIfPermitted(context);
+            },
           ),
 
           // Sectie: THEMA (D-06-09: SegmentedButton, PROF-04)
