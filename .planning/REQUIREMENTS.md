@@ -56,10 +56,10 @@
 ### Location (LOC) — GPS + manual override
 
 - [x] **LOC-01**: App requests location permission on first run via `geolocator` + `permission_handler`
-- [ ] **LOC-02**: If GPS permission granted, use device GPS for forecast location
+- [x] **LOC-02**: If GPS permission granted, use device GPS for forecast location
 - [x] **LOC-03**: User can override location manually with a city picker (curated short-list of NL cities for v1)
-- [ ] **LOC-04**: If GPS permanently denied, automatically fall back to manual city picker with clear explanation — *gap-fix*
-- [ ] **LOC-05**: Manual override persists in shared_preferences and takes precedence over GPS until cleared
+- [x] **LOC-04**: If GPS permanently denied, automatically fall back to manual city picker with clear explanation — *gap-fix*
+- [x] **LOC-05**: Manual override persists in shared_preferences and takes precedence over GPS until cleared
 
 ### Notifications (NOTIF) — Heads-up alerts
 
@@ -156,11 +156,11 @@ Generic acceptance criteria applied to every phase:
 | AVAIL-01 | Phase 6 | TBD |
 | AVAIL-02 | Phase 6 | TBD |
 | AVAIL-03 | Phase 6 | TBD |
-| LOC-01 | Phase 7 | TBD |
-| LOC-02 | Phase 7 | TBD |
-| LOC-03 | Phase 7 | TBD |
-| LOC-04 | Phase 7 | TBD |
-| LOC-05 | Phase 7 | TBD |
+| LOC-01 | Phase 7 | 07-01 (geolocator + permission_handler packages) |
+| LOC-02 | Phase 7 | 07-02 (LocationNotifier GPS whileInUse/always branch) |
+| LOC-03 | Phase 7 | 07-01 (kNlCities) |
+| LOC-04 | Phase 7 | 07-02 (LocationNotifier deniedForever fallback + openSettings) |
+| LOC-05 | Phase 7 | 07-02 (LocationNotifier profile.locationOverride priority) |
 | NOTIF-01 | Phase 8 | TBD |
 | NOTIF-02 | Phase 8 | TBD |
 | NOTIF-03 | Phase 8 | TBD |

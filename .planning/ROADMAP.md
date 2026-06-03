@@ -247,7 +247,7 @@ Plans:
 
 **Wave 2** *(geblokkeerd op Wave 1)*
 
-- [ ] 07-02-PLAN.md — GpsPermissionNotifier (state machine) + LocationNotifier (vervangt stub, prioriteitslogica: override > GPS > default)
+- [x] 07-02-PLAN.md — GpsPermissionNotifier (state machine) + LocationNotifier (vervangt stub, prioriteitslogica: override > GPS > default)
 
 **Wave 3** *(geblokkeerd op Wave 2)*
 

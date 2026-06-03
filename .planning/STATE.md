@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 06-03-PLAN.md — AvailabilityScreen 7x24 interactive grid (commit 13f6476)
-last_updated: "2026-06-03T17:29:18.411Z"
+stopped_at: Completed 07-02-PLAN.md — GpsPermissionNotifier + LocationNotifier (commits a7a5961, 29a642e, 9a269e0, 9850f0f)
+last_updated: "2026-06-03T17:34:14Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 32
-  completed_plans: 28
-  percent: 64
+  completed_plans: 29
+  percent: 66
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 07 (location-gps-manual-city-permission-state-machine) — EXECUTING
-Plan: 1 of 5
-Status: Plan 01 complete — GPS foundation packages + NL cities
+Plan: 2 of 5
+Status: Plan 02 complete — GpsPermissionNotifier + LocationNotifier priority logic
 Last activity: 2026-06-03
 
 Progress: [██████████] 100%
@@ -127,6 +127,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 07-01 (2026-06-03): geolocator 14.0.2 + permission_handler 12.0.3 added; compileSdk = 35 override in build.gradle.kts (D-07-11)
 - 07-01 (2026-06-03): kNlCities const list with 12 NL cities in lib/core/nl_cities.dart (D-07-05)
 - 07-01 (2026-06-03): Used // comment (not ///) for nl_cities.dart header to avoid dangling_library_doc_comments lint info
+- 07-02 (2026-06-03): GpsPermissionNotifier as AsyncNotifier<LocationPermission> with gpsPermissionProvider generated name (D-07-03)
+- 07-02 (2026-06-03): LocationNotifier replaces stub — three-step priority: profile override > GPS > Amsterdam default (LOC-02, LOC-04, LOC-05)
+- 07-02 (2026-06-03): HomeScreen updated to handle AsyncValue<LocationData> via .value?.city — locationProvider changed from sync to async (Rule 3 fix)
 
 ### Pending Todos
 
@@ -150,7 +153,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:29:18.407Z
-Stopped at: Completed 07-01-PLAN.md — GPS foundation: geolocator + permission_handler + NL cities (commits 4a5647a, d83de44)
+Last session: 2026-06-03T17:34:14Z
+Stopped at: Completed 07-02-PLAN.md — GpsPermissionNotifier + LocationNotifier (commits a7a5961, 29a642e, 9a269e0, 9850f0f)
 Resume file: None
-Next action: Execute Phase 07 Plan 02
+Next action: Execute Phase 07 Plan 03
