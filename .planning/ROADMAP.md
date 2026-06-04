@@ -327,6 +327,21 @@ Plans:
   4. The Data Safety form in Play Console correctly declares precise location (collected for app functionality) and Google account info (ephemerally accessed via Calendar OAuth, user-initiated only)
   5. The app is live on the Internal testing track with an opt-in link; at least one tester outside the developer has installed and opened it
 
+**Plans**: 4 plans
+Plans:
+**Wave 1**
+
+- [ ] 10-01-PLAN.md — Android SDK install + applicationId confirm + .gitignore hardening + keystore creation + signing config + version bump
+
+**Wave 2** *(geblokkeerd op Wave 1)*
+
+- [ ] 10-02-PLAN.md — Signed release AAB + APK build + physical device sideload smoke test
+- [ ] 10-03-PLAN.md — GitHub Pages privacy policy + ProfileScreen OVER section (Privacybeleid link + Versie)
+
+**Wave 3** *(geblokkeerd op Wave 2 + Wave 3)*
+
+- [ ] 10-04-PLAN.md — Play Console store listing + Data Safety form + Internal testing track upload + tester opt-in
+
 ## Progress
 
 **Execution Order:**
