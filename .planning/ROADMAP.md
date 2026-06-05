@@ -336,7 +336,7 @@ Plans:
 **Wave 2** *(geblokkeerd op Wave 1)*
 
 - [x] 10-02-PLAN.md — Signed release AAB + APK build + physical device sideload smoke test
-- [ ] 10-03-PLAN.md — GitHub Pages privacy policy + ProfileScreen OVER section (Privacybeleid link + Versie)
+- [x] 10-03-PLAN.md — GitHub Pages privacy policy + ProfileScreen OVER section (Privacybeleid link + Versie)
 
 **Wave 3** *(geblokkeerd op Wave 2 + Wave 3)*
 
@@ -359,4 +359,4 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
 | 8. Background refresh + Notifications | 5/5 | Complete   | 2026-06-03 |
 | 9. Google Calendar integration | 2/2 | Complete    | 2026-06-03 |
-| 10. Release — Internal track only | 2/4 | In Progress|  |
+| 10. Release — Internal track only | 3/4 | In Progress|  |

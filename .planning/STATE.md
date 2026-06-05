@@ -5,12 +5,12 @@ milestone_name: milestone
 status: executing
 stopped_at: Completed 10-01-PLAN.md — Android SDK + applicationId ridewindow.joost.amsterdam + upload keystore + release signing config + .gitignore hardening + version 1.0.0+1
 last_updated: "2026-06-05T20:32:09.204Z"
-last_activity: 2026-06-05 -- Plan 10-02 Task 1 completed (signed release AAB 56.5MB + APK 58.0MB built with obfuscation)
+last_activity: 2026-06-05 -- Plan 10-03 completed (privacy policy at GitHub Pages + ProfileScreen OVER section)
 progress:
   total_phases: 12
   completed_phases: 10
   total_plans: 43
-  completed_plans: 40
+  completed_plans: 41
   percent: 85
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 10 (release-internal-track-only) — EXECUTING
-Plan: 2 of 4 (Task 2 awaiting human action)
-Status: Executing Phase 10 (Plan 02 Task 1 complete; waiting for physical device smoke test)
-Last activity: 2026-06-05 -- Plan 10-02 Task 1 completed (signed release AAB 56.5MB + APK 58.0MB built with obfuscation)
+Plan: 3 of 4 (Plan 10-04 next — Play Console setup)
+Status: Executing Phase 10 (Plans 01-03 complete; Plan 04 = Play Console store listing + Internal testing upload)
+Last activity: 2026-06-05 -- Plan 10-03 completed (privacy policy at GitHub Pages + ProfileScreen OVER section)
 
 Progress: [██████████] 100%
 
@@ -170,7 +170,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 - Phase 9 (Google Calendar): Vereist Google Cloud project setup, OAuth consent screen, en SHA-1 fingerprint registratie. Flag dit bij afsluiting Phase 8.
 - Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
-- Phase 10 (Release): Signed release AAB (56.5MB) and APK (58.0MB) built (Plan 10-02 Task 1 complete). BLOCKING: Physical device sideload smoke test required (Task 2 checkpoint:human-action) before proceeding to Plan 10-03.
+- Phase 10 (Release): Plans 01-03 complete. Smoke test passed. Plan 10-04 remaining — all human-action tasks (Play Console store listing, Data Safety form, AAB upload, tester opt-in).
 - Phase 3 notitie (opgelost 03-03): AvailabilityNotifier gebruikt SharedPreferences — de Drift AvailabilityGridEntries tabel slaat een weekpatroon op (dayOfWeek+hour), niet DateTime-instanties. SharedPreferences met ISO-8601 serialisatie is de juiste aanpak.
 
 ## Deferred Items
