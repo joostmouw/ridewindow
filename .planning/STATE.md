@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-02-PLAN.md — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed
-last_updated: "2026-06-04T06:25:37.612Z"
-last_activity: 2026-06-04 -- Phase 10 planning complete
+stopped_at: Completed 10-01-PLAN.md — Android SDK install + applicationId confirm + keystore creation + signing config + .gitignore hardening + version bump
+last_updated: "2026-06-05T00:00:00Z"
+last_activity: 2026-06-05 -- Phase 10 Plan 01 completed
 progress:
   total_phases: 12
   completed_phases: 10
   total_plans: 43
-  completed_plans: 39
-  percent: 83
+  completed_plans: 40
+  percent: 85
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 10 — release — internal track only
+**Current focus:** Phase 10 — release-internal-track-only
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-04 -- Phase 10 planning complete
+Phase: 10 (release-internal-track-only) — EXECUTING
+Plan: 2 of 4
+Status: Executing Phase 10 (Plan 01 complete, Plan 02 next)
+Last activity: 2026-06-05 -- Plan 10-01 completed (Android SDK + keystore + signing config)
 
 Progress: [██████████] 100%
 
@@ -153,6 +153,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 08-02 (2026-06-03): NetworkType.connected constraint in registerPeriodicTask — voorkomt zinloze network-retries (T-08-02-01 mitigatie)
 - [Phase ?]: UI toggle placement
 - [Phase ?]: Lifecycle observer teardown
+- 10-01 (2026-06-05): applicationId = ridewindow.joost.amsterdam (PERMANENT — cannot change after first Play Console upload; user confirmed via Task 2 checkpoint)
+- 10-01 (2026-06-05): Upload keystore at ~/upload-keystore.jks (outside project dir — never at risk of git commit); backed up to password manager
+- 10-01 (2026-06-05): key.properties gitignored via android/.gitignore (pre-existing Android gitignore) — real passwords set, no PLACEHOLDER values
+- 10-01 (2026-06-05): versionCode uses flutter.versionCode (derived from pubspec.yaml +1 build number) — pubspec.yaml is single source of truth for versioning
 
 ### Pending Todos
 
@@ -163,20 +167,20 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 - Phase 9 (Google Calendar): Vereist Google Cloud project setup, OAuth consent screen, en SHA-1 fingerprint registratie. Flag dit bij afsluiting Phase 8.
 - Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
-- Phase 10 (Release): Android Studio + accepted SDK licenses must be installed before `flutter build appbundle` works.
+- Phase 10 (Release): Android Studio + accepted SDK licenses RESOLVED (Plan 10-01 complete). Next: flutter build appbundle --release (Plan 10-02).
 - Phase 3 notitie (opgelost 03-03): AvailabilityNotifier gebruikt SharedPreferences — de Drift AvailabilityGridEntries tabel slaat een weekpatroon op (dayOfWeek+hour), niet DateTime-instanties. SharedPreferences met ISO-8601 serialisatie is de juiste aanpak.
 
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Tooling | Android Studio + Android SDK + accepted licenses | Deferred to Phase 10 | 2026-06-02 (Plan 01-01) |
+| Tooling | Android Studio + Android SDK + accepted licenses | Resolved — Phase 10 Plan 01 | 2026-06-05 |
 | Verification | Package legitimacy audit (manual pub.dev check) | Skipped (covered by CLAUDE.md) | 2026-06-02 (Plan 01-01 Task 2) |
 | Infra | GitHub remote + private repo | Pending | 2026-06-02 |
 
 ## Session Continuity
 
-Last session: 2026-06-03T19:35:58.034Z
-Stopped at: Completed 08-02-PLAN.md — background_task.dart WorkManager isolate-worker + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed
+Last session: 2026-06-05T00:00:00Z
+Stopped at: Completed 10-01-PLAN.md — Android SDK + applicationId ridewindow.joost.amsterdam + upload keystore + release signing config + .gitignore hardening + version 1.0.0+1
 Resume file: None
-Next action: Execute Phase 08 Plan 03 (NotificationService platform-service)
+Next action: Execute Phase 10 Plan 02 (signed release AAB + APK build + physical device sideload smoke test)
