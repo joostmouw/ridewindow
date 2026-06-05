@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 10-01-PLAN.md — Android SDK install + applicationId confirm + keystore creation + signing config + .gitignore hardening + version bump
-last_updated: "2026-06-05T00:00:00Z"
-last_activity: 2026-06-05 -- Phase 10 Plan 01 completed
+stopped_at: "10-02 Task 2 checkpoint:human-action — physical device sideload smoke test required before continuing"
+last_updated: "2026-06-05T19:50:00Z"
+last_activity: "2026-06-05 -- Phase 10 Plan 02 Task 1 complete (signed release AAB 56.5MB + APK 58.0MB built); awaiting smoke test"
 progress:
   total_phases: 12
   completed_phases: 10
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 10 (release-internal-track-only) — EXECUTING
-Plan: 2 of 4
-Status: Executing Phase 10 (Plan 01 complete, Plan 02 next)
-Last activity: 2026-06-05 -- Plan 10-01 completed (Android SDK + keystore + signing config)
+Plan: 2 of 4 (Task 2 awaiting human action)
+Status: Executing Phase 10 (Plan 02 Task 1 complete; waiting for physical device smoke test)
+Last activity: 2026-06-05 -- Plan 10-02 Task 1 completed (signed release AAB 56.5MB + APK 58.0MB built with obfuscation)
 
 Progress: [██████████] 100%
 
@@ -157,6 +157,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 10-01 (2026-06-05): Upload keystore at ~/upload-keystore.jks (outside project dir — never at risk of git commit); backed up to password manager
 - 10-01 (2026-06-05): key.properties gitignored via android/.gitignore (pre-existing Android gitignore) — real passwords set, no PLACEHOLDER values
 - 10-01 (2026-06-05): versionCode uses flutter.versionCode (derived from pubspec.yaml +1 build number) — pubspec.yaml is single source of truth for versioning
+- 10-02 (2026-06-05): compileSdk bumped 35→36 — required by url_launcher_android, shared_preferences_android, flutter_local_notifications, geolocator_android, google_sign_in_android, package_info_plus; backward compatible with targetSdk/minSdk
+- 10-02 (2026-06-05): isCoreLibraryDesugaringEnabled = true + desugar_jdk_libs:2.1.5 added — flutter_local_notifications v21+ requires core library desugaring
+- 10-02 (2026-06-05): Android cmdline-tools/latest installed to ~/Library/Android/sdk — required for Flutter 3.44.1 post-build symbol stripping; not bundled with Android Studio on this machine
 
 ### Pending Todos
 
@@ -167,7 +170,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 - Phase 9 (Google Calendar): Vereist Google Cloud project setup, OAuth consent screen, en SHA-1 fingerprint registratie. Flag dit bij afsluiting Phase 8.
 - Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
-- Phase 10 (Release): Android Studio + accepted SDK licenses RESOLVED (Plan 10-01 complete). Next: flutter build appbundle --release (Plan 10-02).
+- Phase 10 (Release): Signed release AAB (56.5MB) and APK (58.0MB) built (Plan 10-02 Task 1 complete). BLOCKING: Physical device sideload smoke test required (Task 2 checkpoint:human-action) before proceeding to Plan 10-03.
 - Phase 3 notitie (opgelost 03-03): AvailabilityNotifier gebruikt SharedPreferences — de Drift AvailabilityGridEntries tabel slaat een weekpatroon op (dayOfWeek+hour), niet DateTime-instanties. SharedPreferences met ISO-8601 serialisatie is de juiste aanpak.
 
 ## Deferred Items
