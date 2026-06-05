@@ -4,6 +4,7 @@
 // D-06-06: BlockType.work is niet toggelbaar
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -166,6 +167,7 @@ class AvailabilityScreen extends ConsumerWidget {
     WidgetRef ref,
   ) {
     if (blocked[key] == BlockType.work) return;
+    HapticFeedback.lightImpact();
     ref.read(availabilityProvider.notifier).toggleCustomHour(key);
   }
 

@@ -11,5 +11,8 @@ class DetailArgs {
   /// List of HourlyForecast filtered to the slot's time window [start, end).
   final List<HourlyForecast> forecasts;
 
-  const DetailArgs({required this.slot, required this.forecasts});
+  /// Optional Hero animation tag for ScoreBadge transition.
+  final String? heroTag;
+
+  const DetailArgs({required this.slot, required this.forecasts, this.heroTag});
 }

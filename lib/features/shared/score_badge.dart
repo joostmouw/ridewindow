@@ -7,8 +7,9 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 
 class ScoreBadge extends StatelessWidget {
   final RideTier tier;
+  final String? heroTag;
 
-  const ScoreBadge({super.key, required this.tier});
+  const ScoreBadge({super.key, required this.tier, this.heroTag});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class ScoreBadge extends StatelessWidget {
         fg = const Color(0xFF757575);
     }
 
-    return Container(
+    Widget badge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
         color: bg,
@@ -44,6 +45,18 @@ class ScoreBadge extends StatelessWidget {
         ),
       ),
     );
+
+    if (heroTag != null) {
+      badge = Hero(
+        tag: heroTag!,
+        child: Material(
+          color: Colors.transparent,
+          child: badge,
+        ),
+      );
+    }
+
+    return badge;
   }
 
   String _tierLabel(RideTier tier) => switch (tier) {

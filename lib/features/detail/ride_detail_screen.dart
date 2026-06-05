@@ -9,6 +9,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
 /// Factory typedef voor CalendarService — maakt dependency injection
@@ -21,6 +22,9 @@ class RideDetailScreen extends StatefulWidget {
   final RideSlot slot;
   final List<HourlyForecast> forecasts;
 
+  /// Optional Hero animation tag for ScoreBadge transition.
+  final String? heroTag;
+
   /// Optionele factory voor testinjectie. Default maakt een echte CalendarService.
   final CalendarServiceFactory calendarServiceFactory;
 
@@ -28,6 +32,7 @@ class RideDetailScreen extends StatefulWidget {
     super.key,
     required this.slot,
     required this.forecasts,
+    this.heroTag,
     this.calendarServiceFactory = _defaultCalendarServiceFactory,
   });
 
@@ -214,7 +219,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ScoreBadge(tier: widget.slot.tier),
+                ScoreBadge(tier: widget.slot.tier, heroTag: widget.heroTag),
                 const SizedBox(height: 4),
                 Text(
                   description,
@@ -368,6 +373,26 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
     );
   }
 
+  void _shareSlot() {
+    final tierLabel = switch (widget.slot.tier) {
+      Perfect() => 'Perfect',
+      Great() => 'Goed',
+      Acceptable() => 'Acceptabel',
+      Poor() => 'Slecht',
+    };
+    final summary = CalendarService.buildWeatherSummary(widget.forecasts);
+    final day = _dayName(widget.slot.start);
+    final text = 'Fietsrit $day '
+        '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)} '
+        '($tierLabel)\n$summary\n\nVia RideWindow';
+    Share.share(text);
+  }
+
+  String _dayName(DateTime dt) {
+    const names = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
+    return names[dt.weekday - 1];
+  }
+
   Widget _buildActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -407,6 +432,20 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
               );
             },
             child: const Text('Herinner me de avond ervoor'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF2E7D32),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: const BorderSide(color: Color(0xFF2E7D32)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: _shareSlot,
+            icon: const Icon(Icons.share, size: 18),
+            label: const Text('Deel dit rijvenster'),
           ),
         ],
       ),

@@ -51,6 +51,9 @@ dependencies:
   # Phase 10 — Privacy policy link (About screen)
   url_launcher: ^6.3.1
 
+  # UX — Share ride slots
+  share_plus: ^10.1.4
+
   # fl_chart arriveert in een latere fase
 
 dev_dependencies:

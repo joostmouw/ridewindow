@@ -3,6 +3,7 @@
 // skeleton loading state, lege staat en "Plan het" SnackBar.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,11 +12,13 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
+import 'package:ridewindow/services/calendar_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -80,7 +83,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           children: [
             _buildHeader(cityName, weatherState, lastRefreshedAsync),
             _buildWeekStrip(slotsState),
-            Expanded(child: _buildCardsSection(weatherState, slotsState)),
+            Expanded(
+              child: RefreshIndicator(
+                color: const Color(0xFF2E7D32),
+                onRefresh: () => ref.refresh(weatherProvider.future),
+                child: _buildCardsSection(weatherState, slotsState),
+              ),
+            ),
           ],
         ),
       ),
@@ -246,6 +255,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return GestureDetector(
       onTap: () {
+        HapticFeedback.lightImpact();
         setState(() {
           if (isSelected) {
             _selectedDay = null;
@@ -355,6 +365,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildRideCardList(List<RideSlot> slots) {
     return ListView.builder(
       key: const PageStorageKey('home_ride_cards'),
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       itemCount: slots.length + 1,
       itemBuilder: (context, index) {
@@ -372,73 +383,95 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           );
         }
-        return _buildRideCard(slots[index - 1]);
+        final isBest = index == 1 &&
+            (slots.first.tier is Perfect || slots.first.tier is Great);
+        return _buildRideCard(slots[index - 1], isBest: isBest);
       },
     );
   }
 
   Widget _buildEmptyState(String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.cloud_off_outlined,
-              size: 64,
-              color: Color(0xFFBDBDBD),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Color(0xFF666666),
-                height: 1.5,
+    return LayoutBuilder(
+      builder: (context, constraints) => ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: constraints.maxHeight,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.cloud_off_outlined,
+                      size: 64,
+                      color: Color(0xFFBDBDBD),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF666666),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Color(0xFFBDBDBD),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Weersdata kon niet worden geladen.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                color: Color(0xFF666666),
-                height: 1.5,
+    return LayoutBuilder(
+      builder: (context, constraints) => ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: constraints.maxHeight,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Color(0xFFBDBDBD),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Weersdata kon niet worden geladen.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF666666),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () => ref.invalidate(weatherProvider),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Opnieuw proberen'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2E7D32),
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => ref.invalidate(weatherProvider),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Opnieuw proberen'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D32),
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -447,7 +480,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // Ride card
   // ---------------------------------------------------------------------------
 
-  Widget _buildRideCard(RideSlot slot) {
+  Widget _buildRideCard(RideSlot slot, {bool isBest = false}) {
     final borderColor = _tierBorderColor(slot.tier);
     final weatherState = ref.watch(weatherProvider);
 
@@ -490,23 +523,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final windLabel =
         avgWind == null ? '—' : '${avgWind.toStringAsFixed(0)}km/u';
 
-    return GestureDetector(
+    return Dismissible(
+      key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),
+      direction: DismissDirection.startToEnd,
+      confirmDismiss: (_) async {
+        HapticFeedback.mediumImpact();
+        await _addToCalendar(slot, slotForecasts);
+        return false; // Don't actually dismiss the card
+      },
+      background: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2E7D32),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: 24),
+        child: const Row(
+          children: [
+            Icon(Icons.calendar_today, color: Colors.white, size: 22),
+            SizedBox(width: 8),
+            Text(
+              'Toevoegen aan agenda',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      child: GestureDetector(
       onTap: () {
-        context.push('/detail', extra: DetailArgs(slot: slot, forecasts: slotForecasts));
+        HapticFeedback.selectionClick();
+        context.push(
+          '/detail',
+          extra: DetailArgs(
+            slot: slot,
+            forecasts: slotForecasts,
+            heroTag: 'score_${slot.start.millisecondsSinceEpoch}',
+          ),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: isBest
+              ? const LinearGradient(
+                  colors: [Color(0xFFE8F5E9), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isBest ? null : Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border(
             left: BorderSide(color: borderColor, width: 4),
           ),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x12000000),
-              blurRadius: 6,
-              offset: Offset(0, 1),
+              color: isBest ? const Color(0x292E7D32) : const Color(0x12000000),
+              blurRadius: isBest ? 12 : 6,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
@@ -515,20 +594,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // "Beste keuze" label
+              if (isBest)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E7D32),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'Beste keuze',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ),
               // Card top: dag + badge
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _formatDayName(slot.start),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A1A),
-                    ),
+                  Row(
+                    children: [
+                      WeatherIcon(tier: slot.tier, size: 22),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatDayName(slot.start),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A1A1A),
+                        ),
+                      ),
+                    ],
                   ),
-                  ScoreBadge(tier: slot.tier),
+                  ScoreBadge(
+                    tier: slot.tier,
+                    heroTag: 'score_${slot.start.millisecondsSinceEpoch}',
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
@@ -558,7 +667,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: _showPlanItSnackBar,
+                    onPressed: () => _addToCalendar(slot, slotForecasts),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: slot.tier is Acceptable
                           ? const Color(0xFFFFA726)
@@ -584,6 +693,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         ),
       ),
+    ),  // close Dismissible
     );
   }
 
@@ -634,14 +744,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // SnackBar
   // ---------------------------------------------------------------------------
 
-  void _showPlanItSnackBar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Google Calendar integratie komt in een volgende update.',
-        ),
-      ),
-    );
+  Future<void> _addToCalendar(RideSlot slot, List<HourlyForecast> forecasts) async {
+    try {
+      await CalendarService().addRideSlotToCalendar(slot, forecasts);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Rijvenster toegevoegd aan Google Agenda!'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Kon niet toevoegen: $e')),
+        );
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------

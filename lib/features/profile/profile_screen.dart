@@ -5,6 +5,7 @@
 // D-06-02: onChangeEnd persisteert, onChanged update lokale state.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -369,20 +370,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 FilterChip(
                   label: const Text('2u'),
                   selected: profile.allowedDurations.contains(2),
-                  onSelected: (_) =>
-                      ref.read(profileProvider.notifier).toggleDuration(2),
+                  onSelected: (_) {
+                    HapticFeedback.lightImpact();
+                    ref.read(profileProvider.notifier).toggleDuration(2);
+                  },
                 ),
                 FilterChip(
                   label: const Text('3u'),
                   selected: profile.allowedDurations.contains(3),
-                  onSelected: (_) =>
-                      ref.read(profileProvider.notifier).toggleDuration(3),
+                  onSelected: (_) {
+                    HapticFeedback.lightImpact();
+                    ref.read(profileProvider.notifier).toggleDuration(3);
+                  },
                 ),
                 FilterChip(
                   label: const Text('4-5u'),
                   selected: profile.allowedDurations.contains(5),
-                  onSelected: (_) =>
-                      ref.read(profileProvider.notifier).toggleDuration(5),
+                  onSelected: (_) {
+                    HapticFeedback.lightImpact();
+                    ref.read(profileProvider.notifier).toggleDuration(5);
+                  },
                 ),
               ],
             ),

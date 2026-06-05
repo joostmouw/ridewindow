@@ -138,7 +138,11 @@ GoRouter router(Ref ref) {
           final args = state.extra as DetailArgs;
           return _slideUpTransition(
             state,
-            RideDetailScreen(slot: args.slot, forecasts: args.forecasts),
+            RideDetailScreen(
+              slot: args.slot,
+              forecasts: args.forecasts,
+              heroTag: args.heroTag,
+            ),
           );
         },
       ),
