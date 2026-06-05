@@ -398,7 +398,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         }
         final isBest = index == 1 &&
             (slots.first.tier is Perfect || slots.first.tier is Great);
-        return _buildRideCard(slots[index - 1], isBest: isBest);
+        return _AnimatedCardEntry(
+          index: index,
+          child: _buildRideCard(slots[index - 1], isBest: isBest),
+        );
       },
     );
   }
@@ -827,3 +830,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 // ---------------------------------------------------------------------------
 
 enum _DayClass { good, ok, bad }
+
+// ---------------------------------------------------------------------------
+// Staggered fade+slide animation wrapper for ride cards
+// ---------------------------------------------------------------------------
+
+class _AnimatedCardEntry extends StatefulWidget {
+  final Widget child;
+  final int index;
+
+  const _AnimatedCardEntry({required this.child, required this.index});
+
+  @override
+  State<_AnimatedCardEntry> createState() => _AnimatedCardEntryState();
+}
+
+class _AnimatedCardEntryState extends State<_AnimatedCardEntry>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _fade = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _slide = Tween(
+      begin: const Offset(0, 0.12),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    Future.delayed(Duration(milliseconds: widget.index * 80), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SlideTransition(
+      position: _slide,
+      child: FadeTransition(
+        opacity: _fade,
+        child: widget.child,
+      ),
+    );
+  }
+}

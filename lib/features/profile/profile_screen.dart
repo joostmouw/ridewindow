@@ -256,17 +256,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ],
                 ),
                 // D-06-02: onChangeEnd persisteert, onChanged update lokale state
-                Slider(
-                  value: _tempMin,
-                  min: 0,
-                  max: 20,
-                  divisions: 20,
-                  label: '${_tempMin.round()}°C',
-                  onChanged: (v) => setState(() => _tempMin = v),
-                  onChangeEnd: (v) => ref
-                      .read(profileProvider.notifier)
-                      .updateTolerances(
-                          profile.tolerances.copyWith(tempMinIdealC: v),),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackShape: const _GradientTrackShape(
+                      colors: [Color(0xFFEF5350), Color(0xFFFFA726), Color(0xFF66BB6A)],
+                    ),
+                    trackHeight: 6,
+                    thumbColor: const Color(0xFF2E7D32),
+                    overlayColor: const Color(0x292E7D32),
+                  ),
+                  child: Slider(
+                    value: _tempMin,
+                    min: 0,
+                    max: 20,
+                    divisions: 20,
+                    label: '${_tempMin.round()}°C',
+                    onChanged: (v) => setState(() => _tempMin = v),
+                    onChangeEnd: (v) => ref
+                        .read(profileProvider.notifier)
+                        .updateTolerances(
+                            profile.tolerances.copyWith(tempMinIdealC: v),),
+                  ),
                 ),
               ],
             ),
@@ -285,17 +295,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Text('${_tempMax.round()}°C'),
                   ],
                 ),
-                Slider(
-                  value: _tempMax,
-                  min: 15,
-                  max: 35,
-                  divisions: 20,
-                  label: '${_tempMax.round()}°C',
-                  onChanged: (v) => setState(() => _tempMax = v),
-                  onChangeEnd: (v) => ref
-                      .read(profileProvider.notifier)
-                      .updateTolerances(
-                          profile.tolerances.copyWith(tempMaxIdealC: v),),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackShape: const _GradientTrackShape(
+                      colors: [Color(0xFF66BB6A), Color(0xFFFFA726), Color(0xFFEF5350)],
+                    ),
+                    trackHeight: 6,
+                    thumbColor: const Color(0xFF2E7D32),
+                    overlayColor: const Color(0x292E7D32),
+                  ),
+                  child: Slider(
+                    value: _tempMax,
+                    min: 15,
+                    max: 35,
+                    divisions: 20,
+                    label: '${_tempMax.round()}°C',
+                    onChanged: (v) => setState(() => _tempMax = v),
+                    onChangeEnd: (v) => ref
+                        .read(profileProvider.notifier)
+                        .updateTolerances(
+                            profile.tolerances.copyWith(tempMaxIdealC: v),),
+                  ),
                 ),
               ],
             ),
@@ -314,17 +334,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Text('${_rainMax.toStringAsFixed(1)}mm'),
                   ],
                 ),
-                Slider(
-                  value: _rainMax,
-                  min: 0,
-                  max: 5,
-                  divisions: 50,
-                  label: '${_rainMax.toStringAsFixed(1)}mm',
-                  onChanged: (v) => setState(() => _rainMax = v),
-                  onChangeEnd: (v) => ref
-                      .read(profileProvider.notifier)
-                      .updateTolerances(
-                          profile.tolerances.copyWith(rainMaxIdealMm: v),),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackShape: const _GradientTrackShape(
+                      colors: [Color(0xFF66BB6A), Color(0xFFFFA726), Color(0xFFEF5350)],
+                    ),
+                    trackHeight: 6,
+                    thumbColor: const Color(0xFF2E7D32),
+                    overlayColor: const Color(0x292E7D32),
+                  ),
+                  child: Slider(
+                    value: _rainMax,
+                    min: 0,
+                    max: 5,
+                    divisions: 50,
+                    label: '${_rainMax.toStringAsFixed(1)}mm',
+                    onChanged: (v) => setState(() => _rainMax = v),
+                    onChangeEnd: (v) => ref
+                        .read(profileProvider.notifier)
+                        .updateTolerances(
+                            profile.tolerances.copyWith(rainMaxIdealMm: v),),
+                  ),
                 ),
               ],
             ),
@@ -343,17 +373,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Text('${_windMax.round()}km/u'),
                   ],
                 ),
-                Slider(
-                  value: _windMax,
-                  min: 0,
-                  max: 50,
-                  divisions: 50,
-                  label: '${_windMax.round()}km/u',
-                  onChanged: (v) => setState(() => _windMax = v),
-                  onChangeEnd: (v) => ref
-                      .read(profileProvider.notifier)
-                      .updateTolerances(
-                          profile.tolerances.copyWith(windMaxIdealKmh: v),),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackShape: const _GradientTrackShape(
+                      colors: [Color(0xFF66BB6A), Color(0xFFFFA726), Color(0xFFEF5350)],
+                    ),
+                    trackHeight: 6,
+                    thumbColor: const Color(0xFF2E7D32),
+                    overlayColor: const Color(0x292E7D32),
+                  ),
+                  child: Slider(
+                    value: _windMax,
+                    min: 0,
+                    max: 50,
+                    divisions: 50,
+                    label: '${_windMax.round()}km/u',
+                    onChanged: (v) => setState(() => _windMax = v),
+                    onChangeEnd: (v) => ref
+                        .read(profileProvider.notifier)
+                        .updateTolerances(
+                            profile.tolerances.copyWith(windMaxIdealKmh: v),),
+                  ),
                 ),
               ],
             ),
@@ -416,6 +456,57 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ],
       ),
     );
+  }
+}
+
+/// Custom slider track that paints a horizontal gradient across the full track.
+class _GradientTrackShape extends SliderTrackShape {
+  final List<Color> colors;
+
+  const _GradientTrackShape({required this.colors});
+
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final trackHeight = sliderTheme.trackHeight ?? 4;
+    final trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
+    return Rect.fromLTWH(
+      offset.dx + 12,
+      trackTop,
+      parentBox.size.width - 24,
+      trackHeight,
+    );
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+    required TextDirection textDirection,
+  }) {
+    final rect = getPreferredRect(
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+    );
+    final rrect =
+        RRect.fromRectAndRadius(rect, const Radius.circular(4));
+    final paint = Paint()
+      ..shader = LinearGradient(colors: colors).createShader(rect);
+    context.canvas.drawRRect(rrect, paint);
   }
 }
 
