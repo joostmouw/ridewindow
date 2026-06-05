@@ -84,7 +84,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -355,6 +354,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildRideCardList(List<RideSlot> slots) {
     return ListView.builder(
+      key: const PageStorageKey('home_ride_cards'),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       itemCount: slots.length + 1,
       itemBuilder: (context, index) {
@@ -492,7 +492,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return GestureDetector(
       onTap: () {
-        context.go('/detail', extra: DetailArgs(slot: slot, forecasts: slotForecasts));
+        context.push('/detail', extra: DetailArgs(slot: slot, forecasts: slotForecasts));
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
@@ -627,31 +627,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         );
       }),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Bottom navigation
-  // ---------------------------------------------------------------------------
-
-  Widget _buildBottomNav() {
-    return NavigationBar(
-      selectedIndex: 0,
-      onDestinationSelected: (i) {
-        if (i == 1) context.go('/profile');
-      },
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person),
-          label: 'Profiel',
-        ),
-      ],
     );
   }
 

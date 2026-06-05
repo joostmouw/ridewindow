@@ -122,6 +122,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Profiel')),
       body: ListView(
+        key: const PageStorageKey('profile_settings'),
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
@@ -391,7 +392,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ListTile(
             title: const Text('Mijn schema bewerken'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.go('/availability'),
+            onTap: () => context.push('/availability'),
           ),
 
           // Sectie: OVER (REL-03: privacybeleid + versie)

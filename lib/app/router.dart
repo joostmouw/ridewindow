@@ -1,14 +1,13 @@
 // lib/app/router.dart
 // go_router configuratie met onboarding redirect.
-// Wave 3: WelcomeScreen, OnboardingScreen en AvailabilityScreen zijn echte imports.
-// Wave 4: HomeScreen is echte import (Wave 4 voltooid).
-// Wave 5: /detail route toegevoegd met DetailArgs via state.extra.
-// Phase 6: /profile route toegevoegd; ProfileScreen navigeerbaar via bottomNav.
+// StatefulShellRoute voor persistente NavigationBar over Home en Profiel.
+// Soepele page transitions voor alle routes.
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ridewindow/app/scaffold_with_nav.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
@@ -19,7 +18,42 @@ import 'package:ridewindow/features/profile/profile_screen.dart';
 
 part 'router.g.dart';
 
-/// GoRouter met onboarding-redirect en vier Phase 4 routes.
+/// Fade transition voor tab-wissels en standaard routes.
+CustomTransitionPage<void> _fadeTransition(
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+    transitionDuration: const Duration(milliseconds: 200),
+  );
+}
+
+/// Slide-up transition voor detail/modale schermen.
+CustomTransitionPage<void> _slideUpTransition(
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final tween = Tween(begin: const Offset(0, 0.05), end: Offset.zero)
+          .chain(CurveTween(curve: Curves.easeOut));
+      return FadeTransition(
+        opacity: animation,
+        child: SlideTransition(position: animation.drive(tween), child: child),
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 250),
+  );
+}
+
+/// GoRouter met onboarding-redirect, StatefulShellRoute en soepele transitions.
 ///
 /// Redirect: controleert SharedPreferences 'onboarding_complete'.
 /// false of afwezig → /welcome; true → geen redirect.
@@ -42,37 +76,65 @@ GoRouter router(Ref ref) {
     routes: [
       GoRoute(
         path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
+        pageBuilder: (context, state) =>
+            _fadeTransition(state, const WelcomeScreen()),
       ),
       GoRoute(
         path: '/onboard',
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) =>
+            _fadeTransition(state, const OnboardingScreen()),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
+
+      // Home + Profile als tabs met gedeelde NavigationBar.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ScaffoldWithNav(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                pageBuilder: (context, state) =>
+                    _fadeTransition(state, const HomeScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                pageBuilder: (context, state) =>
+                    _fadeTransition(state, const ProfileScreen()),
+              ),
+            ],
+          ),
+        ],
       ),
+
       GoRoute(
         path: '/availability',
-        builder: (context, state) => const AvailabilityScreen(),
+        pageBuilder: (context, state) =>
+            _slideUpTransition(state, const AvailabilityScreen()),
       ),
       GoRoute(
         path: '/detail',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           // T-05-01: null-safe cast — guard against invalid navigation calls.
           if (state.extra is! DetailArgs) {
-            return const Scaffold(
-              body: Center(child: Text('Ongeldige navigatieargumenten.')),
+            return _fadeTransition(
+              state,
+              const Scaffold(
+                body: Center(child: Text('Ongeldige navigatieargumenten.')),
+              ),
             );
           }
           final args = state.extra as DetailArgs;
-          return RideDetailScreen(slot: args.slot, forecasts: args.forecasts);
+          return _slideUpTransition(
+            state,
+            RideDetailScreen(slot: args.slot, forecasts: args.forecasts),
+          );
         },
-      ),
-      // Phase 6: ProfileScreen — toleranties, rijlengte, thema
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );
