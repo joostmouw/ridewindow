@@ -10,6 +10,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
 /// Factory typedef voor CalendarService — maakt dependency injection
@@ -328,9 +329,20 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
         ? '\u{1F4A8} ${row.windspeedKmh!.round()}km/u'
         : '\u{1F4A8} \u2014';
 
+    // Subtiele achtergrondkleur op basis van uur-score
+    final Color rowBg;
+    if (row.overallScore >= 80) {
+      rowBg = const Color(0x0A2E7D32); // zeer licht groen
+    } else if (row.overallScore >= 60) {
+      rowBg = const Color(0x0AFF9800); // zeer licht oranje
+    } else {
+      rowBg = const Color(0x08C62828); // zeer licht rood
+    }
+
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+      decoration: BoxDecoration(
+        color: rowBg,
+        border: const Border(top: BorderSide(color: Color(0xFFF0F0F0))),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       child: Row(
@@ -414,7 +426,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
                 : const Text('Toevoegen aan agenda'),
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
+          ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF5F5F5),
               foregroundColor: const Color(0xFF1A1A1A),
@@ -424,14 +436,26 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Notificaties komen in een volgende update.'),
-                ),
+            onPressed: () async {
+              final notifService = NotificationService();
+              final canExact = await notifService.canScheduleExact();
+              final slotTitle =
+                  '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
+              await notifService.scheduleEveningBefore(
+                slotDay: widget.slot.start,
+                slotTitle: slotTitle,
+                exact: canExact,
               );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Herinnering gepland voor de avond ervoor!'),
+                  ),
+                );
+              }
             },
-            child: const Text('Herinner me de avond ervoor'),
+            icon: const Icon(Icons.notifications_outlined, size: 18),
+            label: const Text('Herinner me de avond ervoor'),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(

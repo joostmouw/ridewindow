@@ -81,7 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(cityName, weatherState, lastRefreshedAsync),
+            _buildHeader(cityName, weatherState, lastRefreshedAsync, slotsState),
             _buildWeekStrip(slotsState),
             Expanded(
               child: RefreshIndicator(
@@ -104,7 +104,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     String city,
     AsyncValue<List<HourlyForecast>> weatherState,
     AsyncValue<DateTime?> lastRefreshedAsync,
+    SlotsState slotsState,
   ) {
+    final slotCount = slotsState is SlotsLoaded ? slotsState.slots.length : 0;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
       decoration: const BoxDecoration(
@@ -137,13 +139,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ),
               const SizedBox(height: 2),
               Text(
-                lastRefreshedAsync.when(
-                  data: (ts) => ts == null
-                      ? 'Bijgewerkt: —'
-                      : 'Bijgewerkt: ${_formatTime(ts)}',
-                  loading: () => 'Bijgewerkt: —',
-                  error: (_, __) => 'Bijgewerkt: —',
-                ),
+                slotCount > 0
+                    ? '$slotCount rijmoment${slotCount == 1 ? '' : 'en'} deze week'
+                    : lastRefreshedAsync.when(
+                        data: (ts) => ts == null
+                            ? 'Bijgewerkt: —'
+                            : 'Bijgewerkt: ${_formatTime(ts)}',
+                        loading: () => 'Bijgewerkt: —',
+                        error: (_, __) => 'Bijgewerkt: —',
+                      ),
                 style: const TextStyle(fontSize: 13, color: Color(0xFF999999)),
               ),
             ],
@@ -275,7 +279,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               letterSpacing: 0.3,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 2),
+          Text(
+            '${day.day}',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected ? const Color(0xFF2E7D32) : const Color(0xFF666666),
+            ),
+          ),
+          const SizedBox(height: 3),
           Container(
             width: 34,
             height: 34,
@@ -666,7 +679,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () => _addToCalendar(slot, slotForecasts),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: slot.tier is Acceptable
@@ -682,8 +695,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Plan het',
+                    icon: const Icon(Icons.calendar_today, size: 14),
+                    label: const Text(
+                      'Inplannen',
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
