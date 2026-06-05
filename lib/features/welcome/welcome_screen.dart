@@ -61,7 +61,7 @@ class WelcomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  onPressed: () => context.go('/onboard'),
+                  onPressed: () => context.push('/onboard'),
                   child: const Text('Aan de slag \u2192'),
                 ),
               ),

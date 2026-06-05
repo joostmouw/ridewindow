@@ -14,7 +14,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "ridewindow.joost.amsterdam"
+    namespace = "com.fanalists.ridewindow.ridewindow"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -44,6 +44,7 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }

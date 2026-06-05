@@ -30,7 +30,13 @@ GoRouter router(Ref ref) {
     redirect: (context, state) async {
       final prefs = await SharedPreferences.getInstance();
       final done = prefs.getBool('onboarding_complete') ?? false;
-      if (!done) return '/welcome';
+      final loc = state.matchedLocation;
+      if (!done &&
+          loc != '/welcome' &&
+          loc != '/onboard' &&
+          loc != '/availability') {
+        return '/welcome';
+      }
       return null;
     },
     routes: [

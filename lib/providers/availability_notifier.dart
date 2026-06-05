@@ -56,7 +56,7 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
   /// Vervangt de volledige map met [preset] en persisteert.
   Future<void> seedPreset(Map<DateTime, BlockType> preset) async {
     await _persist(preset);
-    state = AsyncData(preset);
+    if (ref.mounted) state = AsyncData(preset);
   }
 
   /// Wist alle geblokkeerde uren.
