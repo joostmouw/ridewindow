@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/platform/notification_service.dart';
@@ -21,6 +22,8 @@ class ProfileScreen extends ConsumerStatefulWidget {
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
+const _kPrivacyPolicyUrl = 'https://joostmouw.github.io/ridewindow-privacy/';
+
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   // Lokale state voor live slider-waarden (vóór onChangeEnd persistentie).
   late double _tempMin;
@@ -29,6 +32,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late double _windMax;
 
   final _notifService = NotificationService();
+
+  Future<void> _launchPrivacyPolicy() async {
+    final uri = Uri.parse(_kPrivacyPolicyUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   /// Vraag POST_NOTIFICATIONS op en toon SnackBar als SCHEDULE_EXACT_ALARM niet beschikbaar is.
   /// Aanroepen bij inschakelen van een notificatie-toggle (NOTIF-04, NOTIF-05).
@@ -382,6 +392,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: const Text('Mijn schema bewerken'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.go('/availability'),
+          ),
+
+          // Sectie: OVER (REL-03: privacybeleid + versie)
+          const _SectionHeader('OVER'),
+          ListTile(
+            title: const Text('Privacybeleid'),
+            trailing: const Icon(Icons.open_in_new),
+            onTap: _launchPrivacyPolicy,
+          ),
+          const ListTile(
+            title: Text('Versie'),
+            trailing: Text('1.0.0'),
           ),
         ],
       ),
