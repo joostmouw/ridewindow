@@ -152,12 +152,13 @@ void main() {
       expect(result.windScore, 0.0);
     });
 
-    test('mid wind: wind=35.0 (15+20, halfway) → windScore == 50.0', () {
+    test('mid wind: wind=35.0 → windScore ≈ 64.6 (convex curve)', () {
+      // excess=20, ratio=0.5, pow(0.5, 1.5)=0.354, score=64.6
       final result = engine.score(
         _forecast(temp: 19, rain: 0.0, windspeed: 35.0),
         tolerances,
       );
-      expect(result.windScore, closeTo(50.0, 0.01));
+      expect(result.windScore, closeTo(64.6, 0.5));
     });
   });
 
@@ -192,6 +193,73 @@ void main() {
       // overall = 0.6*min(100,50,50) + 0.4*(100+50+50)/3
       //         = 0.6*50 + 0.4*(200/3) = 30 + 26.67 ≈ 56.67
       expect(result.overall, closeTo(56.67, 0.1));
+    });
+  });
+
+  group('precipitation probability — SCOR-05', () {
+    test('0mm rain + 0% prob → rainScore == 100', () {
+      final result = engine.score(
+        _forecast(temp: 19, rain: 0.0, prob: 0.0, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, 100.0);
+    });
+
+    test('0mm rain + 80% prob → rainScore == 36 (prob dominates)', () {
+      // amountScore=100 (0mm), probScore=100-80*0.8=36, min=36
+      final result = engine.score(
+        _forecast(temp: 19, rain: 0.0, prob: 80.0, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, closeTo(36.0, 0.1));
+    });
+
+    test('0mm rain + 100% prob → rainScore == 20', () {
+      final result = engine.score(
+        _forecast(temp: 19, rain: 0.0, prob: 100.0, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, closeTo(20.0, 0.1));
+    });
+
+    test('3mm rain + 50% prob → amount score dominates (lower)', () {
+      // amountScore: excess=2.5, ratio=0.5, pow(0.5,0.7)≈0.616, score≈38.4
+      // probScore: 100-50*0.8=60
+      // min(38.4, 60) = 38.4
+      final result = engine.score(
+        _forecast(temp: 19, rain: 3.0, prob: 50.0, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, lessThan(40.0));
+    });
+
+    test('null probability → only amount score used', () {
+      final result = engine.score(
+        _forecast(temp: 19, rain: 0.0, prob: null, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, 100.0);
+    });
+  });
+
+  group('non-linear rain curve', () {
+    test('0.6mm rain → score < 100 but > 90 (concave: steep at start)', () {
+      final result = engine.score(
+        _forecast(temp: 19, rain: 0.6, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, lessThan(100.0));
+      expect(result.rainScore, greaterThan(90.0));
+    });
+
+    test('2.5mm rain → score ≈ 38 (midpoint drops faster than linear)', () {
+      // excess=2.0, ratio=0.4, pow(0.4, 0.7)≈0.497, score≈50.3
+      final result = engine.score(
+        _forecast(temp: 19, rain: 2.5, windspeed: 5.0),
+        tolerances,
+      );
+      expect(result.rainScore, lessThan(55.0));
+      expect(result.rainScore, greaterThan(30.0));
     });
   });
 

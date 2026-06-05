@@ -77,19 +77,27 @@ class SlotsNotifier extends _$SlotsNotifier {
     final profile = profileValue.requireValue;
     final blockedHours = availValue.requireValue;
 
-    // Score alle uren.
+    // Score alle uren (incl. regenkans + niet-lineaire curves).
     final scores = forecasts
         .map((fc) => _scoring.score(fc, profile.tolerances))
         .toList();
 
-    // Genereer slots voor alle toegestane rijduren.
-    final allSlots = _generator.generate(
+    // Genereer slots voor alle toegestane rijduren (nachtfilter 06–22).
+    var allSlots = _generator.generate(
       scores,
       allowedDurations: profile.allowedDurations,
+      minHour: 6,
+      maxHour: 22,
     );
 
+    // Pas slot-niveau penalties toe (trend + windconsistentie).
+    allSlots = _generator.refine(allSlots, forecasts);
+
     // Verwijder geblokkeerde uren én Poor-tier slots.
-    final filtered = _filter.apply(allSlots, blockedHours);
+    var filtered = _filter.apply(allSlots, blockedHours);
+
+    // Dedup: verwijder overlappende inferieure slots.
+    filtered = _generator.dedup(filtered);
 
     if (filtered.isNotEmpty) {
       return SlotsLoaded(filtered);

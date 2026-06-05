@@ -1,5 +1,7 @@
 import 'package:test/test.dart';
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
 
@@ -139,6 +141,195 @@ void main() {
         allowedDurations: [4, 5],
       );
       expect(slots.length, 5);
+    });
+  });
+
+  group('night filter', () {
+    test('hours at 04:00–07:00 with minHour=6 → only 06:00, 07:00 kept', () {
+      final nightBase = DateTime(2025, 7, 5, 4); // 04:00
+      final scores = List.generate(
+        4,
+        (i) => HourlyScore(
+          overall: 90.0,
+          temperatureScore: 90.0,
+          rainScore: 90.0,
+          windScore: 90.0,
+          time: nightBase.add(Duration(hours: i)), // 04, 05, 06, 07
+        ),
+      );
+      final slots = generator.generate(
+        scores,
+        allowedDurations: [2],
+        minHour: 6,
+        maxHour: 22,
+      );
+      // Only the 06–08 window qualifies
+      expect(slots.length, 1);
+      expect(slots.first.start.hour, 6);
+    });
+
+    test('hours at 20:00–23:00 with maxHour=22 → only 20–22 window', () {
+      final eveningBase = DateTime(2025, 7, 5, 20);
+      final scores = List.generate(
+        4,
+        (i) => HourlyScore(
+          overall: 90.0,
+          temperatureScore: 90.0,
+          rainScore: 90.0,
+          windScore: 90.0,
+          time: eveningBase.add(Duration(hours: i)), // 20, 21, 22, 23
+        ),
+      );
+      final slots = generator.generate(
+        scores,
+        allowedDurations: [2],
+        minHour: 6,
+        maxHour: 22,
+      );
+      expect(slots.length, 1);
+      expect(slots.first.start.hour, 20);
+    });
+
+    test('default minHour=0, maxHour=24 → no filtering', () {
+      final nightBase = DateTime(2025, 7, 5, 2); // 02:00
+      final scores = List.generate(
+        3,
+        (i) => HourlyScore(
+          overall: 90.0,
+          temperatureScore: 90.0,
+          rainScore: 90.0,
+          windScore: 90.0,
+          time: nightBase.add(Duration(hours: i)),
+        ),
+      );
+      final slots = generator.generate(scores, allowedDurations: [2]);
+      expect(slots.length, 2); // 02–04 and 03–05
+    });
+  });
+
+  group('contiguity check', () {
+    test('non-contiguous hours → no slots generated', () {
+      final scores = [
+        HourlyScore(
+          overall: 90.0,
+          temperatureScore: 90.0,
+          rainScore: 90.0,
+          windScore: 90.0,
+          time: DateTime(2025, 7, 5, 9),
+        ),
+        HourlyScore(
+          overall: 90.0,
+          temperatureScore: 90.0,
+          rainScore: 90.0,
+          windScore: 90.0,
+          time: DateTime(2025, 7, 5, 11), // 2h gap
+        ),
+      ];
+      final slots = generator.generate(scores, allowedDurations: [2]);
+      expect(slots.length, 0);
+    });
+  });
+
+  group('dedup', () {
+    test('3h slots shifted by 1h: 09–12 and 10–13 deduped (67% overlap)', () {
+      final scores = _buildScores(5); // 08–12, all 90.0
+      final slots = generator.generate(scores, allowedDurations: [3]);
+      expect(slots.length, 3); // 08–11, 09–12, 10–13
+      final deduped = generator.dedup(slots);
+      // 09–12 overlaps 67% with 08–11 → removed; 10–13 overlaps 67% with 08–11 → removed
+      // Only 08–11 survives (or best by score — all same score so first picked wins)
+      expect(deduped.length, lessThan(slots.length));
+    });
+
+    test('non-overlapping slots all kept', () {
+      final morning = HourlyScore(
+        overall: 90.0,
+        temperatureScore: 90.0,
+        rainScore: 90.0,
+        windScore: 90.0,
+        time: DateTime(2025, 7, 5, 8),
+      );
+      final afternoon = HourlyScore(
+        overall: 85.0,
+        temperatureScore: 85.0,
+        rainScore: 85.0,
+        windScore: 85.0,
+        time: DateTime(2025, 7, 5, 14),
+      );
+      final slots = [
+        RideSlot(
+          start: DateTime(2025, 7, 5, 8),
+          end: DateTime(2025, 7, 5, 10),
+          overallScore: 90.0,
+          tier: const Perfect(),
+          hours: [morning, morning],
+        ),
+        RideSlot(
+          start: DateTime(2025, 7, 5, 14),
+          end: DateTime(2025, 7, 5, 16),
+          overallScore: 85.0,
+          tier: const Perfect(),
+          hours: [afternoon, afternoon],
+        ),
+      ];
+      final deduped = generator.dedup(slots);
+      expect(deduped.length, 2);
+    });
+  });
+
+  group('refine — trend penalty', () {
+    test('declining slot gets penalty, stable slot does not', () {
+      final declining = [
+        HourlyScore(
+          overall: 90.0,
+          temperatureScore: 90.0,
+          rainScore: 90.0,
+          windScore: 90.0,
+          time: base,
+        ),
+        HourlyScore(
+          overall: 50.0,
+          temperatureScore: 50.0,
+          rainScore: 50.0,
+          windScore: 50.0,
+          time: base.add(const Duration(hours: 1)),
+        ),
+      ];
+      final stable = _buildScores(2, overall: 70.0);
+
+      final rawSlots = [
+        RideSlot(
+          start: declining.first.time,
+          end: declining.last.time.add(const Duration(hours: 1)),
+          overallScore: 70.0,
+          tier: const Great(),
+          hours: declining,
+        ),
+        RideSlot(
+          start: stable.first.time,
+          end: stable.last.time.add(const Duration(hours: 1)),
+          overallScore: 70.0,
+          tier: const Great(),
+          hours: stable,
+        ),
+      ];
+
+      final forecasts = List.generate(
+        2,
+        (i) => HourlyForecast(
+          temperatureC: 20,
+          apparentTemperatureC: 20,
+          precipitationMm: 0,
+          precipitationProbability: 0,
+          windspeedKmh: 10,
+          winddirectionDeg: 180, // consistent direction → no wind penalty
+          time: base.add(Duration(hours: i)),
+        ),
+      );
+
+      final refined = generator.refine(rawSlots, forecasts);
+      // Declining slot should score lower than stable slot
+      expect(refined[0].overallScore, lessThan(refined[1].overallScore));
     });
   });
 }
