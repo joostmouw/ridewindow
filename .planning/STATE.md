@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 10 (release-internal-track-only) — EXECUTING
-Plan: 3 of 4 (Plan 10-04 next — Play Console setup)
-Status: Executing Phase 10 (Plans 01-03 complete; Plan 04 = Play Console store listing + Internal testing upload)
+Plan: 3 of 4 (Plan 10-04 BLOCKED — Google developer account verification pending)
+Status: Executing Phase 10 (Plans 01-03 complete; Plan 04 blocked on Google identity verification ~few days)
 Last activity: 2026-06-05 -- Plan 10-03 completed (privacy policy at GitHub Pages + ProfileScreen OVER section)
 
 Progress: [██████████] 100%
@@ -170,7 +170,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 - Phase 9 (Google Calendar): Vereist Google Cloud project setup, OAuth consent screen, en SHA-1 fingerprint registratie. Flag dit bij afsluiting Phase 8.
 - Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
-- Phase 10 (Release): Plans 01-03 complete. Smoke test passed. Plan 10-04 remaining — all human-action tasks (Play Console store listing, Data Safety form, AAB upload, tester opt-in).
+- Phase 10 (Release): Plans 01-03 complete. Smoke test passed. Plan 10-04 BLOCKED — Google Play developer account identity verification pending (submitted 2026-06-05, may take a few days). Once verified: complete store listing, Data Safety form, content rating, upload AAB, publish Internal testing track.
 - Phase 3 notitie (opgelost 03-03): AvailabilityNotifier gebruikt SharedPreferences — de Drift AvailabilityGridEntries tabel slaat een weekpatroon op (dayOfWeek+hour), niet DateTime-instanties. SharedPreferences met ISO-8601 serialisatie is de juiste aanpak.
 
 ## Deferred Items
