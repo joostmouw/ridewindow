@@ -1,11 +1,12 @@
 /// Phase 4: MaterialApp.router wired to routerProvider via ConsumerWidget.
 /// Phase 6: darkTheme + themeMode added; reacts to themeModeProvider.
-/// Phase 8: tz.initializeTimeZones() + WorkManager initialisatie vóór runApp().
+/// Phase 8: tz.initializeTimeZones() + WorkManager initialisatie.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
@@ -20,14 +21,26 @@ Future<void> main() async {
   // Laad timezone-data synchroon in geheugen (vereist voor flutter_local_notifications).
   tz.initializeTimeZones();
 
-  // Stel lokale tijdzone in op basis van het apparaat.
-  final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+  // Parallel laden: timezone + SharedPreferences voor snelle cold start.
+  final tzFuture = FlutterTimezone.getLocalTimezone();
+  final prefsFuture = SharedPreferences.getInstance();
+  final timezoneInfo = await tzFuture;
+  final prefs = await prefsFuture;
+
   tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
 
-  // Initialiseer WorkManager met de isolate-safe callbackDispatcher.
-  await Workmanager().initialize(callbackDispatcher);
+  // Start de app snel — WorkManager init daarna (niet blocking voor UI).
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPrefsProvider.overrideWithValue(prefs),
+      ],
+      child: const RideWindowApp(),
+    ),
+  );
 
-  // Registreer periodieke achtergrondtaak (3 uur interval, minimaal 3h flex).
+  // WorkManager init na runApp() — UI is al zichtbaar.
+  await Workmanager().initialize(callbackDispatcher);
   await Workmanager().registerPeriodicTask(
     kWeatherRefreshTaskTag,
     kWeatherRefreshTaskName,
@@ -35,8 +48,6 @@ Future<void> main() async {
     flexInterval: const Duration(hours: 3),
     constraints: Constraints(networkType: NetworkType.connected),
   );
-
-  runApp(const ProviderScope(child: RideWindowApp()));
 }
 
 class RideWindowApp extends ConsumerWidget {

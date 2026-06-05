@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/app/scaffold_with_nav.dart';
@@ -17,6 +18,11 @@ import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
 
 part 'router.g.dart';
+
+/// Pre-loaded SharedPreferences, overridden in main() via ProviderScope.
+final sharedPrefsProvider = Provider<SharedPreferences>(
+  (ref) => throw UnimplementedError('Must be overridden in ProviderScope'),
+);
 
 /// Fade transition voor tab-wissels en standaard routes.
 CustomTransitionPage<void> _fadeTransition(
@@ -61,8 +67,8 @@ CustomTransitionPage<void> _slideUpTransition(
 GoRouter router(Ref ref) {
   return GoRouter(
     initialLocation: '/home',
-    redirect: (context, state) async {
-      final prefs = await SharedPreferences.getInstance();
+    redirect: (context, state) {
+      final prefs = ref.read(sharedPrefsProvider);
       final done = prefs.getBool('onboarding_complete') ?? false;
       final loc = state.matchedLocation;
       if (!done &&
