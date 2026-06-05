@@ -4,6 +4,8 @@
 // Wave 4 — NOTIFICATIES sectie: drie SwitchListTile widgets (NOTIF-01/02/03).
 // D-06-02: onChangeEnd persisteert, onChanged update lokale state.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -243,158 +245,177 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // Sectie: TOLERANTIES
           const _SectionHeader('TOLERANTIES'),
 
-          // --- Min. temperatuur ---
+          // --- Temperatuurbereik (RangeSlider) ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
                 Row(
                   children: [
-                    const Text('Min. temperatuur'),
+                    const Text(
+                      'Temperatuur',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    _infoButton(
+                      context,
+                      _tempRangeDescription(_tempMin, _tempMax),
+                    ),
                     const Spacer(),
-                    Text('${_tempMin.round()}°C'),
+                    Text(
+                      '${_tempMin.round()}°C – ${_tempMax.round()}°C',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2E7D32),
+                      ),
+                    ),
                   ],
                 ),
-                // D-06-02: onChangeEnd persisteert, onChanged update lokale state
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackShape: const _GradientTrackShape(
-                      colors: [Color(0xFFEF5350), Color(0xFFFFA726), Color(0xFF66BB6A)],
-                    ),
-                    trackHeight: 6,
-                    thumbColor: const Color(0xFF2E7D32),
-                    overlayColor: const Color(0x292E7D32),
+                RangeSlider(
+                  values: RangeValues(_tempMin, _tempMax),
+                  min: 0,
+                  max: 40,
+                  divisions: 40,
+                  labels: RangeLabels(
+                    '${_tempMin.round()}°C',
+                    '${_tempMax.round()}°C',
                   ),
-                  child: Slider(
-                    value: _tempMin,
-                    min: 0,
-                    max: 20,
-                    divisions: 20,
-                    label: '${_tempMin.round()}°C',
-                    onChanged: (v) => setState(() => _tempMin = v),
-                    onChangeEnd: (v) => ref
-                        .read(profileProvider.notifier)
-                        .updateTolerances(
-                            profile.tolerances.copyWith(tempMinIdealC: v),),
+                  activeColor: const Color(0xFF2E7D32),
+                  onChanged: (v) => setState(() {
+                    _tempMin = v.start;
+                    _tempMax = v.end;
+                  }),
+                  onChangeEnd: (v) => ref
+                      .read(profileProvider.notifier)
+                      .updateTolerances(
+                        profile.tolerances.copyWith(
+                          tempMinIdealC: v.start,
+                          tempMaxIdealC: v.end,
+                        ),
+                      ),
+                ),
+                Text(
+                  _tempRangeDescription(_tempMin, _tempMax),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF999999),
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
+                const SizedBox(height: 4),
               ],
             ),
           ),
           const Divider(height: 1),
 
-          // --- Max. temperatuur ---
+          // --- Max. neerslag + animated drops ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Text('Max. temperatuur'),
+                    const Text(
+                      'Max. neerslag',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    _infoButton(
+                      context,
+                      _rainDescription(_rainMax),
+                    ),
                     const Spacer(),
-                    Text('${_tempMax.round()}°C'),
+                    Text(
+                      '${_rainMax.toStringAsFixed(1)}mm',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2E7D32),
+                      ),
+                    ),
                   ],
                 ),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackShape: const _GradientTrackShape(
-                      colors: [Color(0xFF66BB6A), Color(0xFFFFA726), Color(0xFFEF5350)],
-                    ),
-                    trackHeight: 6,
-                    thumbColor: const Color(0xFF2E7D32),
-                    overlayColor: const Color(0x292E7D32),
-                  ),
-                  child: Slider(
-                    value: _tempMax,
-                    min: 15,
-                    max: 35,
-                    divisions: 20,
-                    label: '${_tempMax.round()}°C',
-                    onChanged: (v) => setState(() => _tempMax = v),
-                    onChangeEnd: (v) => ref
-                        .read(profileProvider.notifier)
-                        .updateTolerances(
-                            profile.tolerances.copyWith(tempMaxIdealC: v),),
+                SizedBox(
+                  height: 40,
+                  child: _AnimatedRainDrops(intensity: _rainMax / 5.0),
+                ),
+                Slider(
+                  value: _rainMax,
+                  min: 0,
+                  max: 5,
+                  divisions: 50,
+                  activeColor: const Color(0xFF2E7D32),
+                  onChanged: (v) => setState(() => _rainMax = v),
+                  onChangeEnd: (v) => ref
+                      .read(profileProvider.notifier)
+                      .updateTolerances(
+                        profile.tolerances.copyWith(rainMaxIdealMm: v),
+                      ),
+                ),
+                Text(
+                  _rainDescription(_rainMax),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF999999),
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
+                const SizedBox(height: 4),
               ],
             ),
           ),
           const Divider(height: 1),
 
-          // --- Max. neerslag ---
+          // --- Max. wind + animated windsock ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Text('Max. neerslag'),
+                    const Text(
+                      'Max. wind',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    _infoButton(
+                      context,
+                      _windDescription(_windMax),
+                    ),
                     const Spacer(),
-                    Text('${_rainMax.toStringAsFixed(1)}mm'),
+                    Text(
+                      '${_windMax.round()} km/u',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2E7D32),
+                      ),
+                    ),
                   ],
                 ),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackShape: const _GradientTrackShape(
-                      colors: [Color(0xFF66BB6A), Color(0xFFFFA726), Color(0xFFEF5350)],
-                    ),
-                    trackHeight: 6,
-                    thumbColor: const Color(0xFF2E7D32),
-                    overlayColor: const Color(0x292E7D32),
-                  ),
-                  child: Slider(
-                    value: _rainMax,
-                    min: 0,
-                    max: 5,
-                    divisions: 50,
-                    label: '${_rainMax.toStringAsFixed(1)}mm',
-                    onChanged: (v) => setState(() => _rainMax = v),
-                    onChangeEnd: (v) => ref
-                        .read(profileProvider.notifier)
-                        .updateTolerances(
-                            profile.tolerances.copyWith(rainMaxIdealMm: v),),
+                SizedBox(
+                  height: 40,
+                  child: _AnimatedWindFlag(intensity: _windMax / 50.0),
+                ),
+                Slider(
+                  value: _windMax,
+                  min: 0,
+                  max: 50,
+                  divisions: 50,
+                  activeColor: const Color(0xFF2E7D32),
+                  onChanged: (v) => setState(() => _windMax = v),
+                  onChangeEnd: (v) => ref
+                      .read(profileProvider.notifier)
+                      .updateTolerances(
+                        profile.tolerances.copyWith(windMaxIdealKmh: v),
+                      ),
+                ),
+                Text(
+                  _windDescription(_windMax),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF999999),
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-
-          // --- Max. wind ---
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Text('Max. wind'),
-                    const Spacer(),
-                    Text('${_windMax.round()}km/u'),
-                  ],
-                ),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackShape: const _GradientTrackShape(
-                      colors: [Color(0xFF66BB6A), Color(0xFFFFA726), Color(0xFFEF5350)],
-                    ),
-                    trackHeight: 6,
-                    thumbColor: const Color(0xFF2E7D32),
-                    overlayColor: const Color(0x292E7D32),
-                  ),
-                  child: Slider(
-                    value: _windMax,
-                    min: 0,
-                    max: 50,
-                    divisions: 50,
-                    label: '${_windMax.round()}km/u',
-                    onChanged: (v) => setState(() => _windMax = v),
-                    onChangeEnd: (v) => ref
-                        .read(profileProvider.notifier)
-                        .updateTolerances(
-                            profile.tolerances.copyWith(windMaxIdealKmh: v),),
-                  ),
-                ),
+                const SizedBox(height: 4),
               ],
             ),
           ),
@@ -459,54 +480,220 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
-/// Custom slider track that paints a horizontal gradient across the full track.
-class _GradientTrackShape extends SliderTrackShape {
-  final List<Color> colors;
+// ---------------------------------------------------------------------------
+// Helper methods for contextual info descriptions
+// ---------------------------------------------------------------------------
 
-  const _GradientTrackShape({required this.colors});
+Widget _infoButton(BuildContext context, String description) {
+  return IconButton(
+    icon: const Icon(Icons.info_outline, size: 16, color: Color(0xFF999999)),
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+    tooltip: description,
+    onPressed: () => showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        content: Text(description),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+String _tempRangeDescription(double min, double max) {
+  final range = max - min;
+  if (range >= 25) return 'Je fietst in bijna elk weer';
+  if (range >= 15) return 'Comfortabel fietsbereik';
+  if (range >= 8) return 'Alleen bij lekker weer';
+  return 'Alleen bij perfect weer';
+}
+
+String _rainDescription(double mm) {
+  if (mm <= 0.3) return 'Alleen bij droog weer';
+  if (mm <= 1.0) return 'Een beetje motregen is ok';
+  if (mm <= 3.0) return 'Lichte regen geen probleem';
+  return 'Ook bij flinke buien';
+}
+
+String _windDescription(double kmh) {
+  if (kmh <= 10) return 'Alleen bij windstil weer';
+  if (kmh <= 20) return 'Rustig briesje is prima';
+  if (kmh <= 30) return 'Stevige wind geen probleem';
+  return 'Zelfs bij harde wind';
+}
+
+// ---------------------------------------------------------------------------
+// Animated rain drops — more drops at higher intensity
+// ---------------------------------------------------------------------------
+
+class _AnimatedRainDrops extends StatefulWidget {
+  final double intensity; // 0.0–1.0
+
+  const _AnimatedRainDrops({required this.intensity});
 
   @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    required SliderThemeData sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    final trackHeight = sliderTheme.trackHeight ?? 4;
-    final trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2;
-    return Rect.fromLTWH(
-      offset.dx + 12,
-      trackTop,
-      parentBox.size.width - 24,
-      trackHeight,
-    );
+  State<_AnimatedRainDrops> createState() => _AnimatedRainDropsState();
+}
+
+class _AnimatedRainDropsState extends State<_AnimatedRainDrops>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
   }
 
   @override
-  void paint(
-    PaintingContext context,
-    Offset offset, {
-    required RenderBox parentBox,
-    required SliderThemeData sliderTheme,
-    required Animation<double> enableAnimation,
-    required Offset thumbCenter,
-    Offset? secondaryOffset,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-    required TextDirection textDirection,
-  }) {
-    final rect = getPreferredRect(
-      parentBox: parentBox,
-      offset: offset,
-      sliderTheme: sliderTheme,
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dropCount = (widget.intensity * 12).round().clamp(1, 12);
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return CustomPaint(
+          painter: _RainPainter(
+            progress: _controller.value,
+            dropCount: dropCount,
+            intensity: widget.intensity,
+          ),
+          size: const Size(double.infinity, 40),
+        );
+      },
     );
-    final rrect =
-        RRect.fromRectAndRadius(rect, const Radius.circular(4));
+  }
+}
+
+class _RainPainter extends CustomPainter {
+  final double progress;
+  final int dropCount;
+  final double intensity;
+
+  _RainPainter({
+    required this.progress,
+    required this.dropCount,
+    required this.intensity,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..shader = LinearGradient(colors: colors).createShader(rect);
-    context.canvas.drawRRect(rrect, paint);
+      ..color = Color.lerp(
+        const Color(0x4042A5F5),
+        const Color(0xCC1565C0),
+        intensity,
+      )!
+      ..strokeWidth = 1.5 + intensity
+      ..strokeCap = StrokeCap.round;
+
+    final rng = math.Random(42);
+    for (var i = 0; i < dropCount; i++) {
+      final x = rng.nextDouble() * size.width;
+      final speed = 0.7 + rng.nextDouble() * 0.3;
+      final y = ((progress * speed + rng.nextDouble()) % 1.0) * size.height;
+      final length = 4 + intensity * 6;
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(x - 1, y + length),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RainPainter old) =>
+      old.progress != progress || old.dropCount != dropCount;
+}
+
+// ---------------------------------------------------------------------------
+// Animated wind flag — oscillates faster/wider at higher intensity
+// ---------------------------------------------------------------------------
+
+class _AnimatedWindFlag extends StatefulWidget {
+  final double intensity; // 0.0–1.0
+
+  const _AnimatedWindFlag({required this.intensity});
+
+  @override
+  State<_AnimatedWindFlag> createState() => _AnimatedWindFlagState();
+}
+
+class _AnimatedWindFlagState extends State<_AnimatedWindFlag>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        // Angle: 0 at rest, up to 35 degrees at max wind
+        final maxAngle = widget.intensity * 0.6; // ~35 degrees
+        final angle = math.sin(_controller.value * math.pi) * maxAngle;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Transform.rotate(
+              angle: angle,
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                '🚩',
+                style: TextStyle(fontSize: 20 + widget.intensity * 8),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Wind lines that stretch with intensity
+            ...List.generate(
+              (widget.intensity * 3).round().clamp(0, 3),
+              (i) => Padding(
+                padding: const EdgeInsets.only(right: 3),
+                child: Container(
+                  width: 12 + widget.intensity * 20,
+                  height: 2,
+                  decoration: BoxDecoration(
+                    color: Color.lerp(
+                      const Color(0x33999999),
+                      const Color(0x99666666),
+                      widget.intensity,
+                    ),
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
