@@ -46,3 +46,8 @@ app.*.map.json
 
 # Phase 1 — coverage artifacts
 coverage/
+
+# Signing credentials — NEVER commit
+*.jks
+*.keystore
+android/key.properties
