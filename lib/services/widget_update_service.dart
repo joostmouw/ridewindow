@@ -46,7 +46,13 @@ class WidgetUpdateService {
       await HomeWidget.saveWidgetData<bool>('slot_available', false);
     }
 
-    // Vraag Android om de widget RemoteViews te verversen
-    await HomeWidget.updateWidget(androidName: 'RideWidgetProvider');
+    // Vraag Android om de widget RemoteViews te verversen.
+    // qualifiedAndroidName is nodig omdat de namespace (com.fanalists.ridewindow.ridewindow)
+    // afwijkt van de applicationId (ridewindow.joost.amsterdam); home_widget bouwt anders
+    // een onjuiste klassenaam op door "${context.packageName}.RideWidgetProvider" te gebruiken.
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName:
+          'com.fanalists.ridewindow.ridewindow.RideWidgetProvider',
+    );
   }
 }

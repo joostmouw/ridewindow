@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_green_dark"
+    android:padding="8dp">
+
+    <!-- Date: top-left, small bold white text, e.g. "za 21 jun" -->
+    <TextView
+        android:id="@+id/widget_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:textColor="@android:color/white"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <!-- Time window: below date, larger text, e.g. "09:00–13:00" -->
+    <TextView
+        android:id="@+id/widget_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_date"
+        android:layout_alignParentStart="true"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Duration: right of time window, e.g. "4u" -->
+    <TextView
+        android:id="@+id/widget_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_date"
+        android:layout_toEndOf="@id/widget_time"
+        android:layout_marginStart="6dp"
+        android:gravity="center_vertical"
+        android:textColor="#CCFFFFFF"
+        android:textSize="12sp" />
+
+    <!-- Tier label: bottom-right, e.g. "Perfect" -->
+    <TextView
+        android:id="@+id/widget_tier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+
+    <!-- Empty state: centered, shown when no slot is available -->
+    <TextView
+        android:id="@+id/widget_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Geen slot gevonden"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+</RelativeLayout>
