@@ -12,16 +12,16 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - Decimal phases (e.g., 1.5, 2.1): Urgent insertions between integers
 
 - [x] **Phase 1: Project skeleton + test infrastructure** - Flutter project boots, locked deps, canonical lib/ tree, structural test enforcing pure-Dart domain boundary
-- [ ] **Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator** - Pure-Dart domain code with 100% unit test coverage of lib/domain/
+- [x] **Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator** - Pure-Dart domain code with 100% unit test coverage of lib/domain/
 - [x] **Phase 2: Data layer — Drift + Open-Meteo** - Drift schema, OpenMeteoClient, WeatherRepository, forecast cache
 - [x] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
 - [x] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
 - [x] **Phase 5: UI Phase B — Ride Detail + Insights sheet** - Ride Detail screen + "Why this score?" insights bottom sheet
 - [x] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips (completed 2026-06-03)
-- [ ] **Phase 7: Location — GPS + manual city + permission state machine** - geolocator, permission_handler, city picker fallback
+- [x] **Phase 7: Location — GPS + manual city + permission state machine** - geolocator, permission_handler, city picker fallback
 - [x] **Phase 8: Background refresh + Notifications** - WorkManager, flutter_local_notifications, 3 notification types (completed 2026-06-03)
 - [x] **Phase 9: Google Calendar integration** - Lazy OAuth, AutoRefreshingAuthClient, calendar.events scope (completed 2026-06-03)
-- [ ] **Phase 10: Release — Internal track only** - Signed AAB, Play App Signing, privacy policy, Data Safety form, Internal testing track
+- [x] **Phase 10: Release — Internal track only** - Signed AAB, Play App Signing, privacy policy, Data Safety form, Internal testing track
 
 ## Phase Details
 
@@ -58,7 +58,8 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
   6. Null weather inputs clamp to 50/100 "uncertain" rather than crash or coerce to 0; this is unit-tested explicitly
   7. `build_runner` pipeline produces committed generated files; `dart test --coverage=coverage` shows 100% line coverage of `lib/domain/` (excluding `*.freezed.dart` / `*.g.dart`)
 
-**Plans**: TBD
+**Plans**: 4 plans complete (01.5-01 through 01.5-04)
+**Status**: Complete 2026-06-02
 
 ### Phase 2: Data layer — Drift + Open-Meteo
 
@@ -311,7 +312,8 @@ Plans:
   4. `AutoRefreshingAuthClient` handles token expiry silently — no sign-in prompt appears mid-session after a previously successful authentication
   5. No personal data leaves the device unless the user explicitly completes the Google Sign-In flow — confirmed by verifying no Calendar API calls are made on app start
 
-**Plans**: TBD
+**Plans**: 2 plans complete (09-01, 09-02)
+**Status**: Complete 2026-06-03
 
 ### Phase 10: Release — Internal track only
 
@@ -340,7 +342,7 @@ Plans:
 
 **Wave 3** *(geblokkeerd op Wave 2 + Wave 3)*
 
-- [ ] 10-04-PLAN.md — Play Console store listing + Data Safety form + Internal testing track upload + tester opt-in
+- [x] 10-04-PLAN.md — Play Console store listing + Data Safety form + Internal testing track upload + tester opt-in
 
 ## Progress
 
@@ -350,7 +352,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project skeleton + test infrastructure | 3/3 | Complete | 2026-06-02 |
-| 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 0/TBD | Not started | - |
+| 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 4/4 | Complete | 2026-06-02 |
 | 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
 | 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
 | 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
@@ -359,4 +361,4 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
 | 8. Background refresh + Notifications | 5/5 | Complete   | 2026-06-03 |
 | 9. Google Calendar integration | 2/2 | Complete    | 2026-06-03 |
-| 10. Release — Internal track only | 3/4 | In Progress|  |
+| 10. Release — Internal track only | 4/4 | Complete | 2026-06-17 |

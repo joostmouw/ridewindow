@@ -186,10 +186,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 | ID | Slug | Description | Date | Commit |
 |----|------|-------------|------|--------|
 | 260605-wv8 | ux-ui-polish-8-super-app-inspired-improv | UX/UI polish: 8 super-app inspired improvements (Plan het fix, pull-to-refresh, Hero animation, haptic feedback, beste keuze highlight, animated weather icons, swipe-to-calendar, share function) | 2026-06-05 | ca6f0f8 |
+| 260617-qjd | android-home-screen-widget-toont-volgend | Android home screen widget — toont volgende ride slot op een oogopslag | 2026-06-17 | 2691d59 |
 
 ## Session Continuity
 
-Last session: 2026-06-05T21:48:11.647Z
-Stopped at: context exhaustion at 81% (2026-06-05)
-Resume file: .continue-here.md
-Next action: 2 remaining UX tasks (staggered card animation, colored slider tracks), then Phase 10 Plan 04 (blocked on Google identity verification)
+Last session: 2026-06-17
+Last activity: 2026-06-17 - Completed quick task 260617-qjd: Android home screen widget
