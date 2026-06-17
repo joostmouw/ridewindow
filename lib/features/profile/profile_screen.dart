@@ -15,8 +15,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -35,6 +38,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late double _windMax;
 
   final _notifService = NotificationService();
+  int _versionTapCount = 0;
 
   Future<void> _launchPrivacyPolicy() async {
     final uri = Uri.parse(_kPrivacyPolicyUrl);
@@ -81,6 +85,110 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _tempMax = profile?.tolerances.tempMaxIdealC ?? 26.0;
     _rainMax = profile?.tolerances.rainMaxIdealMm ?? 0.5;
     _windMax = profile?.tolerances.windMaxIdealKmh ?? 15.0;
+  }
+
+  void _showNameDialog(BuildContext context, String? currentName) {
+    final controller = TextEditingController(text: currentName);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Your name'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            hintText: 'Enter your name',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(profileProvider.notifier).setUserName(controller.text);
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDebugMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Debug Menu',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.restart_alt),
+              title: const Text('Reset onboarding'),
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('onboarding.completed');
+                if (ctx.mounted) Navigator.of(ctx).pop();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Onboarding reset. Restart the app.')),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_sweep),
+              title: const Text('Clear forecast cache'),
+              onTap: () {
+                ref.invalidate(weatherProvider);
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Forecast cache cleared.')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today_outlined),
+              title: const Text('Reset availability'),
+              onTap: () async {
+                await ref.read(availabilityProvider.notifier).clearAll();
+                if (ctx.mounted) Navigator.of(ctx).pop();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Availability reset to empty.')),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.refresh),
+              title: const Text('Force weather refresh'),
+              onTap: () {
+                ref.invalidate(weatherProvider);
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Weather refresh triggered.')),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   void _openCityPicker(BuildContext context) {
@@ -463,6 +571,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             onTap: () => context.push('/availability'),
           ),
 
+          // Sectie: NAAM
+          const _SectionHeader('NAAM'),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: Text(profile.userName ?? 'Set your name'),
+            subtitle: profile.userName == null
+                ? const Text('Tap to add your name for a personal greeting')
+                : null,
+            onTap: () => _showNameDialog(context, profile.userName),
+          ),
+
           // Sectie: OVER (REL-03: privacybeleid + versie)
           const _SectionHeader('OVER'),
           ListTile(
@@ -470,9 +589,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             trailing: const Icon(Icons.open_in_new),
             onTap: _launchPrivacyPolicy,
           ),
-          const ListTile(
-            title: Text('Versie'),
-            trailing: Text('1.0.0'),
+          ListTile(
+            title: const Text('Versie'),
+            trailing: const Text('1.0.0'),
+            onTap: () {
+              _versionTapCount++;
+              if (_versionTapCount >= 5) {
+                _versionTapCount = 0;
+                _showDebugMenu(context);
+              }
+            },
           ),
         ],
       ),

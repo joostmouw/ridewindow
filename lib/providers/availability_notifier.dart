@@ -53,6 +53,27 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
     state = AsyncData(next);
   }
 
+  /// Zet of wist meerdere uren in één batch.
+  /// Als [block] true is, worden alle [hours] als [BlockType.custom] gezet.
+  /// Als [block] false is, worden alle [hours] gewist (alleen custom, niet work).
+  Future<void> setCustomHours(List<DateTime> hours, {required bool block}) async {
+    final current = await future;
+    final next = Map<DateTime, BlockType>.from(current);
+    for (final hour in hours) {
+      if (block) {
+        if (next[hour] != BlockType.work) {
+          next[hour] = BlockType.custom;
+        }
+      } else {
+        if (next[hour] == BlockType.custom) {
+          next.remove(hour);
+        }
+      }
+    }
+    await _persist(next);
+    state = AsyncData(next);
+  }
+
   /// Vervangt de volledige map met [preset] en persisteert.
   Future<void> seedPreset(Map<DateTime, BlockType> preset) async {
     await _persist(preset);

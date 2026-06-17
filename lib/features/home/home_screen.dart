@@ -15,6 +15,7 @@ import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -74,6 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final locationAsync = ref.watch(locationProvider);
     final cityName = locationAsync.value?.city ?? kDefaultCity;
     final lastRefreshedAsync = ref.watch(lastRefreshedProvider);
+    final userName = ref.watch(profileProvider).value?.userName;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -81,7 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(cityName, weatherState, lastRefreshedAsync, slotsState),
+            _buildHeader(cityName, weatherState, lastRefreshedAsync, slotsState, userName),
             _buildWeekStrip(slotsState),
             Expanded(
               child: RefreshIndicator(
@@ -105,8 +107,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     AsyncValue<List<HourlyForecast>> weatherState,
     AsyncValue<DateTime?> lastRefreshedAsync,
     SlotsState slotsState,
+    String? userName,
   ) {
     final slotCount = slotsState is SlotsLoaded ? slotsState.slots.length : 0;
+    final greeting = _buildGreeting(userName);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
       decoration: const BoxDecoration(
@@ -117,51 +121,84 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    city,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  greeting,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: Color(0xFF999999),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.watch_later_outlined,
-                    size: 18,
-                    color: Color(0xFF666666),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                slotCount > 0
-                    ? '$slotCount rijmoment${slotCount == 1 ? '' : 'en'} deze week'
-                    : lastRefreshedAsync.when(
-                        data: (ts) => ts == null
-                            ? 'Bijgewerkt: —'
-                            : 'Bijgewerkt: ${_formatTime(ts)}',
-                        loading: () => 'Bijgewerkt: —',
-                        error: (_, __) => 'Bijgewerkt: —',
+                    const SizedBox(width: 3),
+                    Text(
+                      city,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF666666),
+                        fontWeight: FontWeight.w500,
                       ),
-                style: const TextStyle(fontSize: 13, color: Color(0xFF999999)),
-              ),
-            ],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      slotCount > 0
+                          ? '$slotCount ride${slotCount == 1 ? '' : 's'} this week'
+                          : lastRefreshedAsync.when(
+                              data: (ts) => ts == null
+                                  ? ''
+                                  : 'Updated ${_formatTime(ts)}',
+                              loading: () => '',
+                              error: (_, __) => '',
+                            ),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF999999),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           if (weatherState.hasError)
             IconButton(
               icon: const Icon(Icons.refresh, color: Color(0xFF2E7D32)),
-              tooltip: 'Opnieuw proberen',
+              tooltip: 'Retry',
               onPressed: () => ref.invalidate(weatherProvider),
             ),
         ],
       ),
     );
+  }
+
+  String _buildGreeting(String? userName) {
+    final hour = DateTime.now().hour;
+    final String timeGreeting;
+    if (hour < 6) {
+      timeGreeting = 'Night owl';
+    } else if (hour < 12) {
+      timeGreeting = 'Good morning';
+    } else if (hour < 17) {
+      timeGreeting = 'Good afternoon';
+    } else if (hour < 21) {
+      timeGreeting = 'Good evening';
+    } else {
+      timeGreeting = 'Good evening';
+    }
+    if (userName != null && userName.isNotEmpty) {
+      return '$timeGreeting, $userName';
+    }
+    return timeGreeting;
   }
 
   // ---------------------------------------------------------------------------
@@ -533,11 +570,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ? null
         : winds.reduce((a, b) => a + b) / winds.length;
 
-    final tempLabel = avgTemp == null ? '—' : '${avgTemp.toStringAsFixed(1)}°C';
+    // Feels like temperature
+    final apparents = slotForecasts
+        .map((f) => f.apparentTemperatureC)
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+    final avgApparent = apparents.isEmpty
+        ? null
+        : apparents.reduce((a, b) => a + b) / apparents.length;
+
+    // Wind direction
+    final windDirs = slotForecasts
+        .map((f) => f.winddirectionDeg)
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+    final avgWindDir = windDirs.isEmpty
+        ? null
+        : windDirs.reduce((a, b) => a + b) / windDirs.length;
+
+    final tempLabel = avgTemp == null
+        ? '—'
+        : avgApparent != null && (avgApparent - avgTemp).abs() >= 2
+            ? '${avgTemp.round()}° (${avgApparent.round()}°)'
+            : '${avgTemp.toStringAsFixed(1)}°C';
     final precipLabel =
         totalPrecip == null ? '—' : '${totalPrecip.toStringAsFixed(1)}mm';
-    final windLabel =
-        avgWind == null ? '—' : '${avgWind.toStringAsFixed(0)}km/u';
+    final windLabel = avgWind == null
+        ? '—'
+        : avgWindDir != null
+            ? '${_windArrow(avgWindDir)} ${avgWind.toStringAsFixed(0)}km/h'
+            : '${avgWind.toStringAsFixed(0)}km/h';
 
     return Dismissible(
       key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),
@@ -815,6 +879,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         Acceptable() => 2,
         Poor() => 3,
       };
+
+  String _windArrow(double degrees) {
+    // Wind direction is where wind comes FROM, arrow shows direction
+    const arrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
+    final index = ((degrees + 22.5) % 360 / 45).floor();
+    return arrows[index];
+  }
 
   Color _tierBorderColor(RideTier tier) => switch (tier) {
         Perfect() => const Color(0xFF2E7D32),

@@ -14,6 +14,7 @@ class UserProfile {
     required this.allowedDurations,
     required this.theme,
     this.locationOverride,
+    this.userName,
     required this.notifEveningBefore,
     required this.notifMorningOf,
     required this.notifWeeklyDigest,
@@ -23,6 +24,7 @@ class UserProfile {
   final List<int> allowedDurations;
   final String theme;
   final String? locationOverride;
+  final String? userName;
   final bool notifEveningBefore;
   final bool notifMorningOf;
   final bool notifWeeklyDigest;
@@ -32,6 +34,7 @@ class UserProfile {
     List<int>? allowedDurations,
     String? theme,
     Object? locationOverride = _sentinel,
+    Object? userName = _sentinel,
     bool? notifEveningBefore,
     bool? notifMorningOf,
     bool? notifWeeklyDigest,
@@ -43,6 +46,9 @@ class UserProfile {
       locationOverride: identical(locationOverride, _sentinel)
           ? this.locationOverride
           : locationOverride as String?,
+      userName: identical(userName, _sentinel)
+          ? this.userName
+          : userName as String?,
       notifEveningBefore: notifEveningBefore ?? this.notifEveningBefore,
       notifMorningOf: notifMorningOf ?? this.notifMorningOf,
       notifWeeklyDigest: notifWeeklyDigest ?? this.notifWeeklyDigest,
@@ -69,6 +75,7 @@ class ProfileNotifier extends _$ProfileNotifier {
   static const _keyDurations = 'profile.allowedDurations';
   static const _keyTheme = 'profile.theme';
   static const _keyLocation = 'profile.locationOverride';
+  static const _keyUserName = 'profile.userName';
   static const _keyNotifEvening = 'profile.notifEveningBefore';
   static const _keyNotifMorning = 'profile.notifMorningOf';
   static const _keyNotifWeekly = 'profile.notifWeeklyDigest';
@@ -91,6 +98,7 @@ class ProfileNotifier extends _$ProfileNotifier {
 
     final theme = prefs.getString(_keyTheme) ?? 'system';
     final locationOverride = prefs.getString(_keyLocation);
+    final userName = prefs.getString(_keyUserName);
     final notifEvening = prefs.getBool(_keyNotifEvening) ?? false;
     final notifMorning = prefs.getBool(_keyNotifMorning) ?? false;
     final notifWeekly = prefs.getBool(_keyNotifWeekly) ?? false;
@@ -105,6 +113,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       allowedDurations: durations.isEmpty ? [2, 3, 5] : durations,
       theme: theme,
       locationOverride: locationOverride,
+      userName: userName,
       notifEveningBefore: notifEvening,
       notifMorningOf: notifMorning,
       notifWeeklyDigest: notifWeekly,
@@ -169,6 +178,21 @@ class ProfileNotifier extends _$ProfileNotifier {
 
     final current = await future;
     state = AsyncData(current.copyWith(locationOverride: location));
+  }
+
+  /// Schrijft de gebruikersnaam naar SharedPreferences en update state.
+  Future<void> setUserName(String? name) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (name == null || name.trim().isEmpty) {
+      await prefs.remove(_keyUserName);
+    } else {
+      await prefs.setString(_keyUserName, name.trim());
+    }
+
+    final current = await future;
+    state = AsyncData(
+      current.copyWith(userName: name?.trim().isEmpty == true ? null : name?.trim()),
+    );
   }
 
   /// Schrijft een notificatie-toggle naar SharedPreferences en update state.

@@ -312,6 +312,98 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
     );
   }
 
+  Widget _buildClothingTip() {
+    final temps = widget.forecasts
+        .where((f) => f.apparentTemperatureC != null)
+        .map((f) => f.apparentTemperatureC!)
+        .toList();
+    if (temps.isEmpty) return const SizedBox.shrink();
+
+    final avgFeelsLike = temps.reduce((a, b) => a + b) / temps.length;
+    final totalPrecip = widget.forecasts
+        .where((f) => f.precipitationMm != null)
+        .map((f) => f.precipitationMm!)
+        .fold(0.0, (a, b) => a + b);
+    final avgWind = widget.forecasts
+        .where((f) => f.windspeedKmh != null)
+        .map((f) => f.windspeedKmh!)
+        .toList();
+    final windAvg =
+        avgWind.isEmpty ? 0.0 : avgWind.reduce((a, b) => a + b) / avgWind.length;
+
+    final items = <String>[];
+    String icon;
+
+    if (avgFeelsLike < 5) {
+      icon = '\u{1F9E4}'; // gloves
+      items.addAll(['Winter jacket', 'Thermal tights', 'Gloves', 'Shoe covers']);
+    } else if (avgFeelsLike < 10) {
+      icon = '\u{1F9E5}'; // coat
+      items.addAll(['Long sleeve jersey', 'Arm warmers', 'Leg warmers']);
+    } else if (avgFeelsLike < 15) {
+      icon = '\u{1F455}'; // shirt
+      items.addAll(['Long sleeve jersey', 'Knee warmers']);
+    } else if (avgFeelsLike < 20) {
+      icon = '\u{1F455}';
+      items.add('Short sleeve jersey');
+      if (avgFeelsLike < 17) items.add('Arm warmers just in case');
+    } else if (avgFeelsLike < 28) {
+      icon = '\u{2600}\u{FE0F}'; // sun
+      items.addAll(['Light jersey', 'Sunscreen']);
+    } else {
+      icon = '\u{1F975}'; // hot face
+      items.addAll(['Light jersey', 'Sunscreen', 'Extra water']);
+    }
+
+    if (totalPrecip > 0.5) {
+      items.add('Rain jacket');
+    }
+    if (windAvg > 25) {
+      items.add('Wind vest');
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F7F0),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFCCE5CC), width: 0.5),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'What to wear',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2E7D32),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  items.join(' \u00B7 '),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF444444),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHourlyRowWidget(HourlyRow row) {
     final time = _fmtTime(row.time);
     final temp = row.temperatureC != null
@@ -502,6 +594,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
                         _buildWeatherRow('Wind', _avgWindString()),
                       ],
                     ),
+                    _buildClothingTip(),
                     _buildInfoCard(
                       title: 'UURLIJKS',
                       rows: hourlyRows
