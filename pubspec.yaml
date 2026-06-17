@@ -54,6 +54,12 @@ dependencies:
   # UX — Share ride slots
   share_plus: ^10.1.4
 
+  # Widget — Android home screen widget data bridge
+  home_widget: ^0.9.3
+
+  # Localisation — Dutch date formatting in WidgetUpdateService
+  intl: ^0.19.0
+
   # fl_chart arriveert in een latere fase
 
 dev_dependencies:
