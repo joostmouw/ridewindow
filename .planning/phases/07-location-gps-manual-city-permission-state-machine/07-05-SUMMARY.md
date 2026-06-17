@@ -96,7 +96,7 @@ None — alle tests verifiëren echte widget-rendering met volledig gecontroleer
 
 None — T-07-05-01 (FakeNotifiers die echte services aanroepen) gemitigeerd: alle `build()` methoden retourneren direct een waarde zonder `Geolocator`, `SharedPreferences`, of netwerk aanroepen.
 
-## Self-Check: PASSED
+## Self-Check: PASSED (post-commit verification)
 
 | Check | Result |
 |-------|--------|

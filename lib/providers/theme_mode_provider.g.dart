@@ -58,4 +58,4 @@ final class ThemeModeProvider
   }
 }
 
-String _$themeModeHash() => r'b2058b1bb73e9a672ce22dd7fc28ed7b1d13d5e4';
+String _$themeModeHash() => r'ff8a91f110574ddc7c9e36abae761642074737ac';

@@ -8,7 +8,7 @@ part of 'router.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// GoRouter met onboarding-redirect en vier Phase 4 routes.
+/// GoRouter met onboarding-redirect, StatefulShellRoute en soepele transitions.
 ///
 /// Redirect: controleert SharedPreferences 'onboarding_complete'.
 /// false of afwezig → /welcome; true → geen redirect.
@@ -16,7 +16,7 @@ part of 'router.dart';
 @ProviderFor(router)
 final routerProvider = RouterProvider._();
 
-/// GoRouter met onboarding-redirect en vier Phase 4 routes.
+/// GoRouter met onboarding-redirect, StatefulShellRoute en soepele transitions.
 ///
 /// Redirect: controleert SharedPreferences 'onboarding_complete'.
 /// false of afwezig → /welcome; true → geen redirect.
@@ -24,7 +24,7 @@ final routerProvider = RouterProvider._();
 final class RouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// GoRouter met onboarding-redirect en vier Phase 4 routes.
+  /// GoRouter met onboarding-redirect, StatefulShellRoute en soepele transitions.
   ///
   /// Redirect: controleert SharedPreferences 'onboarding_complete'.
   /// false of afwezig → /welcome; true → geen redirect.
@@ -61,4 +61,4 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'43f0bbe003479ed905949d7c223457beac45a975';
+String _$routerHash() => r'2d87ad0737e92d1e347c856bfd21f3b039e8dcd5';
