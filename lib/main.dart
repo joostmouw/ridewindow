@@ -13,7 +13,9 @@ import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
 import 'package:ridewindow/platform/background_task.dart';
+import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
+import 'package:ridewindow/services/widget_update_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +57,15 @@ class RideWindowApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Luister op slotsProvider en update het Android home screen widget
+    // telkens als de slots-staat verandert (b.v. na WeatherRefresh of profielwijziging).
+    ref.listen<SlotsState>(slotsProvider, (_, next) {
+      if (next is SlotsLoaded) {
+        final slot = next.slots.firstOrNull;
+        WidgetUpdateService.update(slot);
+      }
+    });
+
     final router = ref.watch(routerProvider);
     return MaterialApp.router(
       title: 'RideWindow',
