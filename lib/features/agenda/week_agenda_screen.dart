@@ -1,11 +1,13 @@
 // lib/features/agenda/week_agenda_screen.dart
-// Week Agenda: 10-day time grid with blocked hours and ride slot overlays.
+// Week Agenda: horizontal day columns with weather quality + availability overlay.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 
@@ -13,31 +15,46 @@ import 'package:ridewindow/providers/slots_notifier.dart';
 // Constants
 // ---------------------------------------------------------------------------
 
-const double _cellWidth = 56.0;
-const double _cellHeight = 52.0;
-const double _hourLabelWidth = 44.0;
-const double _headerHeight = 52.0;
 const int _firstHour = 6;
 const int _lastHour = 22;
 const int _dayCount = 10;
+const double _dayColumnWidth = 72.0;
+const double _hourBlockHeight = 38.0;
+const double _headerHeight = 56.0;
+const double _hourLabelWidth = 44.0;
 
+// Tier colors
 const Color _colorPerfect = Color(0xFF2E7D32);
-const Color _colorGreat = Color(0xFF81C784);
+const Color _colorGreat = Color(0xFF66BB6A);
 const Color _colorAcceptable = Color(0xFFFFB74D);
-const Color _colorBlocked = Color(0xFFE0E0E0);
-const Color _colorFree = Colors.white;
-const Color _colorBorder = Color(0xFFF0F0F0);
-const Color _colorTodayText = Color(0xFF2E7D32);
-const Color _colorNormalDayText = Color(0xFF666666);
+const Color _colorNoData = Color(0xFFF5F5F5);
+const Color _colorBlocked = Color(0x55E53935);
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/// Returns the set of blocked hours (as integers) for [targetDay] by
-/// projecting the current week's pattern onto [targetDay]'s weekday.
-Set<int> _blockedHoursForDay(
+Color _tierColor(RideTier tier) {
+  return switch (tier) {
+    Perfect() => _colorPerfect,
+    Great() => _colorGreat,
+    Acceptable() => _colorAcceptable,
+    Poor() => const Color(0xFFEF9A9A),
+  };
+}
+
+Color _scoreToColor(double score) {
+  if (score >= 80) return _colorPerfect;
+  if (score >= 60) return _colorGreat;
+  if (score >= 40) return _colorAcceptable;
+  return const Color(0xFFEF9A9A);
+}
+
+/// Check if a given hour on a given day is blocked, by projecting the weekly
+/// availability pattern onto the target date.
+bool _isHourBlocked(
   DateTime targetDay,
+  int hour,
   Map<DateTime, BlockType> blockedHours,
 ) {
   final now = DateTime.now();
@@ -47,22 +64,13 @@ Set<int> _blockedHoursForDay(
     now.day - (now.weekday - 1),
   );
   final equivalentDay = weekStart.add(Duration(days: targetDay.weekday - 1));
-
-  final result = <int>{};
-  for (final entry in blockedHours.entries) {
-    final k = entry.key;
-    if (k.year == equivalentDay.year &&
-        k.month == equivalentDay.month &&
-        k.day == equivalentDay.day) {
-      result.add(k.hour);
-    }
-  }
-  return result;
+  final key = DateTime.utc(equivalentDay.year, equivalentDay.month, equivalentDay.day, hour);
+  return blockedHours.containsKey(key);
 }
 
-/// Returns the first slot overlapping the cell [cellStart, cellStart+1h),
-/// or null if none.
-RideSlot? _overlappingSlot(DateTime cellStart, List<RideSlot> slots) {
+/// Find the ride slot that covers this hour cell, if any.
+RideSlot? _slotForHour(DateTime day, int hour, List<RideSlot> slots) {
+  final cellStart = DateTime(day.year, day.month, day.day, hour);
   final cellEnd = cellStart.add(const Duration(hours: 1));
   for (final s in slots) {
     if (s.start.isBefore(cellEnd) && s.end.isAfter(cellStart)) {
@@ -72,263 +80,89 @@ RideSlot? _overlappingSlot(DateTime cellStart, List<RideSlot> slots) {
   return null;
 }
 
-Color _tierColor(RideTier tier) {
-  return switch (tier) {
-    Perfect() => _colorPerfect,
-    Great() => _colorGreat,
-    Acceptable() => _colorAcceptable,
-    Poor() => _colorBlocked,
-  };
+/// Get the hourly score for a specific hour on a specific day.
+HourlyScore? _scoreForHour(DateTime day, int hour, List<HourlyScore> scores) {
+  for (final s in scores) {
+    if (s.time.year == day.year &&
+        s.time.month == day.month &&
+        s.time.day == day.day &&
+        s.time.hour == hour) {
+      return s;
+    }
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
 // WeekAgendaScreen
 // ---------------------------------------------------------------------------
 
-class WeekAgendaScreen extends ConsumerWidget {
+class WeekAgendaScreen extends ConsumerStatefulWidget {
   const WeekAgendaScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WeekAgendaScreen> createState() => _WeekAgendaScreenState();
+}
+
+class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
+  bool _showBlocked = true;
+
+  @override
+  Widget build(BuildContext context) {
     final slotsState = ref.watch(slotsProvider);
     final availValue = ref.watch(availabilityProvider);
-
     final slots = (slotsState is SlotsLoaded) ? slotsState.slots : <RideSlot>[];
     final blockedHours = availValue.value ?? <DateTime, BlockType>{};
 
+    // Collect all hourly scores from all slots for coloring individual hours
+    final allScores = <HourlyScore>[];
+    for (final slot in slots) {
+      allScores.addAll(slot.hours);
+    }
+
     final now = DateTime.now();
-    // Build list of 10 days starting from today.
-    final days = List.generate(
-      _dayCount,
-      (i) => DateTime(now.year, now.month, now.day + i),
-    );
+    final today = DateTime(now.year, now.month, now.day);
+    final days = List.generate(_dayCount, (i) => today.add(Duration(days: i)));
+
+    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Agenda')),
+      appBar: AppBar(
+        title: const Text('Agenda'),
+        actions: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Bloktijden',
+                style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
+              ),
+              Switch(
+                value: _showBlocked,
+                onChanged: (v) => setState(() => _showBlocked = v),
+                activeTrackColor: theme.colorScheme.primary,
+              ),
+            ],
+          ),
+        ],
+      ),
       body: Column(
         children: [
+          // Legend
+          _Legend(showBlocked: _showBlocked),
+          const Divider(height: 1),
+          // Grid
           Expanded(
             child: _AgendaGrid(
               days: days,
+              today: today,
               slots: slots,
+              allScores: allScores,
               blockedHours: blockedHours,
-              today: DateTime(now.year, now.month, now.day),
-            ),
-          ),
-          const _Legend(),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// _AgendaGrid: scrollable time grid
-// ---------------------------------------------------------------------------
-
-class _AgendaGrid extends StatelessWidget {
-  const _AgendaGrid({
-    required this.days,
-    required this.slots,
-    required this.blockedHours,
-    required this.today,
-  });
-
-  final List<DateTime> days;
-  final List<RideSlot> slots;
-  final Map<DateTime, BlockType> blockedHours;
-  final DateTime today;
-
-  @override
-  Widget build(BuildContext context) {
-    // Layout:
-    // Row
-    //   ├── Fixed hour-label column (scrolls vertically with outer scroll)
-    //   └── Expanded: SingleChildScrollView(horizontal)
-    //         └── Column
-    //               ├── Day header row
-    //               └── Grid rows (06-22)
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Fixed left column: corner + hour labels
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Corner spacer aligned with day header row
-              const SizedBox(width: _hourLabelWidth, height: _headerHeight),
-              for (int h = _firstHour; h <= _lastHour; h++)
-                _HourLabel(hour: h),
-            ],
-          ),
-          // Horizontally scrolling area: header + cells
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Day header row
-                  _DayHeaderRow(days: days, today: today),
-                  // Cell rows for each hour
-                  for (int h = _firstHour; h <= _lastHour; h++)
-                    Row(
-                      children: [
-                        for (final day in days)
-                          _GridCell(
-                            day: day,
-                            hour: h,
-                            slots: slots,
-                            blockedHoursForDay:
-                                _blockedHoursForDay(day, blockedHours),
-                          ),
-                      ],
-                    ),
-                ],
-              ),
+              showBlocked: _showBlocked,
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// _DayHeaderRow
-// ---------------------------------------------------------------------------
-
-class _DayHeaderRow extends StatelessWidget {
-  const _DayHeaderRow({required this.days, required this.today});
-
-  final List<DateTime> days;
-  final DateTime today;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: _headerHeight,
-      child: Row(
-        children: [
-          for (final day in days)
-            _DayHeaderCell(day: day, today: today),
-        ],
-      ),
-    );
-  }
-}
-
-class _DayHeaderCell extends StatelessWidget {
-  const _DayHeaderCell({required this.day, required this.today});
-
-  final DateTime day;
-  final DateTime today;
-
-  static const _weekdayLabels = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
-
-  @override
-  Widget build(BuildContext context) {
-    final isToday = day.year == today.year &&
-        day.month == today.month &&
-        day.day == today.day;
-    final color = isToday ? _colorTodayText : _colorNormalDayText;
-    // weekday: 1=Mon ... 7=Sun
-    final label = _weekdayLabels[day.weekday - 1];
-
-    return SizedBox(
-      width: _cellWidth,
-      height: _headerHeight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
-          Text(
-            '${day.day}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// _HourLabel
-// ---------------------------------------------------------------------------
-
-class _HourLabel extends StatelessWidget {
-  const _HourLabel({required this.hour});
-
-  final int hour;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: _hourLabelWidth,
-      height: _cellHeight,
-      child: Center(
-        child: Text(
-          '${hour.toString().padLeft(2, '0')}:00',
-          style: const TextStyle(fontSize: 10, color: Color(0xFF888888)),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// _GridCell
-// ---------------------------------------------------------------------------
-
-class _GridCell extends StatelessWidget {
-  const _GridCell({
-    required this.day,
-    required this.hour,
-    required this.slots,
-    required this.blockedHoursForDay,
-  });
-
-  final DateTime day;
-  final int hour;
-  final List<RideSlot> slots;
-  final Set<int> blockedHoursForDay;
-
-  @override
-  Widget build(BuildContext context) {
-    // Use UTC key to match AvailabilityNotifier storage format.
-    final cellStart = DateTime.utc(day.year, day.month, day.day, hour);
-
-    final isBlocked = blockedHoursForDay.contains(hour);
-    final overlap = _overlappingSlot(cellStart, slots);
-
-    Color bgColor;
-    if (overlap != null) {
-      bgColor = _tierColor(overlap.tier);
-    } else if (isBlocked) {
-      bgColor = _colorBlocked;
-    } else {
-      bgColor = _colorFree;
-    }
-
-    return Container(
-      width: _cellWidth,
-      height: _cellHeight,
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: _colorBorder, width: 0.5),
       ),
     );
   }
@@ -339,37 +173,36 @@ class _GridCell extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _Legend extends StatelessWidget {
-  const _Legend();
+  const _Legend({required this.showBlocked});
+
+  final bool showBlocked;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
         children: [
-          _LegendItem(color: _colorFree, label: 'Vrij', bordered: true),
-          SizedBox(width: 16),
-          _LegendItem(color: _colorBlocked, label: 'Geblokkeerd'),
-          SizedBox(width: 16),
-          _LegendItem(color: _colorPerfect, label: 'Rijvenster'),
+          const _LegendDot(color: _colorPerfect, label: 'Perfect'),
+          const SizedBox(width: 12),
+          const _LegendDot(color: _colorGreat, label: 'Geweldig'),
+          const SizedBox(width: 12),
+          const _LegendDot(color: _colorAcceptable, label: 'Oké'),
+          if (showBlocked) ...[
+            const SizedBox(width: 12),
+            const _LegendDot(color: Color(0xFFE53935), label: 'Bezet'),
+          ],
         ],
       ),
     );
   }
 }
 
-class _LegendItem extends StatelessWidget {
-  const _LegendItem({
-    required this.color,
-    required this.label,
-    this.bordered = false,
-  });
+class _LegendDot extends StatelessWidget {
+  const _LegendDot({required this.color, required this.label});
 
   final Color color;
   final String label;
-  final bool bordered;
 
   @override
   Widget build(BuildContext context) {
@@ -377,19 +210,270 @@ class _LegendItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 14,
-          height: 14,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(
             color: color,
-            border: Border.all(
-              color: bordered ? const Color(0xFFCCCCCC) : Colors.transparent,
-              width: 1,
-            ),
+            shape: BoxShape.circle,
           ),
         ),
         const SizedBox(width: 4),
         Text(label, style: const TextStyle(fontSize: 11)),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _AgendaGrid — fixed hour labels + horizontally scrolling day columns
+// ---------------------------------------------------------------------------
+
+class _AgendaGrid extends StatelessWidget {
+  const _AgendaGrid({
+    required this.days,
+    required this.today,
+    required this.slots,
+    required this.allScores,
+    required this.blockedHours,
+    required this.showBlocked,
+  });
+
+  final List<DateTime> days;
+  final DateTime today;
+  final List<RideSlot> slots;
+  final List<HourlyScore> allScores;
+  final Map<DateTime, BlockType> blockedHours;
+  final bool showBlocked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Fixed hour labels on the left
+        SizedBox(
+          width: _hourLabelWidth,
+          child: Column(
+            children: [
+              SizedBox(height: _headerHeight),
+              for (int h = _firstHour; h <= _lastHour; h++)
+                SizedBox(
+                  height: _hourBlockHeight,
+                  child: Center(
+                    child: Text(
+                      '${h.toString().padLeft(2, '0')}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF999999),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        // Horizontally scrollable day columns
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final day in days)
+                  _DayColumn(
+                    day: day,
+                    isToday: day == today,
+                    slots: slots,
+                    allScores: allScores,
+                    blockedHours: blockedHours,
+                    showBlocked: showBlocked,
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _DayColumn — one vertical column per day
+// ---------------------------------------------------------------------------
+
+class _DayColumn extends StatelessWidget {
+  const _DayColumn({
+    required this.day,
+    required this.isToday,
+    required this.slots,
+    required this.allScores,
+    required this.blockedHours,
+    required this.showBlocked,
+  });
+
+  final DateTime day;
+  final bool isToday;
+  final List<RideSlot> slots;
+  final List<HourlyScore> allScores;
+  final Map<DateTime, BlockType> blockedHours;
+  final bool showBlocked;
+
+  static final _dayFmt = DateFormat('EEE', 'nl_NL');
+
+  @override
+  Widget build(BuildContext context) {
+    final dayLabel = isToday ? 'Vandaag' : _dayFmt.format(day);
+    final dateLabel = '${day.day}/${day.month}';
+
+    return SizedBox(
+      width: _dayColumnWidth,
+      child: Column(
+        children: [
+          // Day header
+          Container(
+            height: _headerHeight,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isToday
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : null,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  dayLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isToday ? FontWeight.bold : FontWeight.w600,
+                    color: isToday
+                        ? Theme.of(context).colorScheme.primary
+                        : const Color(0xFF666666),
+                  ),
+                ),
+                Text(
+                  dateLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isToday
+                        ? Theme.of(context).colorScheme.primary
+                        : const Color(0xFF333333),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Hour blocks
+          for (int h = _firstHour; h <= _lastHour; h++)
+            _HourBlock(
+              day: day,
+              hour: h,
+              slots: slots,
+              allScores: allScores,
+              blockedHours: blockedHours,
+              showBlocked: showBlocked,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _HourBlock — single cell showing weather quality + optional blocked overlay
+// ---------------------------------------------------------------------------
+
+class _HourBlock extends StatelessWidget {
+  const _HourBlock({
+    required this.day,
+    required this.hour,
+    required this.slots,
+    required this.allScores,
+    required this.blockedHours,
+    required this.showBlocked,
+  });
+
+  final DateTime day;
+  final int hour;
+  final List<RideSlot> slots;
+  final List<HourlyScore> allScores;
+  final Map<DateTime, BlockType> blockedHours;
+  final bool showBlocked;
+
+  @override
+  Widget build(BuildContext context) {
+    final slot = _slotForHour(day, hour, slots);
+    final blocked = _isHourBlocked(day, hour, blockedHours);
+
+    // Determine background color based on weather quality
+    Color bgColor;
+    String? label;
+
+    if (slot != null) {
+      // This hour is part of a ride slot — color by tier
+      bgColor = _tierColor(slot.tier);
+      // Show score on the first hour of the slot
+      if (slot.start.hour == hour) {
+        label = '${slot.overallScore.round()}';
+      }
+    } else {
+      // Check hourly scores for weather coloring even outside slots
+      final score = _scoreForHour(day, hour, allScores);
+      if (score != null) {
+        bgColor = _scoreToColor(score.overall);
+      } else {
+        bgColor = _colorNoData;
+      }
+    }
+
+    return Container(
+      width: _dayColumnWidth,
+      height: _hourBlockHeight,
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+        border: slot != null
+            ? Border.all(color: _tierColor(slot.tier), width: 1.5)
+            : null,
+      ),
+      child: Stack(
+        children: [
+          // Score label
+          if (label != null)
+            Center(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          // Blocked overlay (diagonal stripes effect via icon)
+          if (showBlocked && blocked)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _colorBlocked,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.block,
+                    size: 16,
+                    color: Color(0xAAE53935),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

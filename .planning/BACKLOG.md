@@ -10,7 +10,7 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 
 | # | Item | Waarde | Effort | Status |
 |---|------|--------|--------|--------|
-| 1 | **Android home screen widget** — toont volgende ride slot op een oogopslag | HOOG | M | Backlog |
+| 1 | **Android home screen widget** — toont volgende ride slot op een oogopslag | HOOG | M | Done (2691d59) |
 | 2 | **Windrichting indicator op ride cards** — "meewind/tegenwind retour" label | MEDIUM | S | Done (2c7738c) |
 | 3 | **"Feels like" op home card chips** — apparent temperature zichtbaar zonder detail te openen | MEDIUM | S | Done (2c7738c) |
 | 4 | **Settings export/import** — JSON-bestand als poor man's backup zonder backend | LAAG | S | Backlog |
@@ -42,7 +42,7 @@ Significante toevoegingen die een nieuwe milestone/release-cyclus vereisen.
 | 24 | **Route-weer overlay** — GPX/route importeren en per-segment weer tonen (Epic Ride Weather territory) | MEDIUM | XL | Backlog |
 | 25 | **Google Calendar import** — geblokkeerde uren automatisch ophalen uit agenda i.p.v. handmatig grid | HOOG | M | Backlog |
 | 26 | **Kledingadvies** — op basis van temperatuur + windchill een suggestie (arm warmers, regenjas, etc.) | MEDIUM | M | Backlog |
-| 27 | **14-daagse forecast** — uitbreiding van 7 naar 14 dagen met afnemende betrouwbaarheid indicator | MEDIUM | S | Backlog |
+| 27 | **14-daagse forecast** — uitbreiding van 7 naar 14 dagen met afnemende betrouwbaarheid indicator | MEDIUM | S | Deels (10d, 7a6dbbe) |
 | 28 | **Themed branding + app icon polish** — custom launcher icon, splash screen animatie, store screenshots | MEDIUM | M | Backlog |
 | 29 | **Lokalisatie (EN/NL)** — i18n met `flutter_localizations` + ARB bestanden | MEDIUM | M | Backlog |
 | 30 | **Offline modus** — duidelijke UX wanneer geen internet; toon laatst gecachte forecast met stale-indicator | HOOG | M | Backlog |
@@ -77,4 +77,4 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 ---
 
 *Aangemaakt: 2026-06-06*
-*Laatst bijgewerkt: 2026-06-17*
+*Laatst bijgewerkt: 2026-06-18*
