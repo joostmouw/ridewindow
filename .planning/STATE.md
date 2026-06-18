@@ -187,8 +187,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 |----|------|-------------|------|--------|
 | 260605-wv8 | ux-ui-polish-8-super-app-inspired-improv | UX/UI polish: 8 super-app inspired improvements (Plan het fix, pull-to-refresh, Hero animation, haptic feedback, beste keuze highlight, animated weather icons, swipe-to-calendar, share function) | 2026-06-05 | ca6f0f8 |
 | 260617-qjd | android-home-screen-widget-toont-volgend | Android home screen widget — toont volgende ride slot op een oogopslag | 2026-06-17 | 2691d59 |
+| 260618-csx | week-agenda-view-met-ride-overlap-overla | Week-agenda view met ride-overlap overlay en 10 dagen vooruit scrollen | 2026-06-18 | af16b02 |
 
 ## Session Continuity
 
 Last session: 2026-06-17
-Last activity: 2026-06-17 - Completed quick task 260617-qjd: Android home screen widget
+Last activity: 2026-06-18 - Completed quick task 260618-csx: Week-agenda view met ride-overlap overlay
