@@ -92,26 +92,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Your name'),
+        title: const Text('Jouw naam'),
         content: TextField(
           controller: controller,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
           decoration: const InputDecoration(
-            hintText: 'Enter your name',
+            hintText: 'Voer je naam in',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: const Text('Annuleer'),
           ),
           TextButton(
             onPressed: () {
               ref.read(profileProvider.notifier).setUserName(controller.text);
               Navigator.of(ctx).pop();
             },
-            child: const Text('Save'),
+            child: const Text('Opslaan'),
           ),
         ],
       ),
@@ -137,50 +137,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.restart_alt),
-              title: const Text('Reset onboarding'),
+              title: const Text('Onboarding resetten'),
               onTap: () async {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.remove('onboarding.completed');
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Onboarding reset. Restart the app.')),
+                    const SnackBar(content: Text('Onboarding gereset. Herstart de app.')),
                   );
                 }
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_sweep),
-              title: const Text('Clear forecast cache'),
+              title: const Text('Weerdata wissen'),
               onTap: () {
                 ref.invalidate(weatherProvider);
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Forecast cache cleared.')),
+                  const SnackBar(content: Text('Weerdata gewist.')),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.calendar_today_outlined),
-              title: const Text('Reset availability'),
+              title: const Text('Beschikbaarheid resetten'),
               onTap: () async {
                 await ref.read(availabilityProvider.notifier).clearAll();
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Availability reset to empty.')),
+                    const SnackBar(content: Text('Beschikbaarheid gereset.')),
                   );
                 }
               },
             ),
             ListTile(
               leading: const Icon(Icons.refresh),
-              title: const Text('Force weather refresh'),
+              title: const Text('Weer handmatig verversen'),
               onTap: () {
                 ref.invalidate(weatherProvider);
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Weather refresh triggered.')),
+                  const SnackBar(content: Text('Weer wordt ververst.')),
                 );
               },
             ),
@@ -575,9 +575,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const _SectionHeader('NAAM'),
           ListTile(
             leading: const Icon(Icons.person_outline),
-            title: Text(profile.userName ?? 'Set your name'),
+            title: Text(profile.userName ?? 'Stel je naam in'),
             subtitle: profile.userName == null
-                ? const Text('Tap to add your name for a personal greeting')
+                ? const Text('Tik om je naam in te voeren voor een persoonlijke begroeting')
                 : null,
             onTap: () => _showNameDialog(context, profile.userName),
           ),

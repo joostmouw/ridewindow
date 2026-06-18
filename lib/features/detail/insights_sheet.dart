@@ -276,7 +276,7 @@ class InsightsSheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Overall score',
+                  'Totaalscore',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

@@ -370,30 +370,30 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
     if (avgFeelsLike < 5) {
       icon = '\u{1F9E4}'; // gloves
-      items.addAll(['Winter jacket', 'Thermal tights', 'Gloves', 'Shoe covers']);
+      items.addAll(['Winterjas', 'Thermobroek', 'Handschoenen', 'Overschoenen']);
     } else if (avgFeelsLike < 10) {
       icon = '\u{1F9E5}'; // coat
-      items.addAll(['Long sleeve jersey', 'Arm warmers', 'Leg warmers']);
+      items.addAll(['Lange mouw jersey', 'Armwarmers', 'Beenwarmers']);
     } else if (avgFeelsLike < 15) {
       icon = '\u{1F455}'; // shirt
-      items.addAll(['Long sleeve jersey', 'Knee warmers']);
+      items.addAll(['Lange mouw jersey', 'Kniewarmers']);
     } else if (avgFeelsLike < 20) {
       icon = '\u{1F455}';
-      items.add('Short sleeve jersey');
-      if (avgFeelsLike < 17) items.add('Arm warmers just in case');
+      items.add('Korte mouw jersey');
+      if (avgFeelsLike < 17) items.add('Armwarmers voor de zekerheid');
     } else if (avgFeelsLike < 28) {
       icon = '\u{2600}\u{FE0F}'; // sun
-      items.addAll(['Light jersey', 'Sunscreen']);
+      items.addAll(['Licht shirt', 'Zonnebrand']);
     } else {
       icon = '\u{1F975}'; // hot face
-      items.addAll(['Light jersey', 'Sunscreen', 'Extra water']);
+      items.addAll(['Licht shirt', 'Zonnebrand', 'Extra water']);
     }
 
     if (totalPrecip > 0.5) {
-      items.add('Rain jacket');
+      items.add('Regenjas');
     }
     if (windAvg > 25) {
-      items.add('Wind vest');
+      items.add('Windvest');
     }
 
     return Container(
@@ -414,7 +414,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'What to wear',
+                  'Wat trek je aan',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,

@@ -179,11 +179,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     const SizedBox(width: 8),
                     Text(
                       slotCount > 0
-                          ? '$slotCount ride${slotCount == 1 ? '' : 's'} this week'
+                          ? '$slotCount ${slotCount == 1 ? 'rijvenster' : 'rijvensters'} deze week'
                           : lastRefreshedAsync.when(
                               data: (ts) => ts == null
                                   ? ''
-                                  : 'Updated ${_formatTime(ts)}',
+                                  : 'Bijgewerkt ${_formatTime(ts)}',
                               loading: () => '',
                               error: (_, __) => '',
                             ),
@@ -200,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           if (weatherState.hasError)
             IconButton(
               icon: const Icon(Icons.refresh, color: Color(0xFF2E7D32)),
-              tooltip: 'Retry',
+              tooltip: 'Opnieuw proberen',
               onPressed: () => ref.invalidate(weatherProvider),
             ),
         ],
@@ -212,15 +212,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final hour = DateTime.now().hour;
     final String timeGreeting;
     if (hour < 6) {
-      timeGreeting = 'Night owl';
+      timeGreeting = 'Nachtuil';
     } else if (hour < 12) {
-      timeGreeting = 'Good morning';
+      timeGreeting = 'Goedemorgen';
     } else if (hour < 17) {
-      timeGreeting = 'Good afternoon';
+      timeGreeting = 'Goedemiddag';
     } else if (hour < 21) {
-      timeGreeting = 'Good evening';
+      timeGreeting = 'Goedenavond';
     } else {
-      timeGreeting = 'Good evening';
+      timeGreeting = 'Goedenavond';
     }
     if (userName != null && userName.isNotEmpty) {
       return '$timeGreeting, $userName';
