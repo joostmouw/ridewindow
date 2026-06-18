@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:go_router/go_router.dart';
+
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -191,11 +196,14 @@ class _RideCard extends ConsumerWidget {
     final tierText = currentScore != null ? _tierLabel(currentScore) : '?';
 
     // Avg weather
-    double? avgTemp, avgRain, avgWind, avgWindDir;
+    double? avgTemp, avgApparent, avgRain, avgRainProb, avgWind, avgWindDir;
     if (rideForecasts.isNotEmpty) {
       avgTemp = rideForecasts.fold(0.0, (s, f) => s + (f.temperatureC ?? 0)) / rideForecasts.length;
-      avgRain = rideForecasts.fold(0.0, (s, f) => s + (f.precipitationProbability ?? 0)) / rideForecasts.length;
+      avgRain = rideForecasts.fold<double>(0.0, (s, f) => s + (f.precipitationMm ?? 0.0));
+      avgRainProb = rideForecasts.fold(0.0, (s, f) => s + (f.precipitationProbability ?? 0)) / rideForecasts.length;
       avgWind = rideForecasts.fold(0.0, (s, f) => s + (f.windspeedKmh ?? 0)) / rideForecasts.length;
+      final apparents = rideForecasts.map((f) => f.apparentTemperatureC).whereType<double>().toList();
+      avgApparent = apparents.isEmpty ? null : apparents.reduce((a, b) => a + b) / apparents.length;
       // Circular mean for wind direction
       double sinSum = 0, cosSum = 0;
       for (final f in rideForecasts) {
@@ -289,15 +297,23 @@ class _RideCard extends ConsumerWidget {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      _WeatherChip(icon: Icons.thermostat, value: '${avgTemp.round()}°C'),
+                      _WeatherChip(icon: Icons.thermostat, value: avgApparent != null && (avgApparent - avgTemp!).abs() >= 2
+                          ? '${avgTemp.round()}° (${avgApparent.round()}°)'
+                          : '${avgTemp.round()}°C'),
                       const SizedBox(width: 12),
-                      _WeatherChip(icon: Icons.water_drop, value: '${avgRain!.round()}%'),
+                      _WeatherChip(icon: Icons.water_drop, value: avgRainProb != null && avgRainProb > 0
+                          ? '${avgRain!.toStringAsFixed(1)}mm (${avgRainProb.round()}%)'
+                          : '${avgRain!.toStringAsFixed(1)}mm'),
                       const SizedBox(width: 12),
-                      _WeatherChip(icon: Icons.air, value: '${avgWind!.round()} km/h ${_windDirection(avgWindDir)}'),
+                      _WeatherChip(icon: Icons.air, value: avgWind! < 5
+                          ? 'Windstil'
+                          : avgWindDir != null
+                              ? '${avgWind.round()} km/h ${_windDirection(avgWindDir)}'
+                              : '${avgWind.round()} km/h'),
                     ],
                   ),
                   // Wind advice
-                  if (avgWind != null && avgWind > 5) ...[
+                  if (avgWind != null && avgWind >= 5 && avgWindDir != null) ...[
                     const SizedBox(height: 6),
                     Row(
                       children: [
@@ -430,8 +446,31 @@ class _RideCard extends ConsumerWidget {
                   value: scores.fold(0.0, (s, h) => s + h.windScore) / scores.length),
             ],
 
+            // Full detail
+            if (scores.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    final slot = RideSlot(
+                      start: ride.start,
+                      end: ride.end,
+                      overallScore: currentScore ?? ride.plannedScore,
+                      tier: rideTierFromScore(currentScore ?? ride.plannedScore),
+                      hours: scores,
+                    );
+                    context.push('/detail', extra: DetailArgs(slot: slot, forecasts: rideForecasts));
+                  },
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  label: const Text('Bekijk details'),
+                ),
+              ),
+            ],
+
             // Delete
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                 foregroundColor: theme.colorScheme.error,
@@ -501,7 +540,11 @@ class _HourRow extends StatelessWidget {
           Icon(Icons.air, size: 14, color: theme.colorScheme.onSurfaceVariant),
           Expanded(
             child: Text(
-              ' ${forecast.windspeedKmh?.round() ?? '?'} km/h ${_windDirection(forecast.winddirectionDeg)}',
+              forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
+                  ? ' windstil'
+                  : forecast.windspeedKmh != null && forecast.windspeedKmh! >= 15 && forecast.winddirectionDeg != null
+                      ? ' ${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg)}'
+                      : ' ${forecast.windspeedKmh?.round() ?? '?'} km/h',
               style: const TextStyle(fontSize: 12),
               overflow: TextOverflow.ellipsis,
             ),

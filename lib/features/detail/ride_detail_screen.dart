@@ -2,18 +2,26 @@
 // RideDetailScreen: full Wave 2 implementation + Phase 9 Google Calendar integratie.
 // Toont score-banner, info-kaart "Weer", uurlijkse tabel en werkende agenda-knop.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_row.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/services/slot_generator.dart' show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+
+const _pi = math.pi;
+final _sin = math.sin;
+final _cos = math.cos;
+final _atan2 = math.atan2;
 
 /// Factory typedef voor CalendarService — maakt dependency injection
 /// in widget tests mogelijk zonder complexe DI-infrastructuur (PERS-04).
@@ -122,7 +130,17 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .toList();
     if (vals.isEmpty) return '\u2014';
     final total = vals.reduce((a, b) => a + b);
-    if (total == 0.0) return 'Droog';
+    final probs = widget.forecasts
+        .map((f) => f.precipitationProbability)
+        .whereType<double>()
+        .toList();
+    final avgProb = probs.isEmpty
+        ? null
+        : probs.reduce((a, b) => a + b) / probs.length;
+    if (total == 0.0 && (avgProb == null || avgProb == 0)) return 'Droog';
+    if (avgProb != null && avgProb > 0) {
+      return '${total.toStringAsFixed(1)}mm (${avgProb.round()}% kans)';
+    }
     return '${total.toStringAsFixed(1)}mm';
   }
 
@@ -133,6 +151,20 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .toList();
     if (vals.isEmpty) return '\u2014';
     final avg = vals.reduce((a, b) => a + b) / vals.length;
+    if (avg < 5) return 'Windstil';
+    final dirs = widget.forecasts
+        .map((f) => f.winddirectionDeg)
+        .whereType<double>()
+        .toList();
+    if (dirs.isNotEmpty) {
+      double sinSum = 0, cosSum = 0;
+      for (final d in dirs) {
+        sinSum += _sin(d * _pi / 180);
+        cosSum += _cos(d * _pi / 180);
+      }
+      final avgDir = (_atan2(sinSum, cosSum) * 180 / _pi + 360) % 360;
+      return '${avg.round()}km/u uit ${_compassDirection(avgDir)}';
+    }
     return '${avg.round()}km/u';
   }
 
@@ -415,19 +447,25 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         ? 'v.a. ${row.apparentTemperatureC!.round()}\u00B0C'
         : '';
     final precip = row.precipitationMm != null
-        ? (row.precipitationMm! == 0.0
+        ? (row.precipitationMm! == 0.0 && (row.precipitationProbability == null || row.precipitationProbability == 0)
             ? '\u{1F327} droog'
-            : '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm')
+            : row.precipitationProbability != null && row.precipitationProbability! > 0
+                ? '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
+                : '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm')
         : '\u{1F327} \u2014';
     final wind = row.windspeedKmh != null
-        ? '\u{1F4A8} ${row.windspeedKmh!.round()}km/u'
+        ? row.windspeedKmh! < 5
+            ? '\u{1F4A8} windstil'
+            : row.windspeedKmh! < 15 || row.winddirectionDeg == null
+                ? '\u{1F4A8} ${row.windspeedKmh!.round()}km/u'
+                : '\u{1F4A8} ${row.windspeedKmh!.round()}km/u ${_compassDirection(row.winddirectionDeg!)}'
         : '\u{1F4A8} \u2014';
 
     // Subtiele achtergrondkleur op basis van uur-score
     final Color rowBg;
-    if (row.overallScore >= 80) {
+    if (row.overallScore >= 85) {
       rowBg = const Color(0x0A2E7D32); // zeer licht groen
-    } else if (row.overallScore >= 60) {
+    } else if (row.overallScore >= 70) {
       rowBg = const Color(0x0AFF9800); // zeer licht oranje
     } else {
       rowBg = const Color(0x08C62828); // zeer licht rood
@@ -497,6 +535,38 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   String _dayName(DateTime dt) {
     const names = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
     return names[dt.weekday - 1];
+  }
+
+  String _compassDirection(double degrees) {
+    const dirs = ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'];
+    final index = ((degrees + 22.5) % 360 / 45).floor();
+    return dirs[index];
+  }
+
+  double _windPenaltyPercent() {
+    return windVariabilityPenalty(widget.forecasts) * 100;
+  }
+
+  Widget _buildWindPenaltyNote() {
+    final pct = _windPenaltyPercent().round();
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFFF9800)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Wisselende windrichting (-$pct% op score)',
+              style: const TextStyle(fontSize: 12, color: Color(0xFF999999)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildActions(BuildContext context) {
@@ -620,6 +690,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         _buildWeatherRow('Temperatuur', _avgTempString()),
                         _buildWeatherRow('Neerslag', _totalPrecipString()),
                         _buildWeatherRow('Wind', _avgWindString()),
+                        if (_windPenaltyPercent() > 2)
+                          _buildWindPenaltyNote(),
                       ],
                     ),
                     _buildClothingTip(),

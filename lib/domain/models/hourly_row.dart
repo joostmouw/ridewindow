@@ -12,7 +12,9 @@ class HourlyRow {
   final double? temperatureC;
   final double? apparentTemperatureC;
   final double? precipitationMm;
+  final double? precipitationProbability;
   final double? windspeedKmh;
+  final double? winddirectionDeg;
   final double overallScore;
   final double temperatureScore;
   final double rainScore;
@@ -23,7 +25,9 @@ class HourlyRow {
     required this.temperatureC,
     required this.apparentTemperatureC,
     required this.precipitationMm,
+    required this.precipitationProbability,
     required this.windspeedKmh,
+    required this.winddirectionDeg,
     required this.overallScore,
     required this.temperatureScore,
     required this.rainScore,
@@ -58,7 +62,9 @@ List<HourlyRow> buildHourlyRows(
       temperatureC: fc.temperatureC,
       apparentTemperatureC: fc.apparentTemperatureC,
       precipitationMm: fc.precipitationMm,
+      precipitationProbability: fc.precipitationProbability,
       windspeedKmh: fc.windspeedKmh,
+      winddirectionDeg: fc.winddirectionDeg,
       overallScore: score.overall,
       temperatureScore: score.temperatureScore,
       rainScore: score.rainScore,

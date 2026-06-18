@@ -2,11 +2,12 @@
 // HomeScreen: ConsumerStatefulWidget met week strip, ride cards per tier,
 // skeleton loading state, lege staat en "Plan het" SnackBar.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -21,6 +22,11 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+
+const _pi = math.pi;
+final _sin = math.sin;
+final _cos = math.cos;
+final _atan2 = math.atan2;
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -601,28 +607,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ? null
         : apparents.reduce((a, b) => a + b) / apparents.length;
 
-    // Wind direction
-    final windDirs = slotForecasts
-        .map((f) => f.winddirectionDeg)
-        .where((v) => v != null)
-        .cast<double>()
+    // Wind direction (circular mean)
+    double? avgWindDir;
+    {
+      final dirs = slotForecasts
+          .map((f) => f.winddirectionDeg)
+          .whereType<double>()
+          .toList();
+      if (dirs.isNotEmpty) {
+        double sinSum = 0, cosSum = 0;
+        for (final d in dirs) {
+          sinSum += _sin(d * _pi / 180);
+          cosSum += _cos(d * _pi / 180);
+        }
+        avgWindDir = (_atan2(sinSum, cosSum) * 180 / _pi + 360) % 360;
+      }
+    }
+
+    // Precipitation probability
+    final precipProbs = slotForecasts
+        .map((f) => f.precipitationProbability)
+        .whereType<double>()
         .toList();
-    final avgWindDir = windDirs.isEmpty
+    final avgPrecipProb = precipProbs.isEmpty
         ? null
-        : windDirs.reduce((a, b) => a + b) / windDirs.length;
+        : precipProbs.reduce((a, b) => a + b) / precipProbs.length;
 
     final tempLabel = avgTemp == null
         ? '—'
         : avgApparent != null && (avgApparent - avgTemp).abs() >= 2
             ? '${avgTemp.round()}° (${avgApparent.round()}°)'
             : '${avgTemp.toStringAsFixed(1)}°C';
-    final precipLabel =
-        totalPrecip == null ? '—' : '${totalPrecip.toStringAsFixed(1)}mm';
+    final precipLabel = totalPrecip == null
+        ? '—'
+        : avgPrecipProb != null && avgPrecipProb > 0
+            ? '${totalPrecip.toStringAsFixed(1)}mm (${avgPrecipProb.round()}%)'
+            : '${totalPrecip.toStringAsFixed(1)}mm';
     final windLabel = avgWind == null
         ? '—'
-        : avgWindDir != null
-            ? '${_windArrow(avgWindDir)} ${avgWind.toStringAsFixed(0)}km/h'
-            : '${avgWind.toStringAsFixed(0)}km/h';
+        : avgWind < 5
+            ? 'Windstil'
+            : avgWindDir != null
+                ? '${_windArrow(avgWindDir)} ${avgWind.toStringAsFixed(0)}km/h'
+                : '${avgWind.toStringAsFixed(0)}km/h';
 
     return Dismissible(
       key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),

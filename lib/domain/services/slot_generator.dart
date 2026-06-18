@@ -5,6 +5,24 @@ import '../models/hourly_score.dart';
 import '../models/ride_slot.dart';
 import '../models/ride_tier.dart';
 
+/// Computes wind direction variability penalty for a list of forecasts.
+/// Returns a value between 0.0 (consistent) and 0.10 (highly variable).
+double windVariabilityPenalty(List<HourlyForecast> forecasts) {
+  final dirs = forecasts
+      .map((f) => f.winddirectionDeg)
+      .whereType<double>()
+      .toList();
+  if (dirs.length < 2) return 0.0;
+  double sinSum = 0, cosSum = 0;
+  for (final d in dirs) {
+    sinSum += sin(d * pi / 180);
+    cosSum += cos(d * pi / 180);
+  }
+  final meanLength = sqrt(sinSum * sinSum + cosSum * cosSum) / dirs.length;
+  final variability = 1.0 - meanLength;
+  return (variability * 0.10).clamp(0.0, 0.10);
+}
+
 /// Generates ride slots of the given durations from a list of hourly scores.
 /// Slot boundaries use the exclusive-end convention [start, end):
 /// a 2h slot starting at 09:00 covers 09:00–11:00 with end == 11:00.

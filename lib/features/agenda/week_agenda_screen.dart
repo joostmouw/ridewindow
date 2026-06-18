@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -542,7 +545,11 @@ class _CellWidget extends ConsumerWidget {
                 value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm — ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
               const SizedBox(height: 8),
               _DetailRow(icon: Icons.air, label: 'Wind',
-                value: '${forecast.windspeedKmh?.round() ?? '?'} km/h ${_windDirection(forecast.winddirectionDeg)}'),
+                value: forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
+                    ? 'Windstil'
+                    : forecast.windspeedKmh != null && forecast.windspeedKmh! >= 15 && forecast.winddirectionDeg != null
+                        ? '${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg)}'
+                        : '${forecast.windspeedKmh?.round() ?? '?'} km/h'),
             ],
             if (score != null) ...[
               const SizedBox(height: 16),
@@ -573,6 +580,28 @@ class _CellWidget extends ConsumerWidget {
                   label: const Text('Inplannen'),
                 ),
               ),
+              const SizedBox(height: 8),
+              if (forecast != null)
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      final start = day.add(Duration(hours: hour));
+                      final end = start.add(const Duration(hours: 1));
+                      final slot = RideSlot(
+                        start: start,
+                        end: end,
+                        overallScore: score.overall,
+                        tier: rideTierFromScore(score.overall),
+                        hours: [score],
+                      );
+                      context.push('/detail', extra: DetailArgs(slot: slot, forecasts: [forecast]));
+                    },
+                    icon: const Icon(Icons.open_in_new, size: 18),
+                    label: const Text('Bekijk details'),
+                  ),
+                ),
             ],
           ],
         ),
