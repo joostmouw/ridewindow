@@ -26,6 +26,7 @@ class OpenMeteoClient {
         'hourly': _hourlyFields.join(','),
         'timezone': 'auto',
         'timeformat': 'unixtime',
+        'forecast_days': '10',
       },
     );
     final response = await _client.get(uri);
