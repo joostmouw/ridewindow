@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 class ScoreBadge extends StatelessWidget {
   final RideTier tier;
@@ -37,7 +38,12 @@ class ScoreBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        _tierLabel(tier),
+        switch (tier) {
+          Perfect() => S.of(context).tierPerfect,
+          Great() => S.of(context).tierGreat,
+          Acceptable() => S.of(context).tierAcceptable,
+          Poor() => S.of(context).tierPoor,
+        },
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -59,10 +65,4 @@ class ScoreBadge extends StatelessWidget {
     return badge;
   }
 
-  String _tierLabel(RideTier tier) => switch (tier) {
-        Perfect() => 'Perfect',
-        Great() => 'Goed',
-        Acceptable() => 'Acceptabel',
-        Poor() => 'Slecht',
-      };
 }

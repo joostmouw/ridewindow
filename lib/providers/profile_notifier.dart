@@ -13,6 +13,7 @@ class UserProfile {
     required this.tolerances,
     required this.allowedDurations,
     required this.theme,
+    this.locale = 'nl',
     this.locationOverride,
     this.userName,
     required this.notifEveningBefore,
@@ -23,6 +24,7 @@ class UserProfile {
   final WeatherTolerances tolerances;
   final List<int> allowedDurations;
   final String theme;
+  final String locale; // 'nl' or 'en'
   final String? locationOverride;
   final String? userName;
   final bool notifEveningBefore;
@@ -33,6 +35,7 @@ class UserProfile {
     WeatherTolerances? tolerances,
     List<int>? allowedDurations,
     String? theme,
+    String? locale,
     Object? locationOverride = _sentinel,
     Object? userName = _sentinel,
     bool? notifEveningBefore,
@@ -43,6 +46,7 @@ class UserProfile {
       tolerances: tolerances ?? this.tolerances,
       allowedDurations: allowedDurations ?? this.allowedDurations,
       theme: theme ?? this.theme,
+      locale: locale ?? this.locale,
       locationOverride: identical(locationOverride, _sentinel)
           ? this.locationOverride
           : locationOverride as String?,
@@ -76,6 +80,7 @@ class ProfileNotifier extends _$ProfileNotifier {
   static const _keyTheme = 'profile.theme';
   static const _keyLocation = 'profile.locationOverride';
   static const _keyUserName = 'profile.userName';
+  static const _keyLocale = 'profile.locale';
   static const _keyNotifEvening = 'profile.notifEveningBefore';
   static const _keyNotifMorning = 'profile.notifMorningOf';
   static const _keyNotifWeekly = 'profile.notifWeeklyDigest';
@@ -97,6 +102,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         .toList();
 
     final theme = prefs.getString(_keyTheme) ?? 'system';
+    final locale = prefs.getString(_keyLocale) ?? 'nl';
     final locationOverride = prefs.getString(_keyLocation);
     final userName = prefs.getString(_keyUserName);
     final notifEvening = prefs.getBool(_keyNotifEvening) ?? false;
@@ -112,6 +118,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       ),
       allowedDurations: durations.isEmpty ? [2, 3, 5] : durations,
       theme: theme,
+      locale: locale,
       locationOverride: locationOverride,
       userName: userName,
       notifEveningBefore: notifEvening,
@@ -155,6 +162,15 @@ class ProfileNotifier extends _$ProfileNotifier {
     );
 
     state = AsyncData(current.copyWith(allowedDurations: durations));
+  }
+
+  /// Schrijft de taalvoorkeur ('nl'|'en') naar SharedPreferences en update state.
+  Future<void> setLocale(String locale) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyLocale, locale);
+
+    final current = await future;
+    state = AsyncData(current.copyWith(locale: locale));
   }
 
   /// Schrijft het thema ('system'|'light'|'dark') naar SharedPreferences en update state.

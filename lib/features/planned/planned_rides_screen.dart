@@ -16,6 +16,7 @@ import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 Color _scoreColor(double score) {
   if (score >= 85) return const Color(0xFF2E7D32);
@@ -24,29 +25,30 @@ Color _scoreColor(double score) {
   return const Color(0xFFEF9A9A);
 }
 
-String _tierLabel(double score) {
-  if (score >= 85) return 'Perfect';
-  if (score >= 70) return 'Geweldig';
-  if (score >= 50) return 'Oké';
-  return 'Slecht';
+String _tierLabel(double score, BuildContext context) {
+  final s = S.of(context);
+  if (score >= 85) return s.tierPerfectAgenda;
+  if (score >= 70) return s.tierGreatAgenda;
+  if (score >= 50) return s.tierAcceptableAgenda;
+  return s.tierPoorAgenda;
 }
 
-String _windDirection(double? deg) {
+String _windDirection(double? deg, BuildContext context) {
   if (deg == null) return '?';
-  const dirs = ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'];
+  final s = S.of(context);
+  final dirs = [s.compassN, s.compassNE, s.compassE, s.compassSE, s.compassS, s.compassSW, s.compassW, s.compassNW];
   return dirs[((deg + 22.5) % 360 ~/ 45)];
 }
 
 /// Wind comes FROM this direction. To have tailwind on the return,
 /// ride INTO the wind first = ride towards the wind source.
 /// Wind from N (0°) → ride north first, return south with tailwind.
-String _tailwindAdvice(double? deg) {
+String _tailwindAdvice(double? deg, BuildContext context) {
   if (deg == null) return '';
-  // Wind comes from [deg]. Ride towards that direction first.
-  const dirs = ['noordwaarts', 'noordoostwaarts', 'oostwaarts', 'zuidoostwaarts',
-    'zuidwaarts', 'zuidwestwaarts', 'westwaarts', 'noordwestwaarts'];
-  final idx = ((deg + 22.5) % 360 ~/ 45).toInt();
-  return 'Fiets ${dirs[idx]} voor wind mee terug';
+  final s = S.of(context);
+  final dirs = [s.tailwindNorth, s.tailwindNortheast, s.tailwindEast, s.tailwindSoutheast,
+    s.tailwindSouth, s.tailwindSouthwest, s.tailwindWest, s.tailwindNorthwest];
+  return dirs[((deg + 22.5) % 360 ~/ 45).toInt()];
 }
 
 String _fmtTime(DateTime dt) =>
@@ -55,7 +57,6 @@ String _fmtTime(DateTime dt) =>
 class PlannedRidesScreen extends ConsumerStatefulWidget {
   const PlannedRidesScreen({super.key});
 
-  static final _dayFmt = DateFormat('EEEE d MMM', 'nl_NL');
 
   @override
   ConsumerState<PlannedRidesScreen> createState() => _PlannedRidesScreenState();
@@ -88,7 +89,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
     return Stack(
       children: [
         Scaffold(
-      appBar: AppBar(title: const Text('Mijn Ritten')),
+      appBar: AppBar(title: Text(S.of(context).ridesTitle)),
       body: upcoming.isEmpty
           ? Center(
               child: Padding(
@@ -98,10 +99,10 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
                   children: [
                     Icon(Icons.directions_bike, size: 48, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(height: 16),
-                    Text('Nog geen ritten gepland', style: theme.textTheme.titleMedium),
+                    Text(S.of(context).ridesEmpty, style: theme.textTheme.titleMedium),
                     const SizedBox(height: 8),
                     Text(
-                      'Plan een rit vanuit Home of selecteer uren in de Agenda.',
+                      S.of(context).ridesEmptyHint,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -124,7 +125,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
     ),
         if (_showHints && upcoming.isNotEmpty)
           ScreenHintOverlay(
-            hints: ridesHints,
+            hints: ridesHints(context),
             onDismiss: () {
               markHintSeen('rides');
               setState(() => _showHints = false);
@@ -193,7 +194,7 @@ class _RideCard extends ConsumerWidget {
     final currentScore = _avgScore(scores);
     final delta = currentScore != null ? currentScore - ride.plannedScore : null;
     final tierColor = currentScore != null ? _scoreColor(currentScore) : Colors.grey;
-    final tierText = currentScore != null ? _tierLabel(currentScore) : '?';
+    final tierText = currentScore != null ? _tierLabel(currentScore, context) : '?';
 
     // Avg weather
     double? avgTemp, avgApparent, avgRain, avgRainProb, avgWind, avgWindDir;
@@ -226,7 +227,7 @@ class _RideCard extends ConsumerWidget {
       onDismissed: (_) {
         ref.read(plannedRidesProvider.notifier).remove(ride);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Rit verwijderd')),
+          SnackBar(content: Text(S.of(context).rideRemoved)),
         );
       },
       child: Card(
@@ -246,7 +247,7 @@ class _RideCard extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            PlannedRidesScreen._dayFmt.format(ride.start),
+                            DateFormat('EEEE d MMM', Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL').format(ride.start),
                             style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
@@ -281,7 +282,7 @@ class _RideCard extends ConsumerWidget {
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                '${delta > 0 ? '+' : ''}${delta.round()} sinds planning',
+                                S.of(context).rideSincePlanning('${delta > 0 ? '+' : ''}${delta.round()}'),
                                 style: TextStyle(fontSize: 11, color: delta > 0 ? const Color(0xFF2E7D32) : const Color(0xFFE53935)),
                               ),
                             ],
@@ -306,9 +307,9 @@ class _RideCard extends ConsumerWidget {
                           : '${avgRain!.toStringAsFixed(1)}mm'),
                       const SizedBox(width: 12),
                       _WeatherChip(icon: Icons.air, value: avgWind! < 5
-                          ? 'Windstil'
+                          ? S.of(context).windCalm
                           : avgWindDir != null
-                              ? '${avgWind.round()} km/h ${_windDirection(avgWindDir)}'
+                              ? '${avgWind.round()} km/h ${_windDirection(avgWindDir, context)}'
                               : '${avgWind.round()} km/h'),
                     ],
                   ),
@@ -324,7 +325,7 @@ class _RideCard extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            _tailwindAdvice(avgWindDir),
+                            _tailwindAdvice(avgWindDir, context),
                             style: TextStyle(fontSize: 11, color: theme.colorScheme.primary, fontStyle: FontStyle.italic),
                           ),
                         ),
@@ -349,9 +350,9 @@ class _RideCard extends ConsumerWidget {
     double? avgWindDir,
   ) {
     final theme = Theme.of(context);
-    final dayFmt = DateFormat('EEEE d MMMM', 'nl_NL');
+    final dayFmt = DateFormat('EEEE d MMMM', Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL');
     final tierColor = currentScore != null ? _scoreColor(currentScore) : Colors.grey;
-    final tierText = currentScore != null ? _tierLabel(currentScore) : '?';
+    final tierText = currentScore != null ? _tierLabel(currentScore, context) : '?';
 
     showModalBottomSheet(
       context: context,
@@ -409,7 +410,7 @@ class _RideCard extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Wind uit ${_windDirection(avgWindDir)}. ${_tailwindAdvice(avgWindDir)}.',
+                        S.of(context).ridesWindFrom(_windDirection(avgWindDir, context), _tailwindAdvice(avgWindDir, context)),
                         style: TextStyle(fontSize: 13, color: theme.colorScheme.primary),
                       ),
                     ),
@@ -419,7 +420,7 @@ class _RideCard extends ConsumerWidget {
             ],
 
             const SizedBox(height: 16),
-            Text('Per uur', style: theme.textTheme.labelLarge),
+            Text(S.of(context).ridesPerHour, style: theme.textTheme.labelLarge),
             const SizedBox(height: 8),
 
             // Hourly breakdown table
@@ -434,15 +435,15 @@ class _RideCard extends ConsumerWidget {
             // Score breakdown (averages)
             if (scores.isNotEmpty) ...[
               const SizedBox(height: 16),
-              Text('Gemiddelde score-opbouw', style: theme.textTheme.labelLarge),
+              Text(S.of(context).ridesAvgScoreBreakdown, style: theme.textTheme.labelLarge),
               const SizedBox(height: 8),
-              _ScoreBar(label: 'Temperatuur',
+              _ScoreBar(label: S.of(context).weatherTemperature,
                   value: scores.fold(0.0, (s, h) => s + h.temperatureScore) / scores.length),
               const SizedBox(height: 4),
-              _ScoreBar(label: 'Regen',
+              _ScoreBar(label: S.of(context).agendaRain,
                   value: scores.fold(0.0, (s, h) => s + h.rainScore) / scores.length),
               const SizedBox(height: 4),
-              _ScoreBar(label: 'Wind',
+              _ScoreBar(label: S.of(context).weatherWind,
                   value: scores.fold(0.0, (s, h) => s + h.windScore) / scores.length),
             ],
 
@@ -464,7 +465,7 @@ class _RideCard extends ConsumerWidget {
                     context.push('/detail', extra: DetailArgs(slot: slot, forecasts: rideForecasts));
                   },
                   icon: const Icon(Icons.open_in_new, size: 18),
-                  label: const Text('Bekijk details'),
+                  label: Text(S.of(context).agendaViewDetails),
                 ),
               ),
             ],
@@ -480,11 +481,11 @@ class _RideCard extends ConsumerWidget {
                 ref.read(plannedRidesProvider.notifier).remove(ride);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Rit verwijderd')),
+                  SnackBar(content: Text(S.of(context).rideRemoved)),
                 );
               },
               icon: const Icon(Icons.delete_outline, size: 18),
-              label: const Text('Rit verwijderen'),
+              label: Text(S.of(context).ridesDeleteRide),
             ),
           ],
         ),
@@ -541,9 +542,9 @@ class _HourRow extends StatelessWidget {
           Expanded(
             child: Text(
               forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
-                  ? ' windstil'
+                  ? ' ${S.of(context).hourlyWindstil}'
                   : forecast.windspeedKmh != null && forecast.windspeedKmh! >= 15 && forecast.winddirectionDeg != null
-                      ? ' ${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg)}'
+                      ? ' ${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg, context)}'
                       : ' ${forecast.windspeedKmh?.round() ?? '?'} km/h',
               style: const TextStyle(fontSize: 12),
               overflow: TextOverflow.ellipsis,

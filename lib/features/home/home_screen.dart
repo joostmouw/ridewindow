@@ -21,6 +21,7 @@ import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
 const _pi = math.pi;
@@ -115,7 +116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ),
         if (_showHints)
           ScreenHintOverlay(
-            hints: homeHints,
+            hints: homeHints(context),
             onDismiss: () {
               markHintSeen('home');
               setState(() => _showHints = false);
@@ -137,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     String? userName,
   ) {
     final slotCount = slotsState is SlotsLoaded ? slotsState.slots.length : 0;
-    final greeting = _buildGreeting(userName);
+    final greeting = _buildGreeting(context, userName);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
       decoration: const BoxDecoration(
@@ -179,11 +180,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     const SizedBox(width: 8),
                     Text(
                       slotCount > 0
-                          ? '$slotCount ${slotCount == 1 ? 'rijvenster' : 'rijvensters'} deze week'
+                          ? S.of(context).rideWindowCount(slotCount)
                           : lastRefreshedAsync.when(
                               data: (ts) => ts == null
                                   ? ''
-                                  : 'Bijgewerkt ${_formatTime(ts)}',
+                                  : S.of(context).updatedAt(_formatTime(ts)),
                               loading: () => '',
                               error: (_, __) => '',
                             ),
@@ -200,7 +201,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           if (weatherState.hasError)
             IconButton(
               icon: const Icon(Icons.refresh, color: Color(0xFF2E7D32)),
-              tooltip: 'Opnieuw proberen',
+              tooltip: S.of(context).retryButton,
               onPressed: () => ref.invalidate(weatherProvider),
             ),
         ],
@@ -208,22 +209,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  String _buildGreeting(String? userName) {
+  String _buildGreeting(BuildContext context, String? userName) {
+    final s = S.of(context);
     final hour = DateTime.now().hour;
     final String timeGreeting;
     if (hour < 6) {
-      timeGreeting = 'Nachtuil';
+      timeGreeting = s.greetingNightOwl;
     } else if (hour < 12) {
-      timeGreeting = 'Goedemorgen';
+      timeGreeting = s.greetingMorning;
     } else if (hour < 17) {
-      timeGreeting = 'Goedemiddag';
+      timeGreeting = s.greetingAfternoon;
     } else if (hour < 21) {
-      timeGreeting = 'Goedenavond';
+      timeGreeting = s.greetingEvening;
     } else {
-      timeGreeting = 'Goedenavond';
+      timeGreeting = s.greetingEvening;
     }
     if (userName != null && userName.isNotEmpty) {
-      return '$timeGreeting, $userName';
+      return s.greetingWithName(timeGreeting, userName);
     }
     return timeGreeting;
   }
@@ -248,9 +250,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'DEZE WEEK',
-            style: TextStyle(
+          Text(
+            S.of(context).thisWeek,
+            style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
               color: Color(0xFF999999),
@@ -270,7 +272,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildDayChip(DateTime day, SlotsState slotsState) {
-    const dayLabels = ['MA', 'DI', 'WO', 'DO', 'VR', 'ZA', 'ZO'];
+    final s = S.of(context);
+    final dayLabels = [s.dayMon, s.dayTue, s.dayWed, s.dayThu, s.dayFri, s.daySat, s.daySun];
     final label = dayLabels[day.weekday - 1];
     final isSelected = _selectedDay?.day == day.day &&
         _selectedDay?.month == day.month &&
@@ -403,13 +406,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
       String? emptyMessage;
       if (loaded.reason == SlotsEmptyReason.badWeather) {
-        emptyMessage =
-            'Geen goede rijmomenten deze week. Slecht weer verwacht.';
+        emptyMessage = S.of(context).emptyBadWeather;
       } else if (loaded.reason == SlotsEmptyReason.allBlocked) {
-        emptyMessage =
-            'Alle goede momenten zijn geblokkeerd. Pas je schema aan.';
+        emptyMessage = S.of(context).emptyAllBlocked;
       } else if (loaded.slots.isEmpty) {
-        emptyMessage = 'Geen rijmomenten gevonden.';
+        emptyMessage = S.of(context).emptyNoSlots;
       }
 
       if (emptyMessage != null) {
@@ -427,7 +428,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
 
       if (slots.isEmpty && _selectedDay != null) {
-        return _buildEmptyState('Geen rijmomenten op deze dag.');
+        return _buildEmptyState(S.of(context).emptyNoSlotsDay);
       }
 
       // Sorteer: Perfect eerst, daarna Great, Acceptable.
@@ -447,11 +448,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       itemCount: slots.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
-          return const Padding(
-            padding: EdgeInsets.only(bottom: 12),
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
             child: Text(
-              'RIJTIJDEN',
-              style: TextStyle(
+              S.of(context).rideTimes,
+              style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF999999),
@@ -527,8 +528,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       color: Color(0xFFBDBDBD),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Weersdata kon niet worden geladen.',
+                    Text(
+                      S.of(context).weatherLoadError,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
@@ -540,7 +541,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ElevatedButton.icon(
                       onPressed: () => ref.invalidate(weatherProvider),
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Opnieuw proberen'),
+                      label: Text(S.of(context).retryButton),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2E7D32),
                         foregroundColor: Colors.white,
@@ -646,7 +647,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final windLabel = avgWind == null
         ? '—'
         : avgWind < 5
-            ? 'Windstil'
+            ? S.of(context).windCalm
             : avgWindDir != null
                 ? '${_windArrow(avgWindDir)} ${avgWind.toStringAsFixed(0)}km/h'
                 : '${avgWind.toStringAsFixed(0)}km/h';
@@ -667,12 +668,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 24),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.calendar_today, color: Colors.white, size: 22),
-            SizedBox(width: 8),
+            const Icon(Icons.calendar_today, color: Colors.white, size: 22),
+            const SizedBox(width: 8),
             Text(
-              'Toevoegen aan agenda',
+              S.of(context).addToCalendar,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -732,8 +733,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       color: const Color(0xFF2E7D32),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text(
-                      'Beste keuze',
+                    child: Text(
+                      S.of(context).bestChoice,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -811,8 +812,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       elevation: 0,
                     ),
                     icon: const Icon(Icons.calendar_today, size: 14),
-                    label: const Text(
-                      'Inplannen',
+                    label: Text(
+                      S.of(context).schedule,
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -878,15 +879,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       await CalendarService().addRideSlotToCalendar(slot, forecasts);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Rijvenster toegevoegd aan Google Agenda!'),
+          SnackBar(
+            content: Text(S.of(context).addedToGoogleCalendar),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Kon niet toevoegen: $e')),
+          SnackBar(content: Text(S.of(context).couldNotAdd(e.toString()))),
         );
       }
     }
@@ -903,14 +904,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       slot.end.difference(slot.start).inHours;
 
   String _formatDayName(DateTime dt) {
-    const names = [
-      'Maandag',
-      'Dinsdag',
-      'Woensdag',
-      'Donderdag',
-      'Vrijdag',
-      'Zaterdag',
-      'Zondag',
+    final s = S.of(context);
+    final names = [
+      s.dayMonFull,
+      s.dayTueFull,
+      s.dayWedFull,
+      s.dayThuFull,
+      s.dayFriFull,
+      s.daySatFull,
+      s.daySunFull,
     ];
     return names[dt.weekday - 1];
   }

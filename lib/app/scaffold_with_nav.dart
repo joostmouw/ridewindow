@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 class ScaffoldWithNav extends StatelessWidget {
   const ScaffoldWithNav({required this.navigationShell, super.key});
@@ -19,26 +20,26 @@ class ScaffoldWithNav extends StatelessWidget {
           i,
           initialLocation: i == navigationShell.currentIndex,
         ),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: S.of(context).navHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.calendar_view_week_outlined),
-            selectedIcon: Icon(Icons.calendar_view_week),
-            label: 'Agenda',
+            icon: const Icon(Icons.calendar_view_week_outlined),
+            selectedIcon: const Icon(Icons.calendar_view_week),
+            label: S.of(context).navAgenda,
           ),
           NavigationDestination(
-            icon: Icon(Icons.directions_bike_outlined),
-            selectedIcon: Icon(Icons.directions_bike),
-            label: 'Ritten',
+            icon: const Icon(Icons.directions_bike_outlined),
+            selectedIcon: const Icon(Icons.directions_bike),
+            label: S.of(context).navRides,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profiel',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: S.of(context).navProfile,
           ),
         ],
       ),

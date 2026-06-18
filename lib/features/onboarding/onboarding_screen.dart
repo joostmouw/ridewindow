@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
 
@@ -35,32 +36,35 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   AvailabilityPreset? _selected;
 
-  static const _options = [
-    _PresetOption(
-      preset: AvailabilityPreset.eveningsAndWeekends,
-      label: 'Avonden & weekenden',
-      sub: 'Ma\u2013Vr na 17:00, Za/Zo de hele dag',
-      isDashed: false,
-    ),
-    _PresetOption(
-      preset: AvailabilityPreset.morningsAndWeekends,
-      label: 'Ochtenden & weekenden',
-      sub: 'Ma\u2013Vr 06:00\u201309:00, Za/Zo de hele dag',
-      isDashed: false,
-    ),
-    _PresetOption(
-      preset: AvailabilityPreset.weekendsOnly,
-      label: 'Alleen weekenden',
-      sub: 'Za/Zo de hele dag',
-      isDashed: false,
-    ),
-    _PresetOption(
-      preset: AvailabilityPreset.custom,
-      label: 'Stel mijn eigen schema in',
-      sub: 'Ik pas mijn agenda zelf aan',
-      isDashed: true,
-    ),
-  ];
+  static List<_PresetOption> _options(BuildContext context) {
+    final s = S.of(context);
+    return [
+      _PresetOption(
+        preset: AvailabilityPreset.eveningsAndWeekends,
+        label: s.presetEveningsWeekends,
+        sub: s.presetEveningsWeekendsSub,
+        isDashed: false,
+      ),
+      _PresetOption(
+        preset: AvailabilityPreset.morningsAndWeekends,
+        label: s.presetMorningsWeekends,
+        sub: s.presetMorningsWeekendsSub,
+        isDashed: false,
+      ),
+      _PresetOption(
+        preset: AvailabilityPreset.weekendsOnly,
+        label: s.presetWeekendsOnly,
+        sub: s.presetWeekendsOnlySub,
+        isDashed: false,
+      ),
+      _PresetOption(
+        preset: AvailabilityPreset.custom,
+        label: s.presetCustom,
+        sub: s.presetCustomSub,
+        isDashed: true,
+      ),
+    ];
+  }
 
   Future<void> _handleNext() async {
     if (_selected == null) return;
@@ -104,9 +108,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               const SizedBox(height: 16),
               // Titel
-              const Text(
-                'Wanneer rijd jij het liefst?',
-                style: TextStyle(
+              Text(
+                S.of(context).onboardingTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF1A1A1A),
@@ -115,9 +119,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               const SizedBox(height: 8),
               // Subtitel
-              const Text(
-                'Kies een schema om te beginnen. Je kunt dit later altijd aanpassen.',
-                style: TextStyle(
+              Text(
+                S.of(context).onboardingSubtitle,
+                style: const TextStyle(
                   fontSize: 14,
                   color: Color(0xFF666666),
                   height: 1.55,
@@ -127,10 +131,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Preset-opties
               Expanded(
                 child: ListView.separated(
-                  itemCount: _options.length,
+                  itemCount: _options(context).length,
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
-                    final option = _options[index];
+                    final option = _options(context)[index];
                     final isSelected = _selected == option.preset;
                     return _PresetTile(
                       option: option,
@@ -160,7 +164,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   ),
                   onPressed: _handleNext,
-                  child: const Text('Volgende \u2192'),
+                  child: Text(S.of(context).onboardingNext),
                 ),
               ),
             ],

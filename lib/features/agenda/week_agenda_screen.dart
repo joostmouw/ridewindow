@@ -15,6 +15,7 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 const int _kDayCount = 7;
 const _kHours = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
@@ -26,11 +27,12 @@ Color _scoreColor(double score) {
   return const Color(0xFFEF9A9A);
 }
 
-String _tierLabel(double score) {
-  if (score >= 85) return 'Perfect';
-  if (score >= 70) return 'Geweldig';
-  if (score >= 50) return 'Oké';
-  return 'Slecht';
+String _tierLabel(double score, BuildContext context) {
+  final s = S.of(context);
+  if (score >= 85) return s.tierPerfectAgenda;
+  if (score >= 70) return s.tierGreatAgenda;
+  if (score >= 50) return s.tierAcceptableAgenda;
+  return s.tierPoorAgenda;
 }
 
 HourlyScore? _findScore(DateTime day, int hour, List<HourlyScore> scores) {
@@ -65,9 +67,10 @@ bool _isBlocked(DateTime day, int hour, Map<DateTime, BlockType> blocked) {
   return blocked.containsKey(key);
 }
 
-String _windDirection(double? deg) {
+String _windDirection(double? deg, BuildContext context) {
   if (deg == null) return '?';
-  const dirs = ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'];
+  final s = S.of(context);
+  final dirs = [s.compassN, s.compassNE, s.compassE, s.compassSE, s.compassS, s.compassSW, s.compassW, s.compassNW];
   return dirs[((deg + 22.5) % 360 ~/ 45)];
 }
 
@@ -199,7 +202,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
         );
     setState(() => _selection = null);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Rit ingepland (${sel.count}u)!')),
+      SnackBar(content: Text(S.of(context).agendaRidePlanned(sel.count))),
     );
   }
 
@@ -225,18 +228,18 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
       children: [
         Scaffold(
       appBar: AppBar(
-        title: const Text('Agenda'),
+        title: Text(S.of(context).agendaTitle),
         actions: [
           if (_selection != null) ...[
             TextButton(
               onPressed: _clearSelection,
-              child: const Text('Annuleer'),
+              child: Text(S.of(context).agendaCancel),
             ),
           ],
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Bezet', style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface)),
+              Text(S.of(context).agendaBusy, style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface)),
               Switch(
                 value: _showBlocked,
                 onChanged: (v) => setState(() => _showBlocked = v),
@@ -253,18 +256,18 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
             child: Row(
               children: [
                 if (_selection == null) ...[
-                  const _Dot(color: Color(0xFF2E7D32), label: 'Perfect'),
+                  _Dot(color: const Color(0xFF2E7D32), label: S.of(context).tierPerfectAgenda),
                   const SizedBox(width: 10),
-                  const _Dot(color: Color(0xFF66BB6A), label: 'Geweldig'),
+                  _Dot(color: const Color(0xFF66BB6A), label: S.of(context).tierGreatAgenda),
                   const SizedBox(width: 10),
-                  const _Dot(color: Color(0xFFFFB74D), label: 'Oké'),
+                  _Dot(color: const Color(0xFFFFB74D), label: S.of(context).tierAcceptableAgenda),
                   const SizedBox(width: 10),
-                  const _Dot(color: Color(0xFFEF9A9A), label: 'Slecht'),
+                  _Dot(color: const Color(0xFFEF9A9A), label: S.of(context).tierPoorAgenda),
                 ] else ...[
                   Icon(Icons.touch_app, size: 14, color: theme.colorScheme.primary),
                   const SizedBox(width: 4),
                   Text(
-                    '${_selection!.count} uur geselecteerd',
+                    S.of(context).agendaHoursSelected(_selection!.count),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -295,7 +298,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                   child: FilledButton.icon(
                     onPressed: () => _planSelection(days, allScores),
                     icon: const Icon(Icons.directions_bike),
-                    label: Text('Rit inplannen (${_selection!.count}u)'),
+                    label: Text(S.of(context).agendaPlanRide(_selection!.count)),
                   ),
                 ),
               ),
@@ -305,7 +308,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     ),
         if (_showHints)
           ScreenHintOverlay(
-            hints: agendaHints,
+            hints: agendaHints(context),
             onDismiss: () {
               markHintSeen('agenda');
               setState(() => _showHints = false);
@@ -325,7 +328,8 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     Map<DateTime, BlockType> blockedHours,
   ) {
     final theme = Theme.of(context);
-    final dayFmt = DateFormat('E', 'nl_NL');
+    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
+    final dayFmt = DateFormat('E', locale);
 
     return Column(
       children: [
@@ -344,7 +348,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          days[di] == today ? 'Nu' : dayFmt.format(days[di]),
+                          days[di] == today ? S.of(context).agendaNow : dayFmt.format(days[di]),
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -495,10 +499,11 @@ class _CellWidget extends ConsumerWidget {
     final forecast = _findForecast(day, hour, forecasts);
     if (score == null && forecast == null) return;
 
-    final dayFmt = DateFormat('EEEE d MMMM', 'nl_NL');
+    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
+    final dayFmt = DateFormat('EEEE d MMMM', locale);
     final theme = Theme.of(context);
     final tierColor = score != null ? _scoreColor(score.overall) : Colors.grey;
-    final tierText = score != null ? _tierLabel(score.overall) : '?';
+    final tierText = score != null ? _tierLabel(score.overall, context) : '?';
 
     showModalBottomSheet(
       context: context,
@@ -538,30 +543,30 @@ class _CellWidget extends ConsumerWidget {
             ],
             const SizedBox(height: 16),
             if (forecast != null) ...[
-              _DetailRow(icon: Icons.thermostat, label: 'Temperatuur',
+              _DetailRow(icon: Icons.thermostat, label: S.of(context).weatherTemperature,
                 value: '${forecast.temperatureC?.round() ?? '?'}°C (voelt als ${forecast.apparentTemperatureC?.round() ?? '?'}°C)'),
               const SizedBox(height: 8),
-              _DetailRow(icon: Icons.water_drop, label: 'Neerslag',
+              _DetailRow(icon: Icons.water_drop, label: S.of(context).weatherRain,
                 value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm — ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
               const SizedBox(height: 8),
-              _DetailRow(icon: Icons.air, label: 'Wind',
+              _DetailRow(icon: Icons.air, label: S.of(context).weatherWind,
                 value: forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
-                    ? 'Windstil'
+                    ? S.of(context).windCalm
                     : forecast.windspeedKmh != null && forecast.windspeedKmh! >= 15 && forecast.winddirectionDeg != null
-                        ? '${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg)}'
+                        ? '${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg, context)}'
                         : '${forecast.windspeedKmh?.round() ?? '?'} km/h'),
             ],
             if (score != null) ...[
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 8),
-              Text('Score-opbouw', style: theme.textTheme.labelLarge),
+              Text(S.of(context).agendaScoreBreakdown, style: theme.textTheme.labelLarge),
               const SizedBox(height: 8),
-              _ScoreBar(label: 'Temperatuur', value: score.temperatureScore),
+              _ScoreBar(label: S.of(context).weatherTemperature, value: score.temperatureScore),
               const SizedBox(height: 4),
-              _ScoreBar(label: 'Regen', value: score.rainScore),
+              _ScoreBar(label: S.of(context).agendaRain, value: score.rainScore),
               const SizedBox(height: 4),
-              _ScoreBar(label: 'Wind', value: score.windScore),
+              _ScoreBar(label: S.of(context).weatherWind, value: score.windScore),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -573,11 +578,11 @@ class _CellWidget extends ConsumerWidget {
                     );
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Rit ingepland!')),
+                      SnackBar(content: Text(S.of(context).ridePlanned)),
                     );
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Inplannen'),
+                  label: Text(S.of(context).schedule),
                 ),
               ),
               const SizedBox(height: 8),
@@ -599,7 +604,7 @@ class _CellWidget extends ConsumerWidget {
                       context.push('/detail', extra: DetailArgs(slot: slot, forecasts: [forecast]));
                     },
                     icon: const Icon(Icons.open_in_new, size: 18),
-                    label: const Text('Bekijk details'),
+                    label: Text(S.of(context).agendaViewDetails),
                   ),
                 ),
             ],

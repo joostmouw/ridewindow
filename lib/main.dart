@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -13,7 +14,9 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
+import 'package:ridewindow/providers/locale_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
@@ -24,8 +27,9 @@ Future<void> main() async {
   // Laad timezone-data synchroon in geheugen (vereist voor flutter_local_notifications).
   tz.initializeTimeZones();
 
-  // Laad intl locale-data (vereist voor DateFormat met 'nl_NL').
+  // Laad intl locale-data voor NL en EN.
   await initializeDateFormatting('nl_NL');
+  await initializeDateFormatting('en_US');
 
   // Parallel laden: timezone + SharedPreferences voor snelle cold start.
   final tzFuture = FlutterTimezone.getLocalTimezone();
@@ -71,8 +75,17 @@ class RideWindowApp extends ConsumerWidget {
     });
 
     final router = ref.watch(routerProvider);
+    final locale = ref.watch(appLocaleProvider);
     return MaterialApp.router(
       title: 'RideWindow',
+      locale: locale,
+      supportedLocales: S.supportedLocales,
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2E7D32)),
       ),

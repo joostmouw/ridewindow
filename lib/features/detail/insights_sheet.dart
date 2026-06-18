@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 class InsightsSheet extends StatelessWidget {
   final RideSlot slot;
@@ -40,56 +41,65 @@ class InsightsSheet extends StatelessWidget {
   // Hulpfuncties: score-labels per factor (D-05-04)
   // ---------------------------------------------------------------------------
 
-  String _tempLabel(double score) {
-    if (score >= 80) return 'Ideaal';
-    if (score >= 60) return 'Acceptabel';
-    return 'Koud/Warm';
+  String _tempLabel(BuildContext context, double score) {
+    final s = S.of(context);
+    if (score >= 80) return s.insightsTempIdeal;
+    if (score >= 60) return s.insightsTempAcceptable;
+    return s.insightsTempExtreme;
   }
 
-  String _rainLabel(double score) {
-    if (score >= 80) return 'Droog';
-    if (score >= 60) return 'Licht';
-    return 'Nat';
+  String _rainLabel(BuildContext context, double score) {
+    final s = S.of(context);
+    if (score >= 80) return s.insightsRainDry;
+    if (score >= 60) return s.insightsRainLight;
+    return s.insightsRainWet;
   }
 
-  String _windLabel(double score) {
-    if (score >= 80) return 'Rustig';
-    if (score >= 60) return 'Matig';
-    return 'Sterk';
+  String _windLabel(BuildContext context, double score) {
+    final s = S.of(context);
+    if (score >= 80) return s.insightsWindCalm;
+    if (score >= 60) return s.insightsWindModerate;
+    return s.insightsWindStrong;
   }
 
   // ---------------------------------------------------------------------------
   // Hulpfuncties: uitlegteksten per factor (D-05-04)
   // ---------------------------------------------------------------------------
 
-  String _tempNote(double score) {
-    if (score >= 80) return 'Ideale temperatuur — comfortabel rijden';
-    if (score >= 60) return 'Acceptabele temperatuur — pak een extra laag';
-    return 'Buiten het ideale bereik — kleding aanpassen';
+  String _tempNote(BuildContext context, double score) {
+    final s = S.of(context);
+    if (score >= 80) return s.insightsTempNoteIdeal;
+    if (score >= 60) return s.insightsTempNoteAcceptable;
+    return s.insightsTempNoteExtreme;
   }
 
-  String _rainNote(double score) {
-    if (score >= 80) return 'Droog — geen neerslag verwacht';
-    if (score >= 60) return 'Lichte neerslag verwacht — spatborden handig';
-    return 'Neerslag verwacht — overweeg een regenjas';
+  String _rainNote(BuildContext context, double score) {
+    final s = S.of(context);
+    if (score >= 80) return s.insightsRainNoteDry;
+    if (score >= 60) return s.insightsRainNoteLight;
+    return s.insightsRainNoteWet;
   }
 
-  String _windNote(double score) {
-    if (score >= 80) return 'Lichte wind — nauwelijks merkbaar';
-    if (score >= 60) return 'Matige wind — verwacht wat weerstand';
-    return 'Sterke wind — plan de route strategisch';
+  String _windNote(BuildContext context, double score) {
+    final s = S.of(context);
+    if (score >= 80) return s.insightsWindNoteCalm;
+    if (score >= 60) return s.insightsWindNoteModerate;
+    return s.insightsWindNoteStrong;
   }
 
   // ---------------------------------------------------------------------------
   // Hulpfuncties: tier-label, tijdopmaak en dagnaam
   // ---------------------------------------------------------------------------
 
-  String _tierLabel(RideTier tier) => switch (tier) {
-        Perfect() => 'Perfect',
-        Great() => 'Goed',
-        Acceptable() => 'Acceptabel',
-        Poor() => 'Slecht',
-      };
+  String _tierLabel(BuildContext context, RideTier tier) {
+    final s = S.of(context);
+    return switch (tier) {
+      Perfect() => s.tierPerfect,
+      Great() => s.tierGreat,
+      Acceptable() => s.tierAcceptable,
+      Poor() => s.tierPoor,
+    };
+  }
 
   String _formatTime(DateTime dt) {
     final h = dt.hour.toString().padLeft(2, '0');
@@ -97,17 +107,18 @@ class InsightsSheet extends StatelessWidget {
     return '$h:$m';
   }
 
-  String _dayName(DateTime dt) {
-    const names = <int, String>{
-      DateTime.monday: 'maandag',
-      DateTime.tuesday: 'dinsdag',
-      DateTime.wednesday: 'woensdag',
-      DateTime.thursday: 'donderdag',
-      DateTime.friday: 'vrijdag',
-      DateTime.saturday: 'zaterdag',
-      DateTime.sunday: 'zondag',
+  String _dayName(BuildContext context, DateTime dt) {
+    final s = S.of(context);
+    final names = <int, String>{
+      DateTime.monday: s.dayMonLower,
+      DateTime.tuesday: s.dayTueLower,
+      DateTime.wednesday: s.dayWedLower,
+      DateTime.thursday: s.dayThuLower,
+      DateTime.friday: s.dayFriLower,
+      DateTime.saturday: s.daySatLower,
+      DateTime.sunday: s.daySunLower,
     };
-    return names[dt.weekday] ?? 'onbekend';
+    return names[dt.weekday] ?? s.dayUnknown;
   }
 
   // ---------------------------------------------------------------------------
@@ -185,9 +196,10 @@ class InsightsSheet extends StatelessWidget {
     final avgRain = _avg(hours, (h) => h.rainScore);
     final avgWind = _avg(hours, (h) => h.windScore);
 
-    final tierStr = _tierLabel(slot.tier);
+    final s = S.of(context);
+    final tierStr = _tierLabel(context, slot.tier);
     final score = slot.overallScore.round();
-    final day = _dayName(slot.start);
+    final day = _dayName(context, slot.start);
     final startTime = _formatTime(slot.start);
     final endTime = _formatTime(slot.end);
     final durationHours = slot.end.difference(slot.start).inMinutes ~/ 60;
@@ -216,7 +228,7 @@ class InsightsSheet extends StatelessWidget {
 
           // Titel
           Text(
-            "Waarom '$tierStr' — $score/100",
+            s.insightsTitle(tierStr, score.toString()),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -238,30 +250,30 @@ class InsightsSheet extends StatelessWidget {
           // Temperatuur
           _buildFactorRow(
             emoji: '🌡',
-            label: 'Temperatuur',
+            label: s.weatherTemperature,
             score: avgTemp,
-            scoreLabel: _tempLabel(avgTemp),
-            note: _tempNote(avgTemp),
+            scoreLabel: _tempLabel(context, avgTemp),
+            note: _tempNote(context, avgTemp),
           ),
           const SizedBox(height: 18),
 
           // Neerslag
           _buildFactorRow(
             emoji: '🌧',
-            label: 'Neerslag',
+            label: s.weatherRain,
             score: avgRain,
-            scoreLabel: _rainLabel(avgRain),
-            note: _rainNote(avgRain),
+            scoreLabel: _rainLabel(context, avgRain),
+            note: _rainNote(context, avgRain),
           ),
           const SizedBox(height: 18),
 
           // Wind
           _buildFactorRow(
             emoji: '💨',
-            label: 'Wind',
+            label: s.weatherWind,
             score: avgWind,
-            scoreLabel: _windLabel(avgWind),
-            note: _windNote(avgWind),
+            scoreLabel: _windLabel(context, avgWind),
+            note: _windNote(context, avgWind),
           ),
           const SizedBox(height: 16),
 
@@ -275,8 +287,8 @@ class InsightsSheet extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Totaalscore',
+                Text(
+                  s.totalScore,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -303,9 +315,9 @@ class InsightsSheet extends StatelessWidget {
                 foregroundColor: const Color(0xFF2E7D32),
               ),
               onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Begrijpen',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              child: Text(
+                s.understood,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
           ),

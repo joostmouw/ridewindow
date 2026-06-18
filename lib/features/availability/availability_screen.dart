@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 
 class AvailabilityScreen extends ConsumerStatefulWidget {
@@ -24,9 +25,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   bool _dragBlocking = true;
   final Set<DateTime> _draggedCells = {};
 
-  static const List<String> _dagLabels = [
-    'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo',
-  ];
+  List<String> _dagLabels(BuildContext context) {
+    final s = S.of(context);
+    return [s.dayShortMon, s.dayShortTue, s.dayShortWed, s.dayShortThu, s.dayShortFri, s.dayShortSat, s.dayShortSun];
+  }
 
   final GlobalKey _gridKey = GlobalKey();
 
@@ -42,14 +44,14 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     return availValue.when(
       loading: () => Scaffold(
         appBar: AppBar(
-          title: const Text('Mijn schema'),
+          title: Text(S.of(context).availabilityTitle),
           leading: const BackButton(),
         ),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Scaffold(
         appBar: AppBar(
-          title: const Text('Mijn schema'),
+          title: Text(S.of(context).availabilityTitle),
           leading: const BackButton(),
         ),
         body: Center(child: Text('Error: $e')),
@@ -70,7 +72,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   ) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mijn schema'),
+        title: Text(S.of(context).availabilityTitle),
         leading: const BackButton(),
       ),
       body: LayoutBuilder(
@@ -112,7 +114,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                                   height: _headerHeight,
                                   child: Center(
                                     child: Text(
-                                      _dagLabels[d],
+                                      _dagLabels(context)[d],
                                       style: TextStyle(
                                         fontSize: _cellWidth > 40 ? 13 : 11,
                                         fontWeight: FontWeight.bold,
@@ -197,9 +199,9 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _legendItem(Colors.white, 'Vrij', context),
-          _legendItem(const Color(0xFFFF9800), 'Bezet', context),
-          _legendItem(const Color(0xFFB0BEC5), 'Werk', context),
+          _legendItem(Colors.white, S.of(context).legendFree, context),
+          _legendItem(const Color(0xFFFF9800), S.of(context).legendBusy, context),
+          _legendItem(const Color(0xFFB0BEC5), S.of(context).legendWork, context),
         ],
       ),
     );
@@ -232,7 +234,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     Map<DateTime, BlockType> blockedHours,
     DateTime weekStart,
   ) {
-    final profile = _analyzeRiderProfile(blockedHours, weekStart);
+    final profile = _analyzeRiderProfile(context, blockedHours, weekStart);
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -278,9 +280,11 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   // --- Rider profile analyse ---
 
   ({String icon, String title, String description}) _analyzeRiderProfile(
+    BuildContext context,
     Map<DateTime, BlockType> blockedHours,
     DateTime weekStart,
   ) {
+    final s = S.of(context);
     int weekdayFreeHours = 0; // ma-vr
     int weekendFreeHours = 0; // za-zo
     int morningFree = 0; // 6-12
@@ -309,17 +313,16 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (totalFree == 0) {
       return (
         icon: '\u{1F62E}',
-        title: 'Helemaal geen tijd?',
-        description: 'Maak wat uren vrij om je perfecte rijmomenten te vinden.',
+        title: s.riderNoTime,
+        description: s.riderNoTimeDesc,
       );
     }
 
     if (totalFree >= 140) {
       return (
         icon: '\u{1F6B4}',
-        title: 'Fulltime fietser',
-        description:
-            'Je schema staat wagenwijd open. Genoeg keuze uit de beste momenten.',
+        title: s.riderFulltime,
+        description: s.riderFulltimeDesc,
       );
     }
 
@@ -327,9 +330,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (weekendFreeHours > weekdayFreeHours && weekendFreeHours >= 16) {
       return (
         icon: '\u{1F3D4}\u{FE0F}',
-        title: 'Weekendstrijder',
-        description:
-            'Het weekend is jouw speeltuin. We vinden de beste zaterdag- en zondagvensters.',
+        title: s.riderWeekend,
+        description: s.riderWeekendDesc,
       );
     }
 
@@ -337,9 +339,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (morningFree > afternoonFree && morningFree > eveningFree) {
       return (
         icon: '\u{1F305}',
-        title: 'Vroege vogel',
-        description:
-            'Je fietst voordat de wereld wakker wordt. Ochtendslots zijn jouw sweet spot.',
+        title: s.riderEarlyBird,
+        description: s.riderEarlyBirdDesc,
       );
     }
 
@@ -347,9 +348,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (eveningFree > morningFree && eveningFree > afternoonFree) {
       return (
         icon: '\u{1F307}',
-        title: 'Na-werk fietser',
-        description:
-            'De avond is jouw ontsnapping. We zoeken de beste avondvensters met het mooiste weer.',
+        title: s.riderAfterWork,
+        description: s.riderAfterWorkDesc,
       );
     }
 
@@ -357,9 +357,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (afternoonFree > morningFree && afternoonFree > eveningFree) {
       return (
         icon: '\u{2600}\u{FE0F}',
-        title: 'Middagfietser',
-        description:
-            'Je pakt de beste uren van de dag. Middagslots worden jouw ideale momenten.',
+        title: s.riderAfternoon,
+        description: s.riderAfternoonDesc,
       );
     }
 
@@ -367,17 +366,15 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (totalFree < 40) {
       return (
         icon: '\u{1F4AA}',
-        title: 'Druk maar doorzetter',
-        description:
-            'Krap schema, maar elke rit telt. We vinden de pareltjes in je vrije uren.',
+        title: s.riderBusy,
+        description: s.riderBusyDesc,
       );
     }
 
     return (
       icon: '\u{1F6B2}',
-      title: 'Flexibele fietser',
-      description:
-          'Een mooie mix van vrije tijd door de week. Je hebt altijd opties.',
+      title: s.riderFlexible,
+      description: s.riderFlexibleDesc,
     );
   }
 

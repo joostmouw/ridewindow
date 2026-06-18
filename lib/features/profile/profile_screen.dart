@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
@@ -59,13 +60,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!canExact) {
       // Toon SnackBar met uitleg (per NOTIF-05 fallback, D-08-09)
       if (context.mounted) {
+        final s = S.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'Exacte timing niet gegarandeerd. Sta exacte alarmen toe in Instellingen voor betrouwbaarheid.',
-            ),
+            content: Text(s.notifExactTimingWarning),
             action: SnackBarAction(
-              label: 'Instellingen',
+              label: s.settingsLabel,
               onPressed: () => _notifService.openExactAlarmSettings(),
             ),
             duration: const Duration(seconds: 6),
@@ -89,29 +89,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _showNameDialog(BuildContext context, String? currentName) {
     final controller = TextEditingController(text: currentName);
+    final s = S.of(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Jouw naam'),
+        title: Text(s.yourName),
         content: TextField(
           controller: controller,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            hintText: 'Voer je naam in',
+          decoration: InputDecoration(
+            hintText: s.enterYourName,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Annuleer'),
+            child: Text(s.cancel),
           ),
           TextButton(
             onPressed: () {
               ref.read(profileProvider.notifier).setUserName(controller.text);
               Navigator.of(ctx).pop();
             },
-            child: const Text('Opslaan'),
+            child: Text(s.save),
           ),
         ],
       ),
@@ -119,17 +120,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _showDebugMenu(BuildContext context) {
+    final s = S.of(context);
     showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Text(
-                'Debug Menu',
-                style: TextStyle(
+                s.debugMenu,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -137,50 +139,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.restart_alt),
-              title: const Text('Onboarding resetten'),
+              title: Text(s.debugResetOnboarding),
               onTap: () async {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.remove('onboarding.completed');
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Onboarding gereset. Herstart de app.')),
+                    SnackBar(content: Text(s.debugOnboardingReset)),
                   );
                 }
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_sweep),
-              title: const Text('Weerdata wissen'),
+              title: Text(s.debugClearWeather),
               onTap: () {
                 ref.invalidate(weatherProvider);
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Weerdata gewist.')),
+                  SnackBar(content: Text(s.debugWeatherCleared)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.calendar_today_outlined),
-              title: const Text('Beschikbaarheid resetten'),
+              title: Text(s.debugResetAvailability),
               onTap: () async {
                 await ref.read(availabilityProvider.notifier).clearAll();
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Beschikbaarheid gereset.')),
+                    SnackBar(content: Text(s.debugAvailabilityReset)),
                   );
                 }
               },
             ),
             ListTile(
               leading: const Icon(Icons.refresh),
-              title: const Text('Weer handmatig verversen'),
+              title: Text(s.debugRefreshWeather),
               onTap: () {
                 ref.invalidate(weatherProvider);
                 Navigator.of(ctx).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Weer wordt ververst.')),
+                  SnackBar(content: Text(s.debugWeatherRefreshing)),
                 );
               },
             ),
@@ -230,14 +232,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final permissionAsync = ref.watch(gpsPermissionProvider);
     final permission = permissionAsync.value;
 
+    final s = S.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Profiel')),
+      appBar: AppBar(title: Text(s.profileTitle)),
       body: ListView(
         key: const PageStorageKey('profile_settings'),
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
-          const _SectionHeader('LOCATIE'),
+          _SectionHeader(s.sectionLocation),
 
           // ELEMENT 1 — GPS-geblokkeerd banner (deniedForever)
           if (permission == LocationPermission.deniedForever)
@@ -250,21 +253,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Locatie-toegang geblokkeerd',
+                      s.locationBlocked,
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Kies een stad of open instellingen om GPS opnieuw in te schakelen.',
-                    ),
+                    Text(s.locationBlockedHint),
                     TextButton(
                       onPressed: () => ref
                           .read(gpsPermissionProvider.notifier)
                           .openSettings(),
-                      child: const Text('Instellingen openen'),
+                      child: Text(s.openSettings),
                     ),
                   ],
                 ),
@@ -275,20 +276,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           if (permission == LocationPermission.denied)
             ListTile(
               leading: const Icon(Icons.location_searching),
-              title: const Text('GPS-locatie gebruiken'),
+              title: Text(s.useGpsLocation),
               trailing: TextButton(
                 onPressed: () => ref
                     .read(gpsPermissionProvider.notifier)
                     .requestPermission(),
-                child: const Text('Toestemming geven'),
+                child: Text(s.grantPermission),
               ),
             ),
 
           // ELEMENT 3 — Actieve locatie + stad-picker
           ListTile(
             leading: const Icon(Icons.location_city),
-            title: Text(profile.locationOverride ?? 'GPS (automatisch)'),
-            subtitle: const Text('Tik om stad te kiezen'),
+            title: Text(profile.locationOverride ?? s.gpsAutomatic),
+            subtitle: Text(s.tapToChooseCity),
             trailing: profile.locationOverride != null
                 ? IconButton(
                     icon: const Icon(Icons.clear),
@@ -301,11 +302,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: NOTIFICATIES (NOTIF-01, NOTIF-02, NOTIF-03)
-          const _SectionHeader('NOTIFICATIES'),
+          _SectionHeader(s.sectionNotifications),
 
           SwitchListTile(
-            title: const Text('Avond van tevoren'),
-            subtitle: const Text('19:00 de vorige dag als er een top-slot is'),
+            title: Text(s.notifEveningBefore),
+            subtitle: Text(s.notifEveningBeforeSub),
             value: profile.notifEveningBefore,
             onChanged: (v) async {
               await ref.read(profileProvider.notifier).setNotifEveningBefore(v);
@@ -314,8 +315,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           SwitchListTile(
-            title: const Text('Ochtend van de dag'),
-            subtitle: const Text('2 uur voor het slot begint'),
+            title: Text(s.notifMorningOf),
+            subtitle: Text(s.notifMorningOfSub),
             value: profile.notifMorningOf,
             onChanged: (v) async {
               await ref.read(profileProvider.notifier).setNotifMorningOf(v);
@@ -324,8 +325,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           SwitchListTile(
-            title: const Text('Wekelijks overzicht'),
-            subtitle: const Text('Zondagavond 19:00 — beste momenten van de week'),
+            title: Text(s.notifWeeklyDigest),
+            subtitle: Text(s.notifWeeklyDigestSub),
             value: profile.notifWeeklyDigest,
             onChanged: (v) async {
               await ref.read(profileProvider.notifier).setNotifWeeklyDigest(v);
@@ -333,16 +334,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             },
           ),
 
+          // Sectie: TAAL
+          _SectionHeader(s.sectionLanguage),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(value: 'nl', label: Text('Nederlands')),
+                ButtonSegment(value: 'en', label: Text('English')),
+              ],
+              selected: {profile.locale},
+              onSelectionChanged: (s) =>
+                  ref.read(profileProvider.notifier).setLocale(s.first),
+            ),
+          ),
+
           // Sectie: THEMA (D-06-09: SegmentedButton, PROF-04)
-          const _SectionHeader('THEMA'),
+          _SectionHeader(s.sectionTheme),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             // D-06-09: SegmentedButton, PROF-04
             child: SegmentedButton<String>(
-              segments: const [
-                ButtonSegment(value: 'system', label: Text('Systeem')),
-                ButtonSegment(value: 'light', label: Text('Licht')),
-                ButtonSegment(value: 'dark', label: Text('Donker')),
+              segments: [
+                ButtonSegment(value: 'system', label: Text(s.themeSystem)),
+                ButtonSegment(value: 'light', label: Text(s.themeLight)),
+                ButtonSegment(value: 'dark', label: Text(s.themeDark)),
               ],
               selected: {profile.theme},
               onSelectionChanged: (s) =>
@@ -351,7 +367,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: TOLERANTIES
-          const _SectionHeader('TOLERANTIES'),
+          _SectionHeader(s.sectionTolerances),
 
           // --- Temperatuurbereik (RangeSlider) ---
           Padding(
@@ -360,13 +376,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               children: [
                 Row(
                   children: [
-                    const Text(
-                      'Temperatuur',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    Text(
+                      s.toleranceTemperature,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     _infoButton(
                       context,
-                      _tempRangeDescription(_tempMin, _tempMax),
+                      _tempRangeDescription(context, _tempMin, _tempMax),
                     ),
                     const Spacer(),
                     Text(
@@ -402,7 +418,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                 ),
                 Text(
-                  _tempRangeDescription(_tempMin, _tempMax),
+                  _tempRangeDescription(context, _tempMin, _tempMax),
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF999999),
@@ -423,13 +439,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Text(
-                      'Max. neerslag',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    Text(
+                      s.toleranceMaxRain,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     _infoButton(
                       context,
-                      _rainDescription(_rainMax),
+                      _rainDescription(context, _rainMax),
                     ),
                     const Spacer(),
                     Text(
@@ -459,7 +475,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                 ),
                 Text(
-                  _rainDescription(_rainMax),
+                  _rainDescription(context, _rainMax),
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF999999),
@@ -480,13 +496,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Text(
-                      'Max. wind',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    Text(
+                      s.toleranceMaxWind,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     _infoButton(
                       context,
-                      _windDescription(_windMax),
+                      _windDescription(context, _windMax),
                     ),
                     const Spacer(),
                     Text(
@@ -516,7 +532,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                 ),
                 Text(
-                  _windDescription(_windMax),
+                  _windDescription(context, _windMax),
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF999999),
@@ -529,7 +545,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: RIJLENGTE
-          const _SectionHeader('RIJLENGTE'),
+          _SectionHeader(s.sectionRideLength),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Wrap(
@@ -566,31 +582,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // Beschikbaarheidskalender navigatie (D-06-08)
           ListTile(
-            title: const Text('Mijn schema bewerken'),
+            title: Text(s.editMySchedule),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/availability'),
           ),
 
           // Sectie: NAAM
-          const _SectionHeader('NAAM'),
+          _SectionHeader(s.sectionName),
           ListTile(
             leading: const Icon(Icons.person_outline),
-            title: Text(profile.userName ?? 'Stel je naam in'),
+            title: Text(profile.userName ?? s.setYourName),
             subtitle: profile.userName == null
-                ? const Text('Tik om je naam in te voeren voor een persoonlijke begroeting')
+                ? Text(s.nameHint)
                 : null,
             onTap: () => _showNameDialog(context, profile.userName),
           ),
 
           // Sectie: OVER (REL-03: privacybeleid + versie)
-          const _SectionHeader('OVER'),
+          _SectionHeader(s.sectionAbout),
           ListTile(
-            title: const Text('Privacybeleid'),
+            title: Text(s.privacyPolicy),
             trailing: const Icon(Icons.open_in_new),
             onTap: _launchPrivacyPolicy,
           ),
           ListTile(
-            title: const Text('Versie'),
+            title: Text(s.version),
             trailing: const Text('1.0.0'),
             onTap: () {
               _versionTapCount++;
@@ -631,26 +647,29 @@ Widget _infoButton(BuildContext context, String description) {
   );
 }
 
-String _tempRangeDescription(double min, double max) {
+String _tempRangeDescription(BuildContext context, double min, double max) {
+  final s = S.of(context);
   final range = max - min;
-  if (range >= 25) return 'Je fietst in bijna elk weer';
-  if (range >= 15) return 'Comfortabel fietsbereik';
-  if (range >= 8) return 'Alleen bij lekker weer';
-  return 'Alleen bij perfect weer';
+  if (range >= 25) return s.tempDescAllWeather;
+  if (range >= 15) return s.tempDescComfortable;
+  if (range >= 8) return s.tempDescNiceOnly;
+  return s.tempDescPerfectOnly;
 }
 
-String _rainDescription(double mm) {
-  if (mm <= 0.3) return 'Alleen bij droog weer';
-  if (mm <= 1.0) return 'Een beetje motregen is ok';
-  if (mm <= 3.0) return 'Lichte regen geen probleem';
-  return 'Ook bij flinke buien';
+String _rainDescription(BuildContext context, double mm) {
+  final s = S.of(context);
+  if (mm <= 0.3) return s.rainDescDryOnly;
+  if (mm <= 1.0) return s.rainDescDrizzleOk;
+  if (mm <= 3.0) return s.rainDescLightRainOk;
+  return s.rainDescHeavyRainOk;
 }
 
-String _windDescription(double kmh) {
-  if (kmh <= 10) return 'Alleen bij windstil weer';
-  if (kmh <= 20) return 'Rustig briesje is prima';
-  if (kmh <= 30) return 'Stevige wind geen probleem';
-  return 'Zelfs bij harde wind';
+String _windDescription(BuildContext context, double kmh) {
+  final s = S.of(context);
+  if (kmh <= 10) return s.windDescCalmOnly;
+  if (kmh <= 20) return s.windDescBreezeOk;
+  if (kmh <= 30) return s.windDescStrongOk;
+  return s.windDescHardWindOk;
 }
 
 // ---------------------------------------------------------------------------

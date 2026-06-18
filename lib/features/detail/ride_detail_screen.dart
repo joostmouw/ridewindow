@@ -17,6 +17,7 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 const _pi = math.pi;
 final _sin = math.sin;
@@ -79,12 +80,15 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         Poor() => '\u26AA',
       };
 
-  String _tierDescription(RideTier tier) => switch (tier) {
-        Perfect() => 'Perfect \u2014 het beste venster deze week',
-        Great() => 'Goed \u2014 prettige rijomstandigheden',
-        Acceptable() => 'Acceptabel \u2014 te doen, pak een extra laag',
-        Poor() => 'Slecht \u2014 niet ideaal, maar mogelijk',
-      };
+  String _tierDescription(BuildContext context, RideTier tier) {
+    final s = S.of(context);
+    return switch (tier) {
+      Perfect() => s.detailTierPerfectDesc,
+      Great() => s.detailTierGreatDesc,
+      Acceptable() => s.detailTierAcceptableDesc,
+      Poor() => s.detailTierPoorDesc,
+    };
+  }
 
   // ---------------------------------------------------------------------------
   // Helpers: datum/tijd formattering
@@ -104,7 +108,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   // Helpers: info-kaart "Weer" berekeningen
   // ---------------------------------------------------------------------------
 
-  String _avgTempString() {
+  String _avgTempString(BuildContext context) {
     final temps = widget.forecasts
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
@@ -120,10 +124,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     if (apparent.isEmpty) return '$avgRounded\u00B0C';
     final avgApparent =
         (apparent.reduce((a, b) => a + b) / apparent.length).round();
-    return '$avgRounded\u00B0C, voelt als $avgApparent\u00B0C';
+    return '$avgRounded\u00B0C, ${S.of(context).feelsLike(avgApparent.toString())}';
   }
 
-  String _totalPrecipString() {
+  String _totalPrecipString(BuildContext context) {
     final vals = widget.forecasts
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
@@ -137,21 +141,23 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final avgProb = probs.isEmpty
         ? null
         : probs.reduce((a, b) => a + b) / probs.length;
-    if (total == 0.0 && (avgProb == null || avgProb == 0)) return 'Droog';
+    final s = S.of(context);
+    if (total == 0.0 && (avgProb == null || avgProb == 0)) return s.dry;
     if (avgProb != null && avgProb > 0) {
-      return '${total.toStringAsFixed(1)}mm (${avgProb.round()}% kans)';
+      return s.rainChance(total.toStringAsFixed(1), avgProb.round().toString());
     }
     return '${total.toStringAsFixed(1)}mm';
   }
 
-  String _avgWindString() {
+  String _avgWindString(BuildContext context) {
     final vals = widget.forecasts
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
     if (vals.isEmpty) return '\u2014';
     final avg = vals.reduce((a, b) => a + b) / vals.length;
-    if (avg < 5) return 'Windstil';
+    final s = S.of(context);
+    if (avg < 5) return s.windCalm;
     final dirs = widget.forecasts
         .map((f) => f.winddirectionDeg)
         .whereType<double>()
@@ -163,7 +169,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         cosSum += _cos(d * _pi / 180);
       }
       final avgDir = (_atan2(sinSum, cosSum) * 180 / _pi + 360) % 360;
-      return '${avg.round()}km/u uit ${_compassDirection(avgDir)}';
+      return s.windFrom(avg.round().toString(), _compassDirection(context, avgDir));
     }
     return '${avg.round()}km/u';
   }
@@ -183,8 +189,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Rijvenster toegevoegd aan Google Agenda!'),
+          SnackBar(
+            content: Text(S.of(context).addedToGoogleCalendar),
           ),
         );
       }
@@ -192,7 +198,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Kon niet toevoegen: ${e.toString()}'),
+            content: Text(S.of(context).couldNotAdd(e.toString())),
           ),
         );
       }
@@ -208,12 +214,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildAppBar(BuildContext context) {
+    final s = S.of(context);
     final duration = _fmtDuration(widget.slot.start, widget.slot.end);
     final tierLabel = switch (widget.slot.tier) {
-      Perfect() => 'Perfect',
-      Great() => 'Goed',
-      Acceptable() => 'Acceptabel',
-      Poor() => 'Slecht',
+      Perfect() => s.tierPerfect,
+      Great() => s.tierGreat,
+      Acceptable() => s.tierAcceptable,
+      Poor() => s.tierPoor,
     };
 
     return AppBar(
@@ -225,7 +232,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           Text(
-            '$duration \u00B7 $tierLabel omstandigheden',
+            '$duration \u00B7 $tierLabel ${s.detailConditions}',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
           ),
         ],
@@ -240,7 +247,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final bg = _bannerBg(widget.slot.tier);
     final fg = _bannerFg(widget.slot.tier);
     final emoji = _tierEmoji(widget.slot.tier);
-    final description = _tierDescription(widget.slot.tier);
+    final description = _tierDescription(context, widget.slot.tier);
 
     return Container(
       width: double.infinity,
@@ -365,35 +372,36 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final windAvg =
         avgWind.isEmpty ? 0.0 : avgWind.reduce((a, b) => a + b) / avgWind.length;
 
+    final s = S.of(context);
     final items = <String>[];
     String icon;
 
     if (avgFeelsLike < 5) {
       icon = '\u{1F9E4}'; // gloves
-      items.addAll(['Winterjas', 'Thermobroek', 'Handschoenen', 'Overschoenen']);
+      items.addAll([s.clothingWinterJacket, s.clothingThermalPants, s.clothingGloves, s.clothingOvershoes]);
     } else if (avgFeelsLike < 10) {
       icon = '\u{1F9E5}'; // coat
-      items.addAll(['Lange mouw jersey', 'Armwarmers', 'Beenwarmers']);
+      items.addAll([s.clothingLongSleeveJersey, s.clothingArmWarmers, s.clothingLegWarmers]);
     } else if (avgFeelsLike < 15) {
       icon = '\u{1F455}'; // shirt
-      items.addAll(['Lange mouw jersey', 'Kniewarmers']);
+      items.addAll([s.clothingLongSleeveJersey, s.clothingKneeWarmers]);
     } else if (avgFeelsLike < 20) {
       icon = '\u{1F455}';
-      items.add('Korte mouw jersey');
-      if (avgFeelsLike < 17) items.add('Armwarmers voor de zekerheid');
+      items.add(s.clothingShortSleeveJersey);
+      if (avgFeelsLike < 17) items.add(s.clothingArmWarmersJustInCase);
     } else if (avgFeelsLike < 28) {
       icon = '\u{2600}\u{FE0F}'; // sun
-      items.addAll(['Licht shirt', 'Zonnebrand']);
+      items.addAll([s.clothingLightShirt, s.clothingSunscreen]);
     } else {
       icon = '\u{1F975}'; // hot face
-      items.addAll(['Licht shirt', 'Zonnebrand', 'Extra water']);
+      items.addAll([s.clothingLightShirt, s.clothingSunscreen, s.clothingExtraWater]);
     }
 
     if (totalPrecip > 0.5) {
-      items.add('Regenjas');
+      items.add(s.clothingRainJacket);
     }
     if (windAvg > 25) {
-      items.add('Windvest');
+      items.add(s.clothingWindVest);
     }
 
     return Container(
@@ -413,9 +421,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Wat trek je aan',
-                  style: TextStyle(
+                Text(
+                  s.clothingTitle,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF2E7D32),
@@ -439,26 +447,27 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildHourlyRowWidget(HourlyRow row) {
+    final s = S.of(context);
     final time = _fmtTime(row.time);
     final temp = row.temperatureC != null
         ? '${row.temperatureC!.round()}\u00B0C'
         : '\u2014';
     final apparent = row.apparentTemperatureC != null
-        ? 'v.a. ${row.apparentTemperatureC!.round()}\u00B0C'
+        ? s.hourlyFeelsLike(row.apparentTemperatureC!.round().toString())
         : '';
     final precip = row.precipitationMm != null
         ? (row.precipitationMm! == 0.0 && (row.precipitationProbability == null || row.precipitationProbability == 0)
-            ? '\u{1F327} droog'
+            ? '\u{1F327} ${s.hourlyDry}'
             : row.precipitationProbability != null && row.precipitationProbability! > 0
                 ? '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
                 : '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm')
         : '\u{1F327} \u2014';
     final wind = row.windspeedKmh != null
         ? row.windspeedKmh! < 5
-            ? '\u{1F4A8} windstil'
+            ? '\u{1F4A8} ${s.hourlyWindstil}'
             : row.windspeedKmh! < 15 || row.winddirectionDeg == null
                 ? '\u{1F4A8} ${row.windspeedKmh!.round()}km/u'
-                : '\u{1F4A8} ${row.windspeedKmh!.round()}km/u ${_compassDirection(row.winddirectionDeg!)}'
+                : '\u{1F4A8} ${row.windspeedKmh!.round()}km/u ${_compassDirection(context, row.winddirectionDeg!)}'
         : '\u{1F4A8} \u2014';
 
     // Subtiele achtergrondkleur op basis van uur-score
@@ -518,27 +527,29 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   void _shareSlot() {
+    final s = S.of(context);
     final tierLabel = switch (widget.slot.tier) {
-      Perfect() => 'Perfect',
-      Great() => 'Goed',
-      Acceptable() => 'Acceptabel',
-      Poor() => 'Slecht',
+      Perfect() => s.tierPerfect,
+      Great() => s.tierGreat,
+      Acceptable() => s.tierAcceptable,
+      Poor() => s.tierPoor,
     };
     final summary = CalendarService.buildWeatherSummary(widget.forecasts);
-    final day = _dayName(widget.slot.start);
-    final text = 'Fietsrit $day '
-        '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)} '
-        '($tierLabel)\n$summary\n\nVia RideWindow';
-    Share.share(text);
+    final day = _dayName(context, widget.slot.start);
+    final timeRange = '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
+    Share.share(s.shareText(day, timeRange, tierLabel, summary));
   }
 
-  String _dayName(DateTime dt) {
-    const names = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
-    return names[dt.weekday - 1];
+  String _dayName(BuildContext context, DateTime dt) {
+    final s = S.of(context);
+    const days = [DateTime.monday, DateTime.tuesday, DateTime.wednesday, DateTime.thursday, DateTime.friday, DateTime.saturday, DateTime.sunday];
+    final names = [s.dayMonFull, s.dayTueFull, s.dayWedFull, s.dayThuFull, s.dayFriFull, s.daySatFull, s.daySunFull];
+    return names[days.indexOf(dt.weekday)];
   }
 
-  String _compassDirection(double degrees) {
-    const dirs = ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'];
+  String _compassDirection(BuildContext context, double degrees) {
+    final s = S.of(context);
+    final dirs = [s.compassN, s.compassNE, s.compassE, s.compassSE, s.compassS, s.compassSW, s.compassW, s.compassNW];
     final index = ((degrees + 22.5) % 360 / 45).floor();
     return dirs[index];
   }
@@ -560,7 +571,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Wisselende windrichting (-$pct% op score)',
+              S.of(context).windPenalty(pct.toString()),
               style: const TextStyle(fontSize: 12, color: Color(0xFF999999)),
             ),
           ),
@@ -593,11 +604,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     ),
                   );
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Rit ingepland!')),
+                SnackBar(content: Text(S.of(context).ridePlanned)),
               );
             },
             icon: const Icon(Icons.directions_bike),
-            label: const Text('Rit inplannen'),
+            label: Text(S.of(context).planRide),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
@@ -613,7 +624,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             icon: _isLoading
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.calendar_month, size: 18),
-            label: const Text('Toevoegen aan Google Agenda'),
+            label: Text(S.of(context).addToGoogleCalendar),
           ),
           const SizedBox(height: 10),
           ElevatedButton.icon(
@@ -638,14 +649,14 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               );
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Herinnering gepland voor de avond ervoor!'),
+                  SnackBar(
+                    content: Text(S.of(context).reminderPlanned),
                   ),
                 );
               }
             },
             icon: const Icon(Icons.notifications_outlined, size: 18),
-            label: const Text('Herinner me de avond ervoor'),
+            label: Text(S.of(context).remindEveningBefore),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
@@ -659,7 +670,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             ),
             onPressed: _shareSlot,
             icon: const Icon(Icons.share, size: 18),
-            label: const Text('Deel dit rijvenster'),
+            label: Text(S.of(context).shareRideWindow),
           ),
         ],
       ),
@@ -685,18 +696,18 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 child: Column(
                   children: [
                     _buildInfoCard(
-                      title: 'WEER',
+                      title: S.of(context).weatherSection,
                       rows: [
-                        _buildWeatherRow('Temperatuur', _avgTempString()),
-                        _buildWeatherRow('Neerslag', _totalPrecipString()),
-                        _buildWeatherRow('Wind', _avgWindString()),
+                        _buildWeatherRow(S.of(context).weatherTemperature, _avgTempString(context)),
+                        _buildWeatherRow(S.of(context).weatherRain, _totalPrecipString(context)),
+                        _buildWeatherRow(S.of(context).weatherWind, _avgWindString(context)),
                         if (_windPenaltyPercent() > 2)
                           _buildWindPenaltyNote(),
                       ],
                     ),
                     _buildClothingTip(),
                     _buildInfoCard(
-                      title: 'UURLIJKS',
+                      title: S.of(context).weatherHourly,
                       rows: hourlyRows
                           .map(_buildHourlyRowWidget)
                           .toList(),

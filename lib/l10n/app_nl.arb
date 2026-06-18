@@ -1,0 +1,444 @@
+{
+  "@@locale": "nl",
+
+  "appTitle": "RideWindow",
+
+  "navHome": "Home",
+  "navAgenda": "Agenda",
+  "navRides": "Ritten",
+  "navProfile": "Profiel",
+
+  "greetingNightOwl": "Nachtuil",
+  "greetingMorning": "Goedemorgen",
+  "greetingAfternoon": "Goedemiddag",
+  "greetingEvening": "Goedenavond",
+  "greetingWithName": "{greeting}, {name}",
+  "@greetingWithName": {
+    "placeholders": {
+      "greeting": {"type": "String"},
+      "name": {"type": "String"}
+    }
+  },
+
+  "rideWindowCount": "{count} {count, plural, =1{rijvenster} other{rijvensters}} deze week",
+  "@rideWindowCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "updatedAt": "Bijgewerkt {time}",
+  "@updatedAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "retryButton": "Opnieuw proberen",
+  "thisWeek": "DEZE WEEK",
+  "rideTimes": "RIJTIJDEN",
+
+  "dayMon": "MA",
+  "dayTue": "DI",
+  "dayWed": "WO",
+  "dayThu": "DO",
+  "dayFri": "VR",
+  "daySat": "ZA",
+  "daySun": "ZO",
+
+  "dayMonFull": "Maandag",
+  "dayTueFull": "Dinsdag",
+  "dayWedFull": "Woensdag",
+  "dayThuFull": "Donderdag",
+  "dayFriFull": "Vrijdag",
+  "daySatFull": "Zaterdag",
+  "daySunFull": "Zondag",
+
+  "dayMonLower": "maandag",
+  "dayTueLower": "dinsdag",
+  "dayWedLower": "woensdag",
+  "dayThuLower": "donderdag",
+  "dayFriLower": "vrijdag",
+  "daySatLower": "zaterdag",
+  "daySunLower": "zondag",
+  "dayUnknown": "onbekend",
+
+  "tierPerfect": "Perfect",
+  "tierGreat": "Goed",
+  "tierAcceptable": "Acceptabel",
+  "tierPoor": "Slecht",
+
+  "tierPerfectAgenda": "Perfect",
+  "tierGreatAgenda": "Geweldig",
+  "tierAcceptableAgenda": "Ok\u00e9",
+  "tierPoorAgenda": "Slecht",
+
+  "bestChoice": "Beste keuze",
+  "schedule": "Inplannen",
+  "addToCalendar": "Toevoegen aan agenda",
+  "addedToGoogleCalendar": "Rijvenster toegevoegd aan Google Agenda!",
+  "couldNotAdd": "Kon niet toevoegen: {error}",
+  "@couldNotAdd": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "weatherLoadError": "Weersdata kon niet worden geladen.",
+  "emptyBadWeather": "Geen goede rijmomenten deze week. Slecht weer verwacht.",
+  "emptyAllBlocked": "Alle goede momenten zijn geblokkeerd. Pas je schema aan.",
+  "emptyNoSlots": "Geen rijmomenten gevonden.",
+  "emptyNoSlotsDay": "Geen rijmomenten op deze dag.",
+
+  "windCalm": "Windstil",
+  "durationHours": "{hours}u",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+
+  "welcomeTitle": "Jouw perfecte rijmoment",
+  "welcomeSubtitle": "Combineer het weerbericht met jouw agenda en ontdek de beste windows om te fietsen.",
+  "welcomeButton": "Aan de slag \u2192",
+
+  "onboardingTitle": "Wanneer rijd jij het liefst?",
+  "onboardingSubtitle": "Kies een schema om te beginnen. Je kunt dit later altijd aanpassen.",
+  "onboardingNext": "Volgende \u2192",
+  "presetEveningsWeekends": "Avonden & weekenden",
+  "presetEveningsWeekendsSub": "Ma\u2013Vr na 17:00, Za/Zo de hele dag",
+  "presetMorningsWeekends": "Ochtenden & weekenden",
+  "presetMorningsWeekendsSub": "Ma\u2013Vr 06:00\u201309:00, Za/Zo de hele dag",
+  "presetWeekendsOnly": "Alleen weekenden",
+  "presetWeekendsOnlySub": "Za/Zo de hele dag",
+  "presetCustom": "Stel mijn eigen schema in",
+  "presetCustomSub": "Ik pas mijn agenda zelf aan",
+
+  "profileTitle": "Profiel",
+  "sectionLocation": "LOCATIE",
+  "sectionNotifications": "NOTIFICATIES",
+  "sectionTheme": "THEMA",
+  "sectionTolerances": "TOLERANTIES",
+  "sectionRideLength": "RIJLENGTE",
+  "sectionName": "NAAM",
+  "sectionAbout": "OVER",
+  "sectionLanguage": "TAAL",
+
+  "locationBlocked": "Locatie-toegang geblokkeerd",
+  "locationBlockedHint": "Kies een stad of open instellingen om GPS opnieuw in te schakelen.",
+  "openSettings": "Instellingen openen",
+  "useGpsLocation": "GPS-locatie gebruiken",
+  "grantPermission": "Toestemming geven",
+  "gpsAutomatic": "GPS (automatisch)",
+  "tapToChooseCity": "Tik om stad te kiezen",
+
+  "notifEveningBefore": "Avond van tevoren",
+  "notifEveningBeforeSub": "19:00 de vorige dag als er een top-slot is",
+  "notifMorningOf": "Ochtend van de dag",
+  "notifMorningOfSub": "2 uur voor het slot begint",
+  "notifWeeklyDigest": "Wekelijks overzicht",
+  "notifWeeklyDigestSub": "Zondagavond 19:00 \u2014 beste momenten van de week",
+  "notifExactTimingWarning": "Exacte timing niet gegarandeerd. Sta exacte alarmen toe in Instellingen voor betrouwbaarheid.",
+  "settingsLabel": "Instellingen",
+
+  "themeSystem": "Systeem",
+  "themeLight": "Licht",
+  "themeDark": "Donker",
+
+  "toleranceTemperature": "Temperatuur",
+  "toleranceMaxRain": "Max. neerslag",
+  "toleranceMaxWind": "Max. wind",
+
+  "tempDescAllWeather": "Je fietst in bijna elk weer",
+  "tempDescComfortable": "Comfortabel fietsbereik",
+  "tempDescNiceOnly": "Alleen bij lekker weer",
+  "tempDescPerfectOnly": "Alleen bij perfect weer",
+
+  "rainDescDryOnly": "Alleen bij droog weer",
+  "rainDescDrizzleOk": "Een beetje motregen is ok",
+  "rainDescLightRainOk": "Lichte regen geen probleem",
+  "rainDescHeavyRainOk": "Ook bij flinke buien",
+
+  "windDescCalmOnly": "Alleen bij windstil weer",
+  "windDescBreezeOk": "Rustig briesje is prima",
+  "windDescStrongOk": "Stevige wind geen probleem",
+  "windDescHardWindOk": "Zelfs bij harde wind",
+
+  "editMySchedule": "Mijn schema bewerken",
+  "setYourName": "Stel je naam in",
+  "nameHint": "Tik om je naam in te voeren voor een persoonlijke begroeting",
+  "yourName": "Jouw naam",
+  "enterYourName": "Voer je naam in",
+  "cancel": "Annuleer",
+  "save": "Opslaan",
+
+  "privacyPolicy": "Privacybeleid",
+  "version": "Versie",
+
+  "debugMenu": "Debug Menu",
+  "debugResetOnboarding": "Onboarding resetten",
+  "debugOnboardingReset": "Onboarding gereset. Herstart de app.",
+  "debugClearWeather": "Weerdata wissen",
+  "debugWeatherCleared": "Weerdata gewist.",
+  "debugResetAvailability": "Beschikbaarheid resetten",
+  "debugAvailabilityReset": "Beschikbaarheid gereset.",
+  "debugRefreshWeather": "Weer handmatig verversen",
+  "debugWeatherRefreshing": "Weer wordt ververst.",
+
+  "detailTierPerfectDesc": "Perfect \u2014 het beste venster deze week",
+  "detailTierGreatDesc": "Goed \u2014 prettige rijomstandigheden",
+  "detailTierAcceptableDesc": "Acceptabel \u2014 te doen, pak een extra laag",
+  "detailTierPoorDesc": "Slecht \u2014 niet ideaal, maar mogelijk",
+  "detailConditions": "omstandigheden",
+
+  "weatherSection": "WEER",
+  "weatherTemperature": "Temperatuur",
+  "weatherRain": "Neerslag",
+  "weatherWind": "Wind",
+  "weatherHourly": "UURLIJKS",
+  "feelsLike": "voelt als {temp}\u00b0C",
+  "@feelsLike": {
+    "placeholders": {
+      "temp": {"type": "String"}
+    }
+  },
+  "dry": "Droog",
+  "rainChance": "{mm}mm ({percent}% kans)",
+  "@rainChance": {
+    "placeholders": {
+      "mm": {"type": "String"},
+      "percent": {"type": "String"}
+    }
+  },
+  "windFrom": "{speed}km/u uit {direction}",
+  "@windFrom": {
+    "placeholders": {
+      "speed": {"type": "String"},
+      "direction": {"type": "String"}
+    }
+  },
+  "windPenalty": "Wisselende windrichting (-{pct}% op score)",
+  "@windPenalty": {
+    "placeholders": {
+      "pct": {"type": "String"}
+    }
+  },
+
+  "clothingTitle": "Wat trek je aan",
+  "clothingWinterJacket": "Winterjas",
+  "clothingThermalPants": "Thermobroek",
+  "clothingGloves": "Handschoenen",
+  "clothingOvershoes": "Overschoenen",
+  "clothingLongSleeveJersey": "Lange mouw jersey",
+  "clothingArmWarmers": "Armwarmers",
+  "clothingLegWarmers": "Beenwarmers",
+  "clothingKneeWarmers": "Kniewarmers",
+  "clothingShortSleeveJersey": "Korte mouw jersey",
+  "clothingArmWarmersJustInCase": "Armwarmers voor de zekerheid",
+  "clothingLightShirt": "Licht shirt",
+  "clothingSunscreen": "Zonnebrand",
+  "clothingExtraWater": "Extra water",
+  "clothingRainJacket": "Regenjas",
+  "clothingWindVest": "Windvest",
+
+  "planRide": "Rit inplannen",
+  "ridePlanned": "Rit ingepland!",
+  "addToGoogleCalendar": "Toevoegen aan Google Agenda",
+  "remindEveningBefore": "Herinner me de avond ervoor",
+  "reminderPlanned": "Herinnering gepland voor de avond ervoor!",
+  "shareRideWindow": "Deel dit rijvenster",
+  "shareText": "Fietsrit {day} {timeRange} ({tier})\n{summary}\n\nVia RideWindow",
+  "@shareText": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "timeRange": {"type": "String"},
+      "tier": {"type": "String"},
+      "summary": {"type": "String"}
+    }
+  },
+
+  "insightsTitle": "Waarom '{tier}' \u2014 {score}/100",
+  "@insightsTitle": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "score": {"type": "String"}
+    }
+  },
+  "insightsTempIdeal": "Ideaal",
+  "insightsTempAcceptable": "Acceptabel",
+  "insightsTempExtreme": "Koud/Warm",
+  "insightsRainDry": "Droog",
+  "insightsRainLight": "Licht",
+  "insightsRainWet": "Nat",
+  "insightsWindCalm": "Rustig",
+  "insightsWindModerate": "Matig",
+  "insightsWindStrong": "Sterk",
+  "insightsTempNoteIdeal": "Ideale temperatuur \u2014 comfortabel rijden",
+  "insightsTempNoteAcceptable": "Acceptabele temperatuur \u2014 pak een extra laag",
+  "insightsTempNoteExtreme": "Buiten het ideale bereik \u2014 kleding aanpassen",
+  "insightsRainNoteDry": "Droog \u2014 geen neerslag verwacht",
+  "insightsRainNoteLight": "Lichte neerslag verwacht \u2014 spatborden handig",
+  "insightsRainNoteWet": "Neerslag verwacht \u2014 overweeg een regenjas",
+  "insightsWindNoteCalm": "Lichte wind \u2014 nauwelijks merkbaar",
+  "insightsWindNoteModerate": "Matige wind \u2014 verwacht wat weerstand",
+  "insightsWindNoteStrong": "Sterke wind \u2014 plan de route strategisch",
+  "totalScore": "Totaalscore",
+  "understood": "Begrijpen",
+
+  "availabilityTitle": "Mijn schema",
+  "legendFree": "Vrij",
+  "legendBusy": "Bezet",
+  "legendWork": "Werk",
+
+  "riderNoTime": "Helemaal geen tijd?",
+  "riderNoTimeDesc": "Maak wat uren vrij om je perfecte rijmomenten te vinden.",
+  "riderFulltime": "Fulltime fietser",
+  "riderFulltimeDesc": "Je schema staat wagenwijd open. Genoeg keuze uit de beste momenten.",
+  "riderWeekend": "Weekendstrijder",
+  "riderWeekendDesc": "Het weekend is jouw speeltuin. We vinden de beste zaterdag- en zondagvensters.",
+  "riderEarlyBird": "Vroege vogel",
+  "riderEarlyBirdDesc": "Je fietst voordat de wereld wakker wordt. Ochtendslots zijn jouw sweet spot.",
+  "riderAfterWork": "Na-werk fietser",
+  "riderAfterWorkDesc": "De avond is jouw ontsnapping. We zoeken de beste avondvensters met het mooiste weer.",
+  "riderAfternoon": "Middagfietser",
+  "riderAfternoonDesc": "Je pakt de beste uren van de dag. Middagslots worden jouw ideale momenten.",
+  "riderBusy": "Druk maar doorzetter",
+  "riderBusyDesc": "Krap schema, maar elke rit telt. We vinden de pareltjes in je vrije uren.",
+  "riderFlexible": "Flexibele fietser",
+  "riderFlexibleDesc": "Een mooie mix van vrije tijd door de week. Je hebt altijd opties.",
+
+  "agendaTitle": "Agenda",
+  "agendaCancel": "Annuleer",
+  "agendaBusy": "Bezet",
+  "agendaHoursSelected": "{count} uur geselecteerd",
+  "@agendaHoursSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "agendaPlanRide": "Rit inplannen ({count}u)",
+  "@agendaPlanRide": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "agendaRidePlanned": "Rit ingepland ({count}u)!",
+  "@agendaRidePlanned": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "agendaNow": "Nu",
+  "agendaScoreBreakdown": "Score-opbouw",
+  "agendaRain": "Regen",
+  "agendaViewDetails": "Bekijk details",
+
+  "ridesTitle": "Mijn Ritten",
+  "ridesEmpty": "Nog geen ritten gepland",
+  "ridesEmptyHint": "Plan een rit vanuit Home of selecteer uren in de Agenda.",
+  "rideRemoved": "Rit verwijderd",
+  "rideSincePlanning": "{delta} sinds planning",
+  "@rideSincePlanning": {
+    "placeholders": {
+      "delta": {"type": "String"}
+    }
+  },
+  "ridesPerHour": "Per uur",
+  "ridesAvgScoreBreakdown": "Gemiddelde score-opbouw",
+  "ridesDeleteRide": "Rit verwijderen",
+  "ridesWindFrom": "Wind uit {direction}. {advice}.",
+  "@ridesWindFrom": {
+    "placeholders": {
+      "direction": {"type": "String"},
+      "advice": {"type": "String"}
+    }
+  },
+
+  "tailwindNorth": "Fiets noordwaarts voor wind mee terug",
+  "tailwindNortheast": "Fiets noordoostwaarts voor wind mee terug",
+  "tailwindEast": "Fiets oostwaarts voor wind mee terug",
+  "tailwindSoutheast": "Fiets zuidoostwaarts voor wind mee terug",
+  "tailwindSouth": "Fiets zuidwaarts voor wind mee terug",
+  "tailwindSouthwest": "Fiets zuidwestwaarts voor wind mee terug",
+  "tailwindWest": "Fiets westwaarts voor wind mee terug",
+  "tailwindNorthwest": "Fiets noordwestwaarts voor wind mee terug",
+
+  "compassN": "N",
+  "compassNE": "NO",
+  "compassE": "O",
+  "compassSE": "ZO",
+  "compassS": "Z",
+  "compassSW": "ZW",
+  "compassW": "W",
+  "compassNW": "NW",
+
+  "hintTapRideWindow": "Tik op een rijvenster",
+  "hintTapRideWindowDesc": "Bekijk weerdetails, plan de rit in of voeg toe aan Google Agenda.",
+  "hintFilterDay": "Filter op dag",
+  "hintFilterDayDesc": "Tik op een dag bovenaan om alleen die dag te zien.",
+  "hintTapWeatherDetail": "Tik voor weerdetails",
+  "hintTapWeatherDetailDesc": "Tik op een gekleurd uurvak om temperatuur, regen en wind te bekijken.",
+  "hintDragSelect": "Sleep om uren te selecteren",
+  "hintDragSelectDesc": "Houd een vak ingedrukt en sleep verticaal om meerdere uren te selecteren. Tik daarna op \"Rit inplannen\" onderaan.",
+  "hintTapSummary": "Tik voor weersamenvatting",
+  "hintTapSummaryDesc": "Tik op een rit voor een uitgebreid weeroverzicht per uur, score-opbouw en windadvies.",
+  "hintSwipeDelete": "Swipe om te verwijderen",
+  "hintSwipeDeleteDesc": "Veeg een rit naar links om hem te verwijderen.",
+  "hintDismiss": "Tik om door te gaan",
+
+  "calendarEventTitle": "Fietsrit {timeRange}",
+  "@calendarEventTitle": {
+    "placeholders": {
+      "timeRange": {"type": "String"}
+    }
+  },
+  "calendarNoWeatherData": "Geen weerdata beschikbaar",
+  "calendarDry": "droog",
+  "calendarWind": "{speed}km/u wind",
+  "@calendarWind": {
+    "placeholders": {
+      "speed": {"type": "String"}
+    }
+  },
+  "calendarSignInCanceled": "Aanmelden geannuleerd",
+
+  "notifEveningTitle": "Top rijmoment morgen!",
+  "notifEveningBody": "{slot} \u2014 perfecte omstandigheden verwacht",
+  "@notifEveningBody": {
+    "placeholders": {
+      "slot": {"type": "String"}
+    }
+  },
+  "notifMorningTitle": "Over 2 uur een top rijmoment!",
+  "notifMorningBody": "{slot} \u2014 maak je klaar om te rijden",
+  "@notifMorningBody": {
+    "placeholders": {
+      "slot": {"type": "String"}
+    }
+  },
+  "notifWeeklyTitle": "Je rijoverzicht voor deze week",
+  "notifChannelRideAlerts": "Rijmeldingen",
+  "notifChannelRideAlertsDesc": "Avond-van-tevoren en ochtend-van-de-dag rijmeldingen",
+  "notifChannelWeeklyDigest": "Wekelijks overzicht",
+  "notifChannelWeeklyDigestDesc": "Zondagavond overzicht van de beste rijmomenten",
+
+  "widgetTierPerfect": "Perfect",
+  "widgetTierGreat": "Geweldig",
+  "widgetTierAcceptable": "Acceptabel",
+  "widgetTierPoor": "Slecht",
+
+  "hourlyDry": "droog",
+  "hourlyWindstil": "windstil",
+  "hourlyFeelsLike": "v.a. {temp}\u00b0C",
+  "@hourlyFeelsLike": {
+    "placeholders": {
+      "temp": {"type": "String"}
+    }
+  },
+
+  "dayShortMon": "Ma",
+  "dayShortTue": "Di",
+  "dayShortWed": "Wo",
+  "dayShortThu": "Do",
+  "dayShortFri": "Vr",
+  "dayShortSat": "Za",
+  "dayShortSun": "Zo"
+}

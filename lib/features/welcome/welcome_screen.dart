@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -84,9 +85,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 position: _slideTitle,
                 child: FadeTransition(
                   opacity: _fadeTitle,
-                  child: const Text(
-                    'Jouw perfecte rijmoment',
-                    style: TextStyle(
+                  child: Text(
+                    S.of(context).welcomeTitle,
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF1A1A1A),
@@ -101,9 +102,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 position: _slideSub,
                 child: FadeTransition(
                   opacity: _fadeSub,
-                  child: const Text(
-                    'Combineer het weerbericht met jouw agenda en ontdek de beste windows om te fietsen.',
-                    style: TextStyle(
+                  child: Text(
+                    S.of(context).welcomeSubtitle,
+                    style: const TextStyle(
                       fontSize: 15,
                       color: Color(0xFF666666),
                       height: 1.6,
@@ -133,7 +134,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
                       ),
                       onPressed: () => context.push('/onboard'),
-                      child: const Text('Aan de slag \u2192'),
+                      child: Text(S.of(context).welcomeButton),
                     ),
                   ),
                 ),

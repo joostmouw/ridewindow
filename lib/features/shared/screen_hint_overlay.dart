@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Per-screen hint overlay with frosted glass effect.
@@ -73,7 +74,7 @@ class ScreenHintOverlay extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Tik om door te gaan',
+                  S.of(context).hintDismiss,
                   style: TextStyle(color: Colors.white.withAlpha(180), fontSize: 13),
                 ),
               ),
@@ -172,49 +173,56 @@ class _GlassCard extends StatelessWidget {
 // Pre-defined hints per screen
 // ---------------------------------------------------------------------------
 
-const homeHints = [
-  HintItem(
-    alignment: Alignment(0, -0.3),
-    gestureIcon: Icons.touch_app,
-    title: 'Tik op een rijvenster',
-    description: 'Bekijk weerdetails, plan de rit in of voeg toe aan Google Agenda.',
-  ),
-  HintItem(
-    alignment: Alignment(0, 0.3),
-    gestureIcon: Icons.swipe,
-    title: 'Filter op dag',
-    description: 'Tik op een dag bovenaan om alleen die dag te zien.',
-  ),
-];
+List<HintItem> homeHints(BuildContext context) {
+  final s = S.of(context);
+  return [
+    HintItem(
+      alignment: const Alignment(0, -0.3),
+      gestureIcon: Icons.touch_app,
+      title: s.hintTapRideWindow,
+      description: s.hintTapRideWindowDesc,
+    ),
+    HintItem(
+      alignment: const Alignment(0, 0.3),
+      gestureIcon: Icons.swipe,
+      title: s.hintFilterDay,
+      description: s.hintFilterDayDesc,
+    ),
+  ];
+}
 
-const agendaHints = [
-  HintItem(
-    alignment: Alignment(0, -0.3),
-    gestureIcon: Icons.touch_app,
-    title: 'Tik voor weerdetails',
-    description: 'Tik op een gekleurd uurvak om temperatuur, regen en wind te bekijken.',
-  ),
-  HintItem(
-    alignment: Alignment(0, 0.4),
-    gestureIcon: Icons.swipe_vertical,
-    title: 'Sleep om uren te selecteren',
-    description: 'Houd een vak ingedrukt en sleep verticaal om meerdere uren te selecteren. '
-        'Tik daarna op "Rit inplannen" onderaan.',
-  ),
-];
+List<HintItem> agendaHints(BuildContext context) {
+  final s = S.of(context);
+  return [
+    HintItem(
+      alignment: const Alignment(0, -0.3),
+      gestureIcon: Icons.touch_app,
+      title: s.hintTapWeatherDetail,
+      description: s.hintTapWeatherDetailDesc,
+    ),
+    HintItem(
+      alignment: const Alignment(0, 0.4),
+      gestureIcon: Icons.swipe_vertical,
+      title: s.hintDragSelect,
+      description: s.hintDragSelectDesc,
+    ),
+  ];
+}
 
-const ridesHints = [
-  HintItem(
-    alignment: Alignment(0, -0.3),
-    gestureIcon: Icons.touch_app,
-    title: 'Tik voor weersamenvatting',
-    description: 'Tik op een rit voor een uitgebreid weeroverzicht per uur, '
-        'score-opbouw en windadvies.',
-  ),
-  HintItem(
-    alignment: Alignment(0, 0.4),
-    gestureIcon: Icons.swipe_left,
-    title: 'Swipe om te verwijderen',
-    description: 'Veeg een rit naar links om hem te verwijderen.',
-  ),
-];
+List<HintItem> ridesHints(BuildContext context) {
+  final s = S.of(context);
+  return [
+    HintItem(
+      alignment: const Alignment(0, -0.3),
+      gestureIcon: Icons.touch_app,
+      title: s.hintTapSummary,
+      description: s.hintTapSummaryDesc,
+    ),
+    HintItem(
+      alignment: const Alignment(0, 0.4),
+      gestureIcon: Icons.swipe_left,
+      title: s.hintSwipeDelete,
+      description: s.hintSwipeDeleteDesc,
+    ),
+  ];
+}
