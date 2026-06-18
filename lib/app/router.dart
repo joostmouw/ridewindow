@@ -17,6 +17,7 @@ import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
 import 'package:ridewindow/features/agenda/week_agenda_screen.dart';
+import 'package:ridewindow/features/planned/planned_rides_screen.dart';
 
 part 'router.g.dart';
 
@@ -113,6 +114,15 @@ GoRouter router(Ref ref) {
                 path: '/agenda',
                 pageBuilder: (context, state) =>
                     _fadeTransition(state, const WeekAgendaScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/rides',
+                pageBuilder: (context, state) =>
+                    _fadeTransition(state, const PlannedRidesScreen()),
               ),
             ],
           ),

@@ -3,12 +3,14 @@
 // Toont score-banner, info-kaart "Weer", uurlijkse tabel en werkende agenda-knop.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_row.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
@@ -19,7 +21,7 @@ typedef CalendarServiceFactory = CalendarService Function();
 
 CalendarService _defaultCalendarServiceFactory() => CalendarService();
 
-class RideDetailScreen extends StatefulWidget {
+class RideDetailScreen extends ConsumerStatefulWidget {
   final RideSlot slot;
   final List<HourlyForecast> forecasts;
 
@@ -38,10 +40,10 @@ class RideDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<RideDetailScreen> createState() => _RideDetailScreenState();
+  ConsumerState<RideDetailScreen> createState() => _RideDetailScreenState();
 }
 
-class _RideDetailScreenState extends State<RideDetailScreen> {
+class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   bool _isLoading = false;
 
   // ---------------------------------------------------------------------------
@@ -503,8 +505,8 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFF2E7D32),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -512,10 +514,36 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
+            onPressed: () {
+              ref.read(plannedRidesProvider.notifier).add(
+                    PlannedRide(
+                      start: widget.slot.start,
+                      end: widget.slot.end,
+                      plannedScore: widget.slot.overallScore,
+                    ),
+                  );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Rit ingepland!')),
+              );
+            },
+            icon: const Icon(Icons.directions_bike),
+            label: const Text('Rit inplannen'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF2E7D32),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: const BorderSide(color: Color(0xFF2E7D32)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             onPressed: _isLoading ? null : _addToCalendar,
-            child: _isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text('Toevoegen aan agenda'),
+            icon: _isLoading
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.calendar_month, size: 18),
+            label: const Text('Toevoegen aan Google Agenda'),
           ),
           const SizedBox(height: 10),
           ElevatedButton.icon(

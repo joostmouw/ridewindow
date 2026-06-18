@@ -1,87 +1,36 @@
-// lib/features/agenda/week_agenda_screen.dart
-// Week Agenda: horizontal day columns with weather quality + availability overlay.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import 'package:ridewindow/domain/models/ride_slot.dart';
-import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/hourly_scores_provider.dart';
+import 'package:ridewindow/providers/location_provider.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
+const int _kDayCount = 7;
+const _kHours = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 
-const int _firstHour = 6;
-const int _lastHour = 22;
-const int _dayCount = 10;
-const double _dayColumnWidth = 72.0;
-const double _hourBlockHeight = 38.0;
-const double _headerHeight = 56.0;
-const double _hourLabelWidth = 44.0;
-
-// Tier colors
-const Color _colorPerfect = Color(0xFF2E7D32);
-const Color _colorGreat = Color(0xFF66BB6A);
-const Color _colorAcceptable = Color(0xFFFFB74D);
-const Color _colorNoData = Color(0xFFF5F5F5);
-const Color _colorBlocked = Color(0x55E53935);
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-Color _tierColor(RideTier tier) {
-  return switch (tier) {
-    Perfect() => _colorPerfect,
-    Great() => _colorGreat,
-    Acceptable() => _colorAcceptable,
-    Poor() => const Color(0xFFEF9A9A),
-  };
-}
-
-Color _scoreToColor(double score) {
-  if (score >= 80) return _colorPerfect;
-  if (score >= 60) return _colorGreat;
-  if (score >= 40) return _colorAcceptable;
+Color _scoreColor(double score) {
+  if (score >= 85) return const Color(0xFF2E7D32);
+  if (score >= 70) return const Color(0xFF66BB6A);
+  if (score >= 50) return const Color(0xFFFFB74D);
   return const Color(0xFFEF9A9A);
 }
 
-/// Check if a given hour on a given day is blocked, by projecting the weekly
-/// availability pattern onto the target date.
-bool _isHourBlocked(
-  DateTime targetDay,
-  int hour,
-  Map<DateTime, BlockType> blockedHours,
-) {
-  final now = DateTime.now();
-  final weekStart = DateTime.utc(
-    now.year,
-    now.month,
-    now.day - (now.weekday - 1),
-  );
-  final equivalentDay = weekStart.add(Duration(days: targetDay.weekday - 1));
-  final key = DateTime.utc(equivalentDay.year, equivalentDay.month, equivalentDay.day, hour);
-  return blockedHours.containsKey(key);
+String _tierLabel(double score) {
+  if (score >= 85) return 'Perfect';
+  if (score >= 70) return 'Geweldig';
+  if (score >= 50) return 'Oké';
+  return 'Slecht';
 }
 
-/// Find the ride slot that covers this hour cell, if any.
-RideSlot? _slotForHour(DateTime day, int hour, List<RideSlot> slots) {
-  final cellStart = DateTime(day.year, day.month, day.day, hour);
-  final cellEnd = cellStart.add(const Duration(hours: 1));
-  for (final s in slots) {
-    if (s.start.isBefore(cellEnd) && s.end.isAfter(cellStart)) {
-      return s;
-    }
-  }
-  return null;
-}
-
-/// Get the hourly score for a specific hour on a specific day.
-HourlyScore? _scoreForHour(DateTime day, int hour, List<HourlyScore> scores) {
+HourlyScore? _findScore(DateTime day, int hour, List<HourlyScore> scores) {
   for (final s in scores) {
     if (s.time.year == day.year &&
         s.time.month == day.month &&
@@ -93,8 +42,51 @@ HourlyScore? _scoreForHour(DateTime day, int hour, List<HourlyScore> scores) {
   return null;
 }
 
+HourlyForecast? _findForecast(DateTime day, int hour, List<HourlyForecast> forecasts) {
+  for (final f in forecasts) {
+    if (f.time.year == day.year &&
+        f.time.month == day.month &&
+        f.time.day == day.day &&
+        f.time.hour == hour) {
+      return f;
+    }
+  }
+  return null;
+}
+
+bool _isBlocked(DateTime day, int hour, Map<DateTime, BlockType> blocked) {
+  final now = DateTime.now();
+  final weekStart = DateTime.utc(now.year, now.month, now.day - (now.weekday - 1));
+  final equiv = weekStart.add(Duration(days: day.weekday - 1));
+  final key = DateTime.utc(equiv.year, equiv.month, equiv.day, hour);
+  return blocked.containsKey(key);
+}
+
+String _windDirection(double? deg) {
+  if (deg == null) return '?';
+  const dirs = ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'];
+  return dirs[((deg + 22.5) % 360 ~/ 45)];
+}
+
 // ---------------------------------------------------------------------------
-// WeekAgendaScreen
+// Selection state: which day column + hour range is being selected
+// ---------------------------------------------------------------------------
+
+class _Selection {
+  final int dayIndex;
+  final int startHour;
+  final int endHour; // inclusive
+
+  const _Selection({required this.dayIndex, required this.startHour, required this.endHour});
+
+  bool contains(int di, int hour) =>
+      di == dayIndex && hour >= startHour && hour <= endHour;
+
+  int get count => endHour - startHour + 1;
+}
+
+// ---------------------------------------------------------------------------
+// Main screen
 // ---------------------------------------------------------------------------
 
 class WeekAgendaScreen extends ConsumerStatefulWidget {
@@ -106,41 +98,145 @@ class WeekAgendaScreen extends ConsumerStatefulWidget {
 
 class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
   bool _showBlocked = true;
+  bool _showHints = false;
+  _Selection? _selection;
+
+  // Keys for hit-testing during drag
+  final _cellKeys = <String, GlobalKey>{};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await shouldShowHint('agenda') && mounted) {
+        setState(() => _showHints = true);
+      }
+    });
+  }
+
+  GlobalKey _keyFor(int dayIndex, int hour) {
+    final k = '${dayIndex}_$hour';
+    return _cellKeys.putIfAbsent(k, () => GlobalKey());
+  }
+
+  /// Find which cell (dayIndex, hour) is at a global position.
+  (int, int)? _cellAt(Offset globalPos) {
+    for (final entry in _cellKeys.entries) {
+      final ro = entry.value.currentContext?.findRenderObject() as RenderBox?;
+      if (ro == null || !ro.attached) continue;
+      final pos = ro.localToGlobal(Offset.zero);
+      final size = ro.size;
+      if (globalPos.dx >= pos.dx &&
+          globalPos.dx <= pos.dx + size.width &&
+          globalPos.dy >= pos.dy &&
+          globalPos.dy <= pos.dy + size.height) {
+        final parts = entry.key.split('_');
+        return (int.parse(parts[0]), int.parse(parts[1]));
+      }
+    }
+    return null;
+  }
+
+  int? _dragStartHour;
+  int? _dragDayIndex;
+
+  void _onLongPressStart(LongPressStartDetails details) {
+    final hit = _cellAt(details.globalPosition);
+    if (hit == null) return;
+    _dragDayIndex = hit.$1;
+    _dragStartHour = hit.$2;
+    setState(() {
+      _selection = _Selection(dayIndex: hit.$1, startHour: hit.$2, endHour: hit.$2);
+    });
+  }
+
+  void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    if (_dragDayIndex == null || _dragStartHour == null) return;
+    final hit = _cellAt(details.globalPosition);
+    if (hit == null || hit.$1 != _dragDayIndex) return;
+    final h = hit.$2;
+    final lo = h < _dragStartHour! ? h : _dragStartHour!;
+    final hi = h > _dragStartHour! ? h : _dragStartHour!;
+    setState(() {
+      _selection = _Selection(dayIndex: _dragDayIndex!, startHour: lo, endHour: hi);
+    });
+  }
+
+  void _onLongPressEnd(LongPressEndDetails details) {
+    // Selection stays visible until user acts on it or taps elsewhere
+    _dragStartHour = null;
+    _dragDayIndex = null;
+  }
+
+  void _clearSelection() {
+    setState(() => _selection = null);
+  }
+
+  void _planSelection(List<DateTime> days, List<HourlyScore> allScores) {
+    final sel = _selection;
+    if (sel == null) return;
+    final day = days[sel.dayIndex];
+    final start = day.add(Duration(hours: sel.startHour));
+    final end = day.add(Duration(hours: sel.endHour + 1));
+
+    // Average score over selected hours
+    double sum = 0;
+    int count = 0;
+    for (var h = sel.startHour; h <= sel.endHour; h++) {
+      final s = _findScore(day, h, allScores);
+      if (s != null) {
+        sum += s.overall;
+        count++;
+      }
+    }
+    final avgScore = count > 0 ? sum / count : 0.0;
+
+    ref.read(plannedRidesProvider.notifier).add(
+          PlannedRide(start: start, end: end, plannedScore: avgScore),
+        );
+    setState(() => _selection = null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Rit ingepland (${sel.count}u)!')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final slotsState = ref.watch(slotsProvider);
     final availValue = ref.watch(availabilityProvider);
+    final allScores = ref.watch(allHourlyScoresProvider);
+    final weatherValue = ref.watch(weatherProvider);
+    final locationAsync = ref.watch(locationProvider);
     final slots = (slotsState is SlotsLoaded) ? slotsState.slots : <RideSlot>[];
     final blockedHours = availValue.value ?? <DateTime, BlockType>{};
-
-    // Collect all hourly scores from all slots for coloring individual hours
-    final allScores = <HourlyScore>[];
-    for (final slot in slots) {
-      allScores.addAll(slot.hours);
-    }
+    final forecasts = weatherValue.value ?? <HourlyForecast>[];
+    final cityName = locationAsync.value?.city ?? '';
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final days = List.generate(_dayCount, (i) => today.add(Duration(days: i)));
+    final days = List.generate(_kDayCount, (i) => today.add(Duration(days: i)));
 
     final theme = Theme.of(context);
 
-    return Scaffold(
+    return Stack(
+      children: [
+        Scaffold(
       appBar: AppBar(
         title: const Text('Agenda'),
         actions: [
+          if (_selection != null) ...[
+            TextButton(
+              onPressed: _clearSelection,
+              child: const Text('Annuleer'),
+            ),
+          ],
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Bloktijden',
-                style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface),
-              ),
+              Text('Bezet', style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface)),
               Switch(
                 value: _showBlocked,
                 onChanged: (v) => setState(() => _showBlocked = v),
-                activeTrackColor: theme.colorScheme.primary,
               ),
             ],
           ),
@@ -148,59 +244,174 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
       ),
       body: Column(
         children: [
-          // Legend
-          _Legend(showBlocked: _showBlocked),
+          // Legend + selection hint
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              children: [
+                if (_selection == null) ...[
+                  const _Dot(color: Color(0xFF2E7D32), label: 'Perfect'),
+                  const SizedBox(width: 10),
+                  const _Dot(color: Color(0xFF66BB6A), label: 'Geweldig'),
+                  const SizedBox(width: 10),
+                  const _Dot(color: Color(0xFFFFB74D), label: 'Oké'),
+                  const SizedBox(width: 10),
+                  const _Dot(color: Color(0xFFEF9A9A), label: 'Slecht'),
+                ] else ...[
+                  Icon(Icons.touch_app, size: 14, color: theme.colorScheme.primary),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${_selection!.count} uur geselecteerd',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
           const Divider(height: 1),
           // Grid
           Expanded(
-            child: _AgendaGrid(
-              days: days,
-              today: today,
-              slots: slots,
-              allScores: allScores,
-              blockedHours: blockedHours,
-              showBlocked: _showBlocked,
+            child: GestureDetector(
+              onLongPressStart: _onLongPressStart,
+              onLongPressMoveUpdate: _onLongPressMoveUpdate,
+              onLongPressEnd: _onLongPressEnd,
+              child: _buildGrid(context, days, today, allScores, forecasts, cityName, blockedHours),
             ),
           ),
+          // Selection action bar
+          if (_selection != null)
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => _planSelection(days, allScores),
+                    icon: const Icon(Icons.directions_bike),
+                    label: Text('Rit inplannen (${_selection!.count}u)'),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
+    ),
+        if (_showHints)
+          ScreenHintOverlay(
+            hints: agendaHints,
+            onDismiss: () {
+              markHintSeen('agenda');
+              setState(() => _showHints = false);
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildGrid(
+    BuildContext context,
+    List<DateTime> days,
+    DateTime today,
+    List<HourlyScore> allScores,
+    List<HourlyForecast> forecasts,
+    String cityName,
+    Map<DateTime, BlockType> blockedHours,
+  ) {
+    final theme = Theme.of(context);
+    final dayFmt = DateFormat('E', 'nl_NL');
+
+    return Column(
+      children: [
+        // Day headers
+        SizedBox(
+          height: 36,
+          child: Row(
+            children: [
+              const SizedBox(width: 28),
+              for (var di = 0; di < days.length; di++)
+                Expanded(
+                  child: Container(
+                    color: days[di] == today ? theme.colorScheme.primaryContainer : null,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          days[di] == today ? 'Nu' : dayFmt.format(days[di]),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: days[di] == today
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        Text(
+                          '${days[di].day}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: days[di] == today
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        // Hour rows
+        for (final hour in _kHours)
+          Expanded(
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 28,
+                  child: Center(
+                    child: Text(
+                      '$hour',
+                      style: const TextStyle(fontSize: 10, color: Color(0xFF888888)),
+                    ),
+                  ),
+                ),
+                for (var di = 0; di < days.length; di++)
+                  Expanded(
+                    child: _CellWidget(
+                      key: _keyFor(di, hour),
+                      day: days[di],
+                      dayIndex: di,
+                      hour: hour,
+                      allScores: allScores,
+                      forecasts: forecasts,
+                      cityName: cityName,
+                      blockedHours: blockedHours,
+                      showBlocked: _showBlocked,
+                      isToday: days[di] == today,
+                      isSelected: _selection?.contains(di, hour) ?? false,
+                      onTap: _selection != null ? _clearSelection : null,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// _Legend
+// Legend dot
 // ---------------------------------------------------------------------------
 
-class _Legend extends StatelessWidget {
-  const _Legend({required this.showBlocked});
-
-  final bool showBlocked;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        children: [
-          const _LegendDot(color: _colorPerfect, label: 'Perfect'),
-          const SizedBox(width: 12),
-          const _LegendDot(color: _colorGreat, label: 'Geweldig'),
-          const SizedBox(width: 12),
-          const _LegendDot(color: _colorAcceptable, label: 'Oké'),
-          if (showBlocked) ...[
-            const SizedBox(width: 12),
-            const _LegendDot(color: Color(0xFFE53935), label: 'Bezet'),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _LegendDot extends StatelessWidget {
-  const _LegendDot({required this.color, required this.label});
-
+class _Dot extends StatelessWidget {
+  const _Dot({required this.color, required this.label});
   final Color color;
   final String label;
 
@@ -209,271 +420,222 @@ class _LegendDot extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 11)),
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 3),
+        Text(label, style: const TextStyle(fontSize: 10)),
       ],
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// _AgendaGrid — fixed hour labels + horizontally scrolling day columns
+// Single cell
 // ---------------------------------------------------------------------------
 
-class _AgendaGrid extends StatelessWidget {
-  const _AgendaGrid({
-    required this.days,
-    required this.today,
-    required this.slots,
+class _CellWidget extends ConsumerWidget {
+  const _CellWidget({
+    super.key,
+    required this.day,
+    required this.dayIndex,
+    required this.hour,
     required this.allScores,
+    required this.forecasts,
+    required this.cityName,
     required this.blockedHours,
     required this.showBlocked,
+    required this.isToday,
+    required this.isSelected,
+    this.onTap,
   });
 
-  final List<DateTime> days;
-  final DateTime today;
-  final List<RideSlot> slots;
+  final DateTime day;
+  final int dayIndex;
+  final int hour;
   final List<HourlyScore> allScores;
+  final List<HourlyForecast> forecasts;
+  final String cityName;
   final Map<DateTime, BlockType> blockedHours;
   final bool showBlocked;
+  final bool isToday;
+  final bool isSelected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final score = _findScore(day, hour, allScores);
+    final blocked = showBlocked && _isBlocked(day, hour, blockedHours);
+    final color = score != null ? _scoreColor(score.overall) : const Color(0xFFE0E0E0);
+
+    return GestureDetector(
+      onTap: onTap ?? () => _showDetail(context, ref, score),
+      child: Container(
+        margin: const EdgeInsets.all(0.5),
+        decoration: BoxDecoration(
+          color: blocked ? color.withAlpha(80) : color,
+          borderRadius: BorderRadius.circular(3),
+          border: isSelected
+              ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
+              : null,
+        ),
+        child: blocked
+            ? const Center(child: Icon(Icons.block, size: 10, color: Color(0xAAE53935)))
+            : isSelected
+                ? Center(
+                    child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.primary),
+                  )
+                : null,
+      ),
+    );
+  }
+
+  void _showDetail(BuildContext context, WidgetRef ref, HourlyScore? score) {
+    final forecast = _findForecast(day, hour, forecasts);
+    if (score == null && forecast == null) return;
+
+    final dayFmt = DateFormat('EEEE d MMMM', 'nl_NL');
+    final theme = Theme.of(context);
+    final tierColor = score != null ? _scoreColor(score.overall) : Colors.grey;
+    final tierText = score != null ? _tierLabel(score.overall) : '?';
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        dayFmt.format(day),
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text('$hour:00 – ${hour + 1}:00', style: theme.textTheme.bodyLarge),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(color: tierColor, borderRadius: BorderRadius.circular(16)),
+                  child: Text(
+                    score != null ? '${score.overall.round()} — $tierText' : '?',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            if (cityName.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(cityName, style: theme.textTheme.bodySmall),
+            ],
+            const SizedBox(height: 16),
+            if (forecast != null) ...[
+              _DetailRow(icon: Icons.thermostat, label: 'Temperatuur',
+                value: '${forecast.temperatureC?.round() ?? '?'}°C (voelt als ${forecast.apparentTemperatureC?.round() ?? '?'}°C)'),
+              const SizedBox(height: 8),
+              _DetailRow(icon: Icons.water_drop, label: 'Neerslag',
+                value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm — ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
+              const SizedBox(height: 8),
+              _DetailRow(icon: Icons.air, label: 'Wind',
+                value: '${forecast.windspeedKmh?.round() ?? '?'} km/h ${_windDirection(forecast.winddirectionDeg)}'),
+            ],
+            if (score != null) ...[
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              Text('Score-opbouw', style: theme.textTheme.labelLarge),
+              const SizedBox(height: 8),
+              _ScoreBar(label: 'Temperatuur', value: score.temperatureScore),
+              const SizedBox(height: 4),
+              _ScoreBar(label: 'Regen', value: score.rainScore),
+              const SizedBox(height: 4),
+              _ScoreBar(label: 'Wind', value: score.windScore),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    final start = day.add(Duration(hours: hour));
+                    ref.read(plannedRidesProvider.notifier).add(
+                      PlannedRide(start: start, end: start.add(const Duration(hours: 1)), plannedScore: score.overall),
+                    );
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Rit ingepland!')),
+                    );
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Inplannen'),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.icon, required this.label, required this.value});
+  final IconData icon;
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Fixed hour labels on the left
-        SizedBox(
-          width: _hourLabelWidth,
-          child: Column(
-            children: [
-              SizedBox(height: _headerHeight),
-              for (int h = _firstHour; h <= _lastHour; h++)
-                SizedBox(
-                  height: _hourBlockHeight,
-                  child: Center(
-                    child: Text(
-                      '${h.toString().padLeft(2, '0')}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF999999),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        // Horizontally scrollable day columns
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final day in days)
-                  _DayColumn(
-                    day: day,
-                    isToday: day == today,
-                    slots: slots,
-                    allScores: allScores,
-                    blockedHours: blockedHours,
-                    showBlocked: showBlocked,
-                  ),
-              ],
-            ),
-          ),
-        ),
+        Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+        const SizedBox(width: 8),
+        Expanded(child: Text(value, textAlign: TextAlign.end)),
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// _DayColumn — one vertical column per day
-// ---------------------------------------------------------------------------
-
-class _DayColumn extends StatelessWidget {
-  const _DayColumn({
-    required this.day,
-    required this.isToday,
-    required this.slots,
-    required this.allScores,
-    required this.blockedHours,
-    required this.showBlocked,
-  });
-
-  final DateTime day;
-  final bool isToday;
-  final List<RideSlot> slots;
-  final List<HourlyScore> allScores;
-  final Map<DateTime, BlockType> blockedHours;
-  final bool showBlocked;
-
-  static final _dayFmt = DateFormat('EEE', 'nl_NL');
+class _ScoreBar extends StatelessWidget {
+  const _ScoreBar({required this.label, required this.value});
+  final String label;
+  final double value;
 
   @override
   Widget build(BuildContext context) {
-    final dayLabel = isToday ? 'Vandaag' : _dayFmt.format(day);
-    final dateLabel = '${day.day}/${day.month}';
-
-    return SizedBox(
-      width: _dayColumnWidth,
-      child: Column(
-        children: [
-          // Day header
-          Container(
-            height: _headerHeight,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: isToday
-                  ? Theme.of(context).colorScheme.primaryContainer
-                  : null,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  dayLabel,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.w600,
-                    color: isToday
-                        ? Theme.of(context).colorScheme.primary
-                        : const Color(0xFF666666),
-                  ),
-                ),
-                Text(
-                  dateLabel,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isToday
-                        ? Theme.of(context).colorScheme.primary
-                        : const Color(0xFF333333),
-                  ),
-                ),
-              ],
+    return Row(
+      children: [
+        SizedBox(width: 90, child: Text(label, style: const TextStyle(fontSize: 12))),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: value / 100,
+              minHeight: 8,
+              backgroundColor: const Color(0xFFE0E0E0),
+              valueColor: AlwaysStoppedAnimation(_scoreColor(value)),
             ),
           ),
-          // Hour blocks
-          for (int h = _firstHour; h <= _lastHour; h++)
-            _HourBlock(
-              day: day,
-              hour: h,
-              slots: slots,
-              allScores: allScores,
-              blockedHours: blockedHours,
-              showBlocked: showBlocked,
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// _HourBlock — single cell showing weather quality + optional blocked overlay
-// ---------------------------------------------------------------------------
-
-class _HourBlock extends StatelessWidget {
-  const _HourBlock({
-    required this.day,
-    required this.hour,
-    required this.slots,
-    required this.allScores,
-    required this.blockedHours,
-    required this.showBlocked,
-  });
-
-  final DateTime day;
-  final int hour;
-  final List<RideSlot> slots;
-  final List<HourlyScore> allScores;
-  final Map<DateTime, BlockType> blockedHours;
-  final bool showBlocked;
-
-  @override
-  Widget build(BuildContext context) {
-    final slot = _slotForHour(day, hour, slots);
-    final blocked = _isHourBlocked(day, hour, blockedHours);
-
-    // Determine background color based on weather quality
-    Color bgColor;
-    String? label;
-
-    if (slot != null) {
-      // This hour is part of a ride slot — color by tier
-      bgColor = _tierColor(slot.tier);
-      // Show score on the first hour of the slot
-      if (slot.start.hour == hour) {
-        label = '${slot.overallScore.round()}';
-      }
-    } else {
-      // Check hourly scores for weather coloring even outside slots
-      final score = _scoreForHour(day, hour, allScores);
-      if (score != null) {
-        bgColor = _scoreToColor(score.overall);
-      } else {
-        bgColor = _colorNoData;
-      }
-    }
-
-    return Container(
-      width: _dayColumnWidth,
-      height: _hourBlockHeight,
-      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(4),
-        border: slot != null
-            ? Border.all(color: _tierColor(slot.tier), width: 1.5)
-            : null,
-      ),
-      child: Stack(
-        children: [
-          // Score label
-          if (label != null)
-            Center(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          // Blocked overlay (diagonal stripes effect via icon)
-          if (showBlocked && blocked)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: _colorBlocked,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.block,
-                    size: 16,
-                    color: Color(0xAAE53935),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 28,
+          child: Text(
+            '${value.round()}',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
     );
   }
 }

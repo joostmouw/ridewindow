@@ -6,6 +6,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -22,6 +23,9 @@ Future<void> main() async {
 
   // Laad timezone-data synchroon in geheugen (vereist voor flutter_local_notifications).
   tz.initializeTimeZones();
+
+  // Laad intl locale-data (vereist voor DateFormat met 'nl_NL').
+  await initializeDateFormatting('nl_NL');
 
   // Parallel laden: timezone + SharedPreferences voor snelle cold start.
   final tzFuture = FlutterTimezone.getLocalTimezone();

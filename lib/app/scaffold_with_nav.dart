@@ -31,6 +31,11 @@ class ScaffoldWithNav extends StatelessWidget {
             label: 'Agenda',
           ),
           NavigationDestination(
+            icon: Icon(Icons.directions_bike_outlined),
+            selectedIcon: Icon(Icons.directions_bike),
+            label: 'Ritten',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
             label: 'Profiel',

@@ -19,6 +19,7 @@ import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
+import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -30,6 +31,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  bool _showHints = false;
+
   /// null = toon alle slots; non-null = filter op dag.
   DateTime? _selectedDay;
 
@@ -47,6 +50,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _pulseAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    // Show screen hints on first visit
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await shouldShowHint('home') && mounted) {
+        setState(() => _showHints = true);
+      }
+    });
   }
 
   @override
@@ -77,24 +86,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final lastRefreshedAsync = ref.watch(lastRefreshedProvider);
     final userName = ref.watch(profileProvider).value?.userName;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(cityName, weatherState, lastRefreshedAsync, slotsState, userName),
-            _buildWeekStrip(slotsState),
-            Expanded(
-              child: RefreshIndicator(
-                color: const Color(0xFF2E7D32),
-                onRefresh: () => ref.refresh(weatherProvider.future),
-                child: _buildCardsSection(weatherState, slotsState),
-              ),
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: const Color(0xFFF5F5F5),
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(cityName, weatherState, lastRefreshedAsync, slotsState, userName),
+                _buildWeekStrip(slotsState),
+                Expanded(
+                  child: RefreshIndicator(
+                    color: const Color(0xFF2E7D32),
+                    onRefresh: () => ref.refresh(weatherProvider.future),
+                    child: _buildCardsSection(weatherState, slotsState),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        if (_showHints)
+          ScreenHintOverlay(
+            hints: homeHints,
+            onDismiss: () {
+              markHintSeen('home');
+              setState(() => _showHints = false);
+            },
+          ),
+      ],
     );
   }
 
