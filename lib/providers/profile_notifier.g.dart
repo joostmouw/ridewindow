@@ -54,7 +54,7 @@ final class ProfileNotifierProvider
   ProfileNotifier create() => ProfileNotifier();
 }
 
-String _$profileNotifierHash() => r'e121e347ce2657539a0e1705b1aa7b156cbf4c31';
+String _$profileNotifierHash() => r'9aa32d6e212c4844409be7ff0aaef1b18cb916c0';
 
 /// ProfileNotifier laadt alle scalaire gebruikersinstellingen uit SharedPreferences
 /// op cold start en schrijft iedere update direct terug.

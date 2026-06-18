@@ -16,6 +16,7 @@ import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
+import 'package:ridewindow/features/agenda/week_agenda_screen.dart';
 
 part 'router.g.dart';
 
@@ -103,6 +104,15 @@ GoRouter router(Ref ref) {
                 path: '/home',
                 pageBuilder: (context, state) =>
                     _fadeTransition(state, const HomeScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/agenda',
+                pageBuilder: (context, state) =>
+                    _fadeTransition(state, const WeekAgendaScreen()),
               ),
             ],
           ),
