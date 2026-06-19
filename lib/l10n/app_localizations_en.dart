@@ -75,6 +75,27 @@ class SEn extends S {
   String get filterEvening => 'Evening';
 
   @override
+  String get adjustTime => 'ADJUST TIME';
+
+  @override
+  String get startLabel => 'Start';
+
+  @override
+  String get endLabel => 'End';
+
+  @override
+  String get infoTemp =>
+      'The green zone shows your ideal temperature range. The dot shows the average temperature for this ride window. Adjust your range in Profile.';
+
+  @override
+  String get infoRain =>
+      'The green zone shows your rain tolerance. The dot shows the total expected precipitation. Less rain = better ride.';
+
+  @override
+  String get infoWind =>
+      'The green zone shows your wind comfort limit. The dot shows the average wind speed. Strong wind makes cycling harder and less safe.';
+
+  @override
   String get dayMon => 'MON';
 
   @override
@@ -163,6 +184,9 @@ class SEn extends S {
 
   @override
   String get tierPoorAgenda => 'Poor';
+
+  @override
+  String get legendPlanned => 'Planned';
 
   @override
   String get bestChoice => 'Best choice';

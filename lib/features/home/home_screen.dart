@@ -14,6 +14,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/weather_icon.dart';
+import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -880,16 +881,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               ),
               const SizedBox(height: 10),
-              // Weather chips met echte gemiddelde weersdata
-              Row(
-                children: [
-                  _buildWeatherChip('🌡', tempLabel),
-                  const SizedBox(width: 6),
-                  _buildWeatherChip('🌧', precipLabel),
-                  const SizedBox(width: 6),
-                  _buildWeatherChip('💨', windLabel),
-                ],
-              ),
+              // Weather indicator bars
+              if (avgTemp != null || totalPrecip != null || avgWind != null)
+                _buildWeatherBars(
+                  avgTemp: avgTemp,
+                  totalPrecip: totalPrecip,
+                  avgWind: avgWind,
+                ),
               const SizedBox(height: 12),
               // Footer: Plan het knop
               Row(
@@ -927,17 +925,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildWeatherChip(String emoji, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        '$emoji $value',
-        style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
-      ),
+  Widget _buildWeatherBars({
+    double? avgTemp,
+    double? totalPrecip,
+    double? avgWind,
+  }) {
+    final s = S.of(context);
+    final profile = ref.watch(profileProvider).value;
+    final tol = profile?.tolerances;
+    final tempMin = tol?.tempMinIdealC ?? 12.0;
+    final tempMax = tol?.tempMaxIdealC ?? 26.0;
+    final windMax = tol?.windMaxIdealKmh ?? 15.0;
+    final rainMax = tol?.rainMaxIdealMm ?? 0.5;
+
+    return Column(
+      children: [
+        if (avgTemp != null)
+          WeatherIndicatorBar(
+            icon: Icons.thermostat,
+            label: s.weatherTemperature,
+            value: avgTemp,
+            unit: '\u00B0',
+            min: -10,
+            max: 45,
+            idealMin: tempMin,
+            idealMax: tempMax,
+            infoText: s.infoTemp,
+          ),
+        if (totalPrecip != null) ...[
+          const SizedBox(height: 4),
+          WeatherIndicatorBar(
+            icon: Icons.water_drop,
+            label: s.weatherRain,
+            value: totalPrecip,
+            unit: 'mm',
+            min: 0,
+            max: 10,
+            idealMax: rainMax,
+            infoText: s.infoRain,
+          ),
+        ],
+        if (avgWind != null) ...[
+          const SizedBox(height: 4),
+          WeatherIndicatorBar(
+            icon: Icons.air,
+            label: s.weatherWind,
+            value: avgWind,
+            unit: 'km/h',
+            min: 0,
+            max: 60,
+            idealMax: windMax,
+            infoText: s.infoWind,
+          ),
+        ],
+      ],
     );
   }
 

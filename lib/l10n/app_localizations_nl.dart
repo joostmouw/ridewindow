@@ -75,6 +75,27 @@ class SNl extends S {
   String get filterEvening => 'Avond';
 
   @override
+  String get adjustTime => 'TIJD AANPASSEN';
+
+  @override
+  String get startLabel => 'Start';
+
+  @override
+  String get endLabel => 'Eind';
+
+  @override
+  String get infoTemp =>
+      'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.';
+
+  @override
+  String get infoRain =>
+      'De groene zone toont je regentolerantie. De stip toont de verwachte totale neerslag. Minder regen = betere rit.';
+
+  @override
+  String get infoWind =>
+      'De groene zone toont je windcomfortlimiet. De stip toont de gemiddelde windsnelheid. Harde wind maakt fietsen zwaarder en minder veilig.';
+
+  @override
   String get dayMon => 'MA';
 
   @override
@@ -163,6 +184,9 @@ class SNl extends S {
 
   @override
   String get tierPoorAgenda => 'Slecht';
+
+  @override
+  String get legendPlanned => 'Gepland';
 
   @override
   String get bestChoice => 'Beste keuze';

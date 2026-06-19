@@ -39,6 +39,14 @@
   "filterAfternoon": "Middag",
   "filterEvening": "Avond",
 
+  "adjustTime": "TIJD AANPASSEN",
+  "startLabel": "Start",
+  "endLabel": "Eind",
+
+  "infoTemp": "De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.",
+  "infoRain": "De groene zone toont je regentolerantie. De stip toont de verwachte totale neerslag. Minder regen = betere rit.",
+  "infoWind": "De groene zone toont je windcomfortlimiet. De stip toont de gemiddelde windsnelheid. Harde wind maakt fietsen zwaarder en minder veilig.",
+
   "dayMon": "MA",
   "dayTue": "DI",
   "dayWed": "WO",
@@ -73,6 +81,7 @@
   "tierGreatAgenda": "Geweldig",
   "tierAcceptableAgenda": "Ok\u00e9",
   "tierPoorAgenda": "Slecht",
+  "legendPlanned": "Gepland",
 
   "bestChoice": "Beste keuze",
   "schedule": "Inplannen",

@@ -13,7 +13,10 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart' show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/domain/models/hourly_score.dart';
+import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
@@ -54,6 +57,46 @@ class RideDetailScreen extends ConsumerStatefulWidget {
 
 class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   bool _isLoading = false;
+  late DateTime _start;
+  late DateTime _end;
+
+  @override
+  void initState() {
+    super.initState();
+    _start = widget.slot.start;
+    _end = widget.slot.end;
+  }
+
+  /// Get the effective slot hours and forecasts for the adjusted time range.
+  List<HourlyScore> get _effectiveHours {
+    final allScores = ref.read(allHourlyScoresProvider);
+    return allScores
+        .where((s) => !s.time.isBefore(_start) && s.time.isBefore(_end))
+        .toList()
+      ..sort((a, b) => a.time.compareTo(b.time));
+  }
+
+  List<HourlyForecast> get _effectiveForecasts {
+    final allForecasts = ref.read(weatherProvider).value ?? <HourlyForecast>[];
+    return allForecasts
+        .where((f) => !f.time.isBefore(_start) && f.time.isBefore(_end))
+        .toList()
+      ..sort((a, b) => a.time.compareTo(b.time));
+  }
+
+  RideSlot get _effectiveSlot {
+    final hours = _effectiveHours;
+    final avgScore = hours.isEmpty
+        ? widget.slot.overallScore
+        : hours.fold(0.0, (sum, s) => sum + s.overall) / hours.length;
+    return RideSlot(
+      start: _start,
+      end: _end,
+      overallScore: avgScore,
+      tier: rideTierFromScore(avgScore),
+      hours: hours,
+    );
+  }
 
   // ---------------------------------------------------------------------------
   // Helpers: tier-afhankelijke waarden
@@ -215,8 +258,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   Widget _buildAppBar(BuildContext context) {
     final s = S.of(context);
-    final duration = _fmtDuration(widget.slot.start, widget.slot.end);
-    final tierLabel = switch (widget.slot.tier) {
+    final slot = _effectiveSlot;
+    final duration = _fmtDuration(slot.start, slot.end);
+    final tierLabel = switch (slot.tier) {
       Perfect() => s.tierPerfect,
       Great() => s.tierGreat,
       Acceptable() => s.tierAcceptable,
@@ -228,7 +272,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${_fmtTime(widget.slot.start)} \u2013 ${_fmtTime(widget.slot.end)}',
+            '${_fmtTime(slot.start)} \u2013 ${_fmtTime(slot.end)}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           Text(
@@ -244,10 +288,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildScoreBanner(BuildContext context) {
-    final bg = _bannerBg(widget.slot.tier);
-    final fg = _bannerFg(widget.slot.tier);
-    final emoji = _tierEmoji(widget.slot.tier);
-    final description = _tierDescription(context, widget.slot.tier);
+    final slot = _effectiveSlot;
+    final bg = _bannerBg(slot.tier);
+    final fg = _bannerFg(slot.tier);
+    final emoji = _tierEmoji(slot.tier);
+    final description = _tierDescription(context, slot.tier);
 
     return Container(
       width: double.infinity,
@@ -261,7 +306,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ScoreBadge(tier: widget.slot.tier, heroTag: widget.heroTag),
+                ScoreBadge(tier: slot.tier, heroTag: widget.heroTag),
                 const SizedBox(height: 4),
                 Text(
                   description,
@@ -580,6 +625,158 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     );
   }
 
+  Widget _buildTimeAdjuster() {
+    final s = S.of(context);
+    final allScores = ref.watch(allHourlyScoresProvider);
+
+    // Scores for hours around the current range (context hours)
+    final contextStart = _start.subtract(const Duration(hours: 2));
+    final contextEnd = _end.add(const Duration(hours: 2));
+    final contextScores = allScores
+        .where((sc) => !sc.time.isBefore(contextStart) && sc.time.isBefore(contextEnd))
+        .toList()
+      ..sort((a, b) => a.time.compareTo(b.time));
+
+    final canShrinkStart = _end.difference(_start).inHours > 1;
+    final canShrinkEnd = _end.difference(_start).inHours > 1;
+    // Don't expand before 6:00 or after 22:00
+    final canExpandStart = _start.hour > 6;
+    final canExpandEnd = _end.hour < 22;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            s.adjustTime,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF999999),
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Start time adjuster
+          Row(
+            children: [
+              SizedBox(
+                width: 50,
+                child: Text(s.startLabel, style: const TextStyle(fontSize: 12, color: Color(0xFF666666))),
+              ),
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline, size: 20),
+                color: const Color(0xFF2E7D32),
+                onPressed: canExpandStart
+                    ? () => setState(() => _start = _start.subtract(const Duration(hours: 1)))
+                    : null,
+              ),
+              Text(
+                _fmtTime(_start),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline, size: 20),
+                color: const Color(0xFF2E7D32),
+                onPressed: canShrinkStart
+                    ? () => setState(() => _start = _start.add(const Duration(hours: 1)))
+                    : null,
+              ),
+            ],
+          ),
+          // End time adjuster
+          Row(
+            children: [
+              SizedBox(
+                width: 50,
+                child: Text(s.endLabel, style: const TextStyle(fontSize: 12, color: Color(0xFF666666))),
+              ),
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline, size: 20),
+                color: const Color(0xFF2E7D32),
+                onPressed: canShrinkEnd
+                    ? () => setState(() => _end = _end.subtract(const Duration(hours: 1)))
+                    : null,
+              ),
+              Text(
+                _fmtTime(_end),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline, size: 20),
+                color: const Color(0xFF2E7D32),
+                onPressed: canExpandEnd
+                    ? () => setState(() => _end = _end.add(const Duration(hours: 1)))
+                    : null,
+              ),
+              const Spacer(),
+              // Duration label
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${_end.difference(_start).inHours}u',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Per-hour score strip
+          SizedBox(
+            height: 28,
+            child: Row(
+              children: contextScores.map((sc) {
+                final isInRange = !sc.time.isBefore(_start) && sc.time.isBefore(_end);
+                final color = sc.overall >= 85
+                    ? const Color(0xFF2E7D32)
+                    : sc.overall >= 70
+                        ? const Color(0xFF66BB6A)
+                        : sc.overall >= 50
+                            ? const Color(0xFFFFB74D)
+                            : const Color(0xFFEF9A9A);
+                return Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 1),
+                    decoration: BoxDecoration(
+                      color: isInRange ? color : color.withAlpha(40),
+                      borderRadius: BorderRadius.circular(4),
+                      border: isInRange
+                          ? Border.all(color: const Color(0xFF1B5E20), width: 1)
+                          : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${sc.time.hour}',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: isInRange ? Colors.white : const Color(0xFF999999),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -596,11 +793,12 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
             ),
             onPressed: () {
+              final slot = _effectiveSlot;
               ref.read(plannedRidesProvider.notifier).add(
                     PlannedRide(
-                      start: widget.slot.start,
-                      end: widget.slot.end,
-                      plannedScore: widget.slot.overallScore,
+                      start: slot.start,
+                      end: slot.end,
+                      plannedScore: slot.overallScore,
                     ),
                   );
               ScaffoldMessenger.of(context).showSnackBar(
@@ -679,7 +877,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final hourlyRows = buildHourlyRows(widget.slot, widget.forecasts);
+    final slot = _effectiveSlot;
+    final forecasts = _effectiveForecasts;
+    final hourlyRows = buildHourlyRows(slot, forecasts);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
@@ -695,6 +895,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    _buildTimeAdjuster(),
                     _buildInfoCard(
                       title: S.of(context).weatherSection,
                       rows: [

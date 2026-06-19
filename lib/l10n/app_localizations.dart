@@ -205,6 +205,42 @@ abstract class S {
   /// **'Avond'**
   String get filterEvening;
 
+  /// No description provided for @adjustTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'TIJD AANPASSEN'**
+  String get adjustTime;
+
+  /// No description provided for @startLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Start'**
+  String get startLabel;
+
+  /// No description provided for @endLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Eind'**
+  String get endLabel;
+
+  /// No description provided for @infoTemp.
+  ///
+  /// In nl, this message translates to:
+  /// **'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.'**
+  String get infoTemp;
+
+  /// No description provided for @infoRain.
+  ///
+  /// In nl, this message translates to:
+  /// **'De groene zone toont je regentolerantie. De stip toont de verwachte totale neerslag. Minder regen = betere rit.'**
+  String get infoRain;
+
+  /// No description provided for @infoWind.
+  ///
+  /// In nl, this message translates to:
+  /// **'De groene zone toont je windcomfortlimiet. De stip toont de gemiddelde windsnelheid. Harde wind maakt fietsen zwaarder en minder veilig.'**
+  String get infoWind;
+
   /// No description provided for @dayMon.
   ///
   /// In nl, this message translates to:
@@ -384,6 +420,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Slecht'**
   String get tierPoorAgenda;
+
+  /// No description provided for @legendPlanned.
+  ///
+  /// In nl, this message translates to:
+  /// **'Gepland'**
+  String get legendPlanned;
 
   /// No description provided for @bestChoice.
   ///

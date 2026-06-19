@@ -178,6 +178,14 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     setState(() => _selection = null);
   }
 
+  bool _isPlanned(DateTime day, int hour) {
+    final plannedRides = ref.read(plannedRidesProvider);
+    final cellTime = DateTime(day.year, day.month, day.day, hour);
+    final cellEnd = cellTime.add(const Duration(hours: 1));
+    return plannedRides.any((r) =>
+        r.start.isBefore(cellEnd) && r.end.isAfter(cellTime));
+  }
+
   void _planSelection(List<DateTime> days, List<HourlyScore> allScores) {
     final sel = _selection;
     if (sel == null) return;
@@ -213,6 +221,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     final allScores = ref.watch(allHourlyScoresProvider);
     final weatherValue = ref.watch(weatherProvider);
     final locationAsync = ref.watch(locationProvider);
+    final plannedRides = ref.watch(plannedRidesProvider);
     final slots = (slotsState is SlotsLoaded) ? slotsState.slots : <RideSlot>[];
     final blockedHours = availValue.value ?? <DateTime, BlockType>{};
     final forecasts = weatherValue.value ?? <HourlyForecast>[];
@@ -246,6 +255,11 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
               ),
             ],
           ),
+          IconButton(
+            icon: const Icon(Icons.info_outline, size: 20),
+            tooltip: S.of(context).hintDragSelect,
+            onPressed: () => setState(() => _showHints = true),
+          ),
         ],
       ),
       body: Column(
@@ -257,12 +271,14 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
               children: [
                 if (_selection == null) ...[
                   _Dot(color: const Color(0xFF2E7D32), label: S.of(context).tierPerfectAgenda),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   _Dot(color: const Color(0xFF66BB6A), label: S.of(context).tierGreatAgenda),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   _Dot(color: const Color(0xFFFFB74D), label: S.of(context).tierAcceptableAgenda),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   _Dot(color: const Color(0xFFEF9A9A), label: S.of(context).tierPoorAgenda),
+                  const SizedBox(width: 8),
+                  _Dot(color: const Color(0xFF1565C0), label: S.of(context).legendPlanned),
                 ] else ...[
                   Icon(Icons.touch_app, size: 14, color: theme.colorScheme.primary),
                   const SizedBox(width: 4),
@@ -402,6 +418,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                       showBlocked: _showBlocked,
                       isToday: days[di] == today,
                       isSelected: _selection?.contains(di, hour) ?? false,
+                      isPlanned: _isPlanned(days[di], hour),
                       onTap: _selection != null ? _clearSelection : null,
                     ),
                   ),
@@ -452,6 +469,7 @@ class _CellWidget extends ConsumerWidget {
     required this.showBlocked,
     required this.isToday,
     required this.isSelected,
+    required this.isPlanned,
     this.onTap,
   });
 
@@ -465,6 +483,7 @@ class _CellWidget extends ConsumerWidget {
   final bool showBlocked;
   final bool isToday;
   final bool isSelected;
+  final bool isPlanned;
   final VoidCallback? onTap;
 
   @override
@@ -478,19 +497,29 @@ class _CellWidget extends ConsumerWidget {
       child: Container(
         margin: const EdgeInsets.all(0.5),
         decoration: BoxDecoration(
-          color: blocked ? color.withAlpha(80) : color,
+          color: isSelected
+              ? const Color(0xFF2E7D32)
+              : blocked
+                  ? color.withAlpha(80)
+                  : color,
           borderRadius: BorderRadius.circular(3),
           border: isSelected
-              ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
-              : null,
+              ? Border.all(color: const Color(0xFF1B5E20), width: 2)
+              : isPlanned
+                  ? Border.all(color: const Color(0xFF1565C0), width: 2)
+                  : null,
         ),
-        child: blocked
+        child: blocked && !isSelected
             ? const Center(child: Icon(Icons.block, size: 10, color: Color(0xAAE53935)))
             : isSelected
-                ? Center(
-                    child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.primary),
+                ? const Center(
+                    child: Icon(Icons.check, size: 12, color: Colors.white),
                   )
-                : null,
+                : isPlanned
+                    ? const Center(
+                        child: Icon(Icons.directions_bike, size: 10, color: Color(0xFF1565C0)),
+                      )
+                    : null,
       ),
     );
   }
