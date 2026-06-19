@@ -60,10 +60,19 @@ class SEn extends S {
   String get retryButton => 'Try again';
 
   @override
-  String get thisWeek => 'THIS WEEK';
+  String get thisWeek => 'COMING DAYS';
 
   @override
   String get rideTimes => 'RIDE TIMES';
+
+  @override
+  String get filterMorning => 'Morning';
+
+  @override
+  String get filterAfternoon => 'Afternoon';
+
+  @override
+  String get filterEvening => 'Evening';
 
   @override
   String get dayMon => 'MON';

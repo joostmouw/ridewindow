@@ -178,7 +178,7 @@ abstract class S {
   /// No description provided for @thisWeek.
   ///
   /// In nl, this message translates to:
-  /// **'DEZE WEEK'**
+  /// **'KOMENDE DAGEN'**
   String get thisWeek;
 
   /// No description provided for @rideTimes.
@@ -186,6 +186,24 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'RIJTIJDEN'**
   String get rideTimes;
+
+  /// No description provided for @filterMorning.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ochtend'**
+  String get filterMorning;
+
+  /// No description provided for @filterAfternoon.
+  ///
+  /// In nl, this message translates to:
+  /// **'Middag'**
+  String get filterAfternoon;
+
+  /// No description provided for @filterEvening.
+  ///
+  /// In nl, this message translates to:
+  /// **'Avond'**
+  String get filterEvening;
 
   /// No description provided for @dayMon.
   ///

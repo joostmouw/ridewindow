@@ -33,8 +33,11 @@
     }
   },
   "retryButton": "Opnieuw proberen",
-  "thisWeek": "DEZE WEEK",
+  "thisWeek": "KOMENDE DAGEN",
   "rideTimes": "RIJTIJDEN",
+  "filterMorning": "Ochtend",
+  "filterAfternoon": "Middag",
+  "filterEvening": "Avond",
 
   "dayMon": "MA",
   "dayTue": "DI",

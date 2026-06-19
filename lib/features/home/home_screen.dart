@@ -43,6 +43,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// null = toon alle slots; non-null = filter op dag.
   DateTime? _selectedDay;
 
+  /// Dagdeel filter: ochtend (6-12), middag (12-17), avond (17-22).
+  /// null in de set = die periode is actief. Lege set = alles uit (toon niets).
+  /// Standaard: alle drie actief (geen filtering).
+  final Set<_DayPeriod> _activePeriods = {
+    _DayPeriod.morning,
+    _DayPeriod.afternoon,
+    _DayPeriod.evening,
+  };
+
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
 
@@ -103,6 +112,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               children: [
                 _buildHeader(cityName, weatherState, lastRefreshedAsync, slotsState, userName),
                 _buildWeekStrip(slotsState),
+                _buildPeriodFilter(),
                 Expanded(
                   child: RefreshIndicator(
                     color: const Color(0xFF2E7D32),
@@ -235,14 +245,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildWeekStrip(SlotsState slotsState) {
-    // Bereken maandag van de huidige week.
+    // Vandaag + 6 dagen vooruit (altijd 7 dagen zichtbaar).
     final now = DateTime.now();
-    final weekStart =
-        now.subtract(Duration(days: now.weekday - DateTime.monday));
-    final days = List.generate(
-      7,
-      (i) => DateTime(weekStart.year, weekStart.month, weekStart.day + i),
-    );
+    final today = DateTime(now.year, now.month, now.day);
+    final days = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Container(
       color: Colors.white,
@@ -269,6 +275,97 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ],
       ),
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Period filter (ochtend / middag / avond)
+  // ---------------------------------------------------------------------------
+
+  Widget _buildPeriodFilter() {
+    final s = S.of(context);
+    final allActive = _activePeriods.length == 3;
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      child: Row(
+        children: [
+          _buildPeriodChip(_DayPeriod.morning, s.filterMorning, '06–12'),
+          const SizedBox(width: 8),
+          _buildPeriodChip(_DayPeriod.afternoon, s.filterAfternoon, '12–17'),
+          const SizedBox(width: 8),
+          _buildPeriodChip(_DayPeriod.evening, s.filterEvening, '17–22'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPeriodChip(_DayPeriod period, String label, String hours) {
+    final isActive = _activePeriods.contains(period);
+    final allActive = _activePeriods.length == 3;
+    // Als alles aan staat, toon alles als "niet gefilterd" (subtiel).
+    final isHighlighted = isActive && !allActive;
+
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        setState(() {
+          if (allActive) {
+            // Alles staat aan → selecteer alleen deze.
+            _activePeriods
+              ..clear()
+              ..add(period);
+          } else if (isActive && _activePeriods.length == 1) {
+            // Laatste actieve uitzetten → reset naar alles aan.
+            _activePeriods.addAll(_DayPeriod.values);
+          } else if (isActive) {
+            _activePeriods.remove(period);
+          } else {
+            _activePeriods.add(period);
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isHighlighted ? const Color(0xFF2E7D32) : const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isHighlighted ? const Color(0xFF2E7D32) : const Color(0xFFE0E0E0),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isHighlighted ? Colors.white : const Color(0xFF666666),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              hours,
+              style: TextStyle(
+                fontSize: 10,
+                color: isHighlighted ? Colors.white70 : const Color(0xFF999999),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool _slotMatchesPeriod(RideSlot slot) {
+    if (_activePeriods.length == 3) return true; // Geen filter actief.
+    final hour = slot.start.hour;
+    if (hour < 12 && _activePeriods.contains(_DayPeriod.morning)) return true;
+    if (hour >= 12 && hour < 17 && _activePeriods.contains(_DayPeriod.afternoon)) return true;
+    if (hour >= 17 && _activePeriods.contains(_DayPeriod.evening)) return true;
+    return false;
   }
 
   Widget _buildDayChip(DateTime day, SlotsState slotsState) {
@@ -427,7 +524,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         }).toList();
       }
 
-      if (slots.isEmpty && _selectedDay != null) {
+      // Filter op dagdeel (ochtend/middag/avond).
+      slots = slots.where(_slotMatchesPeriod).toList();
+
+      if (slots.isEmpty && (_selectedDay != null || _activePeriods.length < 3)) {
         return _buildEmptyState(S.of(context).emptyNoSlotsDay);
       }
 
@@ -951,6 +1051,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 // ---------------------------------------------------------------------------
 
 enum _DayClass { good, ok, bad }
+
+enum _DayPeriod {
+  morning,   // 6:00 – 11:59
+  afternoon, // 12:00 – 16:59
+  evening,   // 17:00 – 21:59
+}
 
 // ---------------------------------------------------------------------------
 // Staggered fade+slide animation wrapper for ride cards

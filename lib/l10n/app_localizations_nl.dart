@@ -60,10 +60,19 @@ class SNl extends S {
   String get retryButton => 'Opnieuw proberen';
 
   @override
-  String get thisWeek => 'DEZE WEEK';
+  String get thisWeek => 'KOMENDE DAGEN';
 
   @override
   String get rideTimes => 'RIJTIJDEN';
+
+  @override
+  String get filterMorning => 'Ochtend';
+
+  @override
+  String get filterAfternoon => 'Middag';
+
+  @override
+  String get filterEvening => 'Avond';
 
   @override
   String get dayMon => 'MA';

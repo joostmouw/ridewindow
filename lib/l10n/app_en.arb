@@ -17,8 +17,11 @@
   "rideWindowCount": "{count} ride {count, plural, =1{window} other{windows}} this week",
   "updatedAt": "Updated {time}",
   "retryButton": "Try again",
-  "thisWeek": "THIS WEEK",
+  "thisWeek": "COMING DAYS",
   "rideTimes": "RIDE TIMES",
+  "filterMorning": "Morning",
+  "filterAfternoon": "Afternoon",
+  "filterEvening": "Evening",
 
   "dayMon": "MON",
   "dayTue": "TUE",
