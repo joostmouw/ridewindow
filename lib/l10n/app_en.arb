@@ -339,5 +339,10 @@
   "dayShortThu": "Thu",
   "dayShortFri": "Fri",
   "dayShortSat": "Sat",
-  "dayShortSun": "Sun"
+  "dayShortSun": "Sun",
+
+  "importFromCalendar": "Import from Google Calendar",
+  "legendCalendar": "Calendar",
+  "calendarImportSuccess": "Calendar events imported!",
+  "calendarImportError": "Could not import calendar events"
 }

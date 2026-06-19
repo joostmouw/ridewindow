@@ -452,5 +452,10 @@
   "dayShortThu": "Do",
   "dayShortFri": "Vr",
   "dayShortSat": "Za",
-  "dayShortSun": "Zo"
+  "dayShortSun": "Zo",
+
+  "importFromCalendar": "Importeer uit Google Agenda",
+  "legendCalendar": "Agenda",
+  "calendarImportSuccess": "Agenda-afspraken geimporteerd!",
+  "calendarImportError": "Kon agenda-afspraken niet importeren"
 }

@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/services/calendar_service.dart';
 
 class AvailabilityScreen extends ConsumerStatefulWidget {
   const AvailabilityScreen({super.key});
@@ -20,6 +21,9 @@ class AvailabilityScreen extends ConsumerStatefulWidget {
 }
 
 class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
+  // Import state
+  bool _isImporting = false;
+
   // Drag state
   bool _isDragging = false;
   bool _dragBlocking = true;
@@ -74,6 +78,22 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       appBar: AppBar(
         title: Text(S.of(context).availabilityTitle),
         leading: const BackButton(),
+        actions: [
+          _isImporting
+              ? const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.event),
+                  tooltip: S.of(context).importFromCalendar,
+                  onPressed: () => _importFromCalendar(weekStart),
+                ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -202,6 +222,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           _legendItem(Colors.white, S.of(context).legendFree, context),
           _legendItem(const Color(0xFFFF9800), S.of(context).legendBusy, context),
           _legendItem(const Color(0xFFB0BEC5), S.of(context).legendWork, context),
+          _legendItem(const Color(0xFF64B5F6), S.of(context).legendCalendar, context),
         ],
       ),
     );
@@ -395,6 +416,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     return switch (blocked[key]) {
       BlockType.work => const Color(0xFFB0BEC5),
       BlockType.custom => const Color(0xFFFF9800),
+      BlockType.calendar => const Color(0xFF64B5F6),
       null => Colors.white,
     };
   }
@@ -402,7 +424,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   // --- Single cell tap ---
 
   void _onCellTap(DateTime key, Map<DateTime, BlockType> blocked) {
-    if (blocked[key] == BlockType.work) return;
+    if (blocked[key] == BlockType.work || blocked[key] == BlockType.calendar) return;
     HapticFeedback.lightImpact();
     ref.read(availabilityProvider.notifier).toggleCustomHour(key);
   }
@@ -431,7 +453,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (hit == null) return;
 
     final key = _cellKey(weekStart, hit.dayIndex, hit.hour);
-    if (blockedHours[key] == BlockType.work) return;
+    if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) return;
 
     setState(() {
       _isDragging = true;
@@ -452,7 +474,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (hit == null) return;
 
     final key = _cellKey(weekStart, hit.dayIndex, hit.hour);
-    if (blockedHours[key] == BlockType.work) return;
+    if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) return;
 
     if (!_draggedCells.contains(key)) {
       setState(() {
@@ -492,7 +514,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     for (int h = 0; h < 24; h++) {
       final key = _cellKey(weekStart, dayIndex, h);
-      if (blockedHours[key] == BlockType.work) continue;
+      if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) continue;
       keys.add(key);
       if (blockedHours[key] == BlockType.custom) {
         customCount++;
@@ -518,7 +540,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     for (int d = 0; d < 7; d++) {
       final key = _cellKey(weekStart, d, hour);
-      if (blockedHours[key] == BlockType.work) continue;
+      if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) continue;
       keys.add(key);
       if (blockedHours[key] == BlockType.custom) {
         customCount++;
@@ -531,6 +553,58 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     final block = freeCount >= customCount;
     HapticFeedback.mediumImpact();
     ref.read(availabilityProvider.notifier).setCustomHours(keys, block: block);
+  }
+
+  // --- Google Calendar import ---
+
+  Future<void> _importFromCalendar(DateTime weekStart) async {
+    setState(() => _isImporting = true);
+    try {
+      final weekEnd = weekStart.add(const Duration(days: 7));
+      final events = await CalendarService().getEvents(weekStart, weekEnd);
+
+      // Converteer event-ranges naar uurblokken
+      final calendarBlocks = <DateTime, BlockType>{};
+      for (final event in events) {
+        var hour = DateTime.utc(
+          event.start.year,
+          event.start.month,
+          event.start.day,
+          event.start.hour,
+        );
+        final end = event.end;
+        while (hour.isBefore(end)) {
+          calendarBlocks[hour] = BlockType.calendar;
+          hour = hour.add(const Duration(hours: 1));
+        }
+      }
+
+      await ref
+          .read(availabilityProvider.notifier)
+          .importCalendarBlocks(calendarBlocks);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.of(context).calendarImportSuccess),
+          ),
+        );
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().contains('geannuleerd') || e.toString().contains('cancelled')
+                  ? S.of(context).calendarSignInCanceled
+                  : S.of(context).calendarImportError,
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isImporting = false);
+    }
   }
 
   // --- Helpers ---

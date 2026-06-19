@@ -82,6 +82,54 @@ class CalendarService {
     }
   }
 
+  /// Haalt alle events op uit de primaire Google Calendar in het bereik
+  /// [start, end). Retourneert een lijst van (start, end) DateTime-paren.
+  /// Vraagt OAuth-toestemming on-demand (CAL-02).
+  Future<List<({DateTime start, DateTime end})>> getEvents(
+    DateTime start,
+    DateTime end,
+  ) async {
+    await _ensureInitialized();
+
+    final GoogleSignInClientAuthorization authorization;
+    try {
+      authorization = await GoogleSignIn.instance.authorizationClient
+          .authorizeScopes([CalendarApi.calendarEventsScope]);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        throw Exception('Aanmelden geannuleerd');
+      }
+      rethrow;
+    }
+
+    final client = authorization.authClient(
+      scopes: [CalendarApi.calendarEventsScope],
+    );
+
+    try {
+      final calendarApi = CalendarApi(client);
+      final events = await calendarApi.events.list(
+        'primary',
+        timeMin: start.toUtc(),
+        timeMax: end.toUtc(),
+        singleEvents: true,
+        orderBy: 'startTime',
+      );
+
+      final result = <({DateTime start, DateTime end})>[];
+      for (final event in events.items ?? <Event>[]) {
+        final eventStart = event.start?.dateTime ?? event.start?.date;
+        final eventEnd = event.end?.dateTime ?? event.end?.date;
+        if (eventStart != null && eventEnd != null) {
+          result.add((start: eventStart, end: eventEnd));
+        }
+      }
+      return result;
+    } finally {
+      client.close();
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Public helpers (testbaar)
   // ---------------------------------------------------------------------------

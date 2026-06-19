@@ -1872,6 +1872,30 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Zo'**
   String get dayShortSun;
+
+  /// No description provided for @importFromCalendar.
+  ///
+  /// In nl, this message translates to:
+  /// **'Importeer uit Google Agenda'**
+  String get importFromCalendar;
+
+  /// No description provided for @legendCalendar.
+  ///
+  /// In nl, this message translates to:
+  /// **'Agenda'**
+  String get legendCalendar;
+
+  /// No description provided for @calendarImportSuccess.
+  ///
+  /// In nl, this message translates to:
+  /// **'Agenda-afspraken geimporteerd!'**
+  String get calendarImportSuccess;
+
+  /// No description provided for @calendarImportError.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kon agenda-afspraken niet importeren'**
+  String get calendarImportError;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

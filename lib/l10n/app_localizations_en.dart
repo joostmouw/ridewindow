@@ -975,4 +975,16 @@ class SEn extends S {
 
   @override
   String get dayShortSun => 'Sun';
+
+  @override
+  String get importFromCalendar => 'Import from Google Calendar';
+
+  @override
+  String get legendCalendar => 'Calendar';
+
+  @override
+  String get calendarImportSuccess => 'Calendar events imported!';
+
+  @override
+  String get calendarImportError => 'Could not import calendar events';
 }

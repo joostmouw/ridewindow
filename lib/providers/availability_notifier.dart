@@ -6,7 +6,8 @@ part 'availability_notifier.g.dart';
 /// Beschrijft het type geblokkeerd uur.
 /// - [work]: geblokkeerd via een werk-preset (geseed door onboarding of profiel)
 /// - [custom]: handmatig geblokkeerd door de gebruiker
-enum BlockType { work, custom }
+/// - [calendar]: geimporteerd uit Google Calendar
+enum BlockType { work, custom, calendar }
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
@@ -61,7 +62,7 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
     final next = Map<DateTime, BlockType>.from(current);
     for (final hour in hours) {
       if (block) {
-        if (next[hour] != BlockType.work) {
+        if (next[hour] != BlockType.work && next[hour] != BlockType.calendar) {
           next[hour] = BlockType.custom;
         }
       } else {
@@ -78,6 +79,24 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
   Future<void> seedPreset(Map<DateTime, BlockType> preset) async {
     await _persist(preset);
     if (ref.mounted) state = AsyncData(preset);
+  }
+
+  /// Importeert uren uit Google Calendar als [BlockType.calendar] entries.
+  /// Verwijdert eerst alle bestaande calendar-entries voor de opgegeven week,
+  /// dan voegt de nieuwe toe. Laat work- en custom-blocks ongemoeid.
+  Future<void> importCalendarBlocks(Map<DateTime, BlockType> calendarBlocks) async {
+    final current = await future;
+    final next = Map<DateTime, BlockType>.from(current);
+    // Verwijder bestaande calendar-entries
+    next.removeWhere((_, type) => type == BlockType.calendar);
+    // Voeg nieuwe calendar-entries toe (overschrijf niet work/custom)
+    for (final entry in calendarBlocks.entries) {
+      if (!next.containsKey(entry.key)) {
+        next[entry.key] = BlockType.calendar;
+      }
+    }
+    await _persist(next);
+    state = AsyncData(next);
   }
 
   /// Wist alle geblokkeerde uren.

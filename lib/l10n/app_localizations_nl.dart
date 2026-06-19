@@ -979,4 +979,16 @@ class SNl extends S {
 
   @override
   String get dayShortSun => 'Zo';
+
+  @override
+  String get importFromCalendar => 'Importeer uit Google Agenda';
+
+  @override
+  String get legendCalendar => 'Agenda';
+
+  @override
+  String get calendarImportSuccess => 'Agenda-afspraken geimporteerd!';
+
+  @override
+  String get calendarImportError => 'Kon agenda-afspraken niet importeren';
 }
