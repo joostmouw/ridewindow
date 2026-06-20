@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 class ScoreBadge extends StatelessWidget {
   final RideTier tier;
@@ -14,21 +15,22 @@ class ScoreBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.rw.tiers;
     final Color bg;
     final Color fg;
     switch (tier) {
       case Perfect():
-        bg = const Color(0xFFE8F5E9);
-        fg = const Color(0xFF1B5E20);
+        bg = t.perfectBg;
+        fg = t.perfectFg;
       case Great():
-        bg = const Color(0xFFF1F8E9);
-        fg = const Color(0xFF33691E);
+        bg = t.greatBg;
+        fg = t.greatFg;
       case Acceptable():
-        bg = const Color(0xFFFFF3E0);
-        fg = const Color(0xFFE65100);
+        bg = t.acceptableBg;
+        fg = t.acceptableFg;
       case Poor():
-        bg = const Color(0xFFF5F5F5);
-        fg = const Color(0xFF757575);
+        bg = t.poorBg;
+        fg = t.poorFg;
     }
 
     Widget badge = Container(

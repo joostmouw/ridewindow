@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 class WeatherIcon extends StatefulWidget {
   final RideTier tier;
@@ -48,6 +49,7 @@ class _WeatherIconState extends State<WeatherIcon>
   }
 
   Widget _buildSun() {
+    final rw = context.rw;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -59,12 +61,13 @@ class _WeatherIconState extends State<WeatherIcon>
       child: Icon(
         Icons.wb_sunny_rounded,
         size: widget.size,
-        color: const Color(0xFFFFA726),
+        color: rw.scoreAcceptable, // warm sun orange
       ),
     );
   }
 
   Widget _buildPartlyCloudy() {
+    final rw = context.rw;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -77,12 +80,13 @@ class _WeatherIconState extends State<WeatherIcon>
       child: Icon(
         Icons.cloud,
         size: widget.size,
-        color: const Color(0xFF66BB6A),
+        color: rw.scoreGreat,
       ),
     );
   }
 
   Widget _buildCloudy() {
+    final rw = context.rw;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -95,12 +99,13 @@ class _WeatherIconState extends State<WeatherIcon>
       child: Icon(
         Icons.cloud_queue,
         size: widget.size,
-        color: const Color(0xFFFFA726),
+        color: rw.scoreAcceptable,
       ),
     );
   }
 
   Widget _buildRainy() {
+    final rw = context.rw;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -113,7 +118,7 @@ class _WeatherIconState extends State<WeatherIcon>
       child: Icon(
         Icons.grain,
         size: widget.size,
-        color: const Color(0xFFBDBDBD),
+        color: rw.scorePoor,
       ),
     );
   }

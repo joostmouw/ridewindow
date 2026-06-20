@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -90,7 +91,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF1A1A1A),
+                      color: context.rw.textPrimary,
                       height: 1.15,
                     ),
                     textAlign: TextAlign.center,
@@ -106,7 +107,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     S.of(context).welcomeSubtitle,
                     style: const TextStyle(
                       fontSize: 15,
-                      color: Color(0xFF666666),
+                      color: context.rw.textTertiary,
                       height: 1.6,
                     ),
                     textAlign: TextAlign.center,
@@ -122,7 +123,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E7D32),
+                        backgroundColor: context.rw.scorePerfect,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

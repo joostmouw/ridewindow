@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 /// Compact horizontal bar showing an actual value against a reference range.
 /// Used on ride cards and detail screens for temp, rain, and wind.
@@ -34,6 +35,7 @@ class WeatherIndicatorBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rw = context.rw;
     final range = max - min;
     final fraction = range > 0 ? ((value - min) / range).clamp(0.0, 1.0) : 0.5;
     final idealMinFrac = idealMin != null && range > 0
@@ -45,7 +47,7 @@ class WeatherIndicatorBar extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF666666)),
+        Icon(icon, size: 14, color: rw.textTertiary),
         const SizedBox(width: 6),
         SizedBox(
           width: 38,
@@ -62,6 +64,11 @@ class WeatherIndicatorBar extends StatelessWidget {
                 fraction: fraction,
                 idealMinFrac: idealMinFrac,
                 idealMaxFrac: idealMaxFrac,
+                trackColor: rw.border,
+                zoneColor: rw.scoreGreenTint,
+                perfectDot: rw.scorePerfect,
+                warningDot: rw.warning,
+                errorDot: rw.error,
               ),
             ),
           ),
@@ -70,7 +77,7 @@ class WeatherIndicatorBar extends StatelessWidget {
           const SizedBox(width: 4),
           GestureDetector(
             onTap: () => _showInfo(context),
-            child: const Icon(Icons.info_outline, size: 14, color: Color(0xFF999999)),
+            child: Icon(Icons.info_outline, size: 14, color: rw.textHint),
           ),
         ],
       ],
@@ -78,6 +85,7 @@ class WeatherIndicatorBar extends StatelessWidget {
   }
 
   void _showInfo(BuildContext context) {
+    final rw = context.rw;
     showModalBottomSheet(
       context: context,
       builder: (ctx) => Padding(
@@ -88,7 +96,7 @@ class WeatherIndicatorBar extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 20, color: const Color(0xFF2E7D32)),
+                Icon(icon, size: 20, color: rw.scorePerfect),
                 const SizedBox(width: 8),
                 Text(
                   label,
@@ -99,7 +107,7 @@ class WeatherIndicatorBar extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               infoText!,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF444444), height: 1.5),
+              style: TextStyle(fontSize: 14, color: rw.textSecondary, height: 1.5),
             ),
           ],
         ),
@@ -112,11 +120,21 @@ class _BarPainter extends CustomPainter {
   final double fraction;
   final double? idealMinFrac;
   final double? idealMaxFrac;
+  final Color trackColor;
+  final Color zoneColor;
+  final Color perfectDot;
+  final Color warningDot;
+  final Color errorDot;
 
   _BarPainter({
     required this.fraction,
     this.idealMinFrac,
     this.idealMaxFrac,
+    required this.trackColor,
+    required this.zoneColor,
+    required this.perfectDot,
+    required this.warningDot,
+    required this.errorDot,
   });
 
   @override
@@ -127,7 +145,7 @@ class _BarPainter extends CustomPainter {
     final rrect = RRect.fromLTRBR(0, 0, w, h, radius);
 
     // Background track
-    canvas.drawRRect(rrect, Paint()..color = const Color(0xFFE0E0E0));
+    canvas.drawRRect(rrect, Paint()..color = trackColor);
 
     // Ideal zone (green band)
     if (idealMinFrac != null && idealMaxFrac != null) {
@@ -135,13 +153,13 @@ class _BarPainter extends CustomPainter {
       final right = idealMaxFrac! * w;
       canvas.drawRect(
         Rect.fromLTRB(left, 0, right, h),
-        Paint()..color = const Color(0x332E7D32),
+        Paint()..color = zoneColor,
       );
     } else if (idealMaxFrac != null) {
       // Only max threshold (rain, wind): green zone is 0 to max
       canvas.drawRect(
         Rect.fromLTRB(0, 0, idealMaxFrac! * w, h),
-        Paint()..color = const Color(0x332E7D32),
+        Paint()..color = zoneColor,
       );
     }
 
@@ -159,11 +177,11 @@ class _BarPainter extends CustomPainter {
     // If within ideal range, green; otherwise orange/red
     if (idealMinFrac != null && idealMaxFrac != null) {
       if (fraction >= idealMinFrac! && fraction <= idealMaxFrac!) {
-        return const Color(0xFF2E7D32);
+        return perfectDot;
       }
     } else if (idealMaxFrac != null) {
       if (fraction <= idealMaxFrac!) {
-        return const Color(0xFF2E7D32);
+        return perfectDot;
       }
     }
     // How far outside ideal?
@@ -172,8 +190,8 @@ class _BarPainter extends CustomPainter {
         : idealMaxFrac != null && fraction > idealMaxFrac!
             ? fraction - idealMaxFrac!
             : 0.3;
-    if (distance > 0.3) return const Color(0xFFE53935);
-    return const Color(0xFFFF9800);
+    if (distance > 0.3) return errorDot;
+    return warningDot;
   }
 
   @override

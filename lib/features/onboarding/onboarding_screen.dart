@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
 
@@ -85,11 +86,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const green = Color(0xFF2E7D32);
-    const greenBg = Color(0xFFE8F5E9);
+    final green = context.rw.scorePerfect;
+    final greenBg = context.rw.tiers.perfectBg;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
@@ -113,7 +114,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1A1A),
+                  color: context.rw.textPrimary,
                   height: 1.2,
                 ),
               ),
@@ -123,7 +124,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 S.of(context).onboardingSubtitle,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF666666),
+                  color: context.rw.textTertiary,
                   height: 1.55,
                 ),
               ),
@@ -193,7 +194,8 @@ class _PresetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = isSelected ? green : const Color(0xFFE8E8E8);
+    final rw = context.rw;
+    final borderColor = isSelected ? green : rw.borderLight;
     final backgroundColor = isSelected ? greenBg : Colors.white;
 
     Widget tileContent = Container(
@@ -216,7 +218,7 @@ class _PresetTile extends StatelessWidget {
               shape: BoxShape.circle,
               color: isSelected ? green : Colors.transparent,
               border: Border.all(
-                color: isSelected ? green : const Color(0xFFE0E0E0),
+                color: isSelected ? green : rw.border,
                 width: 2,
               ),
             ),
@@ -240,7 +242,7 @@ class _PresetTile extends StatelessWidget {
                     fontSize: 15,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? green : const Color(0xFF1A1A1A),
+                    color: isSelected ? green : rw.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -248,7 +250,7 @@ class _PresetTile extends StatelessWidget {
                   option.sub,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF999999),
+                    color: rw.textHint,
                   ),
                 ),
               ],

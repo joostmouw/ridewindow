@@ -389,7 +389,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       '${_tempMin.round()}°C – ${_tempMax.round()}°C',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF2E7D32),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ],
@@ -403,7 +403,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     '${_tempMin.round()}°C',
                     '${_tempMax.round()}°C',
                   ),
-                  activeColor: const Color(0xFF2E7D32),
+                  activeColor: Theme.of(context).colorScheme.primary,
                   onChanged: (v) => setState(() {
                     _tempMin = v.start;
                     _tempMax = v.end;
@@ -421,7 +421,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _tempRangeDescription(context, _tempMin, _tempMax),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF999999),
+                    color: Theme.of(context).colorScheme.outline,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -452,7 +452,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       '${_rainMax.toStringAsFixed(1)}mm',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF2E7D32),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ],
@@ -466,7 +466,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   min: 0,
                   max: 5,
                   divisions: 50,
-                  activeColor: const Color(0xFF2E7D32),
+                  activeColor: Theme.of(context).colorScheme.primary,
                   onChanged: (v) => setState(() => _rainMax = v),
                   onChangeEnd: (v) => ref
                       .read(profileProvider.notifier)
@@ -478,7 +478,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _rainDescription(context, _rainMax),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF999999),
+                    color: Theme.of(context).colorScheme.outline,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -509,7 +509,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       '${_windMax.round()} km/u',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF2E7D32),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ],
@@ -523,7 +523,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   min: 0,
                   max: 50,
                   divisions: 50,
-                  activeColor: const Color(0xFF2E7D32),
+                  activeColor: Theme.of(context).colorScheme.primary,
                   onChanged: (v) => setState(() => _windMax = v),
                   onChangeEnd: (v) => ref
                       .read(profileProvider.notifier)
@@ -535,7 +535,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _windDescription(context, _windMax),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF999999),
+                    color: Theme.of(context).colorScheme.outline,
                     fontStyle: FontStyle.italic,
                   ),
                 ),

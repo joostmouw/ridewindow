@@ -21,6 +21,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 const _pi = math.pi;
 final _sin = math.sin;
@@ -102,19 +103,25 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   // Helpers: tier-afhankelijke waarden
   // ---------------------------------------------------------------------------
 
-  Color _bannerBg(RideTier tier) => switch (tier) {
-        Perfect() => const Color(0xFFE8F5E9),
-        Great() => const Color(0xFFE8F5E9),
-        Acceptable() => const Color(0xFFFFF3E0),
-        Poor() => const Color(0xFFF5F5F5),
-      };
+  Color _bannerBg(RideTier tier) {
+    final t = context.rw.tiers;
+    return switch (tier) {
+      Perfect() => t.perfectBg,
+      Great() => t.perfectBg,
+      Acceptable() => t.acceptableBg,
+      Poor() => t.poorBg,
+    };
+  }
 
-  Color _bannerFg(RideTier tier) => switch (tier) {
-        Perfect() => const Color(0xFF1B5E20),
-        Great() => const Color(0xFF1B5E20),
-        Acceptable() => const Color(0xFFE65100),
-        Poor() => const Color(0xFF757575),
-      };
+  Color _bannerFg(RideTier tier) {
+    final t = context.rw.tiers;
+    return switch (tier) {
+      Perfect() => t.perfectFg,
+      Great() => t.perfectFg,
+      Acceptable() => t.acceptableFg,
+      Poor() => t.poorFg,
+    };
+  }
 
   String _tierEmoji(RideTier tier) => switch (tier) {
         Perfect() => '\u{1F7E2}',
@@ -224,8 +231,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   Future<void> _addToCalendar() async {
     setState(() => _isLoading = true);
     try {
-      // CalendarService wordt uitsluitend on-demand aangemaakt via de factory
-      // in onPressed (CAL-02). De factory is injecteerbaar voor tests (PERS-04).
       await widget.calendarServiceFactory().addRideSlotToCalendar(
         widget.slot,
         widget.forecasts,
@@ -257,6 +262,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildAppBar(BuildContext context) {
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
     final slot = _effectiveSlot;
     final duration = _fmtDuration(slot.start, slot.end);
@@ -281,8 +288,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           ),
         ],
       ),
-      backgroundColor: Colors.white,
-      foregroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: cs.surface,
+      foregroundColor: rw.textPrimary,
       elevation: 0,
     );
   }
@@ -337,16 +344,18 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     required String title,
     required List<Widget> rows,
   }) {
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x14000000),
+            color: rw.shadow,
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -357,10 +366,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF999999),
+                color: rw.textHint,
                 letterSpacing: 0.8,
               ),
             ),
@@ -372,9 +381,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildWeatherRow(String label, String value) {
+    final rw = context.rw;
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: rw.borderDim)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       child: Row(
@@ -382,15 +392,15 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF666666)),
+              style: TextStyle(fontSize: 13, color: rw.textTertiary),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF1A1A1A),
+              color: rw.textPrimary,
             ),
           ),
         ],
@@ -399,6 +409,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildClothingTip() {
+    final rw = context.rw;
     final temps = widget.forecasts
         .where((f) => f.apparentTemperatureC != null)
         .map((f) => f.apparentTemperatureC!)
@@ -453,9 +464,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F7F0),
+        color: rw.greenBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFCCE5CC), width: 0.5),
+        border: Border.all(color: rw.greenBorder, width: 0.5),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,18 +479,18 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               children: [
                 Text(
                   s.clothingTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2E7D32),
+                    color: rw.scorePerfect,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   items.join(' \u00B7 '),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF444444),
+                    color: rw.textSecondary,
                     height: 1.4,
                   ),
                 ),
@@ -492,6 +503,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildHourlyRowWidget(HourlyRow row) {
+    final rw = context.rw;
     final s = S.of(context);
     final time = _fmtTime(row.time);
     final temp = row.temperatureC != null
@@ -518,17 +530,17 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     // Subtiele achtergrondkleur op basis van uur-score
     final Color rowBg;
     if (row.overallScore >= 85) {
-      rowBg = const Color(0x0A2E7D32); // zeer licht groen
+      rowBg = rw.rowGreenTint;
     } else if (row.overallScore >= 70) {
-      rowBg = const Color(0x0AFF9800); // zeer licht oranje
+      rowBg = rw.rowOrangeTint;
     } else {
-      rowBg = const Color(0x08C62828); // zeer licht rood
+      rowBg = rw.rowRedTint;
     }
 
     return Container(
       decoration: BoxDecoration(
         color: rowBg,
-        border: const Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+        border: Border(top: BorderSide(color: rw.borderDim)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       child: Row(
@@ -537,34 +549,34 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             width: 48,
             child: Text(
               time,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF999999)),
+              style: TextStyle(fontSize: 13, color: rw.textHint),
             ),
           ),
           SizedBox(
             width: 46,
             child: Text(
               temp,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1A1A),
+                color: rw.textPrimary,
               ),
             ),
           ),
           Expanded(
             child: Text(
               apparent,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF666666)),
+              style: TextStyle(fontSize: 13, color: rw.textTertiary),
             ),
           ),
           Text(
             precip,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
+            style: TextStyle(fontSize: 12, color: rw.textTertiary),
           ),
           const SizedBox(width: 8),
           Text(
             wind,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
+            style: TextStyle(fontSize: 12, color: rw.textTertiary),
           ),
         ],
       ),
@@ -604,20 +616,21 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildWindPenaltyNote() {
+    final rw = context.rw;
     final pct = _windPenaltyPercent().round();
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: rw.borderDim)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFFF9800)),
+          Icon(Icons.warning_amber_rounded, size: 16, color: rw.warning),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               S.of(context).windPenalty(pct.toString()),
-              style: const TextStyle(fontSize: 12, color: Color(0xFF999999)),
+              style: TextStyle(fontSize: 12, color: rw.textHint),
             ),
           ),
         ],
@@ -626,6 +639,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildTimeAdjuster() {
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
     final allScores = ref.watch(allHourlyScoresProvider);
 
@@ -647,10 +662,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 2)),
+        boxShadow: [
+          BoxShadow(color: rw.shadow, blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -658,10 +673,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         children: [
           Text(
             s.adjustTime,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF999999),
+              color: rw.textHint,
               letterSpacing: 0.8,
             ),
           ),
@@ -671,11 +686,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             children: [
               SizedBox(
                 width: 50,
-                child: Text(s.startLabel, style: const TextStyle(fontSize: 12, color: Color(0xFF666666))),
+                child: Text(s.startLabel, style: TextStyle(fontSize: 12, color: rw.textTertiary)),
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
-                color: const Color(0xFF2E7D32),
+                color: rw.scorePerfect,
                 onPressed: canExpandStart
                     ? () => setState(() => _start = _start.subtract(const Duration(hours: 1)))
                     : null,
@@ -686,7 +701,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
-                color: const Color(0xFF2E7D32),
+                color: rw.scorePerfect,
                 onPressed: canShrinkStart
                     ? () => setState(() => _start = _start.add(const Duration(hours: 1)))
                     : null,
@@ -698,11 +713,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             children: [
               SizedBox(
                 width: 50,
-                child: Text(s.endLabel, style: const TextStyle(fontSize: 12, color: Color(0xFF666666))),
+                child: Text(s.endLabel, style: TextStyle(fontSize: 12, color: rw.textTertiary)),
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
-                color: const Color(0xFF2E7D32),
+                color: rw.scorePerfect,
                 onPressed: canShrinkEnd
                     ? () => setState(() => _end = _end.subtract(const Duration(hours: 1)))
                     : null,
@@ -713,7 +728,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
-                color: const Color(0xFF2E7D32),
+                color: rw.scorePerfect,
                 onPressed: canExpandEnd
                     ? () => setState(() => _end = _end.add(const Duration(hours: 1)))
                     : null,
@@ -723,7 +738,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
+                  color: rw.surface,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -741,12 +756,12 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               children: contextScores.map((sc) {
                 final isInRange = !sc.time.isBefore(_start) && sc.time.isBefore(_end);
                 final color = sc.overall >= 85
-                    ? const Color(0xFF2E7D32)
+                    ? rw.scorePerfect
                     : sc.overall >= 70
-                        ? const Color(0xFF66BB6A)
+                        ? rw.scoreGreat
                         : sc.overall >= 50
-                            ? const Color(0xFFFFB74D)
-                            : const Color(0xFFEF9A9A);
+                            ? rw.scoreAcceptable
+                            : rw.scorePoor;
                 return Expanded(
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 1),
@@ -754,7 +769,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                       color: isInRange ? color : color.withAlpha(40),
                       borderRadius: BorderRadius.circular(4),
                       border: isInRange
-                          ? Border.all(color: const Color(0xFF1B5E20), width: 1)
+                          ? Border.all(color: rw.tiers.perfectFg, width: 1)
                           : null,
                     ),
                     child: Center(
@@ -763,7 +778,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
-                          color: isInRange ? Colors.white : const Color(0xFF999999),
+                          color: isInRange ? Colors.white : rw.textHint,
                         ),
                       ),
                     ),
@@ -778,6 +793,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildActions(BuildContext context) {
+    final rw = context.rw;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
@@ -785,7 +801,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         children: [
           FilledButton.icon(
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF2E7D32),
+              backgroundColor: rw.scorePerfect,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -811,9 +827,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           const SizedBox(height: 10),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2E7D32),
+              foregroundColor: rw.scorePerfect,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: const BorderSide(color: Color(0xFF2E7D32)),
+              side: BorderSide(color: rw.scorePerfect),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -827,8 +843,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           const SizedBox(height: 10),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF5F5F5),
-              foregroundColor: const Color(0xFF1A1A1A),
+              backgroundColor: rw.surface,
+              foregroundColor: rw.textPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -859,9 +875,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           const SizedBox(height: 10),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2E7D32),
+              foregroundColor: rw.scorePerfect,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: const BorderSide(color: Color(0xFF2E7D32)),
+              side: BorderSide(color: rw.scorePerfect),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -877,12 +893,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final rw = context.rw;
     final slot = _effectiveSlot;
     final forecasts = _effectiveForecasts;
     final hourlyRows = buildHourlyRows(slot, forecasts);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: rw.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
         child: _buildAppBar(context),

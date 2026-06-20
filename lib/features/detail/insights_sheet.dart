@@ -1,14 +1,13 @@
 // lib/features/detail/insights_sheet.dart
 // InsightsSheet: volledige bottom-sheet widget die sub-scores visualiseert
 // als drie LinearProgressIndicator balken met uitleg per factor.
-//
-// Wave 3 implementatie — vervangt de Wave 2 stub.
 
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 class InsightsSheet extends StatelessWidget {
   final RideSlot slot;
@@ -19,8 +18,6 @@ class InsightsSheet extends StatelessWidget {
   // Hulpfuncties: gemiddelde berekening
   // ---------------------------------------------------------------------------
 
-  /// Berekent het gemiddelde van een sub-score over alle uren.
-  /// Geeft 50.0 terug bij een lege lijst (T-05-03-01: nul-deling voorkomen).
   double _avg(List<HourlyScore> hours, double Function(HourlyScore) selector) {
     if (hours.isEmpty) return 50.0;
     final total = hours.fold<double>(0.0, (sum, h) => sum + selector(h));
@@ -31,10 +28,11 @@ class InsightsSheet extends StatelessWidget {
   // Hulpfuncties: kleur op basis van score (D-05-05)
   // ---------------------------------------------------------------------------
 
-  Color _scoreColor(double score) {
-    if (score >= 80) return const Color(0xFF2E7D32); // groen
-    if (score >= 60) return const Color(0xFFE65100); // oranje
-    return const Color(0xFFC62828); // rood
+  Color _scoreColor(BuildContext context, double score) {
+    final rw = context.rw;
+    if (score >= 80) return rw.scorePerfect;
+    if (score >= 60) return rw.tiers.acceptableFg;
+    return rw.errorDark;
   }
 
   // ---------------------------------------------------------------------------
@@ -126,13 +124,15 @@ class InsightsSheet extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   Widget _buildFactorRow({
+    required BuildContext context,
     required String emoji,
     required String label,
     required double score,
     required String scoreLabel,
     required String note,
   }) {
-    final color = _scoreColor(score);
+    final rw = context.rw;
+    final color = _scoreColor(context, score);
     final scoreRounded = score.round();
 
     return Column(
@@ -145,18 +145,18 @@ class InsightsSheet extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
+                  color: rw.textPrimary,
                 ),
               ),
             ),
             Text(
-              '$scoreRounded · $scoreLabel',
-              style: const TextStyle(
+              '$scoreRounded \u00B7 $scoreLabel',
+              style: TextStyle(
                 fontSize: 13,
-                color: Color(0xFF666666),
+                color: rw.textTertiary,
               ),
             ),
           ],
@@ -167,16 +167,16 @@ class InsightsSheet extends StatelessWidget {
           child: LinearProgressIndicator(
             value: (score / 100.0).clamp(0.0, 1.0),
             minHeight: 8,
-            backgroundColor: const Color(0xFFECEFF1),
+            backgroundColor: rw.border,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
         const SizedBox(height: 5),
         Text(
           note,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12.5,
-            color: Color(0xFF666666),
+            color: rw.textTertiary,
             height: 1.45,
           ),
         ),
@@ -190,6 +190,7 @@ class InsightsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rw = context.rw;
     final hours = slot.hours;
 
     final avgTemp = _avg(hours, (h) => h.temperatureScore);
@@ -204,7 +205,7 @@ class InsightsSheet extends StatelessWidget {
     final endTime = _formatTime(slot.end);
     final durationHours = slot.end.difference(slot.start).inMinutes ~/ 60;
 
-    final overallColor = _scoreColor(slot.overallScore);
+    final overallColor = _scoreColor(context, slot.overallScore);
 
     return SingleChildScrollView(
       child: Container(
@@ -220,7 +221,7 @@ class InsightsSheet extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFE0E0E0),
+                color: rw.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -229,27 +230,28 @@ class InsightsSheet extends StatelessWidget {
           // Titel
           Text(
             s.insightsTitle(tierStr, score.toString()),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A1A),
+              color: rw.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
 
           // Meta
           Text(
-            '$day $startTime – $endTime · ${durationHours}u',
-            style: const TextStyle(
+            '$day $startTime \u2013 $endTime \u00B7 ${durationHours}u',
+            style: TextStyle(
               fontSize: 13,
-              color: Color(0xFF666666),
+              color: rw.textTertiary,
             ),
           ),
           const SizedBox(height: 16),
 
           // Temperatuur
           _buildFactorRow(
-            emoji: '🌡',
+            context: context,
+            emoji: '\u{1F321}',
             label: s.weatherTemperature,
             score: avgTemp,
             scoreLabel: _tempLabel(context, avgTemp),
@@ -259,7 +261,8 @@ class InsightsSheet extends StatelessWidget {
 
           // Neerslag
           _buildFactorRow(
-            emoji: '🌧',
+            context: context,
+            emoji: '\u{1F327}',
             label: s.weatherRain,
             score: avgRain,
             scoreLabel: _rainLabel(context, avgRain),
@@ -269,7 +272,8 @@ class InsightsSheet extends StatelessWidget {
 
           // Wind
           _buildFactorRow(
-            emoji: '💨',
+            context: context,
+            emoji: '\u{1F4A8}',
             label: s.weatherWind,
             score: avgWind,
             scoreLabel: _windLabel(context, avgWind),
@@ -281,7 +285,7 @@ class InsightsSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: rw.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -292,7 +296,7 @@ class InsightsSheet extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
+                    color: rw.textPrimary,
                   ),
                 ),
                 Text(
@@ -312,7 +316,7 @@ class InsightsSheet extends StatelessWidget {
             alignment: Alignment.center,
             child: TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF2E7D32),
+                foregroundColor: rw.scorePerfect,
               ),
               onPressed: () => Navigator.pop(context),
               child: Text(

@@ -20,6 +20,8 @@ import 'package:ridewindow/providers/locale_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
+import 'package:ridewindow/theme/app_colors.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,13 +89,15 @@ class RideWindowApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2E7D32)),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.seed),
+        extensions: const [RideWindowTheme.light],
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32),
+          seedColor: AppColors.seed,
           brightness: Brightness.dark,
         ),
+        extensions: const [RideWindowTheme.dark],
       ),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: router,

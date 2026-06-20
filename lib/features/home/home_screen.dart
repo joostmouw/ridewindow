@@ -24,6 +24,7 @@ import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 const _pi = math.pi;
 final _sin = math.sin;
@@ -96,6 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final rw = context.rw;
     final weatherState = ref.watch(weatherProvider);
     final slotsState = ref.watch(slotsProvider);
     final locationAsync = ref.watch(locationProvider);
@@ -106,7 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: const Color(0xFFF5F5F5),
+          backgroundColor: rw.surface,
           body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -116,7 +118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 _buildPeriodFilter(),
                 Expanded(
                   child: RefreshIndicator(
-                    color: const Color(0xFF2E7D32),
+                    color: rw.scorePerfect,
                     onRefresh: () => ref.refresh(weatherProvider.future),
                     child: _buildCardsSection(weatherState, slotsState),
                   ),
@@ -148,14 +150,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     SlotsState slotsState,
     String? userName,
   ) {
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
     final slotCount = slotsState is SlotsLoaded ? slotsState.slots.length : 0;
     final greeting = _buildGreeting(context, userName);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 16, 14),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: cs.surface,
         border: Border(
-          bottom: BorderSide(color: Color(0xFFF0F0F0), width: 1),
+          bottom: BorderSide(color: rw.borderDim, width: 1),
         ),
       ),
       child: Row(
@@ -174,17 +178,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on_outlined,
                       size: 14,
-                      color: Color(0xFF999999),
+                      color: rw.textHint,
                     ),
                     const SizedBox(width: 3),
                     Text(
                       city,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF666666),
+                        color: rw.textTertiary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -199,9 +203,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               loading: () => '',
                               error: (_, __) => '',
                             ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF999999),
+                        color: rw.textHint,
                       ),
                     ),
                   ],
@@ -211,7 +215,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
           if (weatherState.hasError)
             IconButton(
-              icon: const Icon(Icons.refresh, color: Color(0xFF2E7D32)),
+              icon: Icon(Icons.refresh, color: rw.scorePerfect),
               tooltip: S.of(context).retryButton,
               onPressed: () => ref.invalidate(weatherProvider),
             ),
@@ -246,23 +250,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildWeekStrip(SlotsState slotsState) {
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
     // Vandaag + 6 dagen vooruit (altijd 7 dagen zichtbaar).
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final days = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Container(
-      color: Colors.white,
+      color: cs.surface,
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             S.of(context).thisWeek,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF999999),
+              color: rw.textHint,
               letterSpacing: 0.5,
             ),
           ),
@@ -283,11 +289,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildPeriodFilter() {
+    final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
     final allActive = _activePeriods.length == 3;
 
     return Container(
-      color: Colors.white,
+      color: cs.surface,
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
       child: Row(
         children: [
@@ -302,6 +309,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildPeriodChip(_DayPeriod period, String label, String hours) {
+    final rw = context.rw;
     final isActive = _activePeriods.contains(period);
     final allActive = _activePeriods.length == 3;
     // Als alles aan staat, toon alles als "niet gefilterd" (subtiel).
@@ -329,10 +337,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isHighlighted ? const Color(0xFF2E7D32) : const Color(0xFFF5F5F5),
+          color: isHighlighted ? rw.scorePerfect : rw.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isHighlighted ? const Color(0xFF2E7D32) : const Color(0xFFE0E0E0),
+            color: isHighlighted ? rw.scorePerfect : rw.border,
           ),
         ),
         child: Row(
@@ -343,7 +351,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isHighlighted ? Colors.white : const Color(0xFF666666),
+                color: isHighlighted ? Colors.white : rw.textTertiary,
               ),
             ),
             const SizedBox(width: 4),
@@ -351,7 +359,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               hours,
               style: TextStyle(
                 fontSize: 10,
-                color: isHighlighted ? Colors.white70 : const Color(0xFF999999),
+                color: isHighlighted ? Colors.white70 : rw.textHint,
               ),
             ),
           ],
@@ -370,6 +378,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildDayChip(DateTime day, SlotsState slotsState) {
+    final rw = context.rw;
     final s = S.of(context);
     final dayLabels = [s.dayMon, s.dayTue, s.dayWed, s.dayThu, s.dayFri, s.daySat, s.daySun];
     final label = dayLabels[day.weekday - 1];
@@ -390,12 +399,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
       if (daySlots.isEmpty) {
         dotClass = _DayClass.bad;
-        dotText = '✗';
+        dotText = '\u2717';
       } else {
         final bestTier = _bestTier(daySlots);
         if (bestTier is Perfect || bestTier is Great) {
           dotClass = _DayClass.good;
-          dotText = '✓';
+          dotText = '\u2713';
         } else {
           dotClass = _DayClass.ok;
           dotText = '~';
@@ -412,14 +421,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final Color textColor;
     switch (dotClass) {
       case _DayClass.good:
-        bgColor = const Color(0xFFE8F5E9);
-        textColor = const Color(0xFF2E7D32);
+        bgColor = rw.tiers.perfectBg;
+        textColor = rw.scorePerfect;
       case _DayClass.ok:
-        bgColor = const Color(0xFFFFF3E0);
-        textColor = const Color(0xFFE65100);
+        bgColor = rw.tiers.acceptableBg;
+        textColor = rw.tiers.acceptableFg;
       case _DayClass.bad:
-        bgColor = const Color(0xFFFFEBEE);
-        textColor = const Color(0xFFC62828);
+        bgColor = rw.tiers.poorBg;
+        textColor = rw.errorDark;
     }
 
     return GestureDetector(
@@ -437,10 +446,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF999999),
+              color: rw.textHint,
               letterSpacing: 0.3,
             ),
           ),
@@ -450,7 +459,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             style: TextStyle(
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? const Color(0xFF2E7D32) : const Color(0xFF666666),
+              color: isSelected ? rw.scorePerfect : rw.textTertiary,
             ),
           ),
           const SizedBox(height: 3),
@@ -461,7 +470,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               color: bgColor,
               shape: BoxShape.circle,
               border: isSelected
-                  ? Border.all(color: const Color(0xFF2E7D32), width: 2.5)
+                  ? Border.all(color: rw.scorePerfect, width: 2.5)
                   : null,
             ),
             child: Center(
@@ -542,6 +551,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildRideCardList(List<RideSlot> slots) {
+    final rw = context.rw;
     return ListView.builder(
       key: const PageStorageKey('home_ride_cards'),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -553,10 +563,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(
               S.of(context).rideTimes,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF999999),
+                color: rw.textHint,
                 letterSpacing: 0.5,
               ),
             ),
@@ -573,6 +583,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildEmptyState(String message) {
+    final rw = context.rw;
     return LayoutBuilder(
       builder: (context, constraints) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -585,18 +596,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.cloud_off_outlined,
                       size: 64,
-                      color: Color(0xFFBDBDBD),
+                      color: rw.scorePoor,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       message,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
-                        color: Color(0xFF666666),
+                        color: rw.textTertiary,
                         height: 1.5,
                       ),
                     ),
@@ -611,6 +622,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildErrorState() {
+    final rw = context.rw;
     return LayoutBuilder(
       builder: (context, constraints) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -623,10 +635,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.error_outline,
                       size: 64,
-                      color: Color(0xFFBDBDBD),
+                      color: rw.scorePoor,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -634,7 +646,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
-                        color: Color(0xFF666666),
+                        color: rw.textTertiary,
                         height: 1.5,
                       ),
                     ),
@@ -644,7 +656,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       icon: const Icon(Icons.refresh),
                       label: Text(S.of(context).retryButton),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E7D32),
+                        backgroundColor: rw.scorePerfect,
                         foregroundColor: Colors.white,
                       ),
                     ),
@@ -663,6 +675,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildRideCard(RideSlot slot, {bool isBest = false}) {
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
     final borderColor = _tierBorderColor(slot.tier);
     final weatherState = ref.watch(weatherProvider);
 
@@ -736,17 +750,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         : precipProbs.reduce((a, b) => a + b) / precipProbs.length;
 
     final tempLabel = avgTemp == null
-        ? '—'
+        ? '\u2014'
         : avgApparent != null && (avgApparent - avgTemp).abs() >= 2
-            ? '${avgTemp.round()}° (${avgApparent.round()}°)'
-            : '${avgTemp.toStringAsFixed(1)}°C';
+            ? '${avgTemp.round()}\u00B0 (${avgApparent.round()}\u00B0)'
+            : '${avgTemp.toStringAsFixed(1)}\u00B0C';
     final precipLabel = totalPrecip == null
-        ? '—'
+        ? '\u2014'
         : avgPrecipProb != null && avgPrecipProb > 0
             ? '${totalPrecip.toStringAsFixed(1)}mm (${avgPrecipProb.round()}%)'
             : '${totalPrecip.toStringAsFixed(1)}mm';
     final windLabel = avgWind == null
-        ? '—'
+        ? '\u2014'
         : avgWind < 5
             ? S.of(context).windCalm
             : avgWindDir != null
@@ -764,7 +778,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       background: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF2E7D32),
+          color: rw.scorePerfect,
           borderRadius: BorderRadius.circular(18),
         ),
         alignment: Alignment.centerLeft,
@@ -775,7 +789,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             const SizedBox(width: 8),
             Text(
               S.of(context).addToCalendar,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -800,20 +814,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           gradient: isBest
-              ? const LinearGradient(
-                  colors: [Color(0xFFE8F5E9), Colors.white],
+              ? LinearGradient(
+                  colors: [rw.greenGradientStart, cs.surface],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
               : null,
-          color: isBest ? null : Colors.white,
+          color: isBest ? null : cs.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border(
             left: BorderSide(color: borderColor, width: 4),
           ),
           boxShadow: [
             BoxShadow(
-              color: isBest ? const Color(0x292E7D32) : const Color(0x12000000),
+              color: isBest ? rw.bestHighlight : rw.normalHighlight,
               blurRadius: isBest ? 12 : 6,
               offset: const Offset(0, 1),
             ),
@@ -831,12 +845,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2E7D32),
+                      color: rw.scorePerfect,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       S.of(context).bestChoice,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -856,10 +870,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const SizedBox(width: 6),
                       Text(
                         _formatDayName(slot.start),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A1A),
+                          color: rw.textPrimary,
                         ),
                       ),
                     ],
@@ -873,10 +887,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               const SizedBox(height: 6),
               // Tijdreeks
               Text(
-                '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
-                style: const TextStyle(
+                '${_formatTime(slot.start)} \u2013 ${_formatTime(slot.end)} \u00B7 ${_durationHours(slot)}u',
+                style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF444444),
+                  color: rw.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -897,8 +911,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     onPressed: () => _addToCalendar(slot, slotForecasts),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: slot.tier is Acceptable
-                          ? const Color(0xFFFFA726)
-                          : const Color(0xFF2E7D32),
+                          ? rw.scoreAcceptable
+                          : rw.scorePerfect,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,
@@ -912,7 +926,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     icon: const Icon(Icons.calendar_today, size: 14),
                     label: Text(
                       S.of(context).schedule,
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -987,6 +1001,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildSkeletonCards() {
+    final rw = context.rw;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       children: List.generate(3, (index) {
@@ -1002,7 +1017,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             height: 100,
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
+              color: rw.border,
               borderRadius: BorderRadius.circular(18),
             ),
           ),
@@ -1073,17 +1088,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   String _windArrow(double degrees) {
     // Wind direction is where wind comes FROM, arrow shows direction
-    const arrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
+    const arrows = ['\u2193', '\u2199', '\u2190', '\u2196', '\u2191', '\u2197', '\u2192', '\u2198'];
     final index = ((degrees + 22.5) % 360 / 45).floor();
     return arrows[index];
   }
 
-  Color _tierBorderColor(RideTier tier) => switch (tier) {
-        Perfect() => const Color(0xFF2E7D32),
-        Great() => const Color(0xFF66BB6A),
-        Acceptable() => const Color(0xFFFFA726),
-        Poor() => const Color(0xFFBDBDBD),
-      };
+  Color _tierBorderColor(RideTier tier) {
+    final rw = context.rw;
+    return switch (tier) {
+      Perfect() => rw.scorePerfect,
+      Great() => rw.scoreGreat,
+      Acceptable() => rw.scoreAcceptable,
+      Poor() => rw.scorePoor,
+    };
+  }
 
 }
 
