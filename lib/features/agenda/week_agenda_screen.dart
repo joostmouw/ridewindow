@@ -16,15 +16,16 @@ import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 const int _kDayCount = 7;
 const _kHours = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 
-Color _scoreColor(double score) {
-  if (score >= 85) return const Color(0xFF2E7D32);
-  if (score >= 70) return const Color(0xFF66BB6A);
-  if (score >= 50) return const Color(0xFFFFB74D);
-  return const Color(0xFFEF9A9A);
+Color _scoreColor(double score, RideWindowTheme rw) {
+  if (score >= 85) return rw.scorePerfect;
+  if (score >= 70) return rw.scoreGreat;
+  if (score >= 50) return rw.scoreAcceptable;
+  return rw.scorePoor;
 }
 
 String _tierLabel(double score, BuildContext context) {
@@ -270,15 +271,15 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
             child: Row(
               children: [
                 if (_selection == null) ...[
-                  _Dot(color: const Color(0xFF2E7D32), label: S.of(context).tierPerfectAgenda),
+                  _Dot(color: context.rw.scorePerfect, label: S.of(context).tierPerfectAgenda),
                   const SizedBox(width: 8),
-                  _Dot(color: const Color(0xFF66BB6A), label: S.of(context).tierGreatAgenda),
+                  _Dot(color: context.rw.scoreGreat, label: S.of(context).tierGreatAgenda),
                   const SizedBox(width: 8),
-                  _Dot(color: const Color(0xFFFFB74D), label: S.of(context).tierAcceptableAgenda),
+                  _Dot(color: context.rw.scoreAcceptable, label: S.of(context).tierAcceptableAgenda),
                   const SizedBox(width: 8),
-                  _Dot(color: const Color(0xFFEF9A9A), label: S.of(context).tierPoorAgenda),
+                  _Dot(color: context.rw.scorePoor, label: S.of(context).tierPoorAgenda),
                   const SizedBox(width: 8),
-                  _Dot(color: const Color(0xFF1565C0), label: S.of(context).legendPlanned),
+                  _Dot(color: context.rw.plannedRide, label: S.of(context).legendPlanned),
                 ] else ...[
                   Icon(Icons.touch_app, size: 14, color: theme.colorScheme.primary),
                   const SizedBox(width: 4),
@@ -400,7 +401,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                   child: Center(
                     child: Text(
                       '$hour',
-                      style: const TextStyle(fontSize: 10, color: Color(0xFF888888)),
+                      style: TextStyle(fontSize: 10, color: context.rw.textHint),
                     ),
                   ),
                 ),
@@ -490,7 +491,8 @@ class _CellWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final score = _findScore(day, hour, allScores);
     final blocked = showBlocked && _isBlocked(day, hour, blockedHours);
-    final color = score != null ? _scoreColor(score.overall) : const Color(0xFFE0E0E0);
+    final rw = context.rw;
+    final color = score != null ? _scoreColor(score.overall, rw) : rw.border;
 
     return GestureDetector(
       onTap: onTap ?? () => _showDetail(context, ref, score),
@@ -498,26 +500,26 @@ class _CellWidget extends ConsumerWidget {
         margin: const EdgeInsets.all(0.5),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF2E7D32)
+              ? rw.scorePerfect
               : blocked
                   ? color.withAlpha(80)
                   : color,
           borderRadius: BorderRadius.circular(3),
           border: isSelected
-              ? Border.all(color: const Color(0xFF1B5E20), width: 2)
+              ? Border.all(color: rw.tiers.perfectFg, width: 2)
               : isPlanned
-                  ? Border.all(color: const Color(0xFF1565C0), width: 2)
+                  ? Border.all(color: rw.plannedRide, width: 2)
                   : null,
         ),
         child: blocked && !isSelected
-            ? const Center(child: Icon(Icons.block, size: 10, color: Color(0xAAE53935)))
+            ? Center(child: Icon(Icons.block, size: 10, color: rw.error.withAlpha(170)))
             : isSelected
                 ? const Center(
                     child: Icon(Icons.check, size: 12, color: Colors.white),
                   )
                 : isPlanned
-                    ? const Center(
-                        child: Icon(Icons.directions_bike, size: 10, color: Color(0xFF1565C0)),
+                    ? Center(
+                        child: Icon(Icons.directions_bike, size: 10, color: rw.plannedRide),
                       )
                     : null,
       ),
@@ -531,7 +533,8 @@ class _CellWidget extends ConsumerWidget {
     final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
     final dayFmt = DateFormat('EEEE d MMMM', locale);
     final theme = Theme.of(context);
-    final tierColor = score != null ? _scoreColor(score.overall) : Colors.grey;
+    final rw = context.rw;
+    final tierColor = score != null ? _scoreColor(score.overall, rw) : Colors.grey;
     final tierText = score != null ? _tierLabel(score.overall, context) : '?';
 
     showModalBottomSheet(
@@ -675,6 +678,7 @@ class _ScoreBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rw = context.rw;
     return Row(
       children: [
         SizedBox(width: 90, child: Text(label, style: const TextStyle(fontSize: 12))),
@@ -684,8 +688,8 @@ class _ScoreBar extends StatelessWidget {
             child: LinearProgressIndicator(
               value: value / 100,
               minHeight: 8,
-              backgroundColor: const Color(0xFFE0E0E0),
-              valueColor: AlwaysStoppedAnimation(_scoreColor(value)),
+              backgroundColor: rw.border,
+              valueColor: AlwaysStoppedAnimation(_scoreColor(value, rw)),
             ),
           ),
         ),

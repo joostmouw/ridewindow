@@ -111,7 +111,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Titel
               Text(
                 S.of(context).onboardingTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: context.rw.textPrimary,
@@ -122,7 +122,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Subtitel
               Text(
                 S.of(context).onboardingSubtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: context.rw.textTertiary,
                   height: 1.55,
@@ -248,7 +248,7 @@ class _PresetTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   option.sub,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: rw.textHint,
                   ),

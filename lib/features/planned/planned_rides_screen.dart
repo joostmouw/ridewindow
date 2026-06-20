@@ -17,12 +17,13 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
-Color _scoreColor(double score) {
-  if (score >= 85) return const Color(0xFF2E7D32);
-  if (score >= 70) return const Color(0xFF66BB6A);
-  if (score >= 50) return const Color(0xFFFFB74D);
-  return const Color(0xFFEF9A9A);
+Color _scoreColor(double score, RideWindowTheme rw) {
+  if (score >= 85) return rw.scorePerfect;
+  if (score >= 70) return rw.scoreGreat;
+  if (score >= 50) return rw.scoreAcceptable;
+  return rw.scorePoor;
 }
 
 String _tierLabel(double score, BuildContext context) {
@@ -189,11 +190,12 @@ class _RideCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final rw = context.rw;
     final scores = _rideScores();
     final rideForecasts = _rideForecasts();
     final currentScore = _avgScore(scores);
     final delta = currentScore != null ? currentScore - ride.plannedScore : null;
-    final tierColor = currentScore != null ? _scoreColor(currentScore) : Colors.grey;
+    final tierColor = currentScore != null ? _scoreColor(currentScore, rw) : Colors.grey;
     final tierText = currentScore != null ? _tierLabel(currentScore, context) : '?';
 
     // Avg weather
@@ -278,12 +280,12 @@ class _RideCard extends ConsumerWidget {
                               Icon(
                                 delta > 0 ? Icons.trending_up : Icons.trending_down,
                                 size: 14,
-                                color: delta > 0 ? const Color(0xFF2E7D32) : const Color(0xFFE53935),
+                                color: delta > 0 ? rw.scorePerfect : rw.error,
                               ),
                               const SizedBox(width: 2),
                               Text(
                                 S.of(context).rideSincePlanning('${delta > 0 ? '+' : ''}${delta.round()}'),
-                                style: TextStyle(fontSize: 11, color: delta > 0 ? const Color(0xFF2E7D32) : const Color(0xFFE53935)),
+                                style: TextStyle(fontSize: 11, color: delta > 0 ? rw.scorePerfect : rw.error),
                               ),
                             ],
                           ),
@@ -350,8 +352,9 @@ class _RideCard extends ConsumerWidget {
     double? avgWindDir,
   ) {
     final theme = Theme.of(context);
+    final rw = context.rw;
     final dayFmt = DateFormat('EEEE d MMMM', Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL');
-    final tierColor = currentScore != null ? _scoreColor(currentScore) : Colors.grey;
+    final tierColor = currentScore != null ? _scoreColor(currentScore, rw) : Colors.grey;
     final tierText = currentScore != null ? _tierLabel(currentScore, context) : '?';
 
     showModalBottomSheet(
@@ -521,7 +524,7 @@ class _HourRow extends StatelessWidget {
               height: 20,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: _scoreColor(score!.overall),
+                color: _scoreColor(score!.overall, context.rw),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -583,6 +586,7 @@ class _ScoreBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rw = context.rw;
     return Row(
       children: [
         SizedBox(width: 90, child: Text(label, style: const TextStyle(fontSize: 12))),
@@ -592,8 +596,8 @@ class _ScoreBar extends StatelessWidget {
             child: LinearProgressIndicator(
               value: value / 100,
               minHeight: 8,
-              backgroundColor: const Color(0xFFE0E0E0),
-              valueColor: AlwaysStoppedAnimation(_scoreColor(value)),
+              backgroundColor: rw.border,
+              valueColor: AlwaysStoppedAnimation(_scoreColor(value, rw)),
             ),
           ),
         ),

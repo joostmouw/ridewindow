@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 class AvailabilityScreen extends ConsumerStatefulWidget {
   const AvailabilityScreen({super.key});
@@ -160,7 +161,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                                       '${hour.toString().padLeft(2, '0')}:00',
                                       style: TextStyle(
                                         fontSize: _cellHeight > 20 ? 10 : 8,
-                                        color: Colors.grey.shade600,
+                                        color: context.rw.textTertiary,
                                       ),
                                     ),
                                   ),
@@ -195,7 +196,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   ) {
     final key = _cellKey(weekStart, dayIndex, hour);
     final isDragHighlighted = _isDragging && _draggedCells.contains(key);
-    final color = _cellColor(key, blockedHours, isDragHighlighted);
+    final rw = context.rw;
+    final color = _cellColor(key, blockedHours, isDragHighlighted, rw);
 
     return GestureDetector(
       onTap: () => _onCellTap(key, blockedHours),
@@ -205,7 +207,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
         decoration: BoxDecoration(
           color: color,
           border: Border.all(
-            color: Colors.grey.shade300,
+            color: rw.border,
             width: 0.5,
           ),
         ),
@@ -219,10 +221,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _legendItem(Colors.white, S.of(context).legendFree, context),
-          _legendItem(const Color(0xFFFF9800), S.of(context).legendBusy, context),
-          _legendItem(const Color(0xFFB0BEC5), S.of(context).legendWork, context),
-          _legendItem(const Color(0xFF64B5F6), S.of(context).legendCalendar, context),
+          _legendItem(Theme.of(context).colorScheme.surface, S.of(context).legendFree, context),
+          _legendItem(context.rw.availCustom, S.of(context).legendBusy, context),
+          _legendItem(context.rw.availWork, S.of(context).legendWork, context),
+          _legendItem(context.rw.availCalendar, S.of(context).legendCalendar, context),
         ],
       ),
     );
@@ -237,7 +239,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           height: 14,
           decoration: BoxDecoration(
             color: color,
-            border: Border.all(color: Colors.grey.shade400, width: 0.5),
+            border: Border.all(color: context.rw.border, width: 0.5),
             borderRadius: BorderRadius.circular(3),
           ),
         ),
@@ -405,19 +407,20 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     DateTime key,
     Map<DateTime, BlockType> blocked,
     bool isDragHighlighted,
+    RideWindowTheme rw,
   ) {
     if (isDragHighlighted) {
       if (_dragBlocking) {
-        return const Color(0xFFFFCC80);
+        return rw.availCustomLight;
       } else {
-        return const Color(0xFFE0E0E0);
+        return rw.availWorkLight;
       }
     }
     return switch (blocked[key]) {
-      BlockType.work => const Color(0xFFB0BEC5),
-      BlockType.custom => const Color(0xFFFF9800),
-      BlockType.calendar => const Color(0xFF64B5F6),
-      null => Colors.white,
+      BlockType.work => rw.availWork,
+      BlockType.custom => rw.availCustom,
+      BlockType.calendar => rw.availCalendar,
+      null => Theme.of(context).colorScheme.surface,
     };
   }
 

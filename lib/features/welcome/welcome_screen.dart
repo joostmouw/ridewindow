@@ -88,7 +88,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   opacity: _fadeTitle,
                   child: Text(
                     S.of(context).welcomeTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
                       color: context.rw.textPrimary,
@@ -105,7 +105,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   opacity: _fadeSub,
                   child: Text(
                     S.of(context).welcomeSubtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       color: context.rw.textTertiary,
                       height: 1.6,

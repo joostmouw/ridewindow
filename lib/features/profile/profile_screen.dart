@@ -387,7 +387,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const Spacer(),
                     Text(
                       '${_tempMin.round()}°C – ${_tempMax.round()}°C',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -419,7 +419,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 Text(
                   _tempRangeDescription(context, _tempMin, _tempMax),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.outline,
                     fontStyle: FontStyle.italic,
@@ -450,7 +450,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const Spacer(),
                     Text(
                       '${_rainMax.toStringAsFixed(1)}mm',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -476,7 +476,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 Text(
                   _rainDescription(context, _rainMax),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.outline,
                     fontStyle: FontStyle.italic,
@@ -507,7 +507,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const Spacer(),
                     Text(
                       '${_windMax.round()} km/u',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -533,7 +533,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 Text(
                   _windDescription(context, _windMax),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.outline,
                     fontStyle: FontStyle.italic,
