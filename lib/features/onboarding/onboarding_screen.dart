@@ -151,19 +151,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Volgende-knop
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                child: FilledButton(
                   onPressed: _handleNext,
                   child: Text(S.of(context).onboardingNext),
                 ),
@@ -196,7 +184,7 @@ class _PresetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final rw = context.rw;
     final borderColor = isSelected ? green : rw.borderLight;
-    final backgroundColor = isSelected ? greenBg : Colors.white;
+    final backgroundColor = isSelected ? greenBg : Theme.of(context).colorScheme.surface;
 
     Widget tileContent = Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
@@ -223,10 +211,10 @@ class _PresetTile extends StatelessWidget {
               ),
             ),
             child: isSelected
-                ? const Icon(
+                ? Icon(
                     Icons.check,
                     size: 13,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   )
                 : null,
           ),

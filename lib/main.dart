@@ -62,6 +62,114 @@ Future<void> main() async {
   );
 }
 
+ThemeData _buildTheme(Brightness brightness) {
+  final colorScheme = ColorScheme.fromSeed(
+    seedColor: AppColors.seed,
+    brightness: brightness,
+  );
+  final isLight = brightness == Brightness.light;
+
+  return ThemeData(
+    colorScheme: colorScheme,
+    extensions: [isLight ? RideWindowTheme.light : RideWindowTheme.dark],
+
+    // ── Scaffold ──
+    scaffoldBackgroundColor: colorScheme.surface,
+
+    // ── AppBar ──
+    appBarTheme: AppBarTheme(
+      centerTitle: false,
+      elevation: 0,
+      scrolledUnderElevation: 2,
+      backgroundColor: colorScheme.surface,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: colorScheme.surfaceTint,
+    ),
+
+    // ── Cards ──
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      color: colorScheme.surfaceContainerLow,
+    ),
+
+    // ── Buttons ──
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    ),
+
+    // ── Bottom Sheet ──
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: colorScheme.surfaceContainerLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      showDragHandle: true,
+    ),
+
+    // ── Divider ──
+    dividerTheme: DividerThemeData(
+      color: colorScheme.outlineVariant,
+      thickness: 1,
+      space: 1,
+    ),
+
+    // ── SnackBar ──
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+
+    // ── NavigationBar ──
+    navigationBarTheme: NavigationBarThemeData(
+      elevation: 0,
+      backgroundColor: colorScheme.surfaceContainer,
+      indicatorColor: colorScheme.secondaryContainer,
+    ),
+
+    // ── Switch ──
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return colorScheme.onPrimary;
+        }
+        return colorScheme.outline;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return colorScheme.primary;
+        }
+        return colorScheme.surfaceContainerHighest;
+      }),
+    ),
+  );
+}
+
 class RideWindowApp extends ConsumerWidget {
   const RideWindowApp({super.key});
 
@@ -88,17 +196,8 @@ class RideWindowApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.seed),
-        extensions: const [RideWindowTheme.light],
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.seed,
-          brightness: Brightness.dark,
-        ),
-        extensions: const [RideWindowTheme.dark],
-      ),
+      theme: _buildTheme(Brightness.light),
+      darkTheme: _buildTheme(Brightness.dark),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: router,
     );

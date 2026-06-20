@@ -351,7 +351,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isHighlighted ? Colors.white : rw.textTertiary,
+                color: isHighlighted ? Theme.of(context).colorScheme.onPrimary : rw.textTertiary,
               ),
             ),
             const SizedBox(width: 4),
@@ -359,7 +359,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               hours,
               style: TextStyle(
                 fontSize: 10,
-                color: isHighlighted ? Colors.white70 : rw.textHint,
+                color: isHighlighted ? Theme.of(context).colorScheme.onPrimary.withAlpha(180) : rw.textHint,
               ),
             ),
           ],
@@ -651,14 +651,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ElevatedButton.icon(
+                    FilledButton.icon(
                       onPressed: () => ref.invalidate(weatherProvider),
                       icon: const Icon(Icons.refresh),
                       label: Text(S.of(context).retryButton),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: rw.scorePerfect,
-                        foregroundColor: Colors.white,
-                      ),
                     ),
                   ],
                 ),
@@ -785,12 +781,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         padding: const EdgeInsets.only(left: 24),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today, color: Colors.white, size: 22),
+            Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.onPrimary, size: 22),
             const SizedBox(width: 8),
             Text(
               S.of(context).addToCalendar,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -850,10 +846,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ),
                     child: Text(
                       S.of(context).bestChoice,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -907,27 +903,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton.icon(
+                  FilledButton.tonalIcon(
                     onPressed: () => _addToCalendar(slot, slotForecasts),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: slot.tier is Acceptable
-                          ? rw.scoreAcceptable
-                          : rw.scorePerfect,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 0,
-                    ),
                     icon: const Icon(Icons.calendar_today, size: 14),
-                    label: Text(
-                      S.of(context).schedule,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
+                    label: Text(S.of(context).schedule),
                   ),
                 ],
               ),

@@ -778,7 +778,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
-                          color: isInRange ? Colors.white : rw.textHint,
+                          color: isInRange ? Theme.of(context).colorScheme.onPrimary : rw.textHint,
                         ),
                       ),
                     ),
@@ -800,14 +800,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: rw.scorePerfect,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
             onPressed: () {
               final slot = _effectiveSlot;
               ref.read(plannedRidesProvider.notifier).add(
@@ -826,14 +818,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: rw.scorePerfect,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              side: BorderSide(color: rw.scorePerfect),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
             onPressed: _isLoading ? null : _addToCalendar,
             icon: _isLoading
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
@@ -841,16 +825,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             label: Text(S.of(context).addToGoogleCalendar),
           ),
           const SizedBox(height: 10),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: rw.surface,
-              foregroundColor: rw.textPrimary,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+          FilledButton.tonalIcon(
             onPressed: () async {
               final notifService = NotificationService();
               final canExact = await notifService.canScheduleExact();
@@ -874,14 +849,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: rw.scorePerfect,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              side: BorderSide(color: rw.scorePerfect),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
             onPressed: _shareSlot,
             icon: const Icon(Icons.share, size: 18),
             label: Text(S.of(context).shareRideWindow),

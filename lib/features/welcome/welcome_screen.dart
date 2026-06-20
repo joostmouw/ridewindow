@@ -65,7 +65,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
@@ -88,11 +88,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   opacity: _fadeTitle,
                   child: Text(
                     S.of(context).welcomeTitle,
-                    style: TextStyle(
-                      fontSize: 28,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: context.rw.textPrimary,
-                      height: 1.15,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -105,9 +103,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   opacity: _fadeSub,
                   child: Text(
                     S.of(context).welcomeSubtitle,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: context.rw.textTertiary,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       height: 1.6,
                     ),
                     textAlign: TextAlign.center,
@@ -121,19 +118,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   opacity: _fadeButton,
                   child: SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: context.rw.scorePerfect,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                    child: FilledButton(
                       onPressed: () => context.push('/onboard'),
                       child: Text(S.of(context).welcomeButton),
                     ),
