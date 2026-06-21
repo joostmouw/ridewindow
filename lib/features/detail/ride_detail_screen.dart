@@ -258,7 +258,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   // Widgets
   // ---------------------------------------------------------------------------
 
-  Widget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     final rw = context.rw;
     final bg = _bannerBg(_effectiveSlot.tier);
     final s = S.of(context);
@@ -267,8 +267,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final description = _tierDescription(context, slot.tier);
 
     return AppBar(
+      toolbarHeight: 64,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
@@ -283,6 +285,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           Text(
             '$duration \u00B7 $description',
             style: Theme.of(context).textTheme.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -361,54 +365,29 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   Widget _buildClothingTip() {
     final rw = context.rw;
     final temps = widget.forecasts
-        .where((f) => f.apparentTemperatureC != null)
-        .map((f) => f.apparentTemperatureC!)
+        .where((f) => f.temperatureC != null)
+        .map((f) => f.temperatureC!)
         .toList();
     if (temps.isEmpty) return const SizedBox.shrink();
 
-    final avgFeelsLike = temps.reduce((a, b) => a + b) / temps.length;
+    final avgTemp = temps.reduce((a, b) => a + b) / temps.length;
     final totalPrecip = widget.forecasts
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .fold(0.0, (a, b) => a + b);
-    final avgWind = widget.forecasts
+    final winds = widget.forecasts
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
-    final windAvg =
-        avgWind.isEmpty ? 0.0 : avgWind.reduce((a, b) => a + b) / avgWind.length;
+    final windAvg = winds.isEmpty ? 0.0 : winds.reduce((a, b) => a + b) / winds.length;
 
     final s = S.of(context);
-    final items = <String>[];
-    String icon;
-
-    if (avgFeelsLike < 5) {
-      icon = '\u{1F9E4}'; // gloves
-      items.addAll([s.clothingWinterJacket, s.clothingThermalPants, s.clothingGloves, s.clothingOvershoes]);
-    } else if (avgFeelsLike < 10) {
-      icon = '\u{1F9E5}'; // coat
-      items.addAll([s.clothingLongSleeveJersey, s.clothingArmWarmers, s.clothingLegWarmers]);
-    } else if (avgFeelsLike < 15) {
-      icon = '\u{1F455}'; // shirt
-      items.addAll([s.clothingLongSleeveJersey, s.clothingKneeWarmers]);
-    } else if (avgFeelsLike < 20) {
-      icon = '\u{1F455}';
-      items.add(s.clothingShortSleeveJersey);
-      if (avgFeelsLike < 17) items.add(s.clothingArmWarmersJustInCase);
-    } else if (avgFeelsLike < 28) {
-      icon = '\u{2600}\u{FE0F}'; // sun
-      items.addAll([s.clothingLightShirt, s.clothingSunscreen]);
-    } else {
-      icon = '\u{1F975}'; // hot face
-      items.addAll([s.clothingLightShirt, s.clothingSunscreen, s.clothingExtraWater]);
-    }
-
-    if (totalPrecip > 0.5) {
-      items.add(s.clothingRainJacket);
-    }
-    if (windAvg > 25) {
-      items.add(s.clothingWindVest);
-    }
+    final advice = recommendClothing(
+      avgTempC: avgTemp,
+      avgWindKmh: windAvg,
+      totalPrecipMm: totalPrecip,
+    );
+    final items = clothingItems(advice, s);
 
     final cs = Theme.of(context).colorScheme;
     return Card(
@@ -422,10 +401,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,7 +429,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             ),
             const SizedBox(width: 12),
             ClothingTip(
-              avgTempC: avgFeelsLike,
+              avgTempC: avgTemp,
               avgWindKmh: windAvg,
               totalPrecipMm: totalPrecip,
             ),
@@ -827,10 +804,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
     return Scaffold(
       backgroundColor: rw.surface,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: _buildAppBar(context),
-      ),
+      appBar: _buildAppBar(context),
       body: SafeArea(
         child: Column(
           children: [

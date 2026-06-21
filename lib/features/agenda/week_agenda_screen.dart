@@ -28,6 +28,14 @@ Color _scoreColor(double score, RideWindowTheme rw) {
   return rw.scorePoor;
 }
 
+({Color bg, Color fg}) _scoreTonal(double score, RideWindowTheme rw) {
+  final t = rw.tiers;
+  if (score >= 85) return (bg: t.perfectBg, fg: t.perfectFg);
+  if (score >= 70) return (bg: t.greatBg, fg: t.greatFg);
+  if (score >= 50) return (bg: t.acceptableBg, fg: t.acceptableFg);
+  return (bg: t.poorBg, fg: t.poorFg);
+}
+
 String _tierLabel(double score, BuildContext context) {
   final s = S.of(context);
   if (score >= 85) return s.tierPerfectAgenda;
@@ -514,8 +522,8 @@ class _CellWidget extends ConsumerWidget {
         child: blocked && !isSelected
             ? Center(child: Icon(Icons.block, size: 10, color: rw.error.withAlpha(170)))
             : isSelected
-                ? const Center(
-                    child: Icon(Icons.check, size: 12, color: Colors.white),
+                ? Center(
+                    child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
                   )
                 : isPlanned
                     ? Center(
@@ -534,13 +542,15 @@ class _CellWidget extends ConsumerWidget {
     final dayFmt = DateFormat('EEEE d MMMM', locale);
     final theme = Theme.of(context);
     final rw = context.rw;
-    final tierColor = score != null ? _scoreColor(score.overall, rw) : Colors.grey;
+    final tonal = score != null ? _scoreTonal(score.overall, rw) : (bg: rw.tiers.poorBg, fg: rw.tiers.poorFg);
     final tierText = score != null ? _tierLabel(score.overall, context) : '?';
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (ctx) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,10 +571,10 @@ class _CellWidget extends ConsumerWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: tierColor, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: tonal.bg, borderRadius: BorderRadius.circular(16)),
                   child: Text(
                     score != null ? '${score.overall.round()} — $tierText' : '?',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(color: tonal.fg, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
               ],
@@ -641,6 +651,7 @@ class _CellWidget extends ConsumerWidget {
                 ),
             ],
           ],
+        ),
         ),
       ),
     );

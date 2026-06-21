@@ -169,10 +169,10 @@
   "debugRefreshWeather": "Manually refresh weather",
   "debugWeatherRefreshing": "Weather is refreshing.",
 
-  "detailTierPerfectDesc": "Perfect \u2014 the best window this week",
-  "detailTierGreatDesc": "Great \u2014 pleasant riding conditions",
-  "detailTierAcceptableDesc": "Acceptable \u2014 doable, grab an extra layer",
-  "detailTierPoorDesc": "Poor \u2014 not ideal, but possible",
+  "detailTierPerfectDesc": "Ideal cycling weather",
+  "detailTierGreatDesc": "Pleasant cycling weather",
+  "detailTierAcceptableDesc": "Doable, grab an extra layer",
+  "detailTierPoorDesc": "Not ideal, but possible",
   "detailConditions": "conditions",
 
   "weatherSection": "WEATHER",

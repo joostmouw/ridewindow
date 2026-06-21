@@ -195,10 +195,10 @@
   "debugRefreshWeather": "Weer handmatig verversen",
   "debugWeatherRefreshing": "Weer wordt ververst.",
 
-  "detailTierPerfectDesc": "Perfect \u2014 het beste venster deze week",
-  "detailTierGreatDesc": "Goed \u2014 prettige rijomstandigheden",
-  "detailTierAcceptableDesc": "Acceptabel \u2014 te doen, pak een extra laag",
-  "detailTierPoorDesc": "Slecht \u2014 niet ideaal, maar mogelijk",
+  "detailTierPerfectDesc": "Ideaal fietsweer",
+  "detailTierGreatDesc": "Prettig fietsweer",
+  "detailTierAcceptableDesc": "Te doen, pak een extra laag",
+  "detailTierPoorDesc": "Niet ideaal, maar mogelijk",
   "detailConditions": "omstandigheden",
 
   "weatherSection": "WEER",

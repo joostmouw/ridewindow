@@ -1,40 +1,119 @@
 // lib/features/shared/clothing_tip.dart
-// Clothing recommendation based on "feels like" cycling temperature.
-// Cycling logic: legs are the engine (stay warm), upper body catches wind.
-// So mixing = lang boven, kort onder — never the reverse.
+// Clothing recommendation for cyclists based on feels-like temperature.
+//
+// Cycling logic:
+// - Legs are the engine → stay warm from pedaling → shorts until ~14°C
+// - Upper body catches wind → needs protection sooner
+// - So mixing = lang boven, kort onder — never the reverse
+//
+// Thresholds (feels-like, accounting for cycling wind chill):
+//   ≥20°C  kort/kort   — t-shirt + korte broek
+//   14-20°C lang/kort  — lange mouw + korte broek
+//   5-14°C  lang/lang  — lange mouw + lange broek
+//   <5°C    lang/lang+  — volledige bescherming + extra lagen
 
 import 'package:flutter/material.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 
-enum _ClothingCombo {
-  /// kort/kort — short sleeves + shorts
+// ---------------------------------------------------------------------------
+// Shared recommendation logic — used by both the emoji widget and the
+// detailed clothing list on the detail screen.
+// ---------------------------------------------------------------------------
+
+enum ClothingCombo {
   shortShort,
-  /// lang/kort — long sleeves + shorts (upper body cold, legs warm from pedaling)
   longShort,
-  /// lang/lang — long sleeves + long pants
   longLong,
-  /// lang/lang + jacket — full cover + wind/rain layer
-  longLongJacket,
+  longLongExtra,
 }
 
-_ClothingCombo _recommend(double? avgTempC, double? avgWindKmh, double? totalPrecipMm) {
-  if (avgTempC == null) return _ClothingCombo.longShort;
+class ClothingAdvice {
+  final ClothingCombo combo;
+  final double feelsLike;
+  final bool raining;
+  final bool windy;
 
-  // Wind chill for cycling: you ride at ~15-20 km/h into the wind.
+  const ClothingAdvice({
+    required this.combo,
+    required this.feelsLike,
+    required this.raining,
+    required this.windy,
+  });
+}
+
+ClothingAdvice recommendClothing({
+  required double? avgTempC,
+  double? avgWindKmh,
+  double? totalPrecipMm,
+}) {
+  // Cycling adds ~15 km/h effective headwind.
   final wind = (avgWindKmh ?? 0) + 15;
-  final feelsLike = avgTempC - (wind * 0.05);
-
+  final feelsLike = (avgTempC ?? 15) - (wind * 0.05);
   final raining = (totalPrecipMm ?? 0) > 0.5;
+  final windy = (avgWindKmh ?? 0) > 25;
 
-  if (raining) {
-    if (feelsLike >= 18) return _ClothingCombo.longShort;
-    return _ClothingCombo.longLongJacket;
+  final ClothingCombo combo;
+  if (feelsLike >= 20) {
+    combo = ClothingCombo.shortShort;
+  } else if (feelsLike >= 14) {
+    combo = ClothingCombo.longShort;
+  } else if (feelsLike >= 5) {
+    combo = ClothingCombo.longLong;
+  } else {
+    combo = ClothingCombo.longLongExtra;
   }
 
-  if (feelsLike >= 22) return _ClothingCombo.shortShort;
-  if (feelsLike >= 16) return _ClothingCombo.longShort;
-  if (feelsLike >= 8) return _ClothingCombo.longLong;
-  return _ClothingCombo.longLongJacket;
+  return ClothingAdvice(
+    combo: combo,
+    feelsLike: feelsLike,
+    raining: raining,
+    windy: windy,
+  );
 }
+
+/// Returns the detailed clothing items list for the detail screen.
+List<String> clothingItems(ClothingAdvice advice, S s) {
+  final items = <String>[];
+
+  switch (advice.combo) {
+    case ClothingCombo.shortShort:
+      items.add(s.clothingShortSleeveJersey);
+      if (advice.feelsLike >= 25) {
+        items.add(s.clothingSunscreen);
+      }
+      if (advice.feelsLike >= 30) {
+        items.add(s.clothingExtraWater);
+      }
+    case ClothingCombo.longShort:
+      items.add(s.clothingLongSleeveJersey);
+      if (advice.feelsLike < 17) {
+        items.add(s.clothingArmWarmersJustInCase);
+      }
+    case ClothingCombo.longLong:
+      items.add(s.clothingLongSleeveJersey);
+      if (advice.feelsLike < 10) {
+        items.addAll([s.clothingArmWarmers, s.clothingLegWarmers]);
+      } else {
+        items.add(s.clothingKneeWarmers);
+      }
+    case ClothingCombo.longLongExtra:
+      items.addAll([
+        s.clothingWinterJacket,
+        s.clothingThermalPants,
+        s.clothingGloves,
+        s.clothingOvershoes,
+      ]);
+  }
+
+  if (advice.raining) items.add(s.clothingRainJacket);
+  if (advice.windy) items.add(s.clothingWindVest);
+
+  return items;
+}
+
+// ---------------------------------------------------------------------------
+// Emoji widget — compact visual summary
+// ---------------------------------------------------------------------------
 
 class ClothingTip extends StatelessWidget {
   final double? avgTempC;
@@ -50,22 +129,26 @@ class ClothingTip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final combo = _recommend(avgTempC, avgWindKmh, totalPrecipMm);
+    final advice = recommendClothing(
+      avgTempC: avgTempC,
+      avgWindKmh: avgWindKmh,
+      totalPrecipMm: totalPrecipMm,
+    );
     final cs = Theme.of(context).colorScheme;
 
     final String emoji;
     final String label;
-    switch (combo) {
-      case _ClothingCombo.shortShort:
+    switch (advice.combo) {
+      case ClothingCombo.shortShort:
         emoji = '\u{1F455}\u{1FA73}'; // t-shirt + shorts
         label = 'Kort/kort';
-      case _ClothingCombo.longShort:
-        emoji = '\u{1F9E5}\u{1FA73}'; // sweater + shorts
+      case ClothingCombo.longShort:
+        emoji = '\u{1F9E5}\u{1FA73}'; // long sleeve + shorts
         label = 'Lang/kort';
-      case _ClothingCombo.longLong:
-        emoji = '\u{1F9E5}\u{1F456}'; // sweater + jeans
+      case ClothingCombo.longLong:
+        emoji = '\u{1F9E5}\u{1F456}'; // long sleeve + pants
         label = 'Lang/lang';
-      case _ClothingCombo.longLongJacket:
+      case ClothingCombo.longLongExtra:
         emoji = '\u{1F9E5}\u{1F9E5}'; // double layer
         label = 'Lang/lang +';
     }
