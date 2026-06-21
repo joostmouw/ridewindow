@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -26,31 +27,33 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1400),
     );
 
+    // Effects springs for fades (smooth, no overshoot)
     _fadeEmoji = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.3, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.3, curve: AppMotion.effectsCurve)),
     );
     _fadeTitle = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.15, 0.5, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.15, 0.5, curve: AppMotion.effectsCurve)),
     );
     _fadeSub = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.3, 0.65, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.3, 0.65, curve: AppMotion.effectsCurve)),
     );
     _fadeButton = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 0.85, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 0.85, curve: AppMotion.effectsCurve)),
     );
 
+    // Spatial springs for slides (bouncy overshoot)
     const slideUp = Offset(0, 0.15);
     _slideTitle = Tween(begin: slideUp, end: Offset.zero).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.15, 0.5, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.15, 0.5, curve: AppMotion.spatialEmphasizedCurve)),
     );
     _slideSub = Tween(begin: slideUp, end: Offset.zero).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.3, 0.65, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.3, 0.65, curve: AppMotion.spatialEmphasizedCurve)),
     );
     _slideButton = Tween(begin: slideUp, end: Offset.zero).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 0.85, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 0.85, curve: AppMotion.spatialEmphasizedCurve)),
     );
 
     _controller.forward();

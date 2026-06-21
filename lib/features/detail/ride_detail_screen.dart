@@ -12,6 +12,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart' show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
+import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
@@ -38,9 +39,6 @@ class RideDetailScreen extends ConsumerStatefulWidget {
   final RideSlot slot;
   final List<HourlyForecast> forecasts;
 
-  /// Optional Hero animation tag for ScoreBadge transition.
-  final String? heroTag;
-
   /// Optionele factory voor testinjectie. Default maakt een echte CalendarService.
   final CalendarServiceFactory calendarServiceFactory;
 
@@ -48,7 +46,6 @@ class RideDetailScreen extends ConsumerStatefulWidget {
     super.key,
     required this.slot,
     required this.forecasts,
-    this.heroTag,
     this.calendarServiceFactory = _defaultCalendarServiceFactory,
   });
 
@@ -263,80 +260,46 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   Widget _buildAppBar(BuildContext context) {
     final rw = context.rw;
-    final cs = Theme.of(context).colorScheme;
+    final bg = _bannerBg(_effectiveSlot.tier);
     final s = S.of(context);
     final slot = _effectiveSlot;
     final duration = _fmtDuration(slot.start, slot.end);
-    final tierLabel = switch (slot.tier) {
-      Perfect() => s.tierPerfect,
-      Great() => s.tierGreat,
-      Acceptable() => s.tierAcceptable,
-      Poor() => s.tierPoor,
-    };
+    final description = _tierDescription(context, slot.tier);
 
     return AppBar(
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '${_fmtTime(slot.start)} \u2013 ${_fmtTime(slot.end)}',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Text(
+                '${_fmtTime(slot.start)} \u2013 ${_fmtTime(slot.end)}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(width: 8),
+              ScoreBadge(tier: slot.tier),
+            ],
           ),
           Text(
-            '$duration \u00B7 $tierLabel ${s.detailConditions}',
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+            '$duration \u00B7 $description',
+            style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),
-      backgroundColor: cs.surface,
+      backgroundColor: bg,
       foregroundColor: rw.textPrimary,
       elevation: 0,
-    );
-  }
-
-  Widget _buildScoreBanner(BuildContext context) {
-    final slot = _effectiveSlot;
-    final bg = _bannerBg(slot.tier);
-    final fg = _bannerFg(slot.tier);
-    final emoji = _tierEmoji(slot.tier);
-    final description = _tierDescription(context, slot.tier);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: bg,
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ScoreBadge(tier: slot.tier, heroTag: widget.heroTag),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: fg,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.info_outline, color: fg),
-            onPressed: () {
-              showModalBottomSheet<void>(
-                context: context,
-                builder: (_) => InsightsSheet(slot: widget.slot),
-              );
-            },
-          ),
-        ],
-      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: () {
+            showModalBottomSheet<void>(
+              context: context,
+              builder: (_) => InsightsSheet(slot: widget.slot),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -345,20 +308,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     required List<Widget> rows,
   }) {
     final rw = context.rw;
-    final cs = Theme.of(context).colorScheme;
-    return Container(
+    return Card.outlined(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: rw.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -366,8 +317,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Text(
               title,
-              style: TextStyle(
-                fontSize: 10,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: rw.textHint,
                 letterSpacing: 0.8,
@@ -460,44 +410,54 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       items.add(s.clothingWindVest);
     }
 
-    return Container(
+    final cs = Theme.of(context).colorScheme;
+    return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: rw.greenBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: rw.greenBorder, width: 0.5),
+      elevation: 0,
+      color: cs.primaryContainer.withAlpha(30),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: cs.primary.withAlpha(40)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  s.clothingTitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: rw.scorePerfect,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 22)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s.clothingTitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: rw.scorePerfect,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  items.join(' \u00B7 '),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: rw.textSecondary,
-                    height: 1.4,
+                  const SizedBox(height: 4),
+                  Text(
+                    items.join(' \u00B7 '),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: rw.textSecondary,
+                      height: 1.4,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            ClothingTip(
+              avgTempC: avgFeelsLike,
+              avgWindKmh: windAvg,
+              totalPrecipMm: totalPrecip,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -874,7 +834,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildScoreBanner(context),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(

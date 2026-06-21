@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/app/scaffold_with_nav.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
@@ -26,7 +27,7 @@ final sharedPrefsProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError('Must be overridden in ProviderScope'),
 );
 
-/// Fade transition voor tab-wissels en standaard routes.
+/// Fade transition voor tab-wissels — effects spring (smooth, no overshoot).
 CustomTransitionPage<void> _fadeTransition(
   GoRouterState state,
   Widget child,
@@ -35,13 +36,17 @@ CustomTransitionPage<void> _fadeTransition(
     key: state.pageKey,
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(opacity: animation, child: child);
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: AppMotion.effectsCurve,
+      );
+      return FadeTransition(opacity: curved, child: child);
     },
-    transitionDuration: const Duration(milliseconds: 200),
+    transitionDuration: AppMotion.effectsDuration,
   );
 }
 
-/// Slide-up transition voor detail/modale schermen.
+/// Slide-up transition voor detail/modale schermen — spatial spring (bouncy).
 CustomTransitionPage<void> _slideUpTransition(
   GoRouterState state,
   Widget child,
@@ -50,14 +55,21 @@ CustomTransitionPage<void> _slideUpTransition(
     key: state.pageKey,
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final tween = Tween(begin: const Offset(0, 0.05), end: Offset.zero)
-          .chain(CurveTween(curve: Curves.easeOut));
+      final slideTween = Tween(begin: const Offset(0, 0.06), end: Offset.zero)
+          .chain(CurveTween(curve: AppMotion.spatialEmphasizedCurve));
+      final fadeTween = CurvedAnimation(
+        parent: animation,
+        curve: AppMotion.effectsCurve,
+      );
       return FadeTransition(
-        opacity: animation,
-        child: SlideTransition(position: animation.drive(tween), child: child),
+        opacity: fadeTween,
+        child: SlideTransition(
+          position: animation.drive(slideTween),
+          child: child,
+        ),
       );
     },
-    transitionDuration: const Duration(milliseconds: 250),
+    transitionDuration: AppMotion.spatialEmphasizedDuration,
   );
 }
 
@@ -161,7 +173,6 @@ GoRouter router(Ref ref) {
             RideDetailScreen(
               slot: args.slot,
               forecasts: args.forecasts,
-              heroTag: args.heroTag,
             ),
           );
         },
