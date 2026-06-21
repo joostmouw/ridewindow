@@ -56,7 +56,7 @@ class ScreenHintOverlay extends StatelessWidget {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-              child: Container(color: Colors.black.withAlpha(120)),
+              child: Container(color: Theme.of(context).colorScheme.scrim.withAlpha(120)),
             ),
           ),
           // Hint cards positioned around the screen

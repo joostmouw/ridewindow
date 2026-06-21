@@ -86,46 +86,47 @@ ThemeData _buildTheme(Brightness brightness) {
       surfaceTintColor: colorScheme.surfaceTint,
     ),
 
-    // ── Cards ──
+    // ── Cards (M3 Expressive: larger radii) ──
     cardTheme: CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: colorScheme.outlineVariant.withAlpha(120)),
       ),
       color: colorScheme.surfaceContainerLow,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
     ),
 
-    // ── Buttons ──
+    // ── Buttons (M3 Expressive: fully rounded) ──
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: const StadiumBorder(),
       ),
     ),
 
-    // ── Bottom Sheet ──
+    // ── Chips (M3 Expressive) ──
+    chipTheme: ChipThemeData(
+      shape: const StadiumBorder(),
+      showCheckmark: false,
+    ),
+
+    // ── Bottom Sheet (M3 Expressive: 28dp corners) ──
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: colorScheme.surfaceContainerLow,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       showDragHandle: true,
     ),

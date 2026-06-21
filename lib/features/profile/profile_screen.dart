@@ -628,7 +628,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
 Widget _infoButton(BuildContext context, String description) {
   return IconButton(
-    icon: const Icon(Icons.info_outline, size: 16, color: Color(0xFF999999)),
+    icon: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
     padding: EdgeInsets.zero,
     constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
     tooltip: description,

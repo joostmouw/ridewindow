@@ -946,25 +946,25 @@ abstract class S {
   /// No description provided for @detailTierPerfectDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Perfect — het beste venster deze week'**
+  /// **'Ideaal fietsweer'**
   String get detailTierPerfectDesc;
 
   /// No description provided for @detailTierGreatDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Goed — prettige rijomstandigheden'**
+  /// **'Prettig fietsweer'**
   String get detailTierGreatDesc;
 
   /// No description provided for @detailTierAcceptableDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Acceptabel — te doen, pak een extra laag'**
+  /// **'Te doen, pak een extra laag'**
   String get detailTierAcceptableDesc;
 
   /// No description provided for @detailTierPoorDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Slecht — niet ideaal, maar mogelijk'**
+  /// **'Niet ideaal, maar mogelijk'**
   String get detailTierPoorDesc;
 
   /// No description provided for @detailConditions.

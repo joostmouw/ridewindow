@@ -26,6 +26,14 @@ Color _scoreColor(double score, RideWindowTheme rw) {
   return rw.scorePoor;
 }
 
+({Color bg, Color fg}) _scoreTonal(double score, RideWindowTheme rw) {
+  final t = rw.tiers;
+  if (score >= 85) return (bg: t.perfectBg, fg: t.perfectFg);
+  if (score >= 70) return (bg: t.greatBg, fg: t.greatFg);
+  if (score >= 50) return (bg: t.acceptableBg, fg: t.acceptableFg);
+  return (bg: t.poorBg, fg: t.poorFg);
+}
+
 String _tierLabel(double score, BuildContext context) {
   final s = S.of(context);
   if (score >= 85) return s.tierPerfectAgenda;
@@ -195,7 +203,7 @@ class _RideCard extends ConsumerWidget {
     final rideForecasts = _rideForecasts();
     final currentScore = _avgScore(scores);
     final delta = currentScore != null ? currentScore - ride.plannedScore : null;
-    final tierColor = currentScore != null ? _scoreColor(currentScore, rw) : Colors.grey;
+    final tonal = currentScore != null ? _scoreTonal(currentScore, rw) : (bg: rw.tiers.poorBg, fg: rw.tiers.poorFg);
     final tierText = currentScore != null ? _tierLabel(currentScore, context) : '?';
 
     // Avg weather
@@ -266,10 +274,10 @@ class _RideCard extends ConsumerWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(color: tierColor, borderRadius: BorderRadius.circular(12)),
+                          decoration: BoxDecoration(color: tonal.bg, borderRadius: BorderRadius.circular(12)),
                           child: Text(
                             currentScore != null ? '${currentScore.round()} $tierText' : '?',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                            style: TextStyle(color: tonal.fg, fontWeight: FontWeight.bold, fontSize: 12),
                           ),
                         ),
                         if (delta != null && delta.abs() >= 2) ...[
@@ -354,7 +362,7 @@ class _RideCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final rw = context.rw;
     final dayFmt = DateFormat('EEEE d MMMM', Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL');
-    final tierColor = currentScore != null ? _scoreColor(currentScore, rw) : Colors.grey;
+    final tonal = currentScore != null ? _scoreTonal(currentScore, rw) : (bg: rw.tiers.poorBg, fg: rw.tiers.poorFg);
     final tierText = currentScore != null ? _tierLabel(currentScore, context) : '?';
 
     showModalBottomSheet(
@@ -386,10 +394,10 @@ class _RideCard extends ConsumerWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: tierColor, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: tonal.bg, borderRadius: BorderRadius.circular(16)),
                   child: Text(
                     currentScore != null ? '${currentScore.round()} $tierText' : '?',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(color: tonal.fg, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
               ],
@@ -519,19 +527,22 @@ class _HourRow extends StatelessWidget {
             ),
           ),
           if (score != null)
-            Container(
-              width: 32,
-              height: 20,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: _scoreColor(score!.overall, context.rw),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '${score!.overall.round()}',
-                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-              ),
-            )
+            Builder(builder: (_) {
+              final t = _scoreTonal(score!.overall, context.rw);
+              return Container(
+                width: 32,
+                height: 20,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: t.bg,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '${score!.overall.round()}',
+                  style: TextStyle(color: t.fg, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              );
+            })
           else
             const SizedBox(width: 32),
           const SizedBox(width: 8),

@@ -461,17 +461,16 @@ class SEn extends S {
   String get debugWeatherRefreshing => 'Weather is refreshing.';
 
   @override
-  String get detailTierPerfectDesc => 'Perfect — the best window this week';
+  String get detailTierPerfectDesc => 'Ideal cycling weather';
 
   @override
-  String get detailTierGreatDesc => 'Great — pleasant riding conditions';
+  String get detailTierGreatDesc => 'Pleasant cycling weather';
 
   @override
-  String get detailTierAcceptableDesc =>
-      'Acceptable — doable, grab an extra layer';
+  String get detailTierAcceptableDesc => 'Doable, grab an extra layer';
 
   @override
-  String get detailTierPoorDesc => 'Poor — not ideal, but possible';
+  String get detailTierPoorDesc => 'Not ideal, but possible';
 
   @override
   String get detailConditions => 'conditions';

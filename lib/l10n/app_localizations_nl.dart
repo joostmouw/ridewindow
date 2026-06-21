@@ -462,17 +462,16 @@ class SNl extends S {
   String get debugWeatherRefreshing => 'Weer wordt ververst.';
 
   @override
-  String get detailTierPerfectDesc => 'Perfect — het beste venster deze week';
+  String get detailTierPerfectDesc => 'Ideaal fietsweer';
 
   @override
-  String get detailTierGreatDesc => 'Goed — prettige rijomstandigheden';
+  String get detailTierGreatDesc => 'Prettig fietsweer';
 
   @override
-  String get detailTierAcceptableDesc =>
-      'Acceptabel — te doen, pak een extra laag';
+  String get detailTierAcceptableDesc => 'Te doen, pak een extra laag';
 
   @override
-  String get detailTierPoorDesc => 'Slecht — niet ideaal, maar mogelijk';
+  String get detailTierPoorDesc => 'Niet ideaal, maar mogelijk';
 
   @override
   String get detailConditions => 'omstandigheden';

@@ -93,7 +93,7 @@ class _AppTourOverlayState extends State<_AppTourOverlay> {
     final theme = Theme.of(context);
 
     return Material(
-      color: Colors.black.withAlpha(200),
+      color: Theme.of(context).colorScheme.scrim.withAlpha(200),
       child: SafeArea(
         child: Column(
           children: [
