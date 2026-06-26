@@ -432,6 +432,9 @@ class SNl extends S {
   String get privacyPolicy => 'Privacybeleid';
 
   @override
+  String get weatherDataAttribution => 'Weerdata door Open-Meteo.com';
+
+  @override
   String get version => 'Versie';
 
   @override

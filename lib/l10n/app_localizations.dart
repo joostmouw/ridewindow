@@ -883,6 +883,12 @@ abstract class S {
   /// **'Privacybeleid'**
   String get privacyPolicy;
 
+  /// No description provided for @weatherDataAttribution.
+  ///
+  /// In nl, this message translates to:
+  /// **'Weerdata door Open-Meteo.com'**
+  String get weatherDataAttribution;
+
   /// No description provided for @version.
   ///
   /// In nl, this message translates to:

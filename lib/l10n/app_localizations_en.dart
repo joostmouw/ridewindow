@@ -431,6 +431,9 @@ class SEn extends S {
   String get privacyPolicy => 'Privacy policy';
 
   @override
+  String get weatherDataAttribution => 'Weather data by Open-Meteo.com';
+
+  @override
   String get version => 'Version';
 
   @override

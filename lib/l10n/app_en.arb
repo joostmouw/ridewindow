@@ -157,6 +157,7 @@
   "save": "Save",
 
   "privacyPolicy": "Privacy policy",
+  "weatherDataAttribution": "Weather data by Open-Meteo.com",
   "version": "Version",
 
   "debugMenu": "Debug Menu",

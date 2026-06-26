@@ -183,6 +183,7 @@
   "save": "Opslaan",
 
   "privacyPolicy": "Privacybeleid",
+  "weatherDataAttribution": "Weerdata door Open-Meteo.com",
   "version": "Versie",
 
   "debugMenu": "Debug Menu",

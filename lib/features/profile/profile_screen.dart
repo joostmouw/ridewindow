@@ -606,6 +606,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             onTap: _launchPrivacyPolicy,
           ),
           ListTile(
+            title: Text(s.weatherDataAttribution),
+            trailing: const Icon(Icons.open_in_new),
+            onTap: () => launchUrl(Uri.parse('https://open-meteo.com/')),
+          ),
+          ListTile(
             title: Text(s.version),
             trailing: const Text('1.0.0'),
             onTap: () {
