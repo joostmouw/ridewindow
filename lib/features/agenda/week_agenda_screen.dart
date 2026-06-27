@@ -119,6 +119,10 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
   // Keys for hit-testing during drag
   final _cellKeys = <String, GlobalKey>{};
 
+  // Keys for spotlight coach marks
+  final _gridKey = GlobalKey();
+  final _busyToggleKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -255,6 +259,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
             ),
           ],
           Row(
+            key: _busyToggleKey,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(S.of(context).agendaBusy, style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface)),
@@ -307,6 +312,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
           // Grid
           Expanded(
             child: GestureDetector(
+              key: _gridKey,
               onLongPressStart: _onLongPressStart,
               onLongPressMoveUpdate: _onLongPressMoveUpdate,
               onLongPressEnd: _onLongPressEnd,
@@ -333,7 +339,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     ),
         if (_showHints)
           ScreenHintOverlay(
-            hints: agendaHints(context),
+            hints: _agendaHints(context),
             onDismiss: () {
               markHintSeen('agenda');
               setState(() => _showHints = false);
@@ -341,6 +347,26 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
           ),
       ],
     );
+  }
+
+  List<HintItem> _agendaHints(BuildContext context) {
+    final s = S.of(context);
+    return [
+      HintItem(
+        targetKey: _gridKey,
+        gestureIcon: Icons.touch_app,
+        title: s.hintTapWeatherDetail,
+        description: s.hintTapWeatherDetailDesc,
+        spotlightPadding: 0,
+      ),
+      HintItem(
+        targetKey: _gridKey,
+        gestureIcon: Icons.swipe_vertical,
+        title: s.hintDragSelect,
+        description: s.hintDragSelectDesc,
+        spotlightPadding: 0,
+      ),
+    ];
   }
 
   Widget _buildGrid(

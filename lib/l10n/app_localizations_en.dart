@@ -853,6 +853,13 @@ class SEn extends S {
   String get hintFilterDayDesc => 'Tap a day at the top to show only that day.';
 
   @override
+  String get hintFilterPeriod => 'Filter by time of day';
+
+  @override
+  String get hintFilterPeriodDesc =>
+      'Choose morning, afternoon or evening to show rides for that period.';
+
+  @override
   String get hintTapWeatherDetail => 'Tap for weather details';
 
   @override
@@ -880,7 +887,10 @@ class SEn extends S {
   String get hintSwipeDeleteDesc => 'Swipe a ride to the left to delete it.';
 
   @override
-  String get hintDismiss => 'Tap to continue';
+  String get hintDismiss => 'Tap to close';
+
+  @override
+  String get hintNext => 'Tap for next';
 
   @override
   String calendarEventTitle(String timeRange) {

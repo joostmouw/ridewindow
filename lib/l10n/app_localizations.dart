@@ -1657,6 +1657,18 @@ abstract class S {
   /// **'Tik op een dag bovenaan om alleen die dag te zien.'**
   String get hintFilterDayDesc;
 
+  /// No description provided for @hintFilterPeriod.
+  ///
+  /// In nl, this message translates to:
+  /// **'Filter op dagdeel'**
+  String get hintFilterPeriod;
+
+  /// No description provided for @hintFilterPeriodDesc.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kies ochtend, middag of avond om ritten voor dat dagdeel te tonen.'**
+  String get hintFilterPeriodDesc;
+
   /// No description provided for @hintTapWeatherDetail.
   ///
   /// In nl, this message translates to:
@@ -1708,8 +1720,14 @@ abstract class S {
   /// No description provided for @hintDismiss.
   ///
   /// In nl, this message translates to:
-  /// **'Tik om door te gaan'**
+  /// **'Tik om te sluiten'**
   String get hintDismiss;
+
+  /// No description provided for @hintNext.
+  ///
+  /// In nl, this message translates to:
+  /// **'Tik voor volgende'**
+  String get hintNext;
 
   /// No description provided for @calendarEventTitle.
   ///

@@ -152,8 +152,13 @@ GoRouter router(Ref ref) {
 
       GoRoute(
         path: '/availability',
-        pageBuilder: (context, state) =>
-            _slideUpTransition(state, const AvailabilityScreen()),
+        pageBuilder: (context, state) {
+          final fromOnboarding = state.uri.queryParameters['from'] == 'onboarding';
+          return _slideUpTransition(
+            state,
+            AvailabilityScreen(fromOnboarding: fromOnboarding),
+          );
+        },
       ),
       GoRoute(
         path: '/detail',

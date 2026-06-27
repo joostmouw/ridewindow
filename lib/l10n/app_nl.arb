@@ -387,6 +387,8 @@
   "hintTapRideWindowDesc": "Bekijk weerdetails, plan de rit in of voeg toe aan Google Agenda.",
   "hintFilterDay": "Filter op dag",
   "hintFilterDayDesc": "Tik op een dag bovenaan om alleen die dag te zien.",
+  "hintFilterPeriod": "Filter op dagdeel",
+  "hintFilterPeriodDesc": "Kies ochtend, middag of avond om ritten voor dat dagdeel te tonen.",
   "hintTapWeatherDetail": "Tik voor weerdetails",
   "hintTapWeatherDetailDesc": "Tik op een gekleurd uurvak om temperatuur, regen en wind te bekijken.",
   "hintDragSelect": "Sleep om uren te selecteren",
@@ -395,7 +397,8 @@
   "hintTapSummaryDesc": "Tik op een rit voor een uitgebreid weeroverzicht per uur, score-opbouw en windadvies.",
   "hintSwipeDelete": "Swipe om te verwijderen",
   "hintSwipeDeleteDesc": "Veeg een rit naar links om hem te verwijderen.",
-  "hintDismiss": "Tik om door te gaan",
+  "hintDismiss": "Tik om te sluiten",
+  "hintNext": "Tik voor volgende",
 
   "calendarEventTitle": "Fietsrit {timeRange}",
   "@calendarEventTitle": {

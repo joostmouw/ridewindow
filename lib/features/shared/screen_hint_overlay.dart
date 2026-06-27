@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Per-screen hint overlay with frosted glass effect.
-/// Shows once per screen, tracked via SharedPreferences.
+/// Per-screen spotlight coach marks.
+/// Shows hints one at a time with a spotlight cutout around the target element.
 
 const _kPrefix = 'hint_seen_';
 
@@ -19,24 +19,27 @@ Future<void> markHintSeen(String screenKey) async {
   await prefs.setBool('$_kPrefix$screenKey', true);
 }
 
-/// A single hint item with position and content.
+/// A single hint targeting a specific UI element via GlobalKey.
 class HintItem {
-  final Alignment alignment;
+  final GlobalKey targetKey;
   final IconData gestureIcon;
   final String title;
   final String description;
+  /// Extra padding around the spotlight cutout.
+  final double spotlightPadding;
 
   const HintItem({
-    required this.alignment,
+    required this.targetKey,
     required this.gestureIcon,
     required this.title,
     required this.description,
+    this.spotlightPadding = 8,
   });
 }
 
-/// Shows a frosted glass overlay with contextual hints for the current screen.
-/// Tapping anywhere dismisses it.
-class ScreenHintOverlay extends StatelessWidget {
+/// Spotlight coach mark overlay. Shows one hint at a time with a
+/// circular/rounded spotlight cutout around the target widget.
+class ScreenHintOverlay extends StatefulWidget {
   const ScreenHintOverlay({
     super.key,
     required this.hints,
@@ -47,101 +50,112 @@ class ScreenHintOverlay extends StatelessWidget {
   final VoidCallback onDismiss;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onDismiss,
-      child: Stack(
-        children: [
-          // Frosted glass background
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-              child: Container(color: Theme.of(context).colorScheme.scrim.withAlpha(120)),
-            ),
-          ),
-          // Hint cards positioned around the screen
-          ...hints.map((hint) => _buildHintCard(context, hint)),
-          // "Tik om door te gaan" at the bottom
-          Positioned(
-            bottom: 100,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(30),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  S.of(context).hintDismiss,
-                  style: TextStyle(color: Colors.white.withAlpha(180), fontSize: 13),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+  State<ScreenHintOverlay> createState() => _ScreenHintOverlayState();
+}
+
+class _ScreenHintOverlayState extends State<ScreenHintOverlay>
+    with SingleTickerProviderStateMixin {
+  int _currentStep = 0;
+  late AnimationController _animController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOut,
+    );
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  void _next() {
+    if (_currentStep < widget.hints.length - 1) {
+      _animController.reverse().then((_) {
+        if (mounted) {
+          setState(() => _currentStep++);
+          _animController.forward();
+        }
+      });
+    } else {
+      widget.onDismiss();
+    }
+  }
+
+  /// Get the bounding rect of the target widget in global coordinates.
+  Rect? _getTargetRect(HintItem hint) {
+    final renderBox =
+        hint.targetKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) return null;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    return Rect.fromLTWH(
+      offset.dx - hint.spotlightPadding,
+      offset.dy - hint.spotlightPadding,
+      renderBox.size.width + hint.spotlightPadding * 2,
+      renderBox.size.height + hint.spotlightPadding * 2,
     );
   }
 
-  Widget _buildHintCard(BuildContext context, HintItem hint) {
-    final theme = Theme.of(context);
+  @override
+  Widget build(BuildContext context) {
+    final hint = widget.hints[_currentStep];
+    final isLast = _currentStep == widget.hints.length - 1;
+    final s = S.of(context);
+    final targetRect = _getTargetRect(hint);
 
-    // Convert alignment to positioning
-    final screenSize = MediaQuery.of(context).size;
-    final safeTop = MediaQuery.of(context).padding.top;
-
-    // Calculate approximate position from alignment
-    double top;
-    if (hint.alignment.y <= -0.3) {
-      top = safeTop + 80 + ((hint.alignment.y + 1) * 80);
-    } else if (hint.alignment.y >= 0.3) {
-      top = screenSize.height * 0.45 + (hint.alignment.y * 120);
-    } else {
-      top = screenSize.height * 0.35;
-    }
-
-    return Positioned(
-      top: top.clamp(safeTop + 20, screenSize.height - 200),
-      left: 24,
-      right: 24,
-      child: _GlassCard(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: _next,
+      behavior: HitTestBehavior.opaque,
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Stack(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withAlpha(50),
-                borderRadius: BorderRadius.circular(12),
+            // Dark overlay with spotlight cutout
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _SpotlightPainter(
+                  targetRect: targetRect,
+                  overlayColor:
+                      Theme.of(context).colorScheme.scrim.withAlpha(180),
+                ),
               ),
-              child: Icon(hint.gestureIcon, color: Colors.white, size: 24),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    hint.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    hint.description,
-                    style: TextStyle(
-                      color: Colors.white.withAlpha(200),
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
+            // Tooltip card positioned near the target
+            if (targetRect != null)
+              _buildTooltip(context, hint, targetRect, isLast, s),
+            // Step indicator at bottom
+            Positioned(
+              bottom: 48,
+              left: 24,
+              right: 24,
+              child: SafeArea(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < widget.hints.length; i++)
+                      Container(
+                        width: i == _currentStep ? 24 : 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: i == _currentStep
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.white.withAlpha(80),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -149,80 +163,212 @@ class ScreenHintOverlay extends StatelessWidget {
       ),
     );
   }
-}
 
-class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.child});
-  final Widget child;
+  Widget _buildTooltip(
+    BuildContext context,
+    HintItem hint,
+    Rect targetRect,
+    bool isLast,
+    S s,
+  ) {
+    final screenSize = MediaQuery.of(context).size;
+    final safeTop = MediaQuery.of(context).padding.top;
+    final safeBottom = MediaQuery.of(context).padding.bottom;
+    final targetCenter = targetRect.center;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(25),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withAlpha(40)),
+    // Decide if tooltip goes above or below the target
+    final showBelow = targetCenter.dy < screenSize.height * 0.45;
+
+    // Clamp positions so tooltip stays within safe area
+    final minTop = safeTop + 8;
+    final maxBottom = safeBottom + 80; // room for step dots
+
+    double? tooltipTop;
+    double? tooltipBottom;
+
+    if (showBelow) {
+      tooltipTop = (targetRect.bottom + 16).clamp(minTop, screenSize.height * 0.65);
+    } else {
+      tooltipBottom = (screenSize.height - targetRect.top + 16).clamp(maxBottom, screenSize.height * 0.65);
+    }
+
+    return Positioned(
+      top: tooltipTop,
+      bottom: tooltipBottom,
+      left: 20,
+      right: 20,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Arrow pointing to target
+          if (showBelow)
+            Padding(
+              padding: EdgeInsets.only(
+                left: (targetCenter.dx - 20).clamp(16, screenSize.width - 56),
+              ),
+              child: CustomPaint(
+                size: const Size(16, 8),
+                painter: _ArrowPainter(
+                  color: Colors.white.withAlpha(30),
+                  pointUp: true,
+                ),
+              ),
+            ),
+          // Card
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(30),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withAlpha(50)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withAlpha(60),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(hint.gestureIcon,
+                          color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        hint.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  hint.description,
+                  style: TextStyle(
+                    color: Colors.white.withAlpha(210),
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      isLast ? s.hintDismiss : s.hintNext,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Arrow pointing up (when tooltip is above target)
+          if (!showBelow)
+            Padding(
+              padding: EdgeInsets.only(
+                left: (targetCenter.dx - 20).clamp(16, screenSize.width - 56),
+              ),
+              child: CustomPaint(
+                size: const Size(16, 8),
+                painter: _ArrowPainter(
+                  color: Colors.white.withAlpha(30),
+                  pointUp: false,
+                ),
+              ),
+            ),
+        ],
       ),
-      child: child,
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Pre-defined hints per screen
-// ---------------------------------------------------------------------------
+/// Paints a dark overlay with a rounded-rect cutout (spotlight) around the target.
+class _SpotlightPainter extends CustomPainter {
+  final Rect? targetRect;
+  final Color overlayColor;
 
-List<HintItem> homeHints(BuildContext context) {
-  final s = S.of(context);
-  return [
-    HintItem(
-      alignment: const Alignment(0, -0.3),
-      gestureIcon: Icons.touch_app,
-      title: s.hintTapRideWindow,
-      description: s.hintTapRideWindowDesc,
-    ),
-    HintItem(
-      alignment: const Alignment(0, 0.3),
-      gestureIcon: Icons.swipe,
-      title: s.hintFilterDay,
-      description: s.hintFilterDayDesc,
-    ),
-  ];
+  _SpotlightPainter({required this.targetRect, required this.overlayColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = overlayColor;
+    final fullRect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    if (targetRect == null) {
+      canvas.drawRect(fullRect, paint);
+      return;
+    }
+
+    // Draw overlay with a rounded-rect hole
+    final path = Path()
+      ..addRect(fullRect)
+      ..addRRect(RRect.fromRectAndRadius(targetRect!, const Radius.circular(12)));
+    path.fillType = PathFillType.evenOdd;
+    canvas.drawPath(path, paint);
+
+    // Subtle glow around the cutout
+    final glowPaint = Paint()
+      ..color = Colors.white.withAlpha(30)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(targetRect!, const Radius.circular(12)),
+      glowPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SpotlightPainter old) => old.targetRect != targetRect;
 }
 
-List<HintItem> agendaHints(BuildContext context) {
-  final s = S.of(context);
-  return [
-    HintItem(
-      alignment: const Alignment(0, -0.3),
-      gestureIcon: Icons.touch_app,
-      title: s.hintTapWeatherDetail,
-      description: s.hintTapWeatherDetailDesc,
-    ),
-    HintItem(
-      alignment: const Alignment(0, 0.4),
-      gestureIcon: Icons.swipe_vertical,
-      title: s.hintDragSelect,
-      description: s.hintDragSelectDesc,
-    ),
-  ];
-}
+/// Small triangle arrow for the tooltip.
+class _ArrowPainter extends CustomPainter {
+  final Color color;
+  final bool pointUp;
 
-List<HintItem> ridesHints(BuildContext context) {
-  final s = S.of(context);
-  return [
-    HintItem(
-      alignment: const Alignment(0, -0.3),
-      gestureIcon: Icons.touch_app,
-      title: s.hintTapSummary,
-      description: s.hintTapSummaryDesc,
-    ),
-    HintItem(
-      alignment: const Alignment(0, 0.4),
-      gestureIcon: Icons.swipe_left,
-      title: s.hintSwipeDelete,
-      description: s.hintSwipeDeleteDesc,
-    ),
-  ];
+  _ArrowPainter({required this.color, required this.pointUp});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    final path = Path();
+    if (pointUp) {
+      path.moveTo(0, size.height);
+      path.lineTo(size.width / 2, 0);
+      path.lineTo(size.width, size.height);
+    } else {
+      path.moveTo(0, 0);
+      path.lineTo(size.width / 2, size.height);
+      path.lineTo(size.width, 0);
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_ArrowPainter old) => false;
 }

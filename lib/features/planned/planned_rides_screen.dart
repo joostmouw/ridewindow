@@ -74,6 +74,9 @@ class PlannedRidesScreen extends ConsumerStatefulWidget {
 class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
   bool _showHints = false;
 
+  // Keys for spotlight coach marks
+  final _firstRideKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +85,26 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
         setState(() => _showHints = true);
       }
     });
+  }
+
+  List<HintItem> _ridesHints(BuildContext context) {
+    final s = S.of(context);
+    return [
+      HintItem(
+        targetKey: _firstRideKey,
+        gestureIcon: Icons.touch_app,
+        title: s.hintTapSummary,
+        description: s.hintTapSummaryDesc,
+        spotlightPadding: 4,
+      ),
+      HintItem(
+        targetKey: _firstRideKey,
+        gestureIcon: Icons.swipe,
+        title: s.hintSwipeDelete,
+        description: s.hintSwipeDeleteDesc,
+        spotlightPadding: 4,
+      ),
+    ];
   }
 
   @override
@@ -125,6 +148,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: upcoming.length,
               itemBuilder: (context, i) => _RideCard(
+                key: i == 0 ? _firstRideKey : null,
                 ride: upcoming[i],
                 allScores: allScores,
                 forecasts: forecasts,
@@ -134,7 +158,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
     ),
         if (_showHints && upcoming.isNotEmpty)
           ScreenHintOverlay(
-            hints: ridesHints(context),
+            hints: _ridesHints(context),
             onDismiss: () {
               markHintSeen('rides');
               setState(() => _showHints = false);
@@ -147,6 +171,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
 
 class _RideCard extends ConsumerWidget {
   const _RideCard({
+    super.key,
     required this.ride,
     required this.allScores,
     required this.forecasts,

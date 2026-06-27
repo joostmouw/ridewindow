@@ -299,6 +299,8 @@
   "hintTapRideWindowDesc": "View weather details, plan the ride or add to Google Calendar.",
   "hintFilterDay": "Filter by day",
   "hintFilterDayDesc": "Tap a day at the top to show only that day.",
+  "hintFilterPeriod": "Filter by time of day",
+  "hintFilterPeriodDesc": "Choose morning, afternoon or evening to show rides for that period.",
   "hintTapWeatherDetail": "Tap for weather details",
   "hintTapWeatherDetailDesc": "Tap a colored hour cell to view temperature, rain and wind.",
   "hintDragSelect": "Drag to select hours",
@@ -307,7 +309,8 @@
   "hintTapSummaryDesc": "Tap a ride for a detailed hourly weather overview, score breakdown and wind advice.",
   "hintSwipeDelete": "Swipe to delete",
   "hintSwipeDeleteDesc": "Swipe a ride to the left to delete it.",
-  "hintDismiss": "Tap to continue",
+  "hintDismiss": "Tap to close",
+  "hintNext": "Tap for next",
 
   "calendarEventTitle": "Bike ride {timeRange}",
   "calendarNoWeatherData": "No weather data available",

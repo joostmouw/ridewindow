@@ -856,6 +856,13 @@ class SNl extends S {
       'Tik op een dag bovenaan om alleen die dag te zien.';
 
   @override
+  String get hintFilterPeriod => 'Filter op dagdeel';
+
+  @override
+  String get hintFilterPeriodDesc =>
+      'Kies ochtend, middag of avond om ritten voor dat dagdeel te tonen.';
+
+  @override
   String get hintTapWeatherDetail => 'Tik voor weerdetails';
 
   @override
@@ -884,7 +891,10 @@ class SNl extends S {
       'Veeg een rit naar links om hem te verwijderen.';
 
   @override
-  String get hintDismiss => 'Tik om door te gaan';
+  String get hintDismiss => 'Tik om te sluiten';
+
+  @override
+  String get hintNext => 'Tik voor volgende';
 
   @override
   String calendarEventTitle(String timeRange) {

@@ -43,6 +43,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
   bool _showHints = false;
 
+  // GlobalKeys for spotlight coach marks
+  final _weekStripKey = GlobalKey();
+  final _firstCardKey = GlobalKey();
+  final _periodFilterKey = GlobalKey();
+
   /// null = toon alle slots; non-null = filter op dag.
   DateTime? _selectedDay;
 
@@ -59,6 +64,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Delay to ensure all widgets have completed layout for spotlight measurement
+      await Future.delayed(const Duration(milliseconds: 500));
       if (await shouldShowHint('home') && mounted) {
         setState(() => _showHints = true);
       }
@@ -121,10 +128,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        greeting,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+                      GestureDetector(
+                        onTap: userName == null || userName.isEmpty
+                            ? () => _showNameDialog(context)
+                            : null,
+                        child: _GreetingWithWhisperName(
+                          greeting: _buildTimeGreeting(context),
+                          name: userName,
+                          baseStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                          showNameHint: userName == null || userName.isEmpty,
+                          hintColor: cs.primary.withAlpha(120),
                         ),
                       ),
                       Row(
@@ -154,10 +169,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
 
                 // ── Week strip ──
-                SliverToBoxAdapter(child: _buildWeekStrip(slotsState)),
+                SliverToBoxAdapter(
+                  child: KeyedSubtree(
+                    key: _weekStripKey,
+                    child: _buildWeekStrip(slotsState),
+                  ),
+                ),
 
                 // ── Period filter ──
-                SliverToBoxAdapter(child: _buildPeriodFilter()),
+                SliverToBoxAdapter(
+                  child: KeyedSubtree(
+                    key: _periodFilterKey,
+                    child: _buildPeriodFilter(),
+                  ),
+                ),
 
                 // ── Section label ──
                 SliverToBoxAdapter(
@@ -184,7 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ),
         if (_showHints)
           ScreenHintOverlay(
-            hints: homeHints(context),
+            hints: _homeHints(context),
             onDismiss: () {
               markHintSeen('home');
               setState(() => _showHints = false);
@@ -192,6 +217,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
       ],
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Name dialog (when greeting is tapped without a name set)
+  // ---------------------------------------------------------------------------
+
+  Future<void> _showNameDialog(BuildContext context) async {
+    final s = S.of(context);
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.yourName),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          decoration: InputDecoration(hintText: s.enterYourName),
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(s.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: Text(s.save),
+          ),
+        ],
+      ),
+    );
+    if (name != null && name.isNotEmpty) {
+      await ref.read(profileProvider.notifier).setUserName(name);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Coach mark hints
+  // ---------------------------------------------------------------------------
+
+  List<HintItem> _homeHints(BuildContext context) {
+    final s = S.of(context);
+    return [
+      HintItem(
+        targetKey: _weekStripKey,
+        gestureIcon: Icons.touch_app,
+        title: s.hintFilterDay,
+        description: s.hintFilterDayDesc,
+      ),
+      HintItem(
+        targetKey: _firstCardKey,
+        gestureIcon: Icons.touch_app,
+        title: s.hintTapRideWindow,
+        description: s.hintTapRideWindowDesc,
+        spotlightPadding: 4,
+      ),
+      HintItem(
+        targetKey: _periodFilterKey,
+        gestureIcon: Icons.swipe,
+        title: s.hintFilterPeriod,
+        description: s.hintFilterPeriodDesc,
+      ),
+    ];
   }
 
   // ---------------------------------------------------------------------------
@@ -215,6 +304,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       return s.greetingWithName(timeGreeting, userName);
     }
     return timeGreeting;
+  }
+
+  String _buildTimeGreeting(BuildContext context) {
+    final s = S.of(context);
+    final hour = DateTime.now().hour;
+    if (hour < 6) return s.greetingNightOwl;
+    if (hour < 12) return s.greetingMorning;
+    if (hour < 17) return s.greetingAfternoon;
+    return s.greetingEvening;
   }
 
   // ---------------------------------------------------------------------------
@@ -458,9 +556,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           final isBest = index == 0 &&
               (slots.first.tier is Perfect || slots.first.tier is Great);
           final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
+          Widget card = _buildRideCard(slots[index], isBest: isBest);
+          if (index == 0) {
+            card = KeyedSubtree(key: _firstCardKey, child: card);
+          }
           return SpringEntrance(
             delay: AppMotion.staggerDelay * staggerIndex,
-            child: _buildRideCard(slots[index], isBest: isBest),
+            child: card,
           );
         },
       );
@@ -810,4 +912,115 @@ enum _DayPeriod {
   morning,   // 6:00 – 11:59
   afternoon, // 12:00 – 16:59
   evening,   // 17:00 – 21:59
+}
+
+// ---------------------------------------------------------------------------
+// Greeting with whisper name — greeting is static, name fades+slides in
+// ---------------------------------------------------------------------------
+
+class _GreetingWithWhisperName extends StatefulWidget {
+  const _GreetingWithWhisperName({
+    required this.greeting,
+    this.name,
+    this.baseStyle,
+    this.showNameHint = false,
+    this.hintColor,
+  });
+
+  final String greeting;
+  final String? name;
+  final TextStyle? baseStyle;
+  final bool showNameHint;
+  final Color? hintColor;
+
+  @override
+  State<_GreetingWithWhisperName> createState() =>
+      _GreetingWithWhisperNameState();
+}
+
+class _GreetingWithWhisperNameState extends State<_GreetingWithWhisperName>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnim = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+    );
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0.15, 0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+    ));
+    // Start after a short delay so the user sees it
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void didUpdateWidget(_GreetingWithWhisperName old) {
+    super.didUpdateWidget(old);
+    if (old.name != widget.name) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasName = widget.name != null && widget.name!.isNotEmpty;
+
+    if (!hasName) {
+      // No name: show greeting with dotted underline hint to set name
+      return Text.rich(
+        TextSpan(
+          text: '${widget.greeting} ',
+          style: widget.baseStyle,
+          children: [
+            if (widget.showNameHint)
+              TextSpan(
+                text: '...',
+                style: widget.baseStyle?.copyWith(
+                  color: widget.hintColor,
+                  decoration: TextDecoration.underline,
+                  decorationStyle: TextDecorationStyle.dotted,
+                  decorationColor: widget.hintColor,
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    // Has name: greeting static, name whispers in
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('${widget.greeting}, ', style: widget.baseStyle),
+        SlideTransition(
+          position: _slideAnim,
+          child: FadeTransition(
+            opacity: _fadeAnim,
+            child: Text(widget.name!, style: widget.baseStyle),
+          ),
+        ),
+      ],
+    );
+  }
 }

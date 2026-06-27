@@ -70,7 +70,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _handleNext() async {
     if (_selected == null) return;
     if (_selected == AvailabilityPreset.custom) {
-      context.go('/availability');
+      context.go('/availability?from=onboarding');
       return;
     }
     // Berekening van huidige week-maandag

@@ -7,6 +7,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -14,7 +16,9 @@ import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 class AvailabilityScreen extends ConsumerStatefulWidget {
-  const AvailabilityScreen({super.key});
+  const AvailabilityScreen({super.key, this.fromOnboarding = false});
+
+  final bool fromOnboarding;
 
   @override
   ConsumerState<AvailabilityScreen> createState() =>
@@ -178,9 +182,25 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                 ),
               ),
               // Legenda
-              _buildLegend(context),
+              _buildLegend(context, blockedHours),
               // Rider profile
               _buildRiderProfile(context, blockedHours, weekStart),
+              // "Klaar" knop wanneer vanuit onboarding
+              if (widget.fromOnboarding)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('onboarding_complete', true);
+                        if (mounted) context.go('/home');
+                      },
+                      child: Text(S.of(context).onboardingNext),
+                    ),
+                  ),
+                ),
             ],
           );
         },
@@ -215,7 +235,9 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     );
   }
 
-  Widget _buildLegend(BuildContext context) {
+  Widget _buildLegend(BuildContext context, Map<DateTime, BlockType> blockedHours) {
+    final hasWork = blockedHours.values.any((b) => b == BlockType.work);
+    final hasCalendar = blockedHours.values.any((b) => b == BlockType.calendar);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
@@ -223,8 +245,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
         children: [
           _legendItem(Theme.of(context).colorScheme.surface, S.of(context).legendFree, context),
           _legendItem(context.rw.availCustom, S.of(context).legendBusy, context),
-          _legendItem(context.rw.availWork, S.of(context).legendWork, context),
-          _legendItem(context.rw.availCalendar, S.of(context).legendCalendar, context),
+          if (hasWork)
+            _legendItem(context.rw.availWork, S.of(context).legendWork, context),
+          if (hasCalendar)
+            _legendItem(context.rw.availCalendar, S.of(context).legendCalendar, context),
         ],
       ),
     );
