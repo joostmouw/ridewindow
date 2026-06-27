@@ -371,6 +371,27 @@ class SNl extends S {
   String get toleranceMaxWind => 'Max. wind';
 
   @override
+  String get toleranceTempInfoTitle => 'Temperatuurbereik';
+
+  @override
+  String get toleranceTempInfo =>
+      'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer rijvensters; een smaller bereik toont alleen je ideale omstandigheden.';
+
+  @override
+  String get toleranceRainInfoTitle => 'Regentolerantie';
+
+  @override
+  String get toleranceRainInfo =>
+      'Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score — meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.';
+
+  @override
+  String get toleranceWindInfoTitle => 'Windtolerantie';
+
+  @override
+  String get toleranceWindInfo =>
+      'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer rijvensters, maar verwacht zwaarder fietsen.';
+
+  @override
   String get tempDescAllWeather => 'Je fietst in bijna elk weer';
 
   @override

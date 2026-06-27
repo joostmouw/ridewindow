@@ -763,6 +763,42 @@ abstract class S {
   /// **'Max. wind'**
   String get toleranceMaxWind;
 
+  /// No description provided for @toleranceTempInfoTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Temperatuurbereik'**
+  String get toleranceTempInfoTitle;
+
+  /// No description provided for @toleranceTempInfo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer rijvensters; een smaller bereik toont alleen je ideale omstandigheden.'**
+  String get toleranceTempInfo;
+
+  /// No description provided for @toleranceRainInfoTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Regentolerantie'**
+  String get toleranceRainInfoTitle;
+
+  /// No description provided for @toleranceRainInfo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score — meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.'**
+  String get toleranceRainInfo;
+
+  /// No description provided for @toleranceWindInfoTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Windtolerantie'**
+  String get toleranceWindInfoTitle;
+
+  /// No description provided for @toleranceWindInfo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer rijvensters, maar verwacht zwaarder fietsen.'**
+  String get toleranceWindInfo;
+
   /// No description provided for @tempDescAllWeather.
   ///
   /// In nl, this message translates to:

@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -102,7 +104,8 @@ class ProfileNotifier extends _$ProfileNotifier {
         .toList();
 
     final theme = prefs.getString(_keyTheme) ?? 'system';
-    final locale = prefs.getString(_keyLocale) ?? 'nl';
+    final systemLang = ui.PlatformDispatcher.instance.locale.languageCode;
+    final locale = prefs.getString(_keyLocale) ?? (systemLang == 'nl' ? 'nl' : 'en');
     final locationOverride = prefs.getString(_keyLocation);
     final userName = prefs.getString(_keyUserName);
     final notifEvening = prefs.getBool(_keyNotifEvening) ?? false;

@@ -382,6 +382,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     _infoButton(
                       context,
+                      s.toleranceTempInfoTitle,
+                      s.toleranceTempInfo,
                       _tempRangeDescription(context, _tempMin, _tempMax),
                     ),
                     const Spacer(),
@@ -445,6 +447,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     _infoButton(
                       context,
+                      s.toleranceRainInfoTitle,
+                      s.toleranceRainInfo,
                       _rainDescription(context, _rainMax),
                     ),
                     const Spacer(),
@@ -502,6 +506,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     _infoButton(
                       context,
+                      s.toleranceWindInfoTitle,
+                      s.toleranceWindInfo,
                       _windDescription(context, _windMax),
                     ),
                     const Spacer(),
@@ -631,16 +637,47 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 // Helper methods for contextual info descriptions
 // ---------------------------------------------------------------------------
 
-Widget _infoButton(BuildContext context, String description) {
+Widget _infoButton(BuildContext context, String title, String explanation, String currentDesc) {
   return IconButton(
     icon: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
     padding: EdgeInsets.zero,
     constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-    tooltip: description,
+    tooltip: title,
     onPressed: () => showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        content: Text(description),
+        title: Text(title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(explanation),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer.withAlpha(80),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.tune, size: 16, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      currentDesc,
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

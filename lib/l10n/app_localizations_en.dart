@@ -371,6 +371,27 @@ class SEn extends S {
   String get toleranceMaxWind => 'Max. wind';
 
   @override
+  String get toleranceTempInfoTitle => 'Temperature range';
+
+  @override
+  String get toleranceTempInfo =>
+      'Set your ideal cycling temperature. Hours within this range score 100 for temperature. Outside the range, the score drops gradually — the further from your range, the lower the score.\n\nA wider range means more ride windows; a narrower range shows only your ideal conditions.';
+
+  @override
+  String get toleranceRainInfoTitle => 'Rain tolerance';
+
+  @override
+  String get toleranceRainInfo =>
+      'Set the maximum rainfall per hour you\'re willing to ride in. Hours at or below this limit score 100 for rain. Above the limit, the score drops — heavier rain means a lower score.\n\nSet to 0 mm for only dry conditions, or higher if you don\'t mind some rain.';
+
+  @override
+  String get toleranceWindInfoTitle => 'Wind tolerance';
+
+  @override
+  String get toleranceWindInfo =>
+      'Set the maximum wind speed you\'re comfortable cycling in. Hours at or below this limit score 100 for wind. Above the limit, the score drops — stronger wind means a lower score.\n\nHigher tolerance means more ride windows, but expect harder cycling.';
+
+  @override
   String get tempDescAllWeather => 'You ride in almost any weather';
 
   @override

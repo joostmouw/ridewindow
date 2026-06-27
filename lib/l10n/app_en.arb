@@ -133,6 +133,13 @@
   "toleranceMaxRain": "Max. rain",
   "toleranceMaxWind": "Max. wind",
 
+  "toleranceTempInfoTitle": "Temperature range",
+  "toleranceTempInfo": "Set your ideal cycling temperature. Hours within this range score 100 for temperature. Outside the range, the score drops gradually — the further from your range, the lower the score.\n\nA wider range means more ride windows; a narrower range shows only your ideal conditions.",
+  "toleranceRainInfoTitle": "Rain tolerance",
+  "toleranceRainInfo": "Set the maximum rainfall per hour you're willing to ride in. Hours at or below this limit score 100 for rain. Above the limit, the score drops — heavier rain means a lower score.\n\nSet to 0 mm for only dry conditions, or higher if you don't mind some rain.",
+  "toleranceWindInfoTitle": "Wind tolerance",
+  "toleranceWindInfo": "Set the maximum wind speed you're comfortable cycling in. Hours at or below this limit score 100 for wind. Above the limit, the score drops — stronger wind means a lower score.\n\nHigher tolerance means more ride windows, but expect harder cycling.",
+
   "tempDescAllWeather": "You ride in almost any weather",
   "tempDescComfortable": "Comfortable cycling range",
   "tempDescNiceOnly": "Only in nice weather",

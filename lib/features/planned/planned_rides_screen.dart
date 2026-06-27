@@ -81,6 +81,8 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Delay to ensure ListView has laid out the first card for spotlight measurement
+      await Future.delayed(const Duration(milliseconds: 500));
       if (await shouldShowHint('rides') && mounted) {
         setState(() => _showHints = true);
       }

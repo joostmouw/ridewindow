@@ -176,8 +176,12 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
     final safeBottom = MediaQuery.of(context).padding.bottom;
     final targetCenter = targetRect.center;
 
+    // Large targets (>40% of screen): center tooltip on screen instead of
+    // anchoring to an edge that may push it off-screen.
+    final targetCoversScreen = targetRect.height > screenSize.height * 0.4;
+
     // Decide if tooltip goes above or below the target
-    final showBelow = targetCenter.dy < screenSize.height * 0.45;
+    final showBelow = targetCoversScreen || targetCenter.dy < screenSize.height * 0.45;
 
     // Clamp positions so tooltip stays within safe area
     final minTop = safeTop + 8;
@@ -186,7 +190,10 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
     double? tooltipTop;
     double? tooltipBottom;
 
-    if (showBelow) {
+    if (targetCoversScreen) {
+      // Place tooltip in the vertical center of the screen
+      tooltipTop = screenSize.height * 0.38;
+    } else if (showBelow) {
       tooltipTop = (targetRect.bottom + 16).clamp(minTop, screenSize.height * 0.65);
     } else {
       tooltipBottom = (screenSize.height - targetRect.top + 16).clamp(maxBottom, screenSize.height * 0.65);
@@ -201,8 +208,8 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Arrow pointing to target
-          if (showBelow)
+          // Arrow pointing to target (hide for large targets)
+          if (showBelow && !targetCoversScreen)
             Padding(
               padding: EdgeInsets.only(
                 left: (targetCenter.dx - 20).clamp(16, screenSize.width - 56),
