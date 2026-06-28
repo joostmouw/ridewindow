@@ -187,6 +187,12 @@ abstract class S {
   /// **'RIJTIJDEN'**
   String get rideTimes;
 
+  /// No description provided for @plannedRidesLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'GEPLAND'**
+  String get plannedRidesLabel;
+
   /// No description provided for @filterMorning.
   ///
   /// In nl, this message translates to:

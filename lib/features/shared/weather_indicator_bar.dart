@@ -45,6 +45,16 @@ class WeatherIndicatorBar extends StatelessWidget {
         ? ((idealMax! - min) / range).clamp(0.0, 1.0)
         : null;
 
+    // Build ideal range label text
+    final String idealLabel;
+    if (idealMin != null && idealMax != null) {
+      idealLabel = '${idealMin!.round()}–${idealMax!.round()}$unit';
+    } else if (idealMax != null) {
+      idealLabel = '≤${idealMax!.round()}$unit';
+    } else {
+      idealLabel = '';
+    }
+
     return Row(
       children: [
         Icon(icon, size: 14, color: rw.textTertiary),
@@ -73,6 +83,13 @@ class WeatherIndicatorBar extends StatelessWidget {
             ),
           ),
         ),
+        if (idealLabel.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(
+            idealLabel,
+            style: TextStyle(fontSize: 9, color: rw.scorePerfect, fontWeight: FontWeight.w500),
+          ),
+        ],
         if (infoText != null) ...[
           const SizedBox(width: 4),
           GestureDetector(

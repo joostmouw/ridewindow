@@ -17,6 +17,7 @@ import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -183,6 +184,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     child: _buildPeriodFilter(),
                   ),
                 ),
+
+                // ── Planned rides ──
+                _buildPlannedRidesSliver(),
 
                 // ── Section label ──
                 SliverToBoxAdapter(
@@ -478,6 +482,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ],
         ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Planned rides section
+  // ---------------------------------------------------------------------------
+
+  Widget _buildPlannedRidesSliver() {
+    final plannedRides = ref.watch(plannedRidesProvider);
+    if (plannedRides.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
+    final s = S.of(context);
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              s.plannedRidesLabel,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: cs.onSurfaceVariant,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...plannedRides.map((ride) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Material(
+                color: rw.plannedRide.withAlpha(18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: rw.plannedRide.withAlpha(60)),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => context.push('/rides'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        Icon(Icons.event_available, size: 20, color: rw.plannedRide),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _formatDayName(ride.start),
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: rw.plannedRide,
+                                ),
+                              ),
+                              Text(
+                                '${_formatTime(ride.start)} – ${_formatTime(ride.end)} · ${ride.durationHours}u',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ScoreBadge(tier: rideTierFromScore(ride.plannedScore)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),),
+          ],
         ),
       ),
     );

@@ -66,6 +66,9 @@ class SNl extends S {
   String get rideTimes => 'RIJTIJDEN';
 
   @override
+  String get plannedRidesLabel => 'GEPLAND';
+
+  @override
   String get filterMorning => 'Ochtend';
 
   @override

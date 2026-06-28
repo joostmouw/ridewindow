@@ -26,8 +26,8 @@ class TierColors {
   static const light = TierColors(
     perfectFg: Color(0xFF1B5E20),
     perfectBg: Color(0xFFE8F5E9),
-    greatFg: Color(0xFF33691E),
-    greatBg: Color(0xFFF1F8E9),
+    greatFg: Color(0xFF00695C),   // teal 800 — distinct from Perfect green
+    greatBg: Color(0xFFE0F2F1),   // teal 50
     acceptableFg: Color(0xFFE65100),
     acceptableBg: Color(0xFFFFF3E0),
     poorFg: Color(0xFF757575),
@@ -37,8 +37,8 @@ class TierColors {
   static const dark = TierColors(
     perfectFg: Color(0xFFA5D6A7),
     perfectBg: Color(0xFF1B3A1E),
-    greatFg: Color(0xFFC5E1A5),
-    greatBg: Color(0xFF263218),
+    greatFg: Color(0xFF80CBC4),   // teal 200
+    greatBg: Color(0xFF1A332F),   // dark teal
     acceptableFg: Color(0xFFFFCC80),
     acceptableBg: Color(0xFF3E2723),
     poorFg: Color(0xFF9E9E9E),
@@ -64,7 +64,7 @@ abstract final class AppColors {
   static const lightBorderDim = Color(0xFFF0F0F0);
 
   static const lightScorePerfect = Color(0xFF2E7D32);
-  static const lightScoreGreat = Color(0xFF66BB6A);
+  static const lightScoreGreat = Color(0xFF26A69A);  // teal 400
   static const lightScoreAcceptable = Color(0xFFFFA726);
   static const lightScorePoor = Color(0xFFBDBDBD);
 
@@ -107,7 +107,7 @@ abstract final class AppColors {
   static const darkBorderDim = Color(0xFF333333);
 
   static const darkScorePerfect = Color(0xFF66BB6A);
-  static const darkScoreGreat = Color(0xFF81C784);
+  static const darkScoreGreat = Color(0xFF80CBC4);   // teal 200
   static const darkScoreAcceptable = Color(0xFFFFB74D);
   static const darkScorePoor = Color(0xFF757575);
 

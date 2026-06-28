@@ -66,6 +66,9 @@ class SEn extends S {
   String get rideTimes => 'RIDE TIMES';
 
   @override
+  String get plannedRidesLabel => 'PLANNED';
+
+  @override
   String get filterMorning => 'Morning';
 
   @override
