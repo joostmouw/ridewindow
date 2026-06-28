@@ -20,7 +20,7 @@ final class PlannedRidesNotifierProvider
           argument: null,
           retry: null,
           name: r'plannedRidesProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -42,7 +42,7 @@ final class PlannedRidesNotifierProvider
 }
 
 String _$plannedRidesNotifierHash() =>
-    r'3e422b4a164cc8146003bfd7dba3c609f6bce722';
+    r'455b713d9c4c24e740f6d76eac8d7b72c3b49220';
 
 abstract class _$PlannedRidesNotifier extends $Notifier<List<PlannedRide>> {
   List<PlannedRide> build();

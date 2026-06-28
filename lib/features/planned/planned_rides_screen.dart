@@ -118,7 +118,8 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
     final theme = Theme.of(context);
 
     final now = DateTime.now();
-    final upcoming = rides.where((r) => r.end.isAfter(now)).toList();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final upcoming = rides.where((r) => r.end.isAfter(todayStart)).toList();
 
     return Stack(
       children: [

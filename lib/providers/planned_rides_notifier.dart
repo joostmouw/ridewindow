@@ -49,7 +49,7 @@ class PlannedRide {
 
 const _kPrefsKey = 'planned_rides';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class PlannedRidesNotifier extends _$PlannedRidesNotifier {
   @override
   List<PlannedRide> build() {
@@ -58,17 +58,17 @@ class PlannedRidesNotifier extends _$PlannedRidesNotifier {
     if (raw == null) return [];
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
     return list
         .map(PlannedRide.fromJson)
-        .where((r) => r.end.isAfter(now))
+        .where((r) => r.end.isAfter(todayStart))
         .toList()
       ..sort((a, b) => a.start.compareTo(b.start));
   }
 
   void add(PlannedRide ride) {
-    // Don't add if overlapping with existing ride
-    if (state.any((r) =>
-        r.start.isBefore(ride.end) && r.end.isAfter(ride.start))) {
+    // Don't add exact duplicate
+    if (state.any((r) => r.start == ride.start && r.end == ride.end)) {
       return;
     }
     state = [...state, ride]..sort((a, b) => a.start.compareTo(b.start));

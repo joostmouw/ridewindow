@@ -69,11 +69,18 @@ HourlyForecast? _findForecast(DateTime day, int hour, List<HourlyForecast> forec
 }
 
 bool _isBlocked(DateTime day, int hour, Map<DateTime, BlockType> blocked) {
-  final now = DateTime.now();
-  final weekStart = DateTime.utc(now.year, now.month, now.day - (now.weekday - 1));
-  final equiv = weekStart.add(Duration(days: day.weekday - 1));
-  final key = DateTime.utc(equiv.year, equiv.month, equiv.day, hour);
-  return blocked.containsKey(key);
+  // Direct match first
+  final directKey = DateTime(day.year, day.month, day.day, hour);
+  if (blocked.containsKey(directKey)) return true;
+
+  // Normalize to the blocked-hours week (presets seed one reference week)
+  if (blocked.isEmpty) return false;
+  final anyKey = blocked.keys.first;
+  final blockedWeekMonday = anyKey.subtract(Duration(days: anyKey.weekday - DateTime.monday));
+  final normalizedDay = DateTime(blockedWeekMonday.year, blockedWeekMonday.month, blockedWeekMonday.day)
+      .add(Duration(days: day.weekday - DateTime.monday));
+  final normalized = DateTime(normalizedDay.year, normalizedDay.month, normalizedDay.day, hour);
+  return blocked.containsKey(normalized);
 }
 
 String _windDirection(double? deg, BuildContext context) {

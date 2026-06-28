@@ -59,13 +59,20 @@ class WeatherIndicatorBar extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: rw.textTertiary),
         const SizedBox(width: 6),
+        // Fixed-width value column with right-alignment for numeric alignment
         SizedBox(
-          width: 38,
+          width: 46,
           child: Text(
             '${value.round()}$unit',
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
           ),
         ),
+        const SizedBox(width: 6),
         Expanded(
           child: SizedBox(
             height: 12,
@@ -83,15 +90,24 @@ class WeatherIndicatorBar extends StatelessWidget {
             ),
           ),
         ),
-        if (idealLabel.isNotEmpty) ...[
-          const SizedBox(width: 6),
-          Text(
-            idealLabel,
-            style: TextStyle(fontSize: 9, color: rw.scorePerfect, fontWeight: FontWeight.w500),
-          ),
-        ],
+        // Fixed-width ideal range label so bars stay equal length
+        SizedBox(
+          width: 52,
+          child: idealLabel.isNotEmpty
+              ? Text(
+                  idealLabel,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: rw.scorePerfect,
+                    fontWeight: FontWeight.w500,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                )
+              : null,
+        ),
         if (infoText != null) ...[
-          const SizedBox(width: 4),
+          const SizedBox(width: 2),
           GestureDetector(
             onTap: () => _showInfo(context),
             child: Icon(Icons.info_outline, size: 14, color: rw.textHint),
@@ -164,6 +180,10 @@ class _BarPainter extends CustomPainter {
     // Background track
     canvas.drawRRect(rrect, Paint()..color = trackColor);
 
+    // Clip to track shape so the green zone respects rounded corners
+    canvas.save();
+    canvas.clipRRect(rrect);
+
     // Ideal zone (green band)
     if (idealMinFrac != null && idealMaxFrac != null) {
       final left = idealMinFrac! * w;
@@ -179,6 +199,8 @@ class _BarPainter extends CustomPainter {
         Paint()..color = zoneColor,
       );
     }
+
+    canvas.restore();
 
     // Value indicator dot
     final dotX = fraction * w;

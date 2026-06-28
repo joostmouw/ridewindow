@@ -24,7 +24,6 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
-import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -523,7 +522,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
-                  onTap: () => context.push('/rides'),
+                  onTap: () => _openPlannedRideDetail(ride),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     child: Row(
@@ -559,6 +558,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openPlannedRideDetail(PlannedRide ride) {
+    final slotsState = ref.read(slotsProvider);
+    final weatherState = ref.read(weatherProvider);
+    final allForecasts = weatherState.hasValue
+        ? weatherState.requireValue
+        : <HourlyForecast>[];
+    final slotForecasts = allForecasts
+        .where((f) => !f.time.isBefore(ride.start) && f.time.isBefore(ride.end))
+        .toList();
+
+    // Try to find the matching RideSlot from current slots
+    RideSlot? matchingSlot;
+    if (slotsState is SlotsLoaded) {
+      for (final slot in slotsState.slots) {
+        if (slot.start == ride.start && slot.end == ride.end) {
+          matchingSlot = slot;
+          break;
+        }
+      }
+    }
+
+    // Fallback: construct a minimal RideSlot from the planned ride data
+    matchingSlot ??= RideSlot(
+      start: ride.start,
+      end: ride.end,
+      overallScore: ride.plannedScore,
+      tier: rideTierFromScore(ride.plannedScore),
+      hours: const [],
+    );
+
+    HapticFeedback.selectionClick();
+    context.push(
+      '/detail',
+      extra: DetailArgs(
+        slot: matchingSlot,
+        forecasts: slotForecasts,
       ),
     );
   }
@@ -610,7 +649,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         );
       }
 
-      var slots = slotsState.slots;
+      // Filter out already-planned rides
+      final planned = ref.watch(plannedRidesProvider);
+      var slots = slotsState.slots.where((s) {
+        return !planned.any((r) => r.start == s.start && r.end == s.end);
+      }).toList();
+
       if (_selectedDay != null) {
         slots = slots.where((s) {
           return s.start.year == _selectedDay!.year &&
@@ -711,7 +755,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       direction: DismissDirection.startToEnd,
       confirmDismiss: (_) async {
         HapticFeedback.mediumImpact();
-        await _addToCalendar(slot, slotForecasts);
+        _planRide(slot);
         return false;
       },
       background: Container(
@@ -724,10 +768,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         padding: const EdgeInsets.only(left: 24),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, color: cs.onPrimaryContainer, size: 22),
+            Icon(Icons.event_available, color: cs.onPrimaryContainer, size: 22),
             const SizedBox(width: 8),
             Text(
-              S.of(context).addToCalendar,
+              S.of(context).schedule,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 color: cs.onPrimaryContainer,
               ),
@@ -836,8 +880,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 Align(
                   alignment: Alignment.centerRight,
                   child: FilledButton.tonalIcon(
-                    onPressed: () => _addToCalendar(slot, slotForecasts),
-                    icon: const Icon(Icons.calendar_today, size: 16),
+                    onPressed: () => _planRide(slot),
+                    icon: const Icon(Icons.event_available, size: 16),
                     label: Text(S.of(context).schedule),
                   ),
                 ),
@@ -908,24 +952,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   // ---------------------------------------------------------------------------
-  // SnackBar
+  // Plan ride (in-app)
   // ---------------------------------------------------------------------------
 
-  Future<void> _addToCalendar(RideSlot slot, List<HourlyForecast> forecasts) async {
-    try {
-      await CalendarService().addRideSlotToCalendar(slot, forecasts);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context).addedToGoogleCalendar)),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(S.of(context).couldNotAdd(e.toString()))),
-        );
-      }
+  void _planRide(RideSlot slot) {
+    final notifier = ref.read(plannedRidesProvider.notifier);
+    final already = ref.read(plannedRidesProvider).any(
+      (r) => r.start == slot.start && r.end == slot.end,
+    );
+    if (already) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context).ridePlanned)),
+      );
+      return;
     }
+    notifier.add(PlannedRide(
+      start: slot.start,
+      end: slot.end,
+      plannedScore: slot.overallScore,
+    ));
+    HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(S.of(context).ridePlanned)),
+    );
   }
 
   // ---------------------------------------------------------------------------
