@@ -37,9 +37,30 @@ class AvailabilityFilter {
   ) {
     var current = slot.start;
     while (current.isBefore(slot.end)) {
-      if (blockedHours.containsKey(current)) return true;
+      if (_isHourBlocked(current, blockedHours)) return true;
       current = current.add(const Duration(hours: 1));
     }
     return false;
+  }
+
+  /// Checks if [hour] is blocked by normalizing to the same weekday
+  /// in the blocked-hours map. This ensures presets (which are seeded
+  /// for one calendar week) work correctly across week boundaries.
+  bool _isHourBlocked(DateTime hour, Map<DateTime, BlockType> blockedHours) {
+    // Direct match first (fast path for same-week slots)
+    if (blockedHours.containsKey(hour)) return true;
+
+    // Normalize: find the equivalent weekday+hour in the blocked map.
+    // Presets seed Mon-Sun of one week; map any date to that week.
+    if (blockedHours.isEmpty) return false;
+
+    // Find the Monday of the blocked-hours week
+    final anyKey = blockedHours.keys.first;
+    final blockedWeekMonday = anyKey.subtract(Duration(days: anyKey.weekday - DateTime.monday));
+    final normalizedDay = DateTime(blockedWeekMonday.year, blockedWeekMonday.month, blockedWeekMonday.day)
+        .add(Duration(days: hour.weekday - DateTime.monday));
+    final normalized = DateTime(normalizedDay.year, normalizedDay.month, normalizedDay.day, hour.hour);
+
+    return blockedHours.containsKey(normalized);
   }
 }

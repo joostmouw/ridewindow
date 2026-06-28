@@ -536,7 +536,7 @@ class _CellWidget extends ConsumerWidget {
           color: isSelected
               ? rw.scorePerfect
               : blocked
-                  ? color.withAlpha(80)
+                  ? Theme.of(context).colorScheme.surfaceContainerHighest
                   : color,
           borderRadius: BorderRadius.circular(3),
           border: isSelected
@@ -546,7 +546,7 @@ class _CellWidget extends ConsumerWidget {
                   : null,
         ),
         child: blocked && !isSelected
-            ? Center(child: Icon(Icons.block, size: 10, color: rw.error.withAlpha(170)))
+            ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
             : isSelected
                 ? Center(
                     child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
