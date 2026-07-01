@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/availability_presets.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -181,6 +182,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                   ),
                 ),
               ),
+              // Preset keuze
+              _buildPresetChips(context, weekStart),
               // Legenda
               _buildLegend(context, blockedHours),
               // Rider profile
@@ -231,6 +234,34 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
             width: 0.5,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPresetChips(BuildContext context, DateTime weekStart) {
+    final s = S.of(context);
+    final presets = [
+      (AvailabilityPreset.weekendsOnly, s.presetWeekendsOnly),
+      (AvailabilityPreset.eveningsAndWeekends, s.presetEveningsWeekends),
+      (AvailabilityPreset.morningsAndWeekends, s.presetMorningsWeekends),
+      (AvailabilityPreset.custom, s.presetCustom),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      child: Wrap(
+        spacing: 8,
+        children: presets.map((p) => ActionChip(
+          label: Text(p.$2, style: const TextStyle(fontSize: 12)),
+          onPressed: () async {
+            HapticFeedback.mediumImpact();
+            final monday = weekStart.subtract(
+              Duration(days: weekStart.weekday - DateTime.monday),
+            );
+            final preset = buildPreset(p.$1, DateTime(monday.year, monday.month, monday.day));
+            await ref.read(availabilityProvider.notifier).seedPreset(preset);
+          },
+        )).toList(),
       ),
     );
   }
