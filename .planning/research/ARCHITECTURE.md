@@ -1,508 +1,269 @@
 # Architecture Research
 
-**Domain:** Local-first Flutter Android app — cyclist weather-window scheduler
-**Researched:** 2026-06-01
-**Confidence:** HIGH (Flutter official docs + Riverpod official docs + verified community sources)
-
----
+**Domain:** Flutter Web/PWA integration for an existing Android Flutter app (RideWindow v2.0)
+**Researched:** 2026-07-10
+**Confidence:** MEDIUM-HIGH (package platform support verified against pub.dev/official docs; exact web-auth behavior for `google_sign_in` 7.x scope-authorization flagged LOW and needs phase-specific validation)
 
 ## Standard Architecture
 
 ### System Overview
 
+RideWindow's existing layering (domain → data → providers → UI) is **already well-suited to adding a web target** because platform-specific code was pushed to the edges (`lib/data/database`, `lib/platform`, `lib/services`, and the handful of `lib/providers/*_notifier.dart` files that call geolocator/permission_handler/google_sign_in) rather than leaking into `lib/domain` or `lib/features`. The work is almost entirely about **swapping/gating implementations at existing seams**, not restructuring layers.
+
 ```
-┌────────────────────────────────────────────────────────────────────┐
-│                        PRESENTATION LAYER                          │
-│   Views (Screens/Widgets)       ViewModels / Notifiers             │
-│   HomeScreen  DetailScreen      WeatherNotifier  SlotsNotifier     │
-│   ProfileScreen  OnboardScreen  AvailabilityNotifier               │
-├────────────────────────────────────────────────────────────────────┤
-│                         DOMAIN LAYER                               │
-│   (Pure Dart — zero Flutter / zero I/O dependencies)               │
-│   ScoringEngine   SlotGenerator   AvailabilityFilter               │
-│   RideSlot        HourlyScore     UserProfile   WeatherTolerances  │
-├────────────────────────────────────────────────────────────────────┤
-│                          DATA LAYER                                │
-│   WeatherRepository     ProfileRepository     ForecastCache        │
-│   OpenMeteoClient       HiveProfileStore      HiveForecastStore    │
-│   CalendarService       NotificationService                        │
-├────────────────────────────────────────────────────────────────────┤
-│                       PLATFORM LAYER                               │
-│   LocationPlugin    WorkManagerPlugin    FirebaseMessaging          │
-│   GoogleCalendarAPI                                                │
-└────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│  UI (lib/features/*, lib/app/*)                — NO CHANGES for web   │
+├───────────────────────────────────────────────────────────────────────┤
+│  Providers (lib/providers/*_notifier.dart)                             │
+│  ┌───────────────┐ ┌────────────────┐ ┌──────────────┐ ┌────────────┐ │
+│  │ WeatherNotifier│ │ProfileNotifier │ │Availability  │ │SlotsNotifier│ │
+│  │ (no change)   │ │(no change)      │ │Notifier      │ │(no change)  │ │
+│  └───────┬───────┘ └────────────────┘ │(no change)   │ └────────────┘ │
+│  ┌───────┴───────┐ ┌────────────────┐ └──────────────┘                │
+│  │LocationNotifier│ │GpsPermission   │  ← geolocator/permission_handler│
+│  │(transparent   │ │Notifier         │    branch INSIDE these two only │
+│  │ via federated │ │(openSettings()  │                                 │
+│  │ web plugin)   │ │ needs kIsWeb    │                                 │
+│  └───────────────┘ │ guard)          │                                 │
+│                     └────────────────┘                                 │
+├───────────────────────────────────────────────────────────────────────┤
+│  Data / Platform Layer  — THIS is where web branching concentrates     │
+│  ┌─────────────────┐ ┌────────────────────┐ ┌─────────────────────┐   │
+│  │ AppDatabase      │ │ CalendarService    │ │ background_task.dart │   │
+│  │ (Drift)          │ │ (google_sign_in +  │ │ (WorkManager isolate)│   │
+│  │ needs web:       │ │  googleapis)       │ │ NEVER runs on web —  │   │
+│  │ DriftWebOptions  │ │ needs clientId      │ │ guarded at call site │   │
+│  │ + sqlite3.wasm + │ │ passed conditionally│ │ in main.dart, file   │   │
+│  │ drift_worker.js  │ │ at initialize()     │ │ itself untouched     │   │
+│  └─────────────────┘ └────────────────────┘ └─────────────────────┘   │
+│  ┌─────────────────┐ ┌────────────────────┐                            │
+│  │ shared_preferences│ │ home_widget        │                          │
+│  │ — already fully  │ │ (Android-only,      │                          │
+│  │ cross-platform,  │ │ MissingPluginException│                        │
+│  │ NO CHANGES       │ │ on web — guard call │                          │
+│  │ needed           │ │ sites with kIsWeb)  │                          │
+│  └─────────────────┘ └────────────────────┘                            │
+├───────────────────────────────────────────────────────────────────────┤
+│  NEW for web only: web/ directory (index.html, manifest.json,          │
+│  sqlite3.wasm, drift_worker.dart.js, service worker/PWA install)        │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Component Responsibilities
 
-| Component | Responsibility | Layer |
-|-----------|---------------|-------|
-| `ScoringEngine` | Converts hourly weather data + tolerances → 0–100 score per hour. Pure function, no I/O. | Domain |
-| `SlotGenerator` | Finds contiguous good-score hours, produces `RideSlot` objects of 2h / 3h / 4–5h. Pure function. | Domain |
-| `AvailabilityFilter` | Removes slots that overlap blocked hours from user profile. Pure function. | Domain |
-| `WeatherRepository` | Fetches forecast from Open-Meteo and writes to local cache. Returns typed domain models. | Data |
-| `ProfileRepository` | Persists and reads user profile, availability grid, tolerances, ride-length prefs. | Data |
-| `ForecastCache` | Hive box wrapping 168-hour (7×24) forecast. Exposes `isStale()` for cache decisions. | Data |
-| `OpenMeteoClient` | Raw HTTP to Open-Meteo API. Returns raw JSON → domain `HourlyForecast`. | Data |
-| `CalendarService` | Google Calendar OAuth sign-in + event creation. Optional, on-demand only. | Data |
-| `NotificationService` | Firebase Messaging + local notification scheduling. Decoupled from weather logic. | Data |
-| `WeatherNotifier` | AsyncNotifier watching `WeatherRepository`. Exposes `AsyncValue<List<HourlyForecast>>`. | Presentation |
-| `SlotsNotifier` | Derives `List<RideSlot>` by running domain pipeline on weather + profile. Watches both. | Presentation |
-| `AvailabilityNotifier` | Manages availability grid edits; persists on save. | Presentation |
-| `ProfileNotifier` | Manages tolerances, ride lengths, location preference. | Presentation |
-| `HomeScreen` | Reads `SlotsNotifier`. Renders week strip + ranked slot cards. | Presentation |
-| `DetailScreen` | Reads single `RideSlot` from route args. Renders hourly breakdown + insights sheet. | Presentation |
+| Component | Responsibility | Web-specific handling |
+|-----------|----------------|------------------------|
+| `lib/data/database/app_database.dart` | Owns Drift `_openConnection()` | Add `web: DriftWebOptions(...)` alongside existing `native:` param — single function already supports both via `drift_flutter`'s internal conditional imports |
+| `lib/platform/background_task.dart` | WorkManager isolate callback (weather refresh) | Entire file is dead code on web — never registered, never imported into a web-reachable path. No internal `kIsWeb` branching needed inside the file itself |
+| `main.dart` | App bootstrap: timezone init, WorkManager registration, ProviderScope | `if (!kIsWeb) { await Workmanager()... }` guard around WorkManager init/registration; the `ref.listen(slotsProvider, ...) → WidgetUpdateService.update()` call needs a `kIsWeb` guard too |
+| `lib/providers/location_provider.dart` (`LocationNotifier`) | Resolve lat/lon from override → GPS → default | No code change required — `geolocator_web` federated plugin makes `Geolocator.getCurrentPosition()` work transparently via the browser Geolocation API (requires HTTPS/secure context, which Firebase Hosting provides) |
+| `lib/providers/gps_permission_notifier.dart` (`GpsPermissionNotifier`) | GPS permission state machine | `openSettings()` (deep-links to OS app settings via `permission_handler`) has no web equivalent — must be gated with `kIsWeb` and replaced with an in-app message ("enable location in your browser's site settings") |
+| `lib/services/calendar_service.dart` (`CalendarService`) | Google Calendar OAuth + event CRUD | `google_sign_in` 7.x is cross-platform via `google_sign_in_web`, but `initialize()` needs a platform-conditional `clientId`/`serverClientId` (web OAuth client ID vs Android's `google-services.json`-derived config). `authorizeScopes()` / `authClient()` are expected to work unchanged, but this is the single LOW-confidence item in this research — validate early |
+| `lib/services/widget_update_service.dart` | Pushes next-slot data to Android home screen widget via `home_widget` | Android-only feature; package has no web implementation → guard every call site with `kIsWeb`, do not attempt a web equivalent (out of scope) |
+| `lib/providers/profile_notifier.dart`, `availability_notifier.dart` | SharedPreferences-backed settings/availability grid | Zero changes — `shared_preferences` has a mature, fully-supported `shared_preferences_web` implementation (backed by `window.localStorage`) |
+| `lib/domain/services/*` (ScoringEngine, SlotGenerator, AvailabilityFilter) | Pure Dart business logic | Zero changes — no Flutter/platform imports exist here today; this is the strongest evidence the architecture already isolates domain logic correctly |
 
----
-
-## Data Flow
-
-### Primary Pipeline: weather data → score → slots → UI
+## Recommended Project Structure
 
 ```
-[App Launch / Foreground Resume]
-         │
-         ▼
-  WeatherRepository.getForecast(lat, lon)
-    ├─ cache fresh?  YES → return cached HourlyForecast list
-    └─ cache stale?  NO  → OpenMeteoClient.fetch()
-                              │
-                              ▼
-                         cache to Hive (ForecastCache)
-                              │
-                              ▼
-                     return HourlyForecast list
-         │
-         ▼
-  ScoringEngine.score(hourly, tolerances)
-    → List<HourlyScore>  (0–100 per hour, with temp/rain/wind sub-scores)
-         │
-         ▼
-  SlotGenerator.generate(scores, rideLengthPrefs)
-    → List<RideSlot>  (start, end, duration, overallScore)
-         │
-         ▼
-  AvailabilityFilter.filter(slots, userProfile.blockedHours)
-    → List<RideSlot>  (available only, sorted by score desc)
-         │
-         ▼
-  SlotsNotifier (Riverpod AsyncNotifier)
-    → HomeScreen watches → renders ranked slot cards
-    → DetailScreen watches single slot → renders hourly + insights
+ridewindow/
+├── web/                          # NEW — created via `flutter create --platforms web .`
+│   ├── index.html                # add Google Identity Services script/meta if needed for GIS
+│   ├── manifest.json              # PWA manifest — name, icons, theme_color, display: standalone
+│   ├── favicon.png, icons/         # PWA icon set (192, 512, maskable variants)
+│   ├── sqlite3.wasm                # NEW — copied from `sqlite3` package release, drift's wasm backend
+│   └── drift_worker.dart.js        # NEW — generated by drift_dev / bundled drift web worker
+├── lib/
+│   ├── data/database/app_database.dart   # MODIFIED — add DriftWebOptions
+│   ├── platform/background_task.dart     # UNCHANGED — simply never invoked on web
+│   ├── providers/gps_permission_notifier.dart  # MODIFIED — kIsWeb guard on openSettings()
+│   ├── services/calendar_service.dart    # MODIFIED — conditional clientId at initialize()
+│   ├── services/widget_update_service.dart  # UNCHANGED (call sites gated instead)
+│   └── main.dart                          # MODIFIED — kIsWeb guards around WorkManager + widget update
 ```
 
-### Background Refresh Pipeline (WorkManager)
+### Structure Rationale
 
-```
-[Android WorkManager periodic task — min 15 min interval]
-  callbackDispatcher()   ← separate Dart isolate, NOT the Flutter UI isolate
-         │
-         ▼
-  WeatherRepository.getForecast()  ← opens Hive in background isolate
-         │
-         ▼
-  Write fresh forecast to Hive ForecastCache
-         │
-         ▼
-  [Task returns Future.value(true)]
-
-[App returns to foreground]
-         │
-         ▼
-  WeatherNotifier detects stale cache invalidated
-         │
-         ▼
-  Re-runs primary pipeline → SlotsNotifier updates → UI rebuilds
-```
-
-**Key constraint:** WorkManager runs in a separate Dart isolate. It cannot directly update Riverpod state. The bridge is Hive — WorkManager writes to Hive, and on foreground resume the Riverpod provider re-reads Hive and triggers reactive rebuilds. Use `WidgetsBinding.instance.addObserver` in the root widget to trigger a provider refresh on `AppLifecycleState.resumed`.
-
-### Notification Trigger Pipeline
-
-```
-[SlotsNotifier computes slots for tomorrow / this morning]
-         │
-         ▼
-  NotificationService.schedule(slot)
-    ├─ "Evening before" → local notification at 19:00 prior day
-    ├─ "Morning of"     → local notification at slot.start - 2h
-    └─ "Weekly digest"  → WorkManager one-off task Sunday 19:00
-```
-
-### Google Calendar Flow (on-demand only)
-
-```
-[User taps "Add to calendar" on Plan sheet]
-         │
-         ▼
-  CalendarService.isSignedIn() → prompt OAuth if not
-         │
-         ▼
-  CalendarService.createEvent(slot) → Google Calendar API
-         │
-         ▼
-  Show success snackbar
-```
-
----
-
-## State Management: Riverpod
-
-**Recommendation: Riverpod 3.x with code generation (`@riverpod` annotations)**
-
-**Rationale:**
-
-- **No boilerplate overhead for solo dev.** BLoC requires Event classes, State classes, Bloc classes — approximately 145 lines vs Riverpod's ~78 lines for equivalent auth/data flows (verified source: flutterstudio.dev, 2026). For a solo dev working evenings, this is a meaningful DX difference.
-- **Built-in dependency injection.** No separate `get_it` / `injectable` setup. `ref.watch` and `ref.read` replace DI containers.
-- **Testability via ProviderContainer.** Override any provider in tests with `ProviderContainer(overrides: [...])`. Clean test isolation without mocking framework ceremony.
-- **`FutureProvider` handles the weather fetch lifecycle.** Loading / error / data states are first-class (`AsyncValue`). The weather fetch → cache → UI pattern maps directly onto `AsyncNotifier`.
-- **Compile-time safety.** Code-gen annotations catch missing providers at build time, not runtime.
-- **Provider watches across boundaries.** `SlotsNotifier` can `ref.watch(weatherProvider)` and `ref.watch(profileProvider)` — the derived slots re-compute automatically when either changes. This eliminates manual trigger wiring.
-
-**Provider types used in RideWindow:**
-
-| Provider type | Used for |
-|--------------|---------|
-| `FutureProvider` | Weather fetch (async, cached) |
-| `AsyncNotifier` | WeatherNotifier with refresh capability |
-| `Notifier` | SlotsNotifier, AvailabilityNotifier, ProfileNotifier (mutable, synchronous-feeling) |
-| `Provider` | ScoringEngine, SlotGenerator (stateless services — injected as providers for testability) |
-
-**Why not Provider (package):** Deprecated trajectory; requires BuildContext for access; no compile-time safety. Not recommended for new projects in 2026.
-
-**Why not BLoC:** Appropriate for large teams that need strict architectural guardrails. Overkill boilerplate for a solo dev building a 6-screen app.
-
-**Why not setState:** Adequate for leaf widgets only. Cannot share state across screens or survive navigation without lifting to root widget. Not viable for cross-screen data (weather, profile).
-
----
-
-## Recommended Folder Structure
-
-**Choice: Feature-first, with shared domain and data layers**
-
-Feature-first is recommended by Andrea Bizzotto (codewithandrea.com) and the broader Flutter community for apps where features are independently modifiable. For RideWindow, layer-first would scatter the scoring engine, its repository, and its UI across four top-level folders — harder to navigate on a solo project where you're constantly context-switching.
-
-```
-lib/
-├── main.dart                     # ProviderScope, Firebase init, WorkManager setup
-├── app.dart                      # MaterialApp, router, theme
-│
-├── core/                         # Shared across all features
-│   ├── theme/
-│   │   └── app_theme.dart        # Material 3 color scheme, text styles
-│   ├── router/
-│   │   └── app_router.dart       # go_router route definitions
-│   ├── widgets/
-│   │   ├── score_badge.dart      # Reusable "Perfect/Great/OK" chip
-│   │   └── weather_chip.dart     # Temp/rain/wind inline chip
-│   └── extensions/
-│       └── date_extensions.dart
-│
-├── domain/                       # Pure Dart — no Flutter, no I/O
-│   ├── models/
-│   │   ├── hourly_forecast.dart  # Value object: temp, rain, wind per hour
-│   │   ├── hourly_score.dart     # Value object: overall + 3 sub-scores
-│   │   ├── ride_slot.dart        # Value object: start, end, duration, score
-│   │   └── user_profile.dart    # Availability grid, tolerances, prefs
-│   └── services/
-│       ├── scoring_engine.dart   # score(HourlyForecast, Tolerances) → HourlyScore
-│       ├── slot_generator.dart   # generate(List<HourlyScore>, prefs) → List<RideSlot>
-│       └── availability_filter.dart  # filter(List<RideSlot>, UserProfile) → List<RideSlot>
-│
-├── data/                         # Repositories, remote clients, local stores
-│   ├── weather/
-│   │   ├── open_meteo_client.dart     # HTTP calls to Open-Meteo
-│   │   ├── weather_repository.dart    # Cache-or-fetch logic
-│   │   └── forecast_cache.dart        # Hive box wrapper, isStale()
-│   ├── profile/
-│   │   └── profile_repository.dart    # Hive persistence for UserProfile
-│   ├── calendar/
-│   │   └── calendar_service.dart      # Google Calendar OAuth + event creation
-│   └── notifications/
-│       └── notification_service.dart  # Firebase + local notification scheduling
-│
-├── features/
-│   ├── onboarding/
-│   │   ├── onboarding_screen.dart
-│   │   └── onboarding_notifier.dart
-│   │
-│   ├── home/
-│   │   ├── home_screen.dart           # Week strip + slot cards
-│   │   ├── home_notifier.dart         # Watches SlotsNotifier, exposes UI state
-│   │   └── widgets/
-│   │       ├── week_strip.dart
-│   │       └── ride_card.dart
-│   │
-│   ├── ride_detail/
-│   │   ├── ride_detail_screen.dart    # Score banner, weather rows, hourly table
-│   │   ├── ride_detail_notifier.dart
-│   │   └── widgets/
-│   │       ├── insights_sheet.dart    # "Why this score?" bottom sheet
-│   │       └── hourly_table.dart
-│   │
-│   ├── profile/
-│   │   ├── profile_screen.dart        # Settings rows: location, ride length, notifications
-│   │   ├── profile_notifier.dart
-│   │   └── widgets/
-│   │       └── tolerance_slider.dart
-│   │
-│   └── availability/
-│       ├── availability_screen.dart   # 7×16 hour grid
-│       └── availability_notifier.dart
-│
-├── platform/                     # Android-specific integration
-│   ├── workmanager_setup.dart    # callbackDispatcher + task registration
-│   ├── location_service.dart     # geolocator wrapper
-│   └── background_refresh.dart   # Task body: fetch + cache
-│
-└── providers.dart                # Barrel file: all top-level provider declarations
-```
-
-**Structure rationale:**
-
-- `domain/` is flat and import-free — no `package:flutter`, no Hive, no HTTP. This makes the scoring engine trivially unit-testable with `dart test`.
-- `data/` repositories depend on `domain/models/` but not on `features/`. Clean downward dependency.
-- `features/` contain screen + notifier + feature-specific widgets. A feature's notifier imports from `data/` repositories and `domain/services/`, never from another feature.
-- `platform/` isolates all Android-specific wiring. If iOS is added in v2, this folder gets an iOS counterpart without touching `features/`.
-- `providers.dart` barrel: a single import for all Riverpod provider declarations prevents circular imports across features.
-
----
+- **`web/` is entirely new** — this project has never run `flutter create --platforms web .`. That command must be run first; it scaffolds `index.html`, `manifest.json`, icons, and default service worker registration. Do not hand-write these from scratch.
+- **No new `lib/` folders needed.** The existing `lib/data`, `lib/platform`, `lib/providers`, `lib/services` split already puts every platform-coupled call behind a narrow interface (`AppDatabase`, `CalendarService`, `LocationNotifier`, `WidgetUpdateService`). Web support is additive configuration inside these files plus `kIsWeb` guards at 2-3 call sites — not a new abstraction layer.
+- **No conditional-import (`dart:io` vs `dart:html`) files are required.** Every package in the current dependency list (`drift_flutter`, `geolocator`, `google_sign_in`, `shared_preferences`, `flutter_timezone`) already ships its own federated web implementation that resolves automatically via Flutter's plugin registration — the app code calls the same API on every platform. `kIsWeb` runtime checks (not conditional imports) are the correct pattern here because the branching is about *whether to call a package at all* (WorkManager, home_widget — no web implementation exists), not about *which implementation of the same API to use*.
 
 ## Architectural Patterns
 
-### Pattern 1: Derived Provider (SlotsNotifier watches WeatherNotifier + ProfileNotifier)
+### Pattern 1: `kIsWeb` guard at the call site, not inside the platform module
 
-**What:** `SlotsNotifier` is a Riverpod `AsyncNotifier` that `ref.watch`es both the weather provider and the profile provider. When either changes, slots automatically recompute.
+**What:** For packages with **no web implementation at all** (`workmanager`, `home_widget`), wrap every call in `if (!kIsWeb) { ... }` at the point of invocation (`main.dart`), rather than pushing `kIsWeb` checks down into `background_task.dart` or `widget_update_service.dart`.
+**When to use:** When a package throws (`MissingPluginException`) or simply doesn't exist for web — there is no "web behavior" to implement, only "don't call this."
+**Trade-offs:** Keeps `background_task.dart` and `widget_update_service.dart` unmodified and Android-only in effect; the guard lives where the decision to run background/widget code is made, which is `main.dart`'s bootstrap sequence and the `RideWindowApp.build()` listener — both single locations.
 
-**When to use:** Any time you have computed/derived state that depends on multiple sources. Eliminates manual "refresh" calls.
-
+**Example:**
 ```dart
-@riverpod
-class SlotsNotifier extends _$SlotsNotifier {
-  @override
-  Future<List<RideSlot>> build() async {
-    final forecast = await ref.watch(weatherNotifierProvider.future);
-    final profile  = ref.watch(profileNotifierProvider);
-    final scores   = ref.read(scoringEngineProvider).score(forecast, profile.tolerances);
-    final slots    = ref.read(slotGeneratorProvider).generate(scores, profile.rideLengthPrefs);
-    return ref.read(availabilityFilterProvider).filter(slots, profile);
-  }
+// main.dart
+if (!kIsWeb) {
+  await Workmanager().initialize(callbackDispatcher);
+  await Workmanager().registerPeriodicTask(
+    kWeatherRefreshTaskTag,
+    kWeatherRefreshTaskName,
+    frequency: const Duration(hours: 3),
+    constraints: Constraints(networkType: NetworkType.connected),
+  );
 }
 ```
 
-**Trade-offs:** Slightly harder to debug than explicit imperative refresh, but eliminates stale-data bugs.
+### Pattern 2: Same-API cross-platform packages need config, not code branches
 
-### Pattern 2: Repository with Cache-or-Fetch
+**What:** `drift_flutter`'s `driftDatabase()`, `geolocator`'s `Geolocator.getCurrentPosition()`, and `shared_preferences`'s `SharedPreferences.getInstance()` are single functions that already dispatch to the right platform backend internally. The only work needed is supplying the web-specific *configuration* (`DriftWebOptions`, OAuth `clientId`) — not writing `if (kIsWeb)` around the call.
+**When to use:** Whenever a dependency lists a `_web` federated implementation on pub.dev (verify per-package, don't assume).
+**Trade-offs:** Much less code to maintain than manual conditional imports, but failures are configuration-shaped (missing wasm file, missing OAuth client ID, missing HTTPS) rather than compile-time-shaped — these bugs only surface when actually running `flutter build web` / deploying, so this must be tested on web early, not assumed from reading the API.
 
-**What:** `WeatherRepository.getForecast()` checks `ForecastCache.isStale()` before hitting the network. Returns domain models regardless of source (cache or network).
-
-**When to use:** Any remote data that should survive cold starts without re-fetching unnecessarily.
-
+**Example:**
 ```dart
-class WeatherRepository {
-  Future<List<HourlyForecast>> getForecast(double lat, double lon) async {
-    if (!_cache.isStale()) return _cache.read();
-    final raw = await _client.fetch(lat, lon);
-    _cache.write(raw);
-    return raw;
-  }
+// lib/data/database/app_database.dart
+static QueryExecutor _openConnection() {
+  return driftDatabase(
+    name: 'ridewindow',
+    native: const DriftNativeOptions(
+      databaseDirectory: getApplicationSupportDirectory,
+    ),
+    web: DriftWebOptions(
+      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+      driftWorker: Uri.parse('drift_worker.dart.js'),
+    ),
+  );
 }
 ```
 
-**Trade-offs:** Cache invalidation logic lives in one place. The `isStale()` threshold (e.g., 1 hour) is a tunable constant.
+### Pattern 3: Background refresh becomes a foreground trigger, not a platform branch inside `SlotsNotifier`/`WeatherNotifier`
 
-### Pattern 3: Background → Hive → Foreground Resume Bridge
+**What:** Because `WorkManager` has no web equivalent, "background weather refresh" on web is replaced by a **new, small provider** (e.g. a lifecycle-aware refresh trigger inside `RideWindowApp` or a dedicated `WebRefreshNotifier`) that calls `ref.invalidate(weatherProvider)` when the app resumes from background/gains focus, and optionally on a `Timer.periodic` while the tab stays open. This is additive — it does not touch `WeatherNotifier`, `SlotsNotifier`, or any domain code, because those already react correctly to invalidation (Riverpod's dependency graph re-runs `SlotsNotifier` automatically once `weatherProvider` refreshes).
+**When to use:** Any time a background task needs a foreground-only substitute on web.
+**Trade-offs:** Refresh only happens while/when the PWA is open (acceptable per the milestone's explicit scope — "on-foreground/on-load refresh" is the accepted tradeoff, already captured in PROJECT.md).
 
-**What:** WorkManager task writes to Hive. On `AppLifecycleState.resumed`, the root widget calls `ref.invalidate(weatherNotifierProvider)` which re-reads Hive and triggers the full pipeline.
+## Data Flow
 
-**When to use:** Any background work that must surface in the UI without direct isolate-to-Flutter communication (which WorkManager does not support).
-
-```dart
-// In root widget
-class AppLifecycleObserver extends ConsumerWidget with WidgetsBindingObserver {
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      ref.invalidate(weatherNotifierProvider);
-    }
-  }
-}
-```
-
-**Trade-offs:** The UI never directly knows about WorkManager. Decoupled and testable. Minor: a brief loading state on resume (acceptable — same as fresh start).
-
----
-
-## Build Order (Phase Dependencies)
-
-The scoring engine is the center of gravity. Nothing else is correct until the domain layer is correct.
+### Weather Refresh Flow (native vs web)
 
 ```
-Phase 1: Domain layer + Scoring engine
-  └─ ScoringEngine, SlotGenerator, AvailabilityFilter
-  └─ All domain models (HourlyForecast, RideSlot, UserProfile, Tolerances)
-  └─ Full unit test coverage
-  └─ Unblocks: everything (no other component is meaningful without correct scores)
+Native (Android):
+WorkManager isolate (every 3h, background)
+   → background_task.dart: own AppDatabase + http.Client
+   → writes ForecastCacheEntries via ForecastDao
+   → foreground WeatherNotifier reads from same Drift DB on next app open
 
-Phase 2: Data layer — local storage
-  └─ ProfileRepository (Hive/Isar)
-  └─ ForecastCache (Hive/Isar)
-  └─ Unblocks: weather fetch (needs cache); profile (needs persistence)
-
-Phase 3: Data layer — weather fetch
-  └─ OpenMeteoClient (HTTP)
-  └─ WeatherRepository (cache-or-fetch)
-  └─ Unblocks: SlotsNotifier (needs real weather data); background refresh
-
-Phase 4: Riverpod providers + state wiring
-  └─ WeatherNotifier, SlotsNotifier, ProfileNotifier, AvailabilityNotifier
-  └─ providers.dart barrel
-  └─ Unblocks: all screens (screens are thin consumers of providers)
-
-Phase 5: Onboarding + Home screen (MVP visible value)
-  └─ OnboardingScreen, HomeScreen, week strip, RideCard
-  └─ Unblocks: end-to-end flow; first real testing on device
-
-Phase 6: Ride Detail screen + Insights sheet
-  └─ RideDetailScreen, InsightsSheet, hourly breakdown
-  └─ Unblocks: "Why this score?" — critical for trust in scoring
-
-Phase 7: Profile + Availability screens
-  └─ ProfileScreen, AvailabilityScreen (7×16 grid)
-  └─ Tolerance sliders, ride-length chips
-  └─ Unblocks: personalisation; slots filtered by real user availability
-
-Phase 8: Background refresh + Notifications
-  └─ WorkManager setup, callbackDispatcher
-  └─ Firebase Messaging, local notification scheduling
-  └─ Unblocks: passive value (heads-up without opening app)
-
-Phase 9: Google Calendar integration
-  └─ CalendarService, OAuth flow
-  └─ "Add to calendar" action on Plan sheet
-  └─ Unblocks: booking workflow; deferred because it requires Google Cloud project setup
-
-Phase 10: Location (GPS + city picker)
-  └─ geolocator, city search (Open-Meteo geocoding API)
-  └─ Unblocks: real-location forecast (vs hardcoded Amsterdam for dev)
-  └─ Note: hardcode Amsterdam in Phase 3 to unblock weather fetch development
-
-Phase 11: Release packaging
-  └─ AAB signing, ProGuard, Play Console setup
-  └─ Privacy policy, Store listing
+Web (new):
+App resumed / tab focused / page loaded
+   → NEW: kIsWeb-gated trigger (app lifecycle listener or on-init)
+   → ref.invalidate(weatherProvider) — same WeatherNotifier.build() runs
+   → WeatherRepository.getForecast() → OpenMeteoClient.fetch() → Drift write
+   → SlotsNotifier recomputes automatically (unchanged reactive graph)
 ```
 
-**Why this order:**
+### Google Calendar Auth Flow (native vs web)
 
-1. Domain first because it has zero dependencies — you can build and test it offline, before any API key, package, or device. A broken scoring formula discovered in Phase 8 would be catastrophic.
-2. Local storage before network because the cache layer must exist before the repository can use it.
-3. Providers before screens because screens are thin wrappers — without a working provider graph, widget development is blocked.
-4. Background refresh before calendar because WorkManager is simpler (no OAuth) and more impactful for daily usage.
-5. Location deferred because Amsterdam hardcoded is sufficient for all development phases — GPS is polish, not MVP.
+```
+Native (Android):
+User taps "Add to calendar"
+   → CalendarService._ensureInitialized() → GoogleSignIn.instance.initialize()
+     (uses google-services.json client config, no explicit clientId needed)
+   → authorizationClient.authorizeScopes([calendarEventsScope]) → native OAuth consent UI
+   → authClient() → CalendarApi(client).events.insert(...)
 
----
+Web (modified):
+User taps "Add to calendar"
+   → CalendarService._ensureInitialized() → GoogleSignIn.instance.initialize(
+       clientId: webOAuthClientId,       // NEW — required on web, from Google Cloud Console
+     )
+   → authorizationClient.authorizeScopes([calendarEventsScope]) → GIS popup/redirect consent
+   → authClient() → CalendarApi(client).events.insert(...)   (same code path)
+```
 
-## Testing Boundaries
+### Availability Grid / Profile Flow (no change)
 
-| Layer | Test type | What to test | Framework |
-|-------|-----------|-------------|-----------|
-| `domain/services/` | Unit test (`dart test`) | ScoringEngine with edge cases (boundary temps, 0mm rain, 30+ wind), SlotGenerator with various score sequences, AvailabilityFilter with complex blocked grids | Pure Dart — no flutter_test, no mocks needed |
-| `domain/models/` | Unit test | Value equality, fromJson/toJson round-trip | Pure Dart |
-| `data/weather/` | Unit test with mocks | WeatherRepository cache-or-fetch logic; OpenMeteoClient JSON parsing | `mocktail` for HTTP client |
-| `data/profile/` | Integration test (in-memory Hive) | ProfileRepository read/write/update with real Hive in-memory store | `hive_test` or temp directory |
-| Riverpod providers | Unit test with ProviderContainer | SlotsNotifier derives correct slots; WeatherNotifier exposes AsyncValue states | `riverpod` ProviderContainer + `mocktail` |
-| Screens | Widget test | HomeScreen renders correct slot count; RideCard shows correct score badge; AvailabilityScreen toggles cells | `flutter_test`, `ProviderScope` with overrides |
-| End-to-end flows | Integration test | Onboarding → home → detail → plan sheet flow | `integration_test` package |
+`ProfileNotifier`, `AvailabilityNotifier` read/write `shared_preferences` exactly as today. `shared_preferences_web` persists to `window.localStorage`, which — unlike Drift's IndexedDB backend — is not subject to the same storage-eviction risk profile; it can still be cleared by "Clear browsing data," but there's no separate wasm/worker setup to break.
 
-**Key principle:** The scoring engine must have 100% unit test coverage before Phase 5. It is the product's core value claim — if it scores wrong, the app is wrong regardless of how polished the UI is.
+### Key Data Flows
 
----
+1. **Weather cache persistence risk on Safari/iOS PWA:** Drift's web backend prefers OPFS (needs COOP/COEP headers for full benefit, works without them at reduced performance) and falls back to IndexedDB. iOS Safari is known to evict IndexedDB/site data after extended website inactivity in non-installed contexts; an **installed PWA (added to home screen)** is treated more leniently by iOS's storage eviction policy than a regular Safari tab. This is a real risk flagged already in PROJECT.md — recommend surfacing "Add to Home Screen" during onboarding on iOS Safari specifically, and treating full cache loss as a normal, low-cost event (re-fetch from Open-Meteo, not data the user would mourn).
+2. **First paint before Drift is ready:** on web, the wasm module + worker must download before the Drift connection resolves. This is asynchronous the same way native Drift is (already `Future`-based via Riverpod's `AsyncNotifier`), so the loading state UI (already built for native cold start) should carry over unchanged — but initial load may be slower on web due to wasm download, worth measuring against the "2s cold start" performance constraint in CLAUDE.md.
 
-## Anti-Patterns to Avoid
+## Scaling Considerations
 
-### Anti-Pattern 1: Calling scoring logic from the UI layer
+Not applicable in the traditional user-count sense (no backend, no shared infra) — reframed as **platform-maturity considerations**:
 
-**What people do:** Compute scores inside `build()` methods or directly in screen widgets.
-**Why it's wrong:** Makes the scoring engine untestable in isolation, ties business logic to widget lifecycle, and makes tolerance slider changes hard to propagate.
-**Do this instead:** ScoringEngine is a domain service, exposed as a Riverpod `Provider`. The `SlotsNotifier` calls it. Screens only watch `SlotsNotifier`.
+| Stage | Web-specific concern |
+|-------|----------------------|
+| First `flutter build web` render | No storage/auth wired yet — verify UI, theming, go_router paths, and Riverpod providers that don't touch platform packages render correctly |
+| Wiring Drift on web | Verify `sqlite3.wasm` Content-Type is `application/wasm` on Firebase Hosting (may need a `firebase.json` header rule) |
+| Wiring Calendar auth on web | Verify Authorized JavaScript origins in Google Cloud Console include the Firebase Hosting domain; verify popup-blocker behavior since `authorizeScopes()` on web typically opens a popup |
+| Post-launch (PWA installed) | Monitor for storage-eviction complaints on iOS Safari; this is the top known risk per PROJECT.md and should have a research/validation checkpoint of its own, not just be assumed fine |
 
-### Anti-Pattern 2: Updating UI state directly from WorkManager callbackDispatcher
+### Scaling Priorities
 
-**What people do:** Try to call `ref.read(provider.notifier).update()` from the background isolate.
-**Why it's wrong:** WorkManager runs in a separate Dart isolate. Riverpod state lives in the main isolate's `ProviderScope`. Cross-isolate provider mutation is not supported and will silently fail or crash.
-**Do this instead:** WorkManager writes to Hive only. The UI isolate reads Hive on foreground resume via `ref.invalidate()`. The bridge is the local database, not direct state mutation.
+1. **First bottleneck:** Drift web setup (wasm + worker + COOP/COEP headers) is the most likely thing to silently fail or degrade to in-memory-only storage without an error — must be explicitly tested (write data, reload page, confirm persistence) rather than assumed from a successful `flutter build web`.
+2. **Second bottleneck:** Google Calendar OAuth on web is the most likely thing to require back-and-forth with Google Cloud Console (authorized origins, consent screen verification status, testing-mode user allowlist) — budget calendar-integration time generously and start it early enough to hit console configuration issues before the milestone deadline.
 
-### Anti-Pattern 3: Feature folders organized by screen instead of by capability
+## Anti-Patterns
 
-**What people do:** `features/home_screen/`, `features/detail_screen/`, `features/profile_screen/`.
-**Why it's wrong:** Screen-first organization breaks down when one feature (e.g., "ride planning") spans multiple screens. You end up with cross-screen imports that create circular dependencies.
-**Do this instead:** Organize by user capability: `features/home/` (what the user does on the main screen), `features/ride_detail/`, `features/profile/`. Each feature owns its screens, notifiers, and feature-specific widgets.
+### Anti-Pattern 1: Pushing `kIsWeb` checks into domain or provider logic
 
-### Anti-Pattern 4: Storing computed slots in local storage
+**What people do:** Add `if (kIsWeb) { ... } else { ... }` branches inside `ScoringEngine`, `SlotGenerator`, `WeatherNotifier`, or `SlotsNotifier` "just in case."
+**Why it's wrong:** These layers have zero platform dependency today — that's why they're trivially testable and reusable across Android/web. Introducing `kIsWeb` here re-couples domain logic to platform and defeats the entire reason the architecture was built this way.
+**Instead:** Keep all platform branching in `lib/data`, `lib/platform`, `lib/services`, and the 2-3 specific provider files that directly wrap platform packages (`LocationNotifier`, `GpsPermissionNotifier`). Everything downstream of `WeatherNotifier`/`AvailabilityNotifier`/`ProfileNotifier` should never need to know it's running on web.
 
-**What people do:** Persist `List<RideSlot>` to Hive alongside the forecast.
-**Why it's wrong:** Slots are derived from forecast + profile. Any tolerance change or availability edit invalidates cached slots instantly — you'd have to invalidate and recompute anyway. Storing them adds complexity with no benefit.
-**Do this instead:** Store only raw `HourlyForecast` in Hive. Recompute slots on demand via `SlotsNotifier`. The domain pipeline is cheap (pure in-memory computation over 168 hours).
+### Anti-Pattern 2: Assuming a package "supports web" because pub.dev lists the platform badge
 
-### Anti-Pattern 5: One giant `UserProfile` Hive box for everything
-
-**What people do:** Serialize `UserProfile` as one JSON blob in a single Hive entry.
-**Why it's wrong:** The availability grid (7 days × 24 hours = 168 booleans) embedded in the profile JSON becomes expensive to deserialize just to read the user's ride length preference.
-**Do this instead:** Split into two Hive boxes: `profileBox` (tolerances, ride prefs, location, notification settings) and `availabilityBox` (grid). Load them independently. The availability grid is only needed in `AvailabilityFilter`, not on every app resume.
-
----
+**What people do:** See a green "Web" badge on pub.dev and assume full parity with mobile behavior (e.g., assuming `Geolocator.requestPermission()` shows a permission dialog on web the same way it does on Android, or assuming `permission_handler`'s `openAppSettings()` works everywhere).
+**Why it's wrong:** Web badges mean "compiles and has some implementation," not "identical UX." Concretely: web browsers auto-prompt for location permission the first time `getCurrentPosition()`/`getPositionStream()` is called rather than via an explicit separate "request" step; `permission_handler`'s web implementation only supports a subset of permissions and has no equivalent to opening OS app settings.
+**Instead:** For every platform package the app uses beyond `drift_flutter`/`shared_preferences`, explicitly test the actual web behavior of each call during the phase that wires it up, and add narrow `kIsWeb` UX adjustments (e.g., a different copy string for "enable location" on web vs. a settings deep-link on Android) rather than assuming code reuse implies behavior reuse.
 
 ## Integration Points
 
-### External Services
+### External Services / Platform Packages
 
-| Service | Integration pattern | Layer | Notes |
-|---------|---------------------|-------|-------|
-| Open-Meteo API | HTTP GET, no API key | `data/weather/open_meteo_client.dart` | Free tier, 10,000 req/day — weekly background refresh uses ~50/day. Cache aggressively (1h TTL minimum). |
-| Google Calendar API | OAuth 2.0, `googleapis` + `google_sign_in` packages | `data/calendar/calendar_service.dart` | On-demand only (user taps "Plan it"). Do not initialize on startup. Requires Google Cloud project. |
-| Firebase Cloud Messaging | Push token registration, `firebase_messaging` package | `data/notifications/notification_service.dart` | Used for "weekly digest" triggered from server-side schedule. Local notifications for evening/morning alerts. |
-| Android WorkManager | `workmanager` package, `callbackDispatcher` | `platform/workmanager_setup.dart` | Min 15-min interval. Register on first run + after boot via `RECEIVE_BOOT_COMPLETED`. Cannot update Riverpod state directly — see bridge pattern above. |
-| Device GPS | `geolocator` package | `platform/location_service.dart` | Request permission once. Cache last known position. Fall back to stored city coordinates if permission denied. |
+| Package | Web support | Integration pattern | Notes |
+|---------|-------------|----------------------|-------|
+| `drift` + `drift_flutter` | Yes (federated, via `sqlite3.wasm` + worker) | Add `web: DriftWebOptions(sqlite3Wasm: ..., driftWorker: ...)` to existing `driftDatabase()` call in `app_database.dart` | Requires `sqlite3.wasm` + `drift_worker.dart.js` in `web/`; version-match against `pubspec.lock`; serve wasm with `Content-Type: application/wasm` (Firebase Hosting header rule may be needed) |
+| `shared_preferences` | Yes (mature, `shared_preferences_web` uses `localStorage`) | No change | Zero risk item |
+| `geolocator` | Yes (`geolocator_web`, uses browser Geolocation API) | No code change; behavior differs (auto-prompt on first `getCurrentPosition()` call, requires HTTPS/secure context) | Firebase Hosting is HTTPS by default — satisfies secure-context requirement |
+| `permission_handler` | Partial (`permission_handler_html`, limited permission set, no `openAppSettings()` equivalent) | `kIsWeb` guard in `GpsPermissionNotifier.openSettings()` | Only touch point in the codebase is the deep-link-to-settings call; the location-permission state machine itself uses `geolocator`'s own permission API, not `permission_handler` directly |
+| `google_sign_in` + `extension_google_sign_in_as_googleapis_auth` + `googleapis` | Yes (`google_sign_in_web`, GIS-based) | Pass a platform-conditional `clientId`/`serverClientId` to `GoogleSignIn.instance.initialize()`; requires a Web OAuth client ID configured in Google Cloud Console with Firebase Hosting domain as an authorized JavaScript origin | LOW confidence on exact `authorizeScopes()`/`authClient()` web behavior (popup vs redirect, scope-authorization-only vs full sign-in) — validate early in the Calendar-integration phase |
+| `workmanager` | No | `kIsWeb` guard around init/registration in `main.dart`; leave `background_task.dart` untouched (never imported into a web-only path) | Confirmed no web implementation exists (long-standing open feature request, unresolved) |
+| `home_widget` | No | `kIsWeb` guard at call sites (`main.dart` listener, any other invocation) | Android/iOS-native-widget-only package; calling on web throws `MissingPluginException` |
+| `flutter_local_notifications` + `timezone` + `flutter_timezone` | Out of scope for v2.0 web (notifications explicitly deferred per PROJECT.md) | N/A this milestone | `flutter_timezone` itself does have web support (fetches timezone via `Intl` under the hood) if revisited later |
+| Firebase Hosting | N/A (deployment target, not a Flutter package) | `flutter build web` output deployed via `firebase deploy` | Free tier sufficient per CLAUDE.md; needs a `firebase.json` with correct rewrite/headers config for wasm Content-Type |
 
 ### Internal Boundaries
 
-| Boundary | Communication | Rule |
-|----------|---------------|------|
-| `domain/` ↔ `data/` | `data/` imports `domain/models/`. Never reversed. | Domain has zero data dependencies. |
-| `data/` ↔ `features/` | Features import repositories via Riverpod providers. Never import repository class directly. | Keeps features testable via provider overrides. |
-| `features/` ↔ `features/` | Never. Features do not import each other. | Shared state lives in providers.dart or core/. |
-| `platform/` ↔ `data/` | `platform/background_refresh.dart` instantiates `WeatherRepository` directly (no Riverpod — different isolate). | ProviderScope is not available in WorkManager isolate. |
-| `platform/` ↔ `features/` | Never. Platform code does not know about UI features. | Platform writes to Hive; UI reads Hive. |
+| Boundary | Communication | Notes |
+|----------|---------------|-------|
+| Domain (`lib/domain`) ↔ Providers (`lib/providers`) | Direct function calls, no platform awareness | Unaffected by web — this is the layer that proves the architecture generalizes |
+| Providers ↔ Data/Platform (`lib/data`, `lib/platform`, `lib/services`) | Riverpod `ref.watch`/`ref.read` against thin wrapper classes (`AppDatabase`, `CalendarService`, `WeatherRepository`) | All web-specific branching concentrates here; no new boundary needed, just new configuration/guards inside existing classes |
+| `main.dart` bootstrap ↔ platform packages (WorkManager, home_widget) | Direct static calls, `kIsWeb`-gated | The only place where "should this platform feature run at all" is decided |
 
----
+## Suggested Build Order
 
-## Scalability Considerations
+1. **`flutter create --platforms web .`** — scaffold `web/` directory with default `index.html`/`manifest.json`. Commit this scaffold before touching anything else.
+2. **`flutter build web` (or `flutter run -d chrome`) with zero web-specific code changes** — confirm the existing UI (Home, Ride Detail, Profile, Availability, Onboarding, Welcome via go_router) renders, navigates, and that providers relying only on `shared_preferences` (Profile, Availability, locale, theme) work end-to-end. Expect `AppDatabase` and location/calendar features to fail or throw at this stage — that's expected and confirms the scope of remaining work.
+3. **Wire Drift for web** — add `sqlite3.wasm` + `drift_worker.dart.js` to `web/`, add `DriftWebOptions` to `app_database.dart`. Prove persistence explicitly: write data, hard-reload the page, confirm data survives. This is the highest-risk, most silently-failable step — do not skip manual verification.
+4. **Wire geolocation** — test `LocationNotifier`/`GpsPermissionNotifier` in a real browser (not just `flutter run -d chrome` which may behave differently around permission prompts than a deployed HTTPS site). Add the `kIsWeb` guard/copy change for `openSettings()`.
+5. **Wire the on-foreground/on-load refresh trigger** replacing WorkManager — add the new small provider/listener, guard WorkManager init in `main.dart` with `!kIsWeb`, guard `home_widget` calls with `kIsWeb`.
+6. **Wire Google Calendar auth for web** — set up Web OAuth client ID + authorized origins in Google Cloud Console, pass conditional `clientId` into `CalendarService`, manually test the full "Add to calendar" flow in a deployed (not just local) environment since OAuth redirect/origin behavior differs between `localhost` and the production domain.
+7. **PWA polish + deploy** — manifest icons/theme-color, install prompt behavior, Firebase Hosting `firebase.json` headers (wasm Content-Type), verify Lighthouse PWA installability checklist, deploy and test "Add to Home Screen" on an actual iOS device (Safari PWA behavior cannot be reliably verified in desktop-browser dev tools alone).
 
-RideWindow is a local-first single-user app with no backend. Scalability concerns are device-level, not infrastructure-level.
-
-| Concern | Current approach | If it becomes a problem |
-|---------|-----------------|------------------------|
-| 168-hour forecast in memory | In-memory list of 168 `HourlyForecast` structs — negligible (<100 KB) | Non-issue at this scale |
-| Scoring engine CPU time | Pure Dart, 168 iterations — <5ms on any modern phone | If expanded to 14-day forecast: run in `compute()` isolate |
-| Availability grid re-render | 7×16 = 112 cell widgets — StatefulWidget is fine | If grid expands: use `RepaintBoundary` per row |
-| Background refresh battery | WorkManager 15-min minimum, batched by OS | Already handled by WorkManager's battery-aware scheduling |
-| Hive box size | Forecast + profile ≈ 200 KB | Non-issue on any device with >1 GB storage |
-
----
+This order front-loads the step most likely to reveal architecture-level surprises (step 2: does the reactive Riverpod/go_router UI even run on web with zero changes) before investing in the higher-effort, higher-risk platform integrations (Drift persistence, then geolocation, then OAuth) — each subsequent step also has a hard dependency on the previous one working (e.g., there's no point debugging Calendar OAuth popups if the underlying page doesn't render yet).
 
 ## Sources
 
-- Flutter official architecture docs: https://docs.flutter.dev/app-architecture/concepts (HIGH confidence — official)
-- Flutter MVVM layered architecture case study: https://docs.flutter.dev/app-architecture/case-study (HIGH confidence — official)
-- Riverpod 3.x official docs: https://riverpod.dev/docs/how_to/testing (HIGH confidence — official)
-- Riverpod GitHub docs/providers: https://github.com/rrousselgit/riverpod (HIGH confidence — official)
-- Flutter background isolates: https://docs.flutter.dev/perf/isolates (HIGH confidence — official)
-- Flutter WorkManager package: https://pub.dev/packages/workmanager (HIGH confidence — official pub.dev)
-- BLoC vs Riverpod 2026 comparison: https://flutterstudio.dev/blog/bloc-vs-riverpod.html (MEDIUM confidence — verified analysis, single source)
-- Flutter feature-first vs layer-first: https://codewithandrea.com/articles/flutter-project-structure/ (MEDIUM confidence — widely cited community authority, Andrea Bizzotto)
-- WorkManager state update challenge: https://github.com/fluttercommunity/flutter_workmanager/issues/559 (MEDIUM confidence — community issue thread confirming isolate boundary)
+- [Drift Web platform docs](https://drift.simonbinder.eu/platforms/web/) — storage backends (OPFS/IndexedDB/in-memory), sqlite3.wasm + drift_worker setup, COOP/COEP header notes — HIGH confidence, official docs
+- [drift_flutter on pub.dev](https://pub.dev/packages/drift_flutter) — `driftDatabase()` API surface incl. `DriftWebOptions` — HIGH confidence
+- [geolocator on pub.dev](https://pub.dev/packages/geolocator) + changelog — web (`geolocator_web`) requires secure context; permission-check nuances on web — MEDIUM-HIGH confidence (WebSearch-verified against package docs)
+- [permission_handler / permission_handler_web on pub.dev](https://pub.dev/packages/permission_handler_web) — partial web support, no OS-settings equivalent — MEDIUM confidence
+- [google_sign_in on pub.dev](https://pub.dev/packages/google_sign_in) + GitHub issues on v7.x `initialize(clientId/serverClientId)` breaking changes — MEDIUM confidence; exact `authorizeScopes()` web popup behavior is LOW confidence, flagged for phase-specific validation
+- [workmanager (flutter_workmanager) GitHub](https://github.com/fluttercommunity/flutter_workmanager) — confirmed no web platform support (long-open feature request) — HIGH confidence
+- [home_widget on pub.dev](https://pub.dev/packages/home_widget) — Android/iOS-native-widget-only, no web implementation — MEDIUM-HIGH confidence (absence of web platform listing across multiple sources)
+- [flutter_timezone on pub.dev](https://pub.dev/packages/flutter_timezone) — confirmed web support added — MEDIUM confidence (not needed for this milestone since notifications are deferred, included for completeness)
+- Existing codebase read directly: `lib/data/database/app_database.dart`, `lib/platform/background_task.dart`, `lib/services/calendar_service.dart`, `lib/providers/location_provider.dart`, `lib/providers/gps_permission_notifier.dart`, `lib/providers/weather_notifier.dart`, `lib/providers/availability_notifier.dart`, `lib/providers/profile_notifier.dart`, `lib/providers/slots_notifier.dart`, `lib/services/widget_update_service.dart`, `lib/main.dart`, `pubspec.yaml` — HIGH confidence (primary source, current state of the repo)
 
 ---
-
-*Architecture research for: RideWindow — local-first Flutter Android cyclist weather-window app*
-*Researched: 2026-06-01*
+*Architecture research for: Flutter Web/PWA integration (RideWindow v2.0)*
+*Researched: 2026-07-10*

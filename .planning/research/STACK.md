@@ -1,335 +1,128 @@
-# Technology Stack: RideWindow
+# Stack Research
 
-**Project:** RideWindow — Android cyclist weather-window app
-**Researched:** 2026-06-01
-**Overall confidence:** HIGH (all versions verified against pub.dev)
+**Domain:** Flutter Web/PWA build of an existing Android app, targeting iOS Safari users, deployed to Firebase Hosting
+**Researched:** 2026-07-10
+**Confidence:** MEDIUM-HIGH (Context7/official docs for Drift and Flutter web; verified WebSearch + official docs for google_sign_in, geolocator, WebKit storage policy; some Flutter-official PWA doc pages are thin, filled in via community sources)
 
----
+> **Scope note:** This file documents ONLY the stack additions/changes needed for the v2.0 Flutter Web/PWA milestone. It supersedes the previous (v1.0 Android-only) `STACK.md` for research purposes — v1.0's validated stack (Riverpod, Drift, http, freezed, geolocator, permission_handler, workmanager, flutter_local_notifications, go_router, google_sign_in, fl_chart) is already captured in `CLAUDE.md` and is NOT re-researched here except where web adds a caveat.
 
-## Flutter / Dart Runtime
+## Recommended Stack
 
-| Item | Version | Notes |
+### Core Technologies (new for v2.0 web target)
+
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| Flutter Web (built-in, no new package) | Flutter SDK 3.x (already in use) | Compiles existing Dart codebase to a web bundle | No new dependency — `flutter create . --platforms web` adds a `web/` folder to the existing project. Reuses 100% of scoring/provider/UI Dart code. |
+| Drift web backend (via existing `drift` 2.33.0 + new `sqlite3` + `drift_flutter`) | `sqlite3: ^3.0.0`, `drift_flutter: ^0.3.0` | Local SQL storage in the browser (weather cache, availability grid) using sqlite3.wasm over IndexedDB/OPFS | Drift already used natively for the availability grid queries — the web target uses the *same* Drift schema/queries, just a different `QueryExecutor`. `drift_flutter`'s `driftDatabase()` helper picks the right backend per platform (native vs wasm) from one call site. |
+| `google_sign_in` 7.2.0 (already in stack, no version change) | 7.2.0 | Calendar-scoped OAuth sign-in, now also on web | v7's rewrite is built directly on Google Identity Services (GIS) under the hood and lists `web: any` as a supported platform — **no separate web package needed**, unlike the pre-v6 `google_sign_in_web` era. |
+| `geolocator` 14.0.2 (already in stack, no version change) | 14.0.2 | GPS/location on web via browser Geolocation API | `geolocator` auto-pulls in `geolocator_web` as a federated platform implementation; wraps `navigator.geolocation` under the hood. Works on iOS Safari since Safari implements the standard Geolocation API. |
+| Firebase CLI (`firebase-tools`, not a Dart package) | latest (`npm install -g firebase-tools`) | Deploy `build/web` output to Firebase Hosting | Free tier, zero backend code, matches existing "no backend" constraint. Use classic (non-experimental) Hosting config — see "What NOT to Use" below. |
+
+### Supporting Libraries (new for web)
+
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| `sqlite3` | `^3.0.0` (matches whatever `sqlite3.wasm` build you download) | Provides the wasm bindings drift's web backend needs | Add as a direct dependency; the installed `sqlite3.wasm` binary version **must match** this package's version or Drift throws at runtime. |
+| `drift_flutter` | `^0.3.0` | Cross-platform `driftDatabase()` helper that already knows how to wire native (`sqlite3_flutter_libs`) vs web (`sqlite3` + wasm/worker) executors from one call | Recommended over hand-rolling a `WasmDatabase.open()` call per platform — less boilerplate, one code path for native+web. Compatible with drift `^2.30.0`, so 2.33.0 is fine. |
+| Static asset files: `sqlite3.wasm` + `drift_worker.dart.js` | version-matched to `sqlite3` / `drift` packages respectively | Must be manually downloaded into the `web/` folder (not pulled automatically by pub) | Required for any Drift-on-web setup — the sqlite3 WASM module and the drift worker script that coordinates IndexedDB/OPFS access across tabs. Must be served with `Content-Type: application/wasm` (Firebase Hosting serves `.wasm` correctly by default; verify in `firebase.json` if issues arise). |
+| `flutter_web_plugins` (part of Flutter SDK, not pub) | bundled with Flutter SDK | `setUrlStrategy(PathUrlStrategy())` to remove the `#` from `go_router` URLs on web | Needed because Flutter defaults to hash-based URLs on web; without this, deep links / shareable URLs look ugly (`/#/detail/123`) though functionality is unaffected. Call in a web-only entry point or guard with `kIsWeb`. |
+
+### Development Tools
+
+| Tool | Purpose | Notes |
 |------|---------|-------|
-| Flutter SDK | 3.x (stable) | Material 3 is on by default since 3.16; `useMaterial3: true` is no longer needed explicitly |
-| Dart SDK | 3.x | Null-safety, pattern matching, records — use throughout |
+| `firebase-tools` CLI | Build config + deploy to Firebase Hosting | Install globally via npm; `firebase login`, `firebase init hosting`, `firebase deploy`. No Flutter-specific Firebase SDK (e.g. `firebase_core`) is required just for *hosting* a static Flutter web build — those packages are only needed if you later add Firebase Auth/Firestore/Analytics, which is out of scope here. |
+| Safari Web Inspector (Develop menu) | Manually verifying IndexedDB/OPFS behavior and the storage-eviction risk | Chrome DevTools won't reproduce Safari's storage-eviction heuristics — this needs on-device/on-Safari testing, not just Chrome. |
 
-Material 3 is the correct target. Use `ColorScheme.fromSeed(seedColor: Color(0xFF2E7D32))` (cycling green from mockup) and `NavigationBar` (not the deprecated `BottomNavigationBar`). No theming library needed — Flutter's built-in M3 system covers all screens in the mockup.
+## Installation
 
----
+```bash
+# 1. Add web platform to the existing Flutter project (no pubspec change)
+flutter create . --platforms web
 
-## State Management
+# 2. Add web-only Drift dependencies
+flutter pub add sqlite3
+flutter pub add drift_flutter
 
-**Recommendation: Riverpod 3 with code generation**
+# 3. Download version-matched static assets into web/ (manual, not via pub)
+#    - sqlite3.wasm         -> must match the `sqlite3` package version installed above
+#    - drift_worker.dart.js -> must match the `drift` package version (2.33.0)
+#    See https://drift.simonbinder.eu/platforms/web/ for the exact release URLs matching your versions.
 
-| Package | Version (pub.dev) | Publisher | Likes | Published |
-|---------|------------------|-----------|-------|-----------|
-| `flutter_riverpod` | 3.3.1 | dash-overflow.net | 2.87k | 2 months ago |
-| `riverpod_annotation` | 4.0.2 | dash-overflow.net | — | 3 months ago |
-| `riverpod_generator` | resolved via build_runner | dash-overflow.net | — | — |
-| `build_runner` | >=2.4 | dart.dev | — | active |
+# 4. Firebase Hosting (one-time project setup)
+npm install -g firebase-tools
+firebase login
+firebase init hosting   # choose "Use an existing project", public dir = build/web, configure as single-page app = Yes
 
-**Why Riverpod 3 over alternatives:**
-
-- Riverpod 3.0 (released Sept 2025) unifies `AutoDisposeNotifier`/`Notifier` into one interface, reducing boilerplate
-- `AsyncNotifier` is the idiomatic pattern for weather fetch + caching (loading/data/error states built in)
-- Code generation (`@riverpod` annotation) eliminates provider registration boilerplate — solo-dev friendly
-- No `BuildContext` dependency: providers are testable in isolation, which matters for scoring logic
-- Provider and Bloc are either too simple (Provider — missing async primitives) or too verbose for a solo project (Bloc — event/state ceremony is overkill for 6 screens)
-
-**Do NOT use:** `StateProvider`, `StateNotifierProvider`, `ChangeNotifierProvider` — these are legacy in Riverpod 3, moved to a `legacy` import path.
-
-**Do NOT use:** GetX — v5.0 stuck in RC for 12+ months, anti-pattern concerns for code that needs to remain readable after a week away from it.
-
----
-
-## Local Storage
-
-Two-layer approach: simple settings in `shared_preferences`, structured data (availability calendar, cached forecasts) in `drift`.
-
-### Layer 1 — Simple key-value settings
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `shared_preferences` | 2.5.5 | flutter.dev | 10.5k | 2 months ago |
-
-**Why:** User profile scalar values (ride length preferences, tolerance slider values, notification toggles, location override) are all primitive types (`bool`, `int`, `double`, `String`). `shared_preferences` is the official Flutter-team package, 4.83M weekly downloads, zero maintenance concern.
-
-**Limitation to respect:** Not for critical data — weather cache goes to Drift, not here.
-
-### Layer 2 — Structured local database
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `drift` | 2.33.0 | simonbinder.eu | 2.4k | 28 days ago |
-
-**Why Drift over alternatives:**
-
-- **Drift vs Isar:** Isar 3.1.0 was last published 3 years ago on pub.dev (the stable version). Isar v4 is explicitly not production-ready. The community fork (`isar_community`) exists but adds maintenance uncertainty for a solo dev. Drift is a Flutter Favorite, published 28 days ago, battle-tested.
-- **Drift vs Hive:** Hive original is unmaintained (community successor `hive_ce` exists but is a fork). Drift has SQL-level query power needed for the availability calendar (7×24 grid of hour cells, queryable by day+hour range). Hive's key-value model would require full-box scans.
-- **Drift vs SQLite directly:** Drift is SQLite under the hood with type-safe query API and compile-time schema verification. Migration support is first-class — needed when adding features in v2.
-
-**Data stored in Drift:**
-1. `availability_blocks` table — the 7×24 weekly hour grid (day_index INT, hour INT, state TEXT)
-2. `forecast_cache` table — serialized hourly forecast JSON + location + fetched_at timestamp
-3. `ride_slots` table — computed scored slots (derived, cached to avoid recomputation on every open)
-
----
-
-## Networking
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `http` | 1.6.0 | dart.dev | 8.4k | 6 months ago |
-
-**Why `http` over Dio:**
-
-Open-Meteo has a single, simple REST endpoint: `GET /v1/forecast?latitude=...&longitude=...&hourly=...`. No auth, no interceptors, no token refresh, no file upload. Dio's extra weight (interceptor chains, CancelToken plumbing) is unjustified. The official Dart team `http` package is lighter, has a mock client built in for testing, and is already a transitive dependency of several other packages in this stack.
-
-**Data model:** Use `freezed` + `json_serializable` for the Open-Meteo response model (see Models section).
-
----
-
-## Data Models / Code Generation
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `freezed` | 3.2.5 | dash-overflow.net | 4.4k | 3 months ago |
-| `freezed_annotation` | (companion) | dash-overflow.net | — | — |
-| `json_serializable` | >=6.7 | dart.dev | — | active |
-| `json_annotation` | >=4.8 | dart.dev | — | active |
-
-**Why:** The Open-Meteo response is deeply nested JSON. `freezed` gives immutable, equality-comparable model classes with `copyWith` and `fromJson`/`toJson` in a single annotation. This is the standard Flutter data-layer pattern in 2025/2026 and pairs naturally with Riverpod's `AsyncNotifier`.
-
----
-
-## Location / GPS
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `geolocator` | 14.0.2 | baseflow.com | 6.1k | 11 months ago |
-| `permission_handler` | 12.0.3 | baseflow.com | 5.98k | 11 hours ago |
-
-**Why `geolocator`:** Standard choice for Flutter GPS. Uses Android's `FusedLocationProviderClient` (preferred) or `LocationManager` fallback. Handles permission status, accuracy modes, and one-shot vs stream position. 6.1k likes, active.
-
-**Why `permission_handler` separately:** `geolocator` has its own location permission request, but `permission_handler` is needed for the `POST_NOTIFICATIONS` permission (Android 13+) and for `SCHEDULE_EXACT_ALARM` (Android 12+/14+). Using one unified API for all permissions is cleaner than mixing two approaches.
-
-**Android 14 alert:** `SCHEDULE_EXACT_ALARM` is denied by default on Android 14+ for new installs. The app must call `AlarmManager.canScheduleExactAlarms()` and prompt the user. `permission_handler` 12.x handles this.
-
-**Manual location override:** No separate geocoding package needed for v1. Store city name + lat/lon pair in `shared_preferences` from a simple `TextField` with a curated short-list. Full city search (e.g., `geocoding` package) is a v2 feature.
-
----
-
-## Background Work
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `workmanager` | 0.9.0+3 | fluttercommunity.dev | 2.4k | 9 months ago |
-
-**Why:** `workmanager` is the Flutter wrapper around Android's WorkManager — the platform-recommended approach for deferrable background work. Fetch fresh weather data every 3–6 hours in background even when app is closed. Supports periodic tasks and constraint-based execution (e.g., only when network available).
-
-**Architecture note:** The background task callback must be a top-level Dart function (Flutter isolate limitation). Keep background task logic minimal: fetch Open-Meteo → write to Drift cache → optionally trigger a notification if a new great window is detected.
-
-**Do NOT use:** `android_alarm_manager_plus` — requires `SCHEDULE_EXACT_ALARM` permission which users must grant manually on Android 14+. WorkManager's battery-efficient scheduling is the right default. Exact alarms are only needed for notification delivery (handled by `flutter_local_notifications`).
-
----
-
-## Notifications
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `flutter_local_notifications` | 21.0.0 | dexterx.dev | 7.3k | 2 months ago |
-| `timezone` | 0.11.0 | labs.dart.dev | 580 | 4 months ago |
-| `flutter_timezone` | 5.1.0 | wolverinebeach.net | 332 | 4 days ago |
-
-**Why this trio:**
-
-- `flutter_local_notifications` is the definitive Flutter notification package (1.88M weekly downloads, 160 pub points, prerelease v22 in progress). Handles "Evening before", "Morning of", and "Weekly digest" notification types. Uses `zonedSchedule()` for time-based delivery.
-- `timezone` is required by `flutter_local_notifications` for `TZDateTime` — without it, scheduled notifications drift on DST changes or when users travel.
-- `flutter_timezone` retrieves the device's current IANA timezone name at runtime so you can construct `tz.getLocation(deviceTimezone)` correctly. Published 4 days ago, actively maintained.
-
-**Android manifest items needed:**
-```xml
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
-<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
-  <!-- RECEIVE_BOOT_COMPLETED intent filter -->
-</receiver>
+# 5. Build + deploy
+flutter build web --release
+firebase deploy --only hosting
 ```
 
----
+## Alternatives Considered
 
-## Navigation / Routing
+| Recommended | Alternative | When to Use Alternative |
+|-------------|-------------|--------------------------|
+| `drift_flutter` helper for web wiring | Hand-rolled `WasmDatabase.open()` + custom `DatabaseConnection.delayed` | Only if you need fine-grained control over `localSetup`/custom worker naming that `drift_flutter`'s API doesn't expose — not needed for RideWindow's simple single-DB use case. |
+| Classic Firebase Hosting (`firebase init hosting`, static `build/web` as public dir) | Firebase "framework-aware Hosting" (`firebase experiments:enable webframeworks`) | Only relevant for SSR frameworks (Next.js/Angular Universal); it's explicitly an "early public preview... not subject to any SLA." RideWindow is a pure static SPA — classic Hosting is simpler and stable. |
+| `google_sign_in` 7.2.0 native web support | `google_sign_in_web` as a separate pub dependency | Not applicable anymore — pre-v6 architecture required a separate federated web plugin; v7's rewrite folds web support into the main package via GIS. Do not add `google_sign_in_web` manually; it will conflict/be redundant. |
+| `geolocator` 14.0.2 native web support via `geolocator_web` | A hand-rolled `dart:js_interop`/`package:web` wrapper around `navigator.geolocation` | Only if you need browser Permissions-API nuances `geolocator` doesn't expose (e.g., custom permission-prompt UX) — unlikely needed for RideWindow's simple "ask once, fall back to manual city picker" flow. |
+| `firebase-tools` CLI deploy | GitHub Pages / Vercel / Netlify static hosting | Firebase already named in CLAUDE.md constraints and free tier is sufficient; other static hosts work equally well technically but add a second account/tool for no benefit here. |
 
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `go_router` | 17.2.3 | flutter.dev | 5.73k | 31 days ago |
+## What NOT to Use
 
-**Why:** Official Flutter-team router (2.9M downloads, Flutter Favorite). Navigation 2.0 based, handles Android back button correctly without `WillPopScope` hacks. Use `StatefulShellRoute` for the two-tab bottom nav (Home / Profile) to preserve each tab's scroll state. Named routes with `goNamed()` throughout.
+| Avoid | Why | Use Instead |
+|-------|-----|--------------|
+| `workmanager` on web | Explicitly has no web platform support (federated plugin only ships Android/iOS implementations) — confirmed by existing project decision already in PROJECT.md | On-foreground/on-page-load refresh: trigger the weather fetch provider when the app resumes/loads, same `AsyncNotifier` pattern already used, just re-triggered manually instead of via background task |
+| `flutter_local_notifications` for iOS Safari web push | Out of scope per milestone context; also iOS Safari only supports Web Push for an installed (Add to Home Screen) PWA on 16.4+, and is materially less reliable than native — not a drop-in replacement for the existing native notification flows | Nothing — deferred entirely for v2.0 per PROJECT.md decision |
+| `sqlite3_flutter_libs` on web | It's the **native**-platform sqlite3 binary loader (Android/iOS/macOS/Linux/Windows); has no web implementation | `sqlite3` (pure Dart/wasm package) + manually-hosted `sqlite3.wasm` for web, as described above |
+| Relying on IndexedDB persistence without `navigator.storage.persist()` on iOS Safari | WebKit's storage policy evicts script-writable storage (IndexedDB/OPFS) under storage pressure or after a period with no user interaction, using a least-recently-used heuristic — confirmed via WebKit's own "Updates to Storage Policy" post. Persistent-storage grants are heuristic-based and favor installed Home Screen apps | Call `navigator.storage.persist()` (via `dart:js_interop`/`package:web`) on first load, encourage "Add to Home Screen" install (Home Screen web apps get materially higher quota: up to 60%/80% vs 15%/20% for regular tabs), and design the app to tolerate a cleared local DB (re-fetch weather, re-derive defaults) rather than treating local storage as durable |
+| Assuming `extension_google_sign_in_as_googleapis_auth` needs replacing for v7/web | Unfounded concern — verified current release (3.0.0) already depends on `google_sign_in: ^7.0.0` and lists `web` as a supported platform | Keep using it as-is; just confirm the calling code follows v7's split authenticate/authorize API (see Pitfalls below) |
+| Firebase "framework-aware Hosting" preview for this project | It's targeted at SSR frameworks and is explicitly unstable/preview; RideWindow has no server-rendering need | Classic static Hosting config (`public: build/web`, SPA rewrite to `index.html`) |
 
-**Routes to define:**
-- `/` → Welcome (first run only)
-- `/onboard` → Onboarding
-- `/home` → Home (default after onboard)
-- `/detail/:rideId` → Ride Detail
-- `/profile` → Profile
-- `/profile/availability` → Availability calendar
+## Stack Patterns by Variant
 
----
+**If targeting installed-PWA users specifically (Add to Home Screen on iOS):**
+- Use a full `manifest.json` (name, short_name, icons incl. sizes suited to `apple-touch-icon`, `display: standalone`, `theme_color`, `background_color`) plus `<link rel="apple-touch-icon">` and `apple-mobile-web-app-*` meta tags in `web/index.html` — iOS Safari does not read all of `manifest.json` the way Chrome/Android does and needs the legacy Apple meta tags for a proper home-screen icon/splash experience.
+- Because installed PWAs get a much larger storage quota/eviction exemption on iOS, actively prompt "Add to Home Screen" — RideWindow can't trigger the native `beforeinstallprompt` on iOS since it doesn't fire on Safari; this must be a manual instructional UI (e.g. "tap Share -> Add to Home Screen").
 
-## Google Calendar Integration
+**If targeting browser-tab (non-installed) users:**
+- Treat local storage (Drift/IndexedDB) as a **cache, not durable source of truth** — expect eviction after inactivity and design the first-load path to gracefully rebuild state (re-run onboarding defaults, refetch weather) rather than erroring.
+- Consider `--pwa-strategy none` instead of the default `offline-first` if you don't want Flutter's built-in service worker aggressively caching every asset for offline use in a context where users may not "install" the app — `none` avoids surprising stale-asset issues for a browser-tab-only audience, at the cost of no offline support. `offline-first` is the better default if PWA installation is actively encouraged (see above).
 
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `google_sign_in` | 7.2.0 | flutter.dev | 3.58k | 8 months ago |
-| `extension_google_sign_in_as_googleapis_auth` | 3.0.0 | flutter.dev | 108 | 11 months ago |
-| `googleapis` | 16.0.0 | google.dev | — | 3 months ago |
+**If build size / load time matters (2s cold-start budget in CLAUDE.md):**
+- The default web build uses the `canvaskit` renderer; evaluate `flutter build web --wasm` (Skwasm renderer) for potentially faster startup on modern browsers, but Safari WASM/Skwasm support should be spot-checked on-device since renderer support and performance varies by browser/OS version — treat as a phase-level verification item, not a settled decision here.
 
-**Why this trio (not `googleapis_auth` directly):**
+## Version Compatibility
 
-The official Flutter docs explicitly state: "Do not use `package:googleapis_auth` with a Flutter application; use `package:extension_google_sign_in_as_googleapis_auth` instead." The extension adds an `authenticatedClient()` method to `GoogleSignIn`, producing an `AuthClient` accepted by `CalendarApi`. This is the officially supported path as of Flutter 2026 docs.
-
-**Scope needed:** `CalendarApi.calendarScope` (read/write). Request only at the moment the user taps "Add to calendar" — not at app launch (minimises permission friction and data-privacy surface).
-
-**Calendar integration is optional and on-demand.** The entire Google Sign-In flow should be behind a lazy initialisation guard so it doesn't add cold-start cost.
-
----
-
-## UI / Charts
-
-**No chart package needed.**
-
-The mockup shows three progress bars (temperature / rain / wind scores) in the "Why this score?" insight sheet. These are plain `LinearProgressIndicator` or a simple `CustomPainter` (a 8px high coloured bar). Adding `fl_chart` or Syncfusion for three static bars is massive overkill.
-
-**If charts are added later (v2 — weekly overview sparklines, historical data):**
-
-| Package | Version | Publisher | Likes | Published |
-|---------|---------|-----------|-------|-----------|
-| `fl_chart` | 1.2.0 | flchart.dev | 7.1k | 2 months ago |
-
-`fl_chart` is the right choice at that point: 1.38M weekly downloads, 160 pub points, no licensing cost (unlike Syncfusion which requires a paid license for commercial use beyond community edition limits).
-
-**Do NOT use:** Syncfusion Flutter Charts — commercial licensing required for production apps beyond the community free tier. Overkill for three progress bars.
-
----
-
-## Packages Summary Table
-
-| Category | Package | Version | Confidence |
-|----------|---------|---------|------------|
-| State mgmt | `flutter_riverpod` | 3.3.1 | HIGH |
-| State mgmt codegen | `riverpod_annotation` + `riverpod_generator` | 4.0.2 | HIGH |
-| Settings store | `shared_preferences` | 2.5.5 | HIGH |
-| Structured DB | `drift` | 2.33.0 | HIGH |
-| Networking | `http` | 1.6.0 | HIGH |
-| Data models | `freezed` + `freezed_annotation` | 3.2.5 | HIGH |
-| JSON serialization | `json_serializable` + `json_annotation` | >=6.7 | HIGH |
-| Location | `geolocator` | 14.0.2 | HIGH |
-| Permissions | `permission_handler` | 12.0.3 | HIGH |
-| Background work | `workmanager` | 0.9.0+3 | HIGH |
-| Notifications | `flutter_local_notifications` | 21.0.0 | HIGH |
-| Timezone runtime | `flutter_timezone` | 5.1.0 | HIGH |
-| Timezone data | `timezone` | 0.11.0 | HIGH |
-| Navigation | `go_router` | 17.2.3 | HIGH |
-| Google auth | `google_sign_in` | 7.2.0 | HIGH |
-| Google auth bridge | `extension_google_sign_in_as_googleapis_auth` | 3.0.0 | HIGH |
-| Google APIs | `googleapis` | 16.0.0 | HIGH |
-
----
-
-## Installation (pubspec.yaml)
-
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-
-  # State management
-  flutter_riverpod: ^3.3.1
-  riverpod_annotation: ^4.0.2
-
-  # Storage
-  shared_preferences: ^2.5.5
-  drift: ^2.33.0
-  sqlite3_flutter_libs: ^0.5.0   # bundled SQLite for Drift on Android
-
-  # Networking
-  http: ^1.6.0
-
-  # Data models
-  freezed_annotation: ^2.4.0
-  json_annotation: ^4.8.0
-
-  # Location
-  geolocator: ^14.0.2
-  permission_handler: ^12.0.3
-
-  # Background work
-  workmanager: ^0.9.0+3
-
-  # Notifications
-  flutter_local_notifications: ^21.0.0
-  timezone: ^0.11.0
-  flutter_timezone: ^5.1.0
-
-  # Navigation
-  go_router: ^17.2.3
-
-  # Google Calendar
-  google_sign_in: ^7.2.0
-  extension_google_sign_in_as_googleapis_auth: ^3.0.0
-  googleapis: ^16.0.0
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-  # Code generation
-  build_runner: ^2.4.0
-  riverpod_generator: ^2.6.0
-  freezed: ^3.2.5
-  json_serializable: ^6.7.0
-```
-
----
-
-## Alternatives Considered and Rejected
-
-| Category | Rejected | Reason |
-|----------|----------|--------|
-| State mgmt | Bloc/BLoC | Event+state ceremony is 3× the code for 6 screens; overkill for solo dev |
-| State mgmt | Provider | Missing native async primitives; effectively superseded by Riverpod |
-| State mgmt | GetX | v5 stuck in RC; routing+DI+state in one package creates coupling; anti-patterns at scale |
-| Database | Isar 3.x | Last stable pub.dev release 3 years ago; v4 not production-ready; community fork adds uncertainty |
-| Database | `hive` / `hive_ce` | Original abandoned; `hive_ce` is community fork; NoSQL key-value is wrong fit for the availability grid |
-| Database | ObjectBox | Proprietary native binary, adds ~5 MB to APK; Drift is lighter and SQL is portable |
-| Networking | Dio | Interceptors / CancelToken / multipart are all unused for a single GET to Open-Meteo; adds 250 kB |
-| Charts | Syncfusion | Paid license required in production; progress bars don't need a chart library |
-| Charts | charts_flutter | Archived by Google in 2023; do not use |
-| Background | `android_alarm_manager_plus` | Requires `SCHEDULE_EXACT_ALARM` which is denied by default on Android 14+; wrong tool for periodic background refresh |
-| Calendar auth | `googleapis_auth` directly | Flutter docs explicitly state: use `extension_google_sign_in_as_googleapis_auth` instead |
-
----
-
-## Flutter 3.x / Dart 3.x Considerations
-
-- **Material 3 is default** since Flutter 3.16. `useMaterial3: true` is no longer needed in `ThemeData`. Use `NavigationBar` instead of `BottomNavigationBar`.
-- **Dart 3 patterns:** Use sealed classes + pattern matching for ride slot quality tiers (Perfect/Great/Acceptable/Poor). This is cleaner than string enums.
-- **`flutter_local_notifications` v21+** requires `androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle` — the old `androidAllowWhileIdle: true` parameter is deprecated.
-- **Riverpod 3.0:** `AutoDisposeNotifier` is now just `Notifier` (auto-dispose is default). `StateProvider` / `StateNotifierProvider` are legacy — do not use in new code.
-- **`permission_handler` 12.x** requires `compileSdkVersion 35` in `android/app/build.gradle`.
-- **`workmanager` 0.9.x** uses a federated plugin architecture — `workmanager_android` is pulled in automatically.
-- **Isolate constraint:** WorkManager background callbacks run in a separate Dart isolate. Riverpod providers and Drift must be re-initialised inside the callback. Keep the background task a thin data layer operation (fetch → write → done).
-
----
+| Package A | Compatible With | Notes |
+|-----------|-----------------|-------|
+| `drift@2.33.0` | `drift_flutter@^0.3.0` (requires drift `^2.30.0`) | 2.33.0 satisfies the `^2.30.0` constraint — no drift version bump needed. |
+| `drift_flutter@^0.3.0` | `sqlite3@^3.0.0` (web), `sqlite3_flutter_libs@^0.6.0+eol` (native, already in use) | The `+eol` suffix on `sqlite3_flutter_libs` in drift_flutter's own dependency listing is worth flagging — check pub.dev for a newer non-EOL release before locking versions, though the existing native app likely already pins a working version independently. |
+| `sqlite3.wasm` (static asset) | Must match installed `sqlite3` package version exactly | Drift's own docs state: "If you use a sqlite3.wasm from version x, the version of package:sqlite3 must be at least that version." Mismatches cause runtime failures, not compile-time ones — verify manually after every `sqlite3` package bump. |
+| `drift_worker.dart.js` (static asset) | Must match installed `drift` package version | Same version-drift risk as sqlite3.wasm — re-download after any `drift` package upgrade. |
+| `google_sign_in@7.2.0` | `extension_google_sign_in_as_googleapis_auth@3.0.0` | Extension already targets `google_sign_in ^7.0.0` and lists web support — no change needed for the web target. |
+| `geolocator@14.0.2` | `geolocator_web` (auto-resolved, federated plugin, no explicit pubspec entry needed) | Web requires a secure context (HTTPS) — Firebase Hosting serves HTTPS by default, so this is satisfied automatically. |
+| `go_router@17.2.3` | `flutter_web_plugins` (Flutter SDK bundled) | No version pinning needed; `flutter_web_plugins` ships with the Flutter SDK matching your Flutter version. |
+| `http@1.6.0` | Open-Meteo API (CORS-enabled) | Open-Meteo confirmed to send CORS headers allowing direct browser `fetch`/XHR — no proxy needed for the existing weather-fetch code path to work unmodified on web. |
+| `fl_chart`, `freezed`, `flutter_riverpod` | Flutter Web (all platforms) | All three are pure-Dart/rendering libraries with no platform channels — no known web-compatibility caveats found; existing scoring/provider/chart code should compile and run on web unmodified. |
 
 ## Sources
 
-- pub.dev package pages (verified 2026-06-01): workmanager, flutter_local_notifications, geolocator, permission_handler, flutter_riverpod, riverpod_annotation, shared_preferences, drift, http, freezed, go_router, google_sign_in, extension_google_sign_in_as_googleapis_auth, googleapis, timezone, flutter_timezone, fl_chart
-- [Flutter official: Google APIs integration](https://docs.flutter.dev/data-and-backend/google-apis)
-- [Flutter Material 3 migration guide](https://docs.flutter.dev/release/breaking-changes/material-3-migration)
-- [Riverpod 3.0 what's new](https://riverpod.dev/docs/whats_new)
-- [Android 14 SCHEDULE_EXACT_ALARM changes](https://developer.android.com/about/versions/14/changes/schedule-exact-alarms)
-- Quash blog: Hive vs Drift vs Floor vs Isar 2025
-- FlutterFever: Dio vs http in Flutter
+- `/websites/drift_simonbinder_eu` (Context7) — Drift web platform setup: `DriftWebOptions`, `WasmDatabase.open`, required `web/` directory files (`sqlite3.wasm`, `drift_worker.dart.js`), worker compilation via `dart2js`
+- [Drift: Web platform docs](https://drift.simonbinder.eu/platforms/web/) — OPFS vs IndexedDB tiered storage strategy, Safari 16 worker-caching bug, COOP/COEP header requirements, version-matching requirement between `sqlite3` package and `sqlite3.wasm`
+- [drift_flutter on pub.dev](https://pub.dev/packages/drift_flutter) — current version 0.3.0, dependency versions (`sqlite3_flutter_libs ^0.6.0+eol`, `sqlite3 ^3.0.0`), drift `^2.30.0` compatibility — MEDIUM confidence (WebFetch-summarized page content)
+- [WebKit blog: Updates to Storage Policy](https://webkit.org/blog/14403/updates-to-storage-policy/) — HIGH confidence, official WebKit source: eviction is LRU-based on last interaction/storage operation, not a strict "7 days" hard rule; Home Screen web apps get 60%/80% quota vs 15%/20% for regular tabs; `navigator.storage.persist()` mitigation and its heuristic (favors installed PWAs), `QuotaExceededError` handling recommended — **this refines the "7-day eviction" framing already in PROJECT.md**: it's engagement-based eviction under storage pressure rather than a hard 7-day timer, but the practical risk (data loss for inactive/non-installed users) is confirmed and real
+- [pub.dev: google_sign_in](https://pub.dev/packages/google_sign_in) — MEDIUM confidence (WebFetch summary) — confirms `web: any` platform support in 7.x, built on GIS, `authorizeScopes()`/`authorizationClient` API for Calendar scope, access token expires after 3600s on web with no auto-refresh
+- [pub.dev: extension_google_sign_in_as_googleapis_auth](https://pub.dev/packages/extension_google_sign_in_as_googleapis_auth) — MEDIUM confidence — v3.0.0 depends on `google_sign_in ^7.0.0`, lists web as supported platform
+- [pub.dev: geolocator](https://pub.dev/packages/geolocator) — MEDIUM-HIGH confidence — confirms `geolocator_web` auto-included since 6.2.0+, wraps browser Geolocation API, HTTPS-only, several methods throw `UnsupportedError` on web (`getLastKnownPosition`, `openAppSettings`, `openLocationSettings`, `getServiceStatusStream`)
+- [Flutter docs: Building a web app](https://docs.flutter.dev/platform-integration/web/building) — HIGH confidence official source, though thin on PWA specifics (confirmed via WebFetch that this page does not cover manifest.json/service worker/pwa-strategy in detail)
+- [Flutter docs: Build and release a web app](https://docs.flutter.dev/deployment/web) — HIGH confidence — build modes (debug/profile/release), renderers (`canvaskit`/`skwasm`), `flutter build web --wasm`
+- WebSearch (multiple, cross-verified) — `--pwa-strategy offline-first|none` flag behavior, `flutter_service_worker.js` auto-generation, `manifest.json` role — MEDIUM confidence, not found verbatim in the official Flutter docs pages fetched, but consistent across multiple community sources and matches known Flutter CLI behavior
+- [Firebase Hosting: Integrate Flutter Web](https://firebase.google.com/docs/hosting/frameworks/flutter) — MEDIUM confidence (WebFetch summary) — flags the webframeworks integration as "early public preview," recommends Firebase CLI >=12.1.0; classic static hosting (public dir = `build/web`) recommended instead for this project's pure-SPA needs
+- WebSearch — `go_router` + `PathUrlStrategy`/`flutter_web_plugins` for hash-free URLs on web — MEDIUM confidence, consistent across multiple sources, matches known Flutter web routing behavior
+- WebSearch — Open-Meteo CORS support for direct browser access — MEDIUM confidence (no official Open-Meteo docs page fetched directly, but consistent across multiple sources and matches the API's stated "no auth, public" design)
+
+---
+*Stack research for: Flutter Web/PWA build (v2.0) targeting iOS Safari users, deployed via Firebase Hosting*
+*Researched: 2026-07-10*

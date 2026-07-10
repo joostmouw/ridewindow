@@ -1,168 +1,128 @@
 # Feature Research
 
-**Domain:** Cyclist weather-window / ride-planning app (Android)
-**Researched:** 2026-06-01
-**Confidence:** HIGH (6 competitor apps analyzed via official sources + review sites; confirmed by cross-referencing multiple sources)
+**Domain:** Installable PWA on iOS Safari (Flutter Web) — RideWindow v2.0 milestone
+**Researched:** 2026-07-10
+**Confidence:** MEDIUM-HIGH (iOS-specific mechanics verified across WebKit's own blog + multiple independent 2026 sources; storage-eviction specifics conflict between sources and are flagged where noted)
+
+> **Note on scope:** This file supersedes the v1.0 FEATURES.md (Android competitor/feature-landscape research, dated 2026-06-01, archived in git history) for the purposes of the v2.0 milestone. v1.0's feature landscape (scoring, slot generation, availability calendar, competitor gaps) remains valid and shipped — see `.planning/PROJECT.md` "Validated" section. This research answers a narrower, milestone-specific question: what does "installable PWA on iOS Safari" actually require, separate from the already-solved core product features being ported to web.
 
 ---
 
-## Competitor App Survey
+## Context: What Actually Changes for the User
 
-Before categorizing features, here is what each analyzed app actually does — and what it doesn't.
+A regular Safari tab and an "Added to Home Screen" web app are, per Apple's own storage-policy documentation, **treated as separate contexts with their own inactivity counters** — but they otherwise share the same underlying storage quota (60% origin / 80% overall of free disk) ([WebKit: Updates to Storage Policy](https://webkit.org/blog/14403/updates-to-storage-policy/)). Practically, once a user taps "Add to Home Screen":
 
-| App | Core Focus | Scheduling / Time-slot feature? | Score / Rating? | Calendar integration? |
-|-----|------------|--------------------------------|-----------------|----------------------|
-| **MyWindsock** | Route + segment wind analysis, performance metrics (wWatts, Wind Adjusted Time) | No — shows 7-day per-route forecast, user picks start time manually | Segment difficulty score | No |
-| **Epic Ride Weather** | Minute-by-minute route-specific weather along a GPS route | Shows best start time for a given route, but requires user to have a route first | No overall ride score | No |
-| **Headwind** | Wind difficulty rating per Strava route, 7-day forecast per starred route | Shows difficulty forecast per day for saved routes; no availability filter | Difficulty score (not weather comfort) | No |
-| **Komoot (Premium)** | Route planning + on-tour weather overlay | Weather shown per route, no slot recommendations | No | No |
-| **Windy.app (cycling profile)** | General weather map with cycling-tuned feels-like temp, 10-day forecast | No scheduling | No cycling comfort score | No |
-| **cyclingweather.app** | Comfort diagram (Weacodi), 7-day hourly comfort level visualization | No scheduling, no availability filter | Comfort level (visual, not numeric) | No |
-| **Epic Ride Weather (detail)** | Route-timed weather (Strava, Komoot, RWGPS, Garmin integration) | Start-time picker for a route — closest to a time slot, but needs a route | No | No |
-| **AccuWeather / BBC / Met Office** | Generic weather apps with standard hourly forecasts | No cycling-specific scheduling | No | No |
+- **Icon:** The icon shown is *not* reliably pulled from `manifest.json` — iOS Safari prioritizes a dedicated `<link rel="apple-touch-icon">` tag in `web/index.html` and only falls back to the manifest's `icons` array if no apple-touch-icon is present. Skipping this produces a blurry auto-generated screenshot icon on the home screen ([webhint.io](https://webhint.io/docs/user-guide/hints/hint-apple-touch-icons/), [premiumfavicon.com](https://www.premiumfavicon.com/blog/apple-touch-icon-guide)). **HIGH confidence, iOS-specific — Flutter's default `manifest.json` icons are not sufficient alone.**
+- **Standalone mode:** No URL bar, no Safari toolbar, and no native swipe-back-to-previous-page gesture. The app must supply its own back/close affordances; `go_router`'s default web history behavior does not by itself replace the browser chrome the user is used to. **HIGH confidence.**
+- **Splash screen:** iOS shows a static launch image built from `<link rel="apple-touch-startup-image">` tags (device-size-specific — no automatic generation from the manifest like Android). `theme_color` in the manifest sets the status bar color during this launch phase; `background_color` sets the splash background. Skipping this produces a jarring white flash on launch ([web.dev/learn/pwa/enhancements](https://web.dev/learn/pwa/enhancements)). **HIGH confidence.**
+- **Storage behavior:** Home-screen web apps get the *same quota* as Safari tabs, but data can still be evicted under storage pressure or extended inactivity. WebKit's official position is that home-screen apps are not expected to lose data as readily as regular-tab storage, but several independent sources report a ~7-day inactivity eviction window still applies in practice, plus a ~50MB Cache API soft cap. **MEDIUM confidence — sources conflict; treat as a real, unresolved risk** ([itnews.com.au](https://www.itnews.com.au/news/apple-cops-flak-for-deleting-local-browser-storage-after-7-days-539833), [Apple Developer Forums](https://developer.apple.com/forums/thread/710157), [WebKit blog](https://webkit.org/blog/14403/updates-to-storage-policy/)).
 
-**Critical gap confirmed across all competitors:** None of the analyzed apps combine (a) a cyclist-specific weather score with (b) the user's personal availability calendar to output (c) ready-made bookable time slots. This is the white space RideWindow occupies.
+This context shapes every feature decision below.
 
 ---
 
-## Table Stakes (Users Expect These — Missing = Uninstall)
+## Feature Landscape
 
-Features users assume exist in any weather-for-cyclists app. These are not differentiators; failing to deliver them means the app feels broken.
+### Table Stakes (Users Expect These)
 
-| Feature | Why Expected | Complexity | In Mockup? | Notes |
-|---------|--------------|------------|------------|-------|
-| 7-day hourly weather forecast for current location | Every weather app has this; GPS-auto location is assumed | S | Yes (Home screen, week strip) | Open-Meteo covers this; no key needed |
-| Cyclist-relevant weather parameters: temperature, rain, wind | Generic weather apps show humidity and pressure; cyclists care about temp/rain/wind specifically | S | Yes (card chips + detail screen) | All three are in the scoring model |
-| "Feels like" temperature (wind chill / heat index) | Cyclists experience perceived temperature, not air temp; MyWindsock, Windy.app, cyclingweather.app all offer this | S | Not explicitly shown — gap | Detectable via Open-Meteo `apparent_temperature`; should appear on detail screen |
-| Hourly breakdown within a ride window | Epic Ride Weather, MyWindsock, Headwind all show per-hour data inside a slot | S | Yes (Ride Detail "Hourly" card) | Already in mockup |
-| Color-coded weather quality at a glance | Week-level quality indicator (green/amber/red) is table stakes in every cycling app | S | Yes (week strip dots + card border colors) | Already in mockup |
-| Transparent score explanation ("why is this good?") | Users distrust black-box scores; Headwind shows difficulty components, MyWindsock shows factor breakdown | M | Yes (insights sheet with 3 progress bars + i button) | Core differentiator implemented as table stakes — good |
-| Location permission + GPS auto-detection | Assumed in any location-aware app | S | Yes (PROJECT.md) | Needs graceful degradation when GPS denied |
-| Manual location override (city search) | Travel use case; GPS not always desired | S | Yes (Profile location row → picker) | Mentioned in PROJECT.md; not detailed in mockup |
-| Local data persistence (settings survive app restart) | Users expect their preferences to be saved | S | Yes (PROJECT.md — Hive/Isar) | No backend required |
-| Basic notifications (opt-in) | Heads-up before a good window; all calendar/planning apps offer this | M | Yes (Profile notifications section, 3 types) | Android WorkManager; needs exact timing logic |
-| Onboarding that sets expectations | Users need to understand what the app does and set initial availability | S | Yes (Onboarding screen, 4 preset options) | Already in mockup |
+Features required for the web build to feel like a real app rather than "a website with a bookmark." Missing any of these makes the PWA feel broken compared to the shipped Android app.
 
----
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| App icon + splash screen tuned for iOS (`apple-touch-icon`, `apple-touch-startup-image`, `theme_color`, `background_color`) | Users judge "is this a real app" by the home screen icon and launch flash; Flutter's default `manifest.json` alone is insufficient on iOS | LOW-MEDIUM | Flutter's `web/index.html` template needs manual `<link>` tags added; splash images are size-specific per device — either generate a set (e.g. via a generator script) or accept a plain-color splash with correct `background_color`/`theme_color` as the lower-effort v2.0 baseline |
+| Custom "Install this app" instructional UI | iOS Safari does **not** implement `beforeinstallprompt` — there is no native one-tap install banner on iOS at all, ever. Every install is a manual Share-sheet → "Add to Home Screen" action | MEDIUM | Must detect iOS Safari specifically (Android Chrome *does* support `beforeinstallprompt` and should show its own native-triggered flow instead) and show a static illustrated instruction ("tap Share, then Add to Home Screen"). Must only render in browser mode — hide via the `display-mode: standalone` CSS media query once installed, otherwise it nags already-installed users |
+| Standalone display config (`display: standalone` in manifest, `apple-mobile-web-app-capable` + `apple-mobile-web-app-status-bar-style` meta tags, `env(safe-area-inset-*)` CSS) | Without this, "Add to Home Screen" just bookmarks a Safari tab — full browser chrome stays, defeating the point of installing | LOW-MEDIUM | Standard boilerplate; safe-area insets matter for notch/Dynamic Island devices so the app bar doesn't sit under the status bar |
+| Cache-then-network fetch with visible "Last updated HH:MM" label | Users lose the mental model of "the app refreshed in the background" (which they had on Android via WorkManager) — an explicit timestamp rebuilds trust that data is current | LOW | Reuses existing `AsyncNotifier` weather provider; only the trigger changes (see refresh strategy below) |
+| Refresh-on-load + refresh-on-focus (page visibility) + manual pull-to-refresh | Direct replacement for the Android background-refresh feature, which has no web equivalent (`workmanager` has no web backend, and Safari does not implement the Periodic Background Sync API at all) | MEDIUM | `visibilitychange`/focus listeners trigger a re-fetch when the user reopens the tab/app; `RefreshIndicator` gives an explicit manual gesture. This is a genuine feature replacement, not a nice-to-have — without it, data can go stale for days between opens |
+| Offline fallback UI (last-known slots shown, clearly labeled stale, when fetch fails) | Without connectivity or with evicted cache, the app must not show a blank screen or crash — users expect *some* content, even if stale | MEDIUM | Depends on the cache-then-network pattern above; needs a distinct "offline / showing cached data from [time]" banner state, not a silent failure |
+| Graceful geolocation handling with fast fallback to manual city picker | Browser geolocation on iOS Safari has no native-style "Always Allow" — permission is asked per-origin and iOS defaults to "Ask" (re-prompting per session is common), and HTTPS is mandatory (Firebase Hosting satisfies this) | LOW-MEDIUM | The existing manual city override (already shipped in v1) becomes the primary fallback path on web, not a rarely-used secondary option — surface it immediately on permission denial/timeout rather than after a long retry loop |
+| In-app back/close navigation controls | Standalone mode removes the browser's back button and (in practice) the OS-level edge-swipe-back gesture available in a normal Safari tab; the app is now solely responsible for all navigation affordances | MEDIUM | Verify `go_router`'s web history handling still produces sensible in-app back behavior when there is no browser chrome to fall back on |
+| External links open without permanently ejecting the user from standalone mode | Privacy policy links, Google OAuth popups, and "Add to Calendar" flows can hand off to Safari; a careless implementation strands the user in a browser tab instead of returning them to the installed app | LOW-MEDIUM | Test the actual Google Identity Services web sign-in popup behavior inside standalone mode specifically — popup-based OAuth flows have known quirks in standalone PWA contexts on iOS |
 
-## Differentiators (RideWindow's Competitive Edge)
+### Differentiators (Competitive Advantage)
 
-Features that are NOT present in competitors (or are present in weak form), and which directly serve RideWindow's core value.
+Not required for the PWA to function, but they turn iOS's constraints into a more transparent, trustworthy experience than a typical "silently stale" PWA — directly reinforcing the Core Value (accurate, bookable slots the user can trust).
 
-| Feature | Value Proposition | Complexity | In Mockup? | Notes |
-|---------|-------------------|------------|------------|-------|
-| **Availability-aware slot generation** — cross-referencing hourly weather score with user's blocked hours to produce only realistically rideable windows | The single biggest gap across all competitors. Epic Ride Weather picks the best start time for a given route, but requires a pre-existing route and no calendar awareness. RideWindow skips the route and outputs the window directly. | M | Yes (slot cards filtered against availability) | This IS the core differentiator — protect this |
-| **Concrete, bookable time slots with duration labels** — "Saturday 09:00–13:00, 4h — Perfect" rather than a raw hourly chart | Cyclists want a decision, not more data. All competitor apps require the user to read a chart and make their own inference. | M | Yes (ride cards with time + duration + badge) | Unique UX pattern in this space |
-| **Weekly availability calendar (work-hour blocking)** — user defines their weekly free-time template once, app filters slots automatically | No competitor does this. Headwind shows 7-day per-route data but the user still has to mentally check against their schedule. | M | Yes (Availability screen, hour-cell grid) | The friction-removal feature |
-| **Pre-set availability patterns for onboarding** — "Evenings & weekends", "Mornings & weekends", etc., reducing setup to one tap | Competitors either skip onboarding or show a data-entry form. This lowers the barrier to first useful output. | S | Yes (Onboarding screen, 4 options) | Smart defaults accelerate time-to-value |
-| **Weather tolerance sliders per factor** — user controls how temperature, rain, and wind affect their personal score | MyWindsock has CdA and performance tuning (for racers). No competitor has casual-rider tolerance sliders. | M | Referenced in mockup (Profile "Weather sensitivity" row) | Differentiates from one-size-fits-all scores |
-| **Ride-length preference filter** — 2h / 3h / 4–5h chips filter which slot durations are surfaced | No competitor allows filtering by desired ride duration as a preference. | S | Yes (Profile "Ride length" chips) | Low complexity, high perceived value |
-| **Google Calendar export with weather summary** — "Add to calendar" creates an event with start/end + weather detail | Generic "add to calendar" exists in planning apps; the weather-annotated description is novel | M | Yes (Plan overlay sheet, "Add to Google Calendar" button) | OAuth Google Sign-In adds complexity; optional on-demand |
-| **"After work" context labels** — slots show "Thursday after work" to immediately orient the user in their week | All competitors show timestamps only; none add user-context labels | S | Yes (card subtitle "after work") | Simple but highly resonant with the target persona |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Explicit "Showing cached forecast from [time], refreshing…" banner during cache-then-network refresh | Most PWAs either show a stale forecast silently or flash a jarring reload — being transparent about data freshness matches the app's "accuracy is the core value" positioning | LOW | Natural extension of the "Last updated" label already required as table stakes |
+| Contextual "Add to Home Screen" nudge shown after N genuinely useful visits (not on first load) | A day-one install nag has low conversion and feels spammy; a nudge after the user has already seen a good ride slot is more persuasive and less annoying | MEDIUM | Needs a lightweight local visit/engagement counter (Drift or shared_preferences) — no backend needed |
+| `display-mode` detection to tailor onboarding copy (browser-tab visitor vs. installed-app user) | Lets the app skip install-nagging entirely for users who already installed, and lets browser-tab users know *why* installing helps (offline slots, faster reopen) | LOW | Single CSS media query / JS check surfaced to Flutter via a platform channel or `dart:html` |
 
----
+### Anti-Features (Commonly Requested, Often Problematic)
 
-## Anti-Features (Explicitly NOT for v1 — With Reasoning)
-
-Features that seem logical to add but would harm v1 by adding complexity without validating the core value. Some are already documented in PROJECT.md's Out of Scope section; this section adds the feature-level reasoning.
-
-| Anti-Feature | Why Users Request It | Why to Avoid in v1 | What to Do Instead |
-|--------------|---------------------|--------------------|--------------------|
-| **Route planning / GPX upload** | Epic Ride Weather, MyWindsock, Komoot do it; feels like the "next level" | Requires map SDK, GPX parsing, route-timed weather (one weather call per segment, not one per location). Adds 4–6 weeks. Core value doesn't require a route — it requires a window. | Show the window; let the user plan the route in Komoot once they know when to ride |
-| **Social / sharing / Strava sync** | Strava is where cyclists live; feels natural | Auth complexity, API rate limits, no unique value without recording. Headwind + myWindsock already fill this role. | v1 is a planning tool, not an activity tracker |
-| **Historical ride analytics** | "Best month to ride", "average score last quarter" | Requires persistent ride history store; grows in complexity fast. No user feedback yet on whether this is wanted. | Forward-looking only; validate that first |
-| **Multi-location / saved locations** | Travel use case ("what's it like in Mallorca next week?") | Complicates UI; all competitors with multi-location add significant UX overhead. GPS + manual override covers 90% of the persona's needs. | Manual city override is sufficient for v1 |
-| **Cycling-type specialization (road / MTB / gravel profiles)** | Users assume their bike type affects weather relevance | Requires multiple scoring models or factor weights per type. Tolerance sliders already cover personalisation without adding profiles. | Sliders serve the same purpose without mode-switching complexity |
-| **Wear OS companion app** | "A quick glance before I walk out the door" | Android watch support requires separate UI target, Wear OS testing environment. No validation that users want this yet. | Notification is the lightweight equivalent |
-| **Radar map / live weather visualization** | Windy, AccuWeather, NOAA Weather Radar all have this | Weather maps are a commodity; adding one doesn't differentiate RideWindow. High engineering cost for commodity output. | Deep-link to Windy or Buienradar for radar if needed |
-| **Clothing recommendations** | cyclingweather.app has this; feels helpful | Requires curating a clothing logic ruleset; subjective (one person's arm warmers are another's base layer). Risk of being wrong and undermining trust. | The temperature + "feels like" data is sufficient for users to decide |
-| **In-app route navigation / turn-by-turn** | "One app for everything" | Komoot, Google Maps, Wahoo solve this well. Navigation is a distinct product. | Show a "Start in Komoot" or "Open in Maps" deep-link on the Ride Detail screen |
-| **User accounts / cloud sync** | "I want my settings on my new phone" | Backend, auth, GDPR, cost — all removed for v1. No data to lose yet (the persona is a single device user). | Export settings as a file (v1.x) if user need surfaces |
-| **Ads or IAP prompts** | Monetization is legitimate | Adds complexity, damages first-impression trust, distracts from core value validation. Wrong phase. | Free, no ads, no IAP for v1 |
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|------------------|-------------|
+| Web Push notifications for v2.0 | "Just port the Android notifications to web" | iOS Web Push only works for an *already-installed* standalone PWA on iOS 16.4+, requires its own separate permission opt-in, and reliability/delivery timing is materially worse than native — disproportionate effort for a milestone whose install-rate is still unproven | Already correctly deferred per PROJECT.md; revisit once install adoption is measured |
+| True periodic background refresh (a web "WorkManager equivalent") | "We already built background refresh for Android, just reuse the pattern" | Safari does not implement the Periodic Background Sync API at all (not even behind a flag) — there is no browser-side background execution window on iOS Safari, installed or not | On-load / on-focus / pull-to-refresh (already listed as table stakes) is the actual ceiling of what's achievable |
+| Relying on `navigator.storage.persist()` as a guarantee that the availability calendar and cached forecast survive indefinitely | Seems like the "correct" API to call to protect user data | `navigator.storage.persist()` is not supported by iOS Safari at all — there is no Persistent Storage API on iOS, so the call is effectively a no-op there (harmless to call defensively for other platforms, but must not be load-bearing for the product's data-durability story on iOS) | Treat weather/forecast cache as disposable and cheaply re-fetchable (it already is, by design). Treat the user-authored availability calendar and preferences as higher-value data; since sources conflict on whether 7-day eviction actually hits home-screen apps in practice, this needs verification during implementation (e.g., manual testing after a week of non-use) rather than being assumed solved |
+| Full offline-first parity with the native app (fresh weather data available with zero connectivity) | "The Android app caches and refreshes in the background, web should too" | Impossible without fabricating data — there is no way to get a genuinely fresh forecast with zero network on iOS Safari | Offline fallback clearly shows last-known slots as stale, never presents cached data as current |
+| A JS-style automatic install prompt/banner on iOS (mimicking Android Chrome's `beforeinstallprompt` UX) | Parity with Android's one-tap install banner | Technically impossible — Apple has never implemented this API in Safari, on any iOS version to date | Static instructional overlay (Share icon → Add to Home Screen), the only path that exists on iOS |
 
 ---
 
 ## Feature Dependencies
 
 ```
-GPS location permission
-    └──required by──> Weather forecast fetch (Open-Meteo)
-                         └──required by──> Hourly weather score computation
-                                              └──required by──> Slot generation
-                                                                   └──required by──> Home screen ride cards
-                                                                   └──required by──> Week strip day quality dots
+Custom "Install this app" instructional UI
+    └──requires──> Browser/OS detection (iOS Safari vs Android Chrome vs desktop)
+                       └──different-path──> Android Chrome uses native beforeinstallprompt capture instead
 
-Onboarding (availability preset)
-    └──seeds──> Weekly availability calendar
-                   └──required by──> Slot generation (filter)
-                   └──displayed in──> Availability screen (editable)
+Offline fallback UI
+    └──requires──> Cache-then-network fetch strategy
+                       └──requires──> "Last updated" timestamp persisted alongside cached forecast
 
-Weather tolerance sliders
-    └──modifies──> Hourly weather score computation
-                      └──required by──> Slot generation
+Refresh-on-focus / refresh-on-load / pull-to-refresh
+    └──enhances──> Existing AsyncNotifier weather provider (v1 Android code, reused as-is;
+                    only the trigger source changes from WorkManager periodic task to page lifecycle events)
 
-Ride length preference (2h / 3h / 4-5h chips)
-    └──filters──> Slot generation output
+Graceful geolocation handling on web
+    └──enhances──> Existing manual city override feature (already shipped in v1 — becomes primary
+                    fallback path on web rather than a rarely-used secondary option)
 
-Slot generation
-    └──required by──> Ride card on Home screen
-    └──required by──> Insights sheet (score breakdown)
-    └──required by──> Ride Detail screen
+Standalone display config (manifest + meta tags)
+    └──requires──> apple-touch-icon / apple-touch-startup-image assets generated per device size
 
-Google Sign-In (optional, on-demand)
-    └──required by──> Google Calendar export ("Add to calendar")
-
-Notifications (WorkManager)
-    └──depends on──> Slot generation (to know which slot to notify about)
-    └──depends on──> Android permission (POST_NOTIFICATIONS, Android 13+)
+Contextual "Add to Home Screen" nudge
+    └──conflicts-with──> Showing the nudge in standalone mode
+                             └──must check `display-mode: standalone` media query first
 ```
 
 ### Dependency Notes
 
-- **Slot generation is the core dependency** — almost everything in the app is downstream of it. It must be built and correct before Home screen, Detail screen, or notifications can be validated.
-- **Availability calendar seeds slot generation** — onboarding must write a valid availability state before slot generation runs. The default preset must produce a usable state even if the user skips customization.
-- **Google Sign-In is fully optional** — the "Add to calendar" flow is a tap-triggered enhancement; the app is fully functional without it. This decouples calendar work from core validation.
-- **Tolerance sliders modify scoring** — they are an enhancement to score computation, not a blocker. Default values must exist so the app works before the user touches sliders.
+- **Refresh strategy reuses existing scoring/fetch code:** The v1 Android weather-fetch and scoring logic (`AsyncNotifier`-based) does not need to change for v2.0 — only what *triggers* a refetch changes (from a WorkManager periodic task to page-visibility/focus events and a manual pull gesture). This is the single biggest complexity-reducer for the milestone: the core value (accurate scoring, slot detection) is already portable Dart code, per PROJECT.md's decision to reuse the codebase for Flutter Web.
+- **Manual city override becomes load-bearing on web:** In v1 it was a fallback for GPS-unavailable/travel scenarios. On web it must handle the much more common case of a user declining or being re-prompted for geolocation permission every session — the UX needs to treat "permission denied/timed out" as an expected, frequent path, not an edge case.
+- **Install UI requires platform branching:** Android Chrome visiting the same PWA *does* support `beforeinstallprompt`, so the install-prompt code needs two paths — captured native event on Android/Chrome, static illustrated instructions on iOS Safari. Don't build a single "universal" install banner; the underlying mechanisms are fundamentally different.
+- **Storage durability is an open risk, not a dependency to design around confidently:** Because sources conflict on whether the ~7-day inactivity eviction applies to home-screen-installed apps the same way it applies to regular Safari tabs, this should be flagged for verification during implementation (test: leave the installed PWA untouched for 7+ days, confirm availability-calendar and cached-forecast state after reopening) rather than assumed either way.
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1) — All in Mockup
+### Launch With (v2.0)
 
-- [x] GPS location + manual city override
-- [x] Open-Meteo 7-day hourly forecast fetch
-- [x] Cycling score per hour (temp/rain/wind, weighted, tolerance-adjusted)
-- [x] Slot generation filtered by availability and ride-length preference
-- [x] Onboarding with 4 availability presets
-- [x] Availability calendar (weekly hour-cell grid, tap to toggle)
-- [x] Home screen: week strip + ride cards (Perfect/Great/Acceptable tiers)
-- [x] Ride Detail: hourly breakdown, score banner, weather rows
-- [x] Insights sheet: 3 progress bars + text explanations per slot
-- [x] Profile: location, availability, ride length, notifications, weather sensitivity, Google Calendar
-- [x] Notifications: evening before, morning of, weekly digest
-- [x] Google Calendar export (optional, on-demand OAuth)
-- [x] Local persistence (Hive/Isar — settings, availability, cached forecast)
+Minimum viable product for the PWA milestone — what's needed to validate that iOS users can get real value without a native app. (Core scoring/slot generation/availability calendar/Google Calendar integration are already-shipped v1 features being ported per PROJECT.md — listed here only as the dependency baseline everything else sits on top of.)
 
-**Gaps vs. mockup — items to add before first build:**
-- [ ] "Feels like" temperature on Ride Detail screen (Open-Meteo `apparent_temperature` field — not shown in current mockup but table stakes)
-- [ ] Location permission denied state / fallback to manual city (mockup shows happy path only)
-- [ ] Empty state when no slots qualify (e.g., all week is bad weather or fully blocked) — mockup has no such state
+- [ ] Manifest + `apple-touch-icon` + `apple-touch-startup-image` + `theme_color`/`background_color` — without this the app looks like a bookmarked website, not an app
+- [ ] iOS-specific "Add to Home Screen" instructional overlay (shown once per browser-mode visit, hidden via `display-mode: standalone` check once installed) — this is the *only* install path that exists on iOS; skipping it means most users never discover the app is installable
+- [ ] Standalone display config (manifest `display: standalone`, status-bar meta tags, safe-area CSS) — the entire point of installing
+- [ ] Cache-then-network fetch + visible "Last updated HH:MM" label — replaces the trust signal that background refresh provided on Android
+- [ ] Refresh-on-load + refresh-on-focus + manual pull-to-refresh — the actual replacement for WorkManager background refresh; there is no better alternative on Safari
+- [ ] Offline fallback UI showing last-cached slots, clearly labeled stale, when a fetch fails
+- [ ] Geolocation per-session request with the existing manual city picker surfaced immediately on denial/timeout
+- [ ] Ported core scoring + slot generation + availability calendar + Google Calendar integration (already scoped in PROJECT.md — the dependency baseline)
 
-### Add After Validation (v1.x)
+### Add After Validation (v2.x)
 
-- [ ] Wind direction indicator on ride cards ("tailwind/headwind on return") — depends on user feedback that direction matters to them
-- [ ] "Feels like" / apparent temperature visible on home card chips (currently only shown in detail)
-- [ ] Settings export/import file (poor man's backup if no backend)
-- [ ] Widget (Android home screen) — shows next ride slot at a glance
+- [ ] Contextual "Add to Home Screen" nudge after N genuinely useful sessions — trigger: install rate from the static overlay alone turns out low
+- [ ] Best-effort `navigator.storage.persist()` call + `navigator.storage.estimate()` quota check with a user-facing low-storage warning — trigger: real-world reports of data loss on iOS after inactivity
+- [ ] Explicit standalone-vs-browser-tab onboarding copy variants — trigger: analytics show meaningful browser-tab-only usage that never converts to install
 
-### Future Consideration (v2+)
+### Future Consideration (v3+)
 
-- [ ] Route planning / GPX + weather overlay (Epic Ride Weather territory, but RideWindow can add it once slot planning is validated)
-- [ ] Multi-location saved spots (travel use case)
-- [ ] Cycling-type profiles (road / gravel / MTB weight presets)
-- [ ] iOS port (Flutter codebase is ready; add once Android validates concept)
-- [ ] Wear OS tile
+- [ ] Web Push notifications (iOS 16.4+ installed-PWA only) — defer until PWA install adoption is proven; not worth the reliability tradeoff yet
+- [ ] Availability-calendar export/import as a hedge against storage eviction — only worth building if the 7-day-eviction risk is confirmed in practice for installed apps (currently an open, unverified risk, not a confirmed one)
+- [ ] Native iOS App Store app — only if the web version validates real demand (per PROJECT.md's Out of Scope reasoning)
 
 ---
 
@@ -170,62 +130,57 @@ Notifications (WorkManager)
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Slot generation (weather score × availability) | HIGH | MEDIUM | P1 |
-| Onboarding with presets | HIGH | LOW | P1 |
-| Home screen ride cards | HIGH | LOW | P1 |
-| Open-Meteo weather fetch + scoring | HIGH | MEDIUM | P1 |
-| Ride Detail screen + hourly rows | HIGH | LOW | P1 |
-| Insights sheet (i button) | MEDIUM | LOW | P1 |
-| Availability calendar grid | MEDIUM | MEDIUM | P1 |
-| Tolerance sliders | MEDIUM | LOW | P1 |
-| Ride-length preference chips | MEDIUM | LOW | P1 |
-| Notifications (WorkManager) | MEDIUM | MEDIUM | P1 |
-| Feels-like temperature | MEDIUM | LOW | P1 (gap to close) |
-| Google Calendar export | MEDIUM | MEDIUM | P1 |
-| Empty / error states | HIGH | LOW | P1 (gap to close) |
-| Wind direction label on cards | LOW | LOW | P2 |
-| Android home screen widget | MEDIUM | MEDIUM | P2 |
-| Route planning / GPX | LOW (v1) | HIGH | P3 |
-| Multi-location | LOW (v1) | MEDIUM | P3 |
+| App icon + splash config (iOS-specific tags) | HIGH | LOW | P1 |
+| Custom iOS install instructional UI | HIGH | MEDIUM | P1 |
+| Standalone display config + safe-area handling | HIGH | LOW-MEDIUM | P1 |
+| Cache-then-network + "last updated" label | HIGH | LOW | P1 |
+| Refresh-on-load/focus + pull-to-refresh | HIGH | MEDIUM | P1 |
+| Offline fallback UI | MEDIUM-HIGH | MEDIUM | P1 |
+| Geolocation per-session handling + city fallback | HIGH | LOW-MEDIUM | P1 |
+| In-app back/close navigation | MEDIUM | MEDIUM | P1 |
+| External-link/OAuth standalone-mode handling | MEDIUM | LOW-MEDIUM | P1 |
+| Contextual install nudge (post-first-overlay) | MEDIUM | MEDIUM | P2 |
+| `storage.persist()` + quota warning | LOW-MEDIUM | LOW | P2 |
+| Availability-calendar export/import | LOW (until proven necessary) | MEDIUM | P3 |
+| Web Push notifications | MEDIUM | HIGH | P3 |
+
+**Priority key:**
+- P1: Must have for the milestone to feel like a working, installable app
+- P2: Should have, add once real usage data exists
+- P3: Nice to have, defer until a specific trigger condition is met
 
 ---
 
-## Competitor Feature Matrix
+## Competitor / Pattern Analysis
 
-| Feature | MyWindsock | Epic Ride Weather | Headwind | Komoot Premium | Windy.app | cyclingweather.app | RideWindow (planned) |
-|---------|------------|-------------------|----------|----------------|-----------|-------------------|----------------------|
-| Cycling-specific weather score | Yes (complex) | No | Difficulty score | No | Feels-like temp only | Comfort level | Yes — 3-factor 0–100 |
-| Score explanation ("why?") | Partial | No | No | No | No | No | Yes — 3 progress bars + text |
-| Ride slot recommendations | No | Nearest hour for a route | No | No | No | No | Yes — full slot with start/end/duration |
-| Availability calendar filter | No | No | No | No | No | No | Yes — weekly hour-cell grid |
-| Pre-set availability patterns | No | No | No | No | No | No | Yes — 4 one-tap presets |
-| Ride-length preference | No | No | No | No | No | No | Yes — 2h / 3h / 4–5h chips |
-| Tolerance / preference sliders | No (fixed algo) | No | No | No | No | No | Yes — 3 sliders |
-| Google Calendar export | No | No | No | No | No | No | Yes — optional on-demand |
-| Hourly breakdown in window | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| Push notifications | No | No | No | No | No | No | Yes — 3 types |
-| Route / GPX required | Yes | Yes | Yes | Yes | No | No | No — location only |
-| Free (no route needed) | Freemium | Freemium | Free | Premium | Freemium | Yes | Yes (v1) |
-| Android | Yes | Yes | Yes | Yes | Yes | iOS only | Yes |
+Direct competitor weather/planning PWAs with public iOS install-UX writeups are scarce; the most-cited general-purpose reference cases for "how to do iOS PWA install/offline right" are large consumer PWAs (Twitter Lite/X, Pinterest, Starbucks) rather than weather-specific apps. Treat this as directional pattern evidence (MEDIUM confidence), not a like-for-like feature comparison.
+
+| Concern | Common PWA Pattern (Twitter/Pinterest/Starbucks-style) | Typical Weather-App Native Behavior | Our Approach |
+|---------|--------------------------------------------------------|--------------------------------------|--------------|
+| Install discovery | Static illustrated "Add to Home Screen" instructions shown after initial engagement, not on first load | N/A (installed via App Store, no in-app instruction needed) | Static overlay on first browser-mode visit, refined to post-engagement nudge in v2.x |
+| Offline behavior | Cache last-viewed content, show clear "offline" indicator, no fabricated freshness | Native OS handles connectivity gracefully, background refresh keeps data fresh regardless | Cache-then-network with explicit "last updated" timestamp; never claim cached data is current |
+| Location permission | Ask once per session if not previously permission-cached by the browser; quick fallback UI on denial | Native "Always/While Using/Never" system dialog, remembered indefinitely | Per-session ask + immediate manual-city fallback, reusing existing v1 city picker |
 
 ---
 
 ## Sources
 
-- [MyWindsock app review — ProCyclingUK](https://procyclinguk.com/reviewing-the-mywindsock-app/)
-- [MyWindsock premium features](https://mywindsock.com/my/premium/)
-- [Epic Ride Weather — official site](https://www.epicrideweather.com/)
-- [Epic Ride Weather — Google Play](https://play.google.com/store/apps/details?id=com.greensopinion.rideweather&hl=en_US)
-- [Headwind app — official site](https://headwindapp.com/)
-- [Komoot Premium weather features](https://www.komoot.com/premium/weather)
-- [Windy.app cycling guide](https://windy.app/guide/mini-user-guide-cycling.html)
-- [cyclingweather.app — official site](https://cyclingweather.app/)
-- [TreadBikely — 7 top cycling weather apps](https://www.treadbikely.com/7-top-cycling-weather-apps-to-help-keep-you-dry-warm-safe/)
-- [BikeRadar — best cycling apps 2026](https://www.bikeradar.com/advice/buyers-guides/best-cycling-apps)
-- [CyclingWeekly — best cycling apps 2026](https://www.cyclingweekly.com/group-tests/best-cycling-apps-143222)
-- [Clime blog — hourly forecasts for cyclists](https://climeradar.com/blog/best-apps-hourly-weather-forecasts-cyclists-1)
+- [WebKit: Updates to Storage Policy](https://webkit.org/blog/14403/updates-to-storage-policy/) — official storage-quota and eviction-trigger documentation for home-screen web apps vs Safari tabs
+- [Apple cops flak for deleting local browser storage after 7 days — iTnews](https://www.itnews.com.au/news/apple-cops-flak-for-deleting-local-browser-storage-after-7-days-539833)
+- [Safari iOS PWA Data Persistence Beyond 7 Days — Apple Developer Forums](https://developer.apple.com/forums/thread/710157)
+- [PWA iOS Limitations and Safari Support [2026] — MagicBell](https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide)
+- [Safari PWA Limitations on iOS — BSWEN, 2026-03-12](https://docs.bswen.com/blog/2026-03-12-safari-pwa-limitations-ios/)
+- [There is no Persistent Storage API on iOS — Maximiliano Firtman](https://medium.com/@firt/there-is-no-persistent-storage-api-on-ios-and-you-dont-have-control-of-that-unfortunately-because-361adb5e9dc0)
+- [web.dev: Installation prompt](https://web.dev/learn/pwa/installation-prompt)
+- [web.dev: Enhancements (splash screens, theme-color, apple-touch-startup-image)](https://web.dev/learn/pwa/enhancements)
+- [MDN: Making PWAs installable](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable)
+- [webhint.io: Use Apple touch icon](https://webhint.io/docs/user-guide/hints/hint-apple-touch-icons/)
+- [Apple Touch Icon: The Complete Guide — Premium Favicon](https://www.premiumfavicon.com/blog/apple-touch-icon-guide)
+- [Drift: Web platform docs](https://drift.simonbinder.eu/platforms/web/) — OPFS/IndexedDB backend behavior for local storage on web
+- Flutter Web PWA guides on manifest.json / auto-generated `flutter_service_worker.js` / `--pwa-strategy` build flag (multiple 2025-2026 community sources, MEDIUM confidence — cross-check against Flutter's own web build docs during implementation)
+- Geolocation permission behavior: Apple Community discussion threads on per-site "Ask every time" default in Safari (MEDIUM confidence, user-reported, consistent across threads)
+- `flutter-geolocator` and `flutterlocation` GitHub issue trackers — documented web-platform limitations (lat/long only, no full position attributes, permission-check quirks) (HIGH confidence, primary-source issue trackers)
 
 ---
-
-*Feature research for: Cyclist weather-window / ride-planning app (RideWindow)*
-*Researched: 2026-06-01*
+*Feature research for: Installable PWA on iOS Safari (RideWindow v2.0 Flutter Web milestone)*
+*Researched: 2026-07-10*
