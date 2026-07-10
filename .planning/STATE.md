@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: context exhaustion at 77% (2026-06-05)
-last_updated: "2026-06-05T21:43:26.953Z"
-last_activity: 2026-06-05 -- Plan 10-03 completed (privacy policy at GitHub Pages + ProfileScreen OVER section)
+milestone: v2.0
+milestone_name: iOS Web App
+status: planning
+last_updated: "2026-07-10T13:28:56.327Z"
+last_activity: 2026-07-10
 progress:
-  total_phases: 11
-  completed_phases: 10
-  total_plans: 43
-  completed_plans: 42
-  percent: 91
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 10 (release-internal-track-only) — EXECUTING
-Plan: 3 of 4 (Plan 10-04 BLOCKED — Google developer account verification pending)
-Status: Executing Phase 10 (Plans 01-03 complete; Plan 04 blocked on Google identity verification ~few days)
-Last activity: 2026-06-05 -- Plan 10-03 completed (privacy policy at GitHub Pages + ProfileScreen OVER section)
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-10 — Milestone v2.0 started
 
 ## Performance Metrics
 
@@ -191,5 +188,5 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-06-17
+Last session: 2026-07-01T12:37:33.177Z
 Last activity: 2026-06-18 - Completed quick task 260618-csx: Week-agenda view met ride-overlap overlay
