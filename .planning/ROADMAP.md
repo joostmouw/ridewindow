@@ -335,7 +335,12 @@ Plans:
   3. Web-unsupported `geolocator` methods (`getLastKnownPosition`, `openAppSettings`) are guarded and do not throw uncaught errors on web
   4. The existing Android GPS + city picker flow continues to work unchanged (regression check)
 
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+
+**Wave 1**
+
+- [ ] 13-01-PLAN.md — Web seam + guard openSettings() + promote city picker as primary web fallback + manual browser verification
 
 ### Phase 14: Foreground Refresh Strategy
 
