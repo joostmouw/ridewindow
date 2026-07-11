@@ -226,6 +226,15 @@ class SEn extends S {
   String get emptyNoSlotsDay => 'No ride windows on this day.';
 
   @override
+  String staleDataBannerWithTime(String time) {
+    return 'Offline — showing ride windows from $time';
+  }
+
+  @override
+  String get staleDataBannerNoTime =>
+      'Offline — showing last-known ride windows';
+
+  @override
   String get windCalm => 'Calm';
 
   @override

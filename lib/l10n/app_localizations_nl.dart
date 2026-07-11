@@ -227,6 +227,15 @@ class SNl extends S {
   String get emptyNoSlotsDay => 'Geen rijmomenten op deze dag.';
 
   @override
+  String staleDataBannerWithTime(String time) {
+    return 'Offline — toont rijvensters van $time';
+  }
+
+  @override
+  String get staleDataBannerNoTime =>
+      'Offline — toont laatst bekende rijvensters';
+
+  @override
   String get windCalm => 'Windstil';
 
   @override

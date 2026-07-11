@@ -101,6 +101,14 @@
   "emptyNoSlots": "Geen rijmomenten gevonden.",
   "emptyNoSlotsDay": "Geen rijmomenten op deze dag.",
 
+  "staleDataBannerWithTime": "Offline — toont rijvensters van {time}",
+  "@staleDataBannerWithTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "staleDataBannerNoTime": "Offline — toont laatst bekende rijvensters",
+
   "windCalm": "Windstil",
   "durationHours": "{hours}u",
   "@durationHours": {

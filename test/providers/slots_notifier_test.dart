@@ -62,6 +62,30 @@ class FakeWeatherNotifier extends WeatherNotifier {
   Future<List<HourlyForecast>> build() async => forecasts;
 }
 
+/// WeatherNotifier stub die op commando kan falen — gebruikt om REFRESH-04's
+/// "stale data survives a failed refresh" gedrag te bewijzen via de publieke
+/// ProviderContainer.refresh() API (niet via copyWithPrevious, dat @internal is).
+class FakeWeatherFlaky extends WeatherNotifier {
+  List<HourlyForecast> forecasts;
+  bool shouldFail = false;
+  FakeWeatherFlaky(this.forecasts);
+
+  @override
+  Future<List<HourlyForecast>> build() async {
+    if (shouldFail) throw Exception('offline');
+    return forecasts;
+  }
+}
+
+/// WeatherNotifier stub die vanaf de allereerste build() faalt -- simuleert
+/// het "nog nooit geladen" pad (geen eerdere succesvolle waarde).
+class FakeWeatherNeverLoaded extends WeatherNotifier {
+  @override
+  Future<List<HourlyForecast>> build() async {
+    throw Exception('offline from the start');
+  }
+}
+
 class FakeProfileNotifier extends ProfileNotifier {
   @override
   Future<UserProfile> build() async => const UserProfile(
@@ -238,6 +262,89 @@ void main() {
       final loaded = state as SlotsLoaded;
       expect(loaded.slots, isEmpty);
       expect(loaded.reason, equals(SlotsEmptyReason.allBlocked));
+    });
+
+    test(
+        'preserves last-known slots when weatherProvider errors after a prior success (REFRESH-04)',
+        () async {
+      final goodForecasts = _forecasts(baseTime, 6);
+      final fakeWeather = FakeWeatherFlaky(goodForecasts);
+
+      final container = ProviderContainer(
+        // Disable Riverpod's default exponential-backoff retry (up to 10
+        // attempts) so a single simulated failure settles into AsyncError
+        // immediately -- otherwise this test would need to wait through
+        // several real-time retry delays before hasError becomes true.
+        retry: (retryCount, error) => null,
+        overrides: [
+          weatherProvider.overrideWith(() => fakeWeather),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(weatherProvider.future);
+      await container.read(profileProvider.future);
+      await container.read(availabilityProvider.future);
+
+      final stateBefore = container.read(slotsProvider);
+      expect(stateBefore, isA<SlotsLoaded>());
+      final loadedBefore = stateBefore as SlotsLoaded;
+      expect(loadedBefore.slots, isNotEmpty);
+
+      // Simuleer een refresh die faalt (bijv. offline) na een eerder succes.
+      fakeWeather.shouldFail = true;
+      // Publieke API -- dit laat Riverpod intern de vorige waarde bewaren op
+      // de resulterende AsyncError (copyWithPrevious, niet direct aanroepen).
+      container.refresh(weatherProvider);
+      // Wacht tot de gefaalde rebuild daadwerkelijk is opgelost.
+      await container.read(weatherProvider.future).then(
+            (_) => null,
+            onError: (_) => null,
+          );
+
+      final weatherAfter = container.read(weatherProvider);
+      expect(weatherAfter.hasError, isTrue);
+      expect(weatherAfter.hasValue, isTrue);
+
+      final stateAfter = container.read(slotsProvider);
+      expect(stateAfter, isA<SlotsLoaded>());
+      final loadedAfter = stateAfter as SlotsLoaded;
+
+      // Stale data overleeft de fout — identiek aan de staat vóór de fout.
+      expect(loadedAfter.slots.length, equals(loadedBefore.slots.length));
+      expect(loadedAfter.reason, equals(loadedBefore.reason));
+    });
+
+    test(
+        'never-loaded weather error still yields empty slots (regression)',
+        () async {
+      final container = ProviderContainer(
+        // Disable retry -- see comment in the REFRESH-04 test above.
+        retry: (retryCount, error) => null,
+        overrides: [
+          weatherProvider.overrideWith(() => FakeWeatherNeverLoaded()),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // weatherProvider.future rejects since build() throws on the very
+      // first call -- catch it here so the test doesn't fail on the await.
+      await container.read(weatherProvider.future).catchError((_) => <HourlyForecast>[]);
+      await container.read(profileProvider.future);
+      await container.read(availabilityProvider.future);
+
+      final weatherState = container.read(weatherProvider);
+      expect(weatherState.hasError, isTrue);
+      expect(weatherState.hasValue, isFalse);
+
+      final state = container.read(slotsProvider);
+      expect(state, isA<SlotsLoaded>());
+      final loaded = state as SlotsLoaded;
+      expect(loaded.slots, isEmpty);
     });
   });
 }

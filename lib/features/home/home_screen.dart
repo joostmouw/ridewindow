@@ -187,6 +187,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ],
                 ),
 
+                // ── Stale/offline banner (REFRESH-04) ──
+                if (weatherState.hasError && weatherState.hasValue)
+                  SliverToBoxAdapter(
+                    child: _buildStaleBanner(context, lastRefreshedAsync.value),
+                  ),
+
                 // ── Week strip ──
                 SliverToBoxAdapter(
                   child: KeyedSubtree(
@@ -636,7 +642,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       );
     }
 
-    if (weatherState.hasError) {
+    // REFRESH-04: only show the blank full-screen error when there is truly
+    // no previous data to fall back on. When hasError && hasValue (a refresh
+    // failed after an earlier success), fall through to the SlotsLoaded
+    // branch below, which now renders the stale slots SlotsNotifier
+    // preserves, alongside the stale banner added above the week strip.
+    if (weatherState.hasError && !weatherState.hasValue) {
       return SliverFillRemaining(
         hasScrollBody: false,
         child: _buildEmptyState(
@@ -714,6 +725,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return const SliverFillRemaining(
       hasScrollBody: false,
       child: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Stale/offline banner (REFRESH-04)
+  // ---------------------------------------------------------------------------
+
+  Widget _buildStaleBanner(BuildContext context, DateTime? staleTs) {
+    final cs = Theme.of(context).colorScheme;
+    final message = staleTs != null
+        ? S.of(context).staleDataBannerWithTime(_formatTime(staleTs))
+        : S.of(context).staleDataBannerNoTime;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: cs.errorContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.cloud_off, color: cs.onErrorContainer, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: cs.onErrorContainer,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

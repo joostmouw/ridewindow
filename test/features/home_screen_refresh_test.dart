@@ -75,6 +75,18 @@ class FakeWeatherCounting extends WeatherNotifier {
   }
 }
 
+/// WeatherNotifier stub die op commando kan falen na een eerder succes --
+/// gebruikt om REFRESH-04's stale-banner gedrag te bewijzen.
+class FakeWeatherFlaky extends WeatherNotifier {
+  bool shouldFail = false;
+
+  @override
+  Future<List<HourlyForecast>> build() async {
+    if (shouldFail) throw Exception('offline');
+    return const [];
+  }
+}
+
 /// ProfileNotifier stub zonder SharedPreferences.
 class FakeProfileNotifier extends ProfileNotifier {
   @override
@@ -134,9 +146,14 @@ GoRouter _makeRouter() => GoRouter(
 Future<Widget> _buildApp({
   required LastRefreshedNotifier Function() lastRefreshedFn,
   WeatherNotifier Function()? weatherFn,
+  Duration? Function(int retryCount, Object error)? retry,
 }) async {
   final prefs = await SharedPreferences.getInstance();
   return ProviderScope(
+    // Disable Riverpod's default exponential-backoff retry when a test
+    // needs a single simulated failure to settle into AsyncError
+    // immediately (see slots_notifier_test.dart for the same pattern).
+    retry: retry,
     overrides: [
       sharedPrefsProvider.overrideWithValue(prefs),
       lastRefreshedProvider.overrideWith(lastRefreshedFn),
@@ -294,6 +311,45 @@ void main() {
         fakeLastRefreshed.refreshCallCount,
         greaterThan(countAfterInitial),
       );
+    },
+  );
+
+  testWidgets(
+    'stale banner shows and cards remain visible when weatherProvider errors after success (REFRESH-04)',
+    (tester) async {
+      final fakeWeather = FakeWeatherFlaky();
+      await tester.pumpWidget(
+        await _buildApp(
+          lastRefreshedFn: () =>
+              FakeLastRefreshedNotifier(DateTime(2026, 6, 3, 14, 30)),
+          weatherFn: () => fakeWeather,
+          // Disable retry so the simulated failure below settles into
+          // AsyncError immediately instead of waiting through several
+          // real-time exponential-backoff retry delays.
+          retry: (retryCount, error) => null,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Force the failure via the public API, matching production's
+      // ref.invalidate(weatherProvider) -> failing re-fetch path.
+      fakeWeather.shouldFail = true;
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(HomeScreen)),
+        listen: false,
+      );
+      container.refresh(weatherProvider);
+      await tester.pumpAndSettle();
+
+      // (a) stale/offline banner is present with the known timestamp.
+      expect(
+        find.text('Offline — toont rijvensters van 14:30'),
+        findsOneWidget,
+      );
+      // (b) the blank full-screen error is NOT shown when previous data
+      // exists -- proves the full-screen error path was correctly narrowed
+      // to hasError && !hasValue only.
+      expect(find.text('Weersdata kon niet worden geladen.'), findsNothing);
     },
   );
 }

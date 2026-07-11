@@ -493,6 +493,18 @@ abstract class S {
   /// **'Geen rijmomenten op deze dag.'**
   String get emptyNoSlotsDay;
 
+  /// No description provided for @staleDataBannerWithTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Offline — toont rijvensters van {time}'**
+  String staleDataBannerWithTime(String time);
+
+  /// No description provided for @staleDataBannerNoTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Offline — toont laatst bekende rijvensters'**
+  String get staleDataBannerNoTime;
+
   /// No description provided for @windCalm.
   ///
   /// In nl, this message translates to:
