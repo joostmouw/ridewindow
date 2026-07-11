@@ -142,6 +142,9 @@
   "grantPermission": "Toestemming geven",
   "gpsAutomatic": "GPS (automatisch)",
   "tapToChooseCity": "Tik om stad te kiezen",
+  "locationBlockedWebHint": "Schakel locatietoegang in via de site-instellingen van je browser, of kies hieronder een stad.",
+  "chooseCityPrimaryTitle": "Kies je stad voor een voorspelling",
+  "chooseCityPrimaryHint": "We konden je locatie niet ophalen. Kies hieronder een stad om toch een weersvoorspelling te zien.",
 
   "notifEveningBefore": "Avond van tevoren",
   "notifEveningBeforeSub": "19:00 de vorige dag als er een top-slot is",

@@ -329,6 +329,17 @@ class SNl extends S {
   String get tapToChooseCity => 'Tik om stad te kiezen';
 
   @override
+  String get locationBlockedWebHint =>
+      'Schakel locatietoegang in via de site-instellingen van je browser, of kies hieronder een stad.';
+
+  @override
+  String get chooseCityPrimaryTitle => 'Kies je stad voor een voorspelling';
+
+  @override
+  String get chooseCityPrimaryHint =>
+      'We konden je locatie niet ophalen. Kies hieronder een stad om toch een weersvoorspelling te zien.';
+
+  @override
   String get notifEveningBefore => 'Avond van tevoren';
 
   @override

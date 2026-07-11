@@ -116,6 +116,9 @@
   "grantPermission": "Grant permission",
   "gpsAutomatic": "GPS (automatic)",
   "tapToChooseCity": "Tap to choose city",
+  "locationBlockedWebHint": "Enable location access in your browser's site settings, or choose a city below.",
+  "chooseCityPrimaryTitle": "Choose your city for a forecast",
+  "chooseCityPrimaryHint": "We couldn't get your location. Pick a city below to see your forecast anyway.",
 
   "notifEveningBefore": "Evening before",
   "notifEveningBeforeSub": "19:00 the day before if there's a top slot",

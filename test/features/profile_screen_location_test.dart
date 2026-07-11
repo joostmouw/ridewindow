@@ -18,7 +18,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
@@ -98,7 +101,12 @@ Future<void> _pumpProfileScreen(
         ),
         weatherProvider.overrideWith(() => FakeWeatherNotifier()),
       ],
-      child: const MaterialApp(home: ProfileScreen()),
+      child: const MaterialApp(
+        locale: Locale('nl'),
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: ProfileScreen(),
+      ),
     ),
   );
   await tester.pump();
@@ -113,6 +121,8 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
+
+  tearDown(() => debugIsWebOverride = null);
 
   testWidgets(
       'Test 1 — toont GPS (automatisch) als geen override actief',
@@ -185,5 +195,92 @@ void main() {
       find.text('Instellingen openen', skipOffstage: false),
       findsOneWidget,
     );
+  });
+
+  testWidgets(
+      'Test 6 — toont gepromote stad-kies-CTA op web bij denied',
+      (tester) async {
+    debugIsWebOverride = true;
+
+    await _pumpProfileScreen(
+      tester,
+      profile: baseProfile(locationOverride: null),
+      permission: LocationPermission.denied,
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(
+      find.text(s.chooseCityPrimaryTitle, skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.ancestor(
+        of: find.text(s.tapToChooseCity, skipOffstage: false),
+        matching: find.byType(FilledButton),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+      'Test 7 — verbergt native instellingen-knop en toont web-hint bij deniedForever',
+      (tester) async {
+    debugIsWebOverride = true;
+
+    await _pumpProfileScreen(
+      tester,
+      profile: baseProfile(locationOverride: null),
+      permission: LocationPermission.deniedForever,
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.openSettings, skipOffstage: false), findsNothing);
+    expect(
+      find.text(s.locationBlockedWebHint, skipOffstage: false),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+      'Test 8 — toont gepromote CTA nooit op native (regressie)',
+      (tester) async {
+    // debugIsWebOverride blijft null (native/default gedrag).
+    await _pumpProfileScreen(
+      tester,
+      profile: baseProfile(locationOverride: null),
+      permission: LocationPermission.denied,
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(
+      find.text(s.chooseCityPrimaryTitle, skipOffstage: false),
+      findsNothing,
+    );
+  });
+
+  testWidgets(
+      'Test 9 — tappen op gepromote CTA opent de stad-picker bottom sheet',
+      (tester) async {
+    debugIsWebOverride = true;
+
+    await _pumpProfileScreen(
+      tester,
+      profile: baseProfile(locationOverride: null),
+      permission: LocationPermission.deniedForever,
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.tapToChooseCity, skipOffstage: false).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text(kNlCities.first.name, skipOffstage: false), findsOneWidget);
   });
 }
