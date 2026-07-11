@@ -38,12 +38,18 @@ key-decisions:
   - "android/build/ added to .gitignore (was previously untracked/uncaught by the root /build/ rule) after flutter build apk --release generated it during Task 2 verification"
   - "Task 3 (manual Chrome DevTools browser verification) requires an interactive browser session and cannot be executed by this sandboxed worktree agent — correctly left unexecuted per plan's checkpoint:human-verify gate=\"blocking\" type, not self-approved"
 
-requirements-completed: [PERS-05]
-# Note: PERS-06 and PERS-07 are only fully satisfied once Task 3's manual browser
-# verification is approved by the user (see plan frontmatter: requirements: [PERS-05, PERS-06, PERS-07]).
-# PERS-05 (web: DriftWebOptions wiring + native path unaffected) is fully proven by Tasks 1-2.
-# PERS-07's *local* wasm asset presence/version-match is proven; the Content-Type header
-# observation and PERS-06's write-then-reload persistence proof are Task 3 scope.
+requirements-completed: [PERS-05, PERS-06, PERS-07]
+# Task 3 (manual browser verification) approved by user on 2026-07-11.
+# PERS-06 proven: forecast data survived a hard-reload (Cmd+Shift+R) with zero new
+# request to api.open-meteo.com (confirmed via Network tab, Domain column added to
+# distinguish local dev-server requests from the real external API host); identical
+# ride slots rendered before and after reload.
+# PERS-07 local check: inconclusive in this session — sqlite3.wasm's own network
+# request was not observed in the Network tab (likely loaded before DevTools capture
+# started, or fetched inside the drift_worker Web Worker context). This does not
+# block PERS-07 since the plan explicitly scopes the *authoritative* Content-Type
+# check to Phase 17 (production Firebase Hosting deployment does not exist yet) --
+# noted here as a carry-forward, not silently dropped.
 
 # Metrics
 duration: ~20min (Tasks 1-2 only; Task 3 pending)
@@ -128,14 +134,28 @@ Each task was committed atomically:
 
 None - no external service configuration required for Tasks 1-2. Task 3 requires the user to perform manual Chrome DevTools verification (see Checkpoint below) — this is not an external service, but an interactive browser test that could not be automated in this sandboxed worktree.
 
+## Task 3: Manual Browser Verification (2026-07-11) — APPROVED
+
+Performed by the user in a real Chrome session (`flutter run -d chrome`, full restart after an initial hot-reload didn't pick up a temporary diagnostic change):
+
+- **First attempt showed "Weather data could not be loaded"** on Home. Root cause was never conclusively identified (no exception surfaced in console — the codebase has no `ProviderObserver`/`runZonedGuarded` to log `AsyncValue.error`, confirmed via a temporary `debugPrint` instrumentation that was added and then reverted, see Deviations below). A full stop/restart of `flutter run -d chrome` (rather than hot-reload) resolved it — consistent with a stale dev-server/build artifact from before Task 2's wasm/worker assets were fully in place, not a code defect in the `DriftWebOptions` wiring itself.
+- **After restart:** Home rendered real ride slots with live weather data (temp/rain/wind bars, "Best choice" card, "66 ride windows this week") — confirms `AppDatabase` opens successfully on web (PERS-05 runtime-proven, not just build-proven).
+- **Persistence proof (PERS-06):** Hard-reloaded (`Cmd+Shift+R`) with Network tab filtered on `open-meteo` and a `Domain` column added to distinguish `localhost` (dev-server JS chunks) from the real external API host. **Zero requests to `api.open-meteo.com`** appeared after reload; ride slots rendered identically to before the reload. This proves the weather forecast cache was read back from Drift (IndexedDB/wasm) rather than re-fetched.
+- **Content-Type check (PERS-07, local):** Inconclusive — `sqlite3.wasm`'s own network request did not appear in the Network tab in this session (possibly loaded before DevTools capture began, or inside the `drift_worker.dart.js` Worker context, which can be less visible in the main-frame Network view). Per the plan's explicit scoping, this does not block sign-off: the authoritative Content-Type verification happens in Phase 17 against the real Firebase Hosting deployment.
+
+### Deviations During Checkpoint (diagnostic only, not shipped)
+
+**[Rule 2 - Missing Critical, temporary] Added and reverted a diagnostic `debugPrint`**
+- **Found during:** Task 3, while investigating the initial "Weather data could not be loaded" error with no visible cause in the console.
+- **Issue:** `lib/features/home/home_screen.dart`'s error branch (`weatherState.hasError`) never reads or logs `weatherState.error`/`stackTrace`, and there is no app-level `ProviderObserver` or `runZonedGuarded` — so any exception is invisible to the user/developer.
+- **Fix applied temporarily:** Added two `debugPrint` lines logging `weatherState.error`/`stackTrace` in the error branch, to aid live debugging.
+- **Reverted:** Removed immediately after the underlying issue resolved itself via a full `flutter run -d chrome` restart (confirmed `git diff --stat lib/features/home/home_screen.dart` empty before proceeding). Not committed at any point.
+- **Follow-up consideration (not actioned this phase):** The lack of any error-surfacing mechanism (no `ProviderObserver`, no logged `AsyncValue.error`) made this diagnosis slower than necessary and could resurface in later web-specific phases (13, 15) where new failure modes are expected. Worth a lightweight addition (e.g. a `ProviderObserver` that logs provider errors) in a later phase if this recurs — not added here to stay within this plan's scope.
+
 ## Next Phase Readiness
 
-**Tasks 1-2 are complete and committed.** The web build (`flutter build web --release`) and native build (`flutter build apk --release`) both succeed with the new `DriftWebOptions` wiring in place, and the native `DriftNativeOptions` path is provably unaffected (Android release APK still builds and would install/run unchanged).
-
-**Task 3 is NOT complete.** This plan cannot be marked fully done until a human performs the real-browser verification described in the plan (Chrome DevTools Network tab: `sqlite3.wasm` Content-Type check; write-then-reload persistence proof via the weather forecast cache; optional IndexedDB inspection). This is a `type="checkpoint:human-verify" gate="blocking"` task per the plan and per this agent's explicit instructions — it was correctly identified as un-executable by this sandboxed worktree agent and left for the orchestrator/user to resolve in a real browser session, rather than being fabricated or self-approved.
-
-**Blocker for full plan completion:** Task 3 checkpoint — see plan's `<how-to-verify>` steps 1-8 in `.planning/phases/12-drift-web-persistence/12-01-PLAN.md`. Production Firebase Hosting `Content-Type: application/wasm` header verification (via `firebase.json`) remains explicitly deferred to Phase 17, as already noted in the plan (Firebase Hosting deployment does not exist until then).
+**All 3 tasks complete.** `AppDatabase` opens on web via `DriftWebOptions`, the native Android path is unaffected (`flutter build apk --release` still succeeds), and persistence across a hard-reload is manually proven via the real Drift-backed weather forecast cache. PERS-05, PERS-06, and PERS-07 (local scope) are satisfied; PERS-07's production Content-Type header check remains an explicit, tracked carry-forward to Phase 17.
 
 ---
 *Phase: 12-drift-web-persistence*
-*Completed: Tasks 1-2 complete 2026-07-11; Task 3 pending human verification*
+*Completed: 2026-07-11 — all 3 tasks done, Task 3 checkpoint approved by user*
