@@ -317,7 +317,10 @@ Plans:
   3. `sqlite3.wasm` is served with `Content-Type: application/wasm` from the deployed Firebase Hosting domain (explicit `firebase.json` header rule if needed), confirmed via browser network inspector
   4. The existing Android app's Drift-backed data and behavior continue to work unchanged (regression check)
 
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 12-01-PLAN.md — Wire DriftWebOptions + version-matched sqlite3.wasm/drift_worker.dart.js, manually verify write-then-reload persistence in a real browser
 
 ### Phase 13: Geolocation & Manual Fallback
 
