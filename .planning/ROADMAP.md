@@ -355,7 +355,12 @@ Plans:
   3. The UI displays a "Last updated HH:MM" label at all times, reflecting the cache-then-network pattern
   4. Going offline, or a failed fetch, shows the last-known slots clearly labeled as stale rather than a blank screen or crash
 
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+
+**Wave 1**
+
+- [ ] 14-01-PLAN.md — Web-gated resume-refresh trigger + always-visible last-updated label + stale-data fallback UI + manual browser verification
 **UI hint**: yes
 
 ### Phase 15: Google Calendar Web Integration
