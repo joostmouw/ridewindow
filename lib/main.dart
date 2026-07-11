@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -52,14 +53,17 @@ Future<void> main() async {
   );
 
   // WorkManager init na runApp() — UI is al zichtbaar.
-  await Workmanager().initialize(callbackDispatcher);
-  await Workmanager().registerPeriodicTask(
-    kWeatherRefreshTaskTag,
-    kWeatherRefreshTaskName,
-    frequency: const Duration(hours: 3),
-    flexInterval: const Duration(hours: 3),
-    constraints: Constraints(networkType: NetworkType.connected),
-  );
+  // Web heeft geen WorkManager-implementatie; sla deze stap over op web.
+  if (!kIsWeb) {
+    await Workmanager().initialize(callbackDispatcher);
+    await Workmanager().registerPeriodicTask(
+      kWeatherRefreshTaskTag,
+      kWeatherRefreshTaskName,
+      frequency: const Duration(hours: 3),
+      flexInterval: const Duration(hours: 3),
+      constraints: Constraints(networkType: NetworkType.connected),
+    );
+  }
 }
 
 ThemeData _buildTheme(Brightness brightness) {
@@ -179,9 +183,12 @@ class RideWindowApp extends ConsumerWidget {
     // Luister op slotsProvider en update het Android home screen widget
     // telkens als de slots-staat verandert (b.v. na WeatherRefresh of profielwijziging).
     ref.listen<SlotsState>(slotsProvider, (_, next) {
-      if (next is SlotsLoaded) {
-        final slot = next.slots.firstOrNull;
-        WidgetUpdateService.update(slot);
+      // home_widget heeft geen web-implementatie; sla deze stap over op web.
+      if (!kIsWeb) {
+        if (next is SlotsLoaded) {
+          final slot = next.slots.firstOrNull;
+          WidgetUpdateService.update(slot);
+        }
       }
     });
 
