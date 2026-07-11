@@ -301,7 +301,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 11-01-PLAN.md — Web platform scaffold + kIsWeb guards + build/render/regression verification
+- [x] 11-01-PLAN.md — Web platform scaffold + kIsWeb guards + build/render/regression verification
 **UI hint**: yes
 
 ### Phase 12: Drift Web Persistence
@@ -414,7 +414,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 8. Background refresh + Notifications | v1.0 | 0/TBD | Not started | - |
 | 9. Google Calendar integration | v1.0 | 0/TBD | Not started | - |
 | 10. Release — Internal track only | v1.0 | 0/TBD | Not started | - |
-| 11. Web Scaffolding & Build Baseline | v2.0 | 0/1 | Planned | - |
+| 11. Web Scaffolding & Build Baseline | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 12. Drift Web Persistence | v2.0 | 0/TBD | Not started | - |
 | 13. Geolocation & Manual Fallback | v2.0 | 0/TBD | Not started | - |
 | 14. Foreground Refresh Strategy | v2.0 | 0/TBD | Not started | - |
