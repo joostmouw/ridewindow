@@ -55,7 +55,7 @@ final class AvailabilityNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$availabilityNotifierHash() =>
-    r'4ead722b70319d09bcecf96901d1ecc343d05e59';
+    r'15e8b32113635cb0dec4e8eb78642a46432d5606';
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
@@ -70,7 +70,7 @@ abstract class _$AvailabilityNotifier
   FutureOr<Map<DateTime, BlockType>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref
         as $Ref<AsyncValue<Map<DateTime, BlockType>>, Map<DateTime, BlockType>>;
     final element = ref.element as $ClassProviderElement<
@@ -79,6 +79,6 @@ abstract class _$AvailabilityNotifier
         AsyncValue<Map<DateTime, BlockType>>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

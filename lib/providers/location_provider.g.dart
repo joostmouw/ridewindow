@@ -48,13 +48,13 @@ abstract class _$LocationNotifier extends $AsyncNotifier<LocationData> {
   FutureOr<LocationData> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<LocationData>, LocationData>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<LocationData>, LocationData>,
         AsyncValue<LocationData>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

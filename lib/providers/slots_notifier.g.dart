@@ -72,10 +72,10 @@ abstract class _$SlotsNotifier extends $Notifier<SlotsState> {
   SlotsState build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<SlotsState, SlotsState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SlotsState, SlotsState>, SlotsState, Object?, Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

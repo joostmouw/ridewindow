@@ -54,7 +54,7 @@ final class ProfileNotifierProvider
   ProfileNotifier create() => ProfileNotifier();
 }
 
-String _$profileNotifierHash() => r'25d2226986f791a6743fcdff3eae9488b204edca';
+String _$profileNotifierHash() => r'07d135af76f88e932d51d31e614164d42350d144';
 
 /// ProfileNotifier laadt alle scalaire gebruikersinstellingen uit SharedPreferences
 /// op cold start en schrijft iedere update direct terug.
@@ -68,13 +68,13 @@ abstract class _$ProfileNotifier extends $AsyncNotifier<UserProfile> {
   FutureOr<UserProfile> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<UserProfile>, UserProfile>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<UserProfile>, UserProfile>,
         AsyncValue<UserProfile>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

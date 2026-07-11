@@ -42,19 +42,19 @@ final class PlannedRidesNotifierProvider
 }
 
 String _$plannedRidesNotifierHash() =>
-    r'455b713d9c4c24e740f6d76eac8d7b72c3b49220';
+    r'658259bc3286398d55bc4bf0a6e5c313f28252ad';
 
 abstract class _$PlannedRidesNotifier extends $Notifier<List<PlannedRide>> {
   List<PlannedRide> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<List<PlannedRide>, List<PlannedRide>>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<List<PlannedRide>, List<PlannedRide>>,
         List<PlannedRide>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }

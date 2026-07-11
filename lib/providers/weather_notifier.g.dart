@@ -72,7 +72,7 @@ abstract class _$WeatherNotifier extends $AsyncNotifier<List<HourlyForecast>> {
   FutureOr<List<HourlyForecast>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref = this.ref
         as $Ref<AsyncValue<List<HourlyForecast>>, List<HourlyForecast>>;
     final element = ref.element as $ClassProviderElement<
@@ -80,6 +80,6 @@ abstract class _$WeatherNotifier extends $AsyncNotifier<List<HourlyForecast>> {
         AsyncValue<List<HourlyForecast>>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
