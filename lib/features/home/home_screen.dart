@@ -16,6 +16,7 @@ import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
+import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -82,6 +83,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.read(lastRefreshedProvider.notifier).refresh();
+      // REFRESH-01: on web there is no WorkManager background task, so
+      // regaining tab/app focus must itself trigger the cache-then-network
+      // fetch. This is intentionally a no-op on native (isWebPlatform false)
+      // to avoid a redundant/duplicate fetch on every app switch there --
+      // native keeps relying on its existing WorkManager periodic task.
+      if (isWebPlatform) {
+        ref.invalidate(weatherProvider);
+      }
     }
   }
 
@@ -94,6 +103,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final rw = context.rw;
     final cs = Theme.of(context).colorScheme;
     final weatherState = ref.watch(weatherProvider);
+    // REFRESH-03: keeps lastRefreshedProvider in sync with every successful
+    // weather resolution (initial load, pull-to-refresh, and the resume-
+    // triggered invalidate above) -- not just the lifecycle-resume moment
+    // that previously drove lastRefreshedProvider's own re-read.
+    ref.listen<AsyncValue<List<HourlyForecast>>>(weatherProvider, (previous, next) {
+      if (next.hasValue) {
+        ref.read(lastRefreshedProvider.notifier).refresh();
+      }
+    });
     final slotsState = ref.watch(slotsProvider);
     final locationAsync = ref.watch(locationProvider);
     final cityName = locationAsync.value?.city ?? kDefaultCity;
@@ -102,15 +120,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final slotCount = slotsState is SlotsLoaded ? slotsState.slots.length : 0;
     final greeting = _buildGreeting(context, userName);
 
-    // Subtitle: slot count or last refreshed
-    final subtitle = slotCount > 0
-        ? S.of(context).rideWindowCount(slotCount)
-        : lastRefreshedAsync.when(
-            data: (ts) =>
-                ts == null ? cityName : '${S.of(context).updatedAt(_formatTime(ts))} · $cityName',
-            loading: () => cityName,
-            error: (_, __) => cityName,
-          );
+    // Subtitle: last-updated label is appended whenever known, regardless of
+    // slot count (REFRESH-03), while preserving the existing priority of
+    // showing ride-count vs. city name as the primary segment.
+    final lastUpdatedLabel = lastRefreshedAsync.when(
+      data: (ts) => ts == null ? null : S.of(context).updatedAt(_formatTime(ts)),
+      loading: () => null,
+      error: (_, __) => null,
+    );
+    final primary = slotCount > 0 ? S.of(context).rideWindowCount(slotCount) : cityName;
+    final subtitle = lastUpdatedLabel != null ? '$primary · $lastUpdatedLabel' : primary;
 
     return Stack(
       children: [
