@@ -340,7 +340,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 13-01-PLAN.md — Web seam + guard openSettings() + promote city picker as primary web fallback + manual browser verification
+- [x] 13-01-PLAN.md — Web seam + guard openSettings() + promote city picker as primary web fallback + manual browser verification
 
 ### Phase 14: Foreground Refresh Strategy
 
@@ -424,7 +424,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 10. Release — Internal track only | v1.0 | 0/TBD | Not started | - |
 | 11. Web Scaffolding & Build Baseline | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 12. Drift Web Persistence | v2.0 | 1/1 | Complete   | 2026-07-11 |
-| 13. Geolocation & Manual Fallback | v2.0 | 0/TBD | Not started | - |
+| 13. Geolocation & Manual Fallback | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 14. Foreground Refresh Strategy | v2.0 | 0/TBD | Not started | - |
 | 15. Google Calendar Web Integration | v2.0 | 0/TBD | Not started | - |
 | 16. PWA Installability & iOS Polish | v2.0 | 0/TBD | Not started | - |
