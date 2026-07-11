@@ -317,10 +317,10 @@ Plans:
   3. `sqlite3.wasm` is served with `Content-Type: application/wasm` from the deployed Firebase Hosting domain (explicit `firebase.json` header rule if needed), confirmed via browser network inspector
   4. The existing Android app's Drift-backed data and behavior continue to work unchanged (regression check)
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 12-01-PLAN.md — Wire DriftWebOptions + version-matched sqlite3.wasm/drift_worker.dart.js, manually verify write-then-reload persistence in a real browser
+- [x] 12-01-PLAN.md — Wire DriftWebOptions + version-matched sqlite3.wasm/drift_worker.dart.js, manually verify write-then-reload persistence in a real browser
 
 ### Phase 13: Geolocation & Manual Fallback
 
@@ -418,7 +418,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 9. Google Calendar integration | v1.0 | 0/TBD | Not started | - |
 | 10. Release — Internal track only | v1.0 | 0/TBD | Not started | - |
 | 11. Web Scaffolding & Build Baseline | v2.0 | 1/1 | Complete   | 2026-07-11 |
-| 12. Drift Web Persistence | v2.0 | 0/TBD | Not started | - |
+| 12. Drift Web Persistence | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 13. Geolocation & Manual Fallback | v2.0 | 0/TBD | Not started | - |
 | 14. Foreground Refresh Strategy | v2.0 | 0/TBD | Not started | - |
 | 15. Google Calendar Web Integration | v2.0 | 0/TBD | Not started | - |
