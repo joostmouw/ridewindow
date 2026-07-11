@@ -62,6 +62,9 @@ dependencies:
   # Localisation — Dutch date formatting in WidgetUpdateService
   intl: ^0.20.2
 
+  # Phase 12 — Drift web persistence
+  sqlite3: ^3.0.0
+
   # fl_chart arriveert in een latere fase
 
 dev_dependencies:

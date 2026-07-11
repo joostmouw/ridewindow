@@ -51,3 +51,10 @@ coverage/
 *.jks
 *.keystore
 android/key.properties
+
+# Gradle build output (not rooted at /build/, needs its own entry)
+/android/build/
+
+# Phase 12 — dart2js worker build artifacts (sourcemap/deps, not needed at runtime)
+web/drift_worker.dart.js.deps
+web/drift_worker.dart.js.map
