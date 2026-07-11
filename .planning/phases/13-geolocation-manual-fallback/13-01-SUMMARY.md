@@ -45,7 +45,15 @@ key-decisions:
 patterns-established:
   - "Web-only UI/behavior branches: gate on isWebPlatform from lib/core/platform_info.dart, not kIsWeb directly, so they remain covered by flutter test via debugIsWebOverride"
 
-requirements-completed: []  # LOC-06 verified manually (pending human checkpoint); LOC-07 code complete, pending same checkpoint approval
+requirements-completed: [LOC-06, LOC-07]
+# Task 3 approved by user on 2026-07-11. Grant path confirmed: real-coordinate
+# forecast (city "Eindhoven" shown, not Amsterdam default) after clicking Allow.
+# Deny path confirmed: promoted "Choose your city for a forecast" card appeared
+# immediately, "Location access blocked" banner showed with NO native settings
+# button, city picker worked end-to-end (Eindhoven selected and persisted as
+# active override). Zero console exceptions observed across the whole flow.
+# Timeout simulation (step 6) not explicitly exercised -- acceptable per plan's
+# "best-effort" framing since steps 3-5 passed cleanly.
 
 # Metrics
 duration: ~45min
@@ -130,27 +138,25 @@ Each task was committed atomically:
 
 None beyond the two deviations above, both resolved.
 
-## Task 3 — Checkpoint Not Executed
+## Task 3 — Manual Browser Verification (2026-07-11) — APPROVED
 
-Task 3 (`type="checkpoint:human-verify"`, `gate="blocking"`) requires a real, interactive Chrome browser session (`flutter run -d chrome` on localhost) to exercise the actual Geolocation permission-prompt grant/deny/timeout flows. This worktree executor runs in a sandboxed, non-interactive environment and cannot drive a real browser's native permission popups or observe DevTools Console output. Per the plan's own framing, this class of behavior is explicitly documented as invisible to `flutter test`/`flutter analyze` (see PITFALLS.md reference in the plan).
+Performed by the user in a real Chrome session (`flutter run -d chrome`):
 
-**What is verified (automated):**
-- `flutter test test/providers/gps_permission_notifier_test.dart test/features/profile_screen_location_test.dart` — 13/13 pass
-- `flutter analyze` on all touched files — 0 errors (pre-existing info-level lints only, unrelated to this plan)
-- `flutter build apk --release` — succeeds, 66.3MB APK, no Android regression
-- `grep` checks for `isWebPlatform`, `chooseCityPrimaryTitle`, `getLastKnownPosition` call-site count — all match plan's acceptance criteria exactly
-
-**What remains (manual, for the user):** Task 3's 7-step `how-to-verify` procedure — grant path (real-coordinate forecast), deny path (promoted CTA appears, no console exception, settings button absent), city-picker interaction, and best-effort timeout simulation — must be run in a real Chrome session per the plan's `<how-to-verify>` block. This plan is NOT complete until that checkpoint is approved.
+- **Grant path (LOC-06):** Confirmed working — after clicking "Allow" in Chrome's native permission popup, the Home forecast reflected a real, non-Amsterdam location.
+- **Deny path (LOC-07):** Confirmed working — the new `primaryContainer` "Choose your city for a forecast" card appeared immediately at the top of the LOCATIE section; the `deniedForever` "Location access blocked" banner rendered with **no** native "Open settings" button present (proves Task 1's `isWebPlatform` guard is correctly gating the UI, not just the underlying call).
+- **City picker interaction:** Confirmed — tapping the promoted CTA opened the city picker, "Eindhoven" was selected and now shows as the persisted active location override.
+- **Console:** Zero uncaught exceptions observed across the entire grant/deny/city-picker flow.
+- **Timeout simulation (step 6):** Not explicitly exercised — acceptable per the plan's own "best-effort" framing since steps 3-5 (the required checks) passed cleanly.
 
 ## Next Phase Readiness
 
-- Tasks 1-2's code changes are complete, tested, committed, and verified against Android regression (`flutter build apk --release`).
-- Plan 13-01 cannot be marked complete until Task 3's manual browser verification is performed and approved — the deferred iPhone-in-Safari-on-deployed-domain portion of ROADMAP success criterion 1 remains explicitly carried forward to Phase 17 (or a dedicated Phase 16 iOS device pass), per the plan's own scoping note.
+- All 3 tasks complete. `GpsPermissionNotifier.openSettings()` is guarded, the promoted city-picker CTA is proven end-to-end in a real browser, and the native Android GPS + city-picker flow remains unchanged (`flutter build apk --release` still succeeds).
+- LOC-06 and LOC-07 are both satisfied. The deferred iPhone-in-Safari-on-deployed-domain portion of ROADMAP success criterion 1 remains explicitly carried forward to Phase 17 (or a dedicated Phase 16 iOS device pass), per the plan's own scoping note.
 - `deferred-items.md` in this phase directory records two out-of-scope discoveries (sibling test files' localization gap; worktree key.properties gap) for future attention.
 
 ---
 *Phase: 13-geolocation-manual-fallback*
-*Completed: Tasks 1-2 only — Task 3 checkpoint pending human verification*
+*Completed: 2026-07-11 — all 3 tasks done, Task 3 checkpoint approved by user*
 
 ## Self-Check: PASSED
 
