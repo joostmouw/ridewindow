@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
-status: completed
-last_updated: "2026-07-11T14:45:56.856Z"
-last_activity: 2026-07-11 -- Phase 13 marked complete
+status: executing
+last_updated: "2026-07-11T15:09:06.806Z"
+last_activity: 2026-07-11 -- Phase 14 execution started
 progress:
   total_phases: 18
   completed_phases: 3
-  total_plans: 3
+  total_plans: 4
   completed_plans: 3
   percent: 17
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 13 — geolocation-manual-fallback
+**Current focus:** Phase 14 — foreground-refresh-strategy
 
 ## Current Position
 
-Phase: 13 — COMPLETE
+Phase: 14 (foreground-refresh-strategy) — EXECUTING
 Plan: 1 of 1
-Status: Phase 13 complete
-Last activity: 2026-07-11 -- Phase 13 marked complete
+Status: Executing Phase 14
+Last activity: 2026-07-11 -- Phase 14 execution started
 
 ## Performance Metrics
 
