@@ -159,3 +159,15 @@ Once Task 3 is approved, WEB-03 can be marked complete and this plan is fully do
 ---
 *Phase: 11-web-scaffolding-build-baseline*
 *Completed: 2026-07-11 (Tasks 1-2 only; Task 3 checkpoint pending)*
+
+## Self-Check: PASSED
+
+- FOUND: web/index.html
+- FOUND: web/manifest.json
+- FOUND: build/web/main.dart.js
+- FOUND: build/app/outputs/flutter-apk/app-release.apk
+- FOUND: .planning/phases/11-web-scaffolding-build-baseline/11-01-SUMMARY.md
+- FOUND: .planning/phases/11-web-scaffolding-build-baseline/deferred-items.md
+- FOUND commit: 3bb1ebc (Task 1)
+- FOUND commit: f249186 (Task 2)
+- FOUND commit: 61361c1 (docs: SUMMARY)
