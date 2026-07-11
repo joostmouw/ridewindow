@@ -2,14 +2,22 @@
 
 ## Overview
 
-RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit tests, layered with a Drift + Open-Meteo data stack, wired via a Riverpod provider graph, and finally surfaced across six screens (Welcome, Onboarding, Home, Ride Detail, Profile, Availability). Background refresh, notifications, Google Calendar export, real GPS location, and Play Store packaging complete the vertical. Every phase produces a verifiable, testable artifact — nothing is deferred to "we'll sort it later".
+RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit tests, layered with a Drift + Open-Meteo data stack, wired via a Riverpod provider graph, and finally surfaced across six screens (Welcome, Onboarding, Home, Ride Detail, Profile, Availability). v1.0 shipped this as a native Android app (Play Store, internal testing track). v2.0 ports the same Dart codebase to Flutter Web/PWA to reach iOS users without an Apple Developer account — swapping platform-coupled seams (Drift storage backend, geolocation, background refresh, Calendar OAuth) while keeping domain/UI code untouched, then hardening for iOS Safari's PWA quirks and deploying to Firebase Hosting.
+
+## Milestones
+
+- ✅ **v1.0 Android App** - Phases 1–10 (shipped, Internal testing track live)
+- 🚧 **v2.0 iOS Web App (PWA)** - Phases 11–17 (planning)
 
 ## Phases
 
 **Phase Numbering:**
 
-- Integer phases (1–10): Planned milestone work
-- Decimal phases (e.g., 1.5, 2.1): Urgent insertions between integers
+- Integer phases: Planned milestone work, numbered continuously across milestones (never restarts)
+- Decimal phases (e.g., 1.5, 11.1): Urgent insertions between integers
+
+<details>
+<summary>✅ v1.0 Android App (Phases 1–10) - SHIPPED</summary>
 
 - [x] **Phase 1: Project skeleton + test infrastructure** - Flutter project boots, locked deps, canonical lib/ tree, structural test enforcing pure-Dart domain boundary
 - [x] **Phase 1.5: Scoring domain — Freezed models + ScoringEngine + SlotGenerator** - Pure-Dart domain code with 100% unit test coverage of lib/domain/
@@ -17,13 +25,30 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - [x] **Phase 3: Riverpod providers + state graph** - Full provider graph with ProviderContainer tests and reactive recomputation
 - [x] **Phase 4: UI Phase A — Onboarding + Home + Welcome** - Welcome, Onboarding (4 presets), Home (week strip + ride cards)
 - [x] **Phase 5: UI Phase B — Ride Detail + Insights sheet** - Ride Detail screen + "Why this score?" insights bottom sheet
-- [x] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips (completed 2026-06-03)
+- [x] **Phase 6: UI Phase C — Profile + Availability + Tolerance sliders** - Profile screen, availability calendar, tolerance sliders, ride-length chips
 - [x] **Phase 7: Location — GPS + manual city + permission state machine** - geolocator, permission_handler, city picker fallback
-- [x] **Phase 8: Background refresh + Notifications** - WorkManager, flutter_local_notifications, 3 notification types (completed 2026-06-03)
-- [x] **Phase 9: Google Calendar integration** - Lazy OAuth, AutoRefreshingAuthClient, calendar.events scope (completed 2026-06-03)
+- [x] **Phase 8: Background refresh + Notifications** - WorkManager, flutter_local_notifications, 3 notification types
+- [x] **Phase 9: Google Calendar integration** - Lazy OAuth, AutoRefreshingAuthClient, calendar.events scope
 - [x] **Phase 10: Release — Internal track only** - Signed AAB, Play App Signing, privacy policy, Data Safety form, Internal testing track
 
+</details>
+
+### 🚧 v2.0 iOS Web App (PWA) (In Progress)
+
+**Milestone Goal:** Reach iOS users cheaply via a Flutter Web/PWA build of RideWindow, deployed to Firebase Hosting, without an Apple Developer account.
+
+- [ ] **Phase 11: Web Scaffolding & Build Baseline** - `web/` platform added, `flutter build web --release` (CanvasKit) works, existing UI renders/navigates with zero domain code changes, native-only plugins guarded
+- [ ] **Phase 12: Drift Web Persistence** - Drift's IndexedDB/wasm web backend wired and proven to survive page reload
+- [ ] **Phase 13: Geolocation & Manual Fallback** - Browser Geolocation API wired; manual city picker promoted to primary fallback for iOS Safari's per-session re-prompting
+- [ ] **Phase 14: Foreground Refresh Strategy** - On-load/on-focus/pull-to-refresh replaces WorkManager; "Last updated" label; stale-data fallback UI
+- [ ] **Phase 15: Google Calendar Web Integration** - Web OAuth client ID, popup-safe sign-in, "Add to calendar" verified end-to-end on the deployed domain
+- [ ] **Phase 16: PWA Installability & iOS Polish** - iOS meta tags, Add to Home Screen overlay, standalone-mode navigation, real-iPhone verification of install + storage durability
+- [ ] **Phase 17: Deployment Hardening & Firebase Hosting** - `firebase.json` routing/headers, production deploy, full Android + web regression pass
+
 ## Phase Details
+
+<details>
+<summary>v1.0 Phase Details (Phases 1–10) - SHIPPED</summary>
 
 ### Phase 1: Project skeleton + test infrastructure
 
@@ -58,8 +83,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
   6. Null weather inputs clamp to 50/100 "uncertain" rather than crash or coerce to 0; this is unit-tested explicitly
   7. `build_runner` pipeline produces committed generated files; `dart test --coverage=coverage` shows 100% line coverage of `lib/domain/` (excluding `*.freezed.dart` / `*.g.dart`)
 
-**Plans**: 4 plans complete (01.5-01 through 01.5-04)
-**Status**: Complete 2026-06-02
+**Plans**: TBD
 
 ### Phase 2: Data layer — Drift + Open-Meteo
 
@@ -155,7 +179,7 @@ Plans:
 
 **Wave 5** *(geblokkeerd op Wave 4)*
 
-- [ ] 04-05-PLAN.md — Widget tests: WelcomeScreen, OnboardingScreen, HomeScreen (loading/data/leeg)
+- [x] 04-05-PLAN.md — Widget tests: WelcomeScreen, OnboardingScreen, HomeScreen (loading/data/leeg)
 
 **UI hint**: yes
 
@@ -172,24 +196,7 @@ Plans:
   3. Tapping the "Why this score?" trigger opens the InsightsSheet as a bottom sheet with three `LinearProgressIndicator` bars (temp, rain, wind) and a one-line explanation per factor
   4. Each progress bar in the InsightsSheet reflects the actual sub-score values from `ScoringEngine` — confirmed by matching against a known fixture
 
-**Plans**: 4 plans
-Plans:
-**Wave 1**
-
-- [x] 05-01-PLAN.md — HourlyRow model + DetailArgs DTO + ScoreBadge widget + /detail route + HomeScreen tap-navigatie + echte weather chips
-
-**Wave 2** *(geblokkeerd op Wave 1)*
-
-- [x] 05-02-PLAN.md — RideDetailScreen volledig scherm (score-banner, info-kaarten, uurlijkse tabel, InsightsSheet stub)
-
-**Wave 3** *(geblokkeerd op Wave 2)*
-
-- [x] 05-03-PLAN.md — InsightsSheet volledige bottom-sheet (3 LinearProgressIndicator balken, sub-scores, uitleg per factor)
-
-**Wave 4** *(geblokkeerd op Wave 3)*
-
-- [x] 05-04-PLAN.md — Widget tests: RideDetailScreen (5 tests) + InsightsSheet fixture-test (4 tests)
-
+**Plans**: TBD
 **UI hint**: yes
 
 ### Phase 6: UI Phase C — Profile + Availability + Tolerance sliders
@@ -206,24 +213,7 @@ Plans:
   4. After editing availability and returning to Home, the slot list reflects the updated blocked hours without requiring a manual refresh
   5. Material 3 light/dark theme preference (system default acceptable) is accessible from ProfileScreen and the app responds to the selection immediately
 
-**Plans**: 4 plans
-Plans:
-**Wave 1**
-
-- [x] 06-01-PLAN.md — ThemeModeProvider + /profile route + HomeScreen bottomNav wiring + ProfileScreen skeleton
-
-**Wave 2** *(geblokkeerd op Wave 1)*
-
-- [x] 06-02-PLAN.md — ProfileScreen volledig: tolerantie-sliders (4×) + rijlengte-chips (3×) + thema-SegmentedButton
-
-**Wave 3** *(onafhankelijk van Wave 2 — kan parallel uitgevoerd worden)*
-
-- [x] 06-03-PLAN.md — AvailabilityScreen volledig: 7×24 interactief rooster met 3 celstaten + tap-toggle + werk-guard
-
-**Wave 4** *(geblokkeerd op Wave 2 + Wave 3)*
-
-- [x] 06-04-PLAN.md — Widget tests: ProfileScreen (sliders, chips, thema) + AvailabilityScreen (celstaten, tap-guard)
-
+**Plans**: TBD
 **UI hint**: yes
 
 ### Phase 7: Location — GPS + manual city + permission state machine
@@ -240,27 +230,7 @@ Plans:
   4. If location permission is permanently denied, the app detects this, shows a clear explanation, offers a deep-link to app settings, and automatically falls back to the city picker as the primary location source
   5. A manually set location override persists across app restarts and takes precedence over GPS until the user explicitly clears it
 
-**Plans**: 5 plans
-Plans:
-**Wave 1**
-
-- [x] 07-01-PLAN.md — pubspec.yaml (geolocator + permission_handler) + build.gradle.kts compileSdk=35 + AndroidManifest locatie-permissies + lib/core/nl_cities.dart
-
-**Wave 2** *(geblokkeerd op Wave 1)*
-
-- [x] 07-02-PLAN.md — GpsPermissionNotifier (state machine) + LocationNotifier (vervangt stub, prioriteitslogica: override > GPS > default)
-
-**Wave 3** *(geblokkeerd op Wave 2)*
-
-- [x] 07-03-PLAN.md — ProfileScreen LOCATIE sectie (stad-picker bottom sheet + GPS-geblokkeerd banner) + WeatherRepository lat/lon params + WeatherNotifier locatie-koppeling
-
-**Wave 4** *(geblokkeerd op Wave 3)*
-
-- [x] 07-04-PLAN.md — HomeScreen header dynamische locatienaam (locationProvider als AsyncValue)
-
-**Wave 5** *(geblokkeerd op Wave 4)*
-
-- [x] 07-05-PLAN.md — Widget-tests: ProfileScreen locatie (5 tests) + HomeScreen locatienaam (2 tests) + volledige suite gate
+**Plans**: TBD
 
 ### Phase 8: Background refresh + Notifications
 
@@ -276,27 +246,7 @@ Plans:
   4. App requests Android 13+ `POST_NOTIFICATIONS` permission via the standard runtime prompt before scheduling any notification
   5. App requests Android 12+ `SCHEDULE_EXACT_ALARM` via system settings deep-link and falls back to inexact scheduling with a user-visible note if denied
 
-**Plans**: 5 plans
-Plans:
-**Wave 1**
-
-- [x] 08-01-PLAN.md — pubspec.yaml (4 nieuwe deps) + AndroidManifest (permissies + WorkManager service/receiver)
-
-**Wave 2** *(geblokkeerd op Wave 1)*
-
-- [x] 08-02-PLAN.md — background_task.dart (WorkManager isolate-worker) + LastRefreshedNotifier + main.dart WorkManager/tz init + WeatherRepository lastRefreshed schrijven
-
-**Wave 3** *(geblokkeerd op Wave 2)*
-
-- [x] 08-03-PLAN.md — NotificationService (flutter_local_notifications + timezone + 3 schedulers + permissie-flow)
-
-**Wave 4** *(geblokkeerd op Wave 3)*
-
-- [x] 08-04-PLAN.md — ProfileScreen NOTIFICATIES sectie (3 SwitchListTile toggles) + HomeScreen lastRefreshed header + WidgetsBindingObserver
-
-**Wave 5** *(geblokkeerd op Wave 4)*
-
-- [x] 08-05-PLAN.md — Unit/widget tests (15 tests) + volledige suite gate
+**Plans**: TBD
 
 ### Phase 9: Google Calendar integration
 
@@ -312,15 +262,14 @@ Plans:
   4. `AutoRefreshingAuthClient` handles token expiry silently — no sign-in prompt appears mid-session after a previously successful authentication
   5. No personal data leaves the device unless the user explicitly completes the Google Sign-In flow — confirmed by verifying no Calendar API calls are made on app start
 
-**Plans**: 2 plans complete (09-01, 09-02)
-**Status**: Complete 2026-06-03
+**Plans**: TBD
 
 ### Phase 10: Release — Internal track only
 
 **Goal**: A signed release AAB is uploaded to the Play Console Internal testing track and 10–20 cyclist friends can install it via opt-in link
 **Mode:** mvp
 **Depends on**: Phase 9
-**Requirements**: REL-01, REL-02, REL-03, REL-04, REL-05, REL-06
+**Requirements**: REL-2201, REL-02, REL-03, REL-04, REL-05, REL-06
 **Success Criteria** (what must be TRUE):
 
   1. A signed release AAB builds without errors using `--obfuscate --split-debug-info`; the upload keystore and passwords are backed up in a password manager
@@ -329,36 +278,143 @@ Plans:
   4. The Data Safety form in Play Console correctly declares precise location (collected for app functionality) and Google account info (ephemerally accessed via Calendar OAuth, user-initiated only)
   5. The app is live on the Internal testing track with an opt-in link; at least one tester outside the developer has installed and opened it
 
-**Plans**: 4 plans
-Plans:
-**Wave 1**
+**Plans**: TBD
 
-- [x] 10-01-PLAN.md — Android SDK install + applicationId confirm + .gitignore hardening + keystore creation + signing config + version bump
+</details>
 
-**Wave 2** *(geblokkeerd op Wave 1)*
+### Phase 11: Web Scaffolding & Build Baseline
 
-- [x] 10-02-PLAN.md — Signed release AAB + APK build + physical device sideload smoke test
-- [x] 10-03-PLAN.md — GitHub Pages privacy policy + ProfileScreen OVER section (Privacybeleid link + Versie)
+**Goal**: The existing Android app also builds and runs as a Flutter Web app in a browser, using the CanvasKit renderer, with zero domain/UI code changes and native-only plugins safely guarded
+**Mode:** mvp
+**Depends on**: Phase 10 (v1.0 shipped; this milestone builds on the same codebase)
+**Requirements**: WEB-01, WEB-02, WEB-03, WEB-04, WEB-05
+**Success Criteria** (what must be TRUE):
 
-**Wave 3** *(geblokkeerd op Wave 2 + Wave 3)*
+  1. `flutter create --platforms web .` has been run; a `web/` directory exists and is committed
+  2. `flutter build web --release` (CanvasKit renderer, not `--wasm`) completes with zero errors
+  3. Running the app in a desktop browser navigates through all six existing screens (Welcome, Onboarding, Home, Ride Detail, Profile, Availability) via `go_router` with no code changes to domain/UI layers
+  4. `workmanager` and `home_widget` call sites in `main.dart` are guarded with `kIsWeb` checks so the web build neither crashes nor attempts to register native-only background tasks
+  5. `flutter build apk` still succeeds and the existing Android app runs unchanged after these additions (regression check)
 
-- [x] 10-04-PLAN.md — Play Console store listing + Data Safety form + Internal testing track upload + tester opt-in
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Drift Web Persistence
+
+**Goal**: User data (profile, availability, tolerances, settings) reliably persists in the browser across page reloads, on the same Drift schema used natively
+**Mode:** mvp
+**Depends on**: Phase 11
+**Requirements**: PERS-05, PERS-06, PERS-07
+**Success Criteria** (what must be TRUE):
+
+  1. `AppDatabase` opens successfully on web via `DriftWebOptions` (`sqlite3.wasm` + `drift_worker.dart.js`), alongside the existing native `DriftNativeOptions` on Android
+  2. A user can write data (e.g., toggle an availability cell) in the browser, do a full page reload, and see the same data still present — manually verified in a real browser, not just assumed from a successful build
+  3. `sqlite3.wasm` is served with `Content-Type: application/wasm` from the deployed Firebase Hosting domain (explicit `firebase.json` header rule if needed), confirmed via browser network inspector
+  4. The existing Android app's Drift-backed data and behavior continue to work unchanged (regression check)
+
+**Plans**: TBD
+
+### Phase 13: Geolocation & Manual Fallback
+
+**Goal**: Web users get their forecast for their real location via the browser Geolocation API, with the manual city picker promoted to an equally prominent, load-bearing path when permission is denied or times out
+**Mode:** mvp
+**Depends on**: Phase 12
+**Requirements**: LOC-06, LOC-07
+**Success Criteria** (what must be TRUE):
+
+  1. On the deployed HTTPS Firebase Hosting domain, granting browser location permission produces a forecast for the user's real coordinates — verified in a desktop browser and manually on a real iPhone in Safari
+  2. Denying or timing out the geolocation prompt on web immediately surfaces the manual city picker as the primary path, not a buried fallback — reflecting iOS Safari's per-session re-prompt behavior (no "Always Allow")
+  3. Web-unsupported `geolocator` methods (`getLastKnownPosition`, `openAppSettings`) are guarded and do not throw uncaught errors on web
+  4. The existing Android GPS + city picker flow continues to work unchanged (regression check)
+
+**Plans**: TBD
+
+### Phase 14: Foreground Refresh Strategy
+
+**Goal**: Web users see fresh (or clearly-labeled stale) weather data without any background task, driven entirely by page load, regained focus, and manual pull-to-refresh
+**Mode:** mvp
+**Depends on**: Phase 13
+**Requirements**: REFRESH-01, REFRESH-02, REFRESH-03, REFRESH-04
+**Success Criteria** (what must be TRUE):
+
+  1. Loading the web app, or returning to its browser tab after being away, automatically triggers a fresh weather fetch (`ref.invalidate(weatherProvider)`) — verified via network inspector and a changing "Last updated" timestamp
+  2. A user can manually pull-to-refresh on the Home screen to force a re-fetch of weather data
+  3. The UI displays a "Last updated HH:MM" label at all times, reflecting the cache-then-network pattern
+  4. Going offline, or a failed fetch, shows the last-known slots clearly labeled as stale rather than a blank screen or crash
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 15: Google Calendar Web Integration
+
+**Goal**: Web users can add a ride slot to Google Calendar directly from the deployed app, with sign-in surviving Safari's popup blocker and FedCM incompatibility
+**Mode:** mvp
+**Depends on**: Phase 14
+**Requirements**: CAL-06, CAL-07
+**Success Criteria** (what must be TRUE):
+
+  1. `CalendarService` initializes with a platform-conditional web OAuth `clientId` configured in Google Cloud Console for the Firebase Hosting domain; native Android config is unchanged
+  2. Tapping "Add to calendar" on the deployed production URL (not localhost) opens the Google sign-in popup synchronously inside the tap handler (not blocked by Safari) and completes the OAuth consent flow
+  3. A real Google Calendar event is created with the correct start/end time and weather summary, verified end-to-end in a real browser against the deployed production domain
+  4. The full flow is manually verified on a real iPhone in Safari (not just desktop Chrome), given LOW research confidence on iOS popup/FedCM behavior for `google_sign_in` 7.x web
+
+**Plans**: TBD
+
+### Phase 16: PWA Installability & iOS Polish
+
+**Goal**: iOS users can add RideWindow to their Home Screen and use it as a standalone app with correct icons, splash, safe-area layout, and navigation — and their data durably survives Safari's storage eviction policy
+**Mode:** mvp
+**Depends on**: Phase 15
+**Requirements**: PWA-01, PWA-02, PWA-03, PWA-04, PWA-05
+**Success Criteria** (what must be TRUE):
+
+  1. `web/index.html` includes `apple-touch-icon`, `apple-touch-startup-image`, `theme_color`, and `background_color` tags; the app shows a correct icon and splash screen when added to an iPhone Home Screen
+  2. In standalone mode (added to Home Screen), the app displays with no browser chrome (`display: standalone`), correct status bar styling, and content respects notch/Dynamic Island safe areas (`env(safe-area-inset-*)`)
+  3. On iOS Safari in browser mode (not yet installed), a custom "Add to Home Screen" instructional overlay appears, detected via the `display-mode: standalone` media query and hidden once installed; Android Chrome instead uses its native `beforeinstallprompt` flow
+  4. In standalone mode, in-app back/close navigation works correctly with no dead ends (no reliance on a browser back button that doesn't exist)
+  5. The install flow and storage persistence are manually verified on a real iPhone in Safari — including leaving the installed app untouched for several days to confirm whether data survives ITP storage eviction (per research Gap: exemption for installed PWAs is unconfirmed)
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 17: Deployment Hardening & Firebase Hosting
+
+**Goal**: The web app is live at a stable, production HTTPS URL on Firebase Hosting with correct routing and asset headers, and the Android app remains fully unaffected by all web-platform additions
+**Mode:** mvp
+**Depends on**: Phase 16
+**Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03
+**Success Criteria** (what must be TRUE):
+
+  1. `firebase.json` configures `build/web` as the Hosting public directory with rewrite rules so client-side `go_router` routes work correctly on direct URL load and page refresh (no 404s)
+  2. `firebase deploy` succeeds and the app is reachable at a stable HTTPS URL, with all features exercised across Phases 11–16 (build, persistence, geolocation, refresh, Calendar, PWA install) working on that live URL
+  3. A full regression pass confirms `flutter build apk` still builds and the existing Android app's core flows (forecast, slots, availability, Calendar) work unchanged
+
+**Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Project skeleton + test infrastructure | 3/3 | Complete | 2026-06-02 |
-| 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | 4/4 | Complete | 2026-06-02 |
-| 2. Data layer — Drift + Open-Meteo | 3/3 | Complete | 2026-06-02 |
-| 3. Riverpod providers + state graph | 4/4 | Complete | 2026-06-03 |
-| 4. UI Phase A — Onboarding + Home + Welcome | 5/5 | Complete | 2026-06-03 |
-| 5. UI Phase B — Ride Detail + Insights sheet | 4/4 | Complete | 2026-06-03 |
-| 6. UI Phase C — Profile + Availability + Tolerance sliders | 4/4 | Complete   | 2026-06-03 |
-| 7. Location — GPS + manual city + permission state machine | 5/5 | Complete | 2026-06-03 |
-| 8. Background refresh + Notifications | 5/5 | Complete   | 2026-06-03 |
-| 9. Google Calendar integration | 2/2 | Complete    | 2026-06-03 |
-| 10. Release — Internal track only | 4/4 | Complete | 2026-06-17 |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Project skeleton + test infrastructure | v1.0 | 3/3 | Complete | 2026-06-02 |
+| 1.5. Scoring domain — Freezed models + ScoringEngine + SlotGenerator | v1.0 | 0/TBD | Not started | - |
+| 2. Data layer — Drift + Open-Meteo | v1.0 | 3/3 | Complete | 2026-06-02 |
+| 3. Riverpod providers + state graph | v1.0 | 4/4 | Complete | 2026-06-03 |
+| 4. UI Phase A — Onboarding + Home + Welcome | v1.0 | 0/5 | Not started | - |
+| 5. UI Phase B — Ride Detail + Insights sheet | v1.0 | 0/TBD | Not started | - |
+| 6. UI Phase C — Profile + Availability + Tolerance sliders | v1.0 | 0/TBD | Not started | - |
+| 7. Location — GPS + manual city + permission state machine | v1.0 | 0/TBD | Not started | - |
+| 8. Background refresh + Notifications | v1.0 | 0/TBD | Not started | - |
+| 9. Google Calendar integration | v1.0 | 0/TBD | Not started | - |
+| 10. Release — Internal track only | v1.0 | 0/TBD | Not started | - |
+| 11. Web Scaffolding & Build Baseline | v2.0 | 0/TBD | Not started | - |
+| 12. Drift Web Persistence | v2.0 | 0/TBD | Not started | - |
+| 13. Geolocation & Manual Fallback | v2.0 | 0/TBD | Not started | - |
+| 14. Foreground Refresh Strategy | v2.0 | 0/TBD | Not started | - |
+| 15. Google Calendar Web Integration | v2.0 | 0/TBD | Not started | - |
+| 16. PWA Installability & iOS Polish | v2.0 | 0/TBD | Not started | - |
+| 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/TBD | Not started | - |
+
+**Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).

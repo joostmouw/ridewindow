@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
 status: planning
-last_updated: "2026-07-10T13:28:56.327Z"
-last_activity: 2026-07-10
+last_updated: "2026-07-11T11:49:20.000Z"
+last_activity: 2026-07-11
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 10 — release-internal-track-only
+**Current focus:** Phase 11 — web-scaffolding-build-baseline
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-07-10 — Milestone v2.0 started
+Phase: 11 of 17 (Web Scaffolding & Build Baseline)
+Plan: TBD (not yet planned)
+Status: Ready to plan
+Last activity: 2026-07-11 — v2.0 ROADMAP.md created (Phases 11-17), REQUIREMENTS.md traceability filled in, coverage 24/24
 
 ## Performance Metrics
 
@@ -188,5 +188,5 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-07-01T12:37:33.177Z
-Last activity: 2026-06-18 - Completed quick task 260618-csx: Week-agenda view met ride-overlap overlay
+Last session: 2026-07-11T11:49:20.000Z
+Last activity: 2026-07-11 - v2.0 ROADMAP.md created (Phases 11-17: Web Scaffolding, Drift Web Persistence, Geolocation & Manual Fallback, Foreground Refresh, Google Calendar Web, PWA Installability, Deployment Hardening). Next: /gsd:plan-phase 11

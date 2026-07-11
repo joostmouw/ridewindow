@@ -86,4 +86,31 @@ Generic acceptance criteria applied to every phase:
 
 ## Traceability
 
-(Filled in by the roadmapper when `.planning/ROADMAP.md` is created.)
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| WEB-01 | Phase 11 | Pending |
+| WEB-02 | Phase 11 | Pending |
+| WEB-03 | Phase 11 | Pending |
+| WEB-04 | Phase 11 | Pending |
+| WEB-05 | Phase 11 | Pending |
+| PERS-05 | Phase 12 | Pending |
+| PERS-06 | Phase 12 | Pending |
+| PERS-07 | Phase 12 | Pending |
+| LOC-06 | Phase 13 | Pending |
+| LOC-07 | Phase 13 | Pending |
+| REFRESH-01 | Phase 14 | Pending |
+| REFRESH-02 | Phase 14 | Pending |
+| REFRESH-03 | Phase 14 | Pending |
+| REFRESH-04 | Phase 14 | Pending |
+| CAL-06 | Phase 15 | Pending |
+| CAL-07 | Phase 15 | Pending |
+| PWA-01 | Phase 16 | Pending |
+| PWA-02 | Phase 16 | Pending |
+| PWA-03 | Phase 16 | Pending |
+| PWA-04 | Phase 16 | Pending |
+| PWA-05 | Phase 16 | Pending |
+| DEPLOY-01 | Phase 17 | Pending |
+| DEPLOY-02 | Phase 17 | Pending |
+| DEPLOY-03 | Phase 17 | Pending |
+
+**Coverage:** 24/24 v2.0 requirements mapped. No orphans.
