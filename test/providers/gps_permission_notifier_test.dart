@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 
 /// FakeGpsPermissionNotifier retourneert een geconfigureerde toestemmingswaarde
@@ -54,6 +55,43 @@ void main() {
       final state = container.read(gpsPermissionProvider);
       expect(state, isA<AsyncData<LocationPermission>>());
       expect(state.value, equals(LocationPermission.deniedForever));
+    });
+  });
+
+  group('openSettings() web guard (LOC-07)', () {
+    tearDown(() => debugIsWebOverride = null);
+
+    test(
+        'openSettings() completes without throwing when debugIsWebOverride is true',
+        () async {
+      debugIsWebOverride = true;
+
+      final container = ProviderContainer(
+        overrides: [
+          gpsPermissionProvider.overrideWith(
+            () =>
+                FakeGpsPermissionNotifier(LocationPermission.deniedForever),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(gpsPermissionProvider.future);
+
+      // Would throw UnsupportedError from openAppSettings() in this plain
+      // test environment (no platform-channel handler registered) if the
+      // web guard were removed.
+      await expectLater(
+        container.read(gpsPermissionProvider.notifier).openSettings(),
+        completes,
+      );
+    });
+
+    test(
+        'isWebPlatform is false when debugIsWebOverride is left at default (null)',
+        () {
+      expect(debugIsWebOverride, isNull);
+      expect(isWebPlatform, isFalse);
     });
   });
 }

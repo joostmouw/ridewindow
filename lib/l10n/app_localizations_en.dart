@@ -329,6 +329,17 @@ class SEn extends S {
   String get tapToChooseCity => 'Tap to choose city';
 
   @override
+  String get locationBlockedWebHint =>
+      'Enable location access in your browser\'s site settings, or choose a city below.';
+
+  @override
+  String get chooseCityPrimaryTitle => 'Choose your city for a forecast';
+
+  @override
+  String get chooseCityPrimaryHint =>
+      'We couldn\'t get your location. Pick a city below to see your forecast anyway.';
+
+  @override
   String get notifEveningBefore => 'Evening before';
 
   @override

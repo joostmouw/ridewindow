@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -242,6 +243,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
           _SectionHeader(s.sectionLocation),
 
+          // ELEMENT 0 — Web-only promoted city picker CTA (LOC-07 primary path)
+          if (isWebPlatform &&
+              (permission == LocationPermission.denied ||
+                  permission == LocationPermission.deniedForever))
+            Card(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      s.chooseCityPrimaryTitle,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(s.chooseCityPrimaryHint),
+                    const SizedBox(height: 8),
+                    FilledButton.icon(
+                      onPressed: () => _openCityPicker(context),
+                      icon: const Icon(Icons.location_city),
+                      label: Text(s.tapToChooseCity),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           // ELEMENT 1 — GPS-geblokkeerd banner (deniedForever)
           if (permission == LocationPermission.deniedForever)
             Card(
@@ -260,13 +293,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(s.locationBlockedHint),
-                    TextButton(
-                      onPressed: () => ref
-                          .read(gpsPermissionProvider.notifier)
-                          .openSettings(),
-                      child: Text(s.openSettings),
-                    ),
+                    Text(isWebPlatform ? s.locationBlockedWebHint : s.locationBlockedHint),
+                    if (!isWebPlatform)
+                      TextButton(
+                        onPressed: () => ref
+                            .read(gpsPermissionProvider.notifier)
+                            .openSettings(),
+                        child: Text(s.openSettings),
+                      ),
                   ],
                 ),
               ),

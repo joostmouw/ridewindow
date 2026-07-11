@@ -685,6 +685,24 @@ abstract class S {
   /// **'Tik om stad te kiezen'**
   String get tapToChooseCity;
 
+  /// No description provided for @locationBlockedWebHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Schakel locatietoegang in via de site-instellingen van je browser, of kies hieronder een stad.'**
+  String get locationBlockedWebHint;
+
+  /// No description provided for @chooseCityPrimaryTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kies je stad voor een voorspelling'**
+  String get chooseCityPrimaryTitle;
+
+  /// No description provided for @chooseCityPrimaryHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'We konden je locatie niet ophalen. Kies hieronder een stad om toch een weersvoorspelling te zien.'**
+  String get chooseCityPrimaryHint;
+
   /// No description provided for @notifEveningBefore.
   ///
   /// In nl, this message translates to:
