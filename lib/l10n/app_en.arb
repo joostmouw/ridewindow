@@ -80,6 +80,14 @@
   "emptyNoSlots": "No ride windows found.",
   "emptyNoSlotsDay": "No ride windows on this day.",
 
+  "staleDataBannerWithTime": "Offline — showing ride windows from {time}",
+  "@staleDataBannerWithTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "staleDataBannerNoTime": "Offline — showing last-known ride windows",
+
   "windCalm": "Calm",
   "durationHours": "{hours}h",
 

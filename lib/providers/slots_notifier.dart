@@ -63,17 +63,29 @@ class SlotsNotifier extends _$SlotsNotifier {
     final profileValue = ref.watch(profileProvider);
     final availValue = ref.watch(availabilityProvider);
 
-    // Als een van de drie nog laadt of een fout heeft: geef lege slots terug.
-    if (weatherValue.isLoading ||
-        weatherValue.hasError ||
-        profileValue.isLoading ||
+    // Profiel/beschikbaarheid hebben geen stale-data concept in deze fase --
+    // bij loading/error is er simpelweg nog niets te berekenen.
+    if (profileValue.isLoading ||
         profileValue.hasError ||
         availValue.isLoading ||
         availValue.hasError) {
       return const SlotsLoaded([]);
     }
 
-    final forecasts = weatherValue.requireValue;
+    // REFRESH-04: als weather nog nooit is opgelost (initieel loading zonder
+    // data, of een fout zonder eerdere succesvolle waarde), zijn er geen
+    // slots te berekenen. Maar als weatherValue.hasError true is EN hasValue
+    // ook true is (een refresh faalde na een eerder succes -- Riverpod's
+    // ingebouwde previous-data-preservation), valt dit door naar beneden en
+    // hercomputen we slots op basis van de stale forecasts in plaats van
+    // leeg terug te geven. HomeScreen is verantwoordelijk voor het tonen van
+    // de "stale"-visuele behandeling op basis van weatherProvider's eigen
+    // hasError/hasValue, niet op basis van een nieuw veld op SlotsState.
+    if (!weatherValue.hasValue) {
+      return const SlotsLoaded([]);
+    }
+
+    final forecasts = weatherValue.value!;
     final profile = profileValue.requireValue;
     final blockedHours = availValue.requireValue;
 
