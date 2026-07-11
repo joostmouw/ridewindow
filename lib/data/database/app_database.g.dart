@@ -1087,8 +1087,8 @@ final class $$ForecastCacheEntriesTableReferences extends BaseReferences<
       List<HourlyForecastEntry>> _hourlyForecastEntriesRefsTable(
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.hourlyForecastEntries,
-          aliasName: $_aliasNameGenerator(
-              db.forecastCacheEntries.id, db.hourlyForecastEntries.cacheId));
+          aliasName:
+              'forecast_cache_entries__id__hourly_forecast_entries__cache_id');
 
   $$HourlyForecastEntriesTableProcessedTableManager
       get hourlyForecastEntriesRefs {
@@ -1343,8 +1343,8 @@ final class $$HourlyForecastEntriesTableReferences extends BaseReferences<
       super.$_db, super.$_table, super.$_typedResult);
 
   static $ForecastCacheEntriesTable _cacheIdTable(_$AppDatabase db) =>
-      db.forecastCacheEntries.createAlias($_aliasNameGenerator(
-          db.hourlyForecastEntries.cacheId, db.forecastCacheEntries.id));
+      db.forecastCacheEntries.createAlias(
+          'hourly_forecast_entries__cache_id__forecast_cache_entries__id');
 
   $$ForecastCacheEntriesTableProcessedTableManager get cacheId {
     final $_column = $_itemColumn<int>('cache_id')!;

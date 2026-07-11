@@ -50,7 +50,7 @@ abstract class _$GpsPermissionNotifier
   FutureOr<LocationPermission> build();
   @$mustCallSuper
   @override
-  void runBuild() {
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<LocationPermission>, LocationPermission>;
     final element = ref.element as $ClassProviderElement<
@@ -58,6 +58,6 @@ abstract class _$GpsPermissionNotifier
         AsyncValue<LocationPermission>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    return element.handleCreate(ref, build);
   }
 }
