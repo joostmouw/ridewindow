@@ -376,7 +376,16 @@ Plans:
   3. A real Google Calendar event is created with the correct start/end time and weather summary, verified end-to-end in a real browser against the deployed production domain
   4. The full flow is manually verified on a real iPhone in Safari (not just desktop Chrome), given LOW research confidence on iOS popup/FedCM behavior for `google_sign_in` 7.x web
 
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+
+**Wave 1**
+
+- [ ] 15-01-PLAN.md — Web OAuth warmup wiring (kIsWeb-gated eager GoogleSignIn init) + Web OAuth client ID meta tag + Chrome dev-server (localhost) spike verification
+
+**Wave 2** *(blocked on Wave 1 -- needs the Web OAuth client from 15-01 Task 1)*
+
+- [ ] 15-02-PLAN.md — Preliminary Firebase Hosting deploy + production-domain OAuth origin + real iPhone Safari verification
 
 ### Phase 16: PWA Installability & iOS Polish
 
@@ -431,7 +440,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 12. Drift Web Persistence | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 13. Geolocation & Manual Fallback | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 14. Foreground Refresh Strategy | v2.0 | 1/1 | Complete   | 2026-07-12 |
-| 15. Google Calendar Web Integration | v2.0 | 0/TBD | Not started | - |
+| 15. Google Calendar Web Integration | v2.0 | 0/2 | Not started | - |
 | 16. PWA Installability & iOS Polish | v2.0 | 0/TBD | Not started | - |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/TBD | Not started | - |
 
