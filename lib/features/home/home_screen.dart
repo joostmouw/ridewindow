@@ -635,18 +635,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     AsyncValue<List<HourlyForecast>> weatherState,
     SlotsState slotsState,
   ) {
-    if (weatherState.isLoading) {
+    // REFRESH-04: Riverpod 3.x auto-retry keeps AsyncValue.isLoading true
+    // (with hasError also true) while a failed fetch is being retried in the
+    // background -- so isLoading alone can no longer gate the spinner, or a
+    // retry loop after a prior success would hide the stale cards/banner
+    // behind an infinite spinner. Only show the spinner when there is truly
+    // no previous data to fall back on yet.
+    if (weatherState.isLoading && !weatherState.hasValue) {
       return const SliverFillRemaining(
         hasScrollBody: false,
         child: Center(child: CircularProgressIndicator()),
       );
     }
 
-    // REFRESH-04: only show the blank full-screen error when there is truly
-    // no previous data to fall back on. When hasError && hasValue (a refresh
-    // failed after an earlier success), fall through to the SlotsLoaded
-    // branch below, which now renders the stale slots SlotsNotifier
-    // preserves, alongside the stale banner added above the week strip.
+    // Only show the blank full-screen error when there is truly no previous
+    // data to fall back on. When hasError && hasValue (a refresh failed
+    // after an earlier success, or is being auto-retried), fall through to
+    // the SlotsLoaded branch below, which renders the stale slots
+    // SlotsNotifier preserves, alongside the stale banner added above the
+    // week strip.
     if (weatherState.hasError && !weatherState.hasValue) {
       return SliverFillRemaining(
         hasScrollBody: false,
