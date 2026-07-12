@@ -360,7 +360,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 14-01-PLAN.md — Web-gated resume-refresh trigger + always-visible last-updated label + stale-data fallback UI + manual browser verification
+- [x] 14-01-PLAN.md — Web-gated resume-refresh trigger + always-visible last-updated label + stale-data fallback UI + manual browser verification
 **UI hint**: yes
 
 ### Phase 15: Google Calendar Web Integration
@@ -430,7 +430,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 11. Web Scaffolding & Build Baseline | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 12. Drift Web Persistence | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 13. Geolocation & Manual Fallback | v2.0 | 1/1 | Complete   | 2026-07-11 |
-| 14. Foreground Refresh Strategy | v2.0 | 0/TBD | Not started | - |
+| 14. Foreground Refresh Strategy | v2.0 | 1/1 | Complete   | 2026-07-12 |
 | 15. Google Calendar Web Integration | v2.0 | 0/TBD | Not started | - |
 | 16. PWA Installability & iOS Polish | v2.0 | 0/TBD | Not started | - |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/TBD | Not started | - |
