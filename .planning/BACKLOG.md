@@ -26,6 +26,9 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 14 | **Persoonlijke begroeting op Home** — tijdsafhankelijke greeting met naam ("Good morning Joost", "Welcome back Joost") | MEDIUM | S | Done (2c7738c) |
 | 15 | **Drag-to-select beschikbaarheid** — sleep over meerdere cellen om ze in een keer te togglen + rij/kolom-headers om hele dag/uur te selecteren | HOOG | M | Done (2c7738c) |
 | 16 | **Debug/reset menu** — verborgen menu (5x tik op versienummer) met reset onboarding, wis cache, reset beschikbaarheid, forceer refresh | MEDIUM | S | Done (2c7738c) |
+| 17 | **Drag voor meerdere tijdvakken werkt niet (gemeld tijdens v2.0 web-testen)** — gebruiker meldt dat het slepen om meerdere tijdvakken tegelijk te selecteren niet functioneert; onduidelijk of dit een regressie is op item 15 (Availability-grid) of een ontbrekende feature elders (bijv. Home/Agenda) — nader te onderzoeken welk scherm en welke actie precies bedoeld wordt | HOOG | ? | Backlog |
+| 18 | **Verlopen tijden grijs tonen in Agenda** — tijdstippen die al voorbij zijn moeten visueel duidelijk gemarkeerd worden (bijv. grijze kleur) in plaats van er hetzelfde uit te zien als toekomstige tijden | MEDIUM | S | Backlog |
+| 19 | **Verlopen ride-slots verbergen op Home** — Home-scherm moet alleen ride-vensters tonen waarvan de starttijd nog moet komen; slots waarvan de starttijd al voorbij is moeten niet meer op Home verschijnen | MEDIUM | S | Backlog |
 
 ---
 
@@ -77,4 +80,4 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 ---
 
 *Aangemaakt: 2026-06-06*
-*Laatst bijgewerkt: 2026-06-18*
+*Laatst bijgewerkt: 2026-07-12 (items 17-19 toegevoegd n.a.v. feedback tijdens v2.0 Phase 14 browser-verificatie)*
