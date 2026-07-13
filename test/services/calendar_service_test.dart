@@ -153,4 +153,32 @@ void main() {
       expect(true, isTrue);
     });
   });
+
+  group('CalendarService.warmUpForWeb (CAL-06)', () {
+    // -------------------------------------------------------------------------
+    // Test 1 (CAL-06): warmUpForWeb() mag nooit een exception laten ontsnappen,
+    // ook niet als er geen echte GoogleSignIn platform-channel gebonden is
+    // (zoals onder `flutter test`'s Dart-VM omgeving). De try/catch binnenin
+    // vangt de MissingPluginException op — dit bewijst dat een mislukte warmup
+    // de app-start nooit laat crashen.
+    // -------------------------------------------------------------------------
+    test(
+      'warmUpForWeb() completes without throwing under flutter test (geen echte GoogleSignIn plugin gebonden)',
+      () async {
+        await expectLater(CalendarService.warmUpForWeb(), completes);
+      },
+    );
+
+    // -------------------------------------------------------------------------
+    // Test 2 (CAL-06): warmUpForWeb() is idempotent — twee keer aanroepen in
+    // dezelfde sessie mag nooit alsnog een exception opleveren.
+    // -------------------------------------------------------------------------
+    test(
+      'warmUpForWeb() is idempotent — twee keer aanroepen blijft zonder exception',
+      () async {
+        await CalendarService.warmUpForWeb();
+        await CalendarService.warmUpForWeb();
+      },
+    );
+  });
 }
