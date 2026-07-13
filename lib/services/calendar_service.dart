@@ -1,7 +1,9 @@
 // lib/services/calendar_service.dart
 // CalendarService: voegt een rijvenster toe aan Google Calendar via OAuth.
 // GoogleSignIn.instance wordt uitsluitend lazy gebruikt (CAL-02): nooit
-// aangemaakt bij app-start, alleen on-demand bij tik op de knop.
+// aangemaakt bij app-start, alleen on-demand bij tik op de knop -- behalve
+// op web, waar main.dart GoogleSignIn eagerly warmt via
+// CalendarService.warmUpForWeb() (zie CAL-06).
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -13,6 +15,34 @@ class CalendarService {
   // GoogleSignIn 7.x gebruikt een singleton via GoogleSignIn.instance.
   // initialize() wordt precies één keer aangeroepen, bewaakt door _initialized.
   static bool _initialized = false;
+
+  /// Web-only eager warmup (CAL-06): initialiseert GoogleSignIn.instance
+  /// vooraf zodat er, tegen de tijd dat de gebruiker op "Add to calendar"
+  /// tikt, geen onopgeloste await meer in de call chain zit voordat
+  /// authorizeScopes() de OAuth-popup opent. Safari's popup-blocker
+  /// vereist dat de tap-naar-popup call chain synchroon blijft (zie
+  /// RESEARCH.md Pitfall 1) -- deze methode elimineert die async gap op de
+  /// allereerste tik van een sessie.
+  ///
+  /// Veilig om meerdere keren aan te roepen (bewaakt door dezelfde
+  /// [_initialized] vlag als [_ensureInitialized]). Een mislukte warmup is
+  /// nooit fataal voor de app-start: fouten worden stilzwijgend
+  /// opgevangen, en [_initialized] blijft dan `false` zodat de eerste echte
+  /// tik alsnog via [_ensureInitialized]'s eigen (async) init-pad loopt --
+  /// hetzelfde altijd-lazy pad als native Android (CAL-02).
+  static Future<void> warmUpForWeb() async {
+    if (_initialized) return;
+    try {
+      await GoogleSignIn.instance.initialize();
+      _initialized = true;
+    } catch (_) {
+      // Web-only best-effort warmup (CAL-06). Een fout hier mag de
+      // app-start nooit laten crashen -- de eerste echte tik valt gewoon
+      // terug op _ensureInitialized()'s eigen (async) init-aanroep, net als
+      // native's altijd-lazy pad. _initialized blijft false zodat die
+      // fallback alsnog draait.
+    }
+  }
 
   /// Initialiseert GoogleSignIn als dat nog niet is gedaan (lazy, CAL-02).
   Future<void> _ensureInitialized() async {
