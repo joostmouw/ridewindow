@@ -13,6 +13,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
 import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
@@ -575,6 +576,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                         ),
                         ScoreBadge(tier: rideTierFromScore(ride.plannedScore)),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          color: cs.error,
+                          onPressed: () async {
+                            final confirmed = await showUnplanConfirmDialog(context);
+                            if (!confirmed) return;
+                            ref.read(plannedRidesProvider.notifier).remove(ride);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(S.of(context).rideRemoved)),
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
