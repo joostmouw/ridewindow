@@ -29,6 +29,7 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 17 | **Drag voor meerdere tijdvakken werkt niet (gemeld tijdens v2.0 web-testen)** — gebruiker meldt dat het slepen om meerdere tijdvakken tegelijk te selecteren niet functioneert; onduidelijk of dit een regressie is op item 15 (Availability-grid) of een ontbrekende feature elders (bijv. Home/Agenda) — nader te onderzoeken welk scherm en welke actie precies bedoeld wordt | HOOG | ? | Backlog |
 | 18 | **Verlopen tijden grijs tonen in Agenda** — tijdstippen die al voorbij zijn moeten visueel duidelijk gemarkeerd worden (bijv. grijze kleur) in plaats van er hetzelfde uit te zien als toekomstige tijden | MEDIUM | S | Backlog |
 | 19 | **Verlopen ride-slots verbergen op Home** — Home-scherm moet alleen ride-vensters tonen waarvan de starttijd nog moet komen; slots waarvan de starttijd al voorbij is moeten niet meer op Home verschijnen | MEDIUM | S | Backlog |
+| 31 | **Google OAuth consent screen publiceren (of volledig laten verifiëren)** — Calendar-koppeling (CAL-06/07) werkt nu alleen voor handmatig toegevoegde test-users (Testing-modus, max 100). Nodig vóór publieke launch: "Publish app" (snel, maar toont "niet geverifieerd door Google"-waarschuwingsscherm die gebruikers moeten wegklikken) of volledige Google-verificatie aanvragen (verwijdert de waarschuwing, vereist privacybeleid-URL + review, kan dagen/weken duren) | HOOG | S/M | Backlog |
 
 ---
 
@@ -80,4 +81,4 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 ---
 
 *Aangemaakt: 2026-06-06*
-*Laatst bijgewerkt: 2026-07-12 (items 17-19 toegevoegd n.a.v. feedback tijdens v2.0 Phase 14 browser-verificatie)*
+*Laatst bijgewerkt: 2026-07-14 (item 31 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen moet gepubliceerd/geverifieerd worden vóór publieke launch)*
