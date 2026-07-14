@@ -949,6 +949,30 @@ abstract class S {
   /// **'Opslaan'**
   String get save;
 
+  /// No description provided for @sendFeedback.
+  ///
+  /// In nl, this message translates to:
+  /// **'Feedback versturen'**
+  String get sendFeedback;
+
+  /// No description provided for @feedbackRatingLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Hoe zou je RideWindow beoordelen?'**
+  String get feedbackRatingLabel;
+
+  /// No description provided for @feedbackCommentHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wil je iets delen? (optioneel)'**
+  String get feedbackCommentHint;
+
+  /// No description provided for @feedbackSendButton.
+  ///
+  /// In nl, this message translates to:
+  /// **'Versturen'**
+  String get feedbackSendButton;
+
   /// No description provided for @privacyPolicy.
   ///
   /// In nl, this message translates to:

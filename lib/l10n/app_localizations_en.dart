@@ -472,6 +472,18 @@ class SEn extends S {
   String get save => 'Save';
 
   @override
+  String get sendFeedback => 'Send feedback';
+
+  @override
+  String get feedbackRatingLabel => 'How would you rate RideWindow?';
+
+  @override
+  String get feedbackCommentHint => 'Anything you\'d like to share? (optional)';
+
+  @override
+  String get feedbackSendButton => 'Send';
+
+  @override
   String get privacyPolicy => 'Privacy policy';
 
   @override

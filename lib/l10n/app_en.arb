@@ -175,6 +175,11 @@
   "cancel": "Cancel",
   "save": "Save",
 
+  "sendFeedback": "Send feedback",
+  "feedbackRatingLabel": "How would you rate RideWindow?",
+  "feedbackCommentHint": "Anything you'd like to share? (optional)",
+  "feedbackSendButton": "Send",
+
   "privacyPolicy": "Privacy policy",
   "weatherDataAttribution": "Weather data by Open-Meteo.com",
   "version": "Version",

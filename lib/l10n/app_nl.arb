@@ -201,6 +201,11 @@
   "cancel": "Annuleer",
   "save": "Opslaan",
 
+  "sendFeedback": "Feedback versturen",
+  "feedbackRatingLabel": "Hoe zou je RideWindow beoordelen?",
+  "feedbackCommentHint": "Wil je iets delen? (optioneel)",
+  "feedbackSendButton": "Versturen",
+
   "privacyPolicy": "Privacybeleid",
   "weatherDataAttribution": "Weerdata door Open-Meteo.com",
   "version": "Versie",

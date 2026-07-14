@@ -473,6 +473,18 @@ class SNl extends S {
   String get save => 'Opslaan';
 
   @override
+  String get sendFeedback => 'Feedback versturen';
+
+  @override
+  String get feedbackRatingLabel => 'Hoe zou je RideWindow beoordelen?';
+
+  @override
+  String get feedbackCommentHint => 'Wil je iets delen? (optioneel)';
+
+  @override
+  String get feedbackSendButton => 'Versturen';
+
+  @override
   String get privacyPolicy => 'Privacybeleid';
 
   @override
