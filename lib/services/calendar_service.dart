@@ -16,6 +16,29 @@ class CalendarService {
   // initialize() wordt precies één keer aangeroepen, bewaakt door _initialized.
   static bool _initialized = false;
 
+  // Gememoized in-flight initialize()-aanroep (Rule 1 bugfix, CAL-06 follow-up).
+  // GoogleSignIn.instance.initialize() gooit "Bad state: init() has already
+  // been called" als het een tweede keer wordt aangeroepen terwijl de eerste
+  // aanroep nog niet is afgerond. Op web kan warmUpForWeb()'s await nog
+  // in-flight zijn wanneer de gebruiker meteen op "Add to calendar" tikt en
+  // _ensureInitialized() gelijktijdig start -- beide moeten dezelfde
+  // onderliggende initialize()-aanroep delen in plaats van elk hun eigen te
+  // starten. _initFuture wordt op falen weer op null gezet zodat een latere
+  // aanroep het opnieuw kan proberen (zelfde "mislukking is niet
+  // fataal"-semantiek als voorheen).
+  static Future<void>? _initFuture;
+
+  static Future<void> _sharedInitialize() {
+    return _initFuture ??= GoogleSignIn.instance.initialize().then((_) {
+      _initialized = true;
+    }).catchError((Object e, StackTrace st) {
+      _initFuture = null;
+      _initialized = false;
+      // ignore: only_throw_errors
+      throw e;
+    });
+  }
+
   /// Web-only eager warmup (CAL-06): initialiseert GoogleSignIn.instance
   /// vooraf zodat er, tegen de tijd dat de gebruiker op "Add to calendar"
   /// tikt, geen onopgeloste await meer in de call chain zit voordat
@@ -24,17 +47,18 @@ class CalendarService {
   /// RESEARCH.md Pitfall 1) -- deze methode elimineert die async gap op de
   /// allereerste tik van een sessie.
   ///
-  /// Veilig om meerdere keren aan te roepen (bewaakt door dezelfde
-  /// [_initialized] vlag als [_ensureInitialized]). Een mislukte warmup is
-  /// nooit fataal voor de app-start: fouten worden stilzwijgend
+  /// Veilig om meerdere keren aan te roepen, en veilig om gelijktijdig met
+  /// [_ensureInitialized] te lopen: beide delen dezelfde gememoized
+  /// [_sharedInitialize] future, dus er wordt nooit meer dan één keer
+  /// `GoogleSignIn.instance.initialize()` tegelijk aangeroepen. Een mislukte
+  /// warmup is nooit fataal voor de app-start: fouten worden stilzwijgend
   /// opgevangen, en [_initialized] blijft dan `false` zodat de eerste echte
   /// tik alsnog via [_ensureInitialized]'s eigen (async) init-pad loopt --
   /// hetzelfde altijd-lazy pad als native Android (CAL-02).
   static Future<void> warmUpForWeb() async {
     if (_initialized) return;
     try {
-      await GoogleSignIn.instance.initialize();
-      _initialized = true;
+      await _sharedInitialize();
     } catch (_) {
       // Web-only best-effort warmup (CAL-06). Een fout hier mag de
       // app-start nooit laten crashen -- de eerste echte tik valt gewoon
@@ -45,10 +69,12 @@ class CalendarService {
   }
 
   /// Initialiseert GoogleSignIn als dat nog niet is gedaan (lazy, CAL-02).
+  /// Deelt [_sharedInitialize] met [warmUpForWeb] zodat een gelijktijdige
+  /// web-warmup en een tik op "Add to calendar" nooit twee losse
+  /// initialize()-aanroepen tegelijk starten (Rule 1 bugfix).
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
-    await GoogleSignIn.instance.initialize();
-    _initialized = true;
+    await _sharedInitialize();
   }
 
   /// [CalendarService.addRideSlotToCalendar] voegt het rijvenster [slot] toe
