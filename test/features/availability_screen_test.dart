@@ -435,11 +435,15 @@ void main() {
           hour,
         );
 
+    // Grid cells have no borderRadius (unlike the 14x14 legend swatches,
+    // which use BorderRadius.circular(3)) — exclude the legend swatch so
+    // these finders only match actual grid cells.
     Finder customColorFinder() => find.byWidgetPredicate(
           (w) =>
               w is Container &&
               (w.decoration as BoxDecoration?)?.color ==
-                  const Color(0xFFFF9800),
+                  const Color(0xFFFF9800) &&
+              (w.decoration as BoxDecoration?)?.borderRadius == null,
           skipOffstage: false,
         );
 
@@ -447,7 +451,8 @@ void main() {
           (w) =>
               w is Container &&
               (w.decoration as BoxDecoration?)?.color ==
-                  const Color(0xFFB0BEC5),
+                  const Color(0xFFB0BEC5) &&
+              (w.decoration as BoxDecoration?)?.borderRadius == null,
           skipOffstage: false,
         );
 

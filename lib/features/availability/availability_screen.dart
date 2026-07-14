@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/services/drag_run_counter.dart';
+import 'package:ridewindow/domain/services/range_fill.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
@@ -35,6 +36,9 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   bool _isDragging = false;
   bool _dragBlocking = true;
   final Set<DateTime> _draggedCells = {};
+
+  // Two-tap range-select state (RNE-01): null = no open pending block.
+  DateTime? _pendingAnchor;
 
   List<String> _dagLabels(BuildContext context) {
     final s = S.of(context);
@@ -116,7 +120,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           return Column(
             children: [
               // Live drag-run count indicator (BACKLOG-35, scoped down)
-              _buildDragIndicatorBar(context),
+              _buildDragIndicatorBar(context, blockedHours),
               // Grid
               Expanded(
                 child: GestureDetector(
@@ -223,29 +227,48 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   ) {
     final key = _cellKey(weekStart, dayIndex, hour);
     final isDragHighlighted = _isDragging && _draggedCells.contains(key);
+    final isPendingAnchor = _pendingAnchor == key;
     final rw = context.rw;
     final color = _cellColor(key, blockedHours, isDragHighlighted, rw);
 
     return GestureDetector(
       onTap: () => _onCellTap(key, blockedHours),
+      onLongPress: () => _showCellInfo(context, key, blockedHours, hour),
       child: Container(
         width: _cellWidth,
         height: _cellHeight,
         decoration: BoxDecoration(
           color: color,
           border: Border.all(
-            color: rw.border,
-            width: 0.5,
+            color: isPendingAnchor ? Theme.of(context).colorScheme.primary : rw.border,
+            width: isPendingAnchor ? 2 : 0.5,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDragIndicatorBar(BuildContext context) {
+  Widget _buildDragIndicatorBar(
+    BuildContext context,
+    Map<DateTime, BlockType> blockedHours,
+  ) {
+    final pendingAnchor = _pendingAnchor;
+    final showBar = _isDragging || pendingAnchor != null;
+    final runCount = _isDragging
+        ? countSelectionRuns(_draggedCells)
+        : pendingAnchor == null
+            ? 0
+            : countSelectionRuns({
+                for (final e in blockedHours.entries)
+                  if (e.value == BlockType.custom &&
+                      e.key.year == pendingAnchor.year &&
+                      e.key.month == pendingAnchor.month &&
+                      e.key.day == pendingAnchor.day)
+                    e.key,
+              });
     return SizedBox(
       height: _dragIndicatorHeight,
-      child: !_isDragging
+      child: !showBar
           ? const SizedBox.shrink()
           : Center(
               child: Row(
@@ -258,7 +281,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    S.of(context).dragRunsSelected(countSelectionRuns(_draggedCells)),
+                    S.of(context).dragRunsSelected(runCount),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -515,10 +538,70 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   // --- Single cell tap ---
 
   void _onCellTap(DateTime key, Map<DateTime, BlockType> blocked) {
-    if (blocked[key] == BlockType.work || blocked[key] == BlockType.calendar) return;
-    HapticFeedback.lightImpact();
-    ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+    // Work/calendar-blocked cells are always a no-op, regardless of any open
+    // pending anchor (RNE-01 point 6).
+    if (blocked[key] == BlockType.work || blocked[key] == BlockType.calendar) {
+      return;
+    }
+
+    if (blocked[key] == BlockType.custom) {
+      // Already-selected cell: always toggles off (existing behavior).
+      HapticFeedback.lightImpact();
+      ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+      if (_pendingAnchor == key) {
+        // Re-tapping the anchor itself cancels the pending block (RNE-01 point 5).
+        setState(() => _pendingAnchor = null);
+      }
+      // If the toggled-off cell is NOT the anchor, leave _pendingAnchor
+      // untouched — an open block may be left "unfinished" (RNE-01 point 4).
+      return;
+    }
+
+    // Cell is empty (not blocked, not custom).
+    final anchor = _pendingAnchor;
+    if (anchor == null) {
+      // First tap: opens a brand-new pending block (RNE-01 point 1). Also
+      // covers the case where a prior block just closed — the next tap on
+      // an empty hour always opens a brand-new, independent anchor
+      // (RNE-01 point 3).
+      HapticFeedback.lightImpact();
+      ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+      setState(() => _pendingAnchor = key);
+      return;
+    }
+
+    final sameDay = anchor.year == key.year &&
+        anchor.month == key.month &&
+        anchor.day == key.day;
+    if (sameDay) {
+      // Second tap, same day: fills the range and closes the block (RNE-01 point 2).
+      final fillKeys = computeRangeFillKeys(
+        anchorKey: anchor,
+        secondTapKey: key,
+        blockedHours: blocked,
+      );
+      HapticFeedback.mediumImpact();
+      ref.read(availabilityProvider.notifier).setCustomHours(fillKeys, block: true);
+      setState(() => _pendingAnchor = null);
+    } else {
+      // Second tap, different day: closes the old anchor's block as a
+      // standalone 1-hour block (it was already selected from its own first
+      // tap) and opens a brand-new block anchored on the new day (RNE-01 point 7).
+      HapticFeedback.lightImpact();
+      ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+      setState(() => _pendingAnchor = key);
+    }
   }
+
+  // --- Long-press cell-info bottom sheet (RNE-03) ---
+  // Stub for Task 2 (state machine + wiring); implemented fully in Task 3
+  // once the cellInfoStatus* l10n strings exist.
+  void _showCellInfo(
+    BuildContext context,
+    DateTime key,
+    Map<DateTime, BlockType> blockedHours,
+    int hour,
+  ) {}
 
   // --- Drag-to-select ---
 
