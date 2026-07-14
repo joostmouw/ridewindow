@@ -237,6 +237,7 @@
 
   "planRide": "Plan ride",
   "ridePlanned": "Ride planned!",
+  "plannedButtonLabel": "Planned",
   "addToGoogleCalendar": "Add to Google Calendar",
   "remindEveningBefore": "Remind me the evening before",
   "reminderPlanned": "Reminder planned for the evening before!",

@@ -646,6 +646,9 @@ class SEn extends S {
   String get ridePlanned => 'Ride planned!';
 
   @override
+  String get plannedButtonLabel => 'Planned';
+
+  @override
   String get addToGoogleCalendar => 'Add to Google Calendar';
 
   @override

@@ -646,6 +646,9 @@ class SNl extends S {
   String get ridePlanned => 'Rit ingepland!';
 
   @override
+  String get plannedButtonLabel => 'Ingepland';
+
+  @override
   String get addToGoogleCalendar => 'Toevoegen aan Google Agenda';
 
   @override

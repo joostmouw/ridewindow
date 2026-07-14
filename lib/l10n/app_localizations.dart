@@ -1279,6 +1279,12 @@ abstract class S {
   /// **'Rit ingepland!'**
   String get ridePlanned;
 
+  /// No description provided for @plannedButtonLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ingepland'**
+  String get plannedButtonLabel;
+
   /// No description provided for @addToGoogleCalendar.
   ///
   /// In nl, this message translates to:

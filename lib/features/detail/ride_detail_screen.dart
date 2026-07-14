@@ -740,29 +740,39 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   Widget _buildPlanRideBar(BuildContext context) {
     final rw = context.rw;
+    final plannedRides = ref.watch(plannedRidesProvider);
+    final slot = _effectiveSlot;
+    final isPlanned = plannedRides.any(
+      (r) => r.start == slot.start && r.end == slot.end,
+    );
     return Container(
       decoration: BoxDecoration(
         color: rw.surface,
         border: Border(top: BorderSide(color: rw.borderDim)),
       ),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      child: FilledButton.icon(
-        onPressed: () {
-          final slot = _effectiveSlot;
-          ref.read(plannedRidesProvider.notifier).add(
-                PlannedRide(
-                  start: slot.start,
-                  end: slot.end,
-                  plannedScore: slot.overallScore,
-                ),
-              );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context).ridePlanned)),
-          );
-        },
-        icon: const Icon(Icons.directions_bike),
-        label: Text(S.of(context).planRide),
-      ),
+      child: isPlanned
+          ? OutlinedButton.icon(
+              onPressed: null,
+              icon: const Icon(Icons.check_circle_outline),
+              label: Text(S.of(context).plannedButtonLabel),
+            )
+          : FilledButton.icon(
+              onPressed: () {
+                ref.read(plannedRidesProvider.notifier).add(
+                      PlannedRide(
+                        start: slot.start,
+                        end: slot.end,
+                        plannedScore: slot.overallScore,
+                      ),
+                    );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(S.of(context).ridePlanned)),
+                );
+              },
+              icon: const Icon(Icons.directions_bike),
+              label: Text(S.of(context).planRide),
+            ),
     );
   }
 
