@@ -668,4 +668,123 @@ void main() {
       expect(pendingBorderFinder(), findsNWidgets(1)); // anchor still open on hour 5
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // BACKLOG-rne: long-press cell info
+  // ---------------------------------------------------------------------------
+
+  group('BACKLOG-rne: long-press cell info', () {
+    const cellWidth = (800 - 36) / 7;
+    const cellHeight = (1344 - 140 - 32 - 28) / 24;
+
+    Offset cellCenter(int dayIndex, int hour) => Offset(
+          36 + (dayIndex + 0.5) * cellWidth,
+          56 + 32 + 28 + (hour + 0.5) * cellHeight,
+        );
+
+    DateTime weekStartFor(DateTime now) =>
+        now.subtract(Duration(days: now.weekday - DateTime.monday));
+
+    DateTime cellKey(DateTime weekStart, int dayIndex, int hour) =>
+        DateTime.utc(
+          weekStart.year,
+          weekStart.month,
+          weekStart.day + dayIndex,
+          hour,
+        );
+
+    Future<void> pumpScreen(
+      WidgetTester tester,
+      AvailabilityNotifier Function() notifierFactory,
+    ) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            availabilityProvider.overrideWith(notifierFactory),
+          ],
+          child: MaterialApp(
+            locale: const Locale('nl'),
+            localizationsDelegates: S.localizationsDelegates,
+            supportedLocales: S.supportedLocales,
+            theme: ThemeData(extensions: const [RideWindowTheme.light]),
+            home: const AvailabilityScreen(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    testWidgets('Test 1: long-press a free cell shows "Vrij" status',
+        (tester) async {
+      await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
+
+      await tester.longPressAt(cellCenter(0, 3));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Vrij'), findsOneWidget);
+    });
+
+    testWidgets(
+        'Test 2: long-press a work-blocked cell shows "Werk-geblokkeerd" status',
+        (tester) async {
+      final now = DateTime.now();
+      final weekStart = weekStartFor(now);
+      final workKey = cellKey(weekStart, 0, 3);
+
+      await pumpScreen(
+        tester,
+        () => FakeFilledAvailabilityNotifier({workKey: BlockType.work}),
+      );
+
+      await tester.longPressAt(cellCenter(0, 3));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Werk-geblokkeerd'), findsOneWidget);
+    });
+
+    testWidgets(
+        'Test 3: long-press a custom-selected cell shows "Beschikbaar gezet" status',
+        (tester) async {
+      final now = DateTime.now();
+      final weekStart = weekStartFor(now);
+      final customKey = cellKey(weekStart, 0, 3);
+
+      await pumpScreen(
+        tester,
+        () => FakeFilledAvailabilityNotifier({customKey: BlockType.custom}),
+      );
+
+      await tester.longPressAt(cellCenter(0, 3));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Beschikbaar gezet'), findsOneWidget);
+    });
+
+    testWidgets(
+        'Test 4: long-press a calendar-blocked cell shows "Agenda-geblokkeerd" status',
+        (tester) async {
+      final now = DateTime.now();
+      final weekStart = weekStartFor(now);
+      final calendarKey = cellKey(weekStart, 0, 3);
+
+      await pumpScreen(
+        tester,
+        () => FakeFilledAvailabilityNotifier({calendarKey: BlockType.calendar}),
+      );
+
+      await tester.longPressAt(cellCenter(0, 3));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Agenda-geblokkeerd'), findsOneWidget);
+    });
+  });
 }
