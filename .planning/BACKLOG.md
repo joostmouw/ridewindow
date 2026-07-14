@@ -50,6 +50,7 @@ Significante toevoegingen die een nieuwe milestone/release-cyclus vereisen.
 | 28 | **Themed branding + app icon polish** — custom launcher icon, splash screen animatie, store screenshots | MEDIUM | M | Backlog |
 | 29 | **Lokalisatie (EN/NL)** — i18n met `flutter_localizations` + ARB bestanden | MEDIUM | M | Backlog |
 | 30 | **Offline modus** — duidelijke UX wanneer geen internet; toon laatst gecachte forecast met stale-indicator | HOOG | M | Backlog |
+| 32 | **Agenda-event bijwerken bij nieuwe weersdata** — als de forecast voor een al-toegevoegd tijdvak verandert (temp/regen/wind), moet het bestaande Google Calendar-event automatisch worden bijgewerkt i.p.v. verouderd te blijven staan. Vereist het al-toegevoegde event terug te vinden (bijv. via een opgeslagen event-ID per slot) en te updaten i.p.v. opnieuw aan te maken | MEDIUM | M | Backlog |
 
 ---
 
@@ -81,4 +82,4 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 ---
 
 *Aangemaakt: 2026-06-06*
-*Laatst bijgewerkt: 2026-07-14 (item 31 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen moet gepubliceerd/geverifieerd worden vóór publieke launch)*
+*Laatst bijgewerkt: 2026-07-14 (items 31-32 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen publiceren/verifiëren, en agenda-event bijwerken bij nieuwe weersdata)*
