@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/features/profile/feedback_dialog.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -640,6 +641,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
           // Sectie: OVER (REL-03: privacybeleid + versie)
           _SectionHeader(s.sectionAbout),
+          ListTile(
+            leading: const Icon(Icons.feedback_outlined),
+            title: Text(s.sendFeedback),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => showFeedbackDialog(context),
+          ),
           ListTile(
             title: Text(s.privacyPolicy),
             trailing: const Icon(Icons.open_in_new),

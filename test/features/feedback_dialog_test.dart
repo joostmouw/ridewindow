@@ -21,7 +21,7 @@ Future<void> _pumpDialogTrigger(WidgetTester tester) async {
     MaterialApp(
       // RideWindowTheme extension required — the dialog's star row reads
       // context.rw.scorePerfect for the selected-star color.
-      theme: ThemeData(extensions: [RideWindowTheme.light]),
+      theme: ThemeData(extensions: const [RideWindowTheme.light]),
       locale: const Locale('en'),
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
