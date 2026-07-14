@@ -31,6 +31,7 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 19 | **Verlopen ride-slots verbergen op Home** — Home-scherm moet alleen ride-vensters tonen waarvan de starttijd nog moet komen; slots waarvan de starttijd al voorbij is moeten niet meer op Home verschijnen | MEDIUM | S | Backlog |
 | 31 | **Google OAuth consent screen publiceren (of volledig laten verifiëren)** — Calendar-koppeling (CAL-06/07) werkt nu alleen voor handmatig toegevoegde test-users (Testing-modus, max 100). Nodig vóór publieke launch: "Publish app" (snel, maar toont "niet geverifieerd door Google"-waarschuwingsscherm die gebruikers moeten wegklikken) of volledige Google-verificatie aanvragen (verwijdert de waarschuwing, vereist privacybeleid-URL + review, kan dagen/weken duren) | HOOG | S/M | Backlog |
 | 33 | **Feedback-formulier voor gebruikers** — laagdrempelige manier voor (beta-)testers om feedback/bugs door te geven vanuit de app zelf (bijv. knop in Profile die een Google Form opent, of mailto-link), i.p.v. los contact — belangrijk zodra de webapp live gaat en meer mensen 'm proberen | HOOG | S | Backlog |
+| 34 | **"Plan ride"-knop blijft zichtbaar tijdens beschikbaarheid selecteren** — op het Availability-scherm moet de "Plan ride"-knop permanent in beeld blijven (sticky) terwijl je tijdvakken aan het aanvinken/slepen bent, zodat je 'm direct kan indrukken zodra je klaar bent met selecteren i.p.v. te moeten scrollen of wachten tot hij verschijnt | MEDIUM | S | Backlog |
 
 ---
 
@@ -83,4 +84,4 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 ---
 
 *Aangemaakt: 2026-06-06*
-*Laatst bijgewerkt: 2026-07-14 (items 31-33 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen publiceren/verifiëren, agenda-event bijwerken bij nieuwe weersdata, en een feedback-formulier voor gebruikers)*
+*Laatst bijgewerkt: 2026-07-14 (items 31-34 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen publiceren/verifiëren, agenda-event bijwerken bij nieuwe weersdata, feedback-formulier, en sticky "Plan ride"-knop op Availability)*
