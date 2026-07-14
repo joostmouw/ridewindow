@@ -58,3 +58,7 @@ android/key.properties
 # Phase 12 — dart2js worker build artifacts (sourcemap/deps, not needed at runtime)
 web/drift_worker.dart.js.deps
 web/drift_worker.dart.js.map
+
+# Firebase CLI local cache/logs — never commit
+.firebase/
+firebase-debug.log
