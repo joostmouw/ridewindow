@@ -738,31 +738,41 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     );
   }
 
-  Widget _buildActions(BuildContext context) {
+  Widget _buildPlanRideBar(BuildContext context) {
+    final rw = context.rw;
+    return Container(
+      decoration: BoxDecoration(
+        color: rw.surface,
+        border: Border(top: BorderSide(color: rw.borderDim)),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: FilledButton.icon(
+        onPressed: () {
+          final slot = _effectiveSlot;
+          ref.read(plannedRidesProvider.notifier).add(
+                PlannedRide(
+                  start: slot.start,
+                  end: slot.end,
+                  plannedScore: slot.overallScore,
+                ),
+              );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.of(context).ridePlanned)),
+          );
+        },
+        icon: const Icon(Icons.directions_bike),
+        label: Text(S.of(context).planRide),
+      ),
+    );
+  }
+
+  Widget _buildSecondaryActions(BuildContext context) {
     final rw = context.rw;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          FilledButton.icon(
-            onPressed: () {
-              final slot = _effectiveSlot;
-              ref.read(plannedRidesProvider.notifier).add(
-                    PlannedRide(
-                      start: slot.start,
-                      end: slot.end,
-                      plannedScore: slot.overallScore,
-                    ),
-                  );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(S.of(context).ridePlanned)),
-              );
-            },
-            icon: const Icon(Icons.directions_bike),
-            label: Text(S.of(context).planRide),
-          ),
-          const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: _isLoading ? null : _addToCalendar,
             icon: _isLoading
@@ -814,6 +824,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     return Scaffold(
       backgroundColor: rw.surface,
       appBar: _buildAppBar(context),
+      bottomNavigationBar: SafeArea(top: false, child: _buildPlanRideBar(context)),
       body: SafeArea(
         child: Column(
           children: [
@@ -839,7 +850,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                           .map(_buildHourlyRowWidget)
                           .toList(),
                     ),
-                    _buildActions(context),
+                    _buildSecondaryActions(context),
                   ],
                 ),
               ),

@@ -291,6 +291,7 @@
   "agendaCancel": "Cancel",
   "agendaBusy": "Busy",
   "agendaHoursSelected": "{count} hours selected",
+  "dragRunsSelected": "{count} {count, plural, =1{separate time block} other{separate time blocks}} selected",
   "agendaPlanRide": "Plan ride ({count}h)",
   "agendaRidePlanned": "Ride planned ({count}h)!",
   "agendaNow": "Now",
