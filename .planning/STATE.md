@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
-status: executing
-last_updated: "2026-07-13T06:21:07.758Z"
+status: ready_to_plan
+last_updated: 2026-07-14T13:38:59.995Z
 last_activity: 2026-07-13 -- Phase 15 execution started
 progress:
   total_phases: 18
   completed_phases: 4
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 6
   percent: 22
+stopped_at: Phase 15 complete (2/2) — ready to discuss Phase 16
 ---
 
 # Project State
@@ -20,20 +21,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 15 — google-calendar-web-integration
+**Current focus:** Phase 16 — pwa installability & ios polish
 
 ## Current Position
 
-Phase: 15 (google-calendar-web-integration) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 15
-Last activity: 2026-07-13 -- Phase 15 execution started
+Phase: 16
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-14
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12 (Phases 1, 1.5, 2)
+- Total plans completed: 14 (Phases 1, 1.5, 2)
 - Average duration: ~15min voor mechanische taken (geautomatiseerd executor-modus)
 - Total execution time: ~3h (Phase 1) + ~45min (Phase 1.5) + ~40min (Phase 2)
 
@@ -45,6 +46,7 @@ Last activity: 2026-07-13 -- Phase 15 execution started
 | 1.5 | 4 | ~45min | ~11min |
 | 2 | 3 | ~40min | ~13min |
 | 9 | 2 | - | - |
+| 15 | 2 | - | - |
 
 **Recent Trend:**
 

@@ -36,8 +36,8 @@
 
 ### Calendar (CAL) — Web OAuth integration
 
-- [ ] **CAL-06**: `CalendarService` initializes with a platform-conditional web OAuth `clientId` (from Google Cloud Console) on web; native config unchanged on Android
-- [ ] **CAL-07**: "Add to calendar" is manually verified end-to-end against the deployed production Firebase Hosting domain (not just localhost), including the OAuth popup/consent flow in a real browser
+- [x] **CAL-06**: `CalendarService` initializes with a platform-conditional web OAuth `clientId` (from Google Cloud Console) on web; native config unchanged on Android
+- [x] **CAL-07**: "Add to calendar" is manually verified end-to-end against the deployed production Firebase Hosting domain (not just localhost), including the OAuth popup/consent flow in a real browser
 
 ### PWA (PWA) — iOS installability & polish
 
@@ -102,8 +102,8 @@ Generic acceptance criteria applied to every phase:
 | REFRESH-02 | Phase 14 | Pending |
 | REFRESH-03 | Phase 14 | Pending |
 | REFRESH-04 | Phase 14 | Pending |
-| CAL-06 | Phase 15 | Pending |
-| CAL-07 | Phase 15 | Pending |
+| CAL-06 | Phase 15 | Complete |
+| CAL-07 | Phase 15 | Complete |
 | PWA-01 | Phase 16 | Pending |
 | PWA-02 | Phase 16 | Pending |
 | PWA-03 | Phase 16 | Pending |
