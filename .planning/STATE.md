@@ -190,6 +190,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260714-m63 | add-sun-partly-cloudy-icon-to-ride-detai | Sun/partly-cloudy/rain-cloud icon cue on Ride Detail Hourly precip label | 2026-07-14 | c5967b9 |
 | 260714-n0c | add-feedback-feature-backlog-33-send-fee | Backlog #33: "Send feedback" dialog (1-5 star rating + comment) on Profile screen, submitted via mailto: URI using existing url_launcher dependency | 2026-07-14 | 5f00127 |
 | 260714-nfk | add-backlog-36-google-calendar-connectio | Backlog #36: Google Calendar connection visibility — CalendarService.isCalendarConnected()/disconnectCalendar(), Profile screen status row (Connected/Not connected + Disconnect), EN/NL l10n, TDD widget test | 2026-07-14 | 98f1f3b |
+| 260714-o54 | bundle-backlog-34-sticky-plan-ride-butto | Backlog #34: sticky "Plan ride" button via Scaffold.bottomNavigationBar on Ride Detail. Backlog #35: live "N losse tijdvakken geselecteerd" drag-run indicator on Availability, backed by pure countSelectionRuns() helper, 7 unit tests, EN/NL l10n | 2026-07-14 | 1703d60 |
 
 ## Session Continuity
 
