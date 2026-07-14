@@ -188,6 +188,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260617-qjd | android-home-screen-widget-toont-volgend | Android home screen widget — toont volgende ride slot op een oogopslag | 2026-06-17 | 2691d59 |
 | 260618-csx | week-agenda-view-met-ride-overlap-overla | Week-agenda view met ride-overlap overlay en 10 dagen vooruit scrollen | 2026-06-18 | af16b02 |
 | 260714-m63 | add-sun-partly-cloudy-icon-to-ride-detai | Sun/partly-cloudy/rain-cloud icon cue on Ride Detail Hourly precip label | 2026-07-14 | c5967b9 |
+| 260714-n0c | add-feedback-feature-backlog-33-send-fee | Backlog #33: "Send feedback" dialog (1-5 star rating + comment) on Profile screen, submitted via mailto: URI using existing url_launcher dependency | 2026-07-14 | 5f00127 |
 
 ## Session Continuity
 
