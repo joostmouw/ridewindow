@@ -385,7 +385,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 -- needs the Web OAuth client from 15-01 Task 1)*
 
-- [ ] 15-02-PLAN.md — Preliminary Firebase Hosting deploy + production-domain OAuth origin + real iPhone Safari verification
+- [x] 15-02-PLAN.md — Preliminary Firebase Hosting deploy + production-domain OAuth origin + real iPhone Safari verification
 
 ### Phase 16: PWA Installability & iOS Polish
 
@@ -440,7 +440,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 12. Drift Web Persistence | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 13. Geolocation & Manual Fallback | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 14. Foreground Refresh Strategy | v2.0 | 1/1 | Complete   | 2026-07-12 |
-| 15. Google Calendar Web Integration | v2.0 | 1/2 | In Progress|  |
+| 15. Google Calendar Web Integration | v2.0 | 2/2 | Complete   | 2026-07-14 |
 | 16. PWA Installability & iOS Polish | v2.0 | 0/TBD | Not started | - |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/TBD | Not started | - |
 
