@@ -449,12 +449,21 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final apparent = row.apparentTemperatureC != null
         ? s.hourlyFeelsLike(row.apparentTemperatureC!.round().toString())
         : '';
+    final String precipIcon = row.precipitationMm == 0.0 &&
+            (row.precipitationProbability == null || row.precipitationProbability == 0)
+        ? '\u2600\ufe0f'
+        : row.precipitationMm == 0.0 &&
+                row.precipitationProbability != null &&
+                row.precipitationProbability! >= 1 &&
+                row.precipitationProbability! <= 30
+            ? '\u26c5'
+            : '\u{1F327}';
     final precip = row.precipitationMm != null
         ? (row.precipitationMm! == 0.0 && (row.precipitationProbability == null || row.precipitationProbability == 0)
-            ? '\u{1F327} ${s.hourlyDry}'
+            ? '$precipIcon ${s.hourlyDry}'
             : row.precipitationProbability != null && row.precipitationProbability! > 0
-                ? '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
-                : '\u{1F327} ${row.precipitationMm!.toStringAsFixed(1)}mm')
+                ? '$precipIcon ${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
+                : '$precipIcon ${row.precipitationMm!.toStringAsFixed(1)}mm')
         : '\u{1F327} \u2014';
     final wind = row.windspeedKmh != null
         ? row.windspeedKmh! < 5
