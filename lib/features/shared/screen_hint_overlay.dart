@@ -133,31 +133,6 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
             // Tooltip card positioned near the target
             if (targetRect != null)
               _buildTooltip(context, hint, targetRect, isLast, s),
-            // Step indicator at bottom
-            Positioned(
-              bottom: 48,
-              left: 24,
-              right: 24,
-              child: SafeArea(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var i = 0; i < widget.hints.length; i++)
-                      Container(
-                        width: i == _currentStep ? 24 : 8,
-                        height: 8,
-                        margin: const EdgeInsets.only(right: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: i == _currentStep
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.white.withAlpha(80),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -271,24 +246,22 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
                   ),
                 ),
                 const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      isLast ? s.hintDismiss : s.hintNext,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${_currentStep + 1}/${widget.hints.length}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 12,
                       ),
                     ),
-                  ),
+                    TextButton(
+                      onPressed: _next,
+                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      child: Text(isLast ? s.hintDismiss : s.hintNext),
+                    ),
+                  ],
                 ),
               ],
             ),
