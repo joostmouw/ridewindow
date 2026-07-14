@@ -3,7 +3,11 @@
 // GoogleSignIn.instance wordt uitsluitend lazy gebruikt (CAL-02): nooit
 // aangemaakt bij app-start, alleen on-demand bij tik op de knop -- behalve
 // op web, waar main.dart GoogleSignIn eagerly warmt via
-// CalendarService.warmUpForWeb() (zie CAL-06).
+// CalendarService.warmUpForWeb() (zie CAL-06). Een tweede, bewuste
+// uitzondering (backlog #36): navigeren naar het Profielscherm triggert een
+// lazy, niet-promptende autorisatiecontrole via isCalendarConnected() -- dit
+// staat los van, en verandert niets aan, de bestaande lazy-init-timing van
+// addRideSlotToCalendar()/getEvents() of het web warmUpForWeb()-pad.
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -184,6 +188,27 @@ class CalendarService {
     } finally {
       client.close();
     }
+  }
+
+  /// Controleert of de gebruiker Google Calendar-toegang heeft geautoriseerd,
+  /// ZONDER ooit een OAuth-prompt/popup te tonen (backlog #36). Gebruikt
+  /// [GoogleSignInAuthorizationClient.authorizationForScopes], dat `null`
+  /// teruggeeft als autorisatie gebruikersinteractie zou vereisen -- in
+  /// tegenstelling tot [authorizeScopes] dat wél kan prompten. Dit is de
+  /// bewuste CAL-02-uitzondering die wordt getriggerd door navigatie naar het
+  /// Profielscherm.
+  Future<bool> isCalendarConnected() async {
+    await _ensureInitialized();
+    final authorization = await GoogleSignIn.instance.authorizationClient
+        .authorizationForScopes([CalendarApi.calendarEventsScope]);
+    return authorization != null;
+  }
+
+  /// Trekt de Google Calendar-autorisatie van de gebruiker in (backlog #36).
+  /// Synthetiseert ook een uitloggen ([GoogleSignIn.disconnect]).
+  Future<void> disconnectCalendar() async {
+    await _ensureInitialized();
+    await GoogleSignIn.instance.disconnect();
   }
 
   // ---------------------------------------------------------------------------
