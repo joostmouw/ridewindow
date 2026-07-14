@@ -395,6 +395,9 @@
   "ridesPerHour": "Per uur",
   "ridesAvgScoreBreakdown": "Gemiddelde score-opbouw",
   "ridesDeleteRide": "Rit verwijderen",
+  "unplanConfirmTitle": "Rit uitplannen?",
+  "unplanConfirmMessage": "Dit verwijdert de rit uit je geplande ritten. Je kunt hem altijd opnieuw plannen.",
+  "unplanConfirmAction": "Uitplannen",
   "ridesWindFrom": "Wind uit {direction}. {advice}.",
   "@ridesWindFrom": {
     "placeholders": {

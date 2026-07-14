@@ -308,6 +308,9 @@
   "ridesPerHour": "Per hour",
   "ridesAvgScoreBreakdown": "Average score breakdown",
   "ridesDeleteRide": "Delete ride",
+  "unplanConfirmTitle": "Unplan this ride?",
+  "unplanConfirmMessage": "This will remove it from your planned rides. You can plan it again anytime.",
+  "unplanConfirmAction": "Unplan",
   "ridesWindFrom": "Wind from {direction}. {advice}.",
 
   "tailwindNorth": "Ride north for tailwind on the way back",

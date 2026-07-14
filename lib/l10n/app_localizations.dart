@@ -1675,6 +1675,24 @@ abstract class S {
   /// **'Rit verwijderen'**
   String get ridesDeleteRide;
 
+  /// No description provided for @unplanConfirmTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Rit uitplannen?'**
+  String get unplanConfirmTitle;
+
+  /// No description provided for @unplanConfirmMessage.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit verwijdert de rit uit je geplande ritten. Je kunt hem altijd opnieuw plannen.'**
+  String get unplanConfirmMessage;
+
+  /// No description provided for @unplanConfirmAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitplannen'**
+  String get unplanConfirmAction;
+
   /// No description provided for @ridesWindFrom.
   ///
   /// In nl, this message translates to:

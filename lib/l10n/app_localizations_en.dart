@@ -876,6 +876,16 @@ class SEn extends S {
   String get ridesDeleteRide => 'Delete ride';
 
   @override
+  String get unplanConfirmTitle => 'Unplan this ride?';
+
+  @override
+  String get unplanConfirmMessage =>
+      'This will remove it from your planned rides. You can plan it again anytime.';
+
+  @override
+  String get unplanConfirmAction => 'Unplan';
+
+  @override
   String ridesWindFrom(String direction, String advice) {
     return 'Wind from $direction. $advice.';
   }

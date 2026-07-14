@@ -877,6 +877,16 @@ class SNl extends S {
   String get ridesDeleteRide => 'Rit verwijderen';
 
   @override
+  String get unplanConfirmTitle => 'Rit uitplannen?';
+
+  @override
+  String get unplanConfirmMessage =>
+      'Dit verwijdert de rit uit je geplande ritten. Je kunt hem altijd opnieuw plannen.';
+
+  @override
+  String get unplanConfirmAction => 'Uitplannen';
+
+  @override
   String ridesWindFrom(String direction, String advice) {
     return 'Wind uit $direction. $advice.';
   }
