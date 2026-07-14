@@ -814,6 +814,17 @@ class SNl extends S {
   }
 
   @override
+  String dragRunsSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'losse tijdvakken',
+      one: 'tijdvak',
+    );
+    return '$count $_temp0 geselecteerd';
+  }
+
+  @override
   String agendaPlanRide(int count) {
     return 'Rit inplannen (${count}u)';
   }

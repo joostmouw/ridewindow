@@ -813,6 +813,17 @@ class SEn extends S {
   }
 
   @override
+  String dragRunsSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'separate time blocks',
+      one: 'separate time block',
+    );
+    return '$count $_temp0 selected';
+  }
+
+  @override
   String agendaPlanRide(int count) {
     return 'Plan ride (${count}h)';
   }

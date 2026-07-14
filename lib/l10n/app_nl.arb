@@ -358,6 +358,12 @@
       "count": {"type": "int"}
     }
   },
+  "dragRunsSelected": "{count} {count, plural, =1{tijdvak} other{losse tijdvakken}} geselecteerd",
+  "@dragRunsSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "agendaPlanRide": "Rit inplannen ({count}u)",
   "@agendaPlanRide": {
     "placeholders": {

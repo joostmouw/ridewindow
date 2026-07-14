@@ -21,7 +21,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/features/availability/availability_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers
@@ -336,5 +338,76 @@ void main() {
       findsWidgets,
       reason: 'Werk-cel (0xFFB0BEC5) moet na tap ongewijzigd blijven',
     );
+  });
+
+  // ---------------------------------------------------------------------------
+  // BACKLOG-35: drag run indicator
+  // ---------------------------------------------------------------------------
+
+  group('BACKLOG-35: drag run indicator', () {
+    testWidgets(
+        'shows "3 losse tijdvakken geselecteerd" during a 3-day drag and disappears after drag ends',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+          ],
+          child: MaterialApp(
+            locale: const Locale('nl'),
+            localizationsDelegates: S.localizationsDelegates,
+            supportedLocales: S.supportedLocales,
+            theme: ThemeData(extensions: const [RideWindowTheme.light]),
+            home: const AvailabilityScreen(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Fixed viewport (800x1400, devicePixelRatio 1.0, AppBar toolbarHeight 56.0,
+      // no status-bar padding in test env) resolves to:
+      //   cellWidth = (800 - 36) / 7 ≈ 109.14
+      //   cellHeight = (1344 - 140 - 32 - 28) / 24 ≈ 47.67
+      const cellWidth = (800 - 36) / 7;
+      const cellHeight = (1344 - 140 - 32 - 28) / 24;
+      const hour = 1; // stays comfortably inside the viewport, avoids hour-0 boundary rounding
+      Offset cellCenter(int dayIndex) => Offset(
+            36 + (dayIndex + 0.5) * cellWidth,
+            56 + 32 + 28 + (hour + 0.5) * cellHeight,
+          );
+
+      final day0Hour1Center = cellCenter(0);
+      final day1Hour1Center = cellCenter(1);
+      final day2Hour1Center = cellCenter(2);
+
+      // One continuous horizontal drag across 3 day-columns at the same hour —
+      // mirrors the backlog's Mon/Tue/Wed 17:00 example (3 separate 1-hour runs).
+      final gesture = await tester.startGesture(day0Hour1Center);
+      // PanGestureRecognizer (kPanSlop = 36 logical px) does not fire onPanStart on
+      // the raw pointer-down — it fires once the pointer moves past the pan slop.
+      // Nudge 40px horizontally (comfortably within day0's ~109px-wide column, well
+      // under kPanSlop's threshold for the outer GestureDetector to win the arena
+      // against the inner SingleChildScrollView) so onPanStart registers day0's
+      // own cell before the drag moves on to day1/day2.
+      await gesture.moveBy(const Offset(40, 0));
+      await tester.pump();
+      await gesture.moveTo(day1Hour1Center);
+      await tester.pump();
+      await gesture.moveTo(day2Hour1Center);
+      await tester.pump();
+
+      expect(find.text('3 losse tijdvakken geselecteerd'), findsOneWidget);
+
+      await gesture.up();
+      await tester.pump();
+
+      expect(find.textContaining('geselecteerd'), findsNothing);
+      expect(find.byIcon(Icons.touch_app), findsNothing);
+    });
   });
 }

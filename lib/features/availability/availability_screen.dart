@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/domain/services/drag_run_counter.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
@@ -47,6 +48,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   double _cellHeight = 0;
   static const double _headerWidth = 36;
   static const double _headerHeight = 28;
+  static const double _dragIndicatorHeight = 32;
 
   @override
   Widget build(BuildContext context) {
@@ -106,13 +108,15 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           // Bereken celgrootte op basis van beschikbare breedte
           _cellWidth = (constraints.maxWidth - _headerWidth) / 7;
           // Hoogte: beschikbare hoogte minus legenda/profiel ruimte, gedeeld door 24 uur + header
-          final availableHeight = constraints.maxHeight - 140; // ruimte voor legenda + profiel
+          final availableHeight = constraints.maxHeight - 140 - _dragIndicatorHeight; // ruimte voor legenda + profiel + drag-indicator
           _cellHeight = (availableHeight - _headerHeight) / 24;
           // Minimum celgrootte
           if (_cellHeight < 16) _cellHeight = 16;
 
           return Column(
             children: [
+              // Live drag-run count indicator (BACKLOG-35, scoped down)
+              _buildDragIndicatorBar(context),
               // Grid
               Expanded(
                 child: GestureDetector(
@@ -235,6 +239,35 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDragIndicatorBar(BuildContext context) {
+    return SizedBox(
+      height: _dragIndicatorHeight,
+      child: !_isDragging
+          ? const SizedBox.shrink()
+          : Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.touch_app,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    S.of(context).dragRunsSelected(countSelectionRuns(_draggedCells)),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 

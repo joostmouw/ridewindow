@@ -1579,6 +1579,12 @@ abstract class S {
   /// **'{count} uur geselecteerd'**
   String agendaHoursSelected(int count);
 
+  /// No description provided for @dragRunsSelected.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count} {count, plural, =1{tijdvak} other{losse tijdvakken}} geselecteerd'**
+  String dragRunsSelected(int count);
+
   /// No description provided for @agendaPlanRide.
   ///
   /// In nl, this message translates to:
