@@ -502,5 +502,10 @@
   "importFromCalendar": "Importeer uit Google Agenda",
   "legendCalendar": "Agenda",
   "calendarImportSuccess": "Agenda-afspraken geimporteerd!",
-  "calendarImportError": "Kon agenda-afspraken niet importeren"
+  "calendarImportError": "Kon agenda-afspraken niet importeren",
+
+  "cellInfoStatusWork": "Werk-geblokkeerd",
+  "cellInfoStatusCalendar": "Agenda-geblokkeerd",
+  "cellInfoStatusCustom": "Beschikbaar gezet",
+  "cellInfoStatusFree": "Vrij"
 }

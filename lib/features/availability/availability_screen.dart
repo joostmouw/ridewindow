@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/services/drag_run_counter.dart';
@@ -594,14 +595,46 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   }
 
   // --- Long-press cell-info bottom sheet (RNE-03) ---
-  // Stub for Task 2 (state machine + wiring); implemented fully in Task 3
-  // once the cellInfoStatus* l10n strings exist.
+
   void _showCellInfo(
     BuildContext context,
     DateTime key,
     Map<DateTime, BlockType> blockedHours,
     int hour,
-  ) {}
+  ) {
+    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
+    final dayNameRaw = DateFormat('EEEE', locale).format(key);
+    final dayName = dayNameRaw.isEmpty
+        ? dayNameRaw
+        : dayNameRaw[0].toUpperCase() + dayNameRaw.substring(1);
+
+    final status = switch (blockedHours[key]) {
+      BlockType.work => S.of(context).cellInfoStatusWork,
+      BlockType.calendar => S.of(context).cellInfoStatusCalendar,
+      BlockType.custom => S.of(context).cellInfoStatusCustom,
+      null => S.of(context).cellInfoStatusFree,
+    };
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$dayName ${hour.toString().padLeft(2, '0')}:00–${(hour + 1).toString().padLeft(2, '0')}:00',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(status, style: Theme.of(context).textTheme.bodyLarge),
+          ],
+        ),
+      ),
+    );
+  }
 
   // --- Drag-to-select ---
 

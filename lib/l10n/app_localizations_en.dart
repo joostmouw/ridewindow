@@ -1098,4 +1098,16 @@ class SEn extends S {
 
   @override
   String get calendarImportError => 'Could not import calendar events';
+
+  @override
+  String get cellInfoStatusWork => 'Work-blocked';
+
+  @override
+  String get cellInfoStatusCalendar => 'Calendar-blocked';
+
+  @override
+  String get cellInfoStatusCustom => 'Marked available';
+
+  @override
+  String get cellInfoStatusFree => 'Free';
 }

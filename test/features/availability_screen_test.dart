@@ -727,7 +727,15 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      expect(find.text('Vrij'), findsOneWidget);
+      // "Vrij" also appears in the always-visible legend (legendFree), so
+      // disambiguate by matching the bottom sheet's bodyLarge (16.0) status
+      // text specifically, not the legend's bodySmall (12.0) label.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Text && w.data == 'Vrij' && w.style?.fontSize == 16.0,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets(

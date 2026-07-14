@@ -1101,4 +1101,16 @@ class SNl extends S {
 
   @override
   String get calendarImportError => 'Kon agenda-afspraken niet importeren';
+
+  @override
+  String get cellInfoStatusWork => 'Werk-geblokkeerd';
+
+  @override
+  String get cellInfoStatusCalendar => 'Agenda-geblokkeerd';
+
+  @override
+  String get cellInfoStatusCustom => 'Beschikbaar gezet';
+
+  @override
+  String get cellInfoStatusFree => 'Vrij';
 }

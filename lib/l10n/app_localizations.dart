@@ -2082,6 +2082,30 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Kon agenda-afspraken niet importeren'**
   String get calendarImportError;
+
+  /// No description provided for @cellInfoStatusWork.
+  ///
+  /// In nl, this message translates to:
+  /// **'Werk-geblokkeerd'**
+  String get cellInfoStatusWork;
+
+  /// No description provided for @cellInfoStatusCalendar.
+  ///
+  /// In nl, this message translates to:
+  /// **'Agenda-geblokkeerd'**
+  String get cellInfoStatusCalendar;
+
+  /// No description provided for @cellInfoStatusCustom.
+  ///
+  /// In nl, this message translates to:
+  /// **'Beschikbaar gezet'**
+  String get cellInfoStatusCustom;
+
+  /// No description provided for @cellInfoStatusFree.
+  ///
+  /// In nl, this message translates to:
+  /// **'Vrij'**
+  String get cellInfoStatusFree;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

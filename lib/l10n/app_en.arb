@@ -384,5 +384,10 @@
   "importFromCalendar": "Import from Google Calendar",
   "legendCalendar": "Calendar",
   "calendarImportSuccess": "Calendar events imported!",
-  "calendarImportError": "Could not import calendar events"
+  "calendarImportError": "Could not import calendar events",
+
+  "cellInfoStatusWork": "Work-blocked",
+  "cellInfoStatusCalendar": "Calendar-blocked",
+  "cellInfoStatusCustom": "Marked available",
+  "cellInfoStatusFree": "Free"
 }
