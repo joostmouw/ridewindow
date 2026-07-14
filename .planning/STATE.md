@@ -189,6 +189,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260618-csx | week-agenda-view-met-ride-overlap-overla | Week-agenda view met ride-overlap overlay en 10 dagen vooruit scrollen | 2026-06-18 | af16b02 |
 | 260714-m63 | add-sun-partly-cloudy-icon-to-ride-detai | Sun/partly-cloudy/rain-cloud icon cue on Ride Detail Hourly precip label | 2026-07-14 | c5967b9 |
 | 260714-n0c | add-feedback-feature-backlog-33-send-fee | Backlog #33: "Send feedback" dialog (1-5 star rating + comment) on Profile screen, submitted via mailto: URI using existing url_launcher dependency | 2026-07-14 | 5f00127 |
+| 260714-nfk | add-backlog-36-google-calendar-connectio | Backlog #36: Google Calendar connection visibility — CalendarService.isCalendarConnected()/disconnectCalendar(), Profile screen status row (Connected/Not connected + Disconnect), EN/NL l10n, TDD widget test | 2026-07-14 | 98f1f3b |
 
 ## Session Continuity
 
