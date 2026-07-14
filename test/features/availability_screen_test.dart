@@ -410,4 +410,257 @@ void main() {
       expect(find.byIcon(Icons.touch_app), findsNothing);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // BACKLOG-rne: two-tap range-select
+  // ---------------------------------------------------------------------------
+
+  group('BACKLOG-rne: two-tap range-select', () {
+    const cellWidth = (800 - 36) / 7;
+    const cellHeight = (1344 - 140 - 32 - 28) / 24;
+
+    Offset cellCenter(int dayIndex, int hour) => Offset(
+          36 + (dayIndex + 0.5) * cellWidth,
+          56 + 32 + 28 + (hour + 0.5) * cellHeight,
+        );
+
+    DateTime weekStartFor(DateTime now) =>
+        now.subtract(Duration(days: now.weekday - DateTime.monday));
+
+    DateTime cellKey(DateTime weekStart, int dayIndex, int hour) =>
+        DateTime.utc(
+          weekStart.year,
+          weekStart.month,
+          weekStart.day + dayIndex,
+          hour,
+        );
+
+    Finder customColorFinder() => find.byWidgetPredicate(
+          (w) =>
+              w is Container &&
+              (w.decoration as BoxDecoration?)?.color ==
+                  const Color(0xFFFF9800),
+          skipOffstage: false,
+        );
+
+    Finder workColorFinder() => find.byWidgetPredicate(
+          (w) =>
+              w is Container &&
+              (w.decoration as BoxDecoration?)?.color ==
+                  const Color(0xFFB0BEC5),
+          skipOffstage: false,
+        );
+
+    Finder pendingBorderFinder() => find.byWidgetPredicate(
+          (w) =>
+              w is Container &&
+              (w.decoration as BoxDecoration?)?.border is Border &&
+              (((w.decoration as BoxDecoration).border! as Border)
+                      .top
+                      .width ==
+                  2.0),
+          skipOffstage: false,
+        );
+
+    Future<void> pumpScreen(
+      WidgetTester tester,
+      AvailabilityNotifier Function() notifierFactory,
+    ) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            availabilityProvider.overrideWith(notifierFactory),
+          ],
+          child: MaterialApp(
+            locale: const Locale('nl'),
+            localizationsDelegates: S.localizationsDelegates,
+            supportedLocales: S.supportedLocales,
+            theme: ThemeData(extensions: const [RideWindowTheme.light]),
+            home: const AvailabilityScreen(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    testWidgets(
+        'Test 1: same-day two-tap opens then fills-and-closes a block',
+        (tester) async {
+      await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
+
+      await tester.tapAt(cellCenter(0, 1));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNWidgets(1));
+      expect(pendingBorderFinder(), findsNWidgets(1));
+
+      await tester.tapAt(cellCenter(0, 3));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNWidgets(3));
+      expect(pendingBorderFinder(), findsNothing);
+    });
+
+    testWidgets('Test 2: re-tapping the anchor cancels the pending block',
+        (tester) async {
+      await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
+
+      await tester.tapAt(cellCenter(1, 5));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNWidgets(1));
+      expect(pendingBorderFinder(), findsNWidgets(1));
+
+      await tester.tapAt(cellCenter(1, 5));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNothing);
+      expect(pendingBorderFinder(), findsNothing);
+    });
+
+    testWidgets(
+        'Test 3: counter bar reacts to an open pending anchor, not only drag state',
+        (tester) async {
+      await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
+
+      await tester.tapAt(cellCenter(0, 9));
+      await tester.pump();
+
+      expect(find.text('1 tijdvak geselecteerd'), findsOneWidget);
+
+      await tester.tapAt(cellCenter(0, 11));
+      await tester.pump();
+
+      expect(find.textContaining('geselecteerd'), findsNothing);
+    });
+
+    testWidgets(
+        'Test 4: closing a block always opens a brand-new independent anchor on the next empty tap',
+        (tester) async {
+      await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
+
+      await tester.tapAt(cellCenter(0, 9));
+      await tester.pump();
+      await tester.tapAt(cellCenter(0, 11));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNWidgets(3));
+      expect(pendingBorderFinder(), findsNothing);
+
+      await tester.tapAt(cellCenter(0, 15));
+      await tester.pump();
+
+      expect(pendingBorderFinder(), findsNWidgets(1));
+      expect(customColorFinder(), findsNWidgets(4)); // 9,10,11 + 15
+
+      await tester.tapAt(cellCenter(0, 17));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNWidgets(6)); // 9,10,11,15,16,17
+      expect(pendingBorderFinder(), findsNothing);
+    });
+
+    testWidgets(
+        'Test 5: work/calendar no-op guard applies even while a pending anchor is open',
+        (tester) async {
+      final now = DateTime.now();
+      final weekStart = weekStartFor(now);
+      final workKey = cellKey(weekStart, 0, 5);
+
+      await pumpScreen(
+        tester,
+        () => FakeFilledAvailabilityNotifier({workKey: BlockType.work}),
+      );
+
+      await tester.tapAt(cellCenter(0, 2));
+      await tester.pump();
+
+      expect(pendingBorderFinder(), findsNWidgets(1));
+      expect(customColorFinder(), findsNWidgets(1));
+      expect(workColorFinder(), findsWidgets);
+
+      await tester.tapAt(cellCenter(0, 5));
+      await tester.pump();
+
+      // No-op: work cell unchanged, no fill, anchor still open on hour 2 only.
+      expect(workColorFinder(), findsWidgets);
+      expect(customColorFinder(), findsNWidgets(1));
+      expect(pendingBorderFinder(), findsNWidgets(1));
+    });
+
+    testWidgets(
+        'Test 6: a tap on a different day closes the old anchor standalone and opens a new one',
+        (tester) async {
+      await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
+
+      await tester.tapAt(cellCenter(0, 2));
+      await tester.pump();
+
+      expect(pendingBorderFinder(), findsNWidgets(1));
+      expect(customColorFinder(), findsNWidgets(1));
+
+      await tester.tapAt(cellCenter(1, 4));
+      await tester.pump();
+
+      // Day 0 hour 2 remains a standalone closed 1-hour block (no border);
+      // day 1 hour 4 becomes the new open anchor.
+      expect(customColorFinder(), findsNWidgets(2));
+      expect(pendingBorderFinder(), findsNWidgets(1));
+    });
+
+    testWidgets(
+        'Test 7: pending-anchor counter is scoped to the anchor\'s own day, not the whole week',
+        (tester) async {
+      final now = DateTime.now();
+      final weekStart = weekStartFor(now);
+      final preseeded = {
+        cellKey(weekStart, 1, 8): BlockType.custom,
+        cellKey(weekStart, 1, 9): BlockType.custom,
+        cellKey(weekStart, 1, 10): BlockType.custom,
+      };
+
+      await pumpScreen(
+        tester,
+        () => FakeFilledAvailabilityNotifier(preseeded),
+      );
+
+      await tester.tapAt(cellCenter(0, 1));
+      await tester.pump();
+
+      expect(find.text('1 tijdvak geselecteerd'), findsOneWidget);
+      expect(find.textContaining('2 losse'), findsNothing);
+    });
+
+    testWidgets(
+        'Test 8: toggling off a non-anchor already-custom cell leaves the open anchor untouched',
+        (tester) async {
+      final now = DateTime.now();
+      final weekStart = weekStartFor(now);
+      final preseeded = {
+        cellKey(weekStart, 0, 20): BlockType.custom,
+      };
+
+      await pumpScreen(
+        tester,
+        () => FakeFilledAvailabilityNotifier(preseeded),
+      );
+
+      await tester.tapAt(cellCenter(0, 5));
+      await tester.pump();
+
+      expect(pendingBorderFinder(), findsNWidgets(1));
+      expect(customColorFinder(), findsNWidgets(2)); // hour 20 (preseeded) + hour 5 (new anchor)
+
+      await tester.tapAt(cellCenter(0, 20));
+      await tester.pump();
+
+      expect(customColorFinder(), findsNWidgets(1)); // only hour 5 remains
+      expect(pendingBorderFinder(), findsNWidgets(1)); // anchor still open on hour 5
+    });
+  });
 }
