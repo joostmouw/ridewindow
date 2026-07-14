@@ -34,6 +34,8 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 34 | **"Plan ride"-knop blijft zichtbaar tijdens beschikbaarheid selecteren** — op het Availability-scherm moet de "Plan ride"-knop permanent in beeld blijven (sticky) terwijl je tijdvakken aan het aanvinken/slepen bent, zodat je 'm direct kan indrukken zodra je klaar bent met selecteren i.p.v. te moeten scrollen of wachten tot hij verschijnt | MEDIUM | S | Backlog |
 | 35 | **Duidelijke feedback over aantal ritten bij niet-aaneengesloten selectie** — als je meerdere, niet-aaneengesloten tijdsloten selecteert in Availability, moet de app expliciet tonen dat dit meerdere (bijv. 2) losse ritten oplevert; bij één aaneengesloten selectie moet duidelijk zijn dat het 1 rit wordt — nu onduidelijk of/hoe dit onderscheid al zichtbaar is voor de gebruiker | MEDIUM | S | Backlog |
 | 36 | **Google Calendar-koppeling zichtbaar/beheerbaar in Profile** — tester-feedback: de Calendar-koppeling (verbonden account, status) zou een plek moeten hebben in het Profile-scherm, in plaats van (of naast) alleen de losse "Add to calendar"-knop per ride — zodat je in één oogopslag ziet of je gekoppeld bent en het evt. kan loskoppelen | MEDIUM | S | Backlog |
+| 37 | **Regen-icoontje verschijnt bij droog weer (mogelijke bug)** — tester meldt dat een regen-icoontje getoond wordt terwijl de neerslagkans/hoeveelheid "dry" is — onduidelijk of dit een icon-selectielogica bug is (bijv. verkeerde drempelwaarde) of een verkeerd gekoppelde asset; nader te onderzoeken welk scherm (Home-kaart, Ride Detail) en bij welke exacte weerscondities dit optreedt | HOOG | S | Backlog |
+| 38 | **Tip: Google-account koppelen in iOS Agenda-instellingen** — tester-observatie (Phase 15 iPhone-verificatie): een aangemaakt Calendar-event staat wél in Google Calendar maar niet automatisch in de native iPhone Agenda-app, tenzij het Google-account is toegevoegd via iOS Instellingen → Agenda → Accounts. Overweeg een korte in-app tip/uitleg hierover (bijv. na eerste "Add to calendar" op web/iOS) zodat gebruikers niet denken dat de koppeling niet werkt | LAAG | S | Backlog |
 
 ---
 
@@ -86,4 +88,4 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 ---
 
 *Aangemaakt: 2026-06-06*
-*Laatst bijgewerkt: 2026-07-14 (items 31-36 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen publiceren/verifiëren, agenda-event bijwerken bij nieuwe weersdata, feedback-formulier, sticky "Plan ride"-knop, duidelijkere feedback over aantal ritten bij niet-aaneengesloten selectie, en Calendar-koppeling zichtbaar in Profile)*
+*Laatst bijgewerkt: 2026-07-14 (items 31-38 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen, agenda-event bijwerken bij nieuwe weersdata, feedback-formulier, sticky "Plan ride"-knop, duidelijkere feedback bij niet-aaneengesloten selectie, Calendar-koppeling in Profile, regen-icoon bug bij droog weer, en tip over iOS Agenda-koppeling)*
