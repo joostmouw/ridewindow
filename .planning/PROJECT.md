@@ -82,6 +82,8 @@ RideWindow is an app for casual cyclists who want to know — at a glance — th
 
 **Release strategy is conservative.** Internal testing track with 10–20 cyclist friends first. Play Console internal track has no review and unlimited invites — fast iteration loop before going to closed beta and then production.
 
+**Phase 15 complete: web Calendar OAuth + first live deploy.** `CalendarService.warmUpForWeb()` (eager, concurrency-safe GoogleSignIn init) plus a real Web OAuth Client ID resolve the Safari popup-blocker risk (CAL-06); the web app is live at `https://my-project-joost.web.app` on Firebase Hosting, with "Add to calendar" verified end-to-end on real iPhone Safari by two independent testers, both clean on the first tap (CAL-07). The Google Cloud project backing this (`my-project-joost`) is a fresh project, not the (never-completed) Phase 9 Android OAuth project — Android's own Calendar OAuth client still needs equivalent Cloud Console setup if that native feature is to work in production. The OAuth consent screen remains in Testing publish status (manually-added testers only); publishing/full Google verification before public launch is tracked in BACKLOG.md (#31).
+
 ## Constraints
 
 - **Tech stack:** Flutter (Dart) — chosen for cross-platform readiness (iOS in v2), Material 3 out-of-the-box, hot reload DX, lower dependency-maintenance burden than React Native for solo devs.
@@ -127,4 +129,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-10 — milestone v2.0 iOS Web App started*
+*Last updated: 2026-07-14 — Phase 15 (Google Calendar Web Integration) complete*
