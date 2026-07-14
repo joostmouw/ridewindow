@@ -14,6 +14,7 @@ import 'package:ridewindow/domain/services/slot_generator.dart' show windVariabi
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -753,7 +754,22 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: isPlanned
           ? OutlinedButton.icon(
-              onPressed: null,
+              onPressed: () async {
+                final confirmed = await showUnplanConfirmDialog(context);
+                if (!confirmed) return;
+                ref.read(plannedRidesProvider.notifier).remove(
+                      PlannedRide(
+                        start: slot.start,
+                        end: slot.end,
+                        plannedScore: slot.overallScore,
+                      ),
+                    );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(S.of(context).rideRemoved)),
+                  );
+                }
+              },
               icon: const Icon(Icons.check_circle_outline),
               label: Text(S.of(context).plannedButtonLabel),
             )
