@@ -191,6 +191,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260714-n0c | add-feedback-feature-backlog-33-send-fee | Backlog #33: "Send feedback" dialog (1-5 star rating + comment) on Profile screen, submitted via mailto: URI using existing url_launcher dependency | 2026-07-14 | 5f00127 |
 | 260714-nfk | add-backlog-36-google-calendar-connectio | Backlog #36: Google Calendar connection visibility — CalendarService.isCalendarConnected()/disconnectCalendar(), Profile screen status row (Connected/Not connected + Disconnect), EN/NL l10n, TDD widget test | 2026-07-14 | 98f1f3b |
 | 260714-o54 | bundle-backlog-34-sticky-plan-ride-butto | Backlog #34: sticky "Plan ride" button via Scaffold.bottomNavigationBar on Ride Detail. Backlog #35: live "N losse tijdvakken geselecteerd" drag-run indicator on Availability, backed by pure countSelectionRuns() helper, 7 unit tests, EN/NL l10n | 2026-07-14 | 1703d60 |
+| 260714-qor | ride-detail-plan-ride-knop-toont-planned | Backlog #34 vervolg: Ride Detail's "Plan ride" button reactively shows "Planned" + checkmark (muted OutlinedButton) when the effective slot is already in plannedRidesProvider | 2026-07-14 | a109aa2 |
+| 260714-r8u | herstijl-screenhintoverlay-dot-indicator | Restyle ScreenHintOverlay: dot-indicator row + filled pill CTA replaced with compact MD3 "N/M" counter + TextButton, inspired by a shared React/shadcn layout reference (Flutter-native, no React introduced) | 2026-07-14 | 862c80a |
+| 260714-rrx | unplan-delete-geplande-rit-vanaf-ride-de | Unplan/delete a planned ride from Ride Detail's "Planned" button and a new delete icon on Home's planned-rides row, both gated behind a shared confirm dialog; reverses qor's earlier display-only scope choice per explicit user request | 2026-07-14 | 5ce3e6e |
+| 260714-rne | availability-grid-twee-tik-bereik-select | Availability grid: two-tap range-select model (open/fill/close/cancel/cross-day) alongside existing drag gesture, long-press cell-info bottom sheet, day-scoped live counter extension — TDD, 8 unit/widget tests, went through 2 plan-check revision rounds | 2026-07-14 | e5a3683 |
 
 ## Session Continuity
 
