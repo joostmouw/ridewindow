@@ -180,6 +180,13 @@
   "feedbackCommentHint": "Anything you'd like to share? (optional)",
   "feedbackSendButton": "Send",
 
+  "googleCalendarLabel": "Google Calendar",
+  "calendarStatusChecking": "Checking...",
+  "calendarStatusConnected": "Connected",
+  "calendarStatusNotConnected": "Not connected",
+  "calendarDisconnectButton": "Disconnect",
+  "calendarDisconnectedSnackbar": "Disconnected from Google Calendar.",
+
   "privacyPolicy": "Privacy policy",
   "weatherDataAttribution": "Weather data by Open-Meteo.com",
   "version": "Version",

@@ -973,6 +973,42 @@ abstract class S {
   /// **'Versturen'**
   String get feedbackSendButton;
 
+  /// No description provided for @googleCalendarLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Google Agenda'**
+  String get googleCalendarLabel;
+
+  /// No description provided for @calendarStatusChecking.
+  ///
+  /// In nl, this message translates to:
+  /// **'Controleren...'**
+  String get calendarStatusChecking;
+
+  /// No description provided for @calendarStatusConnected.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verbonden'**
+  String get calendarStatusConnected;
+
+  /// No description provided for @calendarStatusNotConnected.
+  ///
+  /// In nl, this message translates to:
+  /// **'Niet verbonden'**
+  String get calendarStatusNotConnected;
+
+  /// No description provided for @calendarDisconnectButton.
+  ///
+  /// In nl, this message translates to:
+  /// **'Loskoppelen'**
+  String get calendarDisconnectButton;
+
+  /// No description provided for @calendarDisconnectedSnackbar.
+  ///
+  /// In nl, this message translates to:
+  /// **'Losgekoppeld van Google Agenda.'**
+  String get calendarDisconnectedSnackbar;
+
   /// No description provided for @privacyPolicy.
   ///
   /// In nl, this message translates to:

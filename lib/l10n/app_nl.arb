@@ -206,6 +206,13 @@
   "feedbackCommentHint": "Wil je iets delen? (optioneel)",
   "feedbackSendButton": "Versturen",
 
+  "googleCalendarLabel": "Google Agenda",
+  "calendarStatusChecking": "Controleren...",
+  "calendarStatusConnected": "Verbonden",
+  "calendarStatusNotConnected": "Niet verbonden",
+  "calendarDisconnectButton": "Loskoppelen",
+  "calendarDisconnectedSnackbar": "Losgekoppeld van Google Agenda.",
+
   "privacyPolicy": "Privacybeleid",
   "weatherDataAttribution": "Weerdata door Open-Meteo.com",
   "version": "Versie",

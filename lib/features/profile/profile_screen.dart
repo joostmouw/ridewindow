@@ -22,6 +22,7 @@ import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/services/calendar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -42,6 +43,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   final _notifService = NotificationService();
   int _versionTapCount = 0;
+
+  // Google Calendar-verbindingsstatus (backlog #36). null = nog aan het
+  // controleren; true/false = resultaat van isCalendarConnected().
+  bool? _calendarConnected;
 
   Future<void> _launchPrivacyPolicy() async {
     final uri = Uri.parse(_kPrivacyPolicyUrl);
@@ -87,6 +92,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _tempMax = profile?.tolerances.tempMaxIdealC ?? 26.0;
     _rainMax = profile?.tolerances.rainMaxIdealMm ?? 0.5;
     _windMax = profile?.tolerances.windMaxIdealKmh ?? 15.0;
+
+    // Backlog #36: check-only (niet-promptende) Google Calendar-status,
+    // fire-and-forget zodat initState() synchroon blijft.
+    _checkCalendarConnection();
+  }
+
+  /// Controleert de Google Calendar-verbindingsstatus zonder ooit te
+  /// prompten (backlog #36). Bij een fout (bv. platform-channel niet
+  /// beschikbaar) degradeert de UI gracieus naar "Not connected" in plaats
+  /// van te crashen (T-quick260714nfk-02).
+  Future<void> _checkCalendarConnection() async {
+    try {
+      final connected = await CalendarService().isCalendarConnected();
+      if (mounted) setState(() => _calendarConnected = connected);
+    } catch (_) {
+      if (mounted) setState(() => _calendarConnected = false);
+    }
+  }
+
+  /// Trekt de Google Calendar-autorisatie in (backlog #36). Best-effort:
+  /// als de aanroep zelf faalt, wordt toch doorgegaan met de UI-update omdat
+  /// de gebruikersintentie (loskoppelen) duidelijk is (T-quick260714nfk-02).
+  Future<void> _disconnectCalendar(BuildContext context) async {
+    try {
+      await CalendarService().disconnectCalendar();
+    } catch (_) {
+      // Best-effort: negeer fouten, ga toch door met UI-update.
+    }
+    if (mounted) setState(() => _calendarConnected = false);
+    if (context.mounted) {
+      final s = S.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(s.calendarDisconnectedSnackbar)),
+      );
+    }
+  }
+
+  String _calendarStatusText(S s) {
+    if (_calendarConnected == null) return s.calendarStatusChecking;
+    return _calendarConnected!
+        ? s.calendarStatusConnected
+        : s.calendarStatusNotConnected;
   }
 
   void _showNameDialog(BuildContext context, String? currentName) {
@@ -646,6 +693,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: Text(s.sendFeedback),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => showFeedbackDialog(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.calendar_month),
+            title: Text(s.googleCalendarLabel),
+            subtitle: Text(_calendarStatusText(s)),
+            trailing: _calendarConnected == null
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : (_calendarConnected!
+                    ? TextButton(
+                        onPressed: () => _disconnectCalendar(context),
+                        child: Text(s.calendarDisconnectButton),
+                      )
+                    : null),
           ),
           ListTile(
             title: Text(s.privacyPolicy),

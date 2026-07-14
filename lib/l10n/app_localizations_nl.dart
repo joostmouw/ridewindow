@@ -485,6 +485,24 @@ class SNl extends S {
   String get feedbackSendButton => 'Versturen';
 
   @override
+  String get googleCalendarLabel => 'Google Agenda';
+
+  @override
+  String get calendarStatusChecking => 'Controleren...';
+
+  @override
+  String get calendarStatusConnected => 'Verbonden';
+
+  @override
+  String get calendarStatusNotConnected => 'Niet verbonden';
+
+  @override
+  String get calendarDisconnectButton => 'Loskoppelen';
+
+  @override
+  String get calendarDisconnectedSnackbar => 'Losgekoppeld van Google Agenda.';
+
+  @override
   String get privacyPolicy => 'Privacybeleid';
 
   @override

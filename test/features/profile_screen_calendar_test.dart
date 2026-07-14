@@ -7,6 +7,7 @@
 /// _checkCalendarConnection()'s try/catch vangt dit op en valt terug op
 /// "Not connected" -- dit bewijst het eigen graceful-degradation-pad van de
 /// app, niet een geslaagde platform-channel-aanroep.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,14 +57,14 @@ class FakeWeatherNotifier extends WeatherNotifier {
   Future<List<HourlyForecast>> build() async => const [];
 }
 
-UserProfile _baseProfile() => UserProfile(
-      tolerances: const WeatherTolerances(
+UserProfile _baseProfile() => const UserProfile(
+      tolerances: WeatherTolerances(
         tempMinIdealC: 12.0,
         tempMaxIdealC: 26.0,
         windMaxIdealKmh: 15.0,
         rainMaxIdealMm: 0.5,
       ),
-      allowedDurations: const [2, 3, 5],
+      allowedDurations: [2, 3, 5],
       theme: 'system',
       locationOverride: null,
       notifEveningBefore: false,
@@ -75,6 +76,14 @@ const _defaultLocation =
     LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam');
 
 Future<void> _pumpProfileScreen(WidgetTester tester) async {
+  // Vergroot het test-viewport zodat de Google Calendar-rij (onderin de
+  // OVER-sectie) binnen de sliver-viewport valt en dus gemount wordt --
+  // zonder dit blijft de rij ongebouwd in de lazy ListView, ook met
+  // skipOffstage: false (dat vindt alleen reeds-gemounte offstage widgets).
+  tester.view.physicalSize = const Size(800, 3000);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: [

@@ -484,6 +484,25 @@ class SEn extends S {
   String get feedbackSendButton => 'Send';
 
   @override
+  String get googleCalendarLabel => 'Google Calendar';
+
+  @override
+  String get calendarStatusChecking => 'Checking...';
+
+  @override
+  String get calendarStatusConnected => 'Connected';
+
+  @override
+  String get calendarStatusNotConnected => 'Not connected';
+
+  @override
+  String get calendarDisconnectButton => 'Disconnect';
+
+  @override
+  String get calendarDisconnectedSnackbar =>
+      'Disconnected from Google Calendar.';
+
+  @override
   String get privacyPolicy => 'Privacy policy';
 
   @override
