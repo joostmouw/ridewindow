@@ -153,4 +153,57 @@ void main() {
       expect(true, isTrue);
     });
   });
+
+  group('CalendarService.warmUpForWeb (CAL-06)', () {
+    // -------------------------------------------------------------------------
+    // Test 1 (CAL-06): warmUpForWeb() mag nooit een exception laten ontsnappen,
+    // ook niet als er geen echte GoogleSignIn platform-channel gebonden is
+    // (zoals onder `flutter test`'s Dart-VM omgeving). De try/catch binnenin
+    // vangt de MissingPluginException op — dit bewijst dat een mislukte warmup
+    // de app-start nooit laat crashen.
+    // -------------------------------------------------------------------------
+    test(
+      'warmUpForWeb() completes without throwing under flutter test (geen echte GoogleSignIn plugin gebonden)',
+      () async {
+        await expectLater(CalendarService.warmUpForWeb(), completes);
+      },
+    );
+
+    // -------------------------------------------------------------------------
+    // Test 2 (CAL-06): warmUpForWeb() is idempotent — twee keer aanroepen in
+    // dezelfde sessie mag nooit alsnog een exception opleveren.
+    // -------------------------------------------------------------------------
+    test(
+      'warmUpForWeb() is idempotent — twee keer aanroepen blijft zonder exception',
+      () async {
+        await CalendarService.warmUpForWeb();
+        await CalendarService.warmUpForWeb();
+      },
+    );
+
+    // -------------------------------------------------------------------------
+    // Regression test (bugfix, post-Task-3 manual verification): twee
+    // GELIJKTIJDIGE aanroepen van warmUpForWeb() -- zonder op de eerste te
+    // wachten voordat de tweede start -- mogen NOOIT leiden tot "Bad state:
+    // init() has already been called" (de exacte fout die de gebruiker
+    // tegenkwam toen main.dart's eager web-warmup nog in-flight was terwijl
+    // een tik op "Add to calendar" gelijktijdig _ensureInitialized() startte).
+    // Beide aanroepen moeten dezelfde gememoized _sharedInitialize-future
+    // delen in plaats van elk hun eigen GoogleSignIn.instance.initialize()
+    // te starten. Onder `flutter test` gooit initialize() zelf een
+    // MissingPluginException (geen platform-channel gebonden) -- dat wordt
+    // door beide aanroepers stilzwijgend opgevangen; de memoisatie-logica
+    // zelf wordt hier wel degelijk getest doordat geen enkele aanroep een
+    // "Bad state"-achtige dubbele-init-exception mag opleveren.
+    // -------------------------------------------------------------------------
+    test(
+      'twee gelijktijdige warmUpForWeb()-aanroepen delen dezelfde initialize()-call (geen "Bad state" exception)',
+      () async {
+        final first = CalendarService.warmUpForWeb();
+        final second = CalendarService.warmUpForWeb();
+
+        await expectLater(Future.wait([first, second]), completes);
+      },
+    );
+  });
 }

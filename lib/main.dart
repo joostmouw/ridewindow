@@ -20,6 +20,7 @@ import 'package:ridewindow/platform/background_task.dart';
 import 'package:ridewindow/providers/locale_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
+import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
@@ -63,6 +64,14 @@ Future<void> main() async {
       flexInterval: const Duration(hours: 3),
       constraints: Constraints(networkType: NetworkType.connected),
     );
+  }
+
+  // Web-only: warm up GoogleSignIn eagerly (CAL-06) so the "Add to calendar"
+  // tap has no unresolved await before the OAuth popup call -- Safari's popup
+  // blocker requires the tap-to-popup call chain to stay synchronous (see
+  // RESEARCH.md Pitfall 1). Native keeps CAL-02's on-demand lazy init, unchanged.
+  if (kIsWeb) {
+    await CalendarService.warmUpForWeb();
   }
 }
 
