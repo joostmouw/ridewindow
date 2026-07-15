@@ -195,6 +195,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260714-r8u | herstijl-screenhintoverlay-dot-indicator | Restyle ScreenHintOverlay: dot-indicator row + filled pill CTA replaced with compact MD3 "N/M" counter + TextButton, inspired by a shared React/shadcn layout reference (Flutter-native, no React introduced) | 2026-07-14 | 862c80a |
 | 260714-rrx | unplan-delete-geplande-rit-vanaf-ride-de | Unplan/delete a planned ride from Ride Detail's "Planned" button and a new delete icon on Home's planned-rides row, both gated behind a shared confirm dialog; reverses qor's earlier display-only scope choice per explicit user request | 2026-07-14 | 5ce3e6e |
 | 260714-rne | availability-grid-twee-tik-bereik-select | Availability grid: two-tap range-select model (open/fill/close/cancel/cross-day) alongside existing drag gesture, long-press cell-info bottom sheet, day-scoped live counter extension — TDD, 8 unit/widget tests, went through 2 plan-check revision rounds | 2026-07-14 | e5a3683 |
+| 260714-spo | agenda-tab-vervang-long-press-sleep-sele | Agenda tab: replaced long-press-drag range-select with two-tap fixed-anchor model (grow/shrink/cancel/cross-day-restart), long-press repurposed to always show weather-detail sheet — full gesture parity with Availability screen. New baseline test suite (7 tests), went through 2 plan-check revision rounds | 2026-07-15 | 52495b9 |
 
 ## Session Continuity
 
