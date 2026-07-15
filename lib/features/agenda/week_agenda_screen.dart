@@ -122,9 +122,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
   bool _showBlocked = true;
   bool _showHints = false;
   _Selection? _selection;
-
-  // Keys for hit-testing during drag
-  final _cellKeys = <String, GlobalKey>{};
+  int? _anchorHour;
 
   // Keys for spotlight coach marks
   final _gridKey = GlobalKey();
@@ -140,62 +138,41 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     });
   }
 
-  GlobalKey _keyFor(int dayIndex, int hour) {
-    final k = '${dayIndex}_$hour';
-    return _cellKeys.putIfAbsent(k, () => GlobalKey());
-  }
+  /// Tap-based range-selection state machine (replaces the old
+  /// long-press-and-drag gesture). See the plan's locked design rules 1-6.
+  void _onCellTap(int dayIndex, int hour, DateTime day, Map<DateTime, BlockType> blockedHours) {
+    // Rule 6: blocked/planned cells are always a complete no-op.
+    if (_isBlocked(day, hour, blockedHours) || _isPlanned(day, hour)) return;
 
-  /// Find which cell (dayIndex, hour) is at a global position.
-  (int, int)? _cellAt(Offset globalPos) {
-    for (final entry in _cellKeys.entries) {
-      final ro = entry.value.currentContext?.findRenderObject() as RenderBox?;
-      if (ro == null || !ro.attached) continue;
-      final pos = ro.localToGlobal(Offset.zero);
-      final size = ro.size;
-      if (globalPos.dx >= pos.dx &&
-          globalPos.dx <= pos.dx + size.width &&
-          globalPos.dy >= pos.dy &&
-          globalPos.dy <= pos.dy + size.height) {
-        final parts = entry.key.split('_');
-        return (int.parse(parts[0]), int.parse(parts[1]));
-      }
+    // Rules 1 & 5: no active selection, or a different day -> open a fresh
+    // 1-hour selection anchored on this hour, discarding any prior one.
+    if (_selection == null || dayIndex != _selection!.dayIndex) {
+      setState(() {
+        _anchorHour = hour;
+        _selection = _Selection(dayIndex: dayIndex, startHour: hour, endHour: hour);
+      });
+      return;
     }
-    return null;
-  }
 
-  int? _dragStartHour;
-  int? _dragDayIndex;
+    // Rule 3: re-tapping the anchor while still exactly 1 hour cancels.
+    if (hour == _anchorHour && _selection!.startHour == _selection!.endHour) {
+      _clearSelection();
+      return;
+    }
 
-  void _onLongPressStart(LongPressStartDetails details) {
-    final hit = _cellAt(details.globalPosition);
-    if (hit == null) return;
-    _dragDayIndex = hit.$1;
-    _dragStartHour = hit.$2;
+    // Rules 2 & 4: recompute against the ORIGINAL fixed anchor.
+    final lo = hour < _anchorHour! ? hour : _anchorHour!;
+    final hi = hour > _anchorHour! ? hour : _anchorHour!;
     setState(() {
-      _selection = _Selection(dayIndex: hit.$1, startHour: hit.$2, endHour: hit.$2);
+      _selection = _Selection(dayIndex: dayIndex, startHour: lo, endHour: hi);
     });
-  }
-
-  void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (_dragDayIndex == null || _dragStartHour == null) return;
-    final hit = _cellAt(details.globalPosition);
-    if (hit == null || hit.$1 != _dragDayIndex) return;
-    final h = hit.$2;
-    final lo = h < _dragStartHour! ? h : _dragStartHour!;
-    final hi = h > _dragStartHour! ? h : _dragStartHour!;
-    setState(() {
-      _selection = _Selection(dayIndex: _dragDayIndex!, startHour: lo, endHour: hi);
-    });
-  }
-
-  void _onLongPressEnd(LongPressEndDetails details) {
-    // Selection stays visible until user acts on it or taps elsewhere
-    _dragStartHour = null;
-    _dragDayIndex = null;
   }
 
   void _clearSelection() {
-    setState(() => _selection = null);
+    setState(() {
+      _selection = null;
+      _anchorHour = null;
+    });
   }
 
   bool _isPlanned(DateTime day, int hour) {
@@ -228,7 +205,10 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     ref.read(plannedRidesProvider.notifier).add(
           PlannedRide(start: start, end: end, plannedScore: avgScore),
         );
-    setState(() => _selection = null);
+    setState(() {
+      _selection = null;
+      _anchorHour = null;
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(S.of(context).agendaRidePlanned(sel.count))),
     );
@@ -318,11 +298,8 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
           const Divider(height: 1),
           // Grid
           Expanded(
-            child: GestureDetector(
+            child: KeyedSubtree(
               key: _gridKey,
-              onLongPressStart: _onLongPressStart,
-              onLongPressMoveUpdate: _onLongPressMoveUpdate,
-              onLongPressEnd: _onLongPressEnd,
               child: _buildGrid(context, days, today, allScores, forecasts, cityName, blockedHours),
             ),
           ),
@@ -368,7 +345,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
       ),
       HintItem(
         targetKey: _gridKey,
-        gestureIcon: Icons.swipe_vertical,
+        gestureIcon: Icons.touch_app,
         title: s.hintDragSelect,
         description: s.hintDragSelectDesc,
         spotlightPadding: 0,
@@ -449,7 +426,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                 for (var di = 0; di < days.length; di++)
                   Expanded(
                     child: _CellWidget(
-                      key: _keyFor(di, hour),
+                      key: ValueKey('cell_${di}_$hour'),
                       day: days[di],
                       dayIndex: di,
                       hour: hour,
@@ -461,7 +438,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                       isToday: days[di] == today,
                       isSelected: _selection?.contains(di, hour) ?? false,
                       isPlanned: _isPlanned(days[di], hour),
-                      onTap: _selection != null ? _clearSelection : null,
+                      onTap: () => _onCellTap(di, hour, days[di], blockedHours),
                     ),
                   ),
               ],
@@ -512,7 +489,7 @@ class _CellWidget extends ConsumerWidget {
     required this.isToday,
     required this.isSelected,
     required this.isPlanned,
-    this.onTap,
+    required this.onTap,
   });
 
   final DateTime day;
@@ -526,7 +503,7 @@ class _CellWidget extends ConsumerWidget {
   final bool isToday;
   final bool isSelected;
   final bool isPlanned;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -536,7 +513,8 @@ class _CellWidget extends ConsumerWidget {
     final color = score != null ? _scoreColor(score.overall, rw) : rw.border;
 
     return GestureDetector(
-      onTap: onTap ?? () => _showDetail(context, ref, score),
+      onTap: onTap,
+      onLongPress: () => _showDetail(context, ref, score),
       child: Container(
         margin: const EdgeInsets.all(0.5),
         decoration: BoxDecoration(

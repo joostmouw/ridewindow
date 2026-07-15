@@ -961,18 +961,18 @@ class SNl extends S {
       'Kies ochtend, middag of avond om ritten voor dat dagdeel te tonen.';
 
   @override
-  String get hintTapWeatherDetail => 'Tik voor weerdetails';
+  String get hintTapWeatherDetail => 'Houd ingedrukt voor weerdetails';
 
   @override
   String get hintTapWeatherDetailDesc =>
-      'Tik op een gekleurd uurvak om temperatuur, regen en wind te bekijken.';
+      'Houd een gekleurd uurvak ingedrukt om temperatuur, regen en wind te bekijken.';
 
   @override
-  String get hintDragSelect => 'Sleep om uren te selecteren';
+  String get hintDragSelect => 'Tik tweemaal om een periode te selecteren';
 
   @override
   String get hintDragSelectDesc =>
-      'Houd een vak ingedrukt en sleep verticaal om meerdere uren te selecteren. Tik daarna op \"Rit inplannen\" onderaan.';
+      'Tik op een uur om te beginnen, tik daarna op een ander uur om de periode in te stellen. Tik daarna op \"Rit inplannen\" onderaan.';
 
   @override
   String get hintTapSummary => 'Tik voor weersamenvatting';

@@ -959,18 +959,18 @@ class SEn extends S {
       'Choose morning, afternoon or evening to show rides for that period.';
 
   @override
-  String get hintTapWeatherDetail => 'Tap for weather details';
+  String get hintTapWeatherDetail => 'Long press for weather details';
 
   @override
   String get hintTapWeatherDetailDesc =>
-      'Tap a colored hour cell to view temperature, rain and wind.';
+      'Long press a colored hour cell to view temperature, rain and wind.';
 
   @override
-  String get hintDragSelect => 'Drag to select hours';
+  String get hintDragSelect => 'Tap twice to select a range';
 
   @override
   String get hintDragSelectDesc =>
-      'Long press a cell and drag vertically to select multiple hours. Then tap \"Plan ride\" at the bottom.';
+      'Tap an hour to start, then tap another hour to set the range. Then tap \"Plan ride\" at the bottom.';
 
   @override
   String get hintTapSummary => 'Tap for weather summary';

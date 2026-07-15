@@ -1834,25 +1834,25 @@ abstract class S {
   /// No description provided for @hintTapWeatherDetail.
   ///
   /// In nl, this message translates to:
-  /// **'Tik voor weerdetails'**
+  /// **'Houd ingedrukt voor weerdetails'**
   String get hintTapWeatherDetail;
 
   /// No description provided for @hintTapWeatherDetailDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Tik op een gekleurd uurvak om temperatuur, regen en wind te bekijken.'**
+  /// **'Houd een gekleurd uurvak ingedrukt om temperatuur, regen en wind te bekijken.'**
   String get hintTapWeatherDetailDesc;
 
   /// No description provided for @hintDragSelect.
   ///
   /// In nl, this message translates to:
-  /// **'Sleep om uren te selecteren'**
+  /// **'Tik tweemaal om een periode te selecteren'**
   String get hintDragSelect;
 
   /// No description provided for @hintDragSelectDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Houd een vak ingedrukt en sleep verticaal om meerdere uren te selecteren. Tik daarna op \"Rit inplannen\" onderaan.'**
+  /// **'Tik op een uur om te beginnen, tik daarna op een ander uur om de periode in te stellen. Tik daarna op \"Rit inplannen\" onderaan.'**
   String get hintDragSelectDesc;
 
   /// No description provided for @hintTapSummary.
