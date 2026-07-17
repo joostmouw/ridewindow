@@ -45,7 +45,7 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 Phase: Milestone v2.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-17 — Milestone v2.0 completed and archived
+Last activity: 2026-07-17 - Completed quick task 260717-no1: Backlog #31 Google OAuth consent screen fast-publish checklist
 
 ## Performance Metrics
 
@@ -224,6 +224,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260714-rrx | unplan-delete-geplande-rit-vanaf-ride-de | Unplan/delete a planned ride from Ride Detail's "Planned" button and a new delete icon on Home's planned-rides row, both gated behind a shared confirm dialog; reverses qor's earlier display-only scope choice per explicit user request | 2026-07-14 | 5ce3e6e |
 | 260714-rne | availability-grid-twee-tik-bereik-select | Availability grid: two-tap range-select model (open/fill/close/cancel/cross-day) alongside existing drag gesture, long-press cell-info bottom sheet, day-scoped live counter extension — TDD, 8 unit/widget tests, went through 2 plan-check revision rounds | 2026-07-14 | e5a3683 |
 | 260714-spo | agenda-tab-vervang-long-press-sleep-sele | Agenda tab: replaced long-press-drag range-select with two-tap fixed-anchor model (grow/shrink/cancel/cross-day-restart), long-press repurposed to always show weather-detail sheet — full gesture parity with Availability screen. New baseline test suite (7 tests), went through 2 plan-check revision rounds | 2026-07-15 | 52495b9 |
+| 260717-no1 | backlog-31-google-oauth-consent-screen-p | Backlog #31: fast-publish route chosen for the OAuth consent screen (Google Calendar scope is Sensitive, not Restricted — no formal verification required). Produced OAUTH-PUBLISH-CHECKLIST.md for Joost to follow manually in Cloud Console; BACKLOG.md #31 marked "Ready for user action" (not Done — the Cloud Console click itself requires Joost's own authenticated session) | 2026-07-17 | 2595362 |
 
 ## Session Continuity
 
