@@ -20,7 +20,7 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           navigatorKey: navigatorKey,
           home: const Scaffold(body: Center(child: Text('Home'))),
-        ));
+        ),);
 
         navigatorKey.currentState!.push(
           MaterialPageRoute<void>(
