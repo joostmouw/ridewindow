@@ -17,7 +17,9 @@ Future<void> _pumpOverlay(WidgetTester tester) async {
     const MaterialApp(
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
-      home: Scaffold(body: AddToHomeScreenOverlay()),
+      // Positioned requires a Stack ancestor -- mirrors the real usage in
+      // lib/main.dart's MaterialApp.router builder.
+      home: Scaffold(body: Stack(children: [AddToHomeScreenOverlay()])),
     ),
   );
 }
