@@ -2106,6 +2106,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Vrij'**
   String get cellInfoStatusFree;
+
+  /// No description provided for @addToHomeScreenHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.'**
+  String get addToHomeScreenHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

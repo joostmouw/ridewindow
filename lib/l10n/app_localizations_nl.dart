@@ -1113,4 +1113,8 @@ class SNl extends S {
 
   @override
   String get cellInfoStatusFree => 'Vrij';
+
+  @override
+  String get addToHomeScreenHint =>
+      'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.';
 }

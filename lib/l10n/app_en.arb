@@ -389,5 +389,6 @@
   "cellInfoStatusWork": "Work-blocked",
   "cellInfoStatusCalendar": "Calendar-blocked",
   "cellInfoStatusCustom": "Marked available",
-  "cellInfoStatusFree": "Free"
+  "cellInfoStatusFree": "Free",
+  "addToHomeScreenHint": "Tap the Share icon, then \"Add to Home Screen\" to install RideWindow."
 }

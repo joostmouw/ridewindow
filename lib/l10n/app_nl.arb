@@ -507,5 +507,6 @@
   "cellInfoStatusWork": "Werk-geblokkeerd",
   "cellInfoStatusCalendar": "Agenda-geblokkeerd",
   "cellInfoStatusCustom": "Beschikbaar gezet",
-  "cellInfoStatusFree": "Vrij"
+  "cellInfoStatusFree": "Vrij",
+  "addToHomeScreenHint": "Tik op het Deel-icoon en kies 'Zet op beginscherm' om RideWindow te installeren."
 }

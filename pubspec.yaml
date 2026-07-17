@@ -65,6 +65,9 @@ dependencies:
   # Phase 12 — Drift web persistence
   sqlite3: ^3.0.0
 
+  # Phase 16 — PWA install detection
+  web: ^1.1.0
+
   # fl_chart arriveert in een latere fase
 
 dev_dependencies:

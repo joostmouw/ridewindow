@@ -1110,4 +1110,8 @@ class SEn extends S {
 
   @override
   String get cellInfoStatusFree => 'Free';
+
+  @override
+  String get addToHomeScreenHint =>
+      'Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.';
 }
