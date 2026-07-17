@@ -15,6 +15,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
+import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
 import 'package:ridewindow/providers/locale_provider.dart';
@@ -217,6 +218,15 @@ class RideWindowApp extends ConsumerWidget {
       darkTheme: _buildTheme(Brightness.dark),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: router,
+      // Renders the iOS "Add to Home Screen" instructional banner above
+      // every route from a single wiring point (PWA-03). Resolves to
+      // nothing on native/Android since isWebPlatform is false there.
+      builder: (context, child) => Stack(
+        children: [
+          if (child != null) child,
+          const AddToHomeScreenOverlay(),
+        ],
+      ),
     );
   }
 }
