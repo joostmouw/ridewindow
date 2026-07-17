@@ -45,7 +45,7 @@
 - [x] **PWA-02**: Manifest and meta tags configure `display: standalone`, `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, and `env(safe-area-inset-*)` CSS for notch/Dynamic Island devices
 - [x] **PWA-03**: A custom "Add to Home Screen" instructional overlay is shown on iOS Safari in browser mode (not standalone), detected via the `display-mode: standalone` media query; Android Chrome uses its own native `beforeinstallprompt` flow instead
 - [x] **PWA-04**: In-app back/close navigation works correctly in standalone mode (no browser chrome to fall back on)
-- [ ] **PWA-05**: The install flow and storage persistence are manually verified on a real iPhone in Safari (not just desktop dev tools or simulator)
+- [x] **PWA-05**: The install flow and storage persistence are manually verified on a real iPhone in Safari (not just desktop dev tools or simulator)
 
 ### Deployment (DEPLOY) — Firebase Hosting
 
@@ -108,7 +108,7 @@ Generic acceptance criteria applied to every phase:
 | PWA-02 | Phase 16 | Complete |
 | PWA-03 | Phase 16 | Complete |
 | PWA-04 | Phase 16 | Complete |
-| PWA-05 | Phase 16 | Pending |
+| PWA-05 | Phase 16 | Complete |
 | DEPLOY-01 | Phase 17 | Pending |
 | DEPLOY-02 | Phase 17 | Pending |
 | DEPLOY-03 | Phase 17 | Pending |

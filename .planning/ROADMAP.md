@@ -412,7 +412,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 16-04-PLAN.md — Deploy + real iPhone Safari verification: install, standalone nav, safe-area, storage durability (PWA-05)
+- [x] 16-04-PLAN.md — Deploy + real iPhone Safari verification: install, standalone nav, safe-area, storage durability (PWA-05)
 **UI hint**: yes
 
 ### Phase 17: Deployment Hardening & Firebase Hosting
@@ -452,7 +452,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 13. Geolocation & Manual Fallback | v2.0 | 1/1 | Complete   | 2026-07-11 |
 | 14. Foreground Refresh Strategy | v2.0 | 1/1 | Complete   | 2026-07-12 |
 | 15. Google Calendar Web Integration | v2.0 | 2/2 | Complete    | 2026-07-14 |
-| 16. PWA Installability & iOS Polish | v2.0 | 3/4 | In Progress|  |
+| 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
