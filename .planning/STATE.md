@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
 status: executing
-last_updated: "2026-07-17T12:21:09.609Z"
+last_updated: "2026-07-17T12:34:55.757Z"
 last_activity: 2026-07-17
 progress:
   total_phases: 18
   completed_phases: 5
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
   percent: 28
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 16
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-17
 
@@ -64,6 +64,7 @@ Last activity: 2026-07-17
 | Phase 09-google-calendar-integration P02 | 10min | 2 tasks | 4 files |
 | Phase 16 P01 | ~2h | 2 tasks | 13 files |
 | Phase 16 P02 | 25min | 2 tasks | 12 files |
+| Phase 16 P03 | ~10min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -163,6 +164,9 @@ Recente beslissingen die het huidige werk beinvloeden:
 - [Phase 16-01]: Recomputed the logo crop bbox via pixel scan instead of the plan's literal coordinates (not tight/symmetric, baked a white halo into maskable/splash composites); added flood-fill alpha for clean colored-canvas compositing; nudged crop origin (+36,+36)px so the 32x32 favicon's center pixel lands on solid black rather than the monogram crossbar stroke
 - [Phase 16-02]: isStandaloneDisplayMode/isIosBrowserMode gate on isWebPlatform BEFORE their own debug overrides (isWebPlatform && (override ?? impl())) so a false web override always wins
 - [Phase 16-02]: AddToHomeScreenOverlay uses colorScheme.inverseSurface/onInverseSurface MD3 tonal pair, top-positioned, no dismiss/persistence per D-04
+- [Phase 16-03]: SafeBackButton uses plain Navigator.of(context).canPop() (never go_router's context.canPop() extension) so it builds identically with or without a GoRouter ancestor -- required by existing MaterialApp(home: child)-only widget test harnesses
+- [Phase 16-03]: Non-poppable tooltip uses a null-safe Localizations.of<S>(context, S) lookup (not S.of(context)!) falling back to a plain 'Home' literal -- avoids throwing in localization-delegate-less test harnesses
+- [Phase 16-03]: Confirmed via git-stash before/after comparison that test/features/availability_screen_test.dart (11 failures) and test/features/detail/ride_detail_screen_calendar_test.dart (4 failures) are pre-existing, unrelated to this plan (BACKLOG.md #11 test-suite health issue) -- identical failure counts before/after
 
 ### Pending Todos
 
@@ -203,5 +207,5 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-07-17T12:21:09.605Z
+Last session: 2026-07-17T12:34:55.753Z
 Last activity: 2026-07-11 - v2.0 ROADMAP.md created (Phases 11-17: Web Scaffolding, Drift Web Persistence, Geolocation & Manual Fallback, Foreground Refresh, Google Calendar Web, PWA Installability, Deployment Hardening). Next: /gsd:plan-phase 11
