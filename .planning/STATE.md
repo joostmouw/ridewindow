@@ -2,18 +2,36 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
-status: executing
-last_updated: "2026-07-17T15:00:00.000Z"
-last_activity: 2026-07-17 -- Phase 17 CLOSED (browser check confirmed by user; Android device smoke test explicitly skipped by user)
+status: Awaiting next milestone
+last_updated: "2026-07-17T14:54:00.557Z"
+last_activity: 2026-07-17 — Milestone v2.0 completed and archived
 progress:
   total_phases: 18
   completed_phases: 7
-  total_plans: 12
+  total_plans: 11
   completed_plans: 11
   percent: 39
 ---
 
 # Project State
+
+## Deferred Items
+
+Items acknowledged and deferred at v2.0 milestone close on 2026-07-17. The `audit-open` tool flagged these 11 quick tasks as "missing" status, but each one has a committed PLAN.md + SUMMARY.md and corresponding feature commits — this is treated as a tracking/audit-tool false positive, not unfinished work.
+
+| Category | Item | Status |
+|----------|------|--------|
+| quick_task | 260617-qjd-android-home-screen-widget-toont-volgend | missing (audit false-positive, work complete) |
+| quick_task | 260618-csx-week-agenda-view-met-ride-overlap-overla | missing (audit false-positive, work complete) |
+| quick_task | 260714-m63-add-sun-partly-cloudy-icon-to-ride-detai | missing (audit false-positive, work complete) |
+| quick_task | 260714-n0c-add-feedback-feature-backlog-33-send-fee | missing (audit false-positive, work complete) |
+| quick_task | 260714-nfk-add-backlog-36-google-calendar-connectio | missing (audit false-positive, work complete) |
+| quick_task | 260714-o54-bundle-backlog-34-sticky-plan-ride-butto | missing (audit false-positive, work complete) |
+| quick_task | 260714-qor-ride-detail-plan-ride-knop-toont-planned | missing (audit false-positive, work complete) |
+| quick_task | 260714-r8u-herstijl-screenhintoverlay-dot-indicator | missing (audit false-positive, work complete) |
+| quick_task | 260714-rne-availability-grid-twee-tik-bereik-select | missing (audit false-positive, work complete) |
+| quick_task | 260714-rrx-unplan-delete-geplande-rit-vanaf-ride-de | missing (audit false-positive, work complete) |
+| quick_task | 260714-spo-agenda-tab-vervang-long-press-sleep-sele | missing (audit false-positive, work complete) |
 
 ## Project Reference
 
@@ -24,10 +42,10 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 17 (deployment-hardening-firebase-hosting) — COMPLETE
-Plan: 1 of 1
-Status: Complete. Browser click-through confirmed by user 2026-07-17. Physical Android smoke test explicitly skipped by user decision (flutter build apk --release itself already succeeded during automated execution).
-Last activity: 2026-07-17 -- Phase 17 CLOSED (browser check confirmed by user; Android device smoke test explicitly skipped by user)
+Phase: Milestone v2.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-17 — Milestone v2.0 completed and archived
 
 ## Performance Metrics
 
@@ -211,3 +229,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 Last session: 2026-07-17T13:14:18.995Z
 Last activity: 2026-07-11 - v2.0 ROADMAP.md created (Phases 11-17: Web Scaffolding, Drift Web Persistence, Geolocation & Manual Fallback, Foreground Refresh, Google Calendar Web, PWA Installability, Deployment Hardening). Next: /gsd:plan-phase 11
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
