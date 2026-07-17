@@ -1,11 +1,11 @@
 {
-    "name": "ridewindow",
-    "short_name": "ridewindow",
+    "name": "RideWindow",
+    "short_name": "RideWindow",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#2E7D32",
+    "theme_color": "#2E7D32",
+    "description": "Cyclist-specific weather windows and ride planning",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
