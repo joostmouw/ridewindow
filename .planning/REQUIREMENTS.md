@@ -43,7 +43,7 @@
 
 - [x] **PWA-01**: `web/index.html` includes `apple-touch-icon`, `apple-touch-startup-image`, `theme_color`, and `background_color` tags tuned for iOS
 - [x] **PWA-02**: Manifest and meta tags configure `display: standalone`, `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, and `env(safe-area-inset-*)` CSS for notch/Dynamic Island devices
-- [ ] **PWA-03**: A custom "Add to Home Screen" instructional overlay is shown on iOS Safari in browser mode (not standalone), detected via the `display-mode: standalone` media query; Android Chrome uses its own native `beforeinstallprompt` flow instead
+- [x] **PWA-03**: A custom "Add to Home Screen" instructional overlay is shown on iOS Safari in browser mode (not standalone), detected via the `display-mode: standalone` media query; Android Chrome uses its own native `beforeinstallprompt` flow instead
 - [ ] **PWA-04**: In-app back/close navigation works correctly in standalone mode (no browser chrome to fall back on)
 - [ ] **PWA-05**: The install flow and storage persistence are manually verified on a real iPhone in Safari (not just desktop dev tools or simulator)
 
@@ -106,7 +106,7 @@ Generic acceptance criteria applied to every phase:
 | CAL-07 | Phase 15 | Complete |
 | PWA-01 | Phase 16 | Complete |
 | PWA-02 | Phase 16 | Complete |
-| PWA-03 | Phase 16 | Pending |
+| PWA-03 | Phase 16 | Complete |
 | PWA-04 | Phase 16 | Pending |
 | PWA-05 | Phase 16 | Pending |
 | DEPLOY-01 | Phase 17 | Pending |

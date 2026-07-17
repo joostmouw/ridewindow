@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
 status: executing
-last_updated: "2026-07-17T12:07:03.785Z"
+last_updated: "2026-07-17T12:21:09.609Z"
 last_activity: 2026-07-17
 progress:
   total_phases: 18
   completed_phases: 5
   total_plans: 10
-  completed_plans: 7
+  completed_plans: 8
   percent: 28
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 16
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-17
 
@@ -63,6 +63,7 @@ Last activity: 2026-07-17
 | Phase 09-google-calendar-integration P01 | 20min | 2 tasks | 4 files |
 | Phase 09-google-calendar-integration P02 | 10min | 2 tasks | 4 files |
 | Phase 16 P01 | ~2h | 2 tasks | 13 files |
+| Phase 16 P02 | 25min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 10-02 (2026-06-05): isCoreLibraryDesugaringEnabled = true + desugar_jdk_libs:2.1.5 added — flutter_local_notifications v21+ requires core library desugaring
 - 10-02 (2026-06-05): Android cmdline-tools/latest installed to ~/Library/Android/sdk — required for Flutter 3.44.1 post-build symbol stripping; not bundled with Android Studio on this machine
 - [Phase 16-01]: Recomputed the logo crop bbox via pixel scan instead of the plan's literal coordinates (not tight/symmetric, baked a white halo into maskable/splash composites); added flood-fill alpha for clean colored-canvas compositing; nudged crop origin (+36,+36)px so the 32x32 favicon's center pixel lands on solid black rather than the monogram crossbar stroke
+- [Phase 16-02]: isStandaloneDisplayMode/isIosBrowserMode gate on isWebPlatform BEFORE their own debug overrides (isWebPlatform && (override ?? impl())) so a false web override always wins
+- [Phase 16-02]: AddToHomeScreenOverlay uses colorScheme.inverseSurface/onInverseSurface MD3 tonal pair, top-positioned, no dismiss/persistence per D-04
 
 ### Pending Todos
 
@@ -200,5 +203,5 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-07-17T12:07:03.781Z
+Last session: 2026-07-17T12:21:09.605Z
 Last activity: 2026-07-11 - v2.0 ROADMAP.md created (Phases 11-17: Web Scaffolding, Drift Web Persistence, Geolocation & Manual Fallback, Foreground Refresh, Google Calendar Web, PWA Installability, Deployment Hardening). Next: /gsd:plan-phase 11
