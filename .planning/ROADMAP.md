@@ -427,7 +427,12 @@ Plans:
   2. `firebase deploy` succeeds and the app is reachable at a stable HTTPS URL, with all features exercised across Phases 11–16 (build, persistence, geolocation, refresh, Calendar, PWA install) working on that live URL
   3. A full regression pass confirms `flutter build apk` still builds and the existing Android app's core flows (forecast, slots, availability, Calendar) work unchanged
 
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+
+**Wave 1**
+
+- [ ] 17-01-PLAN.md — Redeploy + curl-proven routing/wasm headers, full Phase 11-16 feature sweep + deep-link/refresh proof, automated test baseline + Android regression build/smoke test (DEPLOY-01, DEPLOY-02, DEPLOY-03)
 
 ## Progress
 
@@ -453,6 +458,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 14. Foreground Refresh Strategy | v2.0 | 1/1 | Complete   | 2026-07-12 |
 | 15. Google Calendar Web Integration | v2.0 | 2/2 | Complete    | 2026-07-14 |
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
-| 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/TBD | Not started | - |
+| 17. Deployment Hardening & Firebase Hosting | v2.0 | 0/1 | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
