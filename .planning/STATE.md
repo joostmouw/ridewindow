@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
-status: ready_to_plan
-last_updated: 2026-07-14T13:38:59.995Z
-last_activity: 2026-07-13 -- Phase 15 execution started
+status: executing
+last_updated: "2026-07-17T12:07:03.785Z"
+last_activity: 2026-07-17
 progress:
   total_phases: 18
-  completed_phases: 4
-  total_plans: 6
-  completed_plans: 6
-  percent: 22
-stopped_at: Phase 15 complete (2/2) — ready to discuss Phase 16
+  completed_phases: 5
+  total_plans: 10
+  completed_plans: 7
+  percent: 28
 ---
 
 # Project State
@@ -26,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 16
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-14
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-07-17
 
 ## Performance Metrics
 
@@ -63,6 +62,7 @@ Last activity: 2026-07-14
 | Phase 08-background-refresh-notifications P04 | 5min | 2 tasks | 2 files |
 | Phase 09-google-calendar-integration P01 | 20min | 2 tasks | 4 files |
 | Phase 09-google-calendar-integration P02 | 10min | 2 tasks | 4 files |
+| Phase 16 P01 | ~2h | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -159,6 +159,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 10-02 (2026-06-05): compileSdk bumped 35→36 — required by url_launcher_android, shared_preferences_android, flutter_local_notifications, geolocator_android, google_sign_in_android, package_info_plus; backward compatible with targetSdk/minSdk
 - 10-02 (2026-06-05): isCoreLibraryDesugaringEnabled = true + desugar_jdk_libs:2.1.5 added — flutter_local_notifications v21+ requires core library desugaring
 - 10-02 (2026-06-05): Android cmdline-tools/latest installed to ~/Library/Android/sdk — required for Flutter 3.44.1 post-build symbol stripping; not bundled with Android Studio on this machine
+- [Phase 16-01]: Recomputed the logo crop bbox via pixel scan instead of the plan's literal coordinates (not tight/symmetric, baked a white halo into maskable/splash composites); added flood-fill alpha for clean colored-canvas compositing; nudged crop origin (+36,+36)px so the 32x32 favicon's center pixel lands on solid black rather than the monogram crossbar stroke
 
 ### Pending Todos
 
@@ -199,5 +200,5 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-07-11T11:49:20.000Z
+Last session: 2026-07-17T12:07:03.781Z
 Last activity: 2026-07-11 - v2.0 ROADMAP.md created (Phases 11-17: Web Scaffolding, Drift Web Persistence, Geolocation & Manual Fallback, Foreground Refresh, Google Calendar Web, PWA Installability, Deployment Hardening). Next: /gsd:plan-phase 11
