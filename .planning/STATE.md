@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
 status: executing
-last_updated: "2026-07-17T14:23:27.553Z"
-last_activity: 2026-07-17 -- Phase 17 planning complete
+last_updated: "2026-07-17T14:30:00.000Z"
+last_activity: 2026-07-17 -- Phase 17 automated work complete; 2 human-check items pending
 progress:
   total_phases: 18
-  completed_phases: 6
-  total_plans: 11
-  completed_plans: 10
-  percent: 33
+  completed_phases: 7
+  total_plans: 12
+  completed_plans: 11
+  percent: 39
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 16 — pwa installability & ios polish
+**Current focus:** Phase 17 — deployment-hardening-firebase-hosting (automated work done, 2 human-check items pending before v2.0 milestone close-out)
 
 ## Current Position
 
-Phase: 16
-Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-07-17 -- Phase 17 planning complete
+Phase: 17 (deployment-hardening-firebase-hosting) — 17-01 automated tasks complete
+Plan: 1 of 1
+Status: Pending human verification (browser click-through + physical Android smoke test) — see 17-01-SUMMARY.md
+Last activity: 2026-07-17 -- Phase 17 automated work complete; 2 human-check items pending
 
 ## Performance Metrics
 
