@@ -119,26 +119,31 @@ completed: 2026-07-17
 
 The following two items from the plan are **explicit `<human-check>` blocks that cannot be performed by this agent** (no browser access, no physical Android device/emulator access). They are documented here, verbatim from the plan, for the orchestrator to hand to the user:
 
-### Task 2 (fully human-check) -- Full feature sweep on the live production URL
+### Task 2 (fully human-check) -- Full feature sweep on the live production URL -- ✅ CONFIRMED PASSED by user (2026-07-17)
 
 > Open https://my-project-joost.web.app in a desktop browser. Confirm Home loads with ride slots (not blank/error) and a real or fallback-city forecast (LOC-06/07). Confirm a "Last updated HH:MM" label is visible (REFRESH-03) and pull-to-refresh or a manual reload updates it (REFRESH-01/02). Toggle one Availability cell, then reload the page (full refresh) and confirm the toggle persisted (PERS-06 regression check). Tap a ride card to open Ride Detail -- note the address bar now shows a `#/detail/...` hash -- then hard-refresh the browser (Cmd+Shift+R or equivalent) and confirm it reloads directly into that same Ride Detail screen, not back to Home or a blank page (DEPLOY-01's client-side deep-link proof). Confirm the "Add to calendar" button is present and tappable on Ride Detail (CAL-06/07 regression spot-check -- full OAuth flow already verified in Phase 15-02, just confirm it's still there and clickable, no console error on click). Confirm the PWA manifest/icons are still linked correctly (view page source or DevTools Application tab: `manifest.json` loads, `apple-touch-icon` link present) -- full real-iPhone install already verified in Phase 16-04, this is a spot-check only.
 
 **Expected:** All of the above pass with no blank screens, no console errors, no 404s, and the hard-refresh-on-deep-link test specifically restores the exact same screen rather than falling back to Home.
 
-### Task 3's human-check sub-item -- Manual Android smoke test
+**Result:** User confirmed the browser click-through "ziet er goed uit" (looks good) on 2026-07-17.
+
+### Task 3's human-check sub-item -- Manual Android smoke test -- ⏭️ SKIPPED by user decision (2026-07-17)
 
 > Install the release APK (`build/app/outputs/flutter-apk/app-release.apk`) on a physical Android device or emulator. Launch it, confirm Home shows ride slots. Toggle one Availability cell, background and reopen the app, confirm the toggle persisted. Tap "Add to calendar" on a ride slot and confirm a real Google Calendar event is created.
 
 **Expected:** All four checks pass with no crashes and no regressions versus the pre-Phase-17 native app behavior.
+
+**Result:** User explicitly chose to skip this check and close out Phase 17 without it. `flutter build apk --release` already succeeded during automated execution (proving the build itself is sound); only the manual on-device walkthrough was skipped.
 
 **Note:** The release APK built during this plan lives at `build/app/outputs/flutter-apk/app-release.apk` inside this worktree (`/Users/joostmouw/ridewindow/.claude/worktrees/agent-a3ed24bfaf6dab767/build/app/outputs/flutter-apk/app-release.apk`). This build artifact is gitignored and will not survive a worktree merge/cleanup -- if verification happens after this worktree is removed, the user (or orchestrator) will need to re-run `flutter build apk --release` from the merged `main` branch first.
 
 ## Next Phase Readiness
 
 - Task 1's automated deliverable (live, curl-proven production deploy) and Task 3's automated deliverable (corrected test baseline + passing APK build) are both complete and committed
-- Two `<human-check>` items (full plan approved this as PENDING HUMAN VERIFICATION per explicit scope note, not a plan blocker) remain outstanding: the Task 2 browser click-through and Task 3's physical-device Android smoke test, both detailed above for the orchestrator/user to execute
+- Task 2 (browser click-through) confirmed passed by the user on 2026-07-17
+- Task 3's physical-device Android smoke test was explicitly skipped by user decision on 2026-07-17 -- `flutter build apk --release` itself already succeeded during automated execution, so the build is proven sound; only the manual on-device walkthrough was waived
 - Per the plan's own `<verification>` step 1, `git status` after this plan's automated work shows only `.planning/STATE.md` and `.planning/BACKLOG.md` modified (already committed) -- `firebase.json` needed no changes, matching expectations
-- v2.0 milestone completion is otherwise unblocked pending the two human-check items above
+- **Phase 17 is CLOSED.** This was the last planned phase of the v2.0 (iOS Web App) milestone -- all of Phases 11-17 are now Complete per ROADMAP.md.
 
 ---
 *Phase: 17-deployment-hardening-firebase-hosting*

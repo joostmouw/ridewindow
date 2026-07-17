@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: iOS Web App
 status: executing
-last_updated: "2026-07-17T14:30:00.000Z"
-last_activity: 2026-07-17 -- Phase 17 automated work complete; 2 human-check items pending
+last_updated: "2026-07-17T15:00:00.000Z"
+last_activity: 2026-07-17 -- Phase 17 CLOSED (browser check confirmed by user; Android device smoke test explicitly skipped by user)
 progress:
   total_phases: 18
   completed_phases: 7
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 17 — deployment-hardening-firebase-hosting (automated work done, 2 human-check items pending before v2.0 milestone close-out)
+**Current focus:** Phase 17 complete — all v2.0 (iOS Web App) milestone phases (11-17) are now Complete; milestone close-out not yet run
 
 ## Current Position
 
-Phase: 17 (deployment-hardening-firebase-hosting) — 17-01 automated tasks complete
+Phase: 17 (deployment-hardening-firebase-hosting) — COMPLETE
 Plan: 1 of 1
-Status: Pending human verification (browser click-through + physical Android smoke test) — see 17-01-SUMMARY.md
-Last activity: 2026-07-17 -- Phase 17 automated work complete; 2 human-check items pending
+Status: Complete. Browser click-through confirmed by user 2026-07-17. Physical Android smoke test explicitly skipped by user decision (flutter build apk --release itself already succeeded during automated execution).
+Last activity: 2026-07-17 -- Phase 17 CLOSED (browser check confirmed by user; Android device smoke test explicitly skipped by user)
 
 ## Performance Metrics
 
