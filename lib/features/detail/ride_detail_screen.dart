@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_row.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -269,6 +270,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
     return AppBar(
       toolbarHeight: 64,
+      leading: const SafeBackButton(),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

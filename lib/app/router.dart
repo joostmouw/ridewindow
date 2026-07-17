@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/app/scaffold_with_nav.dart';
+import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
@@ -167,8 +168,11 @@ GoRouter router(Ref ref) {
           if (state.extra is! DetailArgs) {
             return _fadeTransition(
               state,
-              const Scaffold(
-                body: Center(child: Text('Ongeldige navigatieargumenten.')),
+              Scaffold(
+                appBar: AppBar(leading: const SafeBackButton()),
+                body: const Center(
+                  child: Text('Ongeldige navigatieargumenten.'),
+                ),
               ),
             );
           }

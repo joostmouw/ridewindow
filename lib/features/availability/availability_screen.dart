@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/services/drag_run_counter.dart';
 import 'package:ridewindow/domain/services/range_fill.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -62,14 +63,14 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       loading: () => Scaffold(
         appBar: AppBar(
           title: Text(S.of(context).availabilityTitle),
-          leading: const BackButton(),
+          leading: const SafeBackButton(),
         ),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Scaffold(
         appBar: AppBar(
           title: Text(S.of(context).availabilityTitle),
-          leading: const BackButton(),
+          leading: const SafeBackButton(),
         ),
         body: Center(child: Text('Error: $e')),
       ),
@@ -90,7 +91,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).availabilityTitle),
-        leading: const BackButton(),
+        leading: const SafeBackButton(),
         actions: [
           _isImporting
               ? const Padding(
