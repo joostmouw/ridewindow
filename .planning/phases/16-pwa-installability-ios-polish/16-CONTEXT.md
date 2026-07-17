@@ -14,8 +14,9 @@ iOS users can add RideWindow to their Home Screen and use it as a standalone app
 ## Implementation Decisions
 
 ### App icon & branding source
-- **D-01:** The web/iOS app icon and splash-screen artwork MUST be derived from RideWindow's existing custom Android launcher icon — `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` (calendar grid + winding road + cyclist silhouette on a dark rounded-square background). The current `web/icons/Icon-192.png` / `Icon-512.png` / maskable variants are still the generic default Flutter logo placeholder — these MUST be replaced, not kept.
-- **D-02:** Same source icon applies to `apple-touch-icon` in `web/index.html` (currently pointing at the default `icons/Icon-192.png`, which needs to become the real branded icon).
+- **D-01:** The web/iOS app icon and splash-screen artwork MUST be derived from `photos/main app logo real.png` — a black rounded-square with a white handwritten-style "RW" monogram. This is the canonical RideWindow logo the user wants used everywhere going forward, NOT the Android launcher icon (`android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png`, a calendar+road+cyclist illustration) that a first-pass codebase scout initially (incorrectly) assumed was the intended source — the user explicitly corrected this. The current `web/icons/Icon-192.png` / `Icon-512.png` / maskable variants are still the generic default Flutter logo placeholder — these MUST be replaced with icons derived from `photos/main app logo real.png`, not kept, and not derived from the Android launcher icon either.
+- **D-02:** Same source (`photos/main app logo real.png`) applies to `apple-touch-icon` in `web/index.html` (currently pointing at the default `icons/Icon-192.png`, which needs to become the real branded icon).
+- **Open question for planner:** The Android app's actual Play Store launcher icon still uses the calendar+cyclist artwork — this phase only concerns iOS/web assets, so this creates an intentional (for now) branding divergence between Android and web/iOS. Flag this to the user during/after planning; do not silently also swap the Android launcher icon as part of this phase (out of scope — Android icon changes belong in BACKLOG.md #28 "Themed branding + app icon polish" if desired later).
 
 ### Splash screen
 - **D-03:** `apple-touch-startup-image` splash screens show the RideWindow icon centered on a flat background in the manifest's brand `theme_color` (`#0175C2` in the current placeholder `manifest.json` — verify this is still the intended "cycling green" brand color from PROJECT.md's Material 3 seed, or update to match; do not introduce a third, different brand color).
@@ -39,8 +40,8 @@ iOS users can add RideWindow to their Home Screen and use it as a standalone app
 - `.planning/REQUIREMENTS.md` §PWA-01 through PWA-05 — exact requirement wording and traceability table
 
 ### Existing branding source (must reuse, not recreate)
-- `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` — the canonical RideWindow icon artwork (calendar + road + cyclist) to derive all new web/iOS icon and splash assets from
-- `android/app/src/main/res/values/ic_launcher_background.xml` — the icon's background color definition, check for consistency with manifest `background_color`/`theme_color`
+- `photos/main app logo real.png` — the canonical RideWindow logo (black rounded-square, white handwritten "RW" monogram) to derive all new web/iOS icon and splash assets from. Confirmed directly by the user after an initial (incorrect) codebase-scout assumption pointed at the Android launcher icon instead.
+- `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` — the Android app's CURRENT launcher icon (calendar + road + cyclist illustration) — NOT the source for this phase's web/iOS assets; kept here only as a reference point for the intentional (for now) Android/web branding divergence noted in D-01's open question.
 
 ### Current web PWA scaffold (default Flutter placeholders to replace)
 - `web/index.html` — current iOS meta tags (`mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, `apple-mobile-web-app-title`, `apple-touch-icon`) exist but are generic/default; missing `apple-mobile-web-app-capable` (legacy iOS tag), `apple-touch-startup-image`, explicit `theme-color`/`background-color` `<meta>` tags (PWA-01/02 require these)
@@ -55,7 +56,7 @@ iOS users can add RideWindow to their Home Screen and use it as a standalone app
 ## Existing Code Insights
 
 ### Reusable Assets
-- `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` — source artwork for all new web icon/splash generation (highest resolution available in the repo)
+- `photos/main app logo real.png` — source artwork for all new web icon/splash generation (2180x1920 PNG, black rounded-square with white "RW" monogram)
 - Flutter web's default PWA scaffold (`web/manifest.json`, `web/index.html`) already has the basic structure (manifest link, some iOS meta tags) — this phase edits/extends it in place rather than starting from scratch
 
 ### Established Patterns
@@ -73,7 +74,7 @@ iOS users can add RideWindow to their Home Screen and use it as a standalone app
 <specifics>
 ## Specific Ideas
 
-User was explicit and specific about one thing: **reuse the real, existing RideWindow app icon** (`android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` — calendar grid + winding road + cyclist silhouette) as the source for all new web/iOS branding artwork, rather than commissioning new artwork or using a generic/placeholder icon. This was said plainly: "main app logo real, deze gebruiken als logo aub."
+User was explicit and specific about one thing: **reuse the real, existing RideWindow app logo** as the source for all new web/iOS branding artwork, rather than commissioning new artwork or using a generic/placeholder icon. This was said plainly: "main app logo real, deze gebruiken als logo aub." The user was pointing at a specific file — `photos/main app logo real.png` (black rounded-square, white handwritten "RW" monogram) — confirmed by direct visual inspection, which is DIFFERENT from the Android app's current calendar+cyclist launcher icon that an initial codebase scout had assumed was the intended source. Always use `photos/main app logo real.png`, not the Android launcher icon, when this phase's tasks say "the app logo."
 
 </specifics>
 

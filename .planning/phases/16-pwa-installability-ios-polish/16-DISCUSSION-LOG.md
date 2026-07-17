@@ -11,10 +11,10 @@
 
 ## App icon & branding source
 
-User interjected before options were formally presented via AskUserQuestion, stating directly: reuse the real existing RideWindow app icon (found during codebase scouting at `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` — calendar grid + winding road + cyclist silhouette) instead of the current default Flutter placeholder icon still in use under `web/icons/`.
+User interjected before options were formally presented via AskUserQuestion, stating directly: reuse the real existing RideWindow app logo instead of the current default Flutter placeholder icon still in use under `web/icons/`. Claude's initial codebase scout had (incorrectly) assumed this meant the Android launcher icon (`android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` — calendar grid + winding road + cyclist silhouette). The user then pointed to the actual intended file, `photos/main app logo real.png` — a black rounded-square with a white handwritten-style "RW" monogram — confirmed by direct visual inspection.
 
-**User's choice:** Use the real Android app icon as the source for all web/iOS branding artwork.
-**Notes:** User's exact words: "main app logo real, deze gebruiken als logo aub."
+**User's choice:** Use `photos/main app logo real.png` (the "RW" monogram) as the source for all web/iOS branding artwork — NOT the Android launcher icon.
+**Notes:** User's exact words: "main app logo real, deze gebruiken als logo aub." Followed up later with: "zie jij het specifieke logo wat ik voor ogen heb genaamd: main app logo real" — prompting the correction.
 
 ---
 
