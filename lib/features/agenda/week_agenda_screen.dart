@@ -409,41 +409,51 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
             ],
           ),
         ),
-        // Hour rows
-        for (final hour in _kHours)
-          Expanded(
-            child: Row(
+        // Hour rows — fixed 48dp per row (Material touch-target minimum, B3),
+        // scrollable if the rows overflow the available viewport height.
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                SizedBox(
-                  width: 28,
-                  child: Center(
-                    child: Text(
-                      '$hour',
-                      style: TextStyle(fontSize: 10, color: context.rw.textHint),
-                    ),
-                  ),
-                ),
-                for (var di = 0; di < days.length; di++)
-                  Expanded(
-                    child: _CellWidget(
-                      key: ValueKey('cell_${di}_$hour'),
-                      day: days[di],
-                      dayIndex: di,
-                      hour: hour,
-                      allScores: allScores,
-                      forecasts: forecasts,
-                      cityName: cityName,
-                      blockedHours: blockedHours,
-                      showBlocked: _showBlocked,
-                      isToday: days[di] == today,
-                      isSelected: _selection?.contains(di, hour) ?? false,
-                      isPlanned: _isPlanned(days[di], hour),
-                      onTap: () => _onCellTap(di, hour, days[di], blockedHours),
+                for (final hour in _kHours)
+                  SizedBox(
+                    height: 48,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 28,
+                          child: Center(
+                            child: Text(
+                              '$hour',
+                              style: TextStyle(fontSize: 10, color: context.rw.textHint),
+                            ),
+                          ),
+                        ),
+                        for (var di = 0; di < days.length; di++)
+                          Expanded(
+                            child: _CellWidget(
+                              key: ValueKey('cell_${di}_$hour'),
+                              day: days[di],
+                              dayIndex: di,
+                              hour: hour,
+                              allScores: allScores,
+                              forecasts: forecasts,
+                              cityName: cityName,
+                              blockedHours: blockedHours,
+                              showBlocked: _showBlocked,
+                              isToday: days[di] == today,
+                              isSelected: _selection?.contains(di, hour) ?? false,
+                              isPlanned: _isPlanned(days[di], hour),
+                              onTap: () => _onCellTap(di, hour, days[di], blockedHours),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
               ],
             ),
           ),
+        ),
       ],
     );
   }

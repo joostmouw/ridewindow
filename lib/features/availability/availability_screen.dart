@@ -52,8 +52,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   // Dynamische cel-afmetingen (berekend in build)
   double _cellWidth = 0;
   double _cellHeight = 0;
-  static const double _headerWidth = 36;
-  static const double _headerHeight = 28;
+  // 44dp not 48dp: narrower-but-improved tradeoff to preserve day-column width
+  // on narrow phones (see backlog #9 research)
+  static const double _headerWidth = 44;
+  static const double _headerHeight = 48;
   static const double _dragIndicatorHeight = 32;
 
   @override
@@ -116,8 +118,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           // Hoogte: beschikbare hoogte minus legenda/profiel ruimte, gedeeld door 24 uur + header
           final availableHeight = constraints.maxHeight - 140 - _dragIndicatorHeight; // ruimte voor legenda + profiel + drag-indicator
           _cellHeight = (availableHeight - _headerHeight) / 24;
-          // Minimum celgrootte
-          if (_cellHeight < 16) _cellHeight = 16;
+          // Minimum celgrootte — 48dp Material touch-target floor
+          if (_cellHeight < 48) _cellHeight = 48;
 
           return Column(
             children: [

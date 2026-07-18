@@ -747,7 +747,7 @@ Widget _infoButton(BuildContext context, String title, String explanation, Strin
   return IconButton(
     icon: Icon(Icons.info_outline, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
     padding: EdgeInsets.zero,
-    constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
     tooltip: title,
     onPressed: () => showDialog<void>(
       context: context,

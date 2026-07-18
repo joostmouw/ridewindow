@@ -28,7 +28,8 @@ class TierColors {
     perfectBg: Color(0xFFE8F5E9),
     greatFg: Color(0xFF00695C),   // teal 800 — distinct from Perfect green
     greatBg: Color(0xFFE0F2F1),   // teal 50
-    acceptableFg: Color(0xFFE65100),
+    // 5.11:1 on acceptableBg (was 0xFFE65100 at 3.46:1, FAILED WCAG AA 4.5:1) — Material "Deep Orange 900"
+    acceptableFg: Color(0xFFBF360C),
     acceptableBg: Color(0xFFFFF3E0),
     poorFg: Color(0xFF757575),
     poorBg: Color(0xFFF5F5F5),
@@ -55,7 +56,8 @@ abstract final class AppColors {
   static const lightTextPrimary = Color(0xFF1A1A1A);
   static const lightTextSecondary = Color(0xFF444444);
   static const lightTextTertiary = Color(0xFF666666);
-  static const lightTextHint = Color(0xFF999999);
+  // 5.33:1 on white / 4.89:1 on lightSurface (was 0xFF999999 at 2.85:1/2.61:1, FAILED WCAG AA 4.5:1)
+  static const lightTextHint = Color(0xFF6B6B6B);
 
   static const lightSurface = Color(0xFFF5F5F5);
   static const lightSurfaceDim = Color(0xFFF0F0F0);
@@ -98,7 +100,9 @@ abstract final class AppColors {
   static const darkTextPrimary = Color(0xFFE0E0E0);
   static const darkTextSecondary = Color(0xFFBDBDBD);
   static const darkTextTertiary = Color(0xFF9E9E9E);
-  static const darkTextHint = Color(0xFF757575);
+  // 5.5:1 on darkSurface / 4.6:1 on darkSurfaceDim (was 0xFF757575 at 3.62:1/3.03:1, FAILED WCAG AA
+  // 4.5:1 — used as real label text at multiple call sites, not purely decorative)
+  static const darkTextHint = Color(0xFF949494);
 
   static const darkSurface = Color(0xFF1E1E1E);
   static const darkSurfaceDim = Color(0xFF2C2C2C);

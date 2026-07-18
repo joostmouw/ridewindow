@@ -371,14 +371,15 @@ void main() {
 
       // Fixed viewport (800x1400, devicePixelRatio 1.0, AppBar toolbarHeight 56.0,
       // no status-bar padding in test env) resolves to:
-      //   cellWidth = (800 - 36) / 7 ≈ 109.14
-      //   cellHeight = (1344 - 140 - 32 - 28) / 24 ≈ 47.67
-      const cellWidth = (800 - 36) / 7;
-      const cellHeight = (1344 - 140 - 32 - 28) / 24;
+      //   cellWidth = (800 - 44) / 7 = 108.0
+      //   raw cellHeight = (1344 - 140 - 32 - 48) / 24 ≈ 46.83 — below the 48dp floor,
+      //   so production code applies the floor and the effective cellHeight is 48.0.
+      const cellWidth = (800 - 44) / 7;
+      const cellHeight = 48.0;
       const hour = 1; // stays comfortably inside the viewport, avoids hour-0 boundary rounding
       Offset cellCenter(int dayIndex) => Offset(
-            36 + (dayIndex + 0.5) * cellWidth,
-            56 + 32 + 28 + (hour + 0.5) * cellHeight,
+            44 + (dayIndex + 0.5) * cellWidth,
+            56 + 32 + 48 + (hour + 0.5) * cellHeight,
           );
 
       final day0Hour1Center = cellCenter(0);
@@ -416,12 +417,15 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('BACKLOG-rne: two-tap range-select', () {
-    const cellWidth = (800 - 36) / 7;
-    const cellHeight = (1344 - 140 - 32 - 28) / 24;
+    // cellWidth = (800 - 44) / 7 = 108.0; raw cellHeight ≈ 46.83 is below the
+    // 48dp floor, so the effective (post-floor) cellHeight is 48.0 — mirrors
+    // production's `if (_cellHeight < 48) _cellHeight = 48;`.
+    const cellWidth = (800 - 44) / 7;
+    const cellHeight = 48.0;
 
     Offset cellCenter(int dayIndex, int hour) => Offset(
-          36 + (dayIndex + 0.5) * cellWidth,
-          56 + 32 + 28 + (hour + 0.5) * cellHeight,
+          44 + (dayIndex + 0.5) * cellWidth,
+          56 + 32 + 48 + (hour + 0.5) * cellHeight,
         );
 
     DateTime weekStartFor(DateTime now) =>
@@ -674,12 +678,15 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('BACKLOG-rne: long-press cell info', () {
-    const cellWidth = (800 - 36) / 7;
-    const cellHeight = (1344 - 140 - 32 - 28) / 24;
+    // cellWidth = (800 - 44) / 7 = 108.0; raw cellHeight ≈ 46.83 is below the
+    // 48dp floor, so the effective (post-floor) cellHeight is 48.0 — mirrors
+    // production's `if (_cellHeight < 48) _cellHeight = 48;`.
+    const cellWidth = (800 - 44) / 7;
+    const cellHeight = 48.0;
 
     Offset cellCenter(int dayIndex, int hour) => Offset(
-          36 + (dayIndex + 0.5) * cellWidth,
-          56 + 32 + 28 + (hour + 0.5) * cellHeight,
+          44 + (dayIndex + 0.5) * cellWidth,
+          56 + 32 + 48 + (hour + 0.5) * cellHeight,
         );
 
     DateTime weekStartFor(DateTime now) =>
