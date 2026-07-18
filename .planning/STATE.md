@@ -45,7 +45,7 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 Phase: Milestone v2.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-17 - Completed quick task 260717-no1: Backlog #31 Google OAuth consent screen fast-publish checklist
+Last activity: 2026-07-18 - Resolved debug session test-binding-state-leakage (backlog #11): flutter test 215/69 -> 282/2. Autonomous continuation while user away; see .planning/debug/resolved/test-binding-state-leakage.md for full checkpoint provenance.
 
 ## Performance Metrics
 
