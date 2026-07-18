@@ -13,6 +13,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
@@ -21,8 +22,42 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/hourly_scores_provider.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+
+// ---------------------------------------------------------------------------
+// Fake Notifiers — same ProviderScope requirement as ride_detail_screen_test.dart:
+// RideDetailScreen reads allHourlyScoresProvider, weatherProvider and
+// plannedRidesProvider directly, so a bare MaterialApp with no ProviderScope
+// ancestor throws "Bad state: No ProviderScope found".
+// ---------------------------------------------------------------------------
+
+class FakeWeatherNotifier extends WeatherNotifier {
+  FakeWeatherNotifier(this.forecasts);
+  final List<HourlyForecast> forecasts;
+
+  @override
+  Future<List<HourlyForecast>> build() async => forecasts;
+}
+
+class FakePlannedRidesNotifier extends PlannedRidesNotifier {
+  @override
+  List<PlannedRide> build() => [];
+
+  @override
+  void add(PlannedRide ride) {
+    state = [...state, ride];
+  }
+
+  @override
+  void remove(PlannedRide ride) {
+    state =
+        state.where((r) => r.start != ride.start || r.end != ride.end).toList();
+  }
+}
 
 // ---------------------------------------------------------------------------
 // FakeCalendarService: blokkeert voor onbepaalde tijd via Completer.
@@ -127,13 +162,24 @@ List<HourlyForecast> makeForecasts() {
   ];
 }
 
-Widget wrapInMaterial(Widget child) {
-  return MaterialApp(
-    home: child,
-    locale: const Locale('nl'),
-    localizationsDelegates: S.localizationsDelegates,
-    supportedLocales: S.supportedLocales,
-    theme: ThemeData(extensions: const [RideWindowTheme.light]),
+Widget wrapInMaterial(
+  Widget child, {
+  List<HourlyForecast> forecasts = const [],
+  List<HourlyScore> hours = const [],
+}) {
+  return ProviderScope(
+    overrides: [
+      weatherProvider.overrideWith(() => FakeWeatherNotifier(forecasts)),
+      allHourlyScoresProvider.overrideWithValue(hours),
+      plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+    ],
+    child: MaterialApp(
+      home: child,
+      locale: const Locale('nl'),
+      localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales,
+      theme: ThemeData(extensions: const [RideWindowTheme.light]),
+    ),
   );
 }
 
@@ -160,15 +206,17 @@ void main() {
           forecasts: forecasts,
           calendarServiceFactory: () => service,
         ),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
 
       // Scroll naar de knop en tik.
       await tester.scrollUntilVisible(
-        find.text('Toevoegen aan agenda'),
+        find.text('Toevoegen aan Google Agenda'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.text('Toevoegen aan agenda'));
+      await tester.tap(find.text('Toevoegen aan Google Agenda'));
 
       // Pump een frame — Future loopt nog (Completer niet voltooid).
       await tester.pump();
@@ -197,14 +245,16 @@ void main() {
           forecasts: forecasts,
           calendarServiceFactory: () => service,
         ),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
 
       await tester.scrollUntilVisible(
-        find.text('Toevoegen aan agenda'),
+        find.text('Toevoegen aan Google Agenda'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.text('Toevoegen aan agenda'));
+      await tester.tap(find.text('Toevoegen aan Google Agenda'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Rijvenster toegevoegd'), findsOneWidget);
@@ -226,14 +276,16 @@ void main() {
           forecasts: forecasts,
           calendarServiceFactory: () => service,
         ),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
 
       await tester.scrollUntilVisible(
-        find.text('Toevoegen aan agenda'),
+        find.text('Toevoegen aan Google Agenda'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.text('Toevoegen aan agenda'));
+      await tester.tap(find.text('Toevoegen aan Google Agenda'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('test fout'), findsOneWidget);
@@ -258,6 +310,8 @@ void main() {
           forecasts: forecasts,
           calendarServiceFactory: () => service,
         ),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 

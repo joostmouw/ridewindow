@@ -11,6 +11,7 @@
 // Tests gebruiken een MaterialApp wrapper (niet go_router) voor widget isolation.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
@@ -19,15 +20,88 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/providers/hourly_scores_provider.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
-Widget wrapInMaterial(Widget child) {
-  return MaterialApp(
-    home: child,
-    locale: const Locale('nl'),
-    localizationsDelegates: S.localizationsDelegates,
-    supportedLocales: S.supportedLocales,
-    theme: ThemeData(extensions: const [RideWindowTheme.light]),
+/// NotificationService stub — avoids the real flutter_local_notifications
+/// platform channel, which is not available in a plain widget test
+/// (LateInitializationError on FlutterLocalNotificationsPlatform.instance).
+class FakeNotificationService extends NotificationService {
+  @override
+  Future<bool> canScheduleExact() async => false;
+
+  @override
+  Future<void> scheduleEveningBefore({
+    required DateTime slotDay,
+    required String slotTitle,
+    required bool exact,
+  }) async {}
+}
+
+// ---------------------------------------------------------------------------
+// Fake Notifiers — RideDetailScreen is a ConsumerStatefulWidget and reads
+// allHourlyScoresProvider, weatherProvider and plannedRidesProvider
+// directly, so a bare MaterialApp with no ProviderScope ancestor throws
+// "Bad state: No ProviderScope found".
+//
+// allHourlyScoresProvider is overridden with a fixed value (the slot's own
+// `hours`, exactly what these tests construct and assert against) rather
+// than left to compute via the real ScoringEngine from weatherProvider +
+// profileProvider — the tests care about "does the widget render this
+// HourlyScore data correctly", not "does the scoring engine agree with the
+// fixture's hardcoded tier/score".
+// ---------------------------------------------------------------------------
+
+/// WeatherNotifier stub that returns exactly the forecasts passed to the
+/// widget under test, so _effectiveForecasts (hourly table, avg temp/wind/
+/// rain) sees the same timestamps the widget filters by.
+class FakeWeatherNotifier extends WeatherNotifier {
+  FakeWeatherNotifier(this.forecasts);
+  final List<HourlyForecast> forecasts;
+
+  @override
+  Future<List<HourlyForecast>> build() async => forecasts;
+}
+
+/// PlannedRidesNotifier stub — empty by default; add()/remove() are faked
+/// to avoid touching SharedPreferences.
+class FakePlannedRidesNotifier extends PlannedRidesNotifier {
+  @override
+  List<PlannedRide> build() => [];
+
+  @override
+  void add(PlannedRide ride) {
+    state = [...state, ride];
+  }
+
+  @override
+  void remove(PlannedRide ride) {
+    state =
+        state.where((r) => r.start != ride.start || r.end != ride.end).toList();
+  }
+}
+
+Widget wrapInMaterial(
+  Widget child, {
+  List<HourlyForecast> forecasts = const [],
+  List<HourlyScore> hours = const [],
+}) {
+  return ProviderScope(
+    overrides: [
+      weatherProvider.overrideWith(() => FakeWeatherNotifier(forecasts)),
+      allHourlyScoresProvider.overrideWithValue(hours),
+      plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+    ],
+    child: MaterialApp(
+      home: child,
+      locale: const Locale('nl'),
+      localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales,
+      theme: ThemeData(extensions: const [RideWindowTheme.light]),
+    ),
   );
 }
 
@@ -91,6 +165,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -106,11 +182,15 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
-      // Perfect tier uses 🟢 emoji
-      expect(find.textContaining('🟢'), findsWidgets);
+      // Perfect tier's ScoreBadge shows a satisfied-face Material icon
+      // (production migrated from emoji text to Icons during the MD3
+      // redesign — see lib/features/shared/score_badge.dart).
+      expect(find.byIcon(Icons.sentiment_very_satisfied), findsWidgets);
     });
 
     testWidgets('Score-banner toont tier-emoji voor Poor slot', (tester) async {
@@ -131,11 +211,15 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
-      // Poor tier uses ⚪ emoji
-      expect(find.textContaining('⚪'), findsWidgets);
+      // Poor tier's ScoreBadge shows a dissatisfied-face Material icon
+      // (production migrated from emoji text to Icons during the MD3
+      // redesign — see lib/features/shared/score_badge.dart).
+      expect(find.byIcon(Icons.sentiment_dissatisfied), findsWidgets);
     });
 
     testWidgets('Score-banner toont beschrijvingstekst voor Perfect',
@@ -145,6 +229,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -159,6 +245,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -174,6 +262,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -187,6 +277,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -201,6 +293,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -217,16 +311,20 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
-      // Scroll to bottom to find the button
+      // Scroll to bottom to find the button. Note: production string is
+      // "Toevoegen aan Google Agenda" (capital A) — see
+      // lib/l10n/app_localizations_nl.dart addToGoogleCalendar.
       await tester.scrollUntilVisible(
-        find.textContaining('agenda'),
+        find.textContaining('Agenda'),
         100,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.textContaining('agenda'));
+      await tester.tap(find.textContaining('Agenda'));
       await tester.pump();
 
       expect(find.byType(SnackBar), findsOneWidget);
@@ -237,7 +335,13 @@ void main() {
       final forecasts = makeForecasts(slot.start);
 
       await tester.pumpWidget(wrapInMaterial(
-        RideDetailScreen(slot: slot, forecasts: forecasts),
+        RideDetailScreen(
+          slot: slot,
+          forecasts: forecasts,
+          notificationServiceFactory: () => FakeNotificationService(),
+        ),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -296,6 +400,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -330,6 +436,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 
@@ -343,6 +451,8 @@ void main() {
 
       await tester.pumpWidget(wrapInMaterial(
         RideDetailScreen(slot: slot, forecasts: forecasts),
+        forecasts: forecasts,
+        hours: slot.hours,
       ));
       await tester.pump();
 

@@ -11,7 +11,8 @@ import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_row.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
-import 'package:ridewindow/domain/services/slot_generator.dart' show windVariabilityPenalty;
+import 'package:ridewindow/domain/services/slot_generator.dart'
+    show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
@@ -37,6 +38,15 @@ typedef CalendarServiceFactory = CalendarService Function();
 
 CalendarService _defaultCalendarServiceFactory() => CalendarService();
 
+/// Factory typedef voor NotificationService — zelfde DI-patroon als
+/// CalendarServiceFactory, zodat widget tests canScheduleExact() kunnen
+/// faken zonder het echte flutter_local_notifications platform channel
+/// (niet beschikbaar in een plain widget test).
+typedef NotificationServiceFactory = NotificationService Function();
+
+NotificationService _defaultNotificationServiceFactory() =>
+    NotificationService();
+
 class RideDetailScreen extends ConsumerStatefulWidget {
   final RideSlot slot;
   final List<HourlyForecast> forecasts;
@@ -44,11 +54,15 @@ class RideDetailScreen extends ConsumerStatefulWidget {
   /// Optionele factory voor testinjectie. Default maakt een echte CalendarService.
   final CalendarServiceFactory calendarServiceFactory;
 
+  /// Optionele factory voor testinjectie. Default maakt een echte NotificationService.
+  final NotificationServiceFactory notificationServiceFactory;
+
   const RideDetailScreen({
     super.key,
     required this.slot,
     required this.forecasts,
     this.calendarServiceFactory = _defaultCalendarServiceFactory,
+    this.notificationServiceFactory = _defaultNotificationServiceFactory,
   });
 
   @override
@@ -187,9 +201,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .map((f) => f.precipitationProbability)
         .whereType<double>()
         .toList();
-    final avgProb = probs.isEmpty
-        ? null
-        : probs.reduce((a, b) => a + b) / probs.length;
+    final avgProb =
+        probs.isEmpty ? null : probs.reduce((a, b) => a + b) / probs.length;
     final s = S.of(context);
     if (total == 0.0 && (avgProb == null || avgProb == 0)) return s.dry;
     if (avgProb != null && avgProb > 0) {
@@ -218,7 +231,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         cosSum += _cos(d * _pi / 180);
       }
       final avgDir = (_atan2(sinSum, cosSum) * 180 / _pi + 360) % 360;
-      return s.windFrom(avg.round().toString(), _compassDirection(context, avgDir));
+      return s.windFrom(
+          avg.round().toString(), _compassDirection(context, avgDir));
     }
     return '${avg.round()}km/u';
   }
@@ -231,9 +245,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     setState(() => _isLoading = true);
     try {
       await widget.calendarServiceFactory().addRideSlotToCalendar(
-        widget.slot,
-        widget.forecasts,
-      );
+            widget.slot,
+            widget.forecasts,
+          );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -279,7 +293,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             children: [
               Text(
                 '${_fmtTime(slot.start)} \u2013 ${_fmtTime(slot.end)}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(width: 8),
               ScoreBadge(tier: slot.tier),
@@ -325,10 +342,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             child: Text(
               title,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: rw.textHint,
-                letterSpacing: 0.8,
-              ),
+                    fontWeight: FontWeight.w700,
+                    color: rw.textHint,
+                    letterSpacing: 0.8,
+                  ),
             ),
           ),
           ...rows,
@@ -382,7 +399,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
-    final windAvg = winds.isEmpty ? 0.0 : winds.reduce((a, b) => a + b) / winds.length;
+    final windAvg =
+        winds.isEmpty ? 0.0 : winds.reduce((a, b) => a + b) / winds.length;
 
     final s = S.of(context);
     final advice = recommendClothing(
@@ -453,7 +471,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         ? s.hourlyFeelsLike(row.apparentTemperatureC!.round().toString())
         : '';
     final String precipIcon = row.precipitationMm == 0.0 &&
-            (row.precipitationProbability == null || row.precipitationProbability == 0)
+            (row.precipitationProbability == null ||
+                row.precipitationProbability == 0)
         ? '\u2600\ufe0f'
         : row.precipitationMm == 0.0 &&
                 row.precipitationProbability != null &&
@@ -462,9 +481,12 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             ? '\u26c5'
             : '\u{1F327}';
     final precip = row.precipitationMm != null
-        ? (row.precipitationMm! == 0.0 && (row.precipitationProbability == null || row.precipitationProbability == 0)
+        ? (row.precipitationMm! == 0.0 &&
+                (row.precipitationProbability == null ||
+                    row.precipitationProbability == 0)
             ? '$precipIcon ${s.hourlyDry}'
-            : row.precipitationProbability != null && row.precipitationProbability! > 0
+            : row.precipitationProbability != null &&
+                    row.precipitationProbability! > 0
                 ? '$precipIcon ${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
                 : '$precipIcon ${row.precipitationMm!.toStringAsFixed(1)}mm')
         : '\u{1F327} \u2014';
@@ -542,20 +564,46 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     };
     final summary = CalendarService.buildWeatherSummary(widget.forecasts);
     final day = _dayName(context, widget.slot.start);
-    final timeRange = '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
+    final timeRange =
+        '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
     Share.share(s.shareText(day, timeRange, tierLabel, summary));
   }
 
   String _dayName(BuildContext context, DateTime dt) {
     final s = S.of(context);
-    const days = [DateTime.monday, DateTime.tuesday, DateTime.wednesday, DateTime.thursday, DateTime.friday, DateTime.saturday, DateTime.sunday];
-    final names = [s.dayMonFull, s.dayTueFull, s.dayWedFull, s.dayThuFull, s.dayFriFull, s.daySatFull, s.daySunFull];
+    const days = [
+      DateTime.monday,
+      DateTime.tuesday,
+      DateTime.wednesday,
+      DateTime.thursday,
+      DateTime.friday,
+      DateTime.saturday,
+      DateTime.sunday
+    ];
+    final names = [
+      s.dayMonFull,
+      s.dayTueFull,
+      s.dayWedFull,
+      s.dayThuFull,
+      s.dayFriFull,
+      s.daySatFull,
+      s.daySunFull
+    ];
     return names[days.indexOf(dt.weekday)];
   }
 
   String _compassDirection(BuildContext context, double degrees) {
     final s = S.of(context);
-    final dirs = [s.compassN, s.compassNE, s.compassE, s.compassSE, s.compassS, s.compassSW, s.compassW, s.compassNW];
+    final dirs = [
+      s.compassN,
+      s.compassNE,
+      s.compassE,
+      s.compassSE,
+      s.compassS,
+      s.compassSW,
+      s.compassW,
+      s.compassNW
+    ];
     final index = ((degrees + 22.5) % 360 / 45).floor();
     return dirs[index];
   }
@@ -597,7 +645,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final contextStart = _start.subtract(const Duration(hours: 2));
     final contextEnd = _end.add(const Duration(hours: 2));
     final contextScores = allScores
-        .where((sc) => !sc.time.isBefore(contextStart) && sc.time.isBefore(contextEnd))
+        .where((sc) =>
+            !sc.time.isBefore(contextStart) && sc.time.isBefore(contextEnd))
         .toList()
       ..sort((a, b) => a.time.compareTo(b.time));
 
@@ -614,7 +663,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         color: cs.surface,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: rw.shadow, blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: rw.shadow, blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -635,24 +685,28 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             children: [
               SizedBox(
                 width: 50,
-                child: Text(s.startLabel, style: TextStyle(fontSize: 12, color: rw.textTertiary)),
+                child: Text(s.startLabel,
+                    style: TextStyle(fontSize: 12, color: rw.textTertiary)),
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
                 color: rw.scorePerfect,
                 onPressed: canExpandStart
-                    ? () => setState(() => _start = _start.subtract(const Duration(hours: 1)))
+                    ? () => setState(() =>
+                        _start = _start.subtract(const Duration(hours: 1)))
                     : null,
               ),
               Text(
                 _fmtTime(_start),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
                 color: rw.scorePerfect,
                 onPressed: canShrinkStart
-                    ? () => setState(() => _start = _start.add(const Duration(hours: 1)))
+                    ? () => setState(
+                        () => _start = _start.add(const Duration(hours: 1)))
                     : null,
               ),
             ],
@@ -662,24 +716,28 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             children: [
               SizedBox(
                 width: 50,
-                child: Text(s.endLabel, style: TextStyle(fontSize: 12, color: rw.textTertiary)),
+                child: Text(s.endLabel,
+                    style: TextStyle(fontSize: 12, color: rw.textTertiary)),
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
                 color: rw.scorePerfect,
                 onPressed: canShrinkEnd
-                    ? () => setState(() => _end = _end.subtract(const Duration(hours: 1)))
+                    ? () => setState(
+                        () => _end = _end.subtract(const Duration(hours: 1)))
                     : null,
               ),
               Text(
                 _fmtTime(_end),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
                 color: rw.scorePerfect,
                 onPressed: canExpandEnd
-                    ? () => setState(() => _end = _end.add(const Duration(hours: 1)))
+                    ? () => setState(
+                        () => _end = _end.add(const Duration(hours: 1)))
                     : null,
               ),
               const Spacer(),
@@ -692,7 +750,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 ),
                 child: Text(
                   '${_end.difference(_start).inHours}u',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -703,7 +762,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             height: 28,
             child: Row(
               children: contextScores.map((sc) {
-                final isInRange = !sc.time.isBefore(_start) && sc.time.isBefore(_end);
+                final isInRange =
+                    !sc.time.isBefore(_start) && sc.time.isBefore(_end);
                 final color = sc.overall >= 85
                     ? rw.scorePerfect
                     : sc.overall >= 70
@@ -727,7 +787,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
-                          color: isInRange ? Theme.of(context).colorScheme.onPrimary : rw.textHint,
+                          color: isInRange
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : rw.textHint,
                         ),
                       ),
                     ),
@@ -804,14 +866,17 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           OutlinedButton.icon(
             onPressed: _isLoading ? null : _addToCalendar,
             icon: _isLoading
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.calendar_month, size: 18),
             label: Text(S.of(context).addToGoogleCalendar),
           ),
           const SizedBox(height: 10),
           FilledButton.tonalIcon(
             onPressed: () async {
-              final notifService = NotificationService();
+              final notifService = widget.notificationServiceFactory();
               final canExact = await notifService.canScheduleExact();
               final slotTitle =
                   '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
@@ -852,7 +917,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     return Scaffold(
       backgroundColor: rw.surface,
       appBar: _buildAppBar(context),
-      bottomNavigationBar: SafeArea(top: false, child: _buildPlanRideBar(context)),
+      bottomNavigationBar:
+          SafeArea(top: false, child: _buildPlanRideBar(context)),
       body: SafeArea(
         child: Column(
           children: [
@@ -864,19 +930,19 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     _buildInfoCard(
                       title: S.of(context).weatherSection,
                       rows: [
-                        _buildWeatherRow(S.of(context).weatherTemperature, _avgTempString(context)),
-                        _buildWeatherRow(S.of(context).weatherRain, _totalPrecipString(context)),
-                        _buildWeatherRow(S.of(context).weatherWind, _avgWindString(context)),
-                        if (_windPenaltyPercent() > 2)
-                          _buildWindPenaltyNote(),
+                        _buildWeatherRow(S.of(context).weatherTemperature,
+                            _avgTempString(context)),
+                        _buildWeatherRow(S.of(context).weatherRain,
+                            _totalPrecipString(context)),
+                        _buildWeatherRow(
+                            S.of(context).weatherWind, _avgWindString(context)),
+                        if (_windPenaltyPercent() > 2) _buildWindPenaltyNote(),
                       ],
                     ),
                     _buildClothingTip(),
                     _buildInfoCard(
                       title: S.of(context).weatherHourly,
-                      rows: hourlyRows
-                          .map(_buildHourlyRowWidget)
-                          .toList(),
+                      rows: hourlyRows.map(_buildHourlyRowWidget).toList(),
                     ),
                     _buildSecondaryActions(context),
                   ],
