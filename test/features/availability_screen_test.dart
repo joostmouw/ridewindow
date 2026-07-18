@@ -57,10 +57,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -77,10 +79,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -91,7 +95,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     for (final dag in ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']) {
-      expect(find.text(dag), findsOneWidget, reason: 'Dag-header "$dag" ontbreekt');
+      expect(find.text(dag), findsOneWidget,
+          reason: 'Dag-header "$dag" ontbreekt');
     }
   });
 
@@ -99,10 +104,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -116,15 +123,16 @@ void main() {
     expect(find.text('23'), findsOneWidget);
   });
 
-  testWidgets('SC-3: Rooster toont 168 cellen (7×24)',
-      (tester) async {
+  testWidgets('SC-3: Rooster toont 168 cellen (7×24)', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -143,10 +151,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+          availabilityProvider
+              .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -183,6 +193,7 @@ void main() {
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -211,6 +222,7 @@ void main() {
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -232,6 +244,7 @@ void main() {
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -244,8 +257,7 @@ void main() {
     expect(find.text('Ma'), findsOneWidget);
   });
 
-  testWidgets(
-      'P04-3: Werk-cel (uur 9, dag 0) heeft werk-kleur 0xFFB0BEC5',
+  testWidgets('P04-3: Werk-cel (uur 9, dag 0) heeft werk-kleur 0xFFB0BEC5',
       (tester) async {
     final now = DateTime.now();
     final weekStart =
@@ -264,6 +276,7 @@ void main() {
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -278,8 +291,7 @@ void main() {
       find.byWidgetPredicate(
         (w) =>
             w is Container &&
-            (w.decoration as BoxDecoration?)?.color ==
-                const Color(0xFFB0BEC5),
+            (w.decoration as BoxDecoration?)?.color == const Color(0xFFB0BEC5),
         skipOffstage: false,
       ),
       findsWidgets,
@@ -287,8 +299,7 @@ void main() {
     );
   });
 
-  testWidgets(
-      'P04-4: Custom-cel (uur 10, dag 0) heeft custom-kleur 0xFFFF9800',
+  testWidgets('P04-4: Custom-cel (uur 10, dag 0) heeft custom-kleur 0xFFFF9800',
       (tester) async {
     final now = DateTime.now();
     final weekStart =
@@ -307,6 +318,7 @@ void main() {
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -321,8 +333,7 @@ void main() {
       find.byWidgetPredicate(
         (w) =>
             w is Container &&
-            (w.decoration as BoxDecoration?)?.color ==
-                const Color(0xFFFF9800),
+            (w.decoration as BoxDecoration?)?.color == const Color(0xFFFF9800),
         skipOffstage: false,
       ),
       findsWidgets,
@@ -330,8 +341,7 @@ void main() {
     );
   });
 
-  testWidgets(
-      'P04-5: Werk-tap-guard: tappen op werk-cel wijzigt celkleur niet',
+  testWidgets('P04-5: Werk-tap-guard: tappen op werk-cel wijzigt celkleur niet',
       (tester) async {
     final now = DateTime.now();
     final weekStart =
@@ -351,6 +361,7 @@ void main() {
         ],
         child: MaterialApp(
           home: const AvailabilityScreen(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -410,7 +421,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
+            availabilityProvider
+                .overrideWith(() => FakeEmptyAvailabilityNotifier()),
           ],
           child: MaterialApp(
             locale: const Locale('nl'),
@@ -430,7 +442,8 @@ void main() {
       //   cellHeight = (1344 - 140 - 32 - 28) / 24 ≈ 47.67
       const cellWidth = (800 - 36) / 7;
       const cellHeight = (1344 - 140 - 32 - 28) / 24;
-      const hour = 1; // stays comfortably inside the viewport, avoids hour-0 boundary rounding
+      const hour =
+          1; // stays comfortably inside the viewport, avoids hour-0 boundary rounding
       Offset cellCenter(int dayIndex) => Offset(
             36 + (dayIndex + 0.5) * cellWidth,
             56 + 32 + 28 + (hour + 0.5) * cellHeight,
@@ -515,9 +528,7 @@ void main() {
           (w) =>
               w is Container &&
               (w.decoration as BoxDecoration?)?.border is Border &&
-              (((w.decoration as BoxDecoration).border! as Border)
-                      .top
-                      .width ==
+              (((w.decoration as BoxDecoration).border! as Border).top.width ==
                   2.0),
           skipOffstage: false,
         );
@@ -548,8 +559,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
-    testWidgets(
-        'Test 1: same-day two-tap opens then fills-and-closes a block',
+    testWidgets('Test 1: same-day two-tap opens then fills-and-closes a block',
         (tester) async {
       await pumpScreen(tester, () => FakeEmptyAvailabilityNotifier());
 
@@ -714,13 +724,15 @@ void main() {
       await tester.pump();
 
       expect(pendingBorderFinder(), findsNWidgets(1));
-      expect(customColorFinder(), findsNWidgets(2)); // hour 20 (preseeded) + hour 5 (new anchor)
+      expect(customColorFinder(),
+          findsNWidgets(2)); // hour 20 (preseeded) + hour 5 (new anchor)
 
       await tester.tapAt(cellCenter(0, 20));
       await tester.pump();
 
       expect(customColorFinder(), findsNWidgets(1)); // only hour 5 remains
-      expect(pendingBorderFinder(), findsNWidgets(1)); // anchor still open on hour 5
+      expect(pendingBorderFinder(),
+          findsNWidgets(1)); // anchor still open on hour 5
     });
   });
 

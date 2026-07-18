@@ -132,6 +132,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -164,6 +165,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),

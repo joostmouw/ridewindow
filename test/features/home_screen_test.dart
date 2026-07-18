@@ -36,7 +36,8 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 class FakeWeatherLoading extends WeatherNotifier {
   @override
   Future<List<HourlyForecast>> build() async {
-    await Completer<void>().future; // hangt oneindig → provider blijft AsyncLoading
+    await Completer<void>()
+        .future; // hangt oneindig → provider blijft AsyncLoading
     return const [];
   }
 }
@@ -126,7 +127,8 @@ void main() {
   // ---------------------------------------------------------------------------
   // Test 1: loading state — skeleton cards zichtbaar
   // ---------------------------------------------------------------------------
-  testWidgets('HomeScreen toont skeleton cards tijdens loading state', (tester) async {
+  testWidgets('HomeScreen toont skeleton cards tijdens loading state',
+      (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -136,6 +138,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -157,7 +160,8 @@ void main() {
   // ---------------------------------------------------------------------------
   // Test 2: data state — ride card tijdreeks zichtbaar
   // ---------------------------------------------------------------------------
-  testWidgets('HomeScreen toont ride cards bij SlotsLoaded met data', (tester) async {
+  testWidgets('HomeScreen toont ride cards bij SlotsLoaded met data',
+      (tester) async {
     final testSlot = _makeTestSlot();
 
     await tester.pumpWidget(
@@ -172,6 +176,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -195,7 +200,8 @@ void main() {
   // ---------------------------------------------------------------------------
   // Test 3: lege staat badWeather — tekst over slecht weer zichtbaar
   // ---------------------------------------------------------------------------
-  testWidgets('HomeScreen toont lege-staat tekst bij badWeather', (tester) async {
+  testWidgets('HomeScreen toont lege-staat tekst bij badWeather',
+      (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -210,6 +216,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -228,7 +235,8 @@ void main() {
   // ---------------------------------------------------------------------------
   // Test 4: lege staat allBlocked — tekst over geblokkeerde uren zichtbaar
   // ---------------------------------------------------------------------------
-  testWidgets('HomeScreen toont lege-staat tekst bij allBlocked', (tester) async {
+  testWidgets('HomeScreen toont lege-staat tekst bij allBlocked',
+      (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -243,6 +251,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
           localizationsDelegates: S.localizationsDelegates,
           supportedLocales: S.supportedLocales,
           theme: ThemeData(extensions: const [RideWindowTheme.light]),

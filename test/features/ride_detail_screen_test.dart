@@ -24,6 +24,7 @@ import 'package:ridewindow/theme/app_theme.dart';
 Widget wrapInMaterial(Widget child) {
   return MaterialApp(
     home: child,
+    locale: const Locale('nl'),
     localizationsDelegates: S.localizationsDelegates,
     supportedLocales: S.supportedLocales,
     theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -98,7 +99,8 @@ void main() {
       expect(find.textContaining('13:00'), findsWidgets);
     });
 
-    testWidgets('Score-banner toont tier-emoji voor Perfect slot', (tester) async {
+    testWidgets('Score-banner toont tier-emoji voor Perfect slot',
+        (tester) async {
       final slot = makeSlot(tier: const Perfect());
       final forecasts = makeForecasts(slot.start);
 
@@ -136,7 +138,8 @@ void main() {
       expect(find.textContaining('⚪'), findsWidgets);
     });
 
-    testWidgets('Score-banner toont beschrijvingstekst voor Perfect', (tester) async {
+    testWidgets('Score-banner toont beschrijvingstekst voor Perfect',
+        (tester) async {
       final slot = makeSlot(tier: const Perfect());
       final forecasts = makeForecasts(slot.start);
 
@@ -148,7 +151,8 @@ void main() {
       expect(find.textContaining('Perfect'), findsWidgets);
     });
 
-    testWidgets('Uurlijkse tabel toont tijd van elke HourlyRow', (tester) async {
+    testWidgets('Uurlijkse tabel toont tijd van elke HourlyRow',
+        (tester) async {
       final start = DateTime(2026, 6, 13, 9, 0);
       final slot = makeSlot(start: start);
       final forecasts = makeForecasts(start, count: 2);
@@ -190,7 +194,8 @@ void main() {
       expect(find.byIcon(Icons.info_outline), findsOneWidget);
     });
 
-    testWidgets('"i"-knop opent InsightsSheet via showModalBottomSheet', (tester) async {
+    testWidgets('"i"-knop opent InsightsSheet via showModalBottomSheet',
+        (tester) async {
       final slot = makeSlot();
       final forecasts = makeForecasts(slot.start);
 
@@ -247,7 +252,8 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
     });
 
-    testWidgets('Info-kaart "Weer" toont gemiddelde temperatuur', (tester) async {
+    testWidgets('Info-kaart "Weer" toont gemiddelde temperatuur',
+        (tester) async {
       final start = DateTime(2026, 6, 13, 9, 0);
       final hours = [
         HourlyScore(
@@ -297,7 +303,8 @@ void main() {
       expect(find.textContaining('21°C'), findsWidgets);
     });
 
-    testWidgets('Info-kaart "Weer" toont "Droog" bij nul neerslag', (tester) async {
+    testWidgets('Info-kaart "Weer" toont "Droog" bij nul neerslag',
+        (tester) async {
       final start = DateTime(2026, 6, 13, 9, 0);
       final slot = makeSlot(start: start);
       final forecasts = [
@@ -329,7 +336,8 @@ void main() {
       expect(find.textContaining('Droog'), findsOneWidget);
     });
 
-    testWidgets('Leeg slot (geen hours) toont scherm zonder crash', (tester) async {
+    testWidgets('Leeg slot (geen hours) toont scherm zonder crash',
+        (tester) async {
       final slot = makeSlot(hours: []);
       final forecasts = <HourlyForecast>[];
 

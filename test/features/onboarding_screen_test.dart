@@ -55,6 +55,7 @@ Widget _buildTestApp() {
     ],
     child: MaterialApp.router(
       routerConfig: router,
+      locale: const Locale('nl'),
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -83,7 +84,8 @@ void main() {
   // ---------------------------------------------------------------------------
   // Test 2: Tapping een preset optie (geen crash, setState werkt)
   // ---------------------------------------------------------------------------
-  testWidgets('OnboardingScreen: tapping eerste preset geeft geen fout', (tester) async {
+  testWidgets('OnboardingScreen: tapping eerste preset geeft geen fout',
+      (tester) async {
     await tester.pumpWidget(_buildTestApp());
     await tester.pumpAndSettle();
 

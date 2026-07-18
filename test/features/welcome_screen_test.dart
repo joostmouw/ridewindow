@@ -33,6 +33,7 @@ Widget _buildTestApp() {
   return ProviderScope(
     child: MaterialApp.router(
       routerConfig: router,
+      locale: const Locale('nl'),
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -59,7 +60,8 @@ void main() {
   // ---------------------------------------------------------------------------
   // Test 2: Titel 'perfecte rijmoment' zichtbaar
   // ---------------------------------------------------------------------------
-  testWidgets('WelcomeScreen toont titel met "perfecte rijmoment"', (tester) async {
+  testWidgets('WelcomeScreen toont titel met "perfecte rijmoment"',
+      (tester) async {
     await tester.pumpWidget(_buildTestApp());
     await tester.pumpAndSettle();
 

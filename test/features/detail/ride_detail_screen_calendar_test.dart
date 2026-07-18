@@ -130,6 +130,7 @@ List<HourlyForecast> makeForecasts() {
 Widget wrapInMaterial(Widget child) {
   return MaterialApp(
     home: child,
+    locale: const Locale('nl'),
     localizationsDelegates: S.localizationsDelegates,
     supportedLocales: S.supportedLocales,
     theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -145,7 +146,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 1: laadstatus — CircularProgressIndicator zichtbaar terwijl Future loopt.
     // -------------------------------------------------------------------------
-    testWidgets('Test 1 — laadstatus: CircularProgressIndicator verschijnt bij knoptik', (tester) async {
+    testWidgets(
+        'Test 1 — laadstatus: CircularProgressIndicator verschijnt bij knoptik',
+        (tester) async {
       final completer = Completer<void>();
       final service = FakeCalendarService(completer);
       final slot = makeSlot();
@@ -181,7 +184,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 2: succesmelding — SnackBar met "Rijvenster toegevoegd" na succes.
     // -------------------------------------------------------------------------
-    testWidgets('Test 2 — succesmelding: SnackBar met "Rijvenster toegevoegd" verschijnt', (tester) async {
+    testWidgets(
+        'Test 2 — succesmelding: SnackBar met "Rijvenster toegevoegd" verschijnt',
+        (tester) async {
       final service = SuccessFakeCalendarService();
       final slot = makeSlot();
       final forecasts = makeForecasts();
@@ -208,7 +213,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 3: foutmelding — SnackBar met foutboodschap als service Exception gooit.
     // -------------------------------------------------------------------------
-    testWidgets('Test 3 — foutmelding: SnackBar met foutboodschap bij Exception', (tester) async {
+    testWidgets(
+        'Test 3 — foutmelding: SnackBar met foutboodschap bij Exception',
+        (tester) async {
       final service = ErrorFakeCalendarService('test fout');
       final slot = makeSlot();
       final forecasts = makeForecasts();
@@ -237,7 +244,9 @@ void main() {
     // tenzij de gebruiker expliciet op de knop tikt.
     // Data verlaat het apparaat niet zonder expliciete gebruikersactie (PERS-04).
     // -------------------------------------------------------------------------
-    testWidgets('Test 4 — PERS-04 privacy: calendarServiceFactory niet aangeroepen zonder knoptik', (tester) async {
+    testWidgets(
+        'Test 4 — PERS-04 privacy: calendarServiceFactory niet aangeroepen zonder knoptik',
+        (tester) async {
       final service = TrackingFakeCalendarService();
       final slot = makeSlot();
       final forecasts = makeForecasts();
@@ -254,7 +263,8 @@ void main() {
 
       // PERS-04 verificatie: addRideSlotToCalendar mag NIET zijn aangeroepen.
       expect(service.wasCalled, isFalse,
-          reason: 'PERS-04: CalendarService.addRideSlotToCalendar mag niet worden '
+          reason:
+              'PERS-04: CalendarService.addRideSlotToCalendar mag niet worden '
               'aangeroepen zonder expliciete gebruikerstik — data verlaat het '
               'apparaat niet tenzij de gebruiker toestemming geeft.');
     });

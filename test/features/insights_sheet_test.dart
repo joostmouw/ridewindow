@@ -26,6 +26,7 @@ import 'package:ridewindow/theme/app_theme.dart';
 Widget wrapInMaterial(Widget child) {
   return MaterialApp(
     home: Scaffold(body: child),
+    locale: const Locale('nl'),
     localizationsDelegates: S.localizationsDelegates,
     supportedLocales: S.supportedLocales,
     theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -66,7 +67,8 @@ RideSlot makeSlot({
 
 void main() {
   group('InsightsSheet', () {
-    testWidgets('Drie LinearProgressIndicator balken zijn aanwezig', (tester) async {
+    testWidgets('Drie LinearProgressIndicator balken zijn aanwezig',
+        (tester) async {
       final slot = makeSlot();
       await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: slot)));
       await tester.pump();
@@ -97,7 +99,8 @@ void main() {
       expect(find.textContaining('4u'), findsWidgets);
     });
 
-    testWidgets('Factor-labels zijn zichtbaar (Temperatuur, Neerslag, Wind)', (tester) async {
+    testWidgets('Factor-labels zijn zichtbaar (Temperatuur, Neerslag, Wind)',
+        (tester) async {
       final slot = makeSlot();
       await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: slot)));
       await tester.pump();
@@ -107,7 +110,8 @@ void main() {
       expect(find.textContaining('Wind'), findsWidgets);
     });
 
-    testWidgets('Score-label "Ideaal" wordt getoond voor hoge temperatuurscore', (tester) async {
+    testWidgets('Score-label "Ideaal" wordt getoond voor hoge temperatuurscore',
+        (tester) async {
       // temperatureScore avg = 94 → ≥ 80 → "Ideaal"
       final slot = makeSlot(
         hours: [
@@ -126,7 +130,8 @@ void main() {
       expect(find.textContaining('Ideaal'), findsWidgets);
     });
 
-    testWidgets('Score-label "Droog" wordt getoond voor hoge neerslags core', (tester) async {
+    testWidgets('Score-label "Droog" wordt getoond voor hoge neerslags core',
+        (tester) async {
       // rainScore avg = 88 → ≥ 80 → "Droog"
       final slot = makeSlot(
         hours: [
@@ -145,7 +150,8 @@ void main() {
       expect(find.textContaining('Droog'), findsWidgets);
     });
 
-    testWidgets('Score-label "Rustig" wordt getoond voor hoge windscore', (tester) async {
+    testWidgets('Score-label "Rustig" wordt getoond voor hoge windscore',
+        (tester) async {
       // windScore avg = 82 → ≥ 80 → "Rustig"
       final slot = makeSlot(
         hours: [
@@ -181,7 +187,8 @@ void main() {
       expect(find.textContaining('Begrijpen'), findsOneWidget);
     });
 
-    testWidgets('Lege hours-lijst veroorzaakt geen crash (fallback score 50)', (tester) async {
+    testWidgets('Lege hours-lijst veroorzaakt geen crash (fallback score 50)',
+        (tester) async {
       final slot = makeSlot(hours: [], overallScore: 50);
       await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: slot)));
       await tester.pump();
@@ -190,7 +197,8 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsNWidgets(3));
     });
 
-    testWidgets('Acceptabel score-label bij gemiddelde temp in 60-79 bereik', (tester) async {
+    testWidgets('Acceptabel score-label bij gemiddelde temp in 60-79 bereik',
+        (tester) async {
       // temperatureScore avg = 70 → ≥ 60 < 80 → "Acceptabel"
       final slot = makeSlot(
         hours: [
@@ -209,7 +217,8 @@ void main() {
       expect(find.textContaining('Acceptabel'), findsWidgets);
     });
 
-    testWidgets('Uitleg-tekst "Lichte wind" wordt getoond bij matige windscore', (tester) async {
+    testWidgets('Uitleg-tekst "Lichte wind" wordt getoond bij matige windscore',
+        (tester) async {
       // windScore avg = 82 → ≥ 80 → "Lichte wind — nauwelijks merkbaar"
       final slot = makeSlot(
         hours: [
@@ -278,9 +287,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       // Bevestig dat alle drie LinearProgressIndicator widgets value == 1.0 hebben
-      final indicators = tester.widgetList<LinearProgressIndicator>(
-        find.byType(LinearProgressIndicator),
-      ).toList();
+      final indicators = tester
+          .widgetList<LinearProgressIndicator>(
+            find.byType(LinearProgressIndicator),
+          )
+          .toList();
 
       expect(indicators, hasLength(3),
           reason: 'Exact 3 LinearProgressIndicator widgets verwacht');

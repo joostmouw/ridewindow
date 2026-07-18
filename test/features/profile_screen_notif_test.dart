@@ -80,11 +80,11 @@ Future<Widget> _buildProfileScreen(FakeProfileNotifier notifier) async {
   return ProviderScope(
     overrides: [
       profileProvider.overrideWith(() => notifier),
-      gpsPermissionProvider
-          .overrideWith(() => FakeGpsPermissionNotifier()),
+      gpsPermissionProvider.overrideWith(() => FakeGpsPermissionNotifier()),
     ],
     child: MaterialApp(
       home: const ProfileScreen(),
+      locale: const Locale('nl'),
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -175,7 +175,8 @@ void main() {
 
       // Tap de eerste SwitchListTile — dit is "Avond van tevoren"
       // skipOffstage: false + scrollIntoView om de widget bereikbaar te maken
-      final firstSwitch = find.byType(SwitchListTile, skipOffstage: false).first;
+      final firstSwitch =
+          find.byType(SwitchListTile, skipOffstage: false).first;
       await tester.scrollUntilVisible(firstSwitch, 100);
       await tester.tap(firstSwitch);
       await tester.pump();

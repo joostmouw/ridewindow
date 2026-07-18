@@ -75,6 +75,7 @@ Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile,
       ],
       child: MaterialApp(
         home: const ProfileScreen(),
+        locale: const Locale('nl'),
         localizationsDelegates: S.localizationsDelegates,
         supportedLocales: S.supportedLocales,
         theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -115,8 +116,7 @@ void main() {
     expect(find.text('THEMA', skipOffstage: false), findsOneWidget);
   });
 
-  testWidgets(
-      'Test 3: Drie FilterChip-widgets aanwezig; chip 2u is selected',
+  testWidgets('Test 3: Drie FilterChip-widgets aanwezig; chip 2u is selected',
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
@@ -151,11 +151,11 @@ void main() {
     expect(find.text('Systeem', skipOffstage: false), findsOneWidget);
   });
 
-  testWidgets(
-      'Test 5: Knop/tegel Mijn schema bewerken aanwezig',
+  testWidgets('Test 5: Knop/tegel Mijn schema bewerken aanwezig',
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
-    expect(find.text('Mijn schema bewerken', skipOffstage: false), findsOneWidget);
+    expect(
+        find.text('Mijn schema bewerken', skipOffstage: false), findsOneWidget);
   });
 }
