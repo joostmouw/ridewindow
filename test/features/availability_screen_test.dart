@@ -119,8 +119,11 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('23'), findsOneWidget);
+    // Hour labels render as zero-padded "HH:00" (see
+    // lib/features/availability/availability_screen.dart hour row:
+    // '${hour.toString().padLeft(2, '0')}:00'), not bare "0"/"23".
+    expect(find.text('00:00'), findsOneWidget);
+    expect(find.text('23:00'), findsOneWidget);
   });
 
   testWidgets('SC-3: Rooster toont 168 cellen (7×24)', (tester) async {

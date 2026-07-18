@@ -175,8 +175,9 @@ void main() {
       await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: slot)));
       await tester.pump();
 
-      // Totaal-rij: "Overall score" aan de linkerkant
-      expect(find.textContaining('Overall score'), findsOneWidget);
+      // Totaal-rij: "Totaalscore" aan de linkerkant (NL localized label —
+      // see lib/l10n/app_localizations_nl.dart totalScore).
+      expect(find.textContaining('Totaalscore'), findsOneWidget);
     });
 
     testWidgets('"Begrijpen" knop is zichtbaar', (tester) async {

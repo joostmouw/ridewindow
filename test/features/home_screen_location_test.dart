@@ -24,6 +24,7 @@ import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -90,6 +91,25 @@ class FakeStaticSlotsNotifier extends SlotsNotifier {
   SlotsState build() => _fixedState;
 }
 
+/// PlannedRidesNotifier stub — empty by default; add()/remove() are faked
+/// to avoid touching sharedPrefsProvider (which is otherwise unoverridden
+/// in these tests and throws "Must be overridden in ProviderScope").
+class FakePlannedRidesNotifier extends PlannedRidesNotifier {
+  @override
+  List<PlannedRide> build() => [];
+
+  @override
+  void add(PlannedRide ride) {
+    state = [...state, ride];
+  }
+
+  @override
+  void remove(PlannedRide ride) {
+    state =
+        state.where((r) => r.start != ride.start || r.end != ride.end).toList();
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Helper: bouw GoRouter
 // ---------------------------------------------------------------------------
@@ -126,6 +146,7 @@ void main() {
           weatherProvider.overrideWith(() => FakeWeatherNotifier()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
           slotsProvider.overrideWith(
             () => FakeStaticSlotsNotifier(const SlotsLoaded([], reason: null)),
           ),
@@ -144,6 +165,11 @@ void main() {
 
     // Stadsnaam 'Rotterdam' zichtbaar in de header (LOC-02)
     expect(find.text('Rotterdam'), findsOneWidget);
+
+    // Flush the pending 500ms spotlight-hint timer (initState's
+    // postFrameCallback in HomeScreen) so the test framework doesn't
+    // fail teardown with "A Timer is still pending".
+    await tester.pump(const Duration(milliseconds: 600));
   });
 
   testWidgets(
@@ -159,6 +185,7 @@ void main() {
           weatherProvider.overrideWith(() => FakeWeatherNotifier()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
           slotsProvider.overrideWith(
             () => FakeStaticSlotsNotifier(const SlotsLoaded([], reason: null)),
           ),
@@ -178,5 +205,10 @@ void main() {
 
     // HomeScreen toont kDefaultCity 'Amsterdam' als fallback (Rule 3 auto-fix in 07-04)
     expect(find.text('Amsterdam'), findsOneWidget);
+
+    // Flush the pending 500ms spotlight-hint timer (initState's
+    // postFrameCallback in HomeScreen) so the test framework doesn't
+    // fail teardown with "A Timer is still pending".
+    await tester.pump(const Duration(milliseconds: 600));
   });
 }

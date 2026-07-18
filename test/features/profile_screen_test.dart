@@ -65,6 +65,15 @@ class FakeGpsPermissionNotifier extends GpsPermissionNotifier {
 
 Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile,
     {LocationPermission permission = LocationPermission.denied}) async {
+  // ProfileScreen's body is a ListView (SliverList under the hood), which —
+  // like ListView.builder — only lays out children within the viewport +
+  // cache extent. skipOffstage: false alone does NOT force off-viewport
+  // sliver children into existence (that flag only affects Offstage
+  // widgets). Grow the test surface tall enough that every section
+  // (LOCATIE through OVER) is laid out without scrolling.
+  await tester.binding.setSurfaceSize(const Size(400, 3000));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -96,12 +105,16 @@ void main() {
   });
 
   testWidgets(
-      'Test 1: ProfileScreen toont vier Slider-widgets bij een geladen profiel',
+      'Test 1: ProfileScreen toont temperatuur-RangeSlider en twee Sliders bij een geladen profiel',
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
-    // skipOffstage: false — ListView rendert alleen zichtbare items in viewport.
-    expect(find.byType(Slider, skipOffstage: false), findsNWidgets(4));
+    // Temperatuurbereik gebruikt een RangeSlider (1); neerslag en wind
+    // gebruiken elk een losse Slider (2) — production was refactored from
+    // 4 separate Sliders to 1 RangeSlider + 2 Sliders for the temperature
+    // range (see lib/features/profile/profile_screen.dart RangeSlider).
+    expect(find.byType(RangeSlider, skipOffstage: false), findsOneWidget);
+    expect(find.byType(Slider, skipOffstage: false), findsNWidgets(2));
   });
 
   testWidgets(
@@ -143,11 +156,14 @@ void main() {
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
+    // Two SegmentedButton<String> now exist: TAAL (language, nl/en) and
+    // THEMA (system/light/dark) — a language section was added after this
+    // test was originally written.
     expect(
       find.byType(SegmentedButton<String>, skipOffstage: false),
-      findsOneWidget,
+      findsNWidgets(2),
     );
-    // 'Systeem' is zichtbaar als segment label
+    // 'Systeem' is zichtbaar als segment label (THEMA sectie)
     expect(find.text('Systeem', skipOffstage: false), findsOneWidget);
   });
 

@@ -23,6 +23,7 @@ import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
@@ -82,6 +83,25 @@ class FakeStaticSlotsNotifier extends SlotsNotifier {
   SlotsState build() => _fixedState;
 }
 
+/// PlannedRidesNotifier stub — empty by default; add()/remove() are faked
+/// to avoid touching sharedPrefsProvider (which is otherwise unoverridden
+/// in these tests and throws "Must be overridden in ProviderScope").
+class FakePlannedRidesNotifier extends PlannedRidesNotifier {
+  @override
+  List<PlannedRide> build() => [];
+
+  @override
+  void add(PlannedRide ride) {
+    state = [...state, ride];
+  }
+
+  @override
+  void remove(PlannedRide ride) {
+    state =
+        state.where((r) => r.start != ride.start || r.end != ride.end).toList();
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Fixture: minimaal RideSlot (Perfect tier, maandag 09:00-13:00)
 // ---------------------------------------------------------------------------
@@ -135,6 +155,7 @@ void main() {
           weatherProvider.overrideWith(() => FakeWeatherLoading()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
         ],
         child: MaterialApp.router(
           routerConfig: _makeRouter(),
@@ -153,8 +174,13 @@ void main() {
     // We verifiëren via AnimatedBuilder widgets (elk skeleton card gebruikt AnimatedBuilder)
     expect(find.byType(AnimatedBuilder), findsWidgets);
 
-    // Geen ride cards zichtbaar (geen 'Plan het' knop)
-    expect(find.text('Plan het'), findsNothing);
+    // Geen ride cards zichtbaar (geen 'Inplannen' knop)
+    expect(find.text('Inplannen'), findsNothing);
+
+    // Flush the pending 500ms spotlight-hint timer (initState's
+    // postFrameCallback in HomeScreen) so the test framework doesn't
+    // fail teardown with "A Timer is still pending".
+    await tester.pump(const Duration(milliseconds: 600));
   });
 
   // ---------------------------------------------------------------------------
@@ -170,6 +196,7 @@ void main() {
           weatherProvider.overrideWith(() => FakeWeatherReady()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
           slotsProvider.overrideWith(
             () => FakeStaticSlotsNotifier(SlotsLoaded([testSlot])),
           ),
@@ -187,14 +214,14 @@ void main() {
     // pumpAndSettle werkt niet vanwege de oneindige skeleton-animatie in HomeScreen
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 600));
 
     // Tijdreeks-tekst: 09:00 – 13:00 · 4u
     expect(find.textContaining('09:00'), findsOneWidget);
     // Tier badge: Perfect
     expect(find.text('Perfect'), findsOneWidget);
-    // 'Plan het' knop
-    expect(find.text('Plan het'), findsOneWidget);
+    // 'Inplannen' knop
+    expect(find.text('Inplannen'), findsOneWidget);
   });
 
   // ---------------------------------------------------------------------------
@@ -208,6 +235,7 @@ void main() {
           weatherProvider.overrideWith(() => FakeWeatherReady()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
           slotsProvider.overrideWith(
             () => FakeStaticSlotsNotifier(
               const SlotsLoaded([], reason: SlotsEmptyReason.badWeather),
@@ -225,11 +253,11 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 600));
 
     // HomeScreen toont: 'Geen goede rijmomenten deze week. Slecht weer verwacht.'
     expect(find.textContaining('Slecht weer'), findsOneWidget);
-    expect(find.text('Plan het'), findsNothing);
+    expect(find.text('Inplannen'), findsNothing);
   });
 
   // ---------------------------------------------------------------------------
@@ -243,6 +271,7 @@ void main() {
           weatherProvider.overrideWith(() => FakeWeatherReady()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
           slotsProvider.overrideWith(
             () => FakeStaticSlotsNotifier(
               const SlotsLoaded([], reason: SlotsEmptyReason.allBlocked),
@@ -260,10 +289,10 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 600));
 
     // HomeScreen toont: 'Alle goede momenten zijn geblokkeerd. Pas je schema aan.'
     expect(find.textContaining('geblokkeerd'), findsOneWidget);
-    expect(find.text('Plan het'), findsNothing);
+    expect(find.text('Inplannen'), findsNothing);
   });
 }

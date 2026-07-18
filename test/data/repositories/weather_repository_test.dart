@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -7,12 +8,21 @@ import 'package:ridewindow/data/database/tables/forecast_cache_entries.dart';
 import 'package:ridewindow/data/database/tables/hourly_forecast_entries.dart';
 import 'package:ridewindow/data/remote/open_meteo_client.dart';
 import 'package:ridewindow/data/repositories/weather_repository.dart';
-import 'package:test/test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'weather_repository_test.mocks.dart';
 
 @GenerateMocks([], customMocks: [MockSpec<http.Client>(as: #MockHttpClient)])
 void main() {
+  // This file uses plain test()/group() (not testWidgets()), so Flutter's
+  // TestWidgetsFlutterBinding is not auto-initialized. WeatherRepository's
+  // getForecast() calls SharedPreferences.getInstance(), which since a
+  // recent shared_preferences version requires ServicesBinding.instance to
+  // resolve the platform channel — without this, tests fail with "Binding
+  // has not yet been initialized." flutter_test re-exports test()/group()/
+  // expect() from package:test, so no other test code needs to change.
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   // Single-hour arrays with all six weather fields present and non-null.
   const String validJson = '''
 {
@@ -54,6 +64,10 @@ void main() {
   late WeatherRepository repo;
 
   setUp(() {
+    // Registers the mock method channel handler for shared_preferences —
+    // without this, SharedPreferences.getInstance() throws
+    // MissingPluginException (no real platform channel in a plain test).
+    SharedPreferences.setMockInitialValues({});
     db = AppDatabase(NativeDatabase.memory());
     mockHttp = MockHttpClient();
     repo = WeatherRepository(db: db, client: OpenMeteoClient(client: mockHttp));
