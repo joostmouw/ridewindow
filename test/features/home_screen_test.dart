@@ -21,7 +21,9 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -132,7 +134,12 @@ void main() {
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
         ],
-        child: MaterialApp.router(routerConfig: _makeRouter()),
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
 
@@ -163,7 +170,12 @@ void main() {
             () => FakeStaticSlotsNotifier(SlotsLoaded([testSlot])),
           ),
         ],
-        child: MaterialApp.router(routerConfig: _makeRouter()),
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     // Pump meerdere frames: async providers resolven, animaties draaien door
@@ -196,7 +208,12 @@ void main() {
             ),
           ),
         ],
-        child: MaterialApp.router(routerConfig: _makeRouter()),
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -224,7 +241,12 @@ void main() {
             ),
           ),
         ],
-        child: MaterialApp.router(routerConfig: _makeRouter()),
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();

@@ -20,9 +20,16 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/features/detail/insights_sheet.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 Widget wrapInMaterial(Widget child) {
-  return MaterialApp(home: Scaffold(body: child));
+  return MaterialApp(
+    home: Scaffold(body: child),
+    localizationsDelegates: S.localizationsDelegates,
+    supportedLocales: S.supportedLocales,
+    theme: ThemeData(extensions: const [RideWindowTheme.light]),
+  );
 }
 
 RideSlot makeSlot({

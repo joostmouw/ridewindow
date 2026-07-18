@@ -10,6 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 // ---------------------------------------------------------------------------
 // Helper: minimale GoRouter-fixture met WelcomeScreen als root
@@ -29,7 +31,12 @@ Widget _buildTestApp() {
     ],
   );
   return ProviderScope(
-    child: MaterialApp.router(routerConfig: router),
+    child: MaterialApp.router(
+      routerConfig: router,
+      localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales,
+      theme: ThemeData(extensions: const [RideWindowTheme.light]),
+    ),
   );
 }
 

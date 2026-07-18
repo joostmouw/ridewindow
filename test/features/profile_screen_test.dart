@@ -15,7 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 
 // ---------------------------------------------------------------------------
@@ -71,7 +73,12 @@ Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile,
           () => FakeGpsPermissionNotifier(permission),
         ),
       ],
-      child: const MaterialApp(home: ProfileScreen()),
+      child: MaterialApp(
+        home: const ProfileScreen(),
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        theme: ThemeData(extensions: const [RideWindowTheme.light]),
+      ),
     ),
   );
   await tester.pump();

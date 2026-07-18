@@ -11,7 +11,9 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 // ---------------------------------------------------------------------------
 // Fake AvailabilityNotifier: retourneert lege blocked-map zonder I/O
@@ -51,7 +53,12 @@ Widget _buildTestApp() {
     overrides: [
       availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
     ],
-    child: MaterialApp.router(routerConfig: router),
+    child: MaterialApp.router(
+      routerConfig: router,
+      localizationsDelegates: S.localizationsDelegates,
+      supportedLocales: S.supportedLocales,
+      theme: ThemeData(extensions: const [RideWindowTheme.light]),
+    ),
   );
 }
 

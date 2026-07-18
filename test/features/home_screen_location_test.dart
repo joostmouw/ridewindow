@@ -21,11 +21,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers
@@ -128,7 +130,12 @@ void main() {
             () => FakeStaticSlotsNotifier(const SlotsLoaded([], reason: null)),
           ),
         ],
-        child: MaterialApp.router(routerConfig: _makeRouter()),
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -155,7 +162,12 @@ void main() {
             () => FakeStaticSlotsNotifier(const SlotsLoaded([], reason: null)),
           ),
         ],
-        child: MaterialApp.router(routerConfig: _makeRouter()),
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
 

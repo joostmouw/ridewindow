@@ -59,7 +59,12 @@ void main() {
         overrides: [
           availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -74,7 +79,12 @@ void main() {
         overrides: [
           availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -91,7 +101,12 @@ void main() {
         overrides: [
           availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -108,7 +123,12 @@ void main() {
         overrides: [
           availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -125,7 +145,12 @@ void main() {
         overrides: [
           availabilityProvider.overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -156,7 +181,12 @@ void main() {
             () => FakeFilledAvailabilityNotifier({werkCelKey: BlockType.work}),
           ),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -179,7 +209,12 @@ void main() {
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -195,7 +230,12 @@ void main() {
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -222,7 +262,12 @@ void main() {
             () => FakeFilledAvailabilityNotifier(mapWithWork),
           ),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -260,7 +305,12 @@ void main() {
             () => FakeFilledAvailabilityNotifier(mapWithCustom),
           ),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();
@@ -299,7 +349,12 @@ void main() {
             () => FakeFilledAvailabilityNotifier(mapWithWork),
           ),
         ],
-        child: const MaterialApp(home: AvailabilityScreen()),
+        child: MaterialApp(
+          home: const AvailabilityScreen(),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
       ),
     );
     await tester.pump();

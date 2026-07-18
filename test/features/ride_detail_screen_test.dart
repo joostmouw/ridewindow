@@ -18,10 +18,15 @@ import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_theme.dart';
 
 Widget wrapInMaterial(Widget child) {
   return MaterialApp(
     home: child,
+    localizationsDelegates: S.localizationsDelegates,
+    supportedLocales: S.supportedLocales,
+    theme: ThemeData(extensions: const [RideWindowTheme.light]),
   );
 }
 
