@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 /// Compact horizontal bar showing an actual value against a reference range.
@@ -108,9 +109,20 @@ class WeatherIndicatorBar extends StatelessWidget {
         ),
         if (infoText != null) ...[
           const SizedBox(width: 2),
-          GestureDetector(
-            onTap: () => _showInfo(context),
-            child: Icon(Icons.info_outline, size: 14, color: rw.textHint),
+          Semantics(
+            button: true,
+            label: S.of(context).weatherMetricInfoTooltip(label),
+            child: GestureDetector(
+              onTap: () => _showInfo(context),
+              behavior: HitTestBehavior.opaque,
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: Center(
+                  child: Icon(Icons.info_outline, size: 14, color: rw.textHint),
+                ),
+              ),
+            ),
           ),
         ],
       ],

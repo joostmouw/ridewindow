@@ -48,6 +48,19 @@
   "decreaseEndTime": "Eindtijd vroeger zetten",
   "increaseEndTime": "Eindtijd later zetten",
 
+  "weatherMetricInfoTooltip": "{label} info",
+  "@weatherMetricInfoTooltip": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+  "weatherTierDescription": "{tier} fietsweer",
+  "@weatherTierDescription": {
+    "placeholders": {
+      "tier": {"type": "String"}
+    }
+  },
+
   "infoTemp": "De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.",
   "infoRain": "De groene zone toont je regentolerantie. De stip toont de verwachte totale neerslag. Minder regen = betere rit.",
   "infoWind": "De groene zone toont je windcomfortlimiet. De stip toont de gemiddelde windsnelheid. Harde wind maakt fietsen zwaarder en minder veilig.",
@@ -522,5 +535,10 @@
   "cellInfoStatusCalendar": "Agenda-geblokkeerd",
   "cellInfoStatusCustom": "Beschikbaar gezet",
   "cellInfoStatusFree": "Vrij",
+  "cellStatusPlanned": "Gepland",
+  "cellStatusSelected": "Geselecteerd",
+  "cellStatusBlocked": "Geblokkeerd",
+  "dayHeaderToggleHint": "Dubbeltik om alle uren voor deze dag te wisselen",
+  "hourHeaderToggleHint": "Dubbeltik om dit uur voor alle dagen te wisselen",
   "addToHomeScreenHint": "Tik op het Deel-icoon en kies 'Zet op beginscherm' om RideWindow te installeren."
 }

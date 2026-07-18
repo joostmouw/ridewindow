@@ -142,18 +142,22 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                             const SizedBox(
                                 width: _headerWidth, height: _headerHeight,),
                             for (int d = 0; d < 7; d++)
-                              GestureDetector(
-                                onTap: () => _onDayHeaderTap(
-                                    d, blockedHours, weekStart,),
-                                child: SizedBox(
-                                  width: _cellWidth,
-                                  height: _headerHeight,
-                                  child: Center(
-                                    child: Text(
-                                      _dagLabels(context)[d],
-                                      style: TextStyle(
-                                        fontSize: _cellWidth > 40 ? 13 : 11,
-                                        fontWeight: FontWeight.bold,
+                              Semantics(
+                                hint: S.of(context).dayHeaderToggleHint,
+                                button: true,
+                                child: GestureDetector(
+                                  onTap: () => _onDayHeaderTap(
+                                      d, blockedHours, weekStart,),
+                                  child: SizedBox(
+                                    width: _cellWidth,
+                                    height: _headerHeight,
+                                    child: Center(
+                                      child: Text(
+                                        _dagLabels(context)[d],
+                                        style: TextStyle(
+                                          fontSize: _cellWidth > 40 ? 13 : 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -165,18 +169,22 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                         for (int hour = 0; hour < 24; hour++)
                           Row(
                             children: [
-                              GestureDetector(
-                                onTap: () => _onHourHeaderTap(
-                                    hour, blockedHours, weekStart,),
-                                child: SizedBox(
-                                  width: _headerWidth,
-                                  height: _cellHeight,
-                                  child: Center(
-                                    child: Text(
-                                      '${hour.toString().padLeft(2, '0')}:00',
-                                      style: TextStyle(
-                                        fontSize: _cellHeight > 20 ? 10 : 8,
-                                        color: context.rw.textTertiary,
+                              Semantics(
+                                hint: S.of(context).hourHeaderToggleHint,
+                                button: true,
+                                child: GestureDetector(
+                                  onTap: () => _onHourHeaderTap(
+                                      hour, blockedHours, weekStart,),
+                                  child: SizedBox(
+                                    width: _headerWidth,
+                                    height: _cellHeight,
+                                    child: Center(
+                                      child: Text(
+                                        '${hour.toString().padLeft(2, '0')}:00',
+                                        style: TextStyle(
+                                          fontSize: _cellHeight > 20 ? 10 : 8,
+                                          color: context.rw.textTertiary,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -233,17 +241,21 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     final rw = context.rw;
     final color = _cellColor(key, blockedHours, isDragHighlighted, rw);
 
-    return GestureDetector(
-      onTap: () => _onCellTap(key, blockedHours),
-      onLongPress: () => _showCellInfo(context, key, blockedHours, hour),
-      child: Container(
-        width: _cellWidth,
-        height: _cellHeight,
-        decoration: BoxDecoration(
-          color: color,
-          border: Border.all(
-            color: isPendingAnchor ? Theme.of(context).colorScheme.primary : rw.border,
-            width: isPendingAnchor ? 2 : 0.5,
+    return Semantics(
+      label: _cellSemanticLabel(context, key, blockedHours, hour),
+      button: true,
+      child: GestureDetector(
+        onTap: () => _onCellTap(key, blockedHours),
+        onLongPress: () => _showCellInfo(context, key, blockedHours, hour),
+        child: Container(
+          width: _cellWidth,
+          height: _cellHeight,
+          decoration: BoxDecoration(
+            color: color,
+            border: Border.all(
+              color: isPendingAnchor ? Theme.of(context).colorScheme.primary : rw.border,
+              width: isPendingAnchor ? 2 : 0.5,
+            ),
           ),
         ),
       ),
@@ -597,24 +609,49 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
   // --- Long-press cell-info bottom sheet (RNE-03) ---
 
+  /// Capitalized full day name for [key] (e.g. "Monday" / "Maandag").
+  String _dayNameFor(BuildContext context, DateTime key) {
+    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
+    final dayNameRaw = DateFormat('EEEE', locale).format(key);
+    return dayNameRaw.isEmpty
+        ? dayNameRaw
+        : dayNameRaw[0].toUpperCase() + dayNameRaw.substring(1);
+  }
+
+  /// Localized blocked/available status text for [key].
+  String _statusFor(
+    BuildContext context,
+    Map<DateTime, BlockType> blockedHours,
+    DateTime key,
+  ) {
+    return switch (blockedHours[key]) {
+      BlockType.work => S.of(context).cellInfoStatusWork,
+      BlockType.calendar => S.of(context).cellInfoStatusCalendar,
+      BlockType.custom => S.of(context).cellInfoStatusCustom,
+      null => S.of(context).cellInfoStatusFree,
+    };
+  }
+
+  /// Screen-reader label for a grid cell: day, hour, and blocked/available status.
+  String _cellSemanticLabel(
+    BuildContext context,
+    DateTime key,
+    Map<DateTime, BlockType> blockedHours,
+    int hour,
+  ) {
+    final dayName = _dayNameFor(context, key);
+    final status = _statusFor(context, blockedHours, key);
+    return '$dayName ${hour.toString().padLeft(2, '0')}:00, $status';
+  }
+
   void _showCellInfo(
     BuildContext context,
     DateTime key,
     Map<DateTime, BlockType> blockedHours,
     int hour,
   ) {
-    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
-    final dayNameRaw = DateFormat('EEEE', locale).format(key);
-    final dayName = dayNameRaw.isEmpty
-        ? dayNameRaw
-        : dayNameRaw[0].toUpperCase() + dayNameRaw.substring(1);
-
-    final status = switch (blockedHours[key]) {
-      BlockType.work => S.of(context).cellInfoStatusWork,
-      BlockType.calendar => S.of(context).cellInfoStatusCalendar,
-      BlockType.custom => S.of(context).cellInfoStatusCustom,
-      null => S.of(context).cellInfoStatusFree,
-    };
+    final dayName = _dayNameFor(context, key);
+    final status = _statusFor(context, blockedHours, key);
 
     showModalBottomSheet(
       context: context,

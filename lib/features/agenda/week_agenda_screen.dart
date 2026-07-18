@@ -512,35 +512,49 @@ class _CellWidget extends ConsumerWidget {
     final rw = context.rw;
     final color = score != null ? _scoreColor(score.overall, rw) : rw.border;
 
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: () => _showDetail(context, ref, score),
-      child: Container(
-        margin: const EdgeInsets.all(0.5),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? rw.scorePerfect
-              : blocked
-                  ? Theme.of(context).colorScheme.surfaceContainerHighest
-                  : color,
-          borderRadius: BorderRadius.circular(3),
-          border: isSelected
-              ? Border.all(color: rw.tiers.perfectFg, width: 2)
-              : isPlanned
-                  ? Border.all(color: rw.plannedRide, width: 2)
-                  : null,
-        ),
-        child: blocked && !isSelected
-            ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
-            : isSelected
-                ? Center(
-                    child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
-                  )
+    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
+    final dayName = DateFormat('EEEE', locale).format(day);
+    var semanticLabel = '$dayName $hour:00';
+    if (score != null) {
+      semanticLabel += ', ${S.of(context).weatherTierDescription(_tierLabel(score.overall, context))}';
+    }
+    if (blocked) semanticLabel += ', ${S.of(context).cellStatusBlocked}';
+    if (isPlanned) semanticLabel += ', ${S.of(context).cellStatusPlanned}';
+    if (isSelected) semanticLabel += ', ${S.of(context).cellStatusSelected}';
+
+    return Semantics(
+      label: semanticLabel,
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        onLongPress: () => _showDetail(context, ref, score),
+        child: Container(
+          margin: const EdgeInsets.all(0.5),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? rw.scorePerfect
+                : blocked
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : color,
+            borderRadius: BorderRadius.circular(3),
+            border: isSelected
+                ? Border.all(color: rw.tiers.perfectFg, width: 2)
                 : isPlanned
-                    ? Center(
-                        child: Icon(Icons.directions_bike, size: 10, color: rw.plannedRide),
-                      )
+                    ? Border.all(color: rw.plannedRide, width: 2)
                     : null,
+          ),
+          child: blocked && !isSelected
+              ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
+              : isSelected
+                  ? Center(
+                      child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
+                    )
+                  : isPlanned
+                      ? Center(
+                          child: Icon(Icons.directions_bike, size: 10, color: rw.plannedRide),
+                        )
+                      : null,
+        ),
       ),
     );
   }

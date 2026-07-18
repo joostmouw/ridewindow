@@ -32,6 +32,9 @@
   "decreaseEndTime": "Decrease end time",
   "increaseEndTime": "Increase end time",
 
+  "weatherMetricInfoTooltip": "{label} info",
+  "weatherTierDescription": "{tier} riding weather",
+
   "infoTemp": "The green zone shows your ideal temperature range. The dot shows the average temperature for this ride window. Adjust your range in Profile.",
   "infoRain": "The green zone shows your rain tolerance. The dot shows the total expected precipitation. Less rain = better ride.",
   "infoWind": "The green zone shows your wind comfort limit. The dot shows the average wind speed. Strong wind makes cycling harder and less safe.",
@@ -399,5 +402,10 @@
   "cellInfoStatusCalendar": "Calendar-blocked",
   "cellInfoStatusCustom": "Marked available",
   "cellInfoStatusFree": "Free",
+  "cellStatusPlanned": "Planned",
+  "cellStatusSelected": "Selected",
+  "cellStatusBlocked": "Blocked",
+  "dayHeaderToggleHint": "Double tap to toggle all hours for this day",
+  "hourHeaderToggleHint": "Double tap to toggle this hour across all days",
   "addToHomeScreenHint": "Tap the Share icon, then \"Add to Home Screen\" to install RideWindow."
 }

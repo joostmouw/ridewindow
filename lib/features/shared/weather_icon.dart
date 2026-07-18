@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 class WeatherIcon extends StatefulWidget {
@@ -36,15 +37,25 @@ class _WeatherIconState extends State<WeatherIcon>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.size,
-      height: widget.size,
-      child: switch (widget.tier) {
-        Perfect() => _buildSun(),
-        Great() => _buildPartlyCloudy(),
-        Acceptable() => _buildCloudy(),
-        Poor() => _buildRainy(),
-      },
+    final s = S.of(context);
+    final tierLabel = switch (widget.tier) {
+      Perfect() => s.tierPerfect,
+      Great() => s.tierGreat,
+      Acceptable() => s.tierAcceptable,
+      Poor() => s.tierPoor,
+    };
+    return Semantics(
+      label: s.weatherTierDescription(tierLabel),
+      child: SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: switch (widget.tier) {
+          Perfect() => _buildSun(),
+          Great() => _buildPartlyCloudy(),
+          Acceptable() => _buildCloudy(),
+          Poor() => _buildRainy(),
+        },
+      ),
     );
   }
 

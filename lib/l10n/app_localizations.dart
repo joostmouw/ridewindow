@@ -253,6 +253,18 @@ abstract class S {
   /// **'Eindtijd later zetten'**
   String get increaseEndTime;
 
+  /// No description provided for @weatherMetricInfoTooltip.
+  ///
+  /// In nl, this message translates to:
+  /// **'{label} info'**
+  String weatherMetricInfoTooltip(String label);
+
+  /// No description provided for @weatherTierDescription.
+  ///
+  /// In nl, this message translates to:
+  /// **'{tier} fietsweer'**
+  String weatherTierDescription(String tier);
+
   /// No description provided for @infoTemp.
   ///
   /// In nl, this message translates to:
@@ -2160,6 +2172,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Vrij'**
   String get cellInfoStatusFree;
+
+  /// No description provided for @cellStatusPlanned.
+  ///
+  /// In nl, this message translates to:
+  /// **'Gepland'**
+  String get cellStatusPlanned;
+
+  /// No description provided for @cellStatusSelected.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geselecteerd'**
+  String get cellStatusSelected;
+
+  /// No description provided for @cellStatusBlocked.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geblokkeerd'**
+  String get cellStatusBlocked;
+
+  /// No description provided for @dayHeaderToggleHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dubbeltik om alle uren voor deze dag te wisselen'**
+  String get dayHeaderToggleHint;
+
+  /// No description provided for @hourHeaderToggleHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dubbeltik om dit uur voor alle dagen te wisselen'**
+  String get hourHeaderToggleHint;
 
   /// No description provided for @addToHomeScreenHint.
   ///

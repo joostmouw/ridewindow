@@ -99,6 +99,16 @@ class SNl extends S {
   String get increaseEndTime => 'Eindtijd later zetten';
 
   @override
+  String weatherMetricInfoTooltip(String label) {
+    return '$label info';
+  }
+
+  @override
+  String weatherTierDescription(String tier) {
+    return '$tier fietsweer';
+  }
+
+  @override
   String get infoTemp =>
       'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.';
 
@@ -1148,6 +1158,23 @@ class SNl extends S {
 
   @override
   String get cellInfoStatusFree => 'Vrij';
+
+  @override
+  String get cellStatusPlanned => 'Gepland';
+
+  @override
+  String get cellStatusSelected => 'Geselecteerd';
+
+  @override
+  String get cellStatusBlocked => 'Geblokkeerd';
+
+  @override
+  String get dayHeaderToggleHint =>
+      'Dubbeltik om alle uren voor deze dag te wisselen';
+
+  @override
+  String get hourHeaderToggleHint =>
+      'Dubbeltik om dit uur voor alle dagen te wisselen';
 
   @override
   String get addToHomeScreenHint =>

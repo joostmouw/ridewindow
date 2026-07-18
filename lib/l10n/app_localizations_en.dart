@@ -99,6 +99,16 @@ class SEn extends S {
   String get increaseEndTime => 'Increase end time';
 
   @override
+  String weatherMetricInfoTooltip(String label) {
+    return '$label info';
+  }
+
+  @override
+  String weatherTierDescription(String tier) {
+    return '$tier riding weather';
+  }
+
+  @override
   String get infoTemp =>
       'The green zone shows your ideal temperature range. The dot shows the average temperature for this ride window. Adjust your range in Profile.';
 
@@ -1145,6 +1155,23 @@ class SEn extends S {
 
   @override
   String get cellInfoStatusFree => 'Free';
+
+  @override
+  String get cellStatusPlanned => 'Planned';
+
+  @override
+  String get cellStatusSelected => 'Selected';
+
+  @override
+  String get cellStatusBlocked => 'Blocked';
+
+  @override
+  String get dayHeaderToggleHint =>
+      'Double tap to toggle all hours for this day';
+
+  @override
+  String get hourHeaderToggleHint =>
+      'Double tap to toggle this hour across all days';
 
   @override
   String get addToHomeScreenHint =>
