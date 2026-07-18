@@ -87,6 +87,18 @@ class SNl extends S {
   String get endLabel => 'Eind';
 
   @override
+  String get decreaseStartTime => 'Starttijd vroeger zetten';
+
+  @override
+  String get increaseStartTime => 'Starttijd later zetten';
+
+  @override
+  String get decreaseEndTime => 'Eindtijd vroeger zetten';
+
+  @override
+  String get increaseEndTime => 'Eindtijd later zetten';
+
+  @override
   String get infoTemp =>
       'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.';
 
@@ -329,6 +341,9 @@ class SNl extends S {
   String get useGpsLocation => 'GPS-locatie gebruiken';
 
   @override
+  String get clearLocationOverride => 'Locatie-override wissen';
+
+  @override
   String get grantPermission => 'Toestemming geven';
 
   @override
@@ -480,6 +495,20 @@ class SNl extends S {
 
   @override
   String get feedbackCommentHint => 'Wil je iets delen? (optioneel)';
+
+  @override
+  String get feedbackCommentLabel => 'Opmerking';
+
+  @override
+  String feedbackStarRating(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sterren',
+      one: '$count ster',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get feedbackSendButton => 'Versturen';
@@ -735,6 +764,9 @@ class SNl extends S {
   String get understood => 'Begrijpen';
 
   @override
+  String get showScoreDetails => 'Waarom deze score';
+
+  @override
   String get availabilityTitle => 'Mijn schema';
 
   @override
@@ -875,6 +907,9 @@ class SNl extends S {
 
   @override
   String get ridesDeleteRide => 'Rit verwijderen';
+
+  @override
+  String get removePlannedRideTooltip => 'Verwijder geplande rit';
 
   @override
   String get unplanConfirmTitle => 'Rit uitplannen?';

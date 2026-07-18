@@ -87,6 +87,18 @@ class SEn extends S {
   String get endLabel => 'End';
 
   @override
+  String get decreaseStartTime => 'Decrease start time';
+
+  @override
+  String get increaseStartTime => 'Increase start time';
+
+  @override
+  String get decreaseEndTime => 'Decrease end time';
+
+  @override
+  String get increaseEndTime => 'Increase end time';
+
+  @override
   String get infoTemp =>
       'The green zone shows your ideal temperature range. The dot shows the average temperature for this ride window. Adjust your range in Profile.';
 
@@ -329,6 +341,9 @@ class SEn extends S {
   String get useGpsLocation => 'Use GPS location';
 
   @override
+  String get clearLocationOverride => 'Clear location override';
+
+  @override
   String get grantPermission => 'Grant permission';
 
   @override
@@ -479,6 +494,20 @@ class SEn extends S {
 
   @override
   String get feedbackCommentHint => 'Anything you\'d like to share? (optional)';
+
+  @override
+  String get feedbackCommentLabel => 'Comment';
+
+  @override
+  String feedbackStarRating(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stars',
+      one: '$count star',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get feedbackSendButton => 'Send';
@@ -734,6 +763,9 @@ class SEn extends S {
   String get understood => 'Got it';
 
   @override
+  String get showScoreDetails => 'Why this score';
+
+  @override
   String get availabilityTitle => 'My schedule';
 
   @override
@@ -874,6 +906,9 @@ class SEn extends S {
 
   @override
   String get ridesDeleteRide => 'Delete ride';
+
+  @override
+  String get removePlannedRideTooltip => 'Remove planned ride';
 
   @override
   String get unplanConfirmTitle => 'Unplan this ride?';

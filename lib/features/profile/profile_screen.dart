@@ -375,6 +375,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             trailing: profile.locationOverride != null
                 ? IconButton(
                     icon: const Icon(Icons.clear),
+                    tooltip: s.clearLocationOverride,
                     onPressed: () => ref
                         .read(profileProvider.notifier)
                         .setLocationOverride(null),

@@ -83,13 +83,18 @@ class _FeedbackDialogState extends State<_FeedbackDialog> {
             children: List.generate(5, (i) {
               final n = i + 1;
               final selected = n <= _rating;
-              return IconButton(
-                key: ValueKey('feedback_star_$n'),
-                icon: Icon(selected ? Icons.star : Icons.star_border),
-                color: selected
-                    ? context.rw.scorePerfect
-                    : Theme.of(context).colorScheme.outline,
-                onPressed: () => setState(() => _rating = n),
+              return Semantics(
+                selected: selected,
+                button: true,
+                child: IconButton(
+                  key: ValueKey('feedback_star_$n'),
+                  icon: Icon(selected ? Icons.star : Icons.star_border),
+                  tooltip: s.feedbackStarRating(n),
+                  color: selected
+                      ? context.rw.scorePerfect
+                      : Theme.of(context).colorScheme.outline,
+                  onPressed: () => setState(() => _rating = n),
+                ),
               );
             }),
           ),
@@ -97,6 +102,7 @@ class _FeedbackDialogState extends State<_FeedbackDialog> {
             controller: _controller,
             maxLines: 4,
             decoration: InputDecoration(
+              labelText: s.feedbackCommentLabel,
               hintText: s.feedbackCommentHint,
               border: const OutlineInputBorder(),
             ),

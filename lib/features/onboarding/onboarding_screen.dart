@@ -102,6 +102,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back_ios),
+                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                   onPressed: () => context.go('/welcome'),
                   padding: EdgeInsets.zero,
                   visualDensity: VisualDensity.compact,

@@ -43,6 +43,10 @@
   "adjustTime": "TIJD AANPASSEN",
   "startLabel": "Start",
   "endLabel": "Eind",
+  "decreaseStartTime": "Starttijd vroeger zetten",
+  "increaseStartTime": "Starttijd later zetten",
+  "decreaseEndTime": "Eindtijd vroeger zetten",
+  "increaseEndTime": "Eindtijd later zetten",
 
   "infoTemp": "De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.",
   "infoRain": "De groene zone toont je regentolerantie. De stip toont de verwachte totale neerslag. Minder regen = betere rit.",
@@ -147,6 +151,7 @@
   "locationBlockedHint": "Kies een stad of open instellingen om GPS opnieuw in te schakelen.",
   "openSettings": "Instellingen openen",
   "useGpsLocation": "GPS-locatie gebruiken",
+  "clearLocationOverride": "Locatie-override wissen",
   "grantPermission": "Toestemming geven",
   "gpsAutomatic": "GPS (automatisch)",
   "tapToChooseCity": "Tik om stad te kiezen",
@@ -204,6 +209,13 @@
   "sendFeedback": "Feedback versturen",
   "feedbackRatingLabel": "Hoe zou je RideWindow beoordelen?",
   "feedbackCommentHint": "Wil je iets delen? (optioneel)",
+  "feedbackCommentLabel": "Opmerking",
+  "feedbackStarRating": "{count, plural, =1{{count} ster} other{{count} sterren}}",
+  "@feedbackStarRating": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "feedbackSendButton": "Versturen",
 
   "googleCalendarLabel": "Google Agenda",
@@ -327,6 +339,7 @@
   "insightsWindNoteStrong": "Sterke wind \u2014 plan de route strategisch",
   "totalScore": "Totaalscore",
   "understood": "Begrijpen",
+  "showScoreDetails": "Waarom deze score",
 
   "availabilityTitle": "Mijn schema",
   "legendFree": "Vrij",
@@ -395,6 +408,7 @@
   "ridesPerHour": "Per uur",
   "ridesAvgScoreBreakdown": "Gemiddelde score-opbouw",
   "ridesDeleteRide": "Rit verwijderen",
+  "removePlannedRideTooltip": "Verwijder geplande rit",
   "unplanConfirmTitle": "Rit uitplannen?",
   "unplanConfirmMessage": "Dit verwijdert de rit uit je geplande ritten. Je kunt hem altijd opnieuw plannen.",
   "unplanConfirmAction": "Uitplannen",

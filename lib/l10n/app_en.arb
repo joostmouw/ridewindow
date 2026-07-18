@@ -27,6 +27,10 @@
   "adjustTime": "ADJUST TIME",
   "startLabel": "Start",
   "endLabel": "End",
+  "decreaseStartTime": "Decrease start time",
+  "increaseStartTime": "Increase start time",
+  "decreaseEndTime": "Decrease end time",
+  "increaseEndTime": "Increase end time",
 
   "infoTemp": "The green zone shows your ideal temperature range. The dot shows the average temperature for this ride window. Adjust your range in Profile.",
   "infoRain": "The green zone shows your rain tolerance. The dot shows the total expected precipitation. Less rain = better ride.",
@@ -121,6 +125,7 @@
   "locationBlockedHint": "Choose a city or open settings to re-enable GPS.",
   "openSettings": "Open settings",
   "useGpsLocation": "Use GPS location",
+  "clearLocationOverride": "Clear location override",
   "grantPermission": "Grant permission",
   "gpsAutomatic": "GPS (automatic)",
   "tapToChooseCity": "Tap to choose city",
@@ -178,6 +183,8 @@
   "sendFeedback": "Send feedback",
   "feedbackRatingLabel": "How would you rate RideWindow?",
   "feedbackCommentHint": "Anything you'd like to share? (optional)",
+  "feedbackCommentLabel": "Comment",
+  "feedbackStarRating": "{count, plural, =1{{count} star} other{{count} stars}}",
   "feedbackSendButton": "Send",
 
   "googleCalendarLabel": "Google Calendar",
@@ -265,6 +272,7 @@
   "insightsWindNoteStrong": "Strong wind \u2014 plan your route strategically",
   "totalScore": "Total score",
   "understood": "Got it",
+  "showScoreDetails": "Why this score",
 
   "availabilityTitle": "My schedule",
   "legendFree": "Free",
@@ -308,6 +316,7 @@
   "ridesPerHour": "Per hour",
   "ridesAvgScoreBreakdown": "Average score breakdown",
   "ridesDeleteRide": "Delete ride",
+  "removePlannedRideTooltip": "Remove planned ride",
   "unplanConfirmTitle": "Unplan this ride?",
   "unplanConfirmMessage": "This will remove it from your planned rides. You can plan it again anytime.",
   "unplanConfirmAction": "Unplan",

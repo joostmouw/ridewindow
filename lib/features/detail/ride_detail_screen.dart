@@ -299,6 +299,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       actions: [
         IconButton(
           icon: const Icon(Icons.info_outline),
+          tooltip: s.showScoreDetails,
           onPressed: () {
             showModalBottomSheet<void>(
               context: context,
@@ -639,6 +640,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
+                tooltip: s.decreaseStartTime,
                 color: rw.scorePerfect,
                 onPressed: canExpandStart
                     ? () => setState(() => _start = _start.subtract(const Duration(hours: 1)))
@@ -650,6 +652,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
+                tooltip: s.increaseStartTime,
                 color: rw.scorePerfect,
                 onPressed: canShrinkStart
                     ? () => setState(() => _start = _start.add(const Duration(hours: 1)))
@@ -666,6 +669,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
+                tooltip: s.decreaseEndTime,
                 color: rw.scorePerfect,
                 onPressed: canShrinkEnd
                     ? () => setState(() => _end = _end.subtract(const Duration(hours: 1)))
@@ -677,6 +681,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
+                tooltip: s.increaseEndTime,
                 color: rw.scorePerfect,
                 onPressed: canExpandEnd
                     ? () => setState(() => _end = _end.add(const Duration(hours: 1)))
