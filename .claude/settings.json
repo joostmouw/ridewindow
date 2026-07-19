@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter build *)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter analyze)",
+      "Bash(dart analyze *)",
+      "Bash(flutter gen-l10n)",
+      "Bash(flutter devices*)",
+      "Bash(flutter run*)",
+      "Bash(adb devices)",
+      "Bash(adb devices*)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb devices*)",
+      "Bash($HOME/Library/Android/sdk/platform-tools/adb devices*)",
+      "Bash(adb logcat*)",
+      "Bash(~/Library/Android/sdk/platform-tools/adb logcat*)",
+      "Bash($HOME/Library/Android/sdk/platform-tools/adb logcat*)",
+      "Bash(keytool -list*)",
+      "Bash(firebase login:list)",
+      "Bash(gsd-sdk query agent-skills *)",
+      "Bash(gsd-sdk query init.quick *)",
+      "Bash(gsd-sdk query config-get *)",
+      "Bash(gsd-sdk query init.plan-phase *)",
+      "Bash(gsd-sdk query init.execute-phase *)",
+      "Bash(gsd-sdk query roadmap.get-phase *)",
+      "Bash(gsd-sdk query phase.mvp-mode *)",
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__Claude_Preview__preview_logs",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__Claude_Preview__preview_console_logs",
+      "mcp__claude-in-chrome__tabs_context_mcp"
+    ]
+  }
+}
