@@ -462,7 +462,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         chipFg = isSelected ? cs.onSurface : rw.tiers.poorFg;
     }
 
-    return GestureDetector(
+    return Semantics(
+      selected: isSelected,
+      button: true,
+      child: GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
         setState(() {
@@ -508,6 +511,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ],
         ),
         ),
+      ),
       ),
     );
   }
@@ -579,6 +583,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         const SizedBox(width: 4),
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
+                          tooltip: s.removePlannedRideTooltip,
                           color: cs.error,
                           onPressed: () async {
                             final confirmed = await showUnplanConfirmDialog(context);

@@ -229,6 +229,42 @@ abstract class S {
   /// **'Eind'**
   String get endLabel;
 
+  /// No description provided for @decreaseStartTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Starttijd vroeger zetten'**
+  String get decreaseStartTime;
+
+  /// No description provided for @increaseStartTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Starttijd later zetten'**
+  String get increaseStartTime;
+
+  /// No description provided for @decreaseEndTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Eindtijd vroeger zetten'**
+  String get decreaseEndTime;
+
+  /// No description provided for @increaseEndTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Eindtijd later zetten'**
+  String get increaseEndTime;
+
+  /// No description provided for @weatherMetricInfoTooltip.
+  ///
+  /// In nl, this message translates to:
+  /// **'{label} info'**
+  String weatherMetricInfoTooltip(String label);
+
+  /// No description provided for @weatherTierDescription.
+  ///
+  /// In nl, this message translates to:
+  /// **'{tier} fietsweer'**
+  String weatherTierDescription(String tier);
+
   /// No description provided for @infoTemp.
   ///
   /// In nl, this message translates to:
@@ -679,6 +715,12 @@ abstract class S {
   /// **'GPS-locatie gebruiken'**
   String get useGpsLocation;
 
+  /// No description provided for @clearLocationOverride.
+  ///
+  /// In nl, this message translates to:
+  /// **'Locatie-override wissen'**
+  String get clearLocationOverride;
+
   /// No description provided for @grantPermission.
   ///
   /// In nl, this message translates to:
@@ -966,6 +1008,18 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Wil je iets delen? (optioneel)'**
   String get feedbackCommentHint;
+
+  /// No description provided for @feedbackCommentLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Opmerking'**
+  String get feedbackCommentLabel;
+
+  /// No description provided for @feedbackStarRating.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{{count} ster} other{{count} sterren}}'**
+  String feedbackStarRating(int count);
 
   /// No description provided for @feedbackSendButton.
   ///
@@ -1441,6 +1495,12 @@ abstract class S {
   /// **'Begrijpen'**
   String get understood;
 
+  /// No description provided for @showScoreDetails.
+  ///
+  /// In nl, this message translates to:
+  /// **'Waarom deze score'**
+  String get showScoreDetails;
+
   /// No description provided for @availabilityTitle.
   ///
   /// In nl, this message translates to:
@@ -1674,6 +1734,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Rit verwijderen'**
   String get ridesDeleteRide;
+
+  /// No description provided for @removePlannedRideTooltip.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verwijder geplande rit'**
+  String get removePlannedRideTooltip;
 
   /// No description provided for @unplanConfirmTitle.
   ///
@@ -2106,6 +2172,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Vrij'**
   String get cellInfoStatusFree;
+
+  /// No description provided for @cellStatusPlanned.
+  ///
+  /// In nl, this message translates to:
+  /// **'Gepland'**
+  String get cellStatusPlanned;
+
+  /// No description provided for @cellStatusSelected.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geselecteerd'**
+  String get cellStatusSelected;
+
+  /// No description provided for @cellStatusBlocked.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geblokkeerd'**
+  String get cellStatusBlocked;
+
+  /// No description provided for @dayHeaderToggleHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dubbeltik om alle uren voor deze dag te wisselen'**
+  String get dayHeaderToggleHint;
+
+  /// No description provided for @hourHeaderToggleHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dubbeltik om dit uur voor alle dagen te wisselen'**
+  String get hourHeaderToggleHint;
 
   /// No description provided for @addToHomeScreenHint.
   ///

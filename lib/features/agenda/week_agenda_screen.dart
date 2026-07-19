@@ -409,41 +409,51 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
             ],
           ),
         ),
-        // Hour rows
-        for (final hour in _kHours)
-          Expanded(
-            child: Row(
+        // Hour rows — fixed 48dp per row (Material touch-target minimum, B3),
+        // scrollable if the rows overflow the available viewport height.
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                SizedBox(
-                  width: 28,
-                  child: Center(
-                    child: Text(
-                      '$hour',
-                      style: TextStyle(fontSize: 10, color: context.rw.textHint),
-                    ),
-                  ),
-                ),
-                for (var di = 0; di < days.length; di++)
-                  Expanded(
-                    child: _CellWidget(
-                      key: ValueKey('cell_${di}_$hour'),
-                      day: days[di],
-                      dayIndex: di,
-                      hour: hour,
-                      allScores: allScores,
-                      forecasts: forecasts,
-                      cityName: cityName,
-                      blockedHours: blockedHours,
-                      showBlocked: _showBlocked,
-                      isToday: days[di] == today,
-                      isSelected: _selection?.contains(di, hour) ?? false,
-                      isPlanned: _isPlanned(days[di], hour),
-                      onTap: () => _onCellTap(di, hour, days[di], blockedHours),
+                for (final hour in _kHours)
+                  SizedBox(
+                    height: 48,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 28,
+                          child: Center(
+                            child: Text(
+                              '$hour',
+                              style: TextStyle(fontSize: 10, color: context.rw.textHint),
+                            ),
+                          ),
+                        ),
+                        for (var di = 0; di < days.length; di++)
+                          Expanded(
+                            child: _CellWidget(
+                              key: ValueKey('cell_${di}_$hour'),
+                              day: days[di],
+                              dayIndex: di,
+                              hour: hour,
+                              allScores: allScores,
+                              forecasts: forecasts,
+                              cityName: cityName,
+                              blockedHours: blockedHours,
+                              showBlocked: _showBlocked,
+                              isToday: days[di] == today,
+                              isSelected: _selection?.contains(di, hour) ?? false,
+                              isPlanned: _isPlanned(days[di], hour),
+                              onTap: () => _onCellTap(di, hour, days[di], blockedHours),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
               ],
             ),
           ),
+        ),
       ],
     );
   }
@@ -512,35 +522,49 @@ class _CellWidget extends ConsumerWidget {
     final rw = context.rw;
     final color = score != null ? _scoreColor(score.overall, rw) : rw.border;
 
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: () => _showDetail(context, ref, score),
-      child: Container(
-        margin: const EdgeInsets.all(0.5),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? rw.scorePerfect
-              : blocked
-                  ? Theme.of(context).colorScheme.surfaceContainerHighest
-                  : color,
-          borderRadius: BorderRadius.circular(3),
-          border: isSelected
-              ? Border.all(color: rw.tiers.perfectFg, width: 2)
-              : isPlanned
-                  ? Border.all(color: rw.plannedRide, width: 2)
-                  : null,
-        ),
-        child: blocked && !isSelected
-            ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
-            : isSelected
-                ? Center(
-                    child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
-                  )
+    final locale = Localizations.localeOf(context).languageCode == 'en' ? 'en_US' : 'nl_NL';
+    final dayName = DateFormat('EEEE', locale).format(day);
+    var semanticLabel = '$dayName $hour:00';
+    if (score != null) {
+      semanticLabel += ', ${S.of(context).weatherTierDescription(_tierLabel(score.overall, context))}';
+    }
+    if (blocked) semanticLabel += ', ${S.of(context).cellStatusBlocked}';
+    if (isPlanned) semanticLabel += ', ${S.of(context).cellStatusPlanned}';
+    if (isSelected) semanticLabel += ', ${S.of(context).cellStatusSelected}';
+
+    return Semantics(
+      label: semanticLabel,
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        onLongPress: () => _showDetail(context, ref, score),
+        child: Container(
+          margin: const EdgeInsets.all(0.5),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? rw.scorePerfect
+                : blocked
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : color,
+            borderRadius: BorderRadius.circular(3),
+            border: isSelected
+                ? Border.all(color: rw.tiers.perfectFg, width: 2)
                 : isPlanned
-                    ? Center(
-                        child: Icon(Icons.directions_bike, size: 10, color: rw.plannedRide),
-                      )
+                    ? Border.all(color: rw.plannedRide, width: 2)
                     : null,
+          ),
+          child: blocked && !isSelected
+              ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
+              : isSelected
+                  ? Center(
+                      child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
+                    )
+                  : isPlanned
+                      ? Center(
+                          child: Icon(Icons.directions_bike, size: 10, color: rw.plannedRide),
+                        )
+                      : null,
+        ),
       ),
     );
   }
