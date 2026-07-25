@@ -95,3 +95,10 @@ None - no external service configuration required. Publishing/verifying the page
 ---
 *Phase: 18-preconditions*
 *Completed: 2026-07-25*
+
+## Self-Check: PASSED
+
+- FOUND: docs/privacy-policy.html
+- FOUND: .planning/phases/18-preconditions/18-02-SUMMARY.md
+- FOUND commit: 6f65f3c
+- FOUND commit: cf75d40 (SUMMARY commit)
