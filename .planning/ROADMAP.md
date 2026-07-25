@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 15. Google Calendar Web Integration | v2.0 | 2/2 | Complete    | 2026-07-14 |
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
-| 18. Preconditions | v3.0 | 0/4 | Planned | - |
+| 18. Preconditions | v3.0 | 3/4 | In Progress|  |
 | 19. Auth | v3.0 | 0/TBD | Not started | - |
 | 20. Repository refactor (local-only) | v3.0 | 0/TBD | Not started | - |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
