@@ -1,55 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideWindow — Privacy Policy</title>
+    <title>RideWindow — Privacybeleid / Privacy Policy</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
         h1 { color: #1a73e8; }
         h2 { margin-top: 2em; }
+        h3 { margin-top: 1.2em; }
         .updated { color: #666; font-size: 0.9em; }
+        nav.lang-switch { margin: 1em 0 2em; font-size: 0.95em; }
+        nav.lang-switch a { margin-right: 0.5em; }
+        section.lang-section { padding-top: 1em; border-top: 3px solid #e8eaed; margin-top: 2.5em; }
+        .deletion-box { background: #f6f8fc; border: 1px solid #d3dcf0; border-radius: 8px; padding: 1em 1.2em; }
     </style>
 </head>
 <body>
-    <h1>RideWindow — Privacy Policy</h1>
-    <p class="updated">Last updated: June 21, 2026</p>
+    <h1>RideWindow — Privacybeleid / Privacy Policy</h1>
+    <p class="updated">Laatst bijgewerkt / Last updated: 25 juli 2026 / July 25, 2026</p>
+
+    <nav class="lang-switch">
+        <a href="#nl">Nederlands</a> · <a href="#en">English</a>
+    </nav>
+
+    <section id="nl" class="lang-section" lang="nl">
+    <h1>Privacybeleid (Nederlands)</h1>
+
+    <h2>Samenvatting</h2>
+    <p>RideWindow werkt volledig zonder account, en zolang je niet inlogt verlaat er niets je toestel. Als je wél inlogt met je Google-account, worden je profielinstellingen, je wekelijkse beschikbaarheid en je geplande ritten opgeslagen op servers in Europa, zodat ze ook beschikbaar zijn op je andere apparaten.</p>
+
+    <h2>Wat op je toestel blijft</h2>
+    <p>Ongeacht of je bent ingelogd, blijven deze gegevens altijd lokaal op je toestel en worden ze nooit naar een server gestuurd:</p>
+    <ul>
+        <li>De cache van de weersvoorspelling</li>
+        <li>Via Google Calendar geïmporteerde geblokkeerde uren</li>
+    </ul>
+
+    <h2>Wat op onze servers wordt opgeslagen (alleen als je bent ingelogd)</h2>
+    <p>Zodra je inlogt met je Google-account, slaan we het volgende op:</p>
+    <ul>
+        <li>Je profielinstellingen (weertoleranties, voorkeurs-ritlengtes, thema, taal, handmatige locatie-override, notificatie-instellingen)</li>
+        <li>Je wekelijkse beschikbaarheidspatroon</li>
+        <li>Je geplande ritten</li>
+    </ul>
+    <p>Ben je niet ingelogd, dan gebeurt dit niet — de app blijft dan net zo werken als voorheen, volledig lokaal.</p>
+
+    <h2>Waar je gegevens staan</h2>
+    <p>Ingelogde gegevens worden gehost door Supabase, in de EU-regio West-Europa (Parijs, <code>eu-west-3</code>).</p>
+
+    <h2>Wie namens ons gegevens verwerkt</h2>
+    <ul>
+        <li><strong>Open-Meteo</strong> — ontvangt je coördinaten om een weersvoorspelling op te halen. Zie hun <a href="https://open-meteo.com/en/terms">privacybeleid</a>.</li>
+        <li><strong>Supabase</strong> — verzorgt authenticatie en de database voor ingelogde gebruikers, gehost in de EU (Parijs).</li>
+        <li><strong>Google</strong> — verzorgt Firebase Hosting voor de webversie van de app, de Google Calendar API als je je agenda koppelt, en Google Sign-In als authenticatiemethode. Zie <a href="https://policies.google.com/privacy">Google's privacybeleid</a>.</li>
+    </ul>
+
+    <h2>Inloggen</h2>
+    <p>Inloggen kan uitsluitend via Google Sign-In. Inloggen is optioneel: de app blijft volledig bruikbaar zonder account, en uitloggen verwijdert nooit je lokale gegevens op het toestel.</p>
+
+    <h2>Jouw rechten</h2>
+    <p>Als ingelogde gebruiker heb je recht op inzage, overdraagbaarheid (export van je gegevens) en verwijdering (erasure) van je gegevens. We reageren binnen één maand op een verzoek. Een export wordt op aanvraag als JSON-bestand aangeleverd.</p>
+
+    <h2 id="verwijderen">Account verwijderen</h2>
+    <div class="deletion-box">
+    <p>Je kunt op elk moment vragen om je account en de daaraan gekoppelde gegevens te laten verwijderen — ook als je de app al hebt verwijderd van je toestel. Dit is precies waarom deze route via e-mail en een webpagina loopt, en niet alleen via een knop in de app.</p>
+    <p><strong>Wat je stuurt:</strong> een e-mail met het Google-account waarmee je was ingelogd, naar <a href="mailto:joost@fanalists.com?subject=RideWindow%20%E2%80%94%20verwijder%20mijn%20account">joost@fanalists.com</a> (onderwerp is al ingevuld).</p>
+    <p><strong>Wat wordt verwijderd:</strong> je account en de daaraan gekoppelde profielinstellingen, beschikbaarheid en geplande ritten.</p>
+    <p><strong>Wat niet wordt verwijderd:</strong> feedback die je eerder hebt ingestuurd blijft bewaard, maar wordt losgekoppeld van je account (geanonimiseerd/de-geïdentificeerd).</p>
+    <p><strong>Reactietermijn:</strong> binnen één maand na je verzoek.</p>
+    </div>
+
+    <h2>Bewaartermijn</h2>
+    <p>Bij verwijdering van je account worden je gegevens (profiel, beschikbaarheid, geplande ritten) direct verwijderd. Eerder ingestuurde feedback blijft bewaard, maar dan zonder koppeling aan jouw account — dit gebruiken we om de score-berekening te blijven verbeteren.</p>
+
+    <h2>Kinderen</h2>
+    <p>RideWindow richt zich niet op kinderen jonger dan 13 jaar. We verzamelen niet bewust gegevens van kinderen.</p>
+
+    <h2>Geen tracking</h2>
+    <p>RideWindow gebruikt geen analytics, geen tracking en geen advertenties.</p>
+
+    <h2>Wijzigingen</h2>
+    <p>We kunnen dit beleid van tijd tot tijd bijwerken. Wijzigingen worden op deze pagina zichtbaar met een bijgewerkte datum.</p>
+
+    <h2>Contact</h2>
+    <p>Vragen over dit privacybeleid? Neem contact op via <a href="mailto:joost@fanalists.com">joost@fanalists.com</a>.</p>
+    </section>
+
+    <section id="en" class="lang-section" lang="en">
+    <h1>Privacy Policy (English)</h1>
 
     <h2>Summary</h2>
-    <p>RideWindow is designed with privacy in mind. Your data stays on your device. We do not collect, store, or share any personal information.</p>
+    <p>RideWindow works fully without an account, and as long as you do not sign in, nothing leaves your device. If you do sign in with your Google account, your profile settings, your weekly availability, and your planned rides are stored on servers in Europe, so they are also available on your other devices.</p>
 
-    <h2>Data we access</h2>
-    <h3>Location</h3>
-    <p>RideWindow requests your device location to fetch local weather forecasts. Your coordinates are sent directly to the weather service (Open-Meteo) to retrieve forecast data. We do not store, log, or share your location.</p>
-
-    <h3>Calendar (optional)</h3>
-    <p>If you choose to connect Google Calendar, RideWindow reads your calendar events to determine your availability for cycling. This data is processed entirely on your device and is never sent to any server controlled by us.</p>
-
-    <h2>Data we do NOT collect</h2>
+    <h2>What stays on your device</h2>
+    <p>Regardless of whether you are signed in, the following always stays local to your device and is never sent to a server:</p>
     <ul>
-        <li>No account or login required</li>
-        <li>No analytics or tracking</li>
-        <li>No advertising</li>
-        <li>No data shared with third parties</li>
-        <li>No server-side storage of any user data</li>
+        <li>The weather forecast cache</li>
+        <li>Blocked hours imported from Google Calendar</li>
     </ul>
 
-    <h2>Third-party services</h2>
+    <h2>What is stored on our servers (signed-in users only)</h2>
+    <p>Once you sign in with your Google account, we store:</p>
+    <ul>
+        <li>Your profile settings (weather tolerances, preferred ride lengths, theme, language, manual location override, notification toggles)</li>
+        <li>Your weekly availability pattern</li>
+        <li>Your planned rides</li>
+    </ul>
+    <p>If you are not signed in, none of this happens — the app works exactly as before, entirely on-device.</p>
+
+    <h2>Where your data is stored</h2>
+    <p>Signed-in data is hosted by Supabase, in the EU region West Europe (Paris, <code>eu-west-3</code>).</p>
+
+    <h2>Who processes data on our behalf</h2>
     <ul>
         <li><strong>Open-Meteo</strong> — receives your coordinates to provide weather data. See their <a href="https://open-meteo.com/en/terms">privacy policy</a>.</li>
-        <li><strong>Google Calendar API</strong> (optional) — used only when you explicitly connect your calendar. Governed by <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</li>
+        <li><strong>Supabase</strong> — provides authentication and the database for signed-in users, hosted in the EU (Paris).</li>
+        <li><strong>Google</strong> — provides Firebase Hosting for the web version of the app, the Google Calendar API if you connect your calendar, and Google Sign-In as the authentication method. See <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</li>
     </ul>
 
-    <h2>Data storage</h2>
-    <p>All app data (preferences, availability settings, cached weather) is stored locally on your device using the app's private storage. Uninstalling the app removes all data.</p>
+    <h2>Signing in</h2>
+    <p>Sign-in is only available via Google Sign-In. Signing in is optional: the app remains fully usable without an account, and signing out never deletes your local data on the device.</p>
+
+    <h2>Your rights</h2>
+    <p>As a signed-in user you have the right to access, portability (export of your data), and erasure of your data. We respond to a request within one month. An export is provided as a JSON file on request.</p>
+
+    <h2 id="delete-account">Deleting your account</h2>
+    <div class="deletion-box">
+    <p>You can request deletion of your account and its associated data at any time — even if you have already uninstalled the app. That is exactly why this route runs through email and a web page, not only an in-app button.</p>
+    <p><strong>What to send:</strong> an email with the Google account you signed in with, to <a href="mailto:joost@fanalists.com?subject=RideWindow%20%E2%80%94%20delete%20my%20account">joost@fanalists.com</a> (subject line is pre-filled).</p>
+    <p><strong>What gets deleted:</strong> your account and its associated profile settings, availability, and planned rides.</p>
+    <p><strong>What does not get deleted:</strong> feedback you previously submitted is retained, but is de-identified (no longer linked to your account).</p>
+    <p><strong>Response window:</strong> within one month of your request.</p>
+    </div>
+
+    <h2>Retention</h2>
+    <p>When your account is deleted, your data (profile, availability, planned rides) is removed immediately. Previously submitted feedback is retained but with no link to your account — we use it to keep improving the score calculation.</p>
 
     <h2>Children</h2>
     <p>RideWindow is not directed at children under 13. We do not knowingly collect data from children.</p>
+
+    <h2>No tracking</h2>
+    <p>RideWindow uses no analytics, no tracking, and no advertising.</p>
 
     <h2>Changes</h2>
     <p>We may update this policy from time to time. Changes will be reflected on this page with an updated date.</p>
 
     <h2>Contact</h2>
     <p>Questions about this privacy policy? Reach out at <a href="mailto:joost@fanalists.com">joost@fanalists.com</a>.</p>
+    </section>
 </body>
 </html>
