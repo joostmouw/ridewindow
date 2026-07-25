@@ -40,7 +40,7 @@ final class GpsPermissionNotifierProvider
 }
 
 String _$gpsPermissionNotifierHash() =>
-    r'83d894c28e1c4fed39c06bd00d9760df696ecbf9';
+    r'a9f8b1c7440f066015442e31b87e0cd717d3b4f7';
 
 /// Beheert de GPS-toestemmings-state machine.
 /// Gegenereerde providernaam: gpsPermissionProvider

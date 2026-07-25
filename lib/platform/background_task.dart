@@ -17,6 +17,7 @@ import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/domain/services/availability_filter.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
+import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
 
@@ -148,7 +149,7 @@ Future<RideSlot?> _computeNextSlot(
       if (parts.length == 2) {
         final dt = DateTime.parse(parts[0]);
         final blockType = BlockType.values.byName(parts[1]);
-        blockedHours[dt] = blockType;
+        blockedHours[canonicalHourKey(dt)] = blockType;
       }
     } catch (_) {
       // Negeer corrupte entries
@@ -169,6 +170,7 @@ Future<RideSlot?> _computeNextSlot(
     allowedDurations: allowedDurations,
     minHour: 6,
     maxHour: 22,
+    notBefore: DateTime.now(),
   );
   allSlots = generator.refine(allSlots, forecasts);
 

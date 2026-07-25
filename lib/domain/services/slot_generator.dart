@@ -31,11 +31,17 @@ class SlotGenerator {
   ///
   /// [minHour]/[maxHour] filter out night hours (default 0–24 = no filter).
   /// Hours must be contiguous (1h apart) within a window.
+  ///
+  /// [notBefore] drops windows that have already started — Open-Meteo returns the
+  /// whole current day from 00:00, so without it the evening still lists this
+  /// morning's windows. Defaults to null (no cut-off) so tests can score fixed
+  /// historical fixtures; both app callers pass the current time.
   List<RideSlot> generate(
     List<HourlyScore> scores, {
     required List<int> allowedDurations,
     int minHour = 0,
     int maxHour = 24,
+    DateTime? notBefore,
   }) {
     if (scores.isEmpty) return [];
 
@@ -54,6 +60,11 @@ class SlotGenerator {
 
         // Contiguity: all hours must be exactly 1h apart
         if (!_isContiguous(window)) continue;
+
+        // Already-started windows are not bookable any more.
+        if (notBefore != null && window.first.time.isBefore(notBefore)) {
+          continue;
+        }
 
         final overallScore =
             window.fold(0.0, (sum, s) => sum + s.overall) / d;
@@ -180,14 +191,21 @@ class SlotGenerator {
     return (variability * 0.10).clamp(0.0, 0.10);
   }
 
-  /// Fraction of [b]'s hours that overlap with [a]. Returns 0.0–1.0.
+  /// Fraction of the *shorter* slot's hours that [a] and [b] share. 0.0–1.0.
+  ///
+  /// Dividing by the shorter duration makes this symmetric. Dividing by [b]'s
+  /// duration (the previous behaviour) let a long slot survive a kept short one
+  /// that sat entirely inside it — 2 of 5 hours is only 0.4 — so Home showed two
+  /// overlapping windows for the same afternoon.
   double _overlapRatio(RideSlot a, RideSlot b) {
     final overlapStart = a.start.isAfter(b.start) ? a.start : b.start;
     final overlapEnd = a.end.isBefore(b.end) ? a.end : b.end;
     if (!overlapStart.isBefore(overlapEnd)) return 0.0;
     final overlapHours = overlapEnd.difference(overlapStart).inHours;
+    final aHours = a.end.difference(a.start).inHours;
     final bHours = b.end.difference(b.start).inHours;
-    if (bHours == 0) return 0.0;
-    return overlapHours / bHours;
+    final shorter = aHours < bHours ? aHours : bHours;
+    if (shorter == 0) return 0.0;
+    return overlapHours / shorter;
   }
 }

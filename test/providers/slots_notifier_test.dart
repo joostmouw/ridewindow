@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/clock_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -133,6 +134,7 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
+          nowProvider.overrideWithValue(baseTime),
           weatherProvider.overrideWith(() => fakeWeather),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),
@@ -171,6 +173,7 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
+          nowProvider.overrideWithValue(baseTime),
           weatherProvider.overrideWith(() => FakeWeatherNotifier(forecasts)),
           profileProvider.overrideWith(() => fakeProfileA),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),
@@ -216,6 +219,7 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
+          nowProvider.overrideWithValue(baseTime),
           weatherProvider.overrideWith(() => FakeWeatherNotifier(badForecasts)),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),
@@ -245,6 +249,7 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
+          nowProvider.overrideWithValue(baseTime),
           weatherProvider.overrideWith(() => FakeWeatherNotifier(goodForecasts)),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider
@@ -277,6 +282,7 @@ void main() {
         // several real-time retry delays before hasError becomes true.
         retry: (retryCount, error) => null,
         overrides: [
+          nowProvider.overrideWithValue(baseTime),
           weatherProvider.overrideWith(() => fakeWeather),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),
@@ -324,6 +330,7 @@ void main() {
         // Disable retry -- see comment in the REFRESH-04 test above.
         retry: (retryCount, error) => null,
         overrides: [
+          nowProvider.overrideWithValue(baseTime),
           weatherProvider.overrideWith(() => FakeWeatherNeverLoaded()),
           profileProvider.overrideWith(() => FakeProfileNotifier()),
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier({})),

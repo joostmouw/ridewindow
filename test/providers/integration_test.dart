@@ -18,6 +18,7 @@ import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/clock_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -115,6 +116,7 @@ void main() {
   test('weather loading→data: WeatherNotifier transitie loading naar data', () async {
     final container = ProviderContainer(
       overrides: [
+          nowProvider.overrideWithValue(_baseTime),
         weatherRepositoryProvider.overrideWith(
           (ref) => throw UnimplementedError('use FakeWeatherNotifier'),
         ),
@@ -147,6 +149,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+          nowProvider.overrideWithValue(_baseTime),
         weatherProvider.overrideWith(() => fakeWeather),
         profileProvider.overrideWith(() => FakeProfileNotifier()),
         availabilityProvider.overrideWith(() => EmptyAvailabilityNotifier()),
@@ -186,6 +189,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+          nowProvider.overrideWithValue(_baseTime),
         weatherProvider.overrideWith(() => FakeWeatherNotifier(_goodForecasts())),
         profileProvider.overrideWith(() => fakeProfile),
         availabilityProvider.overrideWith(() => EmptyAvailabilityNotifier()),
@@ -238,6 +242,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+          nowProvider.overrideWithValue(_baseTime),
         weatherProvider.overrideWith(() => FakeWeatherNotifier(goodForecasts)),
         profileProvider.overrideWith(() => FakeProfileNotifier()),
         availabilityProvider.overrideWith(() => EmptyAvailabilityNotifier()),

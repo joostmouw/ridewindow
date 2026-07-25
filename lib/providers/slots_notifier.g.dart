@@ -59,7 +59,7 @@ final class SlotsNotifierProvider
   }
 }
 
-String _$slotsNotifierHash() => r'ea9f6997826a83faab920f9620e505cca6add8c8';
+String _$slotsNotifierHash() => r'c6c4f5450d16b41078cf26189b418520b4107a33';
 
 /// SlotsNotifier combineert weer, profiel en beschikbaarheid tot gefilterde
 /// `List<RideSlot>`. Riverpod hercomputed automatisch als een van de drie

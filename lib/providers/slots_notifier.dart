@@ -5,6 +5,7 @@ import 'package:ridewindow/domain/services/availability_filter.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/clock_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 
@@ -95,11 +96,15 @@ class SlotsNotifier extends _$SlotsNotifier {
         .toList();
 
     // Genereer slots voor alle toegestane rijduren (nachtfilter 06–22).
+    // Verlopen vensters vallen af; anders staan 's avonds de ochtendvensters van
+    // vandaag nog in de lijst (Open-Meteo levert de dag vanaf 00:00).
+    final now = ref.watch(nowProvider);
     var allSlots = _generator.generate(
       scores,
       allowedDurations: profile.allowedDurations,
       minHour: 6,
       maxHour: 22,
+      notBefore: now,
     );
 
     // Pas slot-niveau penalties toe (trend + windconsistentie).

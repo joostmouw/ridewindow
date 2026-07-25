@@ -5,8 +5,8 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
 
-List<HourlyScore> _buildScores(int count, {double overall = 90.0}) {
-  final base = DateTime(2025, 7, 5, 8); // Saturday 08:00
+List<HourlyScore> _buildScores(int count, {double overall = 90.0, DateTime? start}) {
+  final base = start ?? DateTime(2025, 7, 5, 8); // Saturday 08:00
   return List.generate(
     count,
     (i) => HourlyScore(
@@ -330,6 +330,54 @@ void main() {
       final refined = generator.refine(rawSlots, forecasts);
       // Declining slot should score lower than stable slot
       expect(refined[0].overallScore, lessThan(refined[1].overallScore));
+    });
+  });
+
+  group('dedup overlap is symmetrisch (audit B3)', () {
+    RideSlot slot(int startHour, int hours, double score) {
+      final start = DateTime(2026, 6, 14, startHour);
+      return RideSlot(
+        start: start,
+        end: start.add(Duration(hours: hours)),
+        overallScore: score,
+        tier: rideTierFromScore(score),
+        hours: const [],
+      );
+    }
+
+    test('een kort venster binnen een lang venster laat het lange vallen', () {
+      // Precies het geval van de tester-schermfoto: 19:00-21:00 scoort net hoger
+      // en werd eerst bewaard, waarna 17:00-22:00 er los naast bleef staan.
+      final kort = slot(19, 2, 92.0);
+      final lang = slot(17, 5, 90.0);
+      final result = SlotGenerator().dedup([lang, kort]);
+      expect(result, hasLength(1));
+      expect(result.single, kort);
+    });
+
+    test('niet-overlappende vensters blijven allebei staan', () {
+      final ochtend = slot(8, 2, 90.0);
+      final avond = slot(18, 2, 88.0);
+      expect(SlotGenerator().dedup([ochtend, avond]), hasLength(2));
+    });
+  });
+
+  group('notBefore knipt verlopen vensters weg (audit B5)', () {
+    test('zonder notBefore blijven historische vensters staan', () {
+      final scores = _buildScores(6, start: DateTime(2026, 6, 14, 6));
+      final slots = SlotGenerator().generate(scores, allowedDurations: [2]);
+      expect(slots, isNotEmpty);
+    });
+
+    test('vensters die al begonnen zijn vallen af', () {
+      final scores = _buildScores(6, start: DateTime(2026, 6, 14, 6));
+      final slots = SlotGenerator().generate(
+        scores,
+        allowedDurations: [2],
+        notBefore: DateTime(2026, 6, 14, 9),
+      );
+      expect(slots.every((s) => !s.start.isBefore(DateTime(2026, 6, 14, 9))),
+          isTrue,);
     });
   });
 }

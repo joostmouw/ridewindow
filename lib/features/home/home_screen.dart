@@ -730,7 +730,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         );
       }
 
-      slots.sort((a, b) => _tierOrder(a.tier).compareTo(_tierOrder(b.tier)));
+      // Dart's List.sort is niet stabiel, dus binnen een tier moet de tiebreak
+      // expliciet; anders wisselt de kaartvolgorde per rebuild.
+      slots.sort((a, b) {
+        final byTier = _tierOrder(a.tier).compareTo(_tierOrder(b.tier));
+        return byTier != 0 ? byTier : a.start.compareTo(b.start);
+      });
 
       return SliverList.builder(
         itemCount: slots.length,
