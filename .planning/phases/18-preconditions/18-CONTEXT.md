@@ -28,8 +28,12 @@ Explicitly NOT in this phase: `supabase_flutter`, sign-in, schema, RLS policies,
 - **D-06:** **Accepted risk, recorded rather than solved: the free tier has no automated backups.** If the hosted database is lost there is no restore point. Blast radius is limited because the device keeps its own copy and local storage remains the source of truth by design (see `ARCHITECTURE.md` §2/§4a) — but this is a real regression versus the Firebase plan and belongs in PRE-01's rewritten constraint text, not left implicit.
 
 ### Region and Cloud project (PRE-02, PRE-04)
-- **D-07:** Region is **Frankfurt (`eu-central-1`)** — closest EU-proper region to NL. London and Zurich are explicitly excluded as non-EU. Claude's call, user did not object.
-- **D-08:** Reuse the existing **`my-project-joost`** Google Cloud project rather than creating a new one. Sharing the OAuth consent screen with the Calendar integration is the entire mechanism behind AUTH-05; a separate project would defeat it.
+- **D-07:** ~~Frankfurt~~ → **PRE-02 IS DONE.** Project provisioned 2026-07-25 in **West EU (Paris), `eu-west-3`**, compute NANO, status Healthy, org tier FREE. Paris was on the approved EU-proper list (Frankfurt / Ireland / Paris / Stockholm); the latency difference from NL is negligible, so this stands as-is and is not to be redone. Project URL: `https://hcdrydlgqpnmumfupgcx.supabase.co`. Verified by looking at the dashboard, per D-09.
+- **D-07a:** The dashboard also confirms **"Last backup: No backups"** — D-06's accepted risk is now observed fact, not a prediction.
+- **D-07b:** Project display name is currently "joostmouw's Project" under the "RideWindow" org. Cosmetic only; rename is optional and blocks nothing.
+- **D-08:** Reuse the existing **`my-project-joost`** Google Cloud project rather than creating a new one. Sharing the OAuth consent screen with the Calendar integration is the entire mechanism behind AUTH-05; a separate project would defeat it. Confirmed state from `.planning/quick/260717-no1-.../OAUTH-PUBLISH-CHECKLIST.md`: consent screen is **In production**, sole scope is `calendar.events`, authorized domain is `joostmouw.github.io`.
+- **D-08a:** The privacy policy URL is already fixed and registered on that consent screen: **`https://joostmouw.github.io/ridewindow/privacy-policy.html`**. PRE-05 rewrites *this* page and PRE-06's deletion route goes on *this* page (D-10/D-12). No new hosting, no URL change — changing it would mean re-editing the consent screen.
+- **D-08b:** **`OAUTH-PUBLISH-CHECKLIST.md` line 47 is wrong and must be corrected as part of PRE-07.** It instructs the reader to "Confirm no 100-user cap applies anymore" after publishing. The cap is tied to *verification* status, not *publish* status, so "In production" does not remove it — `.planning/PROJECT.md` already records the correction. Leaving a document in the repo that makes exactly the error PRE-07 exists to prevent defeats the requirement. Either annotate that file or supersede it from the PRE-07 writeup, and link the two.
 - **D-09:** Verification is by **looking at the console**, not by assuming from the signup flow. This applies to the region especially — it cannot be changed afterwards.
 
 ### Account deletion route (PRE-06)
@@ -82,7 +86,10 @@ Explicitly NOT in this phase: `supabase_flutter`, sign-in, schema, RLS policies,
 
 ### Existing production surfaces this phase touches
 - `.planning/BACKLOG.md` — check before adding anything new; the deletion route may already have an entry.
-- The hosted privacy policy URL and the Play Console listing (see `.planning/STATE.md` §Project Reference for the current URL and app ID).
+- `https://joostmouw.github.io/ridewindow/privacy-policy.html` — the live policy page. Rewritten by PRE-05; carries PRE-06's deletion route. Registered on the OAuth consent screen, so the URL must not change.
+- `.planning/quick/260717-no1-backlog-31-google-oauth-consent-screen-p/OAUTH-PUBLISH-CHECKLIST.md` — prior OAuth work. Source of truth for the consent-screen state, **but its line 47 states the 100-user cap is gone after publishing, which is false.** PRE-07 must correct or supersede it (D-08b).
+- `.planning/PROJECT.md` §Current State — already carries the correct version of the cap nuance; use that wording as the basis for PRE-07 rather than rewriting from scratch.
+- The Play Console listing (see `.planning/STATE.md` §Project Reference for app ID and version).
 
 </canonical_refs>
 
