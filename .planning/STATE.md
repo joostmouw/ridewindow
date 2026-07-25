@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
 status: planning
-last_updated: "2026-07-25T14:06:51.557Z"
+last_updated: "2026-07-25T15:52:35.000Z"
 last_activity: 2026-07-25
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -35,17 +35,17 @@ Items acknowledged and deferred at v2.0 milestone close on 2026-07-17. The `audi
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-01)
+See: .planning/PROJECT.md (updated 2026-07-25)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 17 complete — all v2.0 (iOS Web App) milestone phases (11-17) are now Complete; milestone close-out not yet run
+**Current focus:** v3.0 "Accounts & Sociaal" roadmap created (Phases 18–22, scoped to milestone phases 1–2 only). Next: `/gsd:plan-phase 18`.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-07-25 — Milestone v3.0 started
+Phase: 18 — Preconditions (not started)
+Plan: — (TBD, plan-phase not yet run)
+Status: Roadmap created, awaiting phase planning
+Last activity: 2026-07-25 — ROADMAP.md created for v3.0 (Phases 18–22), REQUIREMENTS.md traceability filled
 
 ## Performance Metrics
 
@@ -187,6 +187,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 - [Phase 16-03]: Confirmed via git-stash before/after comparison that test/features/availability_screen_test.dart (11 failures) and test/features/detail/ride_detail_screen_calendar_test.dart (4 failures) are pre-existing, unrelated to this plan (BACKLOG.md #11 test-suite health issue) -- identical failure counts before/after
 - 17-01 (2026-07-17): Corrected full automated-test baseline established (supersedes the partial 16-03 note): `flutter test` on current HEAD consistently reports 215 passing / 69 failing across 13 files -- `ride_detail_screen_test.dart` (13), `insights_sheet_test.dart` (13), `availability_screen_test.dart` (11-12), `profile_screen_test.dart` (5), `profile_screen_notif_test.dart` (5), `weather_repository_test.dart` (3-5), `home_screen_test.dart` (4), `detail/ride_detail_screen_calendar_test.dart` (4), `onboarding_screen_test.dart` (3), `welcome_screen_test.dart` (2), `home_screen_location_test.dart` (2), `providers/integration_test.dart` (1), plus one of `core/pwa_display_mode_test.dart`/`providers/slots_notifier_test.dart` (1) -- the 215/69 totals are stable across repeated runs on this machine but the exact per-file split shifts slightly run-to-run (test-binding/localization state leakage between files, tracked in BACKLOG.md #11). No Phase 17 source changes were made, so this variance is confirmed pre-existing, not a regression.
 - 17-01 (2026-07-17): Phase 17 production deploy completed -- `flutter build web --release` + `firebase deploy --only hosting` succeeded; live at https://my-project-joost.web.app. All 4 curl checks passed on the first attempt (/, /profile, /detail/test123 all HTTP 200; /sqlite3.wasm HTTP 200 with `content-type: application/wasm`) -- firebase.json required no changes. `flutter build apk --release` also exits 0 on this same HEAD.
+- Roadmap 2026-07-25: v3.0 (Accounts & Sociaal) scoped to phases 1–2 of `.planning/milestones/v3.0-ACCOUNTS.md` only. Phases 18–22 created: 18 Preconditions, 19 Auth, 20 Repository refactor (local-only), 21 Sync + migration, 22 Account-backed feedback. AUTH-09 (account deletion removing server data) deliberately mapped to Phase 21, not Phase 19, since no Firestore data exists to delete until Phase 21 wires cloud writes. REG-01/02/04 mapped to Phase 19 (firebase_core/firebase_auth added there); REG-03 mapped to Phase 21 (full Firebase payload, pairs with SYNC-07's 2s budget); REG-05 mapped to Phase 20 (the phase that touches background_task.dart).
 
 ### Pending Todos
 
@@ -199,6 +200,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 - Phase 8 (Notifications): Must test on Samsung/Xiaomi physical devices for WorkManager OEM reliability.
 - Phase 10 (Release): Plans 01-03 complete. Smoke test passed. Plan 10-04 BLOCKED — Google Play developer account identity verification pending (submitted 2026-06-05, may take a few days). Once verified: complete store listing, Data Safety form, content rating, upload AAB, publish Internal testing track.
 - Phase 3 notitie (opgelost 03-03): AvailabilityNotifier gebruikt SharedPreferences — de Drift AvailabilityGridEntries tabel slaat een weekpatroon op (dayOfWeek+hour), niet DateTime-instanties. SharedPreferences met ISO-8601 serialisatie is de juiste aanpak.
+- Phase 18 (Preconditions) — the privacy policy rewrite is legal work with real lead time; per research it should start immediately and run in parallel with Phase 19–21 code, not block them, but it must be live before the accounts release ships.
 
 ## Deferred Items
 
@@ -230,9 +232,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-07-17T13:14:18.995Z
-Last activity: 2026-07-11 - v2.0 ROADMAP.md created (Phases 11-17: Web Scaffolding, Drift Web Persistence, Geolocation & Manual Fallback, Foreground Refresh, Google Calendar Web, PWA Installability, Deployment Hardening). Next: /gsd:plan-phase 11
+Last session: 2026-07-25T15:52:35.000Z
+Last activity: 2026-07-25 - v3.0 ROADMAP.md created (Phases 18-22: Preconditions, Auth, Repository refactor, Sync + migration, Account-backed feedback). REQUIREMENTS.md traceability filled (49/49 mapped). Next: /gsd:plan-phase 18
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Review the v3.0 roadmap draft (`.planning/ROADMAP.md`, Phases 18–22) and confirm scope/phase split before planning begins.
+- Once approved: `/gsd:plan-phase 18`

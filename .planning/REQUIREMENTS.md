@@ -111,11 +111,66 @@ Explicit exclusions, with reasoning, to prevent re-adding.
 
 ## Traceability
 
-Filled by the roadmapper.
+Filled by the roadmapper. Phases 18–22 continue the numbering from v2.0 (last phase was 17); see `.planning/ROADMAP.md` for full phase detail.
+
+**Note on AUTH-09:** although its REQ-ID prefix is AUTH, it is mapped to Phase 21 (Sync + migration) rather than Phase 19 (Auth). Account deletion cannot remove "stored data on the server" before Firestore documents exist to delete — that capability, and its verification, only becomes real once Phase 21 wires Firestore reads/writes and the `AccountSyncService` deletion cleanup path. Phase 19 ships sign-in/out only; there is nothing server-side yet for AUTH-09 to delete.
+
+**Note on REG-01/02/03/04/05:** distributed across phases by which phase's work actually creates the regression risk, per research (`PITFALLS.md` #10, `SUMMARY.md`): REG-01/02/04 land in Phase 19 (Auth), where `firebase_core`/`firebase_auth` are first added and where the Calendar-identity-mismatch risk lives; REG-03 lands in Phase 21 (Sync), where `cloud_firestore` completes the Firebase payload and the cold-start budget is most at risk, pairing naturally with SYNC-07; REG-05 lands in Phase 20 (Repository refactor), the phase that actually touches `background_task.dart`.
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| _pending roadmap_ | | |
+| PRE-01 | Phase 18 | Pending |
+| PRE-02 | Phase 18 | Pending |
+| PRE-03 | Phase 18 | Pending |
+| PRE-04 | Phase 18 | Pending |
+| PRE-05 | Phase 18 | Pending |
+| PRE-06 | Phase 18 | Pending |
+| PRE-07 | Phase 18 | Pending |
+| PRE-08 | Phase 18 | Pending |
+| PRE-09 | Phase 18 | Pending |
+| AUTH-01 | Phase 19 | Pending |
+| AUTH-02 | Phase 19 | Pending |
+| AUTH-03 | Phase 19 | Pending |
+| AUTH-04 | Phase 19 | Pending |
+| AUTH-05 | Phase 19 | Pending |
+| AUTH-06 | Phase 19 | Pending |
+| AUTH-07 | Phase 19 | Pending |
+| AUTH-08 | Phase 19 | Pending |
+| AUTH-09 | Phase 21 | Pending |
+| AUTH-10 | Phase 19 | Pending |
+| SYNC-01 | Phase 21 | Pending |
+| SYNC-02 | Phase 21 | Pending |
+| SYNC-03 | Phase 21 | Pending |
+| SYNC-04 | Phase 21 | Pending |
+| SYNC-05 | Phase 21 | Pending |
+| SYNC-06 | Phase 21 | Pending |
+| SYNC-07 | Phase 21 | Pending |
+| SYNC-08 | Phase 21 | Pending |
+| SYNC-09 | Phase 21 | Pending |
+| SYNC-10 | Phase 21 | Pending |
+| SYNC-11 | Phase 21 | Pending |
+| SYNC-12 | Phase 21 | Pending |
+| MIG-01 | Phase 21 | Pending |
+| MIG-02 | Phase 21 | Pending |
+| MIG-03 | Phase 21 | Pending |
+| MIG-04 | Phase 21 | Pending |
+| MIG-05 | Phase 21 | Pending |
+| MIG-06 | Phase 21 | Pending |
+| MIG-07 | Phase 21 | Pending |
+| MIG-08 | Phase 21 | Pending |
+| FB-01 | Phase 22 | Pending |
+| FB-02 | Phase 22 | Pending |
+| FB-03 | Phase 22 | Pending |
+| FB-04 | Phase 22 | Pending |
+| FB-05 | Phase 22 | Pending |
+| REG-01 | Phase 19 | Pending |
+| REG-02 | Phase 19 | Pending |
+| REG-03 | Phase 21 | Pending |
+| REG-04 | Phase 19 | Pending |
+| REG-05 | Phase 20 | Pending |
+
+**Coverage:** 49/49 v3.0 requirements mapped. No orphans, no duplicates.
 
 ---
 *Requirements defined: 2026-07-25 — milestone v3.0 Accounts & Sociaal*
+*Traceability filled: 2026-07-25 — roadmap Phases 18–22*
