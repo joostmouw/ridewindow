@@ -79,7 +79,8 @@ Active milestone (v3.0 Accounts & Sociaal, phases 1–2 only) detail follows.
   3. Both SHA-1 fingerprints (local release keystore and Play App Signing key, pulled from Play Console → App integrity) are registered on the Android OAuth client in Cloud Console, the deployed PWA origin is on the web OAuth client, and the web client ID is registered in Supabase's Google provider settings (PRE-04)
   4. The published privacy policy and the Play Store Data Safety declaration both reflect server-side storage of location data and calendar-derived availability, live before or at the accounts release (PRE-05, PRE-06)
   5. The Auth-cap-vs-Calendar-cap distinction is documented explicitly, a billing alert (notification, not a spend cap) is configured, a conscious decision is recorded about Supabase's 7-day free-tier inactivity pause, and a data retention/export answer is written down (PRE-07, PRE-08, PRE-09)
-**Plans**: TBD
+**Plans**: 4 - 18-01 constraint rewrite + written answers (PRE-01/07/08/09), 18-02 privacy policy NL+EN + deletion route (PRE-03/05/06), 18-03 keep-warm workflow (PRE-08), 18-04 console setup, manual (PRE-02/03/04/06)
+**Note**: PRE-02 already satisfied - Supabase project provisioned 2026-07-25 in West EU (Paris, `eu-west-3`), free tier. Plan 18-04 re-verifies it in the dashboard rather than assuming.
 
 ### Phase 19: Auth
 **Goal**: Users can sign in and out with their Google account from Profile, as an optional entry point rather than a gate, with signed-in state surviving restarts on both platforms — and this is proven not to have broken the existing release build, the PWA, or Google Calendar.
@@ -156,7 +157,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 15. Google Calendar Web Integration | v2.0 | 2/2 | Complete    | 2026-07-14 |
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
-| 18. Preconditions | v3.0 | 0/TBD | Not started | - |
+| 18. Preconditions | v3.0 | 0/4 | Planned | - |
 | 19. Auth | v3.0 | 0/TBD | Not started | - |
 | 20. Repository refactor (local-only) | v3.0 | 0/TBD | Not started | - |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
