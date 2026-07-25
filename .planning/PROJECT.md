@@ -26,9 +26,22 @@ RideWindow is an app for casual cyclists who want to know — at a glance — th
 
 </details>
 
-## Next Milestone Goals
+## Current Milestone: v3.0 Accounts & Sociaal
 
-Not yet defined — run `/gsd:new-milestone` to scope v2.1+ (candidates already sitting in BACKLOG.md include: contextual "Add to Home Screen" nudge, iOS Web Push once PWA adoption is known, Android home screen widget, week-agenda overlap view, and the accumulated feedback-backlog quick tasks — see BACKLOG.md for the full list).
+**Goal:** Turn RideWindow's two separate data silos (Android SharedPreferences, browser localStorage) into one account-backed profile — Google Sign-In plus Firestore sync of profile and availability — and route user feedback through that account instead of a `mailto:` link.
+
+**Target features:**
+- Accounts via Google Sign-In (Firebase Auth), reusing the `google_sign_in` 7.2.0 dependency already present for Calendar
+- Cloud sync of profile and availability (SharedPreferences → Firestore), so Android and the web PWA are one app
+- First-login data migration: local device data becomes the source of truth on an empty account
+- In-app feedback tied to the user's account, carrying the settings and forecast context that produced it (replaces BACKLOG #33's `mailto:`)
+- Revised project constraints, a rewritten privacy policy, and verified Google Cloud OAuth setup — all release-blocking preconditions, tracked as requirements
+
+**Key context:** Scope is deliberately phases 1–2 of the five-phase plan in `.planning/milestones/v3.0-ACCOUNTS.md`. Friends, availability sharing, ride invites, and server-side notifications (phases 3–5) are deferred until phases 1–2 are running and there is tester feedback — they need a network effect that does not exist yet. Phase 1 is worth building regardless of whether the social phases ever follow: it fixes the real, present problem that there is no backup and no cross-platform sync.
+
+Three constraints below ("No backend", "Budget", "Privacy") are broken by this milestone by design and must be consciously revised in `CLAUDE.md` and here before the first line of code. The privacy policy rewrite is legal work, not a text edit, and is a hard release blocker. The Google Cloud project carries a 100-user lifetime cap while the `calendar.events` scope stays unverified — verify at setup time.
+
+**Open design question for the plan phase:** a second login on another device that already holds local data. "Local wins" must not blindly overwrite the cloud there — that needs an explicit conflict decision, not an implicit consequence.
 
 ## Requirements
 
@@ -74,7 +87,12 @@ Not yet defined — run `/gsd:new-milestone` to scope v2.1+ (candidates already 
 
 <!-- Current scope. Building toward these. -->
 
-Not yet defined — awaiting `/gsd:new-milestone` for v2.1+.
+**v3.0 — Accounts & Sociaal (phases 1–2 only).** Full requirement list with REQ-IDs lives in `.planning/REQUIREMENTS.md`. Scope areas:
+- Preconditions — constraint revision, privacy policy rewrite, Google Cloud OAuth verification
+- Auth — Google Sign-In via Firebase Auth, sign-out, account state across app restart
+- Sync — profile and availability to Firestore, both platforms, offline-tolerant
+- Migration — first-login local-wins migration, plus a defined answer for second-device conflicts
+- Feedback — account-backed feedback with settings/forecast context
 
 ### Out of Scope
 
@@ -83,10 +101,10 @@ Not yet defined — awaiting `/gsd:new-milestone` for v2.1+.
 - **Native iOS App Store app** — v2 addressed iOS via Flutter Web/PWA instead, avoiding the $99/yr Apple Developer account. A native iOS app remains a possible v3+ if the web version validates demand.
 - **Push notifications on web** — iOS Safari Web Push only works for an installed PWA (16.4+) and is less reliable than native; deferred until PWA install adoption is known. Still valid post-v2.0.
 - **Background refresh on web** — `workmanager` has no web support; refresh happens on foreground/page-load instead of via periodic background task. Still valid — this is how it shipped.
-- **User accounts / backend** — No login, no cross-device sync. All data lives locally (per platform/browser). Removes auth complexity, privacy policy headaches, and backend cost.
+- ~~**User accounts / backend**~~ — **Moved into scope for v3.0.** Held out of v1.0/v2.0 to avoid auth complexity, privacy-policy work, and backend cost. Reversed because the local-only model has a concrete cost: no backup (an accidental uninstall loses a user's whole availability schedule), and Android and web are two disconnected silos.
 - **Monetization (IAP / ads)** — Free with no ads. Still a portfolio/hobby project validating core value before considering revenue.
 - **Multi-location / route planning** — One location at a time, no route/elevation integration. Future differentiator.
-- **Social features** — No groups, no shared rides, no leaderboards. Personal planning tool.
+- **Social features beyond account-backed feedback** — Friends, shared availability, ride invites, and server-side push (phases 3–5 of `.planning/milestones/v3.0-ACCOUNTS.md`) are deferred, not cancelled. They need a user base to be worth anything; decide after v3.0 phases 1–2 ship and testers respond. Leaderboards remain out entirely.
 - **Apple Watch / Wear OS companion** — Phone/browser-only. Smartwatch is v3+ territory.
 - **Cycling-type specialization (road / gravel / MTB)** — One generic "ride" profile; tolerances cover personalisation.
 - **Historical weather analytics** — Forward-looking only, 7 days. No "best ride days last month" reporting.
@@ -115,10 +133,10 @@ Not yet defined — awaiting `/gsd:new-milestone` for v2.1+.
 
 - **Tech stack:** Flutter (Dart) — chosen for cross-platform readiness (iOS in v2), Material 3 out-of-the-box, hot reload DX, lower dependency-maintenance burden than React Native for solo devs.
 - **Platforms:** Android (native, shipped v1.0) + Web/PWA for iOS (v2.0) — no native iOS App Store app, no Apple Dev Account ($99/yr).
-- **Budget:** ~€25 one-time (Google Play Developer account) + Firebase Hosting free tier for the web build. No ongoing infra costs (Open-Meteo free, Firebase free tier, Google Calendar API free, all client-side).
+- **Budget:** ~€25 one-time (Google Play Developer account) + Firebase Hosting free tier for the web build. ⚠️ **Under revision in v3.0** — "no ongoing infra costs" no longer holds once Firebase Auth + Firestore are added. Auth is free and Firestore's free tier is generous, but the constraint must be reformulated as an explicit spend ceiling rather than an assumed zero.
 - **Timeline:** Realistic 8–12 weeks side-project pace. Acceptable to ship a thin v1 fast and iterate.
-- **No backend:** Pure client-side. Drift for local storage (native); web build uses Drift's IndexedDB/wasm backend. Removes a whole tier of complexity (auth, hosting, GDPR) and lets each version ship fast.
-- **Privacy:** Location permission is the only sensitive permission. Privacy policy required (Play Store mandate; also linked from the web app). Data never leaves device unless user opts into Calendar integration.
+- **No backend:** Pure client-side. Drift for local storage (native); web build uses Drift's IndexedDB/wasm backend. ⚠️ **Being revoked in v3.0** — Firebase Auth + Firestore are added deliberately, accepting the auth/GDPR tier that v1.0 and v2.0 avoided.
+- **Privacy:** Location permission is the only sensitive permission. Privacy policy required (Play Store mandate; also linked from the web app). ⚠️ **Under revision in v3.0** — "data never leaves the device unless the user connects Calendar" no longer holds: location data and calendar-derived availability land on a server, which makes Joost a data controller. The published policy must be legally rewritten before the first release with accounts.
 - **Performance:** App must show forecast + slots within 2s of cold start (after first run). Weather refresh runs in background via WorkManager on Android; on-foreground/on-load on web (no `workmanager` support there).
 
 ## Key Decisions
@@ -137,6 +155,10 @@ Not yet defined — awaiting `/gsd:new-milestone` for v2.1+.
 | Google Calendar included in v2.0 web scope | `google_sign_in` supports web via Google Identity Services; meaningful differentiator over a bare MVP | ✓ Validated — v2.0 shipped, verified end-to-end on real iPhone Safari by two testers |
 | Notifications deferred for v2.0 web | iOS Safari Web Push only works for installed PWAs (16.4+) and is unreliable; not worth building until PWA adoption is proven | ✓ Validated — shipped without notifications, revisit post-adoption-data |
 | Firebase Hosting for web deployment | Free tier, already in CLAUDE.md tech stack, simple `firebase deploy` for Flutter web builds | ✓ Validated — v2.0 shipped, SPA rewrite + wasm headers curl-proven on live domain in Phase 17 |
+| Reverse "no backend" in v3.0 | Local-only has a real cost: no backup (uninstall = lose everything, and `run-as` backup is blocked on release builds), Android and web are separate silos, and score calibration needs feedback tied to a user's own tolerances | Pending — v3.0 phases 1–2 |
+| Google Sign-In as the only auth method | `google_sign_in` 7.2.0 is already in the app for Calendar; shortest path, and no password management, email verification, or password reset | Pending — accepted limitation: anyone unwilling to use a Google account cannot participate |
+| v3.0 scoped to phases 1–2 only | Phase 1 pays off regardless of what follows; the social phases (3–5) need a network effect that does not exist yet, so building them now risks an empty feature skeleton | Pending — reassess after tester feedback |
+| First-login migration: local wins | On an empty account it is the only correct behaviour, and testers lose nothing they filled in | Pending — second-device conflict case explicitly still to be designed |
 
 ## Evolution
 
@@ -156,4 +178,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-17 — v2.0 (iOS Web App) milestone shipped*
+*Last updated: 2026-07-25 — v3.0 (Accounts & Sociaal) milestone started*

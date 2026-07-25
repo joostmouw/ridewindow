@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: iOS Web App
-status: Awaiting next milestone
-last_updated: "2026-07-17T14:54:00.557Z"
-last_activity: 2026-07-17 — Milestone v2.0 completed and archived
+milestone: v3.0
+milestone_name: Accounts & Sociaal
+status: planning
+last_updated: "2026-07-25T14:06:51.557Z"
+last_activity: 2026-07-25
 progress:
-  total_phases: 18
-  completed_phases: 7
-  total_plans: 11
-  completed_plans: 11
-  percent: 39
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -42,10 +42,10 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: Milestone v2.0 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-25 - Completed quick task 260725-knl: beschikbaarheids-pipeline gerepareerd (zie .planning/AUDIT-COHERENCE-260725.md). Geblokkeerde uren filterden geen enkel slot door een UTC/lokale DateTime-sleutelmismatch; opgelost met een canonieke sleutel, migratie voor bestaande installs en een expliciet weekpatroon-model. Tests 282/2 → 306/0, voor het eerst volledig groen: de 2 al maanden falende tests bleken te falen op allowedDurations in plaats van op de toleranties die ze beweerden te meten, en de dedup-drempel is inclusief gemaakt (bij allowedDurations: [2] dedupte er voorheen niets). Eerder: quick task 260718-f1m: Backlog #9 accessibility audit (Semantics labels, 48dp touch targets, WCAG AA contrast fixes). Worktree was accidentally forked from a stale base predating the #11 test fix; merge required manual conflict resolution in test/features/availability_screen_test.dart (locale param vs. cell-sizing constants) — resolved correctly, flutter test confirmed 282/2 post-merge, no regression from #11's fix.
+Status: Defining requirements
+Last activity: 2026-07-25 — Milestone v3.0 started
 
 ## Performance Metrics
 
