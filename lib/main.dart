@@ -77,11 +77,30 @@ Future<void> main() async {
 }
 
 ThemeData _buildTheme(Brightness brightness) {
-  final colorScheme = ColorScheme.fromSeed(
+  final seeded = ColorScheme.fromSeed(
     seedColor: AppColors.seed,
     brightness: brightness,
   );
   final isLight = brightness == Brightness.light;
+
+  // In light mode dragen de oppervlakken de merkkleur in plaats van MD3's
+  // bijna-witte standaard: brandLight is de achtergrond, containers zijn
+  // lichter zodat kaarten er bovenop komen te liggen. Dark mode volgt het
+  // afgeleide schema van de seed.
+  final colorScheme = isLight
+      ? seeded.copyWith(
+          surface: AppColors.brandLight,
+          surfaceContainerLowest: AppColors.lightSurfaceContainerLowest,
+          surfaceContainerLow: AppColors.lightSurfaceContainerLow,
+          surfaceContainer: AppColors.lightSurfaceContainer,
+          surfaceContainerHigh: AppColors.lightSurfaceContainerHigh,
+          surfaceContainerHighest: AppColors.lightSurfaceContainerHighest,
+          onSurface: AppColors.lightOnSurface,
+          onSurfaceVariant: AppColors.lightOnSurfaceVariant,
+          outline: AppColors.lightOutline,
+          outlineVariant: AppColors.lightOutlineVariant,
+        )
+      : seeded;
 
   return ThemeData(
     colorScheme: colorScheme,

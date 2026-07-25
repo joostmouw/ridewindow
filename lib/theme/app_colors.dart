@@ -26,12 +26,12 @@ class TierColors {
   static const light = TierColors(
     perfectFg: Color(0xFF1B5E20),
     perfectBg: Color(0xFFE8F5E9),
-    greatFg: Color(0xFF00695C),   // teal 800 — distinct from Perfect green
+    greatFg: Color(0xFF006457),   // 4.55:1 op brandLight
     greatBg: Color(0xFFE0F2F1),   // teal 50
-    // 5.11:1 on acceptableBg (was 0xFFE65100 at 3.46:1, FAILED WCAG AA 4.5:1) — Material "Deep Orange 900"
-    acceptableFg: Color(0xFFBF360C),
+    // 4.53:1 op brandLight; ook nog 5.9:1 op acceptableBg
+    acceptableFg: Color(0xFFA42E0A),
     acceptableBg: Color(0xFFFFF3E0),
-    poorFg: Color(0xFF757575),
+    poorFg: Color(0xFF585858),   // 4.56:1 op brandLight
     poorBg: Color(0xFFF5F5F5),
   );
 
@@ -50,20 +50,38 @@ class TierColors {
 /// Semantic colour tokens used throughout the app.
 abstract final class AppColors {
   // ── Brand ──
-  static const seed = Color(0xFF2E7D32);
+  /// Officiele merkkleuren. brandLight draagt de achtergrond, brandDark is de
+  /// mark in het logo en de seed van het kleurenschema.
+  static const brandLight = Color(0xFFC5D4B6);
+  static const brandDark = Color(0xFF234934);
+  static const seed = brandDark;
+
+  /// Oppervlakken in light mode: getinte trappen afgeleid van [brandLight].
+  /// Kaarten zijn lichter dan de achtergrond, zodat ze naar voren komen.
+  static const lightSurfaceContainerLowest = Color(0xFFFCFDF8);
+  static const lightSurfaceContainerLow = Color(0xFFF4F7EC);
+  static const lightSurfaceContainer = Color(0xFFEDF1E2);
+  static const lightSurfaceContainerHigh = Color(0xFFE4EAD7);
+  static const lightSurfaceContainerHighest = Color(0xFFDAE2CC);
+  static const lightOnSurface = Color(0xFF1B2A20);
+  static const lightOnSurfaceVariant = Color(0xFF414F45);
+  static const lightOutline = Color(0xFF6B7663);
+  static const lightOutlineVariant = Color(0xFFA9B79C);
 
   // ── Light semantic ──
-  static const lightTextPrimary = Color(0xFF1A1A1A);
-  static const lightTextSecondary = Color(0xFF444444);
-  static const lightTextTertiary = Color(0xFF666666);
-  // 5.33:1 on white / 4.89:1 on lightSurface (was 0xFF999999 at 2.85:1/2.61:1, FAILED WCAG AA 4.5:1)
-  static const lightTextHint = Color(0xFF6B6B6B);
+  static const lightTextPrimary = Color(0xFF1A2A20);
+  static const lightTextSecondary = Color(0xFF3A4A40);
+  // 4.55:1 op brandLight — opnieuw gewogen toen de achtergrond getint werd
+  static const lightTextTertiary = Color(0xFF4C5C52);
+  // 4.51:1 op brandLight (was 0xFF6B6B6B, zakte naar 3.67:1 toen de achtergrond
+  // van #F5F5F5 naar #C5D4B6 ging)
+  static const lightTextHint = Color(0xFF4E5C54);
 
-  static const lightSurface = Color(0xFFF5F5F5);
-  static const lightSurfaceDim = Color(0xFFF0F0F0);
-  static const lightBorder = Color(0xFFE0E0E0);
-  static const lightBorderLight = Color(0xFFE8E8E8);
-  static const lightBorderDim = Color(0xFFF0F0F0);
+  static const lightSurface = brandLight;
+  static const lightSurfaceDim = Color(0xFFDAE2CC);
+  static const lightBorder = Color(0xFFA9B79C);
+  static const lightBorderLight = Color(0xFFB6C2AA);
+  static const lightBorderDim = Color(0xFFC0CCB4);
 
   static const lightScorePerfect = Color(0xFF2E7D32);
   static const lightScoreGreat = Color(0xFF26A69A);  // teal 400
