@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/domain/services/availability_key.dart';
+
 part 'availability_notifier.g.dart';
 
 /// Beschrijft het type geblokkeerd uur.
@@ -37,18 +39,21 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
         // Corrupte entries worden overgeslagen (T-04-01: Tampering via SharedPreferences)
       }
     }
-    return result;
+    // Bestaande installs hebben zowel UTC- als lokale sleutels opgeslagen; alles
+    // wordt hier op de canonieke vorm gebracht zodat oude blokken blijven werken.
+    return normalizeBlockedHours(result);
   }
 
   /// Wisselt de aanwezigheid van [hour] als [BlockType.custom] entry.
   /// Verwijdert de entry als die al aanwezig is met type custom; voegt toe anders.
   Future<void> toggleCustomHour(DateTime hour) async {
     final current = await future;
+    final key = canonicalHourKey(hour);
     final next = Map<DateTime, BlockType>.from(current);
-    if (next.containsKey(hour) && next[hour] == BlockType.custom) {
-      next.remove(hour);
+    if (next[key] == BlockType.custom) {
+      next.remove(key);
     } else {
-      next[hour] = BlockType.custom;
+      next[key] = BlockType.custom;
     }
     await _persist(next);
     state = AsyncData(next);
@@ -61,13 +66,14 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
     final current = await future;
     final next = Map<DateTime, BlockType>.from(current);
     for (final hour in hours) {
+      final key = canonicalHourKey(hour);
       if (block) {
-        if (next[hour] != BlockType.work && next[hour] != BlockType.calendar) {
-          next[hour] = BlockType.custom;
+        if (next[key] != BlockType.work && next[key] != BlockType.calendar) {
+          next[key] = BlockType.custom;
         }
       } else {
-        if (next[hour] == BlockType.custom) {
-          next.remove(hour);
+        if (next[key] == BlockType.custom) {
+          next.remove(key);
         }
       }
     }
@@ -75,10 +81,24 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
     state = AsyncData(next);
   }
 
-  /// Vervangt de volledige map met [preset] en persisteert.
+  /// Vervangt de work-blokken door [preset] en laat de rest ongemoeid.
+  ///
+  /// Presets beschrijven uitsluitend een werkpatroon. Eerder verving dit de
+  /// volledige map, waardoor een tik op een preset-chip stilzwijgend alle
+  /// handmatige en geïmporteerde blokken wiste. Volgt nu hetzelfde patroon als
+  /// [importCalendarBlocks]: gericht één type verversen.
   Future<void> seedPreset(Map<DateTime, BlockType> preset) async {
-    await _persist(preset);
-    if (ref.mounted) state = AsyncData(preset);
+    final current = await future;
+    final next = Map<DateTime, BlockType>.from(current)
+      ..removeWhere((_, type) => type == BlockType.work);
+    for (final entry in preset.entries) {
+      final key = canonicalHourKey(entry.key);
+      if (!next.containsKey(key)) {
+        next[key] = BlockType.work;
+      }
+    }
+    await _persist(next);
+    if (ref.mounted) state = AsyncData(next);
   }
 
   /// Importeert uren uit Google Calendar als [BlockType.calendar] entries.
@@ -91,8 +111,9 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
     next.removeWhere((_, type) => type == BlockType.calendar);
     // Voeg nieuwe calendar-entries toe (overschrijf niet work/custom)
     for (final entry in calendarBlocks.entries) {
-      if (!next.containsKey(entry.key)) {
-        next[entry.key] = BlockType.calendar;
+      final key = canonicalHourKey(entry.key);
+      if (!next.containsKey(key)) {
+        next[key] = BlockType.calendar;
       }
     }
     await _persist(next);

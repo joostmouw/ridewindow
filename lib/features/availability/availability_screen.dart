@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/core/safe_back_button.dart';
+import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/domain/services/drag_run_counter.dart';
 import 'package:ridewindow/domain/services/range_fill.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -41,6 +42,11 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
   // Two-tap range-select state (RNE-01): null = no open pending block.
   DateTime? _pendingAnchor;
+
+  /// Lookup-index over de geblokkeerde uren, herbouwd bij elke provider-emit.
+  /// Nodig omdat work/custom een terugkerend weekpatroon zijn: een blok dat voor
+  /// een andere kalenderweek is opgeslagen moet in deze week ook kleuren.
+  BlockedHours _blocked = BlockedHours(const {});
 
   List<String> _dagLabels(BuildContext context) {
     final s = S.of(context);
@@ -77,6 +83,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
         body: Center(child: Text('Error: $e')),
       ),
       data: (blockedHours) {
+        _blocked = BlockedHours(blockedHours);
         final now = DateTime.now();
         final weekStart =
             now.subtract(Duration(days: now.weekday - DateTime.monday));
@@ -275,12 +282,12 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
         : pendingAnchor == null
             ? 0
             : countSelectionRuns({
-                for (final e in blockedHours.entries)
-                  if (e.value == BlockType.custom &&
-                      e.key.year == pendingAnchor.year &&
-                      e.key.month == pendingAnchor.month &&
-                      e.key.day == pendingAnchor.day)
-                    e.key,
+                for (var h = 0; h < 24; h++)
+                  if (_blocked.blockTypeAt(DateTime(pendingAnchor.year,
+                          pendingAnchor.month, pendingAnchor.day, h,)) ==
+                      BlockType.custom)
+                    DateTime(pendingAnchor.year, pendingAnchor.month,
+                        pendingAnchor.day, h,),
               });
     return SizedBox(
       height: _dragIndicatorHeight,
@@ -445,7 +452,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     for (int d = 0; d < 7; d++) {
       for (int h = 0; h < 24; h++) {
         final key = _cellKey(weekStart, d, h);
-        final isBlocked = blockedHours.containsKey(key);
+        final isBlocked = _blocked.isBlocked(key);
         if (!isBlocked) {
           totalFree++;
           if (d < 5) {
@@ -543,7 +550,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
         return rw.availWorkLight;
       }
     }
-    return switch (blocked[key]) {
+    return switch (_blocked.blockTypeAt(key)) {
       BlockType.work => rw.availWork,
       BlockType.custom => rw.availCustom,
       BlockType.calendar => rw.availCalendar,
@@ -556,11 +563,12 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   void _onCellTap(DateTime key, Map<DateTime, BlockType> blocked) {
     // Work/calendar-blocked cells are always a no-op, regardless of any open
     // pending anchor (RNE-01 point 6).
-    if (blocked[key] == BlockType.work || blocked[key] == BlockType.calendar) {
+    final currentType = _blocked.blockTypeAt(key);
+    if (currentType == BlockType.work || currentType == BlockType.calendar) {
       return;
     }
 
-    if (blocked[key] == BlockType.custom) {
+    if (currentType == BlockType.custom) {
       // Already-selected cell: always toggles off (existing behavior).
       HapticFeedback.lightImpact();
       ref.read(availabilityProvider.notifier).toggleCustomHour(key);
@@ -626,7 +634,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     Map<DateTime, BlockType> blockedHours,
     DateTime key,
   ) {
-    return switch (blockedHours[key]) {
+    return switch (_blocked.blockTypeAt(key)) {
       BlockType.work => S.of(context).cellInfoStatusWork,
       BlockType.calendar => S.of(context).cellInfoStatusCalendar,
       BlockType.custom => S.of(context).cellInfoStatusCustom,
@@ -700,11 +708,12 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (hit == null) return;
 
     final key = _cellKey(weekStart, hit.dayIndex, hit.hour);
-    if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) return;
+    final type = _blocked.blockTypeAt(key);
+    if (type == BlockType.work || type == BlockType.calendar) return;
 
     setState(() {
       _isDragging = true;
-      _dragBlocking = blockedHours[key] != BlockType.custom;
+      _dragBlocking = type != BlockType.custom;
       _draggedCells.clear();
       _draggedCells.add(key);
     });
@@ -721,7 +730,8 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (hit == null) return;
 
     final key = _cellKey(weekStart, hit.dayIndex, hit.hour);
-    if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) return;
+    final type = _blocked.blockTypeAt(key);
+    if (type == BlockType.work || type == BlockType.calendar) return;
 
     if (!_draggedCells.contains(key)) {
       setState(() {
@@ -761,9 +771,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     for (int h = 0; h < 24; h++) {
       final key = _cellKey(weekStart, dayIndex, h);
-      if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) continue;
+      final type = _blocked.blockTypeAt(key);
+      if (type == BlockType.work || type == BlockType.calendar) continue;
       keys.add(key);
-      if (blockedHours[key] == BlockType.custom) {
+      if (type == BlockType.custom) {
         customCount++;
       } else {
         freeCount++;
@@ -787,9 +798,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     for (int d = 0; d < 7; d++) {
       final key = _cellKey(weekStart, d, hour);
-      if (blockedHours[key] == BlockType.work || blockedHours[key] == BlockType.calendar) continue;
+      final type = _blocked.blockTypeAt(key);
+      if (type == BlockType.work || type == BlockType.calendar) continue;
       keys.add(key);
-      if (blockedHours[key] == BlockType.custom) {
+      if (type == BlockType.custom) {
         customCount++;
       } else {
         freeCount++;
@@ -813,13 +825,9 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       // Converteer event-ranges naar uurblokken
       final calendarBlocks = <DateTime, BlockType>{};
       for (final event in events) {
-        var hour = DateTime.utc(
-          event.start.year,
-          event.start.month,
-          event.start.day,
-          event.start.hour,
-        );
-        final end = event.end;
+        final localStart = event.start.toLocal();
+        var hour = canonicalHourKey(localStart);
+        final end = event.end.toLocal();
         while (hour.isBefore(end)) {
           calendarBlocks[hour] = BlockType.calendar;
           hour = hour.add(const Duration(hours: 1));
@@ -856,8 +864,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
   // --- Helpers ---
 
-  DateTime _cellKey(DateTime weekStart, int dayIndex, int hour) =>
-      DateTime.utc(
+  DateTime _cellKey(DateTime weekStart, int dayIndex, int hour) => DateTime(
         weekStart.year,
         weekStart.month,
         weekStart.day + dayIndex,

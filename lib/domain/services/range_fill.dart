@@ -1,3 +1,4 @@
+import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 
 /// Pure fill-range logic for the two-tap range-select flow on the
@@ -36,8 +37,8 @@ List<DateTime> computeRangeFillKeys({
 
   final result = <DateTime>[];
   for (var h = startHour; h <= endHour; h++) {
-    final key = DateTime.utc(anchorKey.year, anchorKey.month, anchorKey.day, h);
-    final blockType = blockedHours[key];
+    final key = DateTime(anchorKey.year, anchorKey.month, anchorKey.day, h);
+    final blockType = blockTypeAt(key, blockedHours);
     if (blockType == BlockType.work || blockType == BlockType.calendar) {
       continue;
     }

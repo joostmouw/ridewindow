@@ -22,7 +22,7 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final dt = DateTime.utc(2026, 6, 14, 9, 0);
+      final dt = DateTime(2026, 6, 14, 9, 0);
       await container.read(availabilityProvider.notifier).toggleCustomHour(dt);
 
       final blocked = await container.read(availabilityProvider.future);
@@ -34,7 +34,7 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final dt = DateTime.utc(2026, 6, 14, 10, 0);
+      final dt = DateTime(2026, 6, 14, 10, 0);
       await container.read(availabilityProvider.notifier).toggleCustomHour(dt);
       await container.read(availabilityProvider.notifier).toggleCustomHour(dt);
 
@@ -42,11 +42,11 @@ void main() {
       expect(blocked.containsKey(dt), isFalse);
     });
 
-    test('seedPreset vervangt de map — dt aanwezig met BlockType.work', () async {
+    test('seedPreset zet de work-blokken — dt aanwezig met BlockType.work', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final dt = DateTime.utc(2026, 6, 16, 8, 0);
+      final dt = DateTime(2026, 6, 16, 8, 0);
       final preset = {dt: BlockType.work};
       await container.read(availabilityProvider.notifier).seedPreset(preset);
 
@@ -54,11 +54,46 @@ void main() {
       expect(blocked[dt], equals(BlockType.work));
     });
 
+    test('seedPreset laat custom- en calendar-blokken staan (audit C1)', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(availabilityProvider.notifier);
+
+      final custom = DateTime(2026, 6, 16, 19, 0);
+      final calendar = DateTime(2026, 6, 17, 14, 0);
+      await notifier.toggleCustomHour(custom);
+      await notifier.importCalendarBlocks({calendar: BlockType.calendar});
+
+      await notifier.seedPreset({DateTime(2026, 6, 16, 8, 0): BlockType.work});
+
+      final blocked = await container.read(availabilityProvider.future);
+      expect(blocked[custom], equals(BlockType.custom),
+          reason: 'een preset-chip mag handmatige blokken niet wissen',);
+      expect(blocked[calendar], equals(BlockType.calendar),
+          reason: 'een preset-chip mag geimporteerde agenda-blokken niet wissen',);
+      expect(blocked[DateTime(2026, 6, 16, 8, 0)], equals(BlockType.work));
+    });
+
+    test('seedPreset vervangt eerdere work-blokken', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(availabilityProvider.notifier);
+
+      final oud = DateTime(2026, 6, 16, 8, 0);
+      final nieuw = DateTime(2026, 6, 16, 9, 0);
+      await notifier.seedPreset({oud: BlockType.work});
+      await notifier.seedPreset({nieuw: BlockType.work});
+
+      final blocked = await container.read(availabilityProvider.future);
+      expect(blocked.containsKey(oud), isFalse);
+      expect(blocked[nieuw], equals(BlockType.work));
+    });
+
     test('clearAll wist de volledige map', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final dt = DateTime.utc(2026, 6, 16, 9, 0);
+      final dt = DateTime(2026, 6, 16, 9, 0);
       await container.read(availabilityProvider.notifier).seedPreset({dt: BlockType.work});
       await container.read(availabilityProvider.notifier).clearAll();
 
@@ -68,7 +103,7 @@ void main() {
 
     test('persists across re-create — toggleCustomHour dan dispose dan nieuw container → dt aanwezig met BlockType.custom', () async {
       final container1 = ProviderContainer();
-      final dt = DateTime.utc(2026, 6, 15, 8, 0);
+      final dt = DateTime(2026, 6, 15, 8, 0);
       await container1.read(availabilityProvider.notifier).toggleCustomHour(dt);
       container1.dispose();
 

@@ -180,7 +180,7 @@ void main() {
     final weekStart =
         now.subtract(Duration(days: now.weekday - DateTime.monday));
     // Maandag, uur 9 = werk-cel
-    final werkCelKey = DateTime.utc(
+    final werkCelKey = DateTime(
       weekStart.year,
       weekStart.month,
       weekStart.day,
@@ -266,7 +266,7 @@ void main() {
     final weekStart =
         now.subtract(Duration(days: now.weekday - DateTime.monday));
     final mapWithWork = {
-      DateTime.utc(weekStart.year, weekStart.month, weekStart.day, 9):
+      DateTime(weekStart.year, weekStart.month, weekStart.day, 9):
           BlockType.work,
     };
 
@@ -308,7 +308,7 @@ void main() {
     final weekStart =
         now.subtract(Duration(days: now.weekday - DateTime.monday));
     final mapWithCustom = {
-      DateTime.utc(weekStart.year, weekStart.month, weekStart.day, 10):
+      DateTime(weekStart.year, weekStart.month, weekStart.day, 10):
           BlockType.custom,
     };
 
@@ -351,7 +351,7 @@ void main() {
         now.subtract(Duration(days: now.weekday - DateTime.monday));
     // Uur 0, dag 0 = werk-cel (zichtbaar zonder scrollen)
     final mapWithWork = {
-      DateTime.utc(weekStart.year, weekStart.month, weekStart.day, 0):
+      DateTime(weekStart.year, weekStart.month, weekStart.day, 0):
           BlockType.work,
     };
 
@@ -502,7 +502,7 @@ void main() {
         now.subtract(Duration(days: now.weekday - DateTime.monday));
 
     DateTime cellKey(DateTime weekStart, int dayIndex, int hour) =>
-        DateTime.utc(
+        DateTime(
           weekStart.year,
           weekStart.month,
           weekStart.day + dayIndex,
@@ -762,7 +762,7 @@ void main() {
         now.subtract(Duration(days: now.weekday - DateTime.monday));
 
     DateTime cellKey(DateTime weekStart, int dayIndex, int hour) =>
-        DateTime.utc(
+        DateTime(
           weekStart.year,
           weekStart.month,
           weekStart.day + dayIndex,

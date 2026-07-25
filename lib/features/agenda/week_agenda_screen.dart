@@ -7,6 +7,7 @@ import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
@@ -69,18 +70,7 @@ HourlyForecast? _findForecast(DateTime day, int hour, List<HourlyForecast> forec
 }
 
 bool _isBlocked(DateTime day, int hour, Map<DateTime, BlockType> blocked) {
-  // Direct match first
-  final directKey = DateTime(day.year, day.month, day.day, hour);
-  if (blocked.containsKey(directKey)) return true;
-
-  // Normalize to the blocked-hours week (presets seed one reference week)
-  if (blocked.isEmpty) return false;
-  final anyKey = blocked.keys.first;
-  final blockedWeekMonday = anyKey.subtract(Duration(days: anyKey.weekday - DateTime.monday));
-  final normalizedDay = DateTime(blockedWeekMonday.year, blockedWeekMonday.month, blockedWeekMonday.day)
-      .add(Duration(days: day.weekday - DateTime.monday));
-  final normalized = DateTime(normalizedDay.year, normalizedDay.month, normalizedDay.day, hour);
-  return blocked.containsKey(normalized);
+  return isHourBlocked(DateTime(day.year, day.month, day.day, hour), blocked);
 }
 
 String _windDirection(double? deg, BuildContext context) {

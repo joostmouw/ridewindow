@@ -1,5 +1,6 @@
 import '../models/ride_slot.dart';
 import '../models/ride_tier.dart';
+import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 
 /// Filters ride slots by availability and quality tier.
@@ -9,13 +10,15 @@ class AvailabilityFilter {
   /// Removes slots that overlap any hour in [blockedHours].
   ///
   /// A slot overlaps a blocked hour if any hour within [slot.start, slot.end)
-  /// is in [blockedHours]. The slot's end is exclusive.
-  /// All entries in [blockedHours] are blocked regardless of [BlockType].
+  /// is blocked. The slot's end is exclusive.
+  /// All entries in [blockedHours] block, regardless of [BlockType] — the type
+  /// only determines *when* they apply (see [BlockedHours]).
   List<RideSlot> removeBlocked(
     List<RideSlot> slots,
     Map<DateTime, BlockType> blockedHours,
   ) {
-    return slots.where((slot) => !_overlapsBlocked(slot, blockedHours)).toList();
+    final blocked = BlockedHours(blockedHours);
+    return slots.where((slot) => !_overlapsBlocked(slot, blocked)).toList();
   }
 
   /// Removes Poor-tier slots (hidden from the UI per SLOT-04).
@@ -31,36 +34,12 @@ class AvailabilityFilter {
     return removeHiddenPoor(removeBlocked(slots, blockedHours));
   }
 
-  bool _overlapsBlocked(
-    RideSlot slot,
-    Map<DateTime, BlockType> blockedHours,
-  ) {
+  bool _overlapsBlocked(RideSlot slot, BlockedHours blocked) {
     var current = slot.start;
     while (current.isBefore(slot.end)) {
-      if (_isHourBlocked(current, blockedHours)) return true;
+      if (blocked.isBlocked(current)) return true;
       current = current.add(const Duration(hours: 1));
     }
     return false;
-  }
-
-  /// Checks if [hour] is blocked by normalizing to the same weekday
-  /// in the blocked-hours map. This ensures presets (which are seeded
-  /// for one calendar week) work correctly across week boundaries.
-  bool _isHourBlocked(DateTime hour, Map<DateTime, BlockType> blockedHours) {
-    // Direct match first (fast path for same-week slots)
-    if (blockedHours.containsKey(hour)) return true;
-
-    // Normalize: find the equivalent weekday+hour in the blocked map.
-    // Presets seed Mon-Sun of one week; map any date to that week.
-    if (blockedHours.isEmpty) return false;
-
-    // Find the Monday of the blocked-hours week
-    final anyKey = blockedHours.keys.first;
-    final blockedWeekMonday = anyKey.subtract(Duration(days: anyKey.weekday - DateTime.monday));
-    final normalizedDay = DateTime(blockedWeekMonday.year, blockedWeekMonday.month, blockedWeekMonday.day)
-        .add(Duration(days: hour.weekday - DateTime.monday));
-    final normalized = DateTime(normalizedDay.year, normalizedDay.month, normalizedDay.day, hour.hour);
-
-    return blockedHours.containsKey(normalized);
   }
 }
