@@ -95,3 +95,10 @@ PRE-08 is satisfied: the keep-warm workflow exists, is scheduled comfortably ins
 ---
 *Phase: 18-preconditions*
 *Completed: 2026-07-25*
+
+## Self-Check: PASSED
+
+- FOUND: .github/workflows/supabase-keep-warm.yml
+- FOUND: .planning/phases/18-preconditions/18-03-SUMMARY.md
+- FOUND: commit 732ee16 (task commit)
+- FOUND: commit 7861230 (SUMMARY commit)
