@@ -123,13 +123,19 @@ class SlotGenerator {
   }
 
   /// Remove overlapping inferior slots. Two slots "significantly overlap"
-  /// when >50% of the shorter slot's hours are shared. Greedy: keep best first.
+  /// when at least 50% of the shorter slot's hours are shared. Greedy: keep
+  /// best first.
+  ///
+  /// The bound is inclusive because two adjacent windows of the same length
+  /// share exactly half of it — 06:00–08:00 and 07:00–09:00 are the same
+  /// suggestion to a rider. With an exclusive bound and a single allowed
+  /// duration nothing ever deduped, so Home listed every hour-shifted window.
   List<RideSlot> dedup(List<RideSlot> slots) {
     final sorted = [...slots]
       ..sort((a, b) => b.overallScore.compareTo(a.overallScore));
     final kept = <RideSlot>[];
     for (final slot in sorted) {
-      if (!kept.any((p) => _overlapRatio(p, slot) > 0.5)) {
+      if (!kept.any((p) => _overlapRatio(p, slot) >= 0.5)) {
         kept.add(slot);
       }
     }

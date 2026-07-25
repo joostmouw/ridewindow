@@ -355,6 +355,23 @@ void main() {
       expect(result.single, kort);
     });
 
+    test('twee aangrenzende gelijke vensters worden er één', () {
+      // 06:00-08:00 en 07:00-09:00 delen precies de helft van het kortste
+      // venster. Met een exclusieve drempel overleefde elk uur-verschoven
+      // venster, dus bij allowedDurations: [2] dedupte er niets.
+      final vroeg = slot(6, 2, 90.0);
+      final laat = slot(7, 2, 88.0);
+      final result = SlotGenerator().dedup([vroeg, laat]);
+      expect(result, hasLength(1));
+      expect(result.single, vroeg, reason: 'het best scorende venster blijft');
+    });
+
+    test('twee uur uit elkaar blijven beide staan', () {
+      final vroeg = slot(6, 2, 90.0);
+      final laat = slot(8, 2, 88.0);
+      expect(SlotGenerator().dedup([vroeg, laat]), hasLength(2));
+    });
+
     test('niet-overlappende vensters blijven allebei staan', () {
       final ochtend = slot(8, 2, 90.0);
       final avond = slot(18, 2, 88.0);

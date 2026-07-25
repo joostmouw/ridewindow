@@ -15,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -207,7 +208,9 @@ void main() {
     final slotsA = (stateA as SlotsLoaded).slots;
     expect(slotsA, isNotEmpty);
 
-    // Simuleer profiel-update: erg strenge toleranties
+    // Simuleer profiel-update: erg strenge toleranties, verder identiek.
+    // allowedDurations blijft [2, 3] — met een andere duur-set meet deze test
+    // het dedup-gedrag van die set in plaats van het effect van de toleranties.
     const strictProfile = UserProfile(
       tolerances: WeatherTolerances(
         tempMinIdealC: 24.0,
@@ -215,7 +218,7 @@ void main() {
         windMaxIdealKmh: 1.0,
         rainMaxIdealMm: 0.0,
       ),
-      allowedDurations: [2],
+      allowedDurations: [2, 3],
       theme: 'system',
       notifEveningBefore: false,
       notifMorningOf: false,
@@ -228,8 +231,15 @@ void main() {
     expect(stateB, isA<SlotsLoaded>());
     final slotsB = (stateB as SlotsLoaded).slots;
 
-    // Na strenge toleranties zijn er minder slots
-    expect(slotsB.length, lessThan(slotsA.length));
+    // De fixture is een vlakke 20 graden / 10 km/u / 0 mm, dus strengere
+    // toleranties verlagen elk uur even hard en het aantal slots verandert niet.
+    // Wat wel meetbaar verandert — en wat deze test hoort te bewijzen — is dat
+    // SlotsNotifier daadwerkelijk hercomputed heeft op de nieuwe toleranties.
+    expect(slotsB, isNotEmpty);
+    double best(List<RideSlot> slots) =>
+        slots.map((s) => s.overallScore).reduce((a, b) => a > b ? a : b);
+    expect(best(slotsB), lessThan(best(slotsA)),
+        reason: 'strengere toleranties horen de scores omlaag te duwen',);
   });
 
   // -------------------------------------------------------------------------

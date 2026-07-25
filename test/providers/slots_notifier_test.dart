@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/clock_provider.dart';
@@ -188,7 +189,10 @@ void main() {
       final stateA = container.read(slotsProvider);
       expect(stateA, isA<SlotsLoaded>());
 
-      // Simuleer profiel-wijziging: strenge toleranties (minder slots)
+      // Simuleer profiel-wijziging: strenge toleranties, verder identiek.
+      // allowedDurations blijft [2, 3] — anders meet deze test het effect van
+      // een andere duur-set in plaats van dat van de toleranties (zie
+      // .planning/quick/260725-knl-availability-key-mismatch/260725-knl-SUMMARY.md).
       const strictProfile = UserProfile(
         tolerances: WeatherTolerances(
           tempMinIdealC: 20.0,
@@ -196,7 +200,7 @@ void main() {
           windMaxIdealKmh: 5.0,
           rainMaxIdealMm: 0.1,
         ),
-        allowedDurations: [2],
+        allowedDurations: [2, 3],
         theme: 'system',
         notifEveningBefore: false,
         notifMorningOf: false,
@@ -207,10 +211,16 @@ void main() {
       final stateB = container.read(slotsProvider);
       expect(stateB, isA<SlotsLoaded>());
 
-      // Na strenge toleranties zijn de slots anders (minder of geen)
+      // De fixture is vlak (elk uur dezelfde waarden), dus strengere toleranties
+      // verlagen alle scores even hard en het aantal slots blijft gelijk. De
+      // score zelf is het bewijs dat er op de nieuwe toleranties hercomputed is.
       final slotsA = (stateA as SlotsLoaded).slots;
       final slotsB = (stateB as SlotsLoaded).slots;
-      expect(slotsA.length, isNot(equals(slotsB.length)));
+      expect(slotsB, isNotEmpty);
+      double best(List<RideSlot> slots) =>
+          slots.map((s) => s.overallScore).reduce((a, b) => a > b ? a : b);
+      expect(best(slotsB), lessThan(best(slotsA)),
+          reason: 'strengere toleranties horen de scores omlaag te duwen',);
     });
 
     test('empty state bad weather — alle slechte scores → SlotsLoaded met reason = badWeather',
