@@ -6,16 +6,16 @@ date: 2026-07-25
 commits:
   - 70403ea fix — geblokkeerde uren werken weer door in de app
   - 93efbf8 fix — dedup symmetrisch, verlopen vensters weg, stabiele volgorde
-tests: 302 passing / 2 failing (baseline was 282 / 2)
+tests: 306 passing / 0 failing (baseline was 282 / 2)
 ---
 
 # Samenvatting 260725-knl
 
 ## Wat er gebeurd is
 
-Alle zes de geplande items zijn doorgevoerd. De testsuite gaat van **282/2 naar
-302/2**: 20 nieuwe tests erbij, geen enkele regressie, en de twee resterende
-falingen zijn dezelfde twee die al maanden rood stonden.
+Alle zes de geplande items zijn doorgevoerd, plus de dedup-drempel en de twee
+al maanden falende tests op vervolgverzoek. De testsuite gaat van **282/2 naar
+306/0** — voor het eerst volledig groen.
 
 ### Taak 1 — canonieke sleutel, gedeelde lookup, migratie ✅
 
@@ -59,41 +59,36 @@ geïmporteerde blokken blijven staan. Twee nieuwe tests dekken dit af.
 
 ---
 
-## Openstaand: de 2 falende tests — hypothese was fout, echte oorzaak gevonden
+## De 2 falende tests: hypothese was fout, echte oorzaak gevonden en opgelost
 
-Het plan verwachtte dat de dedup-fix deze twee groen zou maken. **Dat gebeurde
-niet** — de getallen zijn exact gelijk gebleven (74 → 104). De aanname klopte niet
-en de asserties zijn bewust niet verzwakt.
+Het plan verwachtte dat de symmetrie-fix in `_overlapRatio` deze twee groen zou
+maken. Dat gebeurde niet — de getallen bleven exact gelijk (74 → 104).
 
-De echte oorzaak is gemeten met de toleranties constant gehouden en alleen de
-toegestane duren gevarieerd:
+De echte oorzaak is gemeten met de toleranties constant en alleen de toegestane
+duren gevarieerd:
 
-| allowedDurations | ruwe slots | na dedup |
-|---|---|---|
-| `[2, 3]` | 203 | 76 |
-| `[2]` | 105 | **105** |
-| `[3]` | 98 | 49 |
-| `[2, 3, 5]` | 287 | 48 |
+| allowedDurations | ruwe slots | dedup (`> 0.5`) | dedup (`>= 0.5`) |
+|---|---|---|---|
+| `[2]` | 105 | **105** | 54 |
+| `[3]` | 98 | 49 | 49 |
+| `[2, 3]` | 203 | 76 | 49 |
+| `[2, 3, 5]` | 287 | 48 | 36 |
 
-Beide tests wisselen tegelijk van toleranties **en** van `allowedDurations`
-(`[2,3]` → `[2]`). De sprong 74 → 104 komt volledig van die tweede wijziging. De
-test meet dus niet wat hij beweert te meten.
+Beide tests wisselden tegelijk van toleranties **en** van `allowedDurations`
+(`[2,3]` → `[2]`). De sprong 74 → 104 kwam volledig van die tweede wijziging.
 
-Daaronder ligt een echte bug die groter is dan het geval op de schermfoto:
+Daaronder lag een echte bug, groter dan het geval op de schermfoto: **bij
+`allowedDurations: [2]` dedupte er niets.** Twee aangrenzende 2-uursvensters
+delen precies 1 uur — 0.5 van het kortste venster — en de drempel was `> 0.5`.
+Een gebruiker die alleen ritten van 2 uur toestaat kreeg op Home elk
+uur-verschoven venster los: ~15 vrijwel identieke kaarten per dag. Met `>= 0.5`
+wordt dat 7,7 per dag.
 
-> **Bij `allowedDurations: [2]` dedupt er niets.** Twee aangrenzende 2-uursvensters
-> delen precies 1 uur, dus 0.5 van het kortste venster, en de drempel is `> 0.5`.
-> Een gebruiker die alleen ritten van 2 uur toestaat krijgt op Home elk
-> uur-verschoven venster los te zien: ~15 vrijwel identieke kaarten per dag.
-
-De fix is één teken — `> 0.5` naar `>= 0.5` in `dedup()` — maar dat verandert het
-gedrag voor iedereen die al een profiel heeft (het collapst ook 4h-vensters die 2
-uur delen, en 6h die 3 uur delen). Dat is een productbeslissing en viel buiten de
-goedgekeurde scope, dus bewust niet doorgevoerd.
-
-Zodra die drempel wijzigt, moeten de twee tests bovendien nog steeds gerepareerd
-worden: ze moeten de toleranties variëren met de duren gelijk, anders blijven ze
-het verkeerde meten.
+De tests zijn daarna op hun werkelijke oorzaak gerepareerd: `allowedDurations`
+blijft nu gelijk. Omdat de fixtures vlak zijn (elk uur exact dezelfde waarden)
+verlagen strengere toleranties alle scores even hard en blijft het aantal slots
+gelijk — de assertie kijkt daarom naar de score zelf, wat het directe bewijs is
+dat `SlotsNotifier` op de nieuwe toleranties hercomputed heeft.
 
 ---
 
