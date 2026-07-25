@@ -11,10 +11,10 @@ RideWindow is an Android app for casual cyclists who want to know — at a glanc
 
 - **Tech stack:** Flutter (Dart) — chosen for cross-platform readiness (iOS in v2), Material 3 out-of-the-box, hot reload DX, lower dependency-maintenance burden than React Native for solo devs.
 - **Platforms:** Android-only for v1 — focus on one store, one review process, no Apple Dev Account ($99/yr) until Android proves the concept.
-- **Budget:** ~€25 one-time (Google Play Developer account). No ongoing infra costs (Open-Meteo free, Firebase free tier, Google Calendar API free, all client-side).
+- **Budget:** ~€25 one-time (Google Play Developer account), plus an explicit ongoing ceiling of **€0/month** from v3.0 onward (Open-Meteo free, Firebase Hosting free tier, Google Calendar API free, Supabase free tier). That €0 ceiling buys two consequences that must stay visible, not implicit: the Supabase free tier has **no automated backups** (a lost hosted database has no restore point — the blast radius is limited only because the device keeps its own copy), and a free Supabase project **pauses after 7 days without API traffic** (mitigated by a keep-warm job, not eliminated). Exceeding €0/month is a conscious future decision, not a drift.
 - **Timeline:** Realistic 8–12 weeks side-project pace. Acceptable to ship a thin v1 fast and iterate.
-- **No backend:** Pure client-side. Hive or Isar for local storage. Removes a whole tier of complexity (auth, hosting, GDPR) and lets v1 ship fast.
-- **Privacy:** Location permission is the only sensitive permission. Privacy policy required (Play Store mandate). Data never leaves device unless user opts into Calendar integration.
+- **No backend (revised in v3.0):** From v3.0 onward the app uses managed **Supabase Auth + Postgres** for signed-in accounts — local Drift/SharedPreferences remain the source of truth on-device, and the app stays fully functional signed-out. The one server-side exception is a single `plpgsql` function invoked via `rpc()`, so first-login migration is a real transaction. No Edge Functions, no other server-side code.
+- **Privacy (revised in v3.0):** Location permission is the only sensitive permission. Privacy policy required (Play Store mandate). A **signed-in** user's profile, availability and planned rides are stored server-side in the EU — Supabase, **West EU (Paris), `eu-west-3`** — while the forecast cache and calendar-imported blocks deliberately stay local. There are now **two** sub-processors: Supabase (auth, database) and Google (Firebase Hosting, Calendar). A **signed-out** user's data still never leaves the device — that remains true and is the whole point of accounts being additive.
 - **Performance:** App must show forecast + slots within 2s of cold start (after first run). Weather refresh runs in background via WorkManager.
 <!-- GSD:project-end -->
 
@@ -95,6 +95,10 @@ RideWindow is an Android app for casual cyclists who want to know — at a glanc
 | `google_sign_in` | 7.2.0 | flutter.dev | 3.58k | 8 months ago |
 | `extension_google_sign_in_as_googleapis_auth` | 3.0.0 | flutter.dev | 108 | 11 months ago |
 | `googleapis` | 16.0.0 | google.dev | — | 3 months ago |
+## Accounts / Cloud Sync (v3.0, not yet in pubspec.yaml)
+| Package | Version | Publisher | Likes | Published |
+|---------|---------|-----------|-------|-----------|
+| `supabase_flutter` | 2.16.0 | supabase.io | — | — |
 ## UI / Charts
 | Package | Version | Publisher | Likes | Published |
 |---------|---------|-----------|-------|-----------|
