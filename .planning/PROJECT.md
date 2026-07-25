@@ -28,11 +28,11 @@ RideWindow is an app for casual cyclists who want to know — at a glance — th
 
 ## Current Milestone: v3.0 Accounts & Sociaal
 
-**Goal:** Turn RideWindow's two separate data silos (Android SharedPreferences, browser localStorage) into one account-backed profile — Google Sign-In plus Firestore sync of profile and availability — and route user feedback through that account instead of a `mailto:` link.
+**Goal:** Turn RideWindow's two separate data silos (Android SharedPreferences, browser localStorage) into one account-backed profile — Google Sign-In plus Supabase/Postgres sync of profile and availability — and route user feedback through that account instead of a `mailto:` link.
 
 **Target features:**
-- Accounts via Google Sign-In (Firebase Auth), reusing the `google_sign_in` 7.2.0 dependency already present for Calendar
-- Cloud sync of profile and availability (SharedPreferences → Firestore), so Android and the web PWA are one app
+- Accounts via Google Sign-In (Supabase Auth, `signInWithIdToken`), reusing the `google_sign_in` 7.2.0 dependency — and its existing memoized init gate — already present for Calendar
+- Cloud sync of profile and availability (SharedPreferences → Postgres), so Android and the web PWA are one app
 - First-login data migration: local device data becomes the source of truth on an empty account
 - In-app feedback tied to the user's account, carrying the settings and forecast context that produced it (replaces BACKLOG #33's `mailto:`)
 - Revised project constraints, a rewritten privacy policy, and verified Google Cloud OAuth setup — all release-blocking preconditions, tracked as requirements
@@ -89,8 +89,8 @@ Three constraints below ("No backend", "Budget", "Privacy") are broken by this m
 
 **v3.0 — Accounts & Sociaal (phases 1–2 only).** Full requirement list with REQ-IDs lives in `.planning/REQUIREMENTS.md`. Scope areas:
 - Preconditions — constraint revision, privacy policy rewrite, Google Cloud OAuth verification
-- Auth — Google Sign-In via Firebase Auth, sign-out, account state across app restart
-- Sync — profile and availability to Firestore, both platforms, offline-tolerant
+- Auth — Google Sign-In via Supabase Auth, sign-out, account state across app restart
+- Sync — profile and availability to Postgres, both platforms, offline-tolerant (needs an outbox; Supabase queues no writes of its own)
 - Migration — first-login local-wins migration, plus a defined answer for second-device conflicts
 - Feedback — account-backed feedback with settings/forecast context
 
@@ -133,9 +133,9 @@ Three constraints below ("No backend", "Budget", "Privacy") are broken by this m
 
 - **Tech stack:** Flutter (Dart) — chosen for cross-platform readiness (iOS in v2), Material 3 out-of-the-box, hot reload DX, lower dependency-maintenance burden than React Native for solo devs.
 - **Platforms:** Android (native, shipped v1.0) + Web/PWA for iOS (v2.0) — no native iOS App Store app, no Apple Dev Account ($99/yr).
-- **Budget:** ~€25 one-time (Google Play Developer account) + Firebase Hosting free tier for the web build. ⚠️ **Under revision in v3.0** — "no ongoing infra costs" no longer holds once Firebase Auth + Firestore are added. Auth is free and Firestore's free tier is generous, but the constraint must be reformulated as an explicit spend ceiling rather than an assumed zero.
+- **Budget:** ~€25 one-time (Google Play Developer account) + Firebase Hosting free tier for the web build. ⚠️ **Under revision in v3.0 (PRE-01)** — "no ongoing infra costs" no longer holds once Supabase Auth + Postgres are added. The free tier is generous but pauses a project after 7 days without traffic, so the constraint must be reformulated as an explicit spend ceiling *and* a conscious answer on that pause.
 - **Timeline:** Realistic 8–12 weeks side-project pace. Acceptable to ship a thin v1 fast and iterate.
-- **No backend:** Pure client-side. Drift for local storage (native); web build uses Drift's IndexedDB/wasm backend. ⚠️ **Being revoked in v3.0** — Firebase Auth + Firestore are added deliberately, accepting the auth/GDPR tier that v1.0 and v2.0 avoided.
+- **No backend:** Pure client-side. Drift for local storage (native); web build uses Drift's IndexedDB/wasm backend. ⚠️ **Being revoked in v3.0 (PRE-01)** — managed Supabase Auth + Postgres are added deliberately, accepting the auth/GDPR tier that v1.0 and v2.0 avoided. No server-side code beyond one `plpgsql` function for transactional first-login migration.
 - **Privacy:** Location permission is the only sensitive permission. Privacy policy required (Play Store mandate; also linked from the web app). ⚠️ **Under revision in v3.0** — "data never leaves the device unless the user connects Calendar" no longer holds: location data and calendar-derived availability land on a server, which makes Joost a data controller. The published policy must be legally rewritten before the first release with accounts.
 - **Performance:** App must show forecast + slots within 2s of cold start (after first run). Weather refresh runs in background via WorkManager on Android; on-foreground/on-load on web (no `workmanager` support there).
 
