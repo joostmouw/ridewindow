@@ -63,6 +63,12 @@ String _tailwindAdvice(double? deg, BuildContext context) {
 String _fmtTime(DateTime dt) =>
     '${dt.hour.toString().padLeft(2, '0')}:00';
 
+/// Vorm van een rit-kaart. De Dismissible-achtergrond en de InkWell-ripple
+/// gebruiken dezelfde waarden, anders veeg je een rechthoek weg onder een kaart
+/// met afgeronde hoeken.
+const _cardMargin = EdgeInsets.symmetric(horizontal: 12, vertical: 4);
+const double _cardRadius = 24;
+
 class PlannedRidesScreen extends ConsumerStatefulWidget {
   const PlannedRidesScreen({super.key});
 
@@ -256,10 +262,16 @@ class _RideCard extends ConsumerWidget {
     return Dismissible(
       key: ValueKey('${ride.start.toIso8601String()}_${ride.end.toIso8601String()}'),
       direction: DismissDirection.endToStart,
+      // Marge en radius volgen de Card hieronder, zodat je de vorm van de kaart
+      // wegveegt en niet een rechthoek die eronder vandaan komt.
       background: Container(
+        margin: _cardMargin,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(_cardRadius),
+        ),
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: theme.colorScheme.errorContainer,
+        padding: const EdgeInsets.only(right: 24),
         child: Icon(Icons.delete, color: theme.colorScheme.onErrorContainer),
       ),
       onDismissed: (_) {
@@ -269,9 +281,9 @@ class _RideCard extends ConsumerWidget {
         );
       },
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        margin: _cardMargin,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(_cardRadius),
           onTap: () => _showDetail(context, ref, scores, rideForecasts, currentScore, avgWindDir),
           child: Padding(
             padding: const EdgeInsets.all(12),
