@@ -259,20 +259,26 @@ class _RideCard extends ConsumerWidget {
       avgWindDir = (math.atan2(sinSum, cosSum) * 180 / math.pi + 360) % 360;
     }
 
-    return Dismissible(
+    // De hele Dismissible zit in één afgeronde clip: zowel de wegschuivende
+    // kaart als de rode achtergrond erachter krijgen daarmee exact de vorm van
+    // het blokje. Alleen de achtergrond afronden volstond niet — dan heeft niets
+    // de bewegende kaart zelf nog naar die vorm gedwongen.
+    return Padding(
+      padding: _cardMargin,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_cardRadius),
+        child: Dismissible(
       key: ValueKey('${ride.start.toIso8601String()}_${ride.end.toIso8601String()}'),
       direction: DismissDirection.endToStart,
-      // Marge en radius volgen de Card hieronder, zodat je de vorm van de kaart
-      // wegveegt en niet een rechthoek die eronder vandaan komt.
-      background: Container(
-        margin: _cardMargin,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.errorContainer,
-          borderRadius: BorderRadius.circular(_cardRadius),
+      background: ColoredBox(
+        color: theme.colorScheme.errorContainer,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 24),
+            child: Icon(Icons.delete, color: theme.colorScheme.onErrorContainer),
+          ),
         ),
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 24),
-        child: Icon(Icons.delete, color: theme.colorScheme.onErrorContainer),
       ),
       onDismissed: (_) {
         ref.read(plannedRidesProvider.notifier).remove(ride);
@@ -281,7 +287,7 @@ class _RideCard extends ConsumerWidget {
         );
       },
       child: Card(
-        margin: _cardMargin,
+        margin: EdgeInsets.zero,
         child: InkWell(
           borderRadius: BorderRadius.circular(_cardRadius),
           onTap: () => _showDetail(context, ref, scores, rideForecasts, currentScore, avgWindDir),
@@ -386,6 +392,8 @@ class _RideCard extends ConsumerWidget {
               ],
             ),
           ),
+        ),
+      ),
         ),
       ),
     );

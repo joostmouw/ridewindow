@@ -531,8 +531,11 @@ class _CellWidget extends ConsumerWidget {
         child: Container(
           margin: const EdgeInsets.all(0.5),
           decoration: BoxDecoration(
+            // Geselecteerd = lichter, niet donkerder (zelfde regel als de
+            // best-choice kaart op Home). De groene rand en het vinkje dragen de
+            // selectie; het vlak zelf komt juist naar voren.
             color: isSelected
-                ? rw.scorePerfect
+                ? Theme.of(context).colorScheme.surfaceContainerLowest
                 : blocked
                     ? Theme.of(context).colorScheme.surfaceContainerHighest
                     : color,
@@ -547,7 +550,7 @@ class _CellWidget extends ConsumerWidget {
               ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
               : isSelected
                   ? Center(
-                      child: Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onPrimary),
+                      child: Icon(Icons.check, size: 12, color: rw.tiers.perfectFg),
                     )
                   : isPlanned
                       ? Center(

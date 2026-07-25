@@ -458,7 +458,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         chipBg = isSelected ? cs.tertiaryContainer : rw.tiers.acceptableBg;
         chipFg = isSelected ? cs.onTertiaryContainer : rw.tiers.acceptableFg;
       case _DayClass.bad:
-        chipBg = isSelected ? cs.surfaceContainerHighest : rw.tiers.poorBg;
+        chipBg = isSelected ? cs.surfaceContainerLowest : rw.tiers.poorBg;
         chipFg = isSelected ? cs.onSurface : rw.tiers.poorFg;
     }
 
@@ -876,13 +876,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ],
         ),
       ),
+      // Gehighlight = lichter, niet donkerder. De best-choice kaart krijgt het
+      // lichtste oppervlak en komt daarmee naar voren; de overige kaarten zakken
+      // een trap terug in de getinte achtergrond. Eerder was dit omgekeerd: een
+      // vrijwel doorzichtige primaryContainer liet juist de groene achtergrond
+      // doorschijnen, waardoor de beste optie donkerder oogde dan de rest.
       child: Card(
         elevation: isBest ? 2 : 0,
-        color: isBest ? cs.primaryContainer.withAlpha(50) : null,
+        color: isBest
+            ? cs.surfaceContainerLowest
+            : cs.surfaceContainerHigh,
         shape: isBest
             ? RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
-                side: BorderSide(color: cs.primary.withAlpha(80)),
+                side: BorderSide(color: cs.primary.withAlpha(120), width: 1.5),
               )
             : null,
         child: InkWell(
