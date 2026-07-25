@@ -8,6 +8,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 
 - ✅ **v1.0 Android App** - Phases 1–10 (shipped, Internal testing track live)
 - ✅ **v2.0 iOS Web App (PWA)** - Phases 11–17 (shipped 2026-07-17) — see `.planning/milestones/v2.0-ROADMAP.md`
+- 📋 **v3.0 Accounts & Sociaal** - gepland, nog niet ingepland — zie `.planning/milestones/v3.0-ACCOUNTS.md`
 
 ## Phases
 
