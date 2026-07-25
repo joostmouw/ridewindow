@@ -1,5 +1,7 @@
 # OAuth Consent Screen — Fast Publish Checklist (Backlog #31)
 
+> **Historical record — 2026-07-25.** The publish itself was completed on 2026-07-17; this file is retained as an accurate record of that setup, not a task list to re-run. **One correction:** §5's original last item wrongly claimed the 100-user cap was gone after publishing. That was false — the 100-user cap on the `calendar.events` Sensitive scope follows Google verification status, not publish status, and "In production" does not remove it. See `docs/ACCOUNTS-OPERATIONS.md` §1 for the full explanation. The item below has been corrected in place.
+
 ## 1. Context
 
 The Google Cloud project `my-project-joost` currently has its OAuth consent screen in **Testing** mode, which caps Google Calendar sign-in to a maximum of 100 manually-added test users. This blocks public launch of the Google Calendar linking feature (CAL-06/07, backlog #31). RideWindow only requests one OAuth scope — `https://www.googleapis.com/auth/calendar.events` (used in `lib/services/calendar_service.dart`) — which Google classifies as a **Sensitive** scope, not **Restricted**. Sensitive scopes do not require Google's formal verification/security-assessment process, so the app can move from Testing to **In production** via the fast "Publish app" route in Cloud Console. This checklist documents the exact manual steps — the actual click can only be performed by Joost in his own authenticated Google Cloud Console session.
@@ -44,7 +46,7 @@ When a user first signs in and grants Calendar access after publishing, Google s
 
 - [ ] OAuth consent screen page shows "In production" status
 - [ ] Test sign-in on a Google account that was never added as a test user in Testing mode — sign-in + Calendar authorization should succeed after clicking through the "Google hasn't verified this app" warning
-- [ ] Confirm no 100-user cap applies anymore (any Google account can now sign in)
+- [x] **Corrected 2026-07-25:** the 100-user lifetime cap on the `calendar.events` Sensitive scope still applies — it is tied to Google **verification** status, which this project does not pursue, not to publish status. "In production" only makes the app publicly reachable; it does not remove the cap. See `docs/ACCOUNTS-OPERATIONS.md` §1 for the full two-caps explanation (Auth sign-in is uncapped in practice; only the Calendar-connect grant counts, cumulatively, toward 100).
 
 ## 6. Rollback note
 
