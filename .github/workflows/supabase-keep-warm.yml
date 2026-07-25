@@ -1,0 +1,87 @@
+# Supabase keep-warm (free tier anti-pause)
+#
+# Why this exists:
+# A Supabase free-tier project pauses itself after 7 days with no incoming
+# API requests. A paused project is unreachable -- every tester's app fails
+# to sign in or sync until it is manually restored from the Supabase
+# dashboard, and the failure lands on the testers, not on the developer, so
+# it can go unreported for days. With a handful of testers and irregular
+# use, a quiet week or two is entirely plausible (see
+# .planning/phases/18-preconditions/18-CONTEXT.md D-04, and
+# .planning/research/PITFALLS.md #8).
+#
+# What this job does, and does not, do:
+# It makes one authenticated HTTP request to the project every 3 days --
+# comfortably inside the 7-day pause window, so a single missed or failed
+# run cannot cause a pause on its own. That is the entire job. It does NOT
+# monitor project health, alert on errors beyond the normal GitHub Actions
+# "failed run" signal, build the Flutter app, run tests, or deploy anything.
+# This repository has no other CI today and this workflow is not the start
+# of one -- if CI is wanted later, that is its own decision.
+#
+# Known caveat, recorded rather than solved:
+# GitHub disables scheduled workflows in repositories with no activity for
+# 60 days. A repo under active development will not hit this, but if
+# development genuinely stops, this job stops with it -- and then the
+# project pauses anyway. That is an acceptable outcome (a truly dormant
+# project pausing is correct), but it should be written down, not
+# discovered.
+#
+# Setup required before this workflow can succeed (one-time, by the repo
+# owner, in GitHub repository settings -> Secrets and variables -> Actions):
+#   - Repository variable  SUPABASE_URL         e.g. https://xxxx.supabase.co
+#   - Repository secret    SUPABASE_ANON_KEY     the project's anon/public key
+# The anon key is designed to be public (it ships inside the app bundle and
+# the web JS; row-level security protects the data, not the key's secrecy),
+# so storing it as a secret here is tidiness rather than security -- it
+# keeps the workflow readable and makes rotating the key a settings change
+# rather than a commit.
+#
+# Until both values are set, the guard step below fails with a clear
+# message instead of an opaque curl error.
+
+name: Supabase keep-warm (free tier anti-pause)
+
+on:
+  schedule:
+    # Every 3rd day of the month, 06:00 UTC. Day-of-month "*/3" always keeps
+    # the gap between runs at 3 days or fewer (the month-boundary gap is
+    # never longer than 3 days), which is comfortably inside the 7-day pause
+    # window while not running more than once a day.
+    - cron: "0 6 */3 * *"
+  workflow_dispatch:
+    # Lets the project be woken by hand from the Actions tab without waiting
+    # for the next scheduled run.
+
+jobs:
+  ping:
+    name: Ping Supabase project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify SUPABASE_URL and SUPABASE_ANON_KEY are configured
+        run: |
+          if [ -z "${{ vars.SUPABASE_URL }}" ] || [ -z "${{ secrets.SUPABASE_ANON_KEY }}" ]; then
+            echo "::error::SUPABASE_URL (repository variable) and/or SUPABASE_ANON_KEY (repository secret) is not set. Add both under Settings > Secrets and variables > Actions before this workflow can run -- see the comment block at the top of this file."
+            exit 1
+          fi
+
+      - name: Ping Supabase REST endpoint to prevent free-tier pause
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # The REST root (/rest/v1/) answers an authenticated request
+          # without requiring any table to exist -- this job must keep
+          # working through Phases 18-20, before the Phase 21 schema lands.
+          # --fail-with-body makes curl exit non-zero on any non-2xx
+          # response while still printing the response body, and
+          # --write-out echoes the HTTP status so a failure is diagnosable
+          # from the Actions log without re-running anything.
+          curl --fail-with-body \
+            --max-time 15 \
+            --silent \
+            --show-error \
+            --write-out "\nSupabase responded with HTTP %{http_code}\n" \
+            --header "apikey: ${SUPABASE_ANON_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL}/rest/v1/"
