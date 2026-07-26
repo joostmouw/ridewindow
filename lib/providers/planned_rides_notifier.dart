@@ -82,6 +82,12 @@ class PlannedRidesNotifier extends _$PlannedRidesNotifier {
     _persist();
   }
 
+  /// Wist alle geplande ritten (D-09: "start fresh" bij accountwissel).
+  void clearAll() {
+    state = [];
+    _persist();
+  }
+
   void _persist() {
     final prefs = ref.read(sharedPrefsProvider);
     final json = jsonEncode(state.map((r) => r.toJson()).toList());

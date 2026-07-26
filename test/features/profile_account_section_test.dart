@@ -18,6 +18,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:ridewindow/app/router.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
@@ -99,6 +100,12 @@ Future<void> _pumpProfileScreen(
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
 
+  // De accountwissel-"start fresh"-tak (Plan 19-04) leest plannedRidesProvider,
+  // dat op zijn beurt sharedPrefsProvider vereist -- zonder deze override
+  // gooit PlannedRidesNotifier.build() een UnimplementedError zodra die tak
+  // wordt geraakt.
+  final prefs = await SharedPreferences.getInstance();
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -111,6 +118,7 @@ Future<void> _pumpProfileScreen(
         ),
         weatherProvider.overrideWith(() => FakeWeatherNotifier()),
         authStateProvider.overrideWith((ref) => authStream),
+        sharedPrefsProvider.overrideWithValue(prefs),
       ],
       child: const MaterialApp(
         locale: Locale('nl'),
@@ -179,5 +187,76 @@ void main() {
 
     expect(find.text(s.accountSignOutConfirmTitle), findsOneWidget);
     expect(find.text(s.accountSignOutConfirmBody), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 4 — andere Google-account dan voorheen toont de accountwissel-dialoog (AUTH-08)',
+      (tester) async {
+    // Overschrijft de lege setUp-default: dit toestel heeft eerder al
+    // gesynchroniseerd met een ander account dan de nieuw ingelogde
+    // gebruiker hieronder.
+    SharedPreferences.setMockInitialValues({
+      'account.lastSyncedUid': 'previous-uid',
+    });
+
+    final newAccountUser = User(
+      id: 'new-uid',
+      appMetadata: const {},
+      userMetadata: const {'full_name': 'New Rider'},
+      aud: 'authenticated',
+      createdAt: DateTime.now().toIso8601String(),
+      email: 'new-rider@example.com',
+    );
+
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(newAccountUser),
+    );
+    // De ref.listen-callback in AccountSection.build() vuurt asynchroon
+    // (na de authStateProvider state-transitie) -- extra pumps geven de
+    // SharedPreferences-lezing en de showDialog-aanroep tijd om te lopen.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSwitchDialogTitle), findsOneWidget);
+    expect(find.text(s.accountSwitchDialogBody), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 5 — tik op "Opnieuw beginnen" sluit de accountwissel-dialoog',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'account.lastSyncedUid': 'previous-uid',
+    });
+
+    final newAccountUser = User(
+      id: 'new-uid',
+      appMetadata: const {},
+      userMetadata: const {'full_name': 'New Rider'},
+      aud: 'authenticated',
+      createdAt: DateTime.now().toIso8601String(),
+      email: 'new-rider@example.com',
+    );
+
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(newAccountUser),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSwitchDialogTitle), findsOneWidget);
+
+    await tester.tap(find.text(s.accountSwitchRestartAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountSwitchDialogTitle), findsNothing);
   });
 }
