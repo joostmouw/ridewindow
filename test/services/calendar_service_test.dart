@@ -206,4 +206,57 @@ void main() {
       },
     );
   });
+
+  group('CalendarService.hashNonce (quick 260726-o3m nonce-fix)', () {
+    // -------------------------------------------------------------------------
+    // Test 1: bekende vector -- geverifieerd via `shasum -a 256` <<< 'test'.
+    // -------------------------------------------------------------------------
+    test('hashNonce("test") geeft de bekende SHA-256-hexvector terug', () {
+      final result = CalendarService.hashNonce('test');
+      expect(
+        result,
+        equals(
+          '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+        ),
+      );
+    });
+
+    // -------------------------------------------------------------------------
+    // Test 2: lege-string vector -- geverifieerd via `shasum -a 256` <<< ''.
+    // -------------------------------------------------------------------------
+    test('hashNonce("") geeft de bekende SHA-256-hexvector van de lege string terug', () {
+      final result = CalendarService.hashNonce('');
+      expect(
+        result,
+        equals(
+          'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        ),
+      );
+    });
+
+    // -------------------------------------------------------------------------
+    // Test 3: stabiliteit -- authNonce moet identiek blijven over twee losse
+    // reads binnen dezelfde test (bewijst het "eenmaal genereren, stabiel
+    // blijven"-contract van de static final _rawNonce).
+    // -------------------------------------------------------------------------
+    test('CalendarService.authNonce blijft identiek over twee losse reads', () {
+      final first = CalendarService.authNonce;
+      final second = CalendarService.authNonce;
+      expect(first, equals(second));
+    });
+
+    // -------------------------------------------------------------------------
+    // Test 4: vorm -- authNonce is niet leeg, en hashNonce(authNonce) matcht
+    // ^[0-9a-f]{64}$ (lowercase hex, 64 tekens) -- de vorm die Supabase's
+    // Go-code verwacht: fmt.Sprintf("%x", sha256.Sum256(...)).
+    // -------------------------------------------------------------------------
+    test(
+      'CalendarService.authNonce is niet leeg en hashNonce(authNonce) heeft de juiste vorm',
+      () {
+        expect(CalendarService.authNonce, isNotEmpty);
+        final hashed = CalendarService.hashNonce(CalendarService.authNonce);
+        expect(RegExp(r'^[0-9a-f]{64}$').hasMatch(hashed), isTrue);
+      },
+    );
+  });
 }

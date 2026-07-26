@@ -13,7 +13,23 @@
 // _sharedInitialize()-gate via de publieke ensureGoogleSignInReady() wrapper
 // hieronder -- GoogleSignIn.instance.initialize() mag nog steeds maar op
 // precies één plek in de hele codebase worden aangeroepen (zie die methode).
+//
+// Quick 260726-o3m: Supabase's signInWithIdToken vereist dat nonce (verstuurd
+// naar Supabase) en de nonce-claim in het Google ID-token ofwel allebei
+// bestaan, ofwel geen van beide -- anders faalt de aanroep met een 400
+// "Passed nonce and nonce in id_token should either both exist or not".
+// Wanneer beide bestaan vergelijkt Supabase SHA-256(ruwe nonce naar Supabase
+// gestuurd) met de nonce-claim in het token. Daarom gaat de RUWE waarde naar
+// Supabase (authNonce) en de SHA-256-hex van diezelfde ruwe waarde naar
+// Google (hashNonce(_rawNonce), via initialize(nonce:)). De nonce wordt
+// precies één keer per app-run gegenereerd (static final) omdat
+// _sharedInitialize() al gememoized is -- een nieuwe nonce per inlogpoging
+// zou niet meer overeenkomen met wat Google al in het token heeft ingebed.
 
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart';
@@ -46,9 +62,38 @@ class CalendarService {
   // fataal"-semantiek als voorheen).
   static Future<void>? _initFuture;
 
+  // Quick 260726-o3m: één CSPRNG-nonce per app-run (static final -- Dart
+  // garandeert lazy, eenmalige initialisatie, geen extra guard nodig). De
+  // RUWE waarde (authNonce) gaat naar Supabase's signInWithIdToken(nonce:);
+  // de SHA-256-hex van diezelfde ruwe waarde (hashNonce(_rawNonce)) gaat naar
+  // Google's initialize(nonce:) hieronder. Zie het bestandshoofd-commentaar
+  // voor waarom de richting ertoe doet.
+  static final String _rawNonce = _generateRawNonce();
+
+  static String _generateRawNonce() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return base64Url.encode(bytes);
+  }
+
+  /// De ruwe, ongehashte nonce voor deze app-run (Quick 260726-o3m). Dit is
+  /// de waarde die naar Supabase's `signInWithIdToken(nonce:)` gaat -- NIET
+  /// de gehashte waarde die naar Google gaat (zie [hashNonce]).
+  static String get authNonce => _rawNonce;
+
+  /// SHA-256-hash (lowercase hex, per `crypto`'s `Digest.toString()`-conventie)
+  /// van [rawNonce]. Dit is de waarde die naar Google's
+  /// `GoogleSignIn.instance.initialize(nonce:)` gaat -- Supabase vergelijkt
+  /// deze hash tegen de nonce-claim in het door Google uitgegeven ID-token.
+  static String hashNonce(String rawNonce) =>
+      sha256.convert(utf8.encode(rawNonce)).toString();
+
   static Future<void> _sharedInitialize() {
     return _initFuture ??= GoogleSignIn.instance
-        .initialize(serverClientId: _kGoogleWebClientId)
+        .initialize(
+      serverClientId: _kGoogleWebClientId,
+      nonce: hashNonce(_rawNonce),
+    )
         .then((_) {
       _initialized = true;
     }).catchError((Object e, StackTrace st) {
