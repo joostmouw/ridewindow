@@ -128,6 +128,20 @@ None for this plan -- the one piece of user setup this plan needed (the Supabase
 
 **Note for the orchestrator:** Plan 19-02 has already completed and merged to `main` (added `serverClientId` to the shared `GoogleSignIn` init gate + `CalendarService.ensureGoogleSignInReady()` in `lib/services/calendar_service.dart`). This worktree branch was intentionally left based on the pre-19-02 commit (`20768d8`) since 19-01 and 19-02 share no files -- the orchestrator's merge will combine both cleanly.
 
+## Self-Check: PASSED
+
+All created files confirmed present on disk:
+- FOUND: lib/core/supabase_config.dart
+- FOUND: lib/providers/auth_notifier.dart
+- FOUND: lib/providers/auth_notifier.g.dart
+- FOUND: .planning/phases/19-auth/19-01-SUMMARY.md
+
+All task commit hashes confirmed in git log:
+- FOUND: 7bc5409 (Task 1)
+- FOUND: a46fe26 (Task 2)
+- FOUND: 6766896 (Task 3)
+- FOUND: 6d431f4 (SUMMARY commit)
+
 ---
 *Phase: 19-auth*
 *Completed: 2026-07-26*
