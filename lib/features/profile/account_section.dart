@@ -12,10 +12,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:ridewindow/domain/services/account_switch_resolver.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
@@ -26,6 +30,12 @@ import 'package:ridewindow/services/calendar_service.dart';
 // seam below instead of importing google_sign_in_web directly (Rule 1 fix,
 // see google_signin_button.dart's header comment).
 import 'google_signin_button.dart';
+
+/// SharedPreferences-sleutel voor de laatst gesynchroniseerde Supabase-uid op
+/// dit toestel (AUTH-08, ARCHITECTURE.md §5). Bewust *niet* toegevoegd aan
+/// ProfileRepository of een gedeeld sleutel-bestand -- die extractie is
+/// Fase 20's werk, niet dit plan's.
+const _kLastSyncedUidKey = 'account.lastSyncedUid';
 
 class AccountSection extends ConsumerStatefulWidget {
   const AccountSection({super.key});
@@ -43,6 +53,13 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
 
   // Dubbeltik-guard voor de Android-inlogknop.
   bool _busy = false;
+
+  // AUTH-08: welke uid al gecontroleerd is op een accountwissel, zodat de
+  // check niet dubbel draait wanneer zowel de interactieve inlogflow
+  // (_handleSignInSuccess) als de reactieve authStateProvider-listener
+  // (build(), voor een herstelde sessie bij koude start) voor dezelfde
+  // sign-in vuren -- "dezelfde code-pad" die het plan bedoelt.
+  String? _lastCheckedUid;
 
   @override
   void initState() {
@@ -94,16 +111,25 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
       debugPrint('AccountSection: kon geen access token krijgen: $e');
     }
 
+    User? signedInUser;
     try {
-      await Supabase.instance.client.auth.signInWithIdToken(
+      final response = await Supabase.instance.client.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       );
+      signedInUser = response.user;
     } catch (e) {
       debugPrint('AccountSection: signInWithIdToken mislukt: $e');
       _showSignInError();
       return;
+    }
+
+    // AUTH-08: vergelijk de nieuw ingelogde uid met de laatst gesynchroniseerde
+    // uid op dit toestel, voor de bestaande naam-invulstap -- nooit gissen bij
+    // een accountwissel (D-08/D-09).
+    if (signedInUser != null) {
+      await _checkAccountSwitch(signedInUser.id);
     }
 
     // D-04: vul profile.userName alleen in als het nog leeg is, nooit
@@ -116,6 +142,65 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     }
     // D-07: geen succesbevestiging -- de sectie verandert zichtbaar, dat is
     // het bewijs.
+  }
+
+  /// AUTH-08: vergelijkt [signedInUid] met de lokaal opgeslagen
+  /// `account.lastSyncedUid` via de pure [resolveAccountSwitch]. Dit is het
+  /// gedeelde code-pad dat zowel de interactieve inlogflow
+  /// (_handleSignInSuccess) als een herstelde sessie bij koude start
+  /// (via de authStateProvider-listener in [build]) raakt -- geen van beide
+  /// mag de gebruiker ooit gissen bij een accountwissel.
+  Future<void> _checkAccountSwitch(String signedInUid) async {
+    if (_lastCheckedUid == signedInUid) return;
+    _lastCheckedUid = signedInUid;
+
+    final prefs = await SharedPreferences.getInstance();
+    final lastSyncedUid = prefs.getString(_kLastSyncedUidKey);
+    final decision = resolveAccountSwitch(
+      signedInUid: signedInUid,
+      lastSyncedUid: lastSyncedUid,
+    );
+
+    switch (decision) {
+      case AccountSwitchDecision.firstSignIn:
+      case AccountSwitchDecision.sameAccount:
+        await prefs.setString(_kLastSyncedUidKey, signedInUid);
+        break;
+      case AccountSwitchDecision.differentAccount:
+        if (!mounted) return;
+        final s = S.of(context);
+        final keepData = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Text(s.accountSwitchDialogTitle),
+            content: Text(s.accountSwitchDialogBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(s.accountSwitchKeepAction),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(s.accountSwitchRestartAction),
+              ),
+            ],
+          ),
+        );
+
+        if (keepData == false) {
+          // D-09: wist uitsluitend profielinstellingen, beschikbaarheid en
+          // geplande ritten -- de Drift forecast-cache is afgeleide data en
+          // wordt hier nooit aangeraakt (zelfde redenering als SYNC-09).
+          // Profiel eerst, want latere lezingen kunnen naar tolerances
+          // verwijzen.
+          await ref.read(profileProvider.notifier).resetToDefaults();
+          await ref.read(availabilityProvider.notifier).clearAll();
+          ref.read(plannedRidesProvider.notifier).clearAll();
+        }
+        await prefs.setString(_kLastSyncedUidKey, signedInUid);
+        break;
+    }
   }
 
   void _showSignInError() {
@@ -177,6 +262,18 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
+
+    // AUTH-08: reageert op elke wijziging in authStateProvider -- niet
+    // alleen op een expliciete inlogtik. Dit is het gedeelde pad dat zowel
+    // de interactieve inlogflow (via _handleSignInSuccess hierboven) als een
+    // herstelde sessie bij koude start (de seed in auth_notifier.dart's
+    // authState()) raakt, zodat een accountwissel nooit ongemerkt blijft.
+    ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
+      final user = next.value;
+      if (user != null) {
+        _checkAccountSwitch(user.id);
+      }
+    });
     final authAsync = ref.watch(authStateProvider);
 
     return Column(

@@ -240,4 +240,42 @@ class ProfileNotifier extends _$ProfileNotifier {
     final current = await future;
     state = AsyncData(current.copyWith(notifWeeklyDigest: value));
   }
+
+  /// Wist alle 11 profiel-sleutels uit SharedPreferences en herbouwt de
+  /// state met dezelfde default-constructielogica als [build] gebruikt --
+  /// zodat een reset bitwise-identiek is aan een verse installatie, niet een
+  /// handmatig gekopieerde benadering die kan afwijken (D-09).
+  Future<void> resetToDefaults() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyTempMin);
+    await prefs.remove(_keyTempMax);
+    await prefs.remove(_keyWindMax);
+    await prefs.remove(_keyRainMax);
+    await prefs.remove(_keyDurations);
+    await prefs.remove(_keyTheme);
+    await prefs.remove(_keyLocation);
+    await prefs.remove(_keyUserName);
+    await prefs.remove(_keyLocale);
+    await prefs.remove(_keyNotifEvening);
+    await prefs.remove(_keyNotifMorning);
+    await prefs.remove(_keyNotifWeekly);
+
+    final systemLang = ui.PlatformDispatcher.instance.locale.languageCode;
+    state = AsyncData(
+      UserProfile(
+        tolerances: const WeatherTolerances(
+          tempMinIdealC: 12.0,
+          tempMaxIdealC: 26.0,
+          windMaxIdealKmh: 15.0,
+          rainMaxIdealMm: 0.5,
+        ),
+        allowedDurations: const [2, 3, 5],
+        theme: 'system',
+        locale: systemLang == 'nl' ? 'nl' : 'en',
+        notifEveningBefore: false,
+        notifMorningOf: false,
+        notifWeeklyDigest: false,
+      ),
+    );
+  }
 }
