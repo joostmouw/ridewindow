@@ -31,8 +31,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="ridewindow">
-  <meta name="theme-color" content="#2E7D32">
-  <meta name="background-color" content="#2E7D32">
+  <!-- Merkkleuren, gelijk aan lib/theme/app_colors.dart. theme-color moet
+       identiek zijn aan manifest.json's theme_color, background-color aan
+       background_color — anders flitst iOS alsnog tussen twee kleuren. -->
+  <meta name="theme-color" content="#234934">
+  <meta name="background-color" content="#C5D4B6">
   <link rel="apple-touch-icon" href="icons/Icon-apple-touch-180.png">
 
   <!-- iOS Home Screen splash screens (apple-touch-startup-image) -->
@@ -55,7 +58,7 @@
   <style>
     html, body {
       margin: 0;
-      background-color: #2E7D32;
+      background-color: #C5D4B6;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
   </style>

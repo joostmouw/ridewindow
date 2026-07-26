@@ -44,9 +44,40 @@ void main() {
       expect(contents, isNot(contains('A new Flutter project.')));
     });
 
-    test('uses the real cycling-green brand color, not the Flutter default', () {
-      expect(contents, contains('#2E7D32'));
+    test('uses the official brand colors, not the Flutter default', () {
+      // #C5D4B6 = AppColors.brandLight (app background), #234934 =
+      // AppColors.brandDark (scheme seed). #2E7D32 is the *old* green — it
+      // survives in app_colors.dart only as the "Perfect" score color, which
+      // is a different meaning of the same hex and must never leak back here.
+      expect(contents, contains('"background_color": "#C5D4B6"'));
+      expect(contents, contains('"theme_color": "#234934"'));
+      expect(contents, isNot(contains('#2E7D32')));
       expect(contents, isNot(contains('#0175C2')));
+    });
+  });
+
+  group('web shell color consistency', () {
+    // The actual invariant: index.html and manifest.json must agree. When they
+    // drift, iOS paints one color then repaints with the other — a visible
+    // flash on every cold start. This is what regressed between 17 and 25 July
+    // 2026, when the brand-color commit touched only Dart code.
+    final html = File('web/index.html').readAsStringSync();
+    final manifest = File('web/manifest.json').readAsStringSync();
+
+    test('index.html theme-color matches manifest theme_color', () {
+      expect(html, contains('name="theme-color" content="#234934"'));
+      expect(manifest, contains('"theme_color": "#234934"'));
+    });
+
+    test('index.html background matches manifest background_color', () {
+      expect(html, contains('name="background-color" content="#C5D4B6"'));
+      expect(html, contains('background-color: #C5D4B6;'));
+      expect(manifest, contains('"background_color": "#C5D4B6"'));
+    });
+
+    test('no stale #2E7D32 anywhere in the web shell', () {
+      expect(html, isNot(contains('#2E7D32')));
+      expect(manifest, isNot(contains('#2E7D32')));
     });
   });
 }
