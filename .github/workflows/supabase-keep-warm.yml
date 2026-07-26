@@ -65,18 +65,32 @@ jobs:
             exit 1
           fi
 
-      - name: Ping Supabase REST endpoint to prevent free-tier pause
+      - name: Ping Supabase auth endpoint to prevent free-tier pause
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          # The REST root (/rest/v1/) answers an authenticated request
-          # without requiring any table to exist -- this job must keep
-          # working through Phases 18-20, before the Phase 21 schema lands.
+          # Endpoint: /auth/v1/health (GoTrue). Answers an anon-key-
+          # authenticated request without requiring any table to exist, so
+          # this job keeps working through Phases 18-20, before the Phase 21
+          # schema lands.
+          #
+          # NOT /rest/v1/ -- that was the original choice and it fails in
+          # practice (run #1, 2026-07-26). The PostgREST root returns
+          # HTTP 401 {"message":"Invalid API key","hint":"Only the
+          # `service_role` API key can be used for this endpoint."}. Using it
+          # would mean putting the service_role key in GitHub, and that key
+          # bypasses row-level security entirely -- an unacceptable trade for
+          # a liveness ping. The distinction is visible in the error: the
+          # REST root rejects the anon key by *role*, while the auth
+          # endpoints only reject a *missing* key.
+          #
           # --fail-with-body makes curl exit non-zero on any non-2xx
           # response while still printing the response body, and
           # --write-out echoes the HTTP status so a failure is diagnosable
-          # from the Actions log without re-running anything.
+          # from the Actions log without re-running anything. That is exactly
+          # how the /rest/v1/ mistake was caught: the server's own hint was
+          # in the log.
           curl --fail-with-body \
             --max-time 15 \
             --silent \
@@ -84,4 +98,4 @@ jobs:
             --write-out "\nSupabase responded with HTTP %{http_code}\n" \
             --header "apikey: ${SUPABASE_ANON_KEY}" \
             --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
-            "${SUPABASE_URL}/rest/v1/"
+            "${SUPABASE_URL}/auth/v1/health"
