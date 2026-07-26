@@ -124,9 +124,24 @@ Play Console: app → Policy and programmes → App content → Data safety.
 
 ---
 
+## 5. GitHub Actions keep-warm (PRE-08)
+
+| Item | Value | Verified |
+|---|---|---|
+| Repository variable `SUPABASE_URL` | `https://hcdrydlgqpnmumfupgcx.supabase.co` | ✓ set 2026-07-26 |
+| Repository secret `SUPABASE_ANON_KEY` | set by the repo owner; `role: anon`, `ref: hcdrydlgqpnmumfupgcx` | ✓ 2026-07-26 |
+| Workflow run | run #2 **Success** in 6s, manually dispatched | ✓ 2026-07-26 |
+| Endpoint pinged | `/auth/v1/health` — **not** `/rest/v1/`, see F-11 | ✓ |
+
+Settings page: `https://github.com/joostmouw/ridewindow/settings/secrets/actions`
+
+**Never put the `service_role` key here.** It sits next to the anon key in the Supabase dashboard and looks almost identical, but it bypasses row-level security entirely. Verify a key before use by decoding its JWT payload and checking `"role"` — the anon key reads `"role":"anon"`.
+
 ## Findings
 
 _Recorded rather than omitted — findings are the most valuable thing this file carries._
+
+**F-11 (resolved 2026-07-26). The keep-warm job pinged an endpoint the anon key cannot use.** Plan 18-03 chose `/rest/v1/` on the reasoning that the PostgREST root answers an authenticated request without any table existing. Run #1 disproved it: `HTTP 401 {"message":"Invalid API key","hint":"Only the 'service_role' API key can be used for this endpoint."}`. Satisfying that endpoint would have meant storing the `service_role` key in GitHub — a key that bypasses row-level security — to run a liveness ping. Changed to `/auth/v1/health`, which accepts the anon key and needs no schema; run #2 succeeded in 6s. The diagnostic tell is the shape of the 401: the REST root rejects the anon key by **role**, the auth endpoints reject only a **missing** key. Worth noting that the failure was legible at all only because plan 18-03 chose `curl --fail-with-body` over plain `--fail` — the server's own hint was in the Actions log, so no re-run or local reproduction was needed.
 
 **F-7 (resolved in favour of the policy). Plan 18-04 and the published privacy policy contradicted each other about calendar data.** The plan instructed that Data Safety declare "location data and calendar-derived availability are collected and stored on servers". The policy rewritten in plan 18-02 and published states the opposite under *"Wat op je toestel blijft"*: calendar-imported blocked hours "worden nooit naar een server gestuurd". The policy is published and is the promise to users; the plan text predates 18-02's execution. **Calendar was therefore not declared.** If Phase 21 ever syncs calendar-derived hours server-side, both the policy and this declaration must change together.
 
