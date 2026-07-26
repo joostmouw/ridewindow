@@ -12,16 +12,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-// package:google_sign_in/web_only.dart does not exist in google_sign_in
-// 7.2.0 -- renderButton() lives in the federated web implementation package
-// (Rule 3 fix, see pubspec.yaml comment above google_sign_in_web).
-import 'package:google_sign_in_web/web_only.dart' as web_only;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+
+// package:google_sign_in/web_only.dart does not exist in google_sign_in
+// 7.2.0 -- renderButton() lives in the federated google_sign_in_web package,
+// which pulls in dart:js_interop-based code that fails to compile for the
+// Dart VM (`flutter test`'s target). Routed through the conditional-import
+// seam below instead of importing google_sign_in_web directly (Rule 1 fix,
+// see google_signin_button.dart's header comment).
+import 'google_signin_button.dart';
 
 class AccountSection extends ConsumerStatefulWidget {
   const AccountSection({super.key});
@@ -219,7 +223,7 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
           const SizedBox(height: 4),
           Text(s.accountSyncPromise),
           const SizedBox(height: 8),
-          web_only.renderButton(),
+          renderGoogleSignInButton(),
         ],
       ),
     );

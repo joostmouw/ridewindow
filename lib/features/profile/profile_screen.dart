@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
@@ -288,6 +289,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         key: const PageStorageKey('profile_settings'),
         padding: const EdgeInsets.only(bottom: 24),
         children: [
+          // Sectie: ACCOUNT (D-01: bewust bovenaan, boven Naam en de
+          // tolerantie-instellingen -- zie 19-CONTEXT.md).
+          const AccountSection(),
+
           // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
           _SectionHeader(s.sectionLocation),
 
