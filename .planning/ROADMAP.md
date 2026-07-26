@@ -92,7 +92,15 @@ Active milestone (v3.0 Accounts & Sociaal, phases 1–2 only) detail follows.
   3. Native and web share one non-racing Google Sign-In bootstrap; a mismatch between the signed-in account and the Calendar-authorized account is surfaced as a warning rather than silently proceeding; and switching Google accounts on the same device leaves no data from the previous account visible (AUTH-05, AUTH-06, AUTH-07, AUTH-08)
   4. Sign-in is proven working from a real release build installed from the Play Store track, not only from a debug build (AUTH-10) — hard gate, per this project's history of Calendar shipping broken for exactly this class of reason
   5. After `supabase_flutter` is added — and after `calendar_service.dart`'s shared `initialize()` gains `serverClientId`, which puts this change directly on the working Calendar path — the Android app still builds and runs correctly as a release build on a real device, the web PWA still installs/launches/navigates correctly, and "Add to calendar" still works end-to-end on both platforms (REG-01, REG-02, REG-04). A baseline web cold-start measurement is taken here, since the entire cloud SDK payload lands in this phase (feeds REG-03)
-**Plans**: TBD
+**Plans**: 7 plans
+Plans:
+- [ ] 19-01-PLAN.md — Supabase bootstrap: pubspec + supabase_config.dart + Supabase.initialize() + seeded authStateProvider
+- [ ] 19-02-PLAN.md — Shared GoogleSignIn init gains serverClientId (AUTH-05, REG-04's sharpest gate)
+- [ ] 19-03-PLAN.md — Account section UI: sign-in/out, Android + web branch, wired into Profile as the first section
+- [ ] 19-04-PLAN.md — Account switch detection (uid compare) + keep-or-restart dialog + local wipe
+- [ ] 19-05-PLAN.md — Calendar-mismatch warning on the existing Calendar row
+- [ ] 19-06-PLAN.md — REGRESSION-CHECKLIST.md + release AAB build + green-suite gate
+- [ ] 19-07-PLAN.md — Manual: Play Console upload + Android/iPhone-PWA verification + cold-start baseline (autonomous: false)
 **UI hint**: yes
 
 ### Phase 20: Repository refactor (local-only)
@@ -158,7 +166,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
-| 19. Auth | v3.0 | 0/TBD | Not started | - |
+| 19. Auth | v3.0 | 0/7 | Not started | - |
 | 20. Repository refactor (local-only) | v3.0 | 0/TBD | Not started | - |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
