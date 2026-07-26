@@ -1063,6 +1063,90 @@ abstract class S {
   /// **'Losgekoppeld van Google Agenda.'**
   String get calendarDisconnectedSnackbar;
 
+  /// No description provided for @sectionAccount.
+  ///
+  /// In nl, this message translates to:
+  /// **'Account'**
+  String get sectionAccount;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen met Google'**
+  String get signInWithGoogle;
+
+  /// No description provided for @accountSyncPromise.
+  ///
+  /// In nl, this message translates to:
+  /// **'Binnenkort: je instellingen en geplande ritten op al je apparaten.'**
+  String get accountSyncPromise;
+
+  /// No description provided for @accountLoading.
+  ///
+  /// In nl, this message translates to:
+  /// **'Bezig met laden…'**
+  String get accountLoading;
+
+  /// No description provided for @accountSignOut.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitloggen'**
+  String get accountSignOut;
+
+  /// No description provided for @accountSignOutConfirmTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitloggen?'**
+  String get accountSignOutConfirmTitle;
+
+  /// No description provided for @accountSignOutConfirmBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je gegevens op dit toestel blijven staan. Je kunt altijd opnieuw inloggen.'**
+  String get accountSignOutConfirmBody;
+
+  /// No description provided for @accountSignInError.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen mislukt. Probeer het opnieuw.'**
+  String get accountSignInError;
+
+  /// No description provided for @accountAvatarSemanticLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Profielfoto'**
+  String get accountAvatarSemanticLabel;
+
+  /// No description provided for @accountSwitchDialogTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ander Google-account'**
+  String get accountSwitchDialogTitle;
+
+  /// No description provided for @accountSwitchDialogBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent nu ingelogd met een ander account dan voorheen op dit toestel. Wil je de gegevens op dit toestel bewaren, of opnieuw beginnen?'**
+  String get accountSwitchDialogBody;
+
+  /// No description provided for @accountSwitchKeepAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Gegevens bewaren'**
+  String get accountSwitchKeepAction;
+
+  /// No description provided for @accountSwitchRestartAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Opnieuw beginnen'**
+  String get accountSwitchRestartAction;
+
+  /// No description provided for @calendarMismatchWarning.
+  ///
+  /// In nl, this message translates to:
+  /// **'Agenda gekoppeld aan een ander account: {email}'**
+  String calendarMismatchWarning(String email);
+
   /// No description provided for @privacyPolicy.
   ///
   /// In nl, this message translates to:

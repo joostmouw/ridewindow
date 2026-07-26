@@ -238,6 +238,26 @@
   "calendarDisconnectButton": "Loskoppelen",
   "calendarDisconnectedSnackbar": "Losgekoppeld van Google Agenda.",
 
+  "sectionAccount": "Account",
+  "signInWithGoogle": "Inloggen met Google",
+  "accountSyncPromise": "Binnenkort: je instellingen en geplande ritten op al je apparaten.",
+  "accountLoading": "Bezig met laden…",
+  "accountSignOut": "Uitloggen",
+  "accountSignOutConfirmTitle": "Uitloggen?",
+  "accountSignOutConfirmBody": "Je gegevens op dit toestel blijven staan. Je kunt altijd opnieuw inloggen.",
+  "accountSignInError": "Inloggen mislukt. Probeer het opnieuw.",
+  "accountAvatarSemanticLabel": "Profielfoto",
+  "accountSwitchDialogTitle": "Ander Google-account",
+  "accountSwitchDialogBody": "Je bent nu ingelogd met een ander account dan voorheen op dit toestel. Wil je de gegevens op dit toestel bewaren, of opnieuw beginnen?",
+  "accountSwitchKeepAction": "Gegevens bewaren",
+  "accountSwitchRestartAction": "Opnieuw beginnen",
+  "calendarMismatchWarning": "Agenda gekoppeld aan een ander account: {email}",
+  "@calendarMismatchWarning": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+
   "privacyPolicy": "Privacybeleid",
   "weatherDataAttribution": "Weerdata door Open-Meteo.com",
   "version": "Versie",
