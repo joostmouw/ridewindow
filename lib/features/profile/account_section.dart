@@ -194,9 +194,24 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
           // wordt hier nooit aangeraakt (zelfde redenering als SYNC-09).
           // Profiel eerst, want latere lezingen kunnen naar tolerances
           // verwijzen.
-          await ref.read(profileProvider.notifier).resetToDefaults();
-          await ref.read(availabilityProvider.notifier).clearAll();
-          ref.read(plannedRidesProvider.notifier).clearAll();
+          //
+          // availabilityProvider is niet keepAlive en wordt door deze sectie
+          // niet gewatcht (in tegenstelling tot profileProvider, dat
+          // ProfileScreen elders al watcht) -- zonder een tijdelijk manuele
+          // listener kan de provider zichzelf tussen de awaits in disposen,
+          // waarna clearAll()'s state-schrijving een UnmountedRefException
+          // gooit.
+          final availabilitySub = ref.listenManual(
+            availabilityProvider,
+            (_, __) {},
+          );
+          try {
+            await ref.read(profileProvider.notifier).resetToDefaults();
+            await ref.read(availabilityProvider.notifier).clearAll();
+            ref.read(plannedRidesProvider.notifier).clearAll();
+          } finally {
+            availabilitySub.close();
+          }
         }
         await prefs.setString(_kLastSyncedUidKey, signedInUid);
         break;
