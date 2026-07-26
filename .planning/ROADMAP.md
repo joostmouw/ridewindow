@@ -112,8 +112,8 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 19-04-PLAN.md — Account switch detection (uid compare) + keep-or-restart dialog + local wipe
-- [ ] 19-05-PLAN.md — Calendar-mismatch warning on the existing Calendar row
+- [x] 19-04-PLAN.md — Account switch detection (uid compare) + keep-or-restart dialog + local wipe
+- [x] 19-05-PLAN.md — Calendar-mismatch warning on the existing Calendar row
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
-| 19. Auth | v3.0 | 3/7 | In Progress|  |
+| 19. Auth | v3.0 | 5/7 | In Progress|  |
 | 20. Repository refactor (local-only) | v3.0 | 0/TBD | Not started | - |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
