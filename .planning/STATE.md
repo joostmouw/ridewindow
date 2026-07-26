@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
 status: executing
-last_updated: "2026-07-26T07:41:55.999Z"
-last_activity: 2026-07-26 -- Phase 19 execution started
+last_updated: "2026-07-26T16:30:00.000Z"
+last_activity: 2026-07-26 -- Phase 19 plannen 01 t/m 06 afgerond; alleen 19-07 (handmatig) rest
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 4
+  completed_plans: 10
   percent: 20
 ---
 
@@ -43,9 +43,17 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 19 (auth) — EXECUTING
-Plan: 1 of 7
-Status: Executing Phase 19
-Last activity: 2026-07-26 -- Phase 19 execution started
+Plan: 6 of 7 afgerond (19-01 t/m 19-06); 19-07 open
+Status: Fase 19 code-compleet, suite groen (317/0). Geblokkeerd op 19-07 — `autonomous: false`,
+puur handwerk: `build/app/outputs/bundle/release/app-release.aab` (1.0.12+13, gebouwd 2026-07-26)
+uploaden naar de Play Console internal testing track, daarna installeren via de Store-link
+(nadrukkelijk niet een lokale APK — D-16/AUTH-10, alleen de Play App Signing SHA-1 bewijst het
+juiste OAuth-client) en `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` aflopen: Android
+in-/uitloggen + agenda-event + herstartpersistentie, iPhone-PWA installeren/standalone/navigeren/
+inloggen/agenda-event, plus de koudestartmeting mét toestel, verbindingstype en methode (die
+methode wordt in fase 21 letterlijk herhaald voor REG-03).
+Fases 20, 21 en 22 hebben nog geen plannen (ROADMAP: TBD).
+Last activity: 2026-07-26 -- Phase 19 plannen 01 t/m 06 afgerond; alleen 19-07 (handmatig) rest
 
 ## Performance Metrics
 
