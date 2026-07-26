@@ -56,7 +56,9 @@ Console work across Cloud Console, Supabase and Play Console, driven interactive
 
 ## Incomplete
 
-**PRE-03 is not met.** The DPA was requested, not executed. Supabase prepares a PandaDoc and emails a signing link within 24 hours; a signature request is not a data processing agreement. From 2026-07-26 the project has a processor holding user data with no executed agreement. Tracked as F-4 in the checklist. This must close before accounts ship.
+**PRE-08 is partially met.** The keep-warm workflow from plan 18-03 exists but cannot run until the repository variable `SUPABASE_URL` and secret `SUPABASE_ANON_KEY` are set in GitHub. Until then every run fails at the guard step — loudly and by design, but the project is not yet protected against the 7-day pause.
+
+**Correction on PRE-03.** An earlier reading of the DPA PDF concluded it was an unsigned template, based on its text layer showing blank signature ruling. That was wrong: the document is cryptographically signed (`/FT/Sig` with a non-empty `/V`, `/Filter/Adobe.PPKLite`, `/ByteRange` present, signing time `D:20260726054529Z`, produced by PandaDoc). PRE-03 is met. The lesson is recorded in F-4 — verify PDF signatures through the document structure, not the extracted text.
 
 ## Findings for later phases
 
