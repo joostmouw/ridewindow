@@ -100,3 +100,10 @@ None - no external service configuration required. (The Supabase project itself 
 ---
 *Phase: 19-auth*
 *Completed: 2026-07-26*
+
+## Self-Check: PASSED
+
+- FOUND: lib/services/calendar_service.dart
+- FOUND: .planning/phases/19-auth/19-02-SUMMARY.md
+- FOUND: commit 11a1845 (Task 1)
+- FOUND: commit f5bd818 (metadata)
