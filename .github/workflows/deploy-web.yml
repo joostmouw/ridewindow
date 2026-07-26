@@ -1,0 +1,144 @@
+# Deploy web to Firebase Hosting (CI)
+#
+# Why this exists:
+# The developer's home uplink measures ~17 KB/s (0.14 Mbit/s) -- confirmed
+# on 2026-07-26 by curl-uploading 1 MiB of random data to httpbin.org
+# (speed_upload 17228 bytes/s). firebase-tools (15.23.0) computes a per-file
+# upload timeout of max(round(size_in_KB) * 20ms, 30s), capped at 2h -- see
+# lib/deploy/hosting/uploader.js:201-204 in the installed firebase-tools
+# package. For build/web/main.dart.js (~1.3 MB gzipped) that is a ~109s
+# budget per attempt, and the upload queue retries a failed file 6 times
+# total (uploader.js:51). At 17 KB/s that single file needs ~80s to
+# transfer -- it fits the budget, but with almost no margin, so any wifi
+# hiccup can burn through all 6 attempts. A deploy from home tonight ran
+# ~11 minutes and then failed outright with "retries exhausted after 6
+# attempts ... Timeout reached making request to
+# https://upload-firebasehosting.googleapis.com/...". Moving the upload to
+# a GitHub-hosted runner removes the slow link from the deploy path
+# entirely -- the only thing that still has to cross the home connection is
+# `git push` (source, kilobytes), not the ~5 MB compiled build/web output.
+#
+# What this job does, and does not, do:
+# On a push to main that touches files able to change the web build (see
+# the path filter below), or on manual dispatch, it runs
+# `flutter build web --release` and deploys build/web to the Firebase
+# Hosting *live* channel for the my-project-joost project. It does NOT run
+# `flutter test` or `flutter analyze` as a deploy gate -- that was
+# considered and rejected for now: the suite's known baseline
+# (.planning/STATE.md, 17-01) is 215 passing / 69 pre-existing failures
+# unrelated to hosting (tracked in BACKLOG.md #11), so gating every deploy
+# on a fully green suite would block all deploys until that separate
+# test-health backlog item is resolved. If the suite becomes green, add a
+# `flutter test` step before the build step -- do not silently reintroduce
+# this gate without updating this comment.
+#
+# Why path filters matter here specifically: this repo's GSD planning
+# workflow produces a large volume of `.planning/**` documentation commits
+# (46 unpushed at the time this workflow was written) that cannot possibly
+# change the compiled web output. Without a path filter, every one of those
+# commits would trigger a full Flutter web build + deploy for nothing. This
+# repository is public, so GitHub Actions minutes on ubuntu-latest runners
+# are free/unmetered regardless -- the EUR 0/month ceiling in CLAUDE.md is
+# not actually at risk here even without the filter -- but a multi-minute
+# build on every doc-only commit is still wasted time and wasted feedback
+# loop, so the filter stays.
+#
+# Why the Firebase Hosting GitHub Action instead of a raw `firebase deploy`
+# CLI call: FirebaseExtended/action-hosting-deploy takes the service
+# account JSON directly as an input (firebaseServiceAccount) and writes it
+# to a credentials file itself -- no manual base64-decode-to-file step in
+# this workflow. The alternative (`npx firebase-tools deploy --only
+# hosting` with GOOGLE_APPLICATION_CREDENTIALS pointed at a hand-written
+# temp file, or the older `firebase login:ci` token flow) adds manual
+# credential-file plumbing for no benefit here, since this workflow only
+# ever deploys to the live channel and never needs preview channels or PR
+# comments. `firebase init hosting:github` -- Google's own setup wizard --
+# specifically pairs with this action, which is why this choice was made.
+#
+# All third-party Actions below are pinned to a commit SHA, not a mutable
+# tag: this job authenticates with a service account key capable of
+# publishing to production hosting, so a tag that could be silently
+# repointed (by accident or via a compromised upstream account) is treated
+# as a real risk. The version tag is kept as a trailing comment so bumping
+# is a deliberate, reviewable diff, not a silent drift.
+#
+# Setup required before this workflow can succeed (one-time, by the repo
+# owner):
+#   Repository secret FIREBASE_SERVICE_ACCOUNT -- a Firebase/GCP service
+#   account JSON key with the Firebase Hosting Admin role on the
+#   my-project-joost project.
+#
+#   Recommended: run `firebase init hosting:github` from the repo root on
+#   your machine. It is interactive (opens a browser / asks you to
+#   authorize against GitHub) so this is necessarily something you run
+#   yourself, not something this workflow or an agent can do for you. It
+#   creates the service account with the right role AND creates a GitHub
+#   secret for you -- but it names that secret
+#   FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST (derived from the project
+#   ID), not FIREBASE_SERVICE_ACCOUNT. After running it, rename the secret
+#   it created to exactly FIREBASE_SERVICE_ACCOUNT (repo -> Settings ->
+#   Secrets and variables -> Actions), or the guard step below will fail
+#   with a message telling you so. Decline the wizard's offer to write its
+#   own workflow YAML files -- this file replaces that output and already
+#   matches this repo's conventions.
+#
+#   Manual alternative (no wizard): GCP Console -> IAM & Admin -> Service
+#   Accounts -> create one with the "Firebase Hosting Admin" role on
+#   my-project-joost -> Keys -> Add key -> JSON -> download it -> paste its
+#   full contents as the FIREBASE_SERVICE_ACCOUNT secret in GitHub.
+#
+# Until that secret exists, the guard step below fails with a clear message
+# instead of an opaque auth error inside the deploy action.
+
+name: Deploy web to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "web/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "firebase.json"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+    # Lets a deploy be forced by hand from the Actions tab -- e.g. after
+    # rotating the service account key, or re-running after a transient
+    # runner problem -- without needing an empty commit.
+
+jobs:
+  deploy:
+    name: Build and deploy build/web
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify FIREBASE_SERVICE_ACCOUNT is configured
+        run: |
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT (repository secret) is not set. Add it under Settings > Secrets and variables > Actions before this workflow can deploy -- see the comment block at the top of this file for the recommended 'firebase init hosting:github' setup and the exact secret name it expects."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: 3.44.1 # pinned to match this app's local dev/test Flutter version (`flutter --version`) -- avoids CI silently building against a newer Flutter that behaves differently
+
+      - name: flutter pub get
+        run: flutter pub get
+
+      - name: flutter build web --release
+        run: flutter build web --release
+
+      - name: Deploy to Firebase Hosting (live channel)
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: my-project-joost
+          channelId: live
+          firebaseToolsVersion: 15.23.0 # pinned to the version already verified locally (the uploader.js timeout formula referenced above was read from this exact version)
