@@ -55,7 +55,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 
 **Milestone Goal:** Turn RideWindow's two separate data silos into one account-backed profile via Google Sign-In (Supabase Auth) and Postgres sync of profile/availability/planned rides, with a defined first-login/second-device migration story, and route feedback through that account. Scope is deliberately milestone phases 1–2 only (`.planning/milestones/v3.0-ACCOUNTS.md`) — friends, shared availability, ride invites, and server-side push (milestone phases 3–5) are deferred until this ships and testers respond.
 
-- [ ] **Phase 18: Preconditions** - Constraint revision, EU Supabase region, SHA-1 and OAuth client audit, rewritten privacy policy naming two sub-processors, Data Safety declaration, and the other release-blocking groundwork — no app code
+- [x] **Phase 18: Preconditions** - Constraint revision, EU Supabase region, SHA-1 and OAuth client audit, rewritten privacy policy naming two sub-processors, Data Safety declaration, and the other release-blocking groundwork — no app code (completed 2026-07-26)
 - [ ] **Phase 19: Auth** - Google Sign-In via Supabase `signInWithIdToken`, sign-out, cross-restart persistence, and a shared native/web bootstrap that reuses — rather than races — the existing Calendar integration's init gate
 - [ ] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement
 - [ ] **Phase 21: Sync + migration** - Postgres sync of profile/availability/planned rides, an offline outbox, first-login and second-device conflict handling, row-level security, and account deletion
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 15. Google Calendar Web Integration | v2.0 | 2/2 | Complete    | 2026-07-14 |
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
-| 18. Preconditions | v3.0 | 3/4 | In Progress|  |
+| 18. Preconditions | v3.0 | 4/4 | Complete   | 2026-07-26 |
 | 19. Auth | v3.0 | 0/TBD | Not started | - |
 | 20. Repository refactor (local-only) | v3.0 | 0/TBD | Not started | - |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
