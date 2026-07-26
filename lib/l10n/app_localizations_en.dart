@@ -542,6 +542,53 @@ class SEn extends S {
       'Disconnected from Google Calendar.';
 
   @override
+  String get sectionAccount => 'Account';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get accountSyncPromise =>
+      'Coming soon: your settings and planned rides on all your devices.';
+
+  @override
+  String get accountLoading => 'Loading…';
+
+  @override
+  String get accountSignOut => 'Sign out';
+
+  @override
+  String get accountSignOutConfirmTitle => 'Sign out?';
+
+  @override
+  String get accountSignOutConfirmBody =>
+      'Your data on this device stays exactly as it is. You can always sign in again.';
+
+  @override
+  String get accountSignInError => 'Sign-in failed. Please try again.';
+
+  @override
+  String get accountAvatarSemanticLabel => 'Profile photo';
+
+  @override
+  String get accountSwitchDialogTitle => 'Different Google account';
+
+  @override
+  String get accountSwitchDialogBody =>
+      'You\'re signed in with a different account than before on this device. Keep the data on this device, or start fresh?';
+
+  @override
+  String get accountSwitchKeepAction => 'Keep data';
+
+  @override
+  String get accountSwitchRestartAction => 'Start fresh';
+
+  @override
+  String calendarMismatchWarning(String email) {
+    return 'Calendar connected to a different account: $email';
+  }
+
+  @override
   String get privacyPolicy => 'Privacy policy';
 
   @override

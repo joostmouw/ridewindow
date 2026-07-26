@@ -49,6 +49,12 @@ dependencies:
   google_sign_in: ^7.2.0
   extension_google_sign_in_as_googleapis_auth: ^3.0.0
   googleapis: ^16.0.0
+  # Phase 19 (19-03): package:google_sign_in/web_only.dart does not exist in
+  # google_sign_in 7.2.0 -- renderButton() lives in the federated web
+  # implementation package. Already resolved transitively (pubspec.lock);
+  # declared directly here so the import is valid and satisfies
+  # depend_on_referenced_packages.
+  google_sign_in_web: ^1.1.3
 
   # Phase 10 — Privacy policy link (About screen)
   url_launcher: ^6.3.1

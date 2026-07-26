@@ -542,6 +542,53 @@ class SNl extends S {
   String get calendarDisconnectedSnackbar => 'Losgekoppeld van Google Agenda.';
 
   @override
+  String get sectionAccount => 'Account';
+
+  @override
+  String get signInWithGoogle => 'Inloggen met Google';
+
+  @override
+  String get accountSyncPromise =>
+      'Binnenkort: je instellingen en geplande ritten op al je apparaten.';
+
+  @override
+  String get accountLoading => 'Bezig met laden…';
+
+  @override
+  String get accountSignOut => 'Uitloggen';
+
+  @override
+  String get accountSignOutConfirmTitle => 'Uitloggen?';
+
+  @override
+  String get accountSignOutConfirmBody =>
+      'Je gegevens op dit toestel blijven staan. Je kunt altijd opnieuw inloggen.';
+
+  @override
+  String get accountSignInError => 'Inloggen mislukt. Probeer het opnieuw.';
+
+  @override
+  String get accountAvatarSemanticLabel => 'Profielfoto';
+
+  @override
+  String get accountSwitchDialogTitle => 'Ander Google-account';
+
+  @override
+  String get accountSwitchDialogBody =>
+      'Je bent nu ingelogd met een ander account dan voorheen op dit toestel. Wil je de gegevens op dit toestel bewaren, of opnieuw beginnen?';
+
+  @override
+  String get accountSwitchKeepAction => 'Gegevens bewaren';
+
+  @override
+  String get accountSwitchRestartAction => 'Opnieuw beginnen';
+
+  @override
+  String calendarMismatchWarning(String email) {
+    return 'Agenda gekoppeld aan een ander account: $email';
+  }
+
+  @override
   String get privacyPolicy => 'Privacybeleid';
 
   @override
