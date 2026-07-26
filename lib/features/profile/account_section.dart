@@ -100,23 +100,39 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
       return;
     }
 
+    // O3M-02 (Bug 2): authorizationForScopes is niet-promptend en veilig op
+    // beide platforms. De promptende authorizeScopes()-fallback mag alleen
+    // op de native/Android-tak draaien (_supportsNativeAuthenticate == true,
+    // D-06's signaal) -- op web wordt deze aanroep gedaan vanuit de
+    // authenticationEvents-listener, buiten elke user-gesture call-stack, dus
+    // de browser blokkeert het popup-venster altijd ("Failed to open popup
+    // window"). Android's exacte twee-staps-volgorde blijft ongewijzigd.
     String? accessToken;
     try {
       var authorization = await account.authorizationClient
           .authorizationForScopes(['email']);
-      authorization ??=
-          await account.authorizationClient.authorizeScopes(['email']);
-      accessToken = authorization.accessToken;
+      if (authorization == null && _supportsNativeAuthenticate) {
+        authorization =
+            await account.authorizationClient.authorizeScopes(['email']);
+      }
+      accessToken = authorization?.accessToken;
     } catch (e) {
       debugPrint('AccountSection: kon geen access token krijgen: $e');
     }
 
     User? signedInUser;
     try {
+      // O3M-01 (Bug 1): nonce: CalendarService.authNonce -- de RUWE nonce die
+      // hoort bij de SHA-256-hash die CalendarService al naar Google's
+      // initialize(nonce:) heeft gestuurd. Zonder deze regel weigert Supabase
+      // met een 400 "Passed nonce and nonce in id_token should either both
+      // exist or not", omdat het Google ID-token wel een nonce-claim draagt
+      // maar hier voorheen niets werd meegestuurd.
       final response = await Supabase.instance.client.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
+        nonce: CalendarService.authNonce,
       );
       signedInUser = response.user;
     } catch (e) {
