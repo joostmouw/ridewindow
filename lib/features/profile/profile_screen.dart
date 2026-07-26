@@ -19,6 +19,7 @@ import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -48,6 +49,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   // Google Calendar-verbindingsstatus (backlog #36). null = nog aan het
   // controleren; true/false = resultaat van isCalendarConnected().
   bool? _calendarConnected;
+
+  // AUTH-07: het Calendar-geautoriseerde e-mailadres wanneer dat afwijkt van
+  // het ingelogde Supabase-account. null = geen mismatch (of nog niet
+  // gecontroleerd, of Calendar niet verbonden) -- alleen gezet nadat zowel
+  // het Calendar-account als het ingelogde account bekend zijn EN verschillen.
+  String? _calendarMismatchEmail;
 
   Future<void> _launchPrivacyPolicy() async {
     final uri = Uri.parse(_kPrivacyPolicyUrl);
@@ -107,8 +114,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     try {
       final connected = await CalendarService().isCalendarConnected();
       if (mounted) setState(() => _calendarConnected = connected);
+      if (connected) {
+        await _checkCalendarMismatch();
+      }
     } catch (_) {
       if (mounted) setState(() => _calendarConnected = false);
+    }
+  }
+
+  /// AUTH-07: vergelijkt het Calendar-geautoriseerde Google-account met het
+  /// ingelogde Supabase-account (D-11: non-prompting, dus alleen aangeroepen
+  /// nadat [_calendarConnected] al `true` is via de eveneens niet-promptende
+  /// [CalendarService.isCalendarConnected]). Een eenmalige read van
+  /// `authStateProvider` op controlemoment is hier correct -- dit is een
+  /// passieve check, net als de bestaande Calendar-statuscontrole, geen
+  /// live-updatende vergelijking. Bij een fout (bv. geen platform-channel in
+  /// tests) degradeert dit stil naar "geen mismatch" in plaats van te
+  /// crashen -- dezelfde fail-safe stijl als [_checkCalendarConnection].
+  Future<void> _checkCalendarMismatch() async {
+    try {
+      final calendarEmail = await CalendarService().currentGoogleEmail();
+      final signedInEmail = ref.read(authStateProvider).value?.email;
+      final mismatch = calendarEmail != null &&
+          signedInEmail != null &&
+          calendarEmail != signedInEmail;
+      if (mounted) {
+        setState(
+          () => _calendarMismatchEmail = mismatch ? calendarEmail : null,
+        );
+      }
+    } catch (_) {
+      if (mounted) setState(() => _calendarMismatchEmail = null);
     }
   }
 
@@ -121,7 +157,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } catch (_) {
       // Best-effort: negeer fouten, ga toch door met UI-update.
     }
-    if (mounted) setState(() => _calendarConnected = false);
+    if (mounted) {
+      setState(() {
+        _calendarConnected = false;
+        _calendarMismatchEmail = null;
+      });
+    }
     if (context.mounted) {
       final s = S.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -703,7 +744,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ListTile(
             leading: const Icon(Icons.calendar_month),
             title: Text(s.googleCalendarLabel),
-            subtitle: Text(_calendarStatusText(s)),
+            subtitle: _calendarMismatchEmail != null
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(_calendarStatusText(s)),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              s.calendarMismatchWarning(
+                                _calendarMismatchEmail!,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Text(_calendarStatusText(s)),
             trailing: _calendarConnected == null
                 ? const SizedBox(
                     width: 20,
