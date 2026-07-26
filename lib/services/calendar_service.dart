@@ -227,6 +227,23 @@ class CalendarService {
     return authorization != null;
   }
 
+  /// Geeft het e-mailadres terug van het Google-account waaronder Calendar
+  /// momenteel is geautoriseerd, ZONDER ooit een OAuth-prompt/popup te tonen
+  /// (D-11, AUTH-07). Gebruikt [GoogleSignIn.instance.attemptLightweightAuthentication],
+  /// dat -- net als [isCalendarConnected]'s [authorizationForScopes] --
+  /// stilzwijgend `null` teruggeeft in plaats van te prompten wanneer er geen
+  /// eerder-geautoriseerde gebruiker herinnerd kan worden. Dit is de sibling-
+  /// check waarop AUTH-07's mismatch-waarschuwing in het Profielscherm is
+  /// gebouwd: het Profielscherm vergelijkt dit resultaat met
+  /// `authStateProvider`'s ingelogde e-mailadres om te signaleren wanneer de
+  /// Calendar-koppeling en de huidige Supabase-login uiteen zijn gelopen.
+  Future<String?> currentGoogleEmail() async {
+    await _ensureInitialized();
+    final account =
+        await GoogleSignIn.instance.attemptLightweightAuthentication();
+    return account?.email;
+  }
+
   /// Trekt de Google Calendar-autorisatie van de gebruiker in (backlog #36).
   /// Synthetiseert ook een uitloggen ([GoogleSignIn.disconnect]).
   Future<void> disconnectCalendar() async {
