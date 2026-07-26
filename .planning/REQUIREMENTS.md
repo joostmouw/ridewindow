@@ -15,15 +15,15 @@
 
 Release-blocking groundwork. None of this is app code, and two items are effectively irreversible once chosen.
 
-- [ ] **PRE-01**: The three broken constraints in `CLAUDE.md` and `PROJECT.md` ("No backend", "Budget: no ongoing infra costs", "Privacy: data never leaves the device") are consciously rewritten — the budget constraint restated as an explicit spend ceiling rather than an assumed zero
-- [ ] **PRE-02**: The Supabase project is created in an EU region — Frankfurt, Ireland, Paris or Stockholm, *not* London or Zurich, which sit outside the EU — and the region is verified in the Supabase dashboard rather than assumed from the signup flow (the region is chosen once at creation)
-- [ ] **PRE-03**: Supabase's Data Processing Agreement is in effect for the project, and **both** sub-processors are named in the privacy policy — Supabase (auth, database) and Google (Firebase Hosting, Calendar). This milestone adds a second processor relationship, it does not replace the existing one
-- [ ] **PRE-04**: Both SHA-1 fingerprints (local release keystore *and* the Play App Signing key, taken from Play Console → App integrity) are registered on the Android OAuth client in Cloud Console, the deployed PWA origin is registered on the web OAuth client, and the **web** client ID is registered in the Supabase dashboard's Google provider settings — Supabase's auth server verifies the ID token against it
-- [ ] **PRE-05**: The privacy policy at the published URL is rewritten to cover server-side storage of location data and calendar-derived availability, the data categories now collected, retention, and user rights
-- [ ] **PRE-06**: The Play Store Data Safety declaration is updated to reflect account creation and server-side data storage, and is live at or before the release that ships accounts
-- [ ] **PRE-07**: The distinction between the Auth user cap (none in practice — basic scopes) and the Calendar-connect cap (100 unique lifetime grants of the unverified `calendar.events` sensitive scope) is documented explicitly, so the two are never conflated during support
-- [ ] **PRE-08**: On the free tier (D-01) there is no spend and therefore nothing to bill an alert on, so the requirement is reworded from a billing alert to the pause tripwire that actually protects the project: a keep-warm job exists and runs on a schedule that stays inside the 7-day inactivity window, Supabase's pause-warning email goes to an address that is actually monitored, and a "sync stopped working" runbook entry exists in `docs/ACCOUNTS-OPERATIONS.md` naming project pausing as the first thing to check. *(Reworded 2026-07-25 — the original text asked for a billing alert, which cannot be satisfied honestly on a plan with nothing to bill; the underlying intent, a tripwire rather than a spend cap, is unchanged.)*
-- [ ] **PRE-09**: A data retention and export answer is documented — how a GDPR Article 20 export request would actually be fulfilled manually, and what happens to data after account deletion
+- [x] **PRE-01**: The three broken constraints in `CLAUDE.md` and `PROJECT.md` ("No backend", "Budget: no ongoing infra costs", "Privacy: data never leaves the device") are consciously rewritten — the budget constraint restated as an explicit spend ceiling rather than an assumed zero
+- [x] **PRE-02**: The Supabase project is created in an EU region — Frankfurt, Ireland, Paris or Stockholm, *not* London or Zurich, which sit outside the EU — and the region is verified in the Supabase dashboard rather than assumed from the signup flow (the region is chosen once at creation)
+- [x] **PRE-03**: Supabase's Data Processing Agreement is in effect for the project, and **both** sub-processors are named in the privacy policy — Supabase (auth, database) and Google (Firebase Hosting, Calendar). This milestone adds a second processor relationship, it does not replace the existing one
+- [x] **PRE-04**: Both SHA-1 fingerprints (local release keystore *and* the Play App Signing key, taken from Play Console → App integrity) are registered on the Android OAuth client in Cloud Console, the deployed PWA origin is registered on the web OAuth client, and the **web** client ID is registered in the Supabase dashboard's Google provider settings — Supabase's auth server verifies the ID token against it
+- [x] **PRE-05**: The privacy policy at the published URL is rewritten to cover server-side storage of location data and calendar-derived availability, the data categories now collected, retention, and user rights
+- [x] **PRE-06**: The Play Store Data Safety declaration is updated to reflect account creation and server-side data storage, and is live at or before the release that ships accounts
+- [x] **PRE-07**: The distinction between the Auth user cap (none in practice — basic scopes) and the Calendar-connect cap (100 unique lifetime grants of the unverified `calendar.events` sensitive scope) is documented explicitly, so the two are never conflated during support
+- [x] **PRE-08**: On the free tier (D-01) there is no spend and therefore nothing to bill an alert on, so the requirement is reworded from a billing alert to the pause tripwire that actually protects the project: a keep-warm job exists and runs on a schedule that stays inside the 7-day inactivity window, Supabase's pause-warning email goes to an address that is actually monitored, and a "sync stopped working" runbook entry exists in `docs/ACCOUNTS-OPERATIONS.md` naming project pausing as the first thing to check. *(Reworded 2026-07-25 — the original text asked for a billing alert, which cannot be satisfied honestly on a plan with nothing to bill; the underlying intent, a tripwire rather than a spend cap, is unchanged.)*
+- [x] **PRE-09**: A data retention and export answer is documented — how a GDPR Article 20 export request would actually be fulfilled manually, and what happens to data after account deletion
 
 ### Authentication (AUTH)
 
@@ -123,15 +123,15 @@ REG-03 remains bound to Phase 21 as the blocking gate, pairing with SYNC-07, but
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| PRE-01 | Phase 18 | Pending |
-| PRE-02 | Phase 18 | Pending |
-| PRE-03 | Phase 18 | Pending |
-| PRE-04 | Phase 18 | Pending |
-| PRE-05 | Phase 18 | Pending |
-| PRE-06 | Phase 18 | Pending |
-| PRE-07 | Phase 18 | Pending |
-| PRE-08 | Phase 18 | Pending |
-| PRE-09 | Phase 18 | Pending |
+| PRE-01 | Phase 18 | Complete |
+| PRE-02 | Phase 18 | Complete |
+| PRE-03 | Phase 18 | Complete |
+| PRE-04 | Phase 18 | Complete |
+| PRE-05 | Phase 18 | Complete |
+| PRE-06 | Phase 18 | Complete |
+| PRE-07 | Phase 18 | Complete |
+| PRE-08 | Phase 18 | Complete |
+| PRE-09 | Phase 18 | Complete |
 | AUTH-01 | Phase 19 | Pending |
 | AUTH-02 | Phase 19 | Pending |
 | AUTH-03 | Phase 19 | Pending |
