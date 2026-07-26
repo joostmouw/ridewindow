@@ -1,6 +1,8 @@
 /// Phase 4: MaterialApp.router wired to routerProvider via ConsumerWidget.
 /// Phase 6: darkTheme + themeMode added; reacts to themeModeProvider.
 /// Phase 8: tz.initializeTimeZones() + WorkManager initialisatie.
+/// Phase 19: Supabase.initialize() parallel aan tzFuture/prefsFuture, awaited
+/// vóór runApp() zodat authStateProvider nooit voor init leest (ARCHITECTURE §7.3).
 library;
 
 import 'package:flutter/material.dart';
@@ -10,11 +12,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
+import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
@@ -36,13 +40,22 @@ Future<void> main() async {
   await initializeDateFormatting('nl_NL');
   await initializeDateFormatting('en_US');
 
-  // Parallel laden: timezone + SharedPreferences voor snelle cold start.
+  // Parallel laden: timezone + SharedPreferences + Supabase voor snelle cold start.
   final tzFuture = FlutterTimezone.getLocalTimezone();
   final prefsFuture = SharedPreferences.getInstance();
+  final supabaseFuture = Supabase.initialize(
+    url: supabaseUrl,
+    publishableKey: supabaseAnonKey,
+  );
   final timezoneInfo = await tzFuture;
   final prefs = await prefsFuture;
 
   tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+
+  // Wacht Supabase-init af vóórdat de eerste widget bouwt — anders kan een
+  // provider authStateProvider lezen terwijl Supabase.instance nog niet
+  // bestaat (ARCHITECTURE.md §1/§7 stap 3).
+  await supabaseFuture;
 
   // Start de app snel — WorkManager init daarna (niet blocking voor UI).
   runApp(

@@ -68,6 +68,9 @@ dependencies:
   # Phase 16 — PWA install detection
   web: ^1.1.0
 
+  # Phase 19 — Supabase Auth
+  supabase_flutter: ^2.16.0
+
   # fl_chart arriveert in een latere fase
 
 dev_dependencies:
