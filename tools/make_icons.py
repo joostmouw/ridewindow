@@ -19,6 +19,12 @@ BRAND_DARK = (35, 73, 52)       # #234934
 
 FULL = sum(abs(a - b) for a, b in zip(SRC_DARK, SRC_LIGHT))
 
+# iOS standalone splash screens. Representative iPhone size classes; each one
+# needs a matching <link rel="apple-touch-startup-image"> media query in
+# web/index.html — add here and there together or the device silently falls
+# back to a blank canvas.
+SPLASH_SIZES = [(750, 1334), (1170, 2532), (1179, 2556), (1284, 2778), (1290, 2796)]
+
 
 def near(c, t, tol=40):
     return sum(abs(a - b) for a, b in zip(c, t)) < tol
@@ -102,6 +108,24 @@ def centred(content, canvas_size, coverage, bg=None):
     return canvas
 
 
+def centred_rect(content, width, height, coverage, bg):
+    """Scale `content` to `coverage` of the canvas *width* and centre it.
+
+    Width-relative rather than max-dimension (as `centred` is): splash canvases
+    are portrait and range from 750x1334 to 1290x2796, so scaling off the long
+    edge would make the mark balloon on the taller devices while staying small
+    on the 4.7" one.
+    """
+    canvas = Image.new('RGBA', (width, height), bg)
+    target = int(width * coverage)
+    cw, ch = content.size
+    scale = target / max(cw, ch)
+    resized = content.resize((max(1, round(cw * scale)), max(1, round(ch * scale))), Image.LANCZOS)
+    canvas.paste(resized, ((width - resized.width) // 2,
+                           (height - resized.height) // 2), resized)
+    return canvas
+
+
 def save(img, path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     img.save(path)
@@ -146,6 +170,15 @@ save(centred(glyph, 180, 0.64, bg=opaque), 'web/icons/Icon-apple-touch-180.png')
 # Maskable icons get cropped to the platform shape: full bleed, content in the safe zone.
 save(centred(glyph, 192, 0.60, bg=opaque), 'web/icons/Icon-maskable-192.png')
 save(centred(glyph, 512, 0.60, bg=opaque), 'web/icons/Icon-maskable-512.png')
+
+# The splash canvas is BRAND_LIGHT, matching manifest.json's background_color
+# and index.html's body background — so the handoff from splash to first Flutter
+# frame is invisible. That means the *mark alone* goes on it, not the rounded
+# square master: a light-green square on a light-green field would vanish.
+print('\nios splash — mark on the brand background:')
+for sw, sh in SPLASH_SIZES:
+    save(centred_rect(glyph, sw, sh, 0.30, opaque),
+         f'web/splash/apple-splash-{sw}x{sh}.png')
 
 print('\nplay store:')
 save(master.resize((512, 512), Image.LANCZOS), 'docs/play-store-icon-512.png')
