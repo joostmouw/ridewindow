@@ -8,6 +8,11 @@
 // lazy, niet-promptende autorisatiecontrole via isCalendarConnected() -- dit
 // staat los van, en verandert niets aan, de bestaande lazy-init-timing van
 // addRideSlotToCalendar()/getEvents() of het web warmUpForWeb()-pad.
+//
+// AUTH-05: sinds Phase 19 deelt Supabase-auth diezelfde gememoized
+// _sharedInitialize()-gate via de publieke ensureGoogleSignInReady() wrapper
+// hieronder -- GoogleSignIn.instance.initialize() mag nog steeds maar op
+// precies één plek in de hele codebase worden aangeroepen (zie die methode).
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,6 +21,15 @@ import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 
 class CalendarService {
+  // Web OAuth client ID (AUTH-05, PITFALLS.md #3): Supabase's
+  // signInWithIdToken verifieert de audience-claim ('aud') van het Google
+  // ID-token tegen exact deze web-client-ID. Dit is dezelfde waarde die al
+  // is ingebed in web/index.html's 'google-signin-client_id' meta-tag --
+  // niet opnieuw afleiden of raden, anders faalt Supabase-verificatie met
+  // een generieke "Invalid audience"-fout die niet naar deze regel wijst.
+  static const String _kGoogleWebClientId =
+      '300023366326-ddo399qf5lavv48njbfpm7rg0mc8cnno.apps.googleusercontent.com';
+
   // GoogleSignIn 7.x gebruikt een singleton via GoogleSignIn.instance.
   // initialize() wordt precies één keer aangeroepen, bewaakt door _initialized.
   static bool _initialized = false;
@@ -33,7 +47,9 @@ class CalendarService {
   static Future<void>? _initFuture;
 
   static Future<void> _sharedInitialize() {
-    return _initFuture ??= GoogleSignIn.instance.initialize().then((_) {
+    return _initFuture ??= GoogleSignIn.instance
+        .initialize(serverClientId: _kGoogleWebClientId)
+        .then((_) {
       _initialized = true;
     }).catchError((Object e, StackTrace st) {
       _initFuture = null;
@@ -42,6 +58,13 @@ class CalendarService {
       throw e;
     });
   }
+
+  /// Publieke ingang tot de gedeelde, gememoized init-gate (AUTH-05): andere
+  /// bestanden (Supabase-auth in Plan 19-03, de mismatch-check in Plan 19-05)
+  /// roepen dit aan in plaats van rechtstreeks [GoogleSignIn.instance.initialize]
+  /// te gebruiken -- die aanroep mag maar op één plek in de hele codebase
+  /// voorkomen (zie [_sharedInitialize]'s doc-comment hierboven).
+  static Future<void> ensureGoogleSignInReady() => _sharedInitialize();
 
   /// Web-only eager warmup (CAL-06): initialiseert GoogleSignIn.instance
   /// vooraf zodat er, tegen de tijd dat de gebruiker op "Add to calendar"
