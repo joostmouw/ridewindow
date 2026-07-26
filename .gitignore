@@ -65,3 +65,6 @@ firebase-debug.log
 
 # Claude Code — machine-local overrides, not shared across machines
 .claude/settings.local.json
+
+# Ondertekende juridische documenten -- horen niet in een publieke repo
+*DPA*.pdf
