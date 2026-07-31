@@ -1,15 +1,12 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/domain/models/block_type.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
 
-part 'availability_notifier.g.dart';
+export 'package:ridewindow/domain/models/block_type.dart' show BlockType;
 
-/// Beschrijft het type geblokkeerd uur.
-/// - [work]: geblokkeerd via een werk-preset (geseed door onboarding of profiel)
-/// - [custom]: handmatig geblokkeerd door de gebruiker
-/// - [calendar]: geimporteerd uit Google Calendar
-enum BlockType { work, custom, calendar }
+part 'availability_notifier.g.dart';
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
