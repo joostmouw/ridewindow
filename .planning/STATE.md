@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 19 code-compleet, suite groen (317/0). Geblokkeerd op 19-07 — `autonomous: false`,"
-last_updated: "2026-07-26T17:32:47.557Z"
-last_activity: 2026-07-26 -- Phase 19 plannen 01 t/m 06 afgerond; alleen 19-07 (handmatig) rest
+status: executing
+last_updated: "2026-07-31T14:55:27.699Z"
+last_activity: 2026-07-31 -- Phase 20 execution started
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 11
+  total_plans: 13
   completed_plans: 10
   percent: 20
 ---
@@ -38,13 +38,13 @@ Items acknowledged and deferred at v2.0 milestone close on 2026-07-17. The `audi
 See: .planning/PROJECT.md (updated 2026-07-25)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 19 — auth
+**Current focus:** Phase 20 — repository-refactor-local-only
 
 ## Current Position
 
-Phase: 19 (auth) — EXECUTING
-Plan: 6 of 7 afgerond (19-01 t/m 19-06); 19-07 open
-Status: Fase 19 code-compleet, suite groen (317/0). Geblokkeerd op 19-07 — `autonomous: false`,
+Phase: 20 (repository-refactor-local-only) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 20
 puur handwerk: `build/app/outputs/bundle/release/app-release.aab` (1.0.12+13, gebouwd 2026-07-26)
 uploaden naar de Play Console internal testing track, daarna installeren via de Store-link
 (nadrukkelijk niet een lokale APK — D-16/AUTH-10, alleen de Play App Signing SHA-1 bewijst het
@@ -53,7 +53,7 @@ in-/uitloggen + agenda-event + herstartpersistentie, iPhone-PWA installeren/stan
 inloggen/agenda-event, plus de koudestartmeting mét toestel, verbindingstype en methode (die
 methode wordt in fase 21 letterlijk herhaald voor REG-03).
 Fases 20, 21 en 22 hebben nog geen plannen (ROADMAP: TBD).
-Last activity: 2026-07-26 -- Phase 19 plannen 01 t/m 06 afgerond; alleen 19-07 (handmatig) rest
+Last activity: 2026-07-31 -- Phase 20 execution started
 
 ## Performance Metrics
 
