@@ -117,3 +117,12 @@ The repository-pattern shape established here (constructor-injected `SharedPrefe
 ---
 *Phase: 20-repository-refactor-local-only*
 *Completed: 2026-07-31*
+
+## Self-Check: PASSED
+
+All created files verified present on disk: `lib/domain/models/block_type.dart`,
+`lib/data/repositories/availability_repository.dart`,
+`test/data/repositories/availability_repository_test.dart`,
+`.planning/phases/20-repository-refactor-local-only/20-01-SUMMARY.md`,
+`.planning/phases/20-repository-refactor-local-only/deferred-items.md`.
+All 5 commits verified present in `git log`: `8569d0b`, `8824057`, `ed81177`, `09625cf`, `942fc26`.
