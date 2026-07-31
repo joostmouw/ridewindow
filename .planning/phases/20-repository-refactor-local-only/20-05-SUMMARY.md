@@ -143,3 +143,8 @@ Phase 21 (sync + migration) can now build on a codebase where all three local do
 ---
 *Phase: 20-repository-refactor-local-only*
 *Completed: 2026-07-31*
+
+## Self-Check: PASSED
+
+SUMMARY.md verified present on disk at `.planning/phases/20-repository-refactor-local-only/20-05-SUMMARY.md`.
+All 4 commits verified present in `git log`: `58cb63c`, `7755b98`, `c68772c`, `420055f`.
