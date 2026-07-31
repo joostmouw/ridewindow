@@ -89,3 +89,10 @@ All three domains (availability, profile, planned rides via 20-01/20-02/20-03) a
 ---
 *Phase: 20-repository-refactor-local-only*
 *Completed: 2026-07-31*
+
+## Self-Check: PASSED
+
+All created/modified files verified present on disk: `lib/platform/background_task.dart`,
+`test/structure/background_task_no_supabase_test.dart`,
+`.planning/phases/20-repository-refactor-local-only/20-04-SUMMARY.md`.
+All 3 commits verified present in `git log`: `e5fe9f7`, `43fbc5a`, `228592d`.
