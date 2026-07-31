@@ -150,11 +150,17 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
 
     // D-04: vul profile.userName alleen in als het nog leeg is, nooit
     // overschrijven.
+    // D-07 (fase 20): deze invulling gaat via het niet-stempelende
+    // schrijfpad hieronder -- de autofill komt van de app, niet van de
+    // gebruiker, en mag profile.updatedAt dus niet bewegen. Zou hij wel
+    // stempelen, dan leest fase 21 elk eerste inloggen op een nieuw toestel
+    // als een echte wijziging en toont hij een conflictdialoog terwijl er
+    // niets aan de hand is.
     if (!mounted) return;
     if (ref.read(profileProvider).value?.userName == null) {
       await ref
           .read(profileProvider.notifier)
-          .setUserName(account.displayName);
+          .setUserNameFromSignIn(account.displayName);
     }
     // D-07: geen succesbevestiging -- de sectie verandert zichtbaar, dat is
     // het bewijs.
