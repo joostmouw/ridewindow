@@ -1,96 +1,63 @@
-import 'dart:convert';
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:ridewindow/app/router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:ridewindow/data/repositories/planned_rides_repository.dart';
+import 'package:ridewindow/domain/models/planned_ride.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
+
+export 'package:ridewindow/domain/models/planned_ride.dart' show PlannedRide;
 
 part 'planned_rides_notifier.g.dart';
 
-class PlannedRide {
-  PlannedRide({
-    required this.start,
-    required this.end,
-    required this.plannedScore,
-  });
-
-  /// Start of the ride (inclusive).
-  final DateTime start;
-
-  /// End of the ride (exclusive, like RideSlot).
-  final DateTime end;
-
-  /// Overall score at the moment of planning.
-  final double plannedScore;
-
-  int get durationHours => end.difference(start).inHours;
-
-  Map<String, dynamic> toJson() => {
-        'start': start.toIso8601String(),
-        'end': end.toIso8601String(),
-        'plannedScore': plannedScore,
-      };
-
-  factory PlannedRide.fromJson(Map<String, dynamic> json) {
-    // Backwards compat: old format had 'time' (single hour)
-    if (json.containsKey('time') && !json.containsKey('start')) {
-      final time = DateTime.parse(json['time'] as String);
-      return PlannedRide(
-        start: time,
-        end: time.add(const Duration(hours: 1)),
-        plannedScore: (json['plannedScore'] as num).toDouble(),
-      );
-    }
-    return PlannedRide(
-      start: DateTime.parse(json['start'] as String),
-      end: DateTime.parse(json['end'] as String),
-      plannedScore: (json['plannedScore'] as num).toDouble(),
-    );
-  }
+/// Construeert de [PlannedRidesRepository]. Gebruikt bewust `getInstance()`
+/// (asynchroon), niet de app-brede prefs-provider hieronder — die gooit
+/// `UnimplementedError` tenzij overschreven, en de bestaande
+/// planned-rides-tests leunen allemaal op
+/// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+@riverpod
+Future<PlannedRidesRepository> plannedRidesRepository(Ref ref) async {
+  return PlannedRidesRepository(await SharedPreferences.getInstance());
 }
-
-const _kPrefsKey = 'planned_rides';
 
 @Riverpod(keepAlive: true)
 class PlannedRidesNotifier extends _$PlannedRidesNotifier {
   @override
-  List<PlannedRide> build() {
-    final prefs = ref.read(sharedPrefsProvider);
-    final raw = prefs.getString(_kPrefsKey);
-    if (raw == null) return [];
-    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
-    final now = DateTime.now();
-    final todayStart = DateTime(now.year, now.month, now.day);
-    return list
-        .map(PlannedRide.fromJson)
-        .where((r) => r.end.isAfter(todayStart))
-        .toList()
-      ..sort((a, b) => a.start.compareTo(b.start));
+  Future<List<PlannedRide>> build() async {
+    // D-11-reactiviteitstrigger: elke wijziging in authStateProvider (in-/
+    // uitloggen, accountwissel) veroorzaakt een lokale herlezing. De waarde
+    // zelf is hier niet nodig — er is nog geen cloud-pad.
+    ref.watch(authStateProvider);
+    final repo = await ref.watch(plannedRidesRepositoryProvider.future);
+    return repo.readLocal();
   }
 
-  void add(PlannedRide ride) {
+  Future<void> add(PlannedRide ride) async {
+    final current = state.value ?? const <PlannedRide>[];
     // Don't add exact duplicate
-    if (state.any((r) => r.start == ride.start && r.end == ride.end)) {
+    if (current.any((r) => r.start == ride.start && r.end == ride.end)) {
       return;
     }
-    state = [...state, ride]..sort((a, b) => a.start.compareTo(b.start));
-    _persist();
+    final next = [...current, ride]..sort((a, b) => a.start.compareTo(b.start));
+    final repo = await ref.read(plannedRidesRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
-  void remove(PlannedRide ride) {
-    state = state
+  Future<void> remove(PlannedRide ride) async {
+    final current = state.value ?? const <PlannedRide>[];
+    final next = current
         .where((r) => r.start != ride.start || r.end != ride.end)
         .toList();
-    _persist();
+    final repo = await ref.read(plannedRidesRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Wist alle geplande ritten (D-09: "start fresh" bij accountwissel).
-  void clearAll() {
-    state = [];
-    _persist();
-  }
-
-  void _persist() {
-    final prefs = ref.read(sharedPrefsProvider);
-    final json = jsonEncode(state.map((r) => r.toJson()).toList());
-    prefs.setString(_kPrefsKey, json);
+  /// Dit wist uitsluitend lokaal — er wordt geen cloud-aanroep gedaan (D-11).
+  Future<void> clearAll() async {
+    final repo = await ref.read(plannedRidesRepositoryProvider.future);
+    await repo.save(const <PlannedRide>[]);
+    state = const AsyncData(<PlannedRide>[]);
   }
 }
