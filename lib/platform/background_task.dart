@@ -11,14 +11,13 @@ import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/data/remote/open_meteo_client.dart';
+import 'package:ridewindow/data/repositories/availability_repository.dart';
+import 'package:ridewindow/data/repositories/profile_repository.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
-import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/domain/services/availability_filter.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
-import 'package:ridewindow/domain/services/availability_key.dart';
-import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
 
 /// Naam voor Workmanager.executeTask herkenning.
@@ -29,16 +28,6 @@ const kWeatherRefreshTaskTag = 'com.ridewindow.weatherRefresh';
 
 /// SharedPreferences sleutel voor lastRefreshed timestamp.
 const _kLastRefreshedKey = 'weather.lastRefreshed';
-
-/// SharedPreferences sleutel voor locatie-override.
-const _kLocationOverrideKey = 'profile.locationOverride';
-
-// SharedPreferences sleutels voor profiel (gespiegeld van ProfileNotifier)
-const _kTempMin = 'profile.tempMinIdealC';
-const _kTempMax = 'profile.tempMaxIdealC';
-const _kWindMax = 'profile.windMaxIdealKmh';
-const _kRainMax = 'profile.rainMaxIdealMm';
-const _kDurations = 'profile.allowedDurations';
 
 /// Top-level callback — MOET top-level zijn voor WorkManager isolate.
 /// @pragma voorkomt dat de Dart tree-shaker deze functie verwijdert in release-builds.
@@ -69,7 +58,8 @@ Future<void> _runWeatherRefresh() async {
   try {
     // 3. SharedPreferences ophalen voor locatie-override + profiel-instellingen
     final prefs = await SharedPreferences.getInstance();
-    final locationOverride = prefs.getString(_kLocationOverrideKey);
+    final profileRepo = ProfileRepository(prefs);
+    final locationOverride = profileRepo.readLocal().locationOverride;
 
     // 4. Bepaal lat/lon — locatie-override heeft prioriteit boven kDefaultLat/kDefaultLon
     double lat = kDefaultLat;
@@ -124,37 +114,13 @@ Future<RideSlot?> _computeNextSlot(
   SharedPreferences prefs,
   List<HourlyForecast> forecasts,
 ) async {
-  // Lees profiel-instellingen met dezelfde defaults als ProfileNotifier
-  final tolerances = WeatherTolerances(
-    tempMinIdealC: prefs.getDouble(_kTempMin) ?? 12.0,
-    tempMaxIdealC: prefs.getDouble(_kTempMax) ?? 26.0,
-    windMaxIdealKmh: prefs.getDouble(_kWindMax) ?? 15.0,
-    rainMaxIdealMm: prefs.getDouble(_kRainMax) ?? 0.5,
-  );
+  // Lees profiel-instellingen via ProfileRepository (zelfde bron als ProfileNotifier)
+  final profile = ProfileRepository(prefs).readLocal();
+  final tolerances = profile.tolerances;
+  final allowedDurations = profile.allowedDurations;
 
-  final durationStrings = prefs.getStringList(_kDurations) ?? ['2', '3', '5'];
-  final durations = durationStrings
-      .map((s) => int.tryParse(s) ?? 0)
-      .where((d) => d > 0)
-      .toList();
-  final allowedDurations = durations.isEmpty ? [2, 3, 5] : durations;
-
-  // Lees geblokkeerde uren (zelfde formaat als AvailabilityNotifier)
-  final blockedStrings =
-      prefs.getStringList('availability.blockedHours') ?? [];
-  final blockedHours = <DateTime, BlockType>{};
-  for (final entry in blockedStrings) {
-    try {
-      final parts = entry.split('|');
-      if (parts.length == 2) {
-        final dt = DateTime.parse(parts[0]);
-        final blockType = BlockType.values.byName(parts[1]);
-        blockedHours[canonicalHourKey(dt)] = blockType;
-      }
-    } catch (_) {
-      // Negeer corrupte entries
-    }
-  }
+  // Lees geblokkeerde uren via AvailabilityRepository (zelfde bron als AvailabilityNotifier)
+  final blockedHours = AvailabilityRepository(prefs).readLocal();
 
   // Score + genereer + filter — zelfde pipeline als SlotsNotifier
   final scoring = ScoringEngine();
