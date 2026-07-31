@@ -3,143 +3,52 @@ import 'dart:ui' as ui;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/repositories/profile_repository.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
+import 'package:ridewindow/domain/models/user_profile.dart';
+
+export 'package:ridewindow/domain/models/user_profile.dart' show UserProfile;
 
 part 'profile_notifier.g.dart';
 
-/// Immutable data class die alle gebruikersinstellingen bevat.
-/// Slaat WeatherTolerances op als nested object, rijlengte-voorkeuren als
-/// `List<int>`, thema als String, en drie notificatie-toggles als bool.
-class UserProfile {
-  const UserProfile({
-    required this.tolerances,
-    required this.allowedDurations,
-    required this.theme,
-    this.locale = 'nl',
-    this.locationOverride,
-    this.userName,
-    required this.notifEveningBefore,
-    required this.notifMorningOf,
-    required this.notifWeeklyDigest,
-  });
-
-  final WeatherTolerances tolerances;
-  final List<int> allowedDurations;
-  final String theme;
-  final String locale; // 'nl' or 'en'
-  final String? locationOverride;
-  final String? userName;
-  final bool notifEveningBefore;
-  final bool notifMorningOf;
-  final bool notifWeeklyDigest;
-
-  UserProfile copyWith({
-    WeatherTolerances? tolerances,
-    List<int>? allowedDurations,
-    String? theme,
-    String? locale,
-    Object? locationOverride = _sentinel,
-    Object? userName = _sentinel,
-    bool? notifEveningBefore,
-    bool? notifMorningOf,
-    bool? notifWeeklyDigest,
-  }) {
-    return UserProfile(
-      tolerances: tolerances ?? this.tolerances,
-      allowedDurations: allowedDurations ?? this.allowedDurations,
-      theme: theme ?? this.theme,
-      locale: locale ?? this.locale,
-      locationOverride: identical(locationOverride, _sentinel)
-          ? this.locationOverride
-          : locationOverride as String?,
-      userName: identical(userName, _sentinel)
-          ? this.userName
-          : userName as String?,
-      notifEveningBefore: notifEveningBefore ?? this.notifEveningBefore,
-      notifMorningOf: notifMorningOf ?? this.notifMorningOf,
-      notifWeeklyDigest: notifWeeklyDigest ?? this.notifWeeklyDigest,
-    );
-  }
+/// Construeert de [ProfileRepository]. Gebruikt bewust `getInstance()`
+/// (asynchroon), niet `sharedPrefsProvider` -- die gooit `UnimplementedError`
+/// tenzij overschreven, en de bestaande profiel-tests leunen allemaal op
+/// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+@riverpod
+Future<ProfileRepository> profileRepository(Ref ref) async {
+  return ProfileRepository(await SharedPreferences.getInstance());
 }
-
-/// Sentinel object voor nullable copyWith parameter.
-const _sentinel = Object();
 
 /// ProfileNotifier laadt alle scalaire gebruikersinstellingen uit SharedPreferences
 /// op cold start en schrijft iedere update direct terug.
 ///
-/// Iedere mutatiemethode: (1) schrijft naar SharedPreferences, (2) bouwt nieuw
-/// UserProfile via copyWith, (3) zet state = AsyncData(next).
+/// Persistentie loopt via [ProfileRepository]. Deze notifier is een dunne
+/// laag: hij houdt de publieke API en de mutatie-logica, de repository is de
+/// enige plek die het opslagformaat kent.
+///
+/// Iedere mutatiemethode: (1) leest de huidige state, (2) bouwt nieuw
+/// UserProfile via copyWith, (3) schrijft via de repository, (4) zet
+/// state = AsyncData(next).
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
 @riverpod
 class ProfileNotifier extends _$ProfileNotifier {
-  static const _keyTempMin = 'profile.tempMinIdealC';
-  static const _keyTempMax = 'profile.tempMaxIdealC';
-  static const _keyWindMax = 'profile.windMaxIdealKmh';
-  static const _keyRainMax = 'profile.rainMaxIdealMm';
-  static const _keyDurations = 'profile.allowedDurations';
-  static const _keyTheme = 'profile.theme';
-  static const _keyLocation = 'profile.locationOverride';
-  static const _keyUserName = 'profile.userName';
-  static const _keyLocale = 'profile.locale';
-  static const _keyNotifEvening = 'profile.notifEveningBefore';
-  static const _keyNotifMorning = 'profile.notifMorningOf';
-  static const _keyNotifWeekly = 'profile.notifWeeklyDigest';
-
   @override
   Future<UserProfile> build() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final tempMin = prefs.getDouble(_keyTempMin) ?? 12.0;
-    final tempMax = prefs.getDouble(_keyTempMax) ?? 26.0;
-    final windMax = prefs.getDouble(_keyWindMax) ?? 15.0;
-    final rainMax = prefs.getDouble(_keyRainMax) ?? 0.5;
-
-    final durationStrings =
-        prefs.getStringList(_keyDurations) ?? ['2', '3', '5'];
-    final durations = durationStrings
-        .map((s) => int.tryParse(s) ?? 0)
-        .where((d) => d > 0)
-        .toList();
-
-    final theme = prefs.getString(_keyTheme) ?? 'system';
-    final systemLang = ui.PlatformDispatcher.instance.locale.languageCode;
-    final locale = prefs.getString(_keyLocale) ?? (systemLang == 'nl' ? 'nl' : 'en');
-    final locationOverride = prefs.getString(_keyLocation);
-    final userName = prefs.getString(_keyUserName);
-    final notifEvening = prefs.getBool(_keyNotifEvening) ?? false;
-    final notifMorning = prefs.getBool(_keyNotifMorning) ?? false;
-    final notifWeekly = prefs.getBool(_keyNotifWeekly) ?? false;
-
-    return UserProfile(
-      tolerances: WeatherTolerances(
-        tempMinIdealC: tempMin,
-        tempMaxIdealC: tempMax,
-        windMaxIdealKmh: windMax,
-        rainMaxIdealMm: rainMax,
-      ),
-      allowedDurations: durations.isEmpty ? [2, 3, 5] : durations,
-      theme: theme,
-      locale: locale,
-      locationOverride: locationOverride,
-      userName: userName,
-      notifEveningBefore: notifEvening,
-      notifMorningOf: notifMorning,
-      notifWeeklyDigest: notifWeekly,
+    final repo = await ref.watch(profileRepositoryProvider.future);
+    return repo.readLocal(
+      systemLanguageCode: ui.PlatformDispatcher.instance.locale.languageCode,
     );
   }
 
   /// Schrijft de vier tolerantie-waarden naar SharedPreferences en update state.
   Future<void> updateTolerances(WeatherTolerances tolerances) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_keyTempMin, tolerances.tempMinIdealC);
-    await prefs.setDouble(_keyTempMax, tolerances.tempMaxIdealC);
-    await prefs.setDouble(_keyWindMax, tolerances.windMaxIdealKmh);
-    await prefs.setDouble(_keyRainMax, tolerances.rainMaxIdealMm);
-
     final current = await future;
-    state = AsyncData(current.copyWith(tolerances: tolerances));
+    final next = current.copyWith(tolerances: tolerances);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Togglet een rijduur: verwijdert als aanwezig, voegt toe als afwezig.
@@ -158,107 +67,102 @@ class ProfileNotifier extends _$ProfileNotifier {
       durations.sort();
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _keyDurations,
-      durations.map((d) => d.toString()).toList(),
-    );
-
-    state = AsyncData(current.copyWith(allowedDurations: durations));
+    final next = current.copyWith(allowedDurations: durations);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Schrijft de taalvoorkeur ('nl'|'en') naar SharedPreferences en update state.
   Future<void> setLocale(String locale) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyLocale, locale);
-
     final current = await future;
-    state = AsyncData(current.copyWith(locale: locale));
+    final next = current.copyWith(locale: locale);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Schrijft het thema ('system'|'light'|'dark') naar SharedPreferences en update state.
   Future<void> setTheme(String theme) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyTheme, theme);
-
     final current = await future;
-    state = AsyncData(current.copyWith(theme: theme));
+    final next = current.copyWith(theme: theme);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Schrijft de locatie-override naar SharedPreferences en update state.
   /// Geef null door om de override te wissen.
   Future<void> setLocationOverride(String? location) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (location == null) {
-      await prefs.remove(_keyLocation);
-    } else {
-      await prefs.setString(_keyLocation, location);
-    }
-
     final current = await future;
-    state = AsyncData(current.copyWith(locationOverride: location));
+    final next = current.copyWith(locationOverride: location);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Schrijft de gebruikersnaam naar SharedPreferences en update state.
+  /// Door de gebruiker getypt -- dit pad stempelt `profile.updatedAt` wel.
   Future<void> setUserName(String? name) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (name == null || name.trim().isEmpty) {
-      await prefs.remove(_keyUserName);
-    } else {
-      await prefs.setString(_keyUserName, name.trim());
-    }
-
     final current = await future;
-    state = AsyncData(
-      current.copyWith(userName: name?.trim().isEmpty == true ? null : name?.trim()),
-    );
+    final trimmed = name?.trim().isEmpty == true ? null : name?.trim();
+    final next = current.copyWith(userName: trimmed);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
+  }
+
+  /// Schrijft de gebruikersnaam naar SharedPreferences zonder `profile.updatedAt`
+  /// te bewegen (D-07).
+  ///
+  /// Deze schrijfactie komt van de app -- de automatische invulling van de
+  /// naam bij inloggen -- en niet van de gebruiker. Zou hij wel stempelen,
+  /// dan leest fase 21 elk eerste inloggen op een nieuw toestel als een
+  /// echte wijziging en toont hij een conflictdialoog terwijl er niets aan
+  /// de hand is. Gebruik [setUserName] voor door de gebruiker getypte namen.
+  Future<void> setUserNameFromSignIn(String? name) async {
+    final current = await future;
+    final trimmed = name?.trim().isEmpty == true ? null : name?.trim();
+    final next = current.copyWith(userName: trimmed);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next, stamp: false);
+    state = AsyncData(next);
   }
 
   /// Schrijft een notificatie-toggle naar SharedPreferences en update state.
   Future<void> setNotifEveningBefore(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyNotifEvening, value);
-
     final current = await future;
-    state = AsyncData(current.copyWith(notifEveningBefore: value));
+    final next = current.copyWith(notifEveningBefore: value);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Schrijft een notificatie-toggle naar SharedPreferences en update state.
   Future<void> setNotifMorningOf(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyNotifMorning, value);
-
     final current = await future;
-    state = AsyncData(current.copyWith(notifMorningOf: value));
+    final next = current.copyWith(notifMorningOf: value);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
   /// Schrijft een notificatie-toggle naar SharedPreferences en update state.
   Future<void> setNotifWeeklyDigest(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyNotifWeekly, value);
-
     final current = await future;
-    state = AsyncData(current.copyWith(notifWeeklyDigest: value));
+    final next = current.copyWith(notifWeeklyDigest: value);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.save(next);
+    state = AsyncData(next);
   }
 
-  /// Wist alle 11 profiel-sleutels uit SharedPreferences en herbouwt de
+  /// Wist alle 12 profiel-sleutels uit SharedPreferences en herbouwt de
   /// state met dezelfde default-constructielogica als [build] gebruikt --
   /// zodat een reset bitwise-identiek is aan een verse installatie, niet een
   /// handmatig gekopieerde benadering die kan afwijken (D-09).
   Future<void> resetToDefaults() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyTempMin);
-    await prefs.remove(_keyTempMax);
-    await prefs.remove(_keyWindMax);
-    await prefs.remove(_keyRainMax);
-    await prefs.remove(_keyDurations);
-    await prefs.remove(_keyTheme);
-    await prefs.remove(_keyLocation);
-    await prefs.remove(_keyUserName);
-    await prefs.remove(_keyLocale);
-    await prefs.remove(_keyNotifEvening);
-    await prefs.remove(_keyNotifMorning);
-    await prefs.remove(_keyNotifWeekly);
+    final repo = await ref.read(profileRepositoryProvider.future);
+    await repo.resetToDefaults();
 
     final systemLang = ui.PlatformDispatcher.instance.locale.languageCode;
     state = AsyncData(
