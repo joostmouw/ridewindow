@@ -57,7 +57,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 
 - [x] **Phase 18: Preconditions** - Constraint revision, EU Supabase region, SHA-1 and OAuth client audit, rewritten privacy policy naming two sub-processors, Data Safety declaration, and the other release-blocking groundwork — no app code (completed 2026-07-26)
 - [ ] **Phase 19: Auth** - Google Sign-In via Supabase `signInWithIdToken`, sign-out, cross-restart persistence, and a shared native/web bootstrap that reuses — rather than races — the existing Calendar integration's init gate
-- [ ] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement
+- [x] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement (completed 2026-07-31)
 - [ ] **Phase 21: Sync + migration** - Postgres sync of profile/availability/planned rides, an offline outbox, first-login and second-device conflict handling, row-level security, and account deletion
 - [ ] **Phase 22: Account-backed feedback** - In-app feedback (signed-in or anonymous) carrying scoring context, replacing the `mailto:` flow
 
@@ -198,7 +198,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
 | 19. Auth | v3.0 | 6/7 | In Progress|  |
-| 20. Repository refactor (local-only) | v3.0 | 1/2 | In Progress|  |
+| 20. Repository refactor (local-only) | v3.0 | 2/2 | Complete   | 2026-07-31 |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
 
