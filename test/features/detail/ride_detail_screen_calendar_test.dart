@@ -45,17 +45,20 @@ class FakeWeatherNotifier extends WeatherNotifier {
 
 class FakePlannedRidesNotifier extends PlannedRidesNotifier {
   @override
-  List<PlannedRide> build() => [];
+  Future<List<PlannedRide>> build() async => [];
 
   @override
-  void add(PlannedRide ride) {
-    state = [...state, ride];
+  Future<void> add(PlannedRide ride) async {
+    state = AsyncData([...?state.value, ride]);
   }
 
   @override
-  void remove(PlannedRide ride) {
-    state =
-        state.where((r) => r.start != ride.start || r.end != ride.end).toList();
+  Future<void> remove(PlannedRide ride) async {
+    state = AsyncData(
+      (state.value ?? const <PlannedRide>[])
+          .where((r) => r.start != ride.start || r.end != ride.end)
+          .toList(),
+    );
   }
 }
 
