@@ -558,7 +558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildPlannedRidesSliver() {
-    final plannedRides = ref.watch(plannedRidesProvider);
+    final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     if (plannedRides.isEmpty)
       return const SliverToBoxAdapter(child: SizedBox.shrink());
 
@@ -760,7 +760,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
 
       // Filter out already-planned rides
-      final planned = ref.watch(plannedRidesProvider);
+      final planned = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
       var slots = slotsState.slots.where((s) {
         return !planned.any((r) => r.start == s.start && r.end == s.end);
       }).toList();
@@ -1150,7 +1150,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   void _planRide(RideSlot slot) {
     final notifier = ref.read(plannedRidesProvider.notifier);
-    final already = ref.read(plannedRidesProvider).any(
+    final already = (ref.read(plannedRidesProvider).value ?? const <PlannedRide>[]).any(
           (r) => r.start == slot.start && r.end == slot.end,
         );
     if (already) {

@@ -810,7 +810,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   Widget _buildPlanRideBar(BuildContext context) {
     final rw = context.rw;
-    final plannedRides = ref.watch(plannedRidesProvider);
+    final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     final slot = _effectiveSlot;
     final isPlanned = plannedRides.any(
       (r) => r.start == slot.start && r.end == slot.end,

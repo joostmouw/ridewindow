@@ -166,7 +166,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
   }
 
   bool _isPlanned(DateTime day, int hour) {
-    final plannedRides = ref.read(plannedRidesProvider);
+    final plannedRides = ref.read(plannedRidesProvider).value ?? const <PlannedRide>[];
     final cellTime = DateTime(day.year, day.month, day.day, hour);
     final cellEnd = cellTime.add(const Duration(hours: 1));
     return plannedRides.any((r) =>
@@ -211,7 +211,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     final allScores = ref.watch(allHourlyScoresProvider);
     final weatherValue = ref.watch(weatherProvider);
     final locationAsync = ref.watch(locationProvider);
-    final plannedRides = ref.watch(plannedRidesProvider);
+    final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     final slots = (slotsState is SlotsLoaded) ? slotsState.slots : <RideSlot>[];
     final blockedHours = availValue.value ?? <DateTime, BlockType>{};
     final forecasts = weatherValue.value ?? <HourlyForecast>[];

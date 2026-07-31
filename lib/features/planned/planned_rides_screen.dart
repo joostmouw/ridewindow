@@ -132,7 +132,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rides = ref.watch(plannedRidesProvider);
+    final rides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     final allScores = ref.watch(allHourlyScoresProvider);
     final forecasts = ref.watch(weatherProvider).value ?? <HourlyForecast>[];
     final cityName = ref.watch(locationProvider).value?.city ?? '';
