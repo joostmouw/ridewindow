@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
 status: executing
-last_updated: "2026-07-31T14:55:27.699Z"
-last_activity: 2026-07-31 -- Phase 20 execution started
+last_updated: "2026-07-31T16:40:36.842Z"
+last_activity: 2026-07-31
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 13
-  completed_plans: 10
-  percent: 20
+  completed_phases: 2
+  total_plans: 16
+  completed_plans: 15
+  percent: 40
 ---
 
 # Project State
@@ -42,18 +42,25 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 ## Current Position
 
-Phase: 20 (repository-refactor-local-only) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 20
-puur handwerk: `build/app/outputs/bundle/release/app-release.aab` (1.0.12+13, gebouwd 2026-07-26)
-uploaden naar de Play Console internal testing track, daarna installeren via de Store-link
-(nadrukkelijk niet een lokale APK — D-16/AUTH-10, alleen de Play App Signing SHA-1 bewijst het
-juiste OAuth-client) en `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` aflopen: Android
-in-/uitloggen + agenda-event + herstartpersistentie, iPhone-PWA installeren/standalone/navigeren/
-inloggen/agenda-event, plus de koudestartmeting mét toestel, verbindingstype en methode (die
-methode wordt in fase 21 letterlijk herhaald voor REG-03).
-Fases 20, 21 en 22 hebben nog geen plannen (ROADMAP: TBD).
-Last activity: 2026-07-31 -- Phase 20 execution started
+Phase: 20 (repository-refactor-local-only) — COMPLETE (5/5 plannen: 20-01 t/m 20-05)
+Status: Fase 20 klaar. Availability-, profile- en planned-rides-persistence lopen nu door
+gedeelde plain-Dart repositories (`AvailabilityRepository`, `ProfileRepository`,
+`PlannedRidesRepository`); `background_task.dart` leest via diezelfde repositories en is
+Supabase-vrij bewezen (REG-05); `PlannedRidesNotifier` is async en reageert op
+`authStateProvider`. Volle suite: 349 geslaagd / 1 gefaald (de vooraf bestaande
+datumgrens-bug in `notification_service_test.dart`, faalt alleen op de laatste dag van de
+maand — niet veroorzaakt door fase 20). `flutter build apk --release` slaagt.
+Nog open van fase 19: 19-07 blijft handwerk — `build/app/outputs/bundle/release/app-release.aab`
+(1.0.12+13, gebouwd 2026-07-26) uploaden naar de Play Console internal testing track, daarna
+installeren via de Store-link (nadrukkelijk niet een lokale APK — D-16/AUTH-10, alleen de Play
+App Signing SHA-1 bewijst het juiste OAuth-client) en
+`.planning/phases/19-auth/REGRESSION-CHECKLIST.md` aflopen: Android in-/uitloggen + agenda-event
++ herstartpersistentie, iPhone-PWA installeren/standalone/navigeren/inloggen/agenda-event, plus
+de koudestartmeting mét toestel, verbindingstype en methode (die methode wordt in fase 21
+letterlijk herhaald voor REG-03).
+Fase 21 (Sync + migration) heeft nog geen plannen (ROADMAP: TBD) — volgende stap na fase 20.
+Last activity: 2026-07-31 -- Fase 20 volledig uitgevoerd (20-01 t/m 20-05), gemerged, release-build
+en volle testsuite zelf geverifieerd op main.
 
 ## Performance Metrics
 
