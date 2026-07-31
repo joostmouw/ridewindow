@@ -131,3 +131,11 @@ Two of the three domains (availability, profile) now sit behind repositories wit
 ---
 *Phase: 20-repository-refactor-local-only*
 *Completed: 2026-07-31*
+
+## Self-Check: PASSED
+
+All created files verified present on disk: `lib/domain/models/user_profile.dart`,
+`lib/data/repositories/profile_repository.dart`,
+`test/data/repositories/profile_repository_test.dart`,
+`.planning/phases/20-repository-refactor-local-only/20-02-SUMMARY.md`.
+All 6 commits verified present in `git log`: `fc9f5fe`, `36650d7`, `c35b13c`, `d00c621`, `86881b4`, `bc56090`.
