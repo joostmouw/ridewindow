@@ -57,7 +57,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 
 - [x] **Phase 18: Preconditions** - Constraint revision, EU Supabase region, SHA-1 and OAuth client audit, rewritten privacy policy naming two sub-processors, Data Safety declaration, and the other release-blocking groundwork — no app code (completed 2026-07-26)
 - [ ] **Phase 19: Auth** - Google Sign-In via Supabase `signInWithIdToken`, sign-out, cross-restart persistence, and a shared native/web bootstrap that reuses — rather than races — the existing Calendar integration's init gate
-- [x] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement (completed 2026-07-31)
+- [ ] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement (20-01/20-02 complete 2026-07-31; 20-03/20-04/20-05 planned, not yet executed)
 - [ ] **Phase 21: Sync + migration** - Postgres sync of profile/availability/planned rides, an offline outbox, first-login and second-device conflict handling, row-level security, and account deletion
 - [ ] **Phase 22: Account-backed feedback** - In-app feedback (signed-in or anonymous) carrying scoring context, replacing the `mailto:` flow
 
@@ -137,7 +137,13 @@ Plans:
   3. `PlannedRidesNotifier` is async and reacts to `authStateProvider` (rebuilds on sign-in/sign-out/account switch) without performing any cloud read or write yet
   4. The full existing automated test suite and `flutter build apk --release` both still pass after the refactor, with no cloud call added anywhere in this phase
 
-**Plans**: TBD
+**Plans**: 5 - 20-01 availability repository, 20-02 profile repository (both complete), 20-03 planned-rides repository + async auth-reactive notifier, 20-04 background_task.dart REG-05 cleanup, 20-05 wire UI consumers to the async contract + final suite/release-build gate
+Plans:
+- [x] 20-01-PLAN.md — AvailabilityRepository + thin AvailabilityNotifier
+- [x] 20-02-PLAN.md — ProfileRepository + thin ProfileNotifier + D-07 non-stamping sign-in autofill
+- [ ] 20-03-PLAN.md — PlannedRidesRepository + async, authStateProvider-reactive PlannedRidesNotifier
+- [ ] 20-04-PLAN.md — background_task.dart reads via ProfileRepository/AvailabilityRepository, REG-05
+- [ ] 20-05-PLAN.md — Wire Home/Planned/Detail/Agenda screens to the AsyncValue contract; full suite + release APK gate
 
 ### Phase 21: Sync + migration
 
@@ -198,7 +204,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
 | 19. Auth | v3.0 | 6/7 | In Progress|  |
-| 20. Repository refactor (local-only) | v3.0 | 2/2 | Complete   | 2026-07-31 |
+| 20. Repository refactor (local-only) | v3.0 | 2/5 | In Progress | - |
 | 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
 
