@@ -8,11 +8,64 @@ part of 'availability_notifier.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Construeert de [AvailabilityRepository]. Gebruikt bewust `getInstance()`
+/// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
+/// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
+/// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+
+@ProviderFor(availabilityRepository)
+final availabilityRepositoryProvider = AvailabilityRepositoryProvider._();
+
+/// Construeert de [AvailabilityRepository]. Gebruikt bewust `getInstance()`
+/// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
+/// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
+/// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+
+final class AvailabilityRepositoryProvider extends $FunctionalProvider<
+        AsyncValue<AvailabilityRepository>,
+        AvailabilityRepository,
+        FutureOr<AvailabilityRepository>>
+    with
+        $FutureModifier<AvailabilityRepository>,
+        $FutureProvider<AvailabilityRepository> {
+  /// Construeert de [AvailabilityRepository]. Gebruikt bewust `getInstance()`
+  /// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
+  /// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
+  /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+  AvailabilityRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'availabilityRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$availabilityRepositoryHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<AvailabilityRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<AvailabilityRepository> create(Ref ref) {
+    return availabilityRepository(ref);
+  }
+}
+
+String _$availabilityRepositoryHash() =>
+    r'6df4bff67e18c870b09d3fa7bc8936cd65106e08';
+
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
-/// Persistentie via SharedPreferences: entries worden opgeslagen als
-/// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
-/// onder de sleutel 'availability.blockedHours'.
+/// Persistentie loopt via [AvailabilityRepository]. Deze notifier is een
+/// dunne laag: hij houdt de publieke API en de mutatie-logica, de repository
+/// is de enige plek die het opslagformaat kent.
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
 
@@ -21,18 +74,18 @@ final availabilityProvider = AvailabilityNotifierProvider._();
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
-/// Persistentie via SharedPreferences: entries worden opgeslagen als
-/// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
-/// onder de sleutel 'availability.blockedHours'.
+/// Persistentie loopt via [AvailabilityRepository]. Deze notifier is een
+/// dunne laag: hij houdt de publieke API en de mutatie-logica, de repository
+/// is de enige plek die het opslagformaat kent.
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
 final class AvailabilityNotifierProvider extends $AsyncNotifierProvider<
     AvailabilityNotifier, Map<DateTime, BlockType>> {
   /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
   ///
-  /// Persistentie via SharedPreferences: entries worden opgeslagen als
-  /// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
-  /// onder de sleutel 'availability.blockedHours'.
+  /// Persistentie loopt via [AvailabilityRepository]. Deze notifier is een
+  /// dunne laag: hij houdt de publieke API en de mutatie-logica, de repository
+  /// is de enige plek die het opslagformaat kent.
   ///
   /// Volledig context-loos en testbaar via ProviderContainer.
   AvailabilityNotifierProvider._()
@@ -55,13 +108,13 @@ final class AvailabilityNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$availabilityNotifierHash() =>
-    r'54570178664817b3366050d09729b9e9dc5e1de3';
+    r'f314cae66962c2af0241ee8e46549bae2dbc2912';
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
-/// Persistentie via SharedPreferences: entries worden opgeslagen als
-/// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
-/// onder de sleutel 'availability.blockedHours'.
+/// Persistentie loopt via [AvailabilityRepository]. Deze notifier is een
+/// dunne laag: hij houdt de publieke API en de mutatie-logica, de repository
+/// is de enige plek die het opslagformaat kent.
 ///
 /// Volledig context-loos en testbaar via ProviderContainer.
 
