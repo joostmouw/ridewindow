@@ -90,12 +90,12 @@ class FakePlannedRidesNotifier extends PlannedRidesNotifier {
   final List<PlannedRide> added = [];
 
   @override
-  List<PlannedRide> build() => seed;
+  Future<List<PlannedRide>> build() async => seed;
 
   @override
-  void add(PlannedRide ride) {
+  Future<void> add(PlannedRide ride) async {
     added.add(ride);
-    state = [...state, ride];
+    state = AsyncData([...?state.value, ride]);
   }
 }
 
