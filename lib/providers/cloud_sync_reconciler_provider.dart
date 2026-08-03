@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
@@ -7,12 +8,67 @@ import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/services/account_sync_service.dart';
 import 'package:ridewindow/services/cloud_reconcile_service.dart';
 
 part 'cloud_sync_reconciler_provider.g.dart';
 
+/// Same key/value as the private `_kLastSyncedUidKey` constant in
+/// `account_section.dart` — Dart privacy is per-file, so this is an
+/// intentional duplication rather than an export, matching this codebase's
+/// existing convention for this exact problem (see `account_section.dart`'s
+/// own header comment on `_AccountSectionHeader` duplicating
+/// `profile_screen.dart`'s private `_SectionHeader` style).
+const _kLastSyncedUidKey = 'account.lastSyncedUid';
+
 @riverpod
 CloudSyncReconciler cloudSyncReconciler(Ref ref) => CloudSyncReconciler(ref);
+
+/// Constructs the real [AccountSyncService] (plan 21-06) with production
+/// dependencies (plan 21-07): the three repositories, the two cloud-read
+/// closures composed from `CloudReconcileService`'s pure row parsers plus
+/// the actual `.from(...).select()...` network calls, the
+/// `migrate_account_data` RPC closure, and the `account.lastSyncedUid`
+/// writer. `AccountSection._runAccountSync()` reads this via `.future`
+/// rather than constructing `AccountSyncService` inline, so widget tests can
+/// override it with a fake service instead of needing a live Supabase
+/// client (see `test/features/profile_account_section_test.dart`'s
+/// `FakeAccountSyncService`).
+@riverpod
+Future<AccountSyncService> accountSyncService(Ref ref) async {
+  final client = Supabase.instance.client;
+  final reconcile = CloudReconcileService();
+  final profileRepo = await ref.watch(profileRepositoryProvider.future);
+  final availabilityRepo = await ref.watch(availabilityRepositoryProvider.future);
+  final plannedRidesRepo = await ref.watch(plannedRidesRepositoryProvider.future);
+
+  return AccountSyncService(
+    profileRepo: profileRepo,
+    availabilityRepo: availabilityRepo,
+    plannedRidesRepo: plannedRidesRepo,
+    readCloudProfile: (userId) async {
+      final row = await client
+          .from(kProfilesTable)
+          .select()
+          .eq('user_id', userId)
+          .maybeSingle();
+      return reconcile.parseProfileRow(row);
+    },
+    readCloudAvailability: (userId) async {
+      final row = await client
+          .from(kAvailabilityTable)
+          .select()
+          .eq('user_id', userId)
+          .maybeSingle();
+      return reconcile.parseAvailabilityRow(row);
+    },
+    migrateFn: (params) => client.rpc(kMigrateAccountDataRpc, params: params),
+    writeLastSyncedUid: (userId) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kLastSyncedUidKey, userId);
+    },
+  );
+}
 
 /// Fire-and-forget foreground entry point (SYNC-04) — silently pulls a newer
 /// cloud row for profile/availability and adopts it locally.

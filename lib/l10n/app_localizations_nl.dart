@@ -549,7 +549,7 @@ class SNl extends S {
 
   @override
   String get accountSyncPromise =>
-      'Binnenkort: je instellingen en geplande ritten op al je apparaten.';
+      'Je instellingen en geplande ritten, op al je apparaten.';
 
   @override
   String get accountLoading => 'Bezig met laden…';
@@ -582,6 +582,26 @@ class SNl extends S {
 
   @override
   String get accountSwitchRestartAction => 'Opnieuw beginnen';
+
+  @override
+  String get accountConflictProfileTitle => 'Profielinstellingen verschillen';
+
+  @override
+  String get accountConflictProfileBody =>
+      'Je profielinstellingen verschillen tussen dit toestel en de cloud. Welke versie wil je bewaren?';
+
+  @override
+  String get accountConflictAvailabilityTitle => 'Beschikbaarheid verschilt';
+
+  @override
+  String get accountConflictAvailabilityBody =>
+      'Je beschikbaarheidskalender verschilt tussen dit toestel en de cloud. Welke versie wil je bewaren?';
+
+  @override
+  String get accountConflictKeepLocalAction => 'Dit toestel';
+
+  @override
+  String get accountConflictKeepCloudAction => 'Cloud';
 
   @override
   String calendarMismatchWarning(String email) {

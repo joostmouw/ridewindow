@@ -240,7 +240,7 @@
 
   "sectionAccount": "Account",
   "signInWithGoogle": "Inloggen met Google",
-  "accountSyncPromise": "Binnenkort: je instellingen en geplande ritten op al je apparaten.",
+  "accountSyncPromise": "Je instellingen en geplande ritten, op al je apparaten.",
   "accountLoading": "Bezig met laden…",
   "accountSignOut": "Uitloggen",
   "accountSignOutConfirmTitle": "Uitloggen?",
@@ -251,6 +251,12 @@
   "accountSwitchDialogBody": "Je bent nu ingelogd met een ander account dan voorheen op dit toestel. Wil je de gegevens op dit toestel bewaren, of opnieuw beginnen?",
   "accountSwitchKeepAction": "Gegevens bewaren",
   "accountSwitchRestartAction": "Opnieuw beginnen",
+  "accountConflictProfileTitle": "Profielinstellingen verschillen",
+  "accountConflictProfileBody": "Je profielinstellingen verschillen tussen dit toestel en de cloud. Welke versie wil je bewaren?",
+  "accountConflictAvailabilityTitle": "Beschikbaarheid verschilt",
+  "accountConflictAvailabilityBody": "Je beschikbaarheidskalender verschilt tussen dit toestel en de cloud. Welke versie wil je bewaren?",
+  "accountConflictKeepLocalAction": "Dit toestel",
+  "accountConflictKeepCloudAction": "Cloud",
   "calendarMismatchWarning": "Agenda gekoppeld aan een ander account: {email}",
   "@calendarMismatchWarning": {
     "placeholders": {
