@@ -167,23 +167,23 @@ Plans:
 
 **Wave 2** *(blocked on 21-02)*
 
-- [ ] 21-03-PLAN.md — Offline outbox: Drift table + DAO + SyncOutboxService.drain()
+- [x] 21-03-PLAN.md — Offline outbox: Drift table + DAO + SyncOutboxService.drain()
 
 **Wave 3** *(blocked on 21-02, 21-03)*
 
-- [ ] 21-04-PLAN.md — Cloud sink for profile + availability (row-shape conversion, outbox wiring, foreground reconcile)
+- [x] 21-04-PLAN.md — Cloud sink for profile + availability (row-shape conversion, outbox wiring, foreground reconcile)
 
 **Wave 4** *(blocked on 21-04)*
 
-- [ ] 21-05-PLAN.md — Cloud sink for planned rides (per-ride outbox, union-merge reconcile)
+- [x] 21-05-PLAN.md — Cloud sink for planned rides (per-ride outbox, union-merge reconcile)
 
 **Wave 5** *(blocked on 21-01, 21-04, 21-05)*
 
-- [ ] 21-06-PLAN.md — AccountSyncService (resolver + cloud composition, migrate_account_data RPC trigger, MIG-08 exact-shape test)
+- [x] 21-06-PLAN.md — AccountSyncService (resolver + cloud composition, migrate_account_data RPC trigger, MIG-08 exact-shape test)
 
 **Wave 6** *(blocked on 21-06)*
 
-- [ ] 21-07-PLAN.md — Wire AccountSyncService into sign-in flow, sequential conflict dialogs (D-04/D-05), sync status text (D-06/D-07)
+- [x] 21-07-PLAN.md — Wire AccountSyncService into sign-in flow, sequential conflict dialogs (D-04/D-05), sync status text (D-06/D-07)
 
 **Wave 7** *(blocked on 21-02, 21-07)*
 
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
 | 19. Auth | v3.0 | 6/7 | In Progress|  |
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
-| 21. Sync + migration | v3.0 | 2/9 | In Progress|  |
+| 21. Sync + migration | v3.0 | 7/9 | In Progress|  |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
