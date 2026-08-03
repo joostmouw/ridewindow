@@ -15,13 +15,16 @@
 ///   P04-4: Custom-cel heeft kleur 0xFFFF9800 (oranje)
 ///   P04-5: Tappen op werk-cel wijzigt celkleur niet (tap-tap-guard)
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -57,6 +60,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -79,6 +83,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -104,6 +109,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -130,6 +136,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -154,6 +161,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -190,6 +198,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider.overrideWith(
             () => FakeFilledAvailabilityNotifier({werkCelKey: BlockType.work}),
           ),
@@ -220,6 +229,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -242,6 +252,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider
               .overrideWith(() => FakeEmptyAvailabilityNotifier()),
         ],
@@ -273,6 +284,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider.overrideWith(
             () => FakeFilledAvailabilityNotifier(mapWithWork),
           ),
@@ -315,6 +327,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider.overrideWith(
             () => FakeFilledAvailabilityNotifier(mapWithCustom),
           ),
@@ -358,6 +371,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
           availabilityProvider.overrideWith(
             () => FakeFilledAvailabilityNotifier(mapWithWork),
           ),
@@ -424,6 +438,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
             availabilityProvider
                 .overrideWith(() => FakeEmptyAvailabilityNotifier()),
           ],
@@ -550,6 +565,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
             availabilityProvider.overrideWith(notifierFactory),
           ],
           child: MaterialApp(
@@ -780,6 +796,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+          appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
             availabilityProvider.overrideWith(notifierFactory),
           ],
           child: MaterialApp(

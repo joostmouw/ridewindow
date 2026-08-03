@@ -12,6 +12,11 @@ part of 'profile_notifier.dart';
 /// (asynchroon), niet `sharedPrefsProvider` -- die gooit `UnimplementedError`
 /// tenzij overschreven, en de bestaande profiel-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+/// (`userId == null`) construeert nog steeds een repository, alleen een
+/// waarvan de outbox-schrijvingen no-ops zijn per
+/// [ProfileRepository]'s eigen guard.
 
 @ProviderFor(profileRepository)
 final profileRepositoryProvider = ProfileRepositoryProvider._();
@@ -20,6 +25,11 @@ final profileRepositoryProvider = ProfileRepositoryProvider._();
 /// (asynchroon), niet `sharedPrefsProvider` -- die gooit `UnimplementedError`
 /// tenzij overschreven, en de bestaande profiel-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+/// (`userId == null`) construeert nog steeds een repository, alleen een
+/// waarvan de outbox-schrijvingen no-ops zijn per
+/// [ProfileRepository]'s eigen guard.
 
 final class ProfileRepositoryProvider extends $FunctionalProvider<
         AsyncValue<ProfileRepository>,
@@ -32,6 +42,11 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   /// (asynchroon), niet `sharedPrefsProvider` -- die gooit `UnimplementedError`
   /// tenzij overschreven, en de bestaande profiel-tests leunen allemaal op
   /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+  ///
+  /// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+  /// (`userId == null`) construeert nog steeds een repository, alleen een
+  /// waarvan de outbox-schrijvingen no-ops zijn per
+  /// [ProfileRepository]'s eigen guard.
   ProfileRepositoryProvider._()
       : super(
           from: null,
@@ -58,7 +73,7 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$profileRepositoryHash() => r'71a0d60c85bf0437b8ab30e03e5988fb34505800';
+String _$profileRepositoryHash() => r'8003869af3940609163f725dd56ff8232d538fb6';
 
 /// ProfileNotifier laadt alle scalaire gebruikersinstellingen uit SharedPreferences
 /// op cold start en schrijft iedere update direct terug.
@@ -121,7 +136,7 @@ final class ProfileNotifierProvider
   ProfileNotifier create() => ProfileNotifier();
 }
 
-String _$profileNotifierHash() => r'ed8493d620cace731621a7f4fe898b0768c87353';
+String _$profileNotifierHash() => r'7333f0e465828f0b1497fda0cc0daff1c6c72e1e';
 
 /// ProfileNotifier laadt alle scalaire gebruikersinstellingen uit SharedPreferences
 /// op cold start en schrijft iedere update direct terug.

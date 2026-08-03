@@ -12,6 +12,11 @@ part of 'availability_notifier.dart';
 /// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
 /// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+/// (`userId == null`) construeert nog steeds een repository, alleen een
+/// waarvan de outbox-schrijvingen no-ops zijn per
+/// [AvailabilityRepository]'s eigen guard.
 
 @ProviderFor(availabilityRepository)
 final availabilityRepositoryProvider = AvailabilityRepositoryProvider._();
@@ -20,6 +25,11 @@ final availabilityRepositoryProvider = AvailabilityRepositoryProvider._();
 /// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
 /// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+/// (`userId == null`) construeert nog steeds een repository, alleen een
+/// waarvan de outbox-schrijvingen no-ops zijn per
+/// [AvailabilityRepository]'s eigen guard.
 
 final class AvailabilityRepositoryProvider extends $FunctionalProvider<
         AsyncValue<AvailabilityRepository>,
@@ -32,6 +42,11 @@ final class AvailabilityRepositoryProvider extends $FunctionalProvider<
   /// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
   /// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
   /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+  ///
+  /// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+  /// (`userId == null`) construeert nog steeds een repository, alleen een
+  /// waarvan de outbox-schrijvingen no-ops zijn per
+  /// [AvailabilityRepository]'s eigen guard.
   AvailabilityRepositoryProvider._()
       : super(
           from: null,
@@ -59,7 +74,7 @@ final class AvailabilityRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$availabilityRepositoryHash() =>
-    r'6df4bff67e18c870b09d3fa7bc8936cd65106e08';
+    r'4ed60c31efbb0ddb274b46a9aba1ebe4038379c8';
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///
@@ -108,7 +123,7 @@ final class AvailabilityNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$availabilityNotifierHash() =>
-    r'f314cae66962c2af0241ee8e46549bae2dbc2912';
+    r'f95c802298f2f0b46891b6ae154888e827465167';
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///

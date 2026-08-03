@@ -1,9 +1,23 @@
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
+
+/// Task 3 (plan 21-04): profileRepositoryProvider now also watches
+/// appDatabaseProvider (for the outbox DAO). The real appDatabaseProvider
+/// opens a disk-backed Drift database via path_provider, which needs a real
+/// platform channel unavailable in a plain `test()` (no widget binding) —
+/// every ProviderContainer in this suite therefore overrides it with an
+/// in-memory database.
+List<Override> _testOverrides() => [
+      appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
+    ];
 
 void main() {
   setUp(() {
@@ -12,7 +26,7 @@ void main() {
 
   group('ProfileNotifier', () {
     test('cold start defaults — leeg SharedPreferences levert defaults op', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       final profile = await container.read(profileProvider.future);
@@ -30,7 +44,7 @@ void main() {
     });
 
     test('persist tolerances — wijzigingen overleven dispose/re-create cyclus', () async {
-      final container1 = ProviderContainer();
+      final container1 = ProviderContainer(overrides: _testOverrides());
       await container1.read(profileProvider.future);
 
       const updated = WeatherTolerances(
@@ -43,7 +57,7 @@ void main() {
       await container1.read(profileProvider.notifier).updateTolerances(updated);
       container1.dispose();
 
-      final container2 = ProviderContainer();
+      final container2 = ProviderContainer(overrides: _testOverrides());
       addTearDown(container2.dispose);
 
       final profile = await container2.read(profileProvider.future);
@@ -55,7 +69,7 @@ void main() {
     });
 
     test('toggleDuration removes — [2,3,5] → toggle 3 → [2,5]', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       await container.read(profileProvider.future);
@@ -71,7 +85,7 @@ void main() {
         'profile.allowedDurations': ['2'],
       });
 
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       await container.read(profileProvider.future);

@@ -1,4 +1,4 @@
-import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/domain/models/block_type.dart';
 
 /// Canonieke sleutel voor een geblokkeerd uur.
 ///
@@ -91,3 +91,51 @@ BlockType? blockTypeAt(DateTime hour, Map<DateTime, BlockType> blockedHours) =>
 /// Zoals [blockTypeAt], maar alleen de ja/nee-vraag.
 bool isHourBlocked(DateTime hour, Map<DateTime, BlockType> blockedHours) =>
     BlockedHours(blockedHours).isBlocked(hour);
+
+/// weekdag(1-7) * 24 + uur(0-23) — dezelfde formule als [BlockedHours]'
+/// interne `_slotOf`, hier publiek en herbruikbaar gemaakt voor de
+/// cloud-rijvorm (SYNC-01/SYNC-02).
+int recurringSlotKey(DateTime canonicalHour) =>
+    canonicalHour.weekday * 24 + canonicalHour.hour;
+
+/// SYNC-10: [BlockType.calendar]-entries zijn datum-specifiek en gaan nooit
+/// het toestel af — dezelfde redenering als bij de Drift forecast-cache
+/// (SYNC-09). Alleen work/custom overleven in de cloud-rij.
+///
+/// Levert de `recurring` jsonb-vorm van `public.availability`:
+/// `{"<weekdag>-<uur>": "<blocktype>"}`, string-sleutels, string-waarden.
+Map<String, dynamic> toRecurringRow(Map<DateTime, BlockType> hours) {
+  final recurring = <String, String>{};
+  for (final entry in hours.entries) {
+    if (entry.value == BlockType.calendar) continue;
+    final key = canonicalHourKey(entry.key);
+    recurring['${key.weekday}-${key.hour}'] = entry.value.name;
+  }
+  return recurring;
+}
+
+/// Reconstrueert een lokaal-opslagvormige map uit een gepulde cloud
+/// `recurring`-rij. Het cloud-formaat is weekdag+uur-abstract (geen
+/// concrete datum), dus elk slot wordt op [weekAnchor]'s week gelegd
+/// (standaard: de maandag van de huidige week) — dezelfde conventie als
+/// `buildPreset`'s `weekStart.weekday == DateTime.monday`.
+Map<DateTime, BlockType> fromRecurringJson(
+  Map<String, dynamic> recurring, {
+  DateTime? weekAnchor,
+}) {
+  final now = weekAnchor ?? DateTime.now();
+  final monday = DateTime(now.year, now.month, now.day)
+      .subtract(Duration(days: now.weekday - 1));
+  final result = <DateTime, BlockType>{};
+  for (final entry in recurring.entries) {
+    final parts = entry.key.split('-');
+    if (parts.length != 2) continue;
+    final weekday = int.tryParse(parts[0]);
+    final hour = int.tryParse(parts[1]);
+    if (weekday == null || hour == null) continue;
+    final date = monday.add(Duration(days: weekday - 1, hours: hour));
+    final blockType = BlockType.values.byName(entry.value as String);
+    result[date] = blockType;
+  }
+  return result;
+}

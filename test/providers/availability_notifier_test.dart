@@ -1,8 +1,22 @@
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+
+/// Task 3 (plan 21-04): availabilityRepositoryProvider now also watches
+/// appDatabaseProvider (for the outbox DAO). The real appDatabaseProvider
+/// opens a disk-backed Drift database via path_provider, which needs a real
+/// platform channel unavailable in a plain `test()` (no widget binding) —
+/// every ProviderContainer in this suite therefore overrides it with an
+/// in-memory database.
+List<Override> _testOverrides() => [
+      appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory())),
+    ];
 
 void main() {
   setUp(() {
@@ -11,7 +25,7 @@ void main() {
 
   group('AvailabilityNotifier', () {
     test('cold start empty — nieuw container levert lege Map<DateTime, BlockType> op', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       final blocked = await container.read(availabilityProvider.future);
@@ -19,7 +33,7 @@ void main() {
     });
 
     test('toggle adds hour — toggleCustomHour voegt BlockType.custom entry toe', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       final dt = DateTime(2026, 6, 14, 9, 0);
@@ -31,7 +45,7 @@ void main() {
     });
 
     test('toggle removes hour — toggleCustomHour tweemaal verwijdert de entry', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       final dt = DateTime(2026, 6, 14, 10, 0);
@@ -43,7 +57,7 @@ void main() {
     });
 
     test('seedPreset zet de work-blokken — dt aanwezig met BlockType.work', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       final dt = DateTime(2026, 6, 16, 8, 0);
@@ -55,7 +69,7 @@ void main() {
     });
 
     test('seedPreset laat custom- en calendar-blokken staan (audit C1)', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
       final notifier = container.read(availabilityProvider.notifier);
 
@@ -75,7 +89,7 @@ void main() {
     });
 
     test('seedPreset vervangt eerdere work-blokken', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
       final notifier = container.read(availabilityProvider.notifier);
 
@@ -90,7 +104,7 @@ void main() {
     });
 
     test('clearAll wist de volledige map', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(overrides: _testOverrides());
       addTearDown(container.dispose);
 
       final dt = DateTime(2026, 6, 16, 9, 0);
@@ -102,12 +116,12 @@ void main() {
     });
 
     test('persists across re-create — toggleCustomHour dan dispose dan nieuw container → dt aanwezig met BlockType.custom', () async {
-      final container1 = ProviderContainer();
+      final container1 = ProviderContainer(overrides: _testOverrides());
       final dt = DateTime(2026, 6, 15, 8, 0);
       await container1.read(availabilityProvider.notifier).toggleCustomHour(dt);
       container1.dispose();
 
-      final container2 = ProviderContainer();
+      final container2 = ProviderContainer(overrides: _testOverrides());
       addTearDown(container2.dispose);
 
       final blocked = await container2.read(availabilityProvider.future);

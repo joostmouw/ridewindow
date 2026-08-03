@@ -1,7 +1,7 @@
 import '../models/ride_slot.dart';
 import '../models/ride_tier.dart';
+import 'package:ridewindow/domain/models/block_type.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
-import 'package:ridewindow/providers/availability_notifier.dart';
 
 /// Filters ride slots by availability and quality tier.
 /// Poor-tier slots (score < 50) are hidden from the UI per SLOT-04.

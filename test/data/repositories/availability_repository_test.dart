@@ -1,6 +1,11 @@
+import 'dart:convert';
+
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/data/repositories/availability_repository.dart';
 import 'package:ridewindow/domain/models/block_type.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
@@ -104,5 +109,75 @@ void main() {
   test('Test 6 — readUpdatedAt() geeft null op een installatie zonder dat veld',
       () async {
     expect(repo.readUpdatedAt(), isNull);
+  });
+
+  group('outbox-aware save (Task 2, SYNC-12)', () {
+    late AppDatabase db;
+
+    setUp(() {
+      db = AppDatabase(NativeDatabase.memory());
+    });
+
+    tearDown(() async {
+      await db.close();
+    });
+
+    test(
+        'a single save() with 5 hour changes enqueues exactly one outbox row '
+        'matching toRecurringRow(hours)', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedInRepo = AvailabilityRepository(
+        prefs,
+        outbox: db.syncOutboxDao,
+        userId: 'uid-1',
+      );
+
+      final hours = {
+        DateTime(2026, 7, 27, 9): BlockType.work,
+        DateTime(2026, 7, 27, 10): BlockType.work,
+        DateTime(2026, 7, 28, 17): BlockType.custom,
+        DateTime(2026, 7, 29, 8): BlockType.custom,
+        DateTime(2026, 7, 30, 14): BlockType.calendar,
+      };
+
+      await signedInRepo.save(hours);
+
+      final pending = await db.syncOutboxDao.pendingRows();
+      expect(pending, hasLength(1));
+      expect(pending.single.entity, kOutboxEntityAvailability);
+      expect(pending.single.entityKey, 'uid-1');
+      expect(pending.single.operation, 'upsert');
+      expect(
+        jsonDecode(pending.single.payload),
+        equals(toRecurringRow(hours)),
+      );
+    });
+
+    test(
+        'constructed without outbox/userId enqueues nothing and keeps '
+        'existing local-write behaviour', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedOutRepo = AvailabilityRepository(prefs);
+
+      await signedOutRepo.save(
+        {DateTime(2026, 7, 27, 9): BlockType.custom},
+      );
+
+      expect(signedOutRepo.readLocal().length, 1);
+    });
+
+    test('stampUpdatedAt(value) sets the exact epoch-ms value, not now()',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = AvailabilityRepository(prefs);
+      final known = DateTime.fromMillisecondsSinceEpoch(1700000000000);
+
+      await repo.stampUpdatedAt(known);
+
+      expect(repo.readUpdatedAt(), 1700000000000);
+    });
   });
 }

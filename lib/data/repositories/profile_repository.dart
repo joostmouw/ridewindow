@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/domain/models/user_profile.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 
@@ -9,10 +13,20 @@ import 'package:ridewindow/domain/models/weather_tolerances.dart';
 /// Alle sleutelstrings, typen en defaults zijn letterlijk hetzelfde als wat
 /// vroeger in `ProfileNotifier` stond (D-01) -- deze klasse is een
 /// verhuizing, geen verbouwing.
+///
+/// [outbox]/[userId] zijn optioneel en additief (ARCHITECTURE.md §4a): als
+/// beide gezet zijn (signed-in), enqueuet elke [save] een cloud-schrijving
+/// via de outbox. Zonder outbox/userId (signed-out, of de bestaande
+/// `background_task.dart`-aanroepstijl) is dit een stille no-op, exact zoals
+/// het patroon dat dit vervangt. Deze klasse importeert bewust nooit de
+/// cloud-SDK zelf (REG-05) — de outbox is een Drift-only afhankelijkheid.
 class ProfileRepository {
-  ProfileRepository(this._prefs);
+  ProfileRepository(this._prefs, {SyncOutboxDao? outbox, this.userId})
+      : _outbox = outbox;
 
   final SharedPreferences _prefs;
+  final SyncOutboxDao? _outbox;
+  final String? userId;
 
   static const kTempMinKey = 'profile.tempMinIdealC';
   static const kTempMaxKey = 'profile.tempMaxIdealC';
@@ -112,7 +126,25 @@ class ProfileRepository {
         DateTime.now().millisecondsSinceEpoch,
       );
     }
+
+    if (_outbox != null && userId != null) {
+      await _outbox.enqueueOrCoalesce(
+        entity: kOutboxEntityProfile,
+        entityKey: userId!,
+        operation: 'upsert',
+        payload: jsonEncode(profile.toRow(userId!)),
+      );
+    }
   }
+
+  /// Zet [kUpdatedAtKey] op een expliciete waarde in plaats van "nu" — alleen
+  /// gebruikt bij het overnemen van een gepulde cloud-rij, zodat de lokale
+  /// tijdstempel weerspiegelt wanneer de CLOUD-data voor het laatst
+  /// veranderde, niet wanneer dit toestel toevallig pulde. Zonder dit zou
+  /// `resolveAccountSync` lokaal "nu" als nieuwer zien dan de cloud bij de
+  /// eerstvolgende vergelijking, terwijl er lokaal niets echt veranderd is.
+  Future<void> stampUpdatedAt(DateTime value) =>
+      _prefs.setInt(kUpdatedAtKey, value.millisecondsSinceEpoch);
 
   /// Verwijdert alle twaalf profiel-sleutels én [kUpdatedAtKey].
   ///

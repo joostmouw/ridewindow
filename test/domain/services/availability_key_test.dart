@@ -102,4 +102,76 @@ void main() {
     expect(blockTypeAt(DateTime(2026, 7, 27, 9), const {}), isNull);
     expect(isHourBlocked(DateTime(2026, 7, 27, 9), const {}), isFalse);
   });
+
+  group('recurringSlotKey', () {
+    test('matcht dezelfde formule als BlockedHours interne _slotOf', () {
+      // maandag 2026-07-27, 9u: weekday=1, hour=9 -> 1*24+9 = 33
+      expect(recurringSlotKey(DateTime(2026, 7, 27, 9)), 33);
+    });
+  });
+
+  group('toRecurringRow — SYNC-10: calendar-entries gaan nooit mee', () {
+    test('bevat alleen work/custom als "weekdag-uur": "blocktype" paren', () {
+      final hours = {
+        DateTime(2026, 7, 27, 9): BlockType.work, // maandag
+        DateTime(2026, 7, 28, 17): BlockType.custom, // dinsdag
+        DateTime(2026, 7, 29, 14): BlockType.calendar, // woensdag
+      };
+      final row = toRecurringRow(hours);
+
+      expect(row.length, 2);
+      expect(row['1-9'], 'work');
+      expect(row['2-17'], 'custom');
+      expect(row.values.contains('calendar'), isFalse);
+    });
+
+    test('een uitsluitend-calendar map levert een lege recurring-rij op', () {
+      final row = toRecurringRow({
+        DateTime(2026, 7, 27, 9): BlockType.calendar,
+      });
+      expect(row, isEmpty);
+    });
+  });
+
+  group('fromRecurringJson', () {
+    test('materialiseert weekdag-uur sleutels op de huidige week', () {
+      final now = DateTime.now();
+      final monday = DateTime(now.year, now.month, now.day)
+          .subtract(Duration(days: now.weekday - 1));
+
+      final result = fromRecurringJson({'2-9': 'work', '2-17': 'custom'});
+
+      expect(result.length, 2);
+      final tuesday9 = monday.add(const Duration(days: 1, hours: 9));
+      final tuesday17 = monday.add(const Duration(days: 1, hours: 17));
+      expect(result[tuesday9], BlockType.work);
+      expect(result[tuesday17], BlockType.custom);
+      expect(tuesday9.weekday, DateTime.tuesday);
+    });
+
+    test('negeert misvormde sleutels stilzwijgend', () {
+      final result = fromRecurringJson({'onzin': 'work', '2-9': 'work'});
+      expect(result.length, 1);
+    });
+  });
+
+  group('toRecurringRow / fromRecurringJson — round-trip (SYNC-10)', () {
+    test('(weekdag, uur, BlockType) triples overleven de heenreis-terugreis', () {
+      final hours = {
+        DateTime(2026, 7, 27, 9): BlockType.work, // maandag
+        DateTime(2026, 7, 28, 17): BlockType.custom, // dinsdag
+      };
+
+      final roundTripped = fromRecurringJson(toRecurringRow(hours));
+
+      final originalTriples = hours.entries
+          .map((e) => (recurringSlotKey(e.key), e.value))
+          .toSet();
+      final roundTrippedTriples = roundTripped.entries
+          .map((e) => (recurringSlotKey(e.key), e.value))
+          .toSet();
+
+      expect(roundTrippedTriples, originalTriples);
+    });
+  });
 }

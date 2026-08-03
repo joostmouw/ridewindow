@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/data/repositories/profile_repository.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/domain/models/user_profile.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 
 export 'package:ridewindow/domain/models/user_profile.dart' show UserProfile;
 
@@ -15,9 +17,20 @@ part 'profile_notifier.g.dart';
 /// (asynchroon), niet `sharedPrefsProvider` -- die gooit `UnimplementedError`
 /// tenzij overschreven, en de bestaande profiel-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+/// (`userId == null`) construeert nog steeds een repository, alleen een
+/// waarvan de outbox-schrijvingen no-ops zijn per
+/// [ProfileRepository]'s eigen guard.
 @riverpod
 Future<ProfileRepository> profileRepository(Ref ref) async {
-  return ProfileRepository(await SharedPreferences.getInstance());
+  final userId = ref.watch(currentUserIdProvider);
+  final outbox = ref.watch(appDatabaseProvider).syncOutboxDao;
+  return ProfileRepository(
+    await SharedPreferences.getInstance(),
+    outbox: outbox,
+    userId: userId,
+  );
 }
 
 /// ProfileNotifier laadt alle scalaire gebruikersinstellingen uit SharedPreferences
@@ -36,6 +49,11 @@ Future<ProfileRepository> profileRepository(Ref ref) async {
 class ProfileNotifier extends _$ProfileNotifier {
   @override
   Future<UserProfile> build() async {
+    // ARCHITECTURE.md §1: rebuild op in-/uitloggen/account-wissel, ook al
+    // gebruikt build() de waarde zelf niet -- readLocal() blijft synchroon
+    // en netwerkloos (SYNC-07); alleen de foreground-reconciler (Task 3)
+    // pult ooit de cloud.
+    ref.watch(authStateProvider);
     final repo = await ref.watch(profileRepositoryProvider.future);
     return repo.readLocal(
       systemLanguageCode: ui.PlatformDispatcher.instance.locale.languageCode,

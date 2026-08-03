@@ -7,9 +7,10 @@ const kFeedbackTable = 'feedback';
 const kMigrateAccountDataRpc = 'migrate_account_data';
 const kDeleteOwnAccountRpc = 'delete_own_account';
 
-/// Outbox entity type strings — must match SyncOutboxDao's `entity` column
-/// values exactly (plain strings, not an enum, because the Drift column is
-/// TEXT and this keeps encode/decode trivial).
-const kOutboxEntityProfile = 'profile';
-const kOutboxEntityAvailability = 'availability';
-const kOutboxEntityPlannedRide = 'planned_ride';
+// Outbox entity type strings moved to
+// lib/data/database/sync_outbox_entity_types.dart (plan 21-04) — see that
+// file's doc comment for why they can no longer live here: repositories
+// reachable from lib/platform/background_task.dart (REG-05) need them, and
+// this file's own NAME contains "supabase", which breaks
+// test/structure/background_task_no_supabase_test.dart's substring check
+// even though this file's contents never import package:supabase_flutter.

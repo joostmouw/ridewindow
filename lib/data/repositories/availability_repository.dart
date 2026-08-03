@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/domain/models/block_type.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
 
@@ -8,10 +12,20 @@ import 'package:ridewindow/domain/services/availability_key.dart';
 /// Persistentie via SharedPreferences: entries worden opgeslagen als
 /// "ISO8601|blocktype" strings (bv. "2026-06-14T09:00:00.000Z|custom")
 /// onder de sleutel [kBlockedHoursKey].
+///
+/// [outbox]/[userId] zijn optioneel en additief (ARCHITECTURE.md §4a): als
+/// beide gezet zijn (signed-in), enqueuet elke [save] precies één
+/// cloud-schrijving via de outbox (SYNC-12), ongeacht hoeveel uren wijzigden
+/// in die aanroep. Zonder outbox/userId is dit een stille no-op, exact zoals
+/// het patroon dat dit vervangt. Deze klasse importeert bewust nooit de
+/// cloud-SDK zelf (REG-05) — de outbox is een Drift-only afhankelijkheid.
 class AvailabilityRepository {
-  AvailabilityRepository(this._prefs);
+  AvailabilityRepository(this._prefs, {SyncOutboxDao? outbox, this.userId})
+      : _outbox = outbox;
 
   final SharedPreferences _prefs;
+  final SyncOutboxDao? _outbox;
+  final String? userId;
 
   static const kBlockedHoursKey = 'availability.blockedHours';
   static const kUpdatedAtKey = 'availability.updatedAt';
@@ -52,7 +66,22 @@ class AvailabilityRepository {
         DateTime.now().millisecondsSinceEpoch,
       );
     }
+
+    if (_outbox != null && userId != null) {
+      await _outbox.enqueueOrCoalesce(
+        entity: kOutboxEntityAvailability,
+        entityKey: userId!,
+        operation: 'upsert',
+        payload: jsonEncode(toRecurringRow(hours)),
+      );
+    }
   }
+
+  /// Zet [kUpdatedAtKey] op een expliciete waarde in plaats van "nu" — alleen
+  /// gebruikt bij het overnemen van een gepulde cloud-rij (zie
+  /// [ProfileRepository.stampUpdatedAt] voor dezelfde redenering).
+  Future<void> stampUpdatedAt(DateTime value) =>
+      _prefs.setInt(kUpdatedAtKey, value.millisecondsSinceEpoch);
 
   /// Geeft het epoch-ms tijdstip van de laatste [save]-aanroep, of `null` als
   /// dat veld nog nooit geschreven is.

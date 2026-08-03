@@ -10,10 +10,13 @@
 /// Alle tests gebruiken ProviderContainer (geen WidgetTester, geen Flutter-UI).
 /// SharedPreferences.setMockInitialValues({}) in setUp garandeert geïsoleerde state.
 
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
@@ -23,6 +26,15 @@ import 'package:ridewindow/providers/clock_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+
+/// Task 3 (plan 21-04): profileRepositoryProvider/availabilityRepositoryProvider
+/// now also watch appDatabaseProvider (for the outbox DAO). The real
+/// appDatabaseProvider opens a disk-backed Drift database via path_provider,
+/// which needs a real platform channel unavailable in a plain `test()` (no
+/// widget binding) — every ProviderContainer in this suite therefore
+/// overrides it with an in-memory database.
+Override _inMemoryAppDatabase() =>
+    appDatabaseProvider.overrideWith((ref) => AppDatabase(NativeDatabase.memory()));
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -117,6 +129,7 @@ void main() {
   test('weather loading→data: WeatherNotifier transitie loading naar data', () async {
     final container = ProviderContainer(
       overrides: [
+          _inMemoryAppDatabase(),
           nowProvider.overrideWithValue(_baseTime),
         weatherRepositoryProvider.overrideWith(
           (ref) => throw UnimplementedError('use FakeWeatherNotifier'),
@@ -150,6 +163,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+          _inMemoryAppDatabase(),
           nowProvider.overrideWithValue(_baseTime),
         weatherProvider.overrideWith(() => fakeWeather),
         profileProvider.overrideWith(() => FakeProfileNotifier()),
@@ -190,6 +204,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+          _inMemoryAppDatabase(),
           nowProvider.overrideWithValue(_baseTime),
         weatherProvider.overrideWith(() => FakeWeatherNotifier(_goodForecasts())),
         profileProvider.overrideWith(() => fakeProfile),
@@ -252,6 +267,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
+          _inMemoryAppDatabase(),
           nowProvider.overrideWithValue(_baseTime),
         weatherProvider.overrideWith(() => FakeWeatherNotifier(goodForecasts)),
         profileProvider.overrideWith(() => FakeProfileNotifier()),
@@ -289,7 +305,7 @@ void main() {
   test('dispose and recreate preserves settings: profiel overleeft container dispose',
       () async {
     // Container 1: schrijf toleranties naar SharedPreferences
-    final container1 = ProviderContainer();
+    final container1 = ProviderContainer(overrides: [_inMemoryAppDatabase()]);
 
     // Wacht op initieel profiel
     await container1.read(profileProvider.future);
@@ -313,7 +329,7 @@ void main() {
     container1.dispose();
 
     // Container 2: laden vanuit SharedPreferences (mock heeft de waarden)
-    final container2 = ProviderContainer();
+    final container2 = ProviderContainer(overrides: [_inMemoryAppDatabase()]);
     addTearDown(container2.dispose);
 
     final restoredProfile = await container2.read(profileProvider.future);
