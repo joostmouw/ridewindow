@@ -1177,6 +1177,18 @@ abstract class S {
   /// **'Cloud'**
   String get accountConflictKeepCloudAction;
 
+  /// No description provided for @accountSyncStatusSynced.
+  ///
+  /// In nl, this message translates to:
+  /// **'Gesynchroniseerd'**
+  String get accountSyncStatusSynced;
+
+  /// No description provided for @accountSyncStatusPending.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wordt gesynchroniseerd...'**
+  String get accountSyncStatusPending;
+
   /// No description provided for @calendarMismatchWarning.
   ///
   /// In nl, this message translates to:

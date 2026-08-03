@@ -604,6 +604,12 @@ class SEn extends S {
   String get accountConflictKeepCloudAction => 'Cloud';
 
   @override
+  String get accountSyncStatusSynced => 'Synced';
+
+  @override
+  String get accountSyncStatusPending => 'Syncing…';
+
+  @override
   String calendarMismatchWarning(String email) {
     return 'Calendar connected to a different account: $email';
   }

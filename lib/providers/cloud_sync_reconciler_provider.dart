@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -23,6 +24,13 @@ const _kLastSyncedUidKey = 'account.lastSyncedUid';
 
 @riverpod
 CloudSyncReconciler cloudSyncReconciler(Ref ref) => CloudSyncReconciler(ref);
+
+/// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
+/// status indicator) — watched directly from `AccountSection`'s signed-in
+/// row.
+@riverpod
+Stream<int> outboxPendingCount(Ref ref) =>
+    ref.watch(appDatabaseProvider).syncOutboxDao.watchPendingCount();
 
 /// Constructs the real [AccountSyncService] (plan 21-06) with production
 /// dependencies (plan 21-07): the three repositories, the two cloud-read

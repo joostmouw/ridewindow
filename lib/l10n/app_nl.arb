@@ -257,6 +257,8 @@
   "accountConflictAvailabilityBody": "Je beschikbaarheidskalender verschilt tussen dit toestel en de cloud. Welke versie wil je bewaren?",
   "accountConflictKeepLocalAction": "Dit toestel",
   "accountConflictKeepCloudAction": "Cloud",
+  "accountSyncStatusSynced": "Gesynchroniseerd",
+  "accountSyncStatusPending": "Wordt gesynchroniseerd...",
   "calendarMismatchWarning": "Agenda gekoppeld aan een ander account: {email}",
   "@calendarMismatchWarning": {
     "placeholders": {

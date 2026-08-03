@@ -143,6 +143,7 @@ Future<void> _pumpProfileScreen(
   WidgetTester tester, {
   required Stream<User?> authStream,
   AccountSyncService? fakeSyncService,
+  Stream<int>? outboxPendingCountStream,
 }) async {
   // Vergroot het test-viewport zodat de nieuwe Account-sectie (bovenaan) en
   // de bestaande secties allemaal binnen de sliver-viewport vallen en dus
@@ -163,6 +164,12 @@ Future<void> _pumpProfileScreen(
   // testbare fake, tenzij een test zelf iets anders opgeeft.
   final syncService = fakeSyncService ?? FakeAccountSyncService(const [], prefs: prefs);
 
+  // outboxPendingCountProvider default: overschreven met een direct-emitting
+  // Stream in plaats van de echte appDatabaseProvider/Drift-keten -- een
+  // live `.watchSingle()`-stream schedulet bij widget-teardown een
+  // zero-duration Timer die flutter_test's eind-van-test invariant-check
+  // ("A Timer is still pending...") laat falen, en geen van de bestaande
+  // tests in dit bestand heeft de echte database nodig.
   final overrides = <Override>[
     profileProvider.overrideWith(() => FakeProfileNotifier(_baseProfile())),
     gpsPermissionProvider.overrideWith(
@@ -175,6 +182,9 @@ Future<void> _pumpProfileScreen(
     authStateProvider.overrideWith((ref) => authStream),
     sharedPrefsProvider.overrideWithValue(prefs),
     accountSyncServiceProvider.overrideWith((ref) async => syncService),
+    outboxPendingCountProvider.overrideWith(
+      (ref) => outboxPendingCountStream ?? Stream<int>.value(0),
+    ),
   ];
 
   await tester.pumpWidget(
@@ -362,5 +372,56 @@ void main() {
 
     expect(find.text(s.accountConflictAvailabilityTitle), findsNothing);
     expect(fakeService.resolvedDomains, [SyncDomain.profile, SyncDomain.availability]);
+  });
+
+  testWidgets(
+      'Test 7 — 0 openstaande outbox-rijen toont "Gesynchroniseerd", niet '
+      '"Wordt gesynchroniseerd..." (D-06/D-07)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+      outboxPendingCountStream: Stream<int>.value(0),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsOneWidget);
+    expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsNothing);
+  });
+
+  testWidgets(
+      'Test 8 — 3 openstaande outbox-rijen toont "Wordt gesynchroniseerd...", '
+      'niet "Gesynchroniseerd" (D-06/D-07)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+      outboxPendingCountStream: Stream<int>.value(3),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsOneWidget);
+    expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsNothing);
+  });
+
+  testWidgets(
+      'Test 9 — uitgelogde rij toont nooit een sync-statustekst (D-06/D-07 '
+      'gelden alleen voor de ingelogde staat)',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsNothing);
+    expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsNothing);
   });
 }

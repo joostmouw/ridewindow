@@ -444,13 +444,31 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
         user.email ??
         '';
 
+    // D-06/D-07: exactly two visible sync-status strings, never a third.
+    // loading/error render nothing (a transient blank frame is acceptable,
+    // a fabricated third status string is not).
+    final pendingCountAsync = ref.watch(outboxPendingCountProvider);
+
     return ListTile(
       leading: Semantics(
         label: s.accountAvatarSemanticLabel,
         child: _AccountAvatar(avatarUrl: avatarUrl),
       ),
       title: Text(displayName),
-      subtitle: user.email != null ? Text(user.email!) : null,
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (user.email != null) Text(user.email!),
+          pendingCountAsync.when(
+            data: (count) => Text(
+              count == 0 ? s.accountSyncStatusSynced : s.accountSyncStatusPending,
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+        ],
+      ),
       trailing: TextButton(
         onPressed: () => _confirmAndSignOut(context),
         child: Text(s.accountSignOut),

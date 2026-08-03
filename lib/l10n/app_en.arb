@@ -216,6 +216,8 @@
   "accountConflictAvailabilityBody": "Your availability calendar differs between this device and the cloud. Which version do you want to keep?",
   "accountConflictKeepLocalAction": "This device",
   "accountConflictKeepCloudAction": "Cloud",
+  "accountSyncStatusSynced": "Synced",
+  "accountSyncStatusPending": "Syncing…",
   "calendarMismatchWarning": "Calendar connected to a different account: {email}",
 
   "privacyPolicy": "Privacy policy",

@@ -53,6 +53,51 @@ final class CloudSyncReconcilerProvider extends $FunctionalProvider<
 String _$cloudSyncReconcilerHash() =>
     r'eda8ca8ba30905816581f18f019e64e49f08ca32';
 
+/// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
+/// status indicator) — watched directly from `AccountSection`'s signed-in
+/// row.
+
+@ProviderFor(outboxPendingCount)
+final outboxPendingCountProvider = OutboxPendingCountProvider._();
+
+/// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
+/// status indicator) — watched directly from `AccountSection`'s signed-in
+/// row.
+
+final class OutboxPendingCountProvider
+    extends $FunctionalProvider<AsyncValue<int>, int, Stream<int>>
+    with $FutureModifier<int>, $StreamProvider<int> {
+  /// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
+  /// status indicator) — watched directly from `AccountSection`'s signed-in
+  /// row.
+  OutboxPendingCountProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'outboxPendingCountProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$outboxPendingCountHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<int> create(Ref ref) {
+    return outboxPendingCount(ref);
+  }
+}
+
+String _$outboxPendingCountHash() =>
+    r'0ef1220fd99e466ed372c04e91d55db4d62c30de';
+
 /// Constructs the real [AccountSyncService] (plan 21-06) with production
 /// dependencies (plan 21-07): the three repositories, the two cloud-read
 /// closures composed from `CloudReconcileService`'s pure row parsers plus

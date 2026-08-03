@@ -604,6 +604,12 @@ class SNl extends S {
   String get accountConflictKeepCloudAction => 'Cloud';
 
   @override
+  String get accountSyncStatusSynced => 'Gesynchroniseerd';
+
+  @override
+  String get accountSyncStatusPending => 'Wordt gesynchroniseerd...';
+
+  @override
   String calendarMismatchWarning(String email) {
     return 'Agenda gekoppeld aan een ander account: $email';
   }
