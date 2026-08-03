@@ -1045,6 +1045,427 @@ class AvailabilityGridEntriesCompanion
   }
 }
 
+class $SyncOutboxEntriesTable extends SyncOutboxEntries
+    with TableInfo<$SyncOutboxEntriesTable, SyncOutboxEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SyncOutboxEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _entityMeta = const VerificationMeta('entity');
+  @override
+  late final GeneratedColumn<String> entity = GeneratedColumn<String>(
+      'entity', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _entityKeyMeta =
+      const VerificationMeta('entityKey');
+  @override
+  late final GeneratedColumn<String> entityKey = GeneratedColumn<String>(
+      'entity_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _operationMeta =
+      const VerificationMeta('operation');
+  @override
+  late final GeneratedColumn<String> operation = GeneratedColumn<String>(
+      'operation', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('upsert'));
+  static const VerificationMeta _payloadMeta =
+      const VerificationMeta('payload');
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+      'payload', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _queuedAtMeta =
+      const VerificationMeta('queuedAt');
+  @override
+  late final GeneratedColumn<int> queuedAt = GeneratedColumn<int>(
+      'queued_at', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _attemptsMeta =
+      const VerificationMeta('attempts');
+  @override
+  late final GeneratedColumn<int> attempts = GeneratedColumn<int>(
+      'attempts', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _lastErrorMeta =
+      const VerificationMeta('lastError');
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+      'last_error', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        entity,
+        entityKey,
+        operation,
+        payload,
+        queuedAt,
+        attempts,
+        lastError
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_outbox_entries';
+  @override
+  VerificationContext validateIntegrity(Insertable<SyncOutboxEntry> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('entity')) {
+      context.handle(_entityMeta,
+          entity.isAcceptableOrUnknown(data['entity']!, _entityMeta));
+    } else if (isInserting) {
+      context.missing(_entityMeta);
+    }
+    if (data.containsKey('entity_key')) {
+      context.handle(_entityKeyMeta,
+          entityKey.isAcceptableOrUnknown(data['entity_key']!, _entityKeyMeta));
+    } else if (isInserting) {
+      context.missing(_entityKeyMeta);
+    }
+    if (data.containsKey('operation')) {
+      context.handle(_operationMeta,
+          operation.isAcceptableOrUnknown(data['operation']!, _operationMeta));
+    }
+    if (data.containsKey('payload')) {
+      context.handle(_payloadMeta,
+          payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta));
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('queued_at')) {
+      context.handle(_queuedAtMeta,
+          queuedAt.isAcceptableOrUnknown(data['queued_at']!, _queuedAtMeta));
+    } else if (isInserting) {
+      context.missing(_queuedAtMeta);
+    }
+    if (data.containsKey('attempts')) {
+      context.handle(_attemptsMeta,
+          attempts.isAcceptableOrUnknown(data['attempts']!, _attemptsMeta));
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(_lastErrorMeta,
+          lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {entity, entityKey},
+      ];
+  @override
+  SyncOutboxEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncOutboxEntry(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      entity: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entity'])!,
+      entityKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entity_key'])!,
+      operation: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}operation'])!,
+      payload: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payload'])!,
+      queuedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}queued_at'])!,
+      attempts: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}attempts'])!,
+      lastError: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_error']),
+    );
+  }
+
+  @override
+  $SyncOutboxEntriesTable createAlias(String alias) {
+    return $SyncOutboxEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class SyncOutboxEntry extends DataClass implements Insertable<SyncOutboxEntry> {
+  final int id;
+  final String entity;
+  final String entityKey;
+  final String operation;
+  final String payload;
+  final int queuedAt;
+  final int attempts;
+  final String? lastError;
+  const SyncOutboxEntry(
+      {required this.id,
+      required this.entity,
+      required this.entityKey,
+      required this.operation,
+      required this.payload,
+      required this.queuedAt,
+      required this.attempts,
+      this.lastError});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['entity'] = Variable<String>(entity);
+    map['entity_key'] = Variable<String>(entityKey);
+    map['operation'] = Variable<String>(operation);
+    map['payload'] = Variable<String>(payload);
+    map['queued_at'] = Variable<int>(queuedAt);
+    map['attempts'] = Variable<int>(attempts);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
+    return map;
+  }
+
+  SyncOutboxEntriesCompanion toCompanion(bool nullToAbsent) {
+    return SyncOutboxEntriesCompanion(
+      id: Value(id),
+      entity: Value(entity),
+      entityKey: Value(entityKey),
+      operation: Value(operation),
+      payload: Value(payload),
+      queuedAt: Value(queuedAt),
+      attempts: Value(attempts),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
+    );
+  }
+
+  factory SyncOutboxEntry.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncOutboxEntry(
+      id: serializer.fromJson<int>(json['id']),
+      entity: serializer.fromJson<String>(json['entity']),
+      entityKey: serializer.fromJson<String>(json['entityKey']),
+      operation: serializer.fromJson<String>(json['operation']),
+      payload: serializer.fromJson<String>(json['payload']),
+      queuedAt: serializer.fromJson<int>(json['queuedAt']),
+      attempts: serializer.fromJson<int>(json['attempts']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'entity': serializer.toJson<String>(entity),
+      'entityKey': serializer.toJson<String>(entityKey),
+      'operation': serializer.toJson<String>(operation),
+      'payload': serializer.toJson<String>(payload),
+      'queuedAt': serializer.toJson<int>(queuedAt),
+      'attempts': serializer.toJson<int>(attempts),
+      'lastError': serializer.toJson<String?>(lastError),
+    };
+  }
+
+  SyncOutboxEntry copyWith(
+          {int? id,
+          String? entity,
+          String? entityKey,
+          String? operation,
+          String? payload,
+          int? queuedAt,
+          int? attempts,
+          Value<String?> lastError = const Value.absent()}) =>
+      SyncOutboxEntry(
+        id: id ?? this.id,
+        entity: entity ?? this.entity,
+        entityKey: entityKey ?? this.entityKey,
+        operation: operation ?? this.operation,
+        payload: payload ?? this.payload,
+        queuedAt: queuedAt ?? this.queuedAt,
+        attempts: attempts ?? this.attempts,
+        lastError: lastError.present ? lastError.value : this.lastError,
+      );
+  SyncOutboxEntry copyWithCompanion(SyncOutboxEntriesCompanion data) {
+    return SyncOutboxEntry(
+      id: data.id.present ? data.id.value : this.id,
+      entity: data.entity.present ? data.entity.value : this.entity,
+      entityKey: data.entityKey.present ? data.entityKey.value : this.entityKey,
+      operation: data.operation.present ? data.operation.value : this.operation,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      queuedAt: data.queuedAt.present ? data.queuedAt.value : this.queuedAt,
+      attempts: data.attempts.present ? data.attempts.value : this.attempts,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncOutboxEntry(')
+          ..write('id: $id, ')
+          ..write('entity: $entity, ')
+          ..write('entityKey: $entityKey, ')
+          ..write('operation: $operation, ')
+          ..write('payload: $payload, ')
+          ..write('queuedAt: $queuedAt, ')
+          ..write('attempts: $attempts, ')
+          ..write('lastError: $lastError')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, entity, entityKey, operation, payload, queuedAt, attempts, lastError);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncOutboxEntry &&
+          other.id == this.id &&
+          other.entity == this.entity &&
+          other.entityKey == this.entityKey &&
+          other.operation == this.operation &&
+          other.payload == this.payload &&
+          other.queuedAt == this.queuedAt &&
+          other.attempts == this.attempts &&
+          other.lastError == this.lastError);
+}
+
+class SyncOutboxEntriesCompanion extends UpdateCompanion<SyncOutboxEntry> {
+  final Value<int> id;
+  final Value<String> entity;
+  final Value<String> entityKey;
+  final Value<String> operation;
+  final Value<String> payload;
+  final Value<int> queuedAt;
+  final Value<int> attempts;
+  final Value<String?> lastError;
+  const SyncOutboxEntriesCompanion({
+    this.id = const Value.absent(),
+    this.entity = const Value.absent(),
+    this.entityKey = const Value.absent(),
+    this.operation = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.queuedAt = const Value.absent(),
+    this.attempts = const Value.absent(),
+    this.lastError = const Value.absent(),
+  });
+  SyncOutboxEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String entity,
+    required String entityKey,
+    this.operation = const Value.absent(),
+    required String payload,
+    required int queuedAt,
+    this.attempts = const Value.absent(),
+    this.lastError = const Value.absent(),
+  })  : entity = Value(entity),
+        entityKey = Value(entityKey),
+        payload = Value(payload),
+        queuedAt = Value(queuedAt);
+  static Insertable<SyncOutboxEntry> custom({
+    Expression<int>? id,
+    Expression<String>? entity,
+    Expression<String>? entityKey,
+    Expression<String>? operation,
+    Expression<String>? payload,
+    Expression<int>? queuedAt,
+    Expression<int>? attempts,
+    Expression<String>? lastError,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entity != null) 'entity': entity,
+      if (entityKey != null) 'entity_key': entityKey,
+      if (operation != null) 'operation': operation,
+      if (payload != null) 'payload': payload,
+      if (queuedAt != null) 'queued_at': queuedAt,
+      if (attempts != null) 'attempts': attempts,
+      if (lastError != null) 'last_error': lastError,
+    });
+  }
+
+  SyncOutboxEntriesCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? entity,
+      Value<String>? entityKey,
+      Value<String>? operation,
+      Value<String>? payload,
+      Value<int>? queuedAt,
+      Value<int>? attempts,
+      Value<String?>? lastError}) {
+    return SyncOutboxEntriesCompanion(
+      id: id ?? this.id,
+      entity: entity ?? this.entity,
+      entityKey: entityKey ?? this.entityKey,
+      operation: operation ?? this.operation,
+      payload: payload ?? this.payload,
+      queuedAt: queuedAt ?? this.queuedAt,
+      attempts: attempts ?? this.attempts,
+      lastError: lastError ?? this.lastError,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (entity.present) {
+      map['entity'] = Variable<String>(entity.value);
+    }
+    if (entityKey.present) {
+      map['entity_key'] = Variable<String>(entityKey.value);
+    }
+    if (operation.present) {
+      map['operation'] = Variable<String>(operation.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (queuedAt.present) {
+      map['queued_at'] = Variable<int>(queuedAt.value);
+    }
+    if (attempts.present) {
+      map['attempts'] = Variable<int>(attempts.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncOutboxEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('entity: $entity, ')
+          ..write('entityKey: $entityKey, ')
+          ..write('operation: $operation, ')
+          ..write('payload: $payload, ')
+          ..write('queuedAt: $queuedAt, ')
+          ..write('attempts: $attempts, ')
+          ..write('lastError: $lastError')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1054,13 +1475,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $HourlyForecastEntriesTable(this);
   late final $AvailabilityGridEntriesTable availabilityGridEntries =
       $AvailabilityGridEntriesTable(this);
+  late final $SyncOutboxEntriesTable syncOutboxEntries =
+      $SyncOutboxEntriesTable(this);
   late final ForecastDao forecastDao = ForecastDao(this as AppDatabase);
+  late final SyncOutboxDao syncOutboxDao = SyncOutboxDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [forecastCacheEntries, hourlyForecastEntries, availabilityGridEntries];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        forecastCacheEntries,
+        hourlyForecastEntries,
+        availabilityGridEntries,
+        syncOutboxEntries
+      ];
 }
 
 typedef $$ForecastCacheEntriesTableCreateCompanionBuilder
@@ -1820,6 +2248,220 @@ typedef $$AvailabilityGridEntriesTableProcessedTableManager
         ),
         AvailabilityGridEntry,
         PrefetchHooks Function()>;
+typedef $$SyncOutboxEntriesTableCreateCompanionBuilder
+    = SyncOutboxEntriesCompanion Function({
+  Value<int> id,
+  required String entity,
+  required String entityKey,
+  Value<String> operation,
+  required String payload,
+  required int queuedAt,
+  Value<int> attempts,
+  Value<String?> lastError,
+});
+typedef $$SyncOutboxEntriesTableUpdateCompanionBuilder
+    = SyncOutboxEntriesCompanion Function({
+  Value<int> id,
+  Value<String> entity,
+  Value<String> entityKey,
+  Value<String> operation,
+  Value<String> payload,
+  Value<int> queuedAt,
+  Value<int> attempts,
+  Value<String?> lastError,
+});
+
+class $$SyncOutboxEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $SyncOutboxEntriesTable> {
+  $$SyncOutboxEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get entity => $composableBuilder(
+      column: $table.entity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get entityKey => $composableBuilder(
+      column: $table.entityKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get operation => $composableBuilder(
+      column: $table.operation, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get payload => $composableBuilder(
+      column: $table.payload, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get queuedAt => $composableBuilder(
+      column: $table.queuedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get attempts => $composableBuilder(
+      column: $table.attempts, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+      column: $table.lastError, builder: (column) => ColumnFilters(column));
+}
+
+class $$SyncOutboxEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SyncOutboxEntriesTable> {
+  $$SyncOutboxEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get entity => $composableBuilder(
+      column: $table.entity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get entityKey => $composableBuilder(
+      column: $table.entityKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get operation => $composableBuilder(
+      column: $table.operation, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+      column: $table.payload, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get queuedAt => $composableBuilder(
+      column: $table.queuedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get attempts => $composableBuilder(
+      column: $table.attempts, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+      column: $table.lastError, builder: (column) => ColumnOrderings(column));
+}
+
+class $$SyncOutboxEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SyncOutboxEntriesTable> {
+  $$SyncOutboxEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get entity =>
+      $composableBuilder(column: $table.entity, builder: (column) => column);
+
+  GeneratedColumn<String> get entityKey =>
+      $composableBuilder(column: $table.entityKey, builder: (column) => column);
+
+  GeneratedColumn<String> get operation =>
+      $composableBuilder(column: $table.operation, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<int> get queuedAt =>
+      $composableBuilder(column: $table.queuedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get attempts =>
+      $composableBuilder(column: $table.attempts, builder: (column) => column);
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
+}
+
+class $$SyncOutboxEntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SyncOutboxEntriesTable,
+    SyncOutboxEntry,
+    $$SyncOutboxEntriesTableFilterComposer,
+    $$SyncOutboxEntriesTableOrderingComposer,
+    $$SyncOutboxEntriesTableAnnotationComposer,
+    $$SyncOutboxEntriesTableCreateCompanionBuilder,
+    $$SyncOutboxEntriesTableUpdateCompanionBuilder,
+    (
+      SyncOutboxEntry,
+      BaseReferences<_$AppDatabase, $SyncOutboxEntriesTable, SyncOutboxEntry>
+    ),
+    SyncOutboxEntry,
+    PrefetchHooks Function()> {
+  $$SyncOutboxEntriesTableTableManager(
+      _$AppDatabase db, $SyncOutboxEntriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SyncOutboxEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SyncOutboxEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SyncOutboxEntriesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> entity = const Value.absent(),
+            Value<String> entityKey = const Value.absent(),
+            Value<String> operation = const Value.absent(),
+            Value<String> payload = const Value.absent(),
+            Value<int> queuedAt = const Value.absent(),
+            Value<int> attempts = const Value.absent(),
+            Value<String?> lastError = const Value.absent(),
+          }) =>
+              SyncOutboxEntriesCompanion(
+            id: id,
+            entity: entity,
+            entityKey: entityKey,
+            operation: operation,
+            payload: payload,
+            queuedAt: queuedAt,
+            attempts: attempts,
+            lastError: lastError,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String entity,
+            required String entityKey,
+            Value<String> operation = const Value.absent(),
+            required String payload,
+            required int queuedAt,
+            Value<int> attempts = const Value.absent(),
+            Value<String?> lastError = const Value.absent(),
+          }) =>
+              SyncOutboxEntriesCompanion.insert(
+            id: id,
+            entity: entity,
+            entityKey: entityKey,
+            operation: operation,
+            payload: payload,
+            queuedAt: queuedAt,
+            attempts: attempts,
+            lastError: lastError,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SyncOutboxEntriesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SyncOutboxEntriesTable,
+    SyncOutboxEntry,
+    $$SyncOutboxEntriesTableFilterComposer,
+    $$SyncOutboxEntriesTableOrderingComposer,
+    $$SyncOutboxEntriesTableAnnotationComposer,
+    $$SyncOutboxEntriesTableCreateCompanionBuilder,
+    $$SyncOutboxEntriesTableUpdateCompanionBuilder,
+    (
+      SyncOutboxEntry,
+      BaseReferences<_$AppDatabase, $SyncOutboxEntriesTable, SyncOutboxEntry>
+    ),
+    SyncOutboxEntry,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1831,4 +2473,6 @@ class $AppDatabaseManager {
   $$AvailabilityGridEntriesTableTableManager get availabilityGridEntries =>
       $$AvailabilityGridEntriesTableTableManager(
           _db, _db.availabilityGridEntries);
+  $$SyncOutboxEntriesTableTableManager get syncOutboxEntries =>
+      $$SyncOutboxEntriesTableTableManager(_db, _db.syncOutboxEntries);
 }
