@@ -11,8 +11,8 @@
 -- loudly (Postgres will raise "already exists" errors), not silently no-op
 -- over a schema someone may have hand-edited in the dashboard.
 --
--- Order: (1) tables, (2) RLS + policies, (3) updated_at triggers,
--- (4) migrate_account_data(), (5) delete_own_account().
+-- Order: (1) tables, (2) RLS + policies, (3) grants, (4) updated_at triggers,
+-- (5) migrate_account_data(), (6) delete_own_account().
 
 -- ---------------------------------------------------------------------------
 -- 1. Tables
@@ -84,7 +84,33 @@ create policy "insert own feedback" on public.feedback
 -- rows but can never read them back (FB-05, schema half — UI is Phase 22).
 
 -- ---------------------------------------------------------------------------
--- 3. updated_at auto-stamp triggers (profiles, availability only —
+-- 3. Table grants — necessary but easy to miss: RLS policies alone are NOT
+--    sufficient. Postgres checks table-level privileges BEFORE it evaluates
+--    any RLS policy, and Supabase's default privileges for the
+--    `authenticated` role on newly created tables do NOT include SELECT /
+--    INSERT / UPDATE / DELETE — only REFERENCES / TRIGGER / TRUNCATE. Without
+--    these grants, a signed-in client using the `authenticated` role is
+--    rejected with `permission denied for table ...` before the "own row
+--    only" policies above ever run, which would silently break SYNC-01/
+--    SYNC-02 (a user could not read or write even their own rows) despite
+--    every policy being correct. Discovered by running
+--    supabase/tests/rls_deny_test.sql against the live project (see
+--    .planning/phases/21-sync-migration/MANUAL-VERIFICATION-21.md).
+--
+--    `feedback` deliberately gets INSERT only, never SELECT/UPDATE/DELETE —
+--    this is the grants-level half of FB-05 ("can write, can never read
+--    back"), matching the RLS policy above which has no select policy either.
+--    `anon` deliberately gets nothing on any of these tables: signed-out
+--    users never touch the cloud tables at all.
+-- ---------------------------------------------------------------------------
+
+grant select, insert, update, delete on public.profiles      to authenticated;
+grant select, insert, update, delete on public.availability  to authenticated;
+grant select, insert, update, delete on public.planned_rides to authenticated;
+grant insert                          on public.feedback     to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 4. updated_at auto-stamp triggers (profiles, availability only —
 --    planned_rides has no updated_at column by design, since
 --    resolveAccountSync only ever compares profile/availability timestamps
 --    per MIG-04's exact wording)
@@ -109,7 +135,7 @@ create trigger availability_set_updated_at
   for each row execute function public.set_updated_at();
 
 -- ---------------------------------------------------------------------------
--- 4. migrate_account_data() — MIG-05/06's single rpc()-invoked transaction.
+-- 5. migrate_account_data() — MIG-05/06's single rpc()-invoked transaction.
 --    Upserts profiles/availability/planned_rides atomically. Derives
 --    user_id ONLY from auth.uid(), never from a client-supplied parameter —
 --    the elevated-privilege mode below means this runs with elevated
@@ -203,7 +229,7 @@ grant execute on function public.migrate_account_data(
 ) to authenticated;
 
 -- ---------------------------------------------------------------------------
--- 5. delete_own_account() — AUTH-09's actual deletion trigger. A bare
+-- 6. delete_own_account() — AUTH-09's actual deletion trigger. A bare
 --    anon-key client cannot call auth.admin.deleteUser() (needs the
 --    service-role key), so this elevated-privilege function is the client's
 --    only path to remove their own auth.users row. The foreign-key rules
