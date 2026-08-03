@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: Fase 20 klaar. Availability-, profile- en planned-rides-persistence lopen nu door
-last_updated: "2026-08-03T17:00:02.345Z"
-last_activity: 2026-07-31 -- Fase 20 volledig uitgevoerd (20-01 t/m 20-05), gemerged, release-build
+status: executing
+last_updated: "2026-08-03T18:10:09.726Z"
+last_activity: 2026-08-03
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 16
-  completed_plans: 15
+  total_plans: 25
+  completed_plans: 17
   percent: 40
 ---
 
@@ -38,12 +38,13 @@ Items acknowledged and deferred at v2.0 milestone close on 2026-07-17. The `audi
 See: .planning/PROJECT.md (updated 2026-07-25)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 20 — repository-refactor-local-only
+**Current focus:** Phase 21 — sync-migration
 
 ## Current Position
 
-Phase: 20 (repository-refactor-local-only) — COMPLETE (5/5 plannen: 20-01 t/m 20-05)
-Status: Fase 20 klaar. Availability-, profile- en planned-rides-persistence lopen nu door
+Phase: 21 (sync-migration) — EXECUTING
+Plan: 2 of 9
+Status: Ready to execute
 gedeelde plain-Dart repositories (`AvailabilityRepository`, `ProfileRepository`,
 `PlannedRidesRepository`); `background_task.dart` leest via diezelfde repositories en is
 Supabase-vrij bewezen (REG-05); `PlannedRidesNotifier` is async en reageert op
@@ -61,7 +62,7 @@ App Signing SHA-1 bewijst het juiste OAuth-client) en
 de koudestartmeting mét toestel, verbindingstype en methode (die methode wordt in fase 21
 letterlijk herhaald voor REG-03).
 Fase 21 (Sync + migration) heeft nog geen plannen (ROADMAP: TBD) — volgende stap na fase 20.
-Last activity: 2026-07-31 -- Fase 20 volledig uitgevoerd (20-01 t/m 20-05), gemerged, release-build
+Last activity: 2026-08-03
 en volle testsuite zelf geverifieerd op main.
 
 ## Performance Metrics
@@ -101,6 +102,7 @@ en volle testsuite zelf geverifieerd op main.
 | Phase 16 P01 | ~2h | 2 tasks | 13 files |
 | Phase 16 P02 | 25min | 2 tasks | 12 files |
 | Phase 16 P03 | ~10min | 2 tasks | 6 files |
+| Phase 21 P02 | 23min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -206,6 +208,8 @@ Recente beslissingen die het huidige werk beinvloeden:
 - 17-01 (2026-07-17): Corrected full automated-test baseline established (supersedes the partial 16-03 note): `flutter test` on current HEAD consistently reports 215 passing / 69 failing across 13 files -- `ride_detail_screen_test.dart` (13), `insights_sheet_test.dart` (13), `availability_screen_test.dart` (11-12), `profile_screen_test.dart` (5), `profile_screen_notif_test.dart` (5), `weather_repository_test.dart` (3-5), `home_screen_test.dart` (4), `detail/ride_detail_screen_calendar_test.dart` (4), `onboarding_screen_test.dart` (3), `welcome_screen_test.dart` (2), `home_screen_location_test.dart` (2), `providers/integration_test.dart` (1), plus one of `core/pwa_display_mode_test.dart`/`providers/slots_notifier_test.dart` (1) -- the 215/69 totals are stable across repeated runs on this machine but the exact per-file split shifts slightly run-to-run (test-binding/localization state leakage between files, tracked in BACKLOG.md #11). No Phase 17 source changes were made, so this variance is confirmed pre-existing, not a regression.
 - 17-01 (2026-07-17): Phase 17 production deploy completed -- `flutter build web --release` + `firebase deploy --only hosting` succeeded; live at https://my-project-joost.web.app. All 4 curl checks passed on the first attempt (/, /profile, /detail/test123 all HTTP 200; /sqlite3.wasm HTTP 200 with `content-type: application/wasm`) -- firebase.json required no changes. `flutter build apk --release` also exits 0 on this same HEAD.
 - Roadmap 2026-07-25: v3.0 (Accounts & Sociaal) scoped to phases 1–2 of `.planning/milestones/v3.0-ACCOUNTS.md` only. Phases 18–22 created: 18 Preconditions, 19 Auth, 20 Repository refactor (local-only), 21 Sync + migration, 22 Account-backed feedback. AUTH-09 (account deletion removing server data) deliberately mapped to Phase 21, not Phase 19, since no Firestore data exists to delete until Phase 21 wires cloud writes. REG-01/02/04 mapped to Phase 19 (firebase_core/firebase_auth added there); REG-03 mapped to Phase 21 (full Firebase payload, pairs with SYNC-07's 2s budget); REG-05 mapped to Phase 20 (the phase that touches background_task.dart).
+- [Phase 21]: 21-02: Supabase default privileges for 'authenticated' on newly created tables exclude DML (only REFERENCES/TRIGGER/TRUNCATE) — RLS policies alone are insufficient; explicit GRANT statements are required and are now part of 0001_accounts_sync.sql. — Found live: signed-in client rejected with 42501 permission denied before any RLS policy ran. Fixed via grant select/insert/update/delete to authenticated on profiles/availability/planned_rides, insert-only on feedback.
+- [Phase 21]: 21-02: rls_deny_test.sql rewritten to return a visible result table instead of relying on raise notice — the Supabase SQL Editor does not display NOTICE output, so a passing and a silently-skipped run were indistinguishable. — Also added the positive case (owner can select own row), which a missing-grants defect would have passed silently while the deny-case-only assertions still held.
 
 ### Pending Todos
 
@@ -251,7 +255,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-08-03T17:00:02.332Z
+Last session: 2026-08-03T18:10:09.722Z
 Last activity: 2026-07-25 - v3.0 ROADMAP.md created (Phases 18-22: Preconditions, Auth, Repository refactor, Sync + migration, Account-backed feedback). REQUIREMENTS.md traceability filled (49/49 mapped). Next: /gsd:plan-phase 18
 
 ## Operator Next Steps

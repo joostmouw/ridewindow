@@ -35,23 +35,23 @@ Release-blocking groundwork. None of this is app code, and two items are effecti
 - [ ] **AUTH-06**: Sign-in works on web, where `google_sign_in` cannot use `authenticate()` at all and Google's own rendered sign-in button is mandatory — a different flow from the Calendar integration's authorization-only path, and new surface with no existing analog in this codebase
 - [ ] **AUTH-07**: When the signed-in account differs from the account that authorized Calendar access, the user is warned rather than having calendar events silently written under a different identity
 - [ ] **AUTH-08**: When a different Google account signs in on a device, no data from the previous account remains visible
-- [ ] **AUTH-09**: User can delete their account, and doing so removes their stored data on the server, not only their login (Google Play policy requirement, enforced since 2024-04-15)
+- [x] **AUTH-09**: User can delete their account, and doing so removes their stored data on the server, not only their login (Google Play policy requirement, enforced since 2024-04-15)
 - [ ] **AUTH-10**: Sign-in works from a real release build installed from the Play Store track, not only from a debug build
 
 ### Cloud sync (SYNC)
 
-- [ ] **SYNC-01**: A signed-in user's profile settings (tolerances, ride-length preferences, theme, locale, location override, notification toggles) are stored in the cloud
-- [ ] **SYNC-02**: A signed-in user's weekly availability pattern is stored in the cloud
-- [ ] **SYNC-03**: A signed-in user's planned rides are stored in the cloud
+- [x] **SYNC-01**: A signed-in user's profile settings (tolerances, ride-length preferences, theme, locale, location override, notification toggles) are stored in the cloud
+- [x] **SYNC-02**: A signed-in user's weekly availability pattern is stored in the cloud
+- [x] **SYNC-03**: A signed-in user's planned rides are stored in the cloud
 - [ ] **SYNC-04**: A change made on one platform appears on the other after the app is opened or brought to the foreground
 - [ ] **SYNC-05**: Changes made while offline are applied locally straight away and reach the cloud once a connection returns
 - [ ] **SYNC-06**: User can see whether their data has been synced, and can tell when changes are still pending
 - [ ] **SYNC-07**: The app opens and shows forecast and slots within the existing 2-second budget, without waiting on a network round-trip to the cloud
-- [ ] **SYNC-08**: One user cannot read or modify another user's data, verified by an automated test that asserts denial across two separate accounts, run against the deployed database's row-level security policies and not only against a local instance
-- [ ] **SYNC-09**: The forecast cache is not synced — it is derived data and stays local
-- [ ] **SYNC-10**: Calendar-imported blocked hours are not synced — they are date-specific, expire naturally, and are re-derivable by re-running the Calendar import
+- [x] **SYNC-08**: One user cannot read or modify another user's data, verified by an automated test that asserts denial across two separate accounts, run against the deployed database's row-level security policies and not only against a local instance
+- [x] **SYNC-09**: The forecast cache is not synced — it is derived data and stays local
+- [x] **SYNC-10**: Calendar-imported blocked hours are not synced — they are date-specific, expire naturally, and are re-derivable by re-running the Calendar import
 - [ ] **SYNC-11**: The app works correctly on web when opened in more than one tab, without data loss or stale reads
-- [ ] **SYNC-12**: Availability changes are written as one batched document write rather than one write per edited hour cell
+- [x] **SYNC-12**: Availability changes are written as one batched document write rather than one write per edited hour cell
 
 ### Migration and conflict handling (MIG)
 
@@ -59,9 +59,9 @@ Release-blocking groundwork. None of this is app code, and two items are effecti
 - [ ] **MIG-02**: When an account already holds data and the device's local data belongs to a different (or no previous) account, the account's data wins and the device is updated — local leftovers are never pushed over it
 - [ ] **MIG-03**: When an account already holds data and the same user's own device data has genuinely diverged since the last sync, the user is asked which version to keep, rather than one silently overwriting the other
 - [ ] **MIG-04**: The app records when profile and availability were last changed, and which account last synced on the device — the two facts MIG-02 and MIG-03 depend on, neither of which exists today
-- [ ] **MIG-05**: Migration is written as a single all-or-nothing operation, so an interrupted migration cannot leave a half-populated account that later looks complete
-- [ ] **MIG-06**: Migration is only treated as complete once the server has confirmed the write, not when the local SDK optimistically reports success
-- [ ] **MIG-07**: Local data is never deleted as part of migration
+- [x] **MIG-05**: Migration is written as a single all-or-nothing operation, so an interrupted migration cannot leave a half-populated account that later looks complete
+- [x] **MIG-06**: Migration is only treated as complete once the server has confirmed the write, not when the local SDK optimistically reports success
+- [x] **MIG-07**: Local data is never deleted as part of migration
 - [ ] **MIG-08**: An automated test seeds realistic production-shaped local data and asserts the exact resulting cloud document shape — manual testing is insufficient here, given this app's history of silent data-format bugs
 
 ### Account-backed feedback (FB)
@@ -140,27 +140,27 @@ REG-03 remains bound to Phase 21 as the blocking gate, pairing with SYNC-07, but
 | AUTH-06 | Phase 19 | Pending |
 | AUTH-07 | Phase 19 | Pending |
 | AUTH-08 | Phase 19 | Pending |
-| AUTH-09 | Phase 21 | Pending |
+| AUTH-09 | Phase 21 | Complete |
 | AUTH-10 | Phase 19 | Pending |
-| SYNC-01 | Phase 21 | Pending |
-| SYNC-02 | Phase 21 | Pending |
-| SYNC-03 | Phase 21 | Pending |
+| SYNC-01 | Phase 21 | Complete |
+| SYNC-02 | Phase 21 | Complete |
+| SYNC-03 | Phase 21 | Complete |
 | SYNC-04 | Phase 21 | Pending |
 | SYNC-05 | Phase 21 | Pending |
 | SYNC-06 | Phase 21 | Pending |
 | SYNC-07 | Phase 21 | Pending |
-| SYNC-08 | Phase 21 | Pending |
-| SYNC-09 | Phase 21 | Pending |
-| SYNC-10 | Phase 21 | Pending |
+| SYNC-08 | Phase 21 | Complete |
+| SYNC-09 | Phase 21 | Complete |
+| SYNC-10 | Phase 21 | Complete |
 | SYNC-11 | Phase 21 | Pending |
-| SYNC-12 | Phase 21 | Pending |
+| SYNC-12 | Phase 21 | Complete |
 | MIG-01 | Phase 21 | Pending |
 | MIG-02 | Phase 21 | Pending |
 | MIG-03 | Phase 21 | Pending |
 | MIG-04 | Phase 21 | Pending |
-| MIG-05 | Phase 21 | Pending |
-| MIG-06 | Phase 21 | Pending |
-| MIG-07 | Phase 21 | Pending |
+| MIG-05 | Phase 21 | Complete |
+| MIG-06 | Phase 21 | Complete |
+| MIG-07 | Phase 21 | Complete |
 | MIG-08 | Phase 21 | Pending |
 | FB-01 | Phase 22 | Pending |
 | FB-02 | Phase 22 | Pending |

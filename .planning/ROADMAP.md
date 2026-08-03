@@ -162,8 +162,8 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 21-01-PLAN.md — account_sync_resolver.dart (full resolveAccountSync) + unit tests
-- [ ] 21-02-PLAN.md — Postgres schema + RLS + migrate_account_data()/delete_own_account() + RLS deny-case test (checkpoint: apply migration)
+- [x] 21-01-PLAN.md — account_sync_resolver.dart (full resolveAccountSync) + unit tests
+- [x] 21-02-PLAN.md — Postgres schema + RLS + migrate_account_data()/delete_own_account() + RLS deny-case test (checkpoint: apply migration)
 
 **Wave 2** *(blocked on 21-02)*
 
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
 | 19. Auth | v3.0 | 6/7 | In Progress|  |
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
-| 21. Sync + migration | v3.0 | 0/9 | Not started | - |
+| 21. Sync + migration | v3.0 | 2/9 | In Progress|  |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
