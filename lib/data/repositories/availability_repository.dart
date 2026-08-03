@@ -90,4 +90,20 @@ class AvailabilityRepository {
   /// (D-08). Fase 20 leest dit veld nergens om iets te beslissen — de getter
   /// bestaat voor fase 21.
   int? readUpdatedAt() => _prefs.getInt(kUpdatedAtKey);
+
+  /// Enqueuet de *huidige* lokale uren naar de outbox, zonder lokale opslag
+  /// of tijdstempel te herschrijven (plan 21-06's `AccountSyncService`).
+  /// Alleen gebruikt wanneer een divergentie oplost naar "push local" — de
+  /// lokale data is al correct, die moet alleen nog de cloud bereiken.
+  /// Stille no-op zonder outbox/userId.
+  Future<void> enqueueCurrentState() async {
+    if (_outbox == null || userId == null) return;
+    final hours = readLocal();
+    await _outbox.enqueueOrCoalesce(
+      entity: kOutboxEntityAvailability,
+      entityKey: userId!,
+      operation: 'upsert',
+      payload: jsonEncode(toRecurringRow(hours)),
+    );
+  }
 }
