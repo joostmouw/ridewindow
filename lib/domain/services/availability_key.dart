@@ -1,4 +1,4 @@
-import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/domain/models/block_type.dart';
 
 /// Canonieke sleutel voor een geblokkeerd uur.
 ///

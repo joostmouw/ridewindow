@@ -18,6 +18,7 @@ import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -90,6 +91,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.read(lastRefreshedProvider.notifier).refresh();
+      // SYNC-04: fire-and-forget, never awaited in the UI path -- silently
+      // pulls a newer cloud row for a signed-in user on both platforms.
+      // Unlike the weatherProvider invalidate below, this is NOT gated on
+      // isWebPlatform: AppLifecycleState.resumed fires on native too.
+      ref.read(cloudSyncReconcilerProvider).reconcileOnForeground();
       // REFRESH-01: on web there is no WorkManager background task, so
       // regaining tab/app focus must itself trigger the cache-then-network
       // fetch. This is intentionally a no-op on native (isWebPlatform false)

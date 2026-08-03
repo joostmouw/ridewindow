@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/data/repositories/availability_repository.dart';
 import 'package:ridewindow/domain/models/block_type.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 
 export 'package:ridewindow/domain/models/block_type.dart' show BlockType;
 
@@ -13,9 +15,20 @@ part 'availability_notifier.g.dart';
 /// (asynchroon), niet `sharedPrefsProvider` — die gooit `UnimplementedError`
 /// tenzij overschreven, en de bestaande availability-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a): signed-out
+/// (`userId == null`) construeert nog steeds een repository, alleen een
+/// waarvan de outbox-schrijvingen no-ops zijn per
+/// [AvailabilityRepository]'s eigen guard.
 @riverpod
 Future<AvailabilityRepository> availabilityRepository(Ref ref) async {
-  return AvailabilityRepository(await SharedPreferences.getInstance());
+  final userId = ref.watch(currentUserIdProvider);
+  final outbox = ref.watch(appDatabaseProvider).syncOutboxDao;
+  return AvailabilityRepository(
+    await SharedPreferences.getInstance(),
+    outbox: outbox,
+    userId: userId,
+  );
 }
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
@@ -29,6 +42,11 @@ Future<AvailabilityRepository> availabilityRepository(Ref ref) async {
 class AvailabilityNotifier extends _$AvailabilityNotifier {
   @override
   Future<Map<DateTime, BlockType>> build() async {
+    // ARCHITECTURE.md §1: rebuild op in-/uitloggen/account-wissel, ook al
+    // gebruikt build() de waarde zelf niet -- readLocal() blijft synchroon
+    // en netwerkloos (SYNC-07); alleen de foreground-reconciler (Task 3)
+    // pult ooit de cloud.
+    ref.watch(authStateProvider);
     final repo = await ref.watch(availabilityRepositoryProvider.future);
     return repo.readLocal();
   }
