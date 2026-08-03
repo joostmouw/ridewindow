@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/domain/models/planned_ride.dart';
 
 /// Enige bron van waarheid voor de sleutel `planned_rides` in SharedPreferences.
@@ -9,10 +11,23 @@ import 'package:ridewindow/domain/models/planned_ride.dart';
 /// Persistentie via SharedPreferences: een JSON-lijst van [PlannedRide.toJson]
 /// onder de sleutel [kPlannedRidesKey], ongewijzigd ten opzichte van hoe
 /// `PlannedRidesNotifier` dit altijd al opsloeg (D-01).
+///
+/// [outbox]/[userId] zijn optioneel en additief (ARCHITECTURE.md §4a).
+/// Anders dan [ProfileRepository]/[AvailabilityRepository] enqueuet niet
+/// `save()` zelf een cloud-schrijving — `planned_rides` is een groeiende
+/// lijst van losse rijen, geen enkele mutabele blob, dus [add]/[remove]
+/// enqueuen elk precies één per-rit outbox-rij (upsert/delete). `save()`
+/// blijft de kale lokale schrijfoperatie, gebruikt door de foreground-
+/// reconciler om de samengevoegde lijst weg te schrijven zonder een tweede
+/// keer te enqueuen. Deze klasse importeert bewust nooit de cloud-SDK zelf
+/// (REG-05) — de outbox is een Drift-only afhankelijkheid.
 class PlannedRidesRepository {
-  PlannedRidesRepository(this._prefs);
+  PlannedRidesRepository(this._prefs, {SyncOutboxDao? outbox, this.userId})
+      : _outbox = outbox;
 
   final SharedPreferences _prefs;
+  final SyncOutboxDao? _outbox;
+  final String? userId;
 
   static const kPlannedRidesKey = 'planned_rides';
   static const kUpdatedAtKey = 'planned_rides.updatedAt';
@@ -56,4 +71,57 @@ class PlannedRidesRepository {
   /// (D-08). Fase 20 leest dit veld nergens om iets te beslissen — de getter
   /// bestaat voor fase 21.
   int? readUpdatedAt() => _prefs.getInt(kUpdatedAtKey);
+
+  /// Verhuisd uit `PlannedRidesNotifier.add()` — dezelfde dedup-op-start/end
+  /// check, dezelfde sortering op start. Enqueuet daarnaast precies één
+  /// 'upsert' outbox-rij voor deze ene rit wanneer ingelogd.
+  Future<void> add(PlannedRide ride) async {
+    final current = readLocal();
+    if (current.any((r) => r.start == ride.start && r.end == ride.end)) {
+      return;
+    }
+    final next = [...current, ride]..sort((a, b) => a.start.compareTo(b.start));
+    await save(next);
+    if (_outbox != null && userId != null) {
+      await _outbox.enqueueOrCoalesce(
+        entity: kOutboxEntityPlannedRide,
+        entityKey: '${userId!}:${ride.rideId}',
+        operation: 'upsert',
+        payload: jsonEncode(ride.toRow(userId!)),
+      );
+    }
+  }
+
+  /// Verhuisd uit `PlannedRidesNotifier.remove()`. Enqueuet een 'delete'
+  /// outbox-rij voor precies deze rit — de payload is `'{}'`, omdat de
+  /// drain-stap het delete-filter (user_id + ride_id) uit `entityKey` haalt,
+  /// niet uit de payload.
+  Future<void> remove(PlannedRide ride) async {
+    final current = readLocal();
+    final next =
+        current.where((r) => r.start != ride.start || r.end != ride.end).toList();
+    await save(next);
+    if (_outbox != null && userId != null) {
+      await _outbox.enqueueOrCoalesce(
+        entity: kOutboxEntityPlannedRide,
+        entityKey: '${userId!}:${ride.rideId}',
+        operation: 'delete',
+        payload: '{}',
+      );
+    }
+  }
+
+  /// Alleen gebruikt door de foreground-reconciler (plan 21-05's
+  /// `CloudSyncReconciler`) om een rit die lokaal al bestaat maar nog niet in
+  /// de cloud staat te pushen, zonder [add]'s dedup/[save] opnieuw te
+  /// draaien (de rit staat al in de lokale lijst).
+  Future<void> enqueueUpsert(PlannedRide ride) async {
+    if (_outbox == null || userId == null) return;
+    await _outbox.enqueueOrCoalesce(
+      entity: kOutboxEntityPlannedRide,
+      entityKey: '${userId!}:${ride.rideId}',
+      operation: 'upsert',
+      payload: jsonEncode(ride.toRow(userId!)),
+    );
+  }
 }

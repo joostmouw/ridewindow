@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/data/repositories/planned_rides_repository.dart';
 import 'package:ridewindow/domain/models/planned_ride.dart';
 
@@ -188,5 +191,121 @@ void main() {
 
   test('Test 8 — readUpdatedAt() geeft null zonder dat veld (D-08)', () async {
     expect(repo.readUpdatedAt(), isNull);
+  });
+
+  group('outbox-aware add()/remove() (Task 1, SYNC-03)', () {
+    late AppDatabase db;
+
+    setUp(() {
+      db = AppDatabase(NativeDatabase.memory());
+    });
+
+    tearDown(() async {
+      await db.close();
+    });
+
+    PlannedRide makeRide() {
+      final start = DateTime.now().add(const Duration(days: 1));
+      final end = start.add(const Duration(hours: 3));
+      return PlannedRide(start: start, end: end, plannedScore: 77.0);
+    }
+
+    test(
+        'add() with outbox+userId calls enqueueOrCoalesce exactly once with '
+        'entity: kOutboxEntityPlannedRide, entityKey uid:rideId, operation upsert',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedInRepo = PlannedRidesRepository(
+        prefs,
+        outbox: db.syncOutboxDao,
+        userId: 'uid-1',
+      );
+      final ride = makeRide();
+
+      await signedInRepo.add(ride);
+
+      final pending = await db.syncOutboxDao.pendingRows();
+      expect(pending, hasLength(1));
+      expect(pending.single.entity, kOutboxEntityPlannedRide);
+      expect(pending.single.entityKey, 'uid-1:${ride.rideId}');
+      expect(pending.single.operation, 'upsert');
+      expect(
+        jsonDecode(pending.single.payload),
+        equals(ride.toRow('uid-1')),
+      );
+    });
+
+    test(
+        'remove() after add() calls enqueueOrCoalesce with operation delete, '
+        'same entityKey, payload {}', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedInRepo = PlannedRidesRepository(
+        prefs,
+        outbox: db.syncOutboxDao,
+        userId: 'uid-1',
+      );
+      final ride = makeRide();
+      await signedInRepo.add(ride);
+
+      await signedInRepo.remove(ride);
+
+      final pending = await db.syncOutboxDao.pendingRows();
+      // Coalesced onto the same (entity, entityKey) row — still exactly one.
+      expect(pending, hasLength(1));
+      expect(pending.single.entity, kOutboxEntityPlannedRide);
+      expect(pending.single.entityKey, 'uid-1:${ride.rideId}');
+      expect(pending.single.operation, 'delete');
+      expect(pending.single.payload, '{}');
+    });
+
+    test(
+        'add() without outbox/userId enqueues nothing and behaves like the '
+        'existing shipped add() (dedup + sort unchanged)', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedOutRepo = PlannedRidesRepository(prefs);
+      final ride = makeRide();
+
+      await signedOutRepo.add(ride);
+      // Adding the exact same start/end again is a no-op dedup.
+      await signedOutRepo.add(ride);
+
+      final result = signedOutRepo.readLocal();
+      expect(result, hasLength(1));
+      expect(result.first.start, ride.start);
+      expect(result.first.end, ride.end);
+    });
+
+    test('enqueueUpsert() enqueues one upsert row without touching local storage',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedInRepo = PlannedRidesRepository(
+        prefs,
+        outbox: db.syncOutboxDao,
+        userId: 'uid-1',
+      );
+      final ride = makeRide();
+
+      await signedInRepo.enqueueUpsert(ride);
+
+      final pending = await db.syncOutboxDao.pendingRows();
+      expect(pending, hasLength(1));
+      expect(pending.single.operation, 'upsert');
+      expect(signedInRepo.readLocal(), isEmpty);
+    });
+
+    test('enqueueUpsert() without outbox/userId is a silent no-op', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedOutRepo = PlannedRidesRepository(prefs);
+      final ride = makeRide();
+
+      await signedOutRepo.enqueueUpsert(ride);
+
+      expect(signedOutRepo.readLocal(), isEmpty);
+    });
   });
 }

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/data/repositories/planned_rides_repository.dart';
 import 'package:ridewindow/domain/models/planned_ride.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 
 export 'package:ridewindow/domain/models/planned_ride.dart' show PlannedRide;
@@ -14,9 +15,18 @@ part 'planned_rides_notifier.g.dart';
 /// `UnimplementedError` tenzij overschreven, en de bestaande
 /// planned-rides-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a), zelfde patroon als
+/// `profileRepositoryProvider`/`availabilityRepositoryProvider` (plan 21-04).
 @riverpod
 Future<PlannedRidesRepository> plannedRidesRepository(Ref ref) async {
-  return PlannedRidesRepository(await SharedPreferences.getInstance());
+  final userId = ref.watch(currentUserIdProvider);
+  final outbox = ref.watch(appDatabaseProvider).syncOutboxDao;
+  return PlannedRidesRepository(
+    await SharedPreferences.getInstance(),
+    outbox: outbox,
+    userId: userId,
+  );
 }
 
 @Riverpod(keepAlive: true)
@@ -25,32 +35,23 @@ class PlannedRidesNotifier extends _$PlannedRidesNotifier {
   Future<List<PlannedRide>> build() async {
     // D-11-reactiviteitstrigger: elke wijziging in authStateProvider (in-/
     // uitloggen, accountwissel) veroorzaakt een lokale herlezing. De waarde
-    // zelf is hier niet nodig — er is nog geen cloud-pad.
+    // zelf is hier niet nodig — het cloud-pad loopt via
+    // plannedRidesRepositoryProvider's eigen currentUserIdProvider-watch.
     ref.watch(authStateProvider);
     final repo = await ref.watch(plannedRidesRepositoryProvider.future);
     return repo.readLocal();
   }
 
   Future<void> add(PlannedRide ride) async {
-    final current = state.value ?? const <PlannedRide>[];
-    // Don't add exact duplicate
-    if (current.any((r) => r.start == ride.start && r.end == ride.end)) {
-      return;
-    }
-    final next = [...current, ride]..sort((a, b) => a.start.compareTo(b.start));
     final repo = await ref.read(plannedRidesRepositoryProvider.future);
-    await repo.save(next);
-    state = AsyncData(next);
+    await repo.add(ride);
+    state = AsyncData(repo.readLocal());
   }
 
   Future<void> remove(PlannedRide ride) async {
-    final current = state.value ?? const <PlannedRide>[];
-    final next = current
-        .where((r) => r.start != ride.start || r.end != ride.end)
-        .toList();
     final repo = await ref.read(plannedRidesRepositoryProvider.future);
-    await repo.save(next);
-    state = AsyncData(next);
+    await repo.remove(ride);
+    state = AsyncData(repo.readLocal());
   }
 
   /// Wist alle geplande ritten (D-09: "start fresh" bij accountwissel).
