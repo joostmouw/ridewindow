@@ -13,6 +13,9 @@ part of 'planned_rides_notifier.dart';
 /// `UnimplementedError` tenzij overschreven, en de bestaande
 /// planned-rides-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a), zelfde patroon als
+/// `profileRepositoryProvider`/`availabilityRepositoryProvider` (plan 21-04).
 
 @ProviderFor(plannedRidesRepository)
 final plannedRidesRepositoryProvider = PlannedRidesRepositoryProvider._();
@@ -22,6 +25,9 @@ final plannedRidesRepositoryProvider = PlannedRidesRepositoryProvider._();
 /// `UnimplementedError` tenzij overschreven, en de bestaande
 /// planned-rides-tests leunen allemaal op
 /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+///
+/// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a), zelfde patroon als
+/// `profileRepositoryProvider`/`availabilityRepositoryProvider` (plan 21-04).
 
 final class PlannedRidesRepositoryProvider extends $FunctionalProvider<
         AsyncValue<PlannedRidesRepository>,
@@ -35,6 +41,9 @@ final class PlannedRidesRepositoryProvider extends $FunctionalProvider<
   /// `UnimplementedError` tenzij overschreven, en de bestaande
   /// planned-rides-tests leunen allemaal op
   /// `SharedPreferences.setMockInitialValues` in combinatie met `getInstance()`.
+  ///
+  /// `outbox`/`userId` zijn additief (ARCHITECTURE.md §4a), zelfde patroon als
+  /// `profileRepositoryProvider`/`availabilityRepositoryProvider` (plan 21-04).
   PlannedRidesRepositoryProvider._()
       : super(
           from: null,
@@ -62,7 +71,7 @@ final class PlannedRidesRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$plannedRidesRepositoryHash() =>
-    r'd2d197b9f2cef5111a25a59ea5862f4d687bcaa8';
+    r'4bd2afd14a87e6e52e463c41b830fb07a8a7dddf';
 
 @ProviderFor(PlannedRidesNotifier)
 final plannedRidesProvider = PlannedRidesNotifierProvider._();
@@ -89,7 +98,7 @@ final class PlannedRidesNotifierProvider
 }
 
 String _$plannedRidesNotifierHash() =>
-    r'393e079627c0cf14738806425cfece620da7baad';
+    r'a4007e74da99b658ace25d5ff9746852eeb1ea89';
 
 abstract class _$PlannedRidesNotifier
     extends $AsyncNotifier<List<PlannedRide>> {

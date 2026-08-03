@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/data/repositories/planned_rides_repository.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 
@@ -48,9 +51,13 @@ void main() {
       final authController = StreamController<User?>.broadcast();
       addTearDown(authController.close);
 
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(() => db.close());
+
       final container = ProviderContainer(
         overrides: [
           authStateProvider.overrideWith((ref) => authController.stream),
+          appDatabaseProvider.overrideWith((ref) => db),
         ],
       );
       addTearDown(container.dispose);
@@ -130,9 +137,13 @@ void main() {
       final authController = StreamController<User?>.broadcast();
       addTearDown(authController.close);
 
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(() => db.close());
+
       final container = ProviderContainer(
         overrides: [
           authStateProvider.overrideWith((ref) => authController.stream),
+          appDatabaseProvider.overrideWith((ref) => db),
         ],
       );
       addTearDown(container.dispose);
@@ -170,6 +181,53 @@ void main() {
       final second = await container.read(plannedRidesProvider.future);
 
       expect(second.length, 2);
+    });
+  });
+
+  group('PlannedRidesNotifier.clearAll() — D-11: blijft lokaal-only (Task 1)', () {
+    test(
+        'clearAll() enqueuet nooit een outbox-rij, ook niet met een signed-in '
+        'outbox+userId geconstrueerde repository', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(() => db.close());
+
+      final now = DateTime.now();
+      final future = now.add(const Duration(days: 1));
+      await _seed([
+        PlannedRide(
+          start: future,
+          end: future.add(const Duration(hours: 2)),
+          plannedScore: 80.0,
+        ),
+      ]);
+
+      final authController = StreamController<User?>.broadcast();
+      addTearDown(authController.close);
+
+      final container = ProviderContainer(
+        overrides: [
+          authStateProvider.overrideWith((ref) => authController.stream),
+          appDatabaseProvider.overrideWith((ref) => db),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // Ingelogde gebruiker — plannedRidesRepositoryProvider construeert nu
+      // een repository met een niet-null outbox+userId.
+      authController.add(_fakeUser('user-1'));
+      await container.read(plannedRidesProvider.future);
+      await Future<void>.delayed(Duration.zero);
+
+      await container.read(plannedRidesProvider.notifier).clearAll();
+
+      final pending = await db.syncOutboxDao.pendingRows();
+      expect(
+        pending,
+        isEmpty,
+        reason:
+            'clearAll() is uitsluitend lokaal (D-11) — er mag geen outbox-rij ontstaan',
+      );
+      expect(await container.read(plannedRidesProvider.future), isEmpty);
     });
   });
 }
