@@ -36,6 +36,7 @@ import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -127,6 +128,15 @@ Future<void> _pumpProfileScreen(
         authStateProvider.overrideWith(
           (ref) => authStream ?? Stream<User?>.value(null),
         ),
+        // Plan 21-07: AccountSection's signed-in row now watches
+        // outboxPendingCountProvider (D-06/D-07 sync status text). Without
+        // this override, Test 4 (signed-in) falls through to the real
+        // provider, which opens a disk-backed Drift database via
+        // path_provider -- unavailable/unstable in this plain widget-test
+        // environment (same real-vs-fake-database problem documented in
+        // profile_notifier_test.dart for appDatabaseProvider). This test
+        // doesn't assert on sync status, so any fixed value is fine.
+        outboxPendingCountProvider.overrideWith((ref) => Stream<int>.value(0)),
       ],
       child: const MaterialApp(
         locale: Locale('nl'),

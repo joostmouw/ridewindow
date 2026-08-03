@@ -16,11 +16,12 @@ part of 'auth_notifier.dart';
 ///
 /// Twee Supabase-valkuilen (ARCHITECTURE.md §1) waar deze implementatie
 /// expliciet omheen bouwt:
-/// 1. `onAuthStateChange` herhaalt géén synchrone beginwaarde zoals
-///    Firebase's `authStateChanges()` dat wel doet — de herstelde sessie is
-///    direct na `Supabase.initialize()` synchroon beschikbaar via
-///    `currentSession`. Zonder deze seed toont een koude start één frame
-///    lang "uitgelogd" (AUTH-04 zou dan flaky zijn, niet waar).
+/// 1. De herstelde sessie is direct na `Supabase.initialize()` synchroon
+///    beschikbaar via `currentSession` — maar de daaropvolgende stream,
+///    `onAuthStateChange`, herhaalt géén synchrone beginwaarde zoals
+///    Firebase's `authStateChanges()` dat wel doet. Zonder deze seed toont
+///    een koude start één frame lang "uitgelogd" (AUTH-04 zou dan flaky
+///    zijn, niet waar).
 /// 2. `User.id` is een Supabase-UUID, geen Google-account-id. AUTH-07's
 ///    Calendar-mismatch-vergelijking (Plan 19-05) moet `.email` gebruiken,
 ///    niet dit id.
@@ -36,11 +37,12 @@ final authStateProvider = AuthStateProvider._();
 ///
 /// Twee Supabase-valkuilen (ARCHITECTURE.md §1) waar deze implementatie
 /// expliciet omheen bouwt:
-/// 1. `onAuthStateChange` herhaalt géén synchrone beginwaarde zoals
-///    Firebase's `authStateChanges()` dat wel doet — de herstelde sessie is
-///    direct na `Supabase.initialize()` synchroon beschikbaar via
-///    `currentSession`. Zonder deze seed toont een koude start één frame
-///    lang "uitgelogd" (AUTH-04 zou dan flaky zijn, niet waar).
+/// 1. De herstelde sessie is direct na `Supabase.initialize()` synchroon
+///    beschikbaar via `currentSession` — maar de daaropvolgende stream,
+///    `onAuthStateChange`, herhaalt géén synchrone beginwaarde zoals
+///    Firebase's `authStateChanges()` dat wel doet. Zonder deze seed toont
+///    een koude start één frame lang "uitgelogd" (AUTH-04 zou dan flaky
+///    zijn, niet waar).
 /// 2. `User.id` is een Supabase-UUID, geen Google-account-id. AUTH-07's
 ///    Calendar-mismatch-vergelijking (Plan 19-05) moet `.email` gebruiken,
 ///    niet dit id.
@@ -56,11 +58,12 @@ final class AuthStateProvider
   ///
   /// Twee Supabase-valkuilen (ARCHITECTURE.md §1) waar deze implementatie
   /// expliciet omheen bouwt:
-  /// 1. `onAuthStateChange` herhaalt géén synchrone beginwaarde zoals
-  ///    Firebase's `authStateChanges()` dat wel doet — de herstelde sessie is
-  ///    direct na `Supabase.initialize()` synchroon beschikbaar via
-  ///    `currentSession`. Zonder deze seed toont een koude start één frame
-  ///    lang "uitgelogd" (AUTH-04 zou dan flaky zijn, niet waar).
+  /// 1. De herstelde sessie is direct na `Supabase.initialize()` synchroon
+  ///    beschikbaar via `currentSession` — maar de daaropvolgende stream,
+  ///    `onAuthStateChange`, herhaalt géén synchrone beginwaarde zoals
+  ///    Firebase's `authStateChanges()` dat wel doet. Zonder deze seed toont
+  ///    een koude start één frame lang "uitgelogd" (AUTH-04 zou dan flaky
+  ///    zijn, niet waar).
   /// 2. `User.id` is een Supabase-UUID, geen Google-account-id. AUTH-07's
   ///    Calendar-mismatch-vergelijking (Plan 19-05) moet `.email` gebruiken,
   ///    niet dit id.

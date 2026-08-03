@@ -199,7 +199,7 @@
 
   "sectionAccount": "Account",
   "signInWithGoogle": "Sign in with Google",
-  "accountSyncPromise": "Coming soon: your settings and planned rides on all your devices.",
+  "accountSyncPromise": "Your settings and planned rides, on all your devices.",
   "accountLoading": "Loading…",
   "accountSignOut": "Sign out",
   "accountSignOutConfirmTitle": "Sign out?",
@@ -210,6 +210,14 @@
   "accountSwitchDialogBody": "You're signed in with a different account than before on this device. Keep the data on this device, or start fresh?",
   "accountSwitchKeepAction": "Keep data",
   "accountSwitchRestartAction": "Start fresh",
+  "accountConflictProfileTitle": "Profile settings differ",
+  "accountConflictProfileBody": "Your profile settings differ between this device and the cloud. Which version do you want to keep?",
+  "accountConflictAvailabilityTitle": "Availability differs",
+  "accountConflictAvailabilityBody": "Your availability calendar differs between this device and the cloud. Which version do you want to keep?",
+  "accountConflictKeepLocalAction": "This device",
+  "accountConflictKeepCloudAction": "Cloud",
+  "accountSyncStatusSynced": "Synced",
+  "accountSyncStatusPending": "Syncing…",
   "calendarMismatchWarning": "Calendar connected to a different account: {email}",
 
   "privacyPolicy": "Privacy policy",

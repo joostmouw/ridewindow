@@ -1078,7 +1078,7 @@ abstract class S {
   /// No description provided for @accountSyncPromise.
   ///
   /// In nl, this message translates to:
-  /// **'Binnenkort: je instellingen en geplande ritten op al je apparaten.'**
+  /// **'Je instellingen en geplande ritten, op al je apparaten.'**
   String get accountSyncPromise;
 
   /// No description provided for @accountLoading.
@@ -1140,6 +1140,54 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Opnieuw beginnen'**
   String get accountSwitchRestartAction;
+
+  /// No description provided for @accountConflictProfileTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Profielinstellingen verschillen'**
+  String get accountConflictProfileTitle;
+
+  /// No description provided for @accountConflictProfileBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je profielinstellingen verschillen tussen dit toestel en de cloud. Welke versie wil je bewaren?'**
+  String get accountConflictProfileBody;
+
+  /// No description provided for @accountConflictAvailabilityTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Beschikbaarheid verschilt'**
+  String get accountConflictAvailabilityTitle;
+
+  /// No description provided for @accountConflictAvailabilityBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je beschikbaarheidskalender verschilt tussen dit toestel en de cloud. Welke versie wil je bewaren?'**
+  String get accountConflictAvailabilityBody;
+
+  /// No description provided for @accountConflictKeepLocalAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit toestel'**
+  String get accountConflictKeepLocalAction;
+
+  /// No description provided for @accountConflictKeepCloudAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Cloud'**
+  String get accountConflictKeepCloudAction;
+
+  /// No description provided for @accountSyncStatusSynced.
+  ///
+  /// In nl, this message translates to:
+  /// **'Gesynchroniseerd'**
+  String get accountSyncStatusSynced;
+
+  /// No description provided for @accountSyncStatusPending.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wordt gesynchroniseerd...'**
+  String get accountSyncStatusPending;
 
   /// No description provided for @calendarMismatchWarning.
   ///

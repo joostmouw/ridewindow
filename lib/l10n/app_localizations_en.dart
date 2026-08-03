@@ -549,7 +549,7 @@ class SEn extends S {
 
   @override
   String get accountSyncPromise =>
-      'Coming soon: your settings and planned rides on all your devices.';
+      'Your settings and planned rides, on all your devices.';
 
   @override
   String get accountLoading => 'Loading…';
@@ -582,6 +582,32 @@ class SEn extends S {
 
   @override
   String get accountSwitchRestartAction => 'Start fresh';
+
+  @override
+  String get accountConflictProfileTitle => 'Profile settings differ';
+
+  @override
+  String get accountConflictProfileBody =>
+      'Your profile settings differ between this device and the cloud. Which version do you want to keep?';
+
+  @override
+  String get accountConflictAvailabilityTitle => 'Availability differs';
+
+  @override
+  String get accountConflictAvailabilityBody =>
+      'Your availability calendar differs between this device and the cloud. Which version do you want to keep?';
+
+  @override
+  String get accountConflictKeepLocalAction => 'This device';
+
+  @override
+  String get accountConflictKeepCloudAction => 'Cloud';
+
+  @override
+  String get accountSyncStatusSynced => 'Synced';
+
+  @override
+  String get accountSyncStatusPending => 'Syncing…';
 
   @override
   String calendarMismatchWarning(String email) {

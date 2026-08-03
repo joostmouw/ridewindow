@@ -19,8 +19,10 @@ import 'package:ridewindow/domain/services/account_switch_resolver.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/services/account_sync_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 
 // package:google_sign_in/web_only.dart does not exist in google_sign_in
@@ -238,6 +240,77 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
         await prefs.setString(_kLastSyncedUidKey, signedInUid);
         break;
     }
+
+    // Plan 21-07: MIG-01/02/03 + D-04/D-05/D-06/D-07 -- appended as the
+    // final step, after both switch-decision branches above have fully
+    // settled local storage (see this method's own `lastSyncedUid` local,
+    // captured BEFORE either `prefs.setString` call above -- AccountSyncService
+    // needs that pre-write snapshot, never the already-overwritten value).
+    await _runAccountSync(signedInUid, lastSyncedUid);
+  }
+
+  /// Wires plan 21-06's `AccountSyncService` into the sign-in flow (MIG-01/
+  /// 02/03) and shows at most two sequential D-04/D-05 conflict dialogs,
+  /// profile before availability. Wrapped in try/catch: a sync failure
+  /// (network error, RLS denial, etc.) must never block the sign-in flow
+  /// that already succeeded above -- same "never crash on a background sync
+  /// problem" reasoning as `CloudSyncReconciler.reconcileOnForeground`.
+  Future<void> _runAccountSync(
+    String userId,
+    String? preSwitchLastSyncedUid,
+  ) async {
+    try {
+      final service = await ref.read(accountSyncServiceProvider.future);
+
+      final prompts = await service.onSignIn(
+        userId,
+        lastSyncedUid: preSwitchLastSyncedUid,
+      );
+
+      for (final prompt in prompts) {
+        if (!mounted) return;
+        final s = S.of(context);
+        final isProfile = prompt.domain == SyncDomain.profile;
+        final keepLocal = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Text(
+              isProfile
+                  ? s.accountConflictProfileTitle
+                  : s.accountConflictAvailabilityTitle,
+            ),
+            content: Text(
+              isProfile
+                  ? s.accountConflictProfileBody
+                  : s.accountConflictAvailabilityBody,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(s.accountConflictKeepLocalAction),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(s.accountConflictKeepCloudAction),
+              ),
+            ],
+          ),
+        );
+        await service.resolvePrompt(prompt, userId, keepLocal: keepLocal ?? true);
+      }
+
+      if (prompts.isNotEmpty) {
+        await service.markSynced(userId);
+      }
+
+      if (mounted) {
+        ref.invalidate(profileProvider);
+        ref.invalidate(availabilityProvider);
+      }
+    } catch (e) {
+      debugPrint('AccountSection: _runAccountSync mislukt: $e');
+    }
   }
 
   void _showSignInError() {
@@ -371,13 +444,31 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
         user.email ??
         '';
 
+    // D-06/D-07: exactly two visible sync-status strings, never a third.
+    // loading/error render nothing (a transient blank frame is acceptable,
+    // a fabricated third status string is not).
+    final pendingCountAsync = ref.watch(outboxPendingCountProvider);
+
     return ListTile(
       leading: Semantics(
         label: s.accountAvatarSemanticLabel,
         child: _AccountAvatar(avatarUrl: avatarUrl),
       ),
       title: Text(displayName),
-      subtitle: user.email != null ? Text(user.email!) : null,
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (user.email != null) Text(user.email!),
+          pendingCountAsync.when(
+            data: (count) => Text(
+              count == 0 ? s.accountSyncStatusSynced : s.accountSyncStatusPending,
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+        ],
+      ),
       trailing: TextButton(
         onPressed: () => _confirmAndSignOut(context),
         child: Text(s.accountSignOut),

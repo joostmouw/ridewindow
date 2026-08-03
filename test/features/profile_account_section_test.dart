@@ -15,19 +15,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/app/router.dart';
+import 'package:ridewindow/data/repositories/availability_repository.dart';
+import 'package:ridewindow/data/repositories/planned_rides_repository.dart';
+import 'package:ridewindow/data/repositories/profile_repository.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/services/account_sync_service.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers (zelfde patroon als profile_screen_calendar_test.dart)
@@ -62,6 +68,50 @@ class FakeWeatherNotifier extends WeatherNotifier {
   Future<List<HourlyForecast>> build() async => const [];
 }
 
+/// Fake seam for `accountSyncServiceProvider` (plan 21-07's testability
+/// hook, see `cloud_sync_reconciler_provider.dart`'s doc comment on that
+/// provider) -- overrides `onSignIn`/`resolvePrompt`/`markSynced` directly
+/// so widget tests never touch a live `SupabaseClient`. The repo/closure
+/// constructor arguments are never exercised by the overridden methods, so
+/// plain real repositories (backed by the test's own SharedPreferences) are
+/// enough -- no separate mock needed.
+class FakeAccountSyncService extends AccountSyncService {
+  FakeAccountSyncService(
+    this.promptsToReturn, {
+    required SharedPreferences prefs,
+  }) : super(
+          profileRepo: ProfileRepository(prefs),
+          availabilityRepo: AvailabilityRepository(prefs),
+          plannedRidesRepo: PlannedRidesRepository(prefs),
+          readCloudProfile: (_) async => null,
+          readCloudAvailability: (_) async => null,
+          migrateFn: (_) async {},
+          writeLastSyncedUid: (_) async {},
+        );
+
+  final List<PendingSyncPrompt> promptsToReturn;
+  final List<SyncDomain> resolvedDomains = [];
+
+  @override
+  Future<List<PendingSyncPrompt>> onSignIn(
+    String userId, {
+    required String? lastSyncedUid,
+  }) async =>
+      promptsToReturn;
+
+  @override
+  Future<void> resolvePrompt(
+    PendingSyncPrompt prompt,
+    String userId, {
+    required bool keepLocal,
+  }) async {
+    resolvedDomains.add(prompt.domain);
+  }
+
+  @override
+  Future<void> markSynced(String userId) async {}
+}
+
 UserProfile _baseProfile() => const UserProfile(
       tolerances: WeatherTolerances(
         tempMinIdealC: 12.0,
@@ -92,6 +142,8 @@ final _fakeUser = User(
 Future<void> _pumpProfileScreen(
   WidgetTester tester, {
   required Stream<User?> authStream,
+  AccountSyncService? fakeSyncService,
+  Stream<int>? outboxPendingCountStream,
 }) async {
   // Vergroot het test-viewport zodat de nieuwe Account-sectie (bovenaan) en
   // de bestaande secties allemaal binnen de sliver-viewport vallen en dus
@@ -106,20 +158,38 @@ Future<void> _pumpProfileScreen(
   // wordt geraakt.
   final prefs = await SharedPreferences.getInstance();
 
+  // Plan 21-07: elke ingelogde flow raakt nu _runAccountSync() aan het einde
+  // van _checkAccountSwitch(), wat accountSyncServiceProvider (dat anders een
+  // live Supabase-client zou aanroepen) nodig heeft -- krijgt hier altijd een
+  // testbare fake, tenzij een test zelf iets anders opgeeft.
+  final syncService = fakeSyncService ?? FakeAccountSyncService(const [], prefs: prefs);
+
+  // outboxPendingCountProvider default: overschreven met een direct-emitting
+  // Stream in plaats van de echte appDatabaseProvider/Drift-keten -- een
+  // live `.watchSingle()`-stream schedulet bij widget-teardown een
+  // zero-duration Timer die flutter_test's eind-van-test invariant-check
+  // ("A Timer is still pending...") laat falen, en geen van de bestaande
+  // tests in dit bestand heeft de echte database nodig.
+  final overrides = <Override>[
+    profileProvider.overrideWith(() => FakeProfileNotifier(_baseProfile())),
+    gpsPermissionProvider.overrideWith(
+      () => FakeGpsPermissionNotifier(LocationPermission.whileInUse),
+    ),
+    locationProvider.overrideWith(
+      () => FakeLocationNotifier(_defaultLocation),
+    ),
+    weatherProvider.overrideWith(() => FakeWeatherNotifier()),
+    authStateProvider.overrideWith((ref) => authStream),
+    sharedPrefsProvider.overrideWithValue(prefs),
+    accountSyncServiceProvider.overrideWith((ref) async => syncService),
+    outboxPendingCountProvider.overrideWith(
+      (ref) => outboxPendingCountStream ?? Stream<int>.value(0),
+    ),
+  ];
+
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        profileProvider.overrideWith(() => FakeProfileNotifier(_baseProfile())),
-        gpsPermissionProvider.overrideWith(
-          () => FakeGpsPermissionNotifier(LocationPermission.whileInUse),
-        ),
-        locationProvider.overrideWith(
-          () => FakeLocationNotifier(_defaultLocation),
-        ),
-        weatherProvider.overrideWith(() => FakeWeatherNotifier()),
-        authStateProvider.overrideWith((ref) => authStream),
-        sharedPrefsProvider.overrideWithValue(prefs),
-      ],
+      overrides: overrides,
       child: const MaterialApp(
         locale: Locale('nl'),
         localizationsDelegates: S.localizationsDelegates,
@@ -258,5 +328,100 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text(s.accountSwitchDialogTitle), findsNothing);
+  });
+
+  testWidgets(
+      'Test 6 — divergente profile + availability toont twee sequentiële '
+      'conflictdialogen, profiel eerst, nooit tegelijk (D-04/D-05)',
+      (tester) async {
+    final prefs = await SharedPreferences.getInstance();
+    final fakeService = FakeAccountSyncService(
+      const [
+        PendingSyncPrompt(SyncDomain.profile),
+        PendingSyncPrompt(SyncDomain.availability),
+      ],
+      prefs: prefs,
+    );
+
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+      fakeSyncService: fakeService,
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    // Alleen de profiel-dialoog is zichtbaar -- de beschikbaarheid-dialoog
+    // verschijnt pas nadat deze is afgehandeld, nooit tegelijk.
+    expect(find.text(s.accountConflictProfileTitle), findsOneWidget);
+    expect(find.text(s.accountConflictAvailabilityTitle), findsNothing);
+
+    await tester.tap(find.text(s.accountConflictKeepLocalAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountConflictProfileTitle), findsNothing);
+    expect(find.text(s.accountConflictAvailabilityTitle), findsOneWidget);
+
+    await tester.tap(find.text(s.accountConflictKeepLocalAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountConflictAvailabilityTitle), findsNothing);
+    expect(fakeService.resolvedDomains, [SyncDomain.profile, SyncDomain.availability]);
+  });
+
+  testWidgets(
+      'Test 7 — 0 openstaande outbox-rijen toont "Gesynchroniseerd", niet '
+      '"Wordt gesynchroniseerd..." (D-06/D-07)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+      outboxPendingCountStream: Stream<int>.value(0),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsOneWidget);
+    expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsNothing);
+  });
+
+  testWidgets(
+      'Test 8 — 3 openstaande outbox-rijen toont "Wordt gesynchroniseerd...", '
+      'niet "Gesynchroniseerd" (D-06/D-07)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+      outboxPendingCountStream: Stream<int>.value(3),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsOneWidget);
+    expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsNothing);
+  });
+
+  testWidgets(
+      'Test 9 — uitgelogde rij toont nooit een sync-statustekst (D-06/D-07 '
+      'gelden alleen voor de ingelogde staat)',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsNothing);
+    expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsNothing);
   });
 }
