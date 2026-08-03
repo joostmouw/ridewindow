@@ -1,4 +1,5 @@
 import 'package:ridewindow/domain/models/block_type.dart';
+import 'package:ridewindow/domain/models/planned_ride.dart';
 import 'package:ridewindow/domain/models/user_profile.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
 
@@ -45,5 +46,48 @@ class CloudReconcileService {
       hours: fromRecurringJson(row['recurring'] as Map<String, dynamic>),
       updatedAt: DateTime.parse(row['updated_at'] as String),
     );
+  }
+
+  /// Parses a pulled `public.planned_rides` result set (plan 21-05,
+  /// SYNC-03). Unlike [parseProfileRow]/[parseAvailabilityRow] this takes a
+  /// `List`, not a nullable single row — `planned_rides` is a growable list
+  /// of independent rows, not a single mutable blob, so there is no
+  /// `updated_at` comparison here; the caller (`CloudSyncReconciler`) applies
+  /// a union merge instead, per plan 21-05's objective. An empty/missing
+  /// cloud result set is simply an empty list, not a "no data yet" sentinel.
+  List<PlannedRide> parsePlannedRidesRows(List<Map<String, dynamic>> rows) =>
+      rows.map(PlannedRide.fromRow).toList();
+
+  /// Pure union-merge algorithm for planned rides (plan 21-05, SYNC-03) —
+  /// any ride present on either side ends up in [merged] (sorted by start).
+  /// [localOnly] is exactly the rides the caller still needs to push to the
+  /// cloud (present locally, absent from [cloud]) — `merged` deliberately
+  /// does not distinguish that on its own, since a ride either exists or it
+  /// doesn't, with no mutable state to diverge on.
+  ///
+  /// Kept as a plain method with no `SupabaseClient`/outbox dependency so
+  /// the merge behavior itself is unit-testable directly against fake
+  /// local/cloud inputs — the actual network read and outbox enqueue calls
+  /// live in `CloudSyncReconciler.reconcilePlannedRides` (Task 3's
+  /// unverified-by-automated-test seam, same split as `parseProfileRow`/
+  /// `parseAvailabilityRow` vs. the real `.from(...).select()` call).
+  ({List<PlannedRide> merged, List<PlannedRide> localOnly}) mergePlannedRides({
+    required List<PlannedRide> local,
+    required List<PlannedRide> cloud,
+  }) {
+    final cloudIds = cloud.map((r) => r.rideId).toSet();
+    final localOnly =
+        local.where((r) => !cloudIds.contains(r.rideId)).toList();
+
+    final mergedMap = <String, PlannedRide>{
+      for (final r in local) r.rideId: r,
+    };
+    for (final ride in cloud) {
+      mergedMap.putIfAbsent(ride.rideId, () => ride);
+    }
+    final merged = mergedMap.values.toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
+
+    return (merged: merged, localOnly: localOnly);
   }
 }

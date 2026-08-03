@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 import 'package:ridewindow/domain/models/block_type.dart';
+import 'package:ridewindow/domain/models/planned_ride.dart';
 import 'package:ridewindow/services/cloud_reconcile_service.dart';
 
 void main() {
@@ -54,6 +55,85 @@ void main() {
       expect(result!.hours.length, 2);
       expect(result.hours.values.toSet(), {BlockType.work, BlockType.custom});
       expect(result.updatedAt, DateTime.parse('2026-08-01T12:00:00.000Z'));
+    });
+  });
+
+  group('parsePlannedRidesRows', () {
+    test('empty rows list parses to an empty list (no "no data yet" sentinel)',
+        () {
+      expect(service.parsePlannedRidesRows(const []), isEmpty);
+    });
+
+    test('maps each row through PlannedRide.fromRow', () {
+      final ride = PlannedRide(
+        start: DateTime.parse('2026-08-10T09:00:00.000'),
+        end: DateTime.parse('2026-08-10T13:00:00.000'),
+        plannedScore: 82.5,
+      );
+
+      final result = service.parsePlannedRidesRows([ride.toRow('uid-1')]);
+
+      expect(result, hasLength(1));
+      expect(result.single.start, ride.start);
+      expect(result.single.end, ride.end);
+      expect(result.single.plannedScore, ride.plannedScore);
+    });
+  });
+
+  group('mergePlannedRides — union merge (plan 21-05, SYNC-03)', () {
+    PlannedRide ride(String isoStart, double score) => PlannedRide(
+          start: DateTime.parse(isoStart),
+          end: DateTime.parse(isoStart).add(const Duration(hours: 2)),
+          plannedScore: score,
+        );
+
+    test(
+        'local [A, B] + cloud [B, C] (by rideId) merges to [A, B, C] sorted by '
+        'start, localOnly is exactly [A]', () {
+      final a = ride('2026-08-10T09:00:00.000', 70.0);
+      final b = ride('2026-08-11T09:00:00.000', 75.0);
+      // Same rideId as b (same start) but a different cloud-side score —
+      // proves the union keeps the LOCAL copy for ids present on both
+      // sides (putIfAbsent semantics), not a cloud overwrite.
+      final bFromCloud = ride('2026-08-11T09:00:00.000', 999.0);
+      final c = ride('2026-08-12T09:00:00.000', 80.0);
+
+      final result = service.mergePlannedRides(
+        local: [a, b],
+        cloud: [bFromCloud, c],
+      );
+
+      expect(result.merged.map((r) => r.rideId).toList(), [
+        a.rideId,
+        b.rideId,
+        c.rideId,
+      ]);
+      expect(
+        result.merged.firstWhere((r) => r.rideId == b.rideId).plannedScore,
+        75.0,
+        reason: 'local copy of a shared rideId wins the union, not the cloud copy',
+      );
+      expect(result.localOnly, hasLength(1));
+      expect(result.localOnly.single.rideId, a.rideId);
+    });
+
+    test('local [A] + cloud [] merges to just [A], localOnly is [A]', () {
+      final a = ride('2026-08-10T09:00:00.000', 70.0);
+
+      final result = service.mergePlannedRides(local: [a], cloud: const []);
+
+      expect(result.merged.map((r) => r.rideId).toList(), [a.rideId]);
+      expect(result.localOnly, hasLength(1));
+      expect(result.localOnly.single.rideId, a.rideId);
+    });
+
+    test('local [] + cloud [X] merges to [X], localOnly is empty', () {
+      final x = ride('2026-08-10T09:00:00.000', 70.0);
+
+      final result = service.mergePlannedRides(local: const [], cloud: [x]);
+
+      expect(result.merged.map((r) => r.rideId).toList(), [x.rideId]);
+      expect(result.localOnly, isEmpty);
     });
   });
 }
