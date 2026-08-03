@@ -97,3 +97,12 @@ None - no external service configuration required. This is a pure, SDK-free Dart
 ---
 *Phase: 21-sync-migration*
 *Completed: 2026-08-03*
+
+## Self-Check: PASSED
+
+- FOUND: lib/domain/services/account_sync_resolver.dart
+- FOUND: test/domain/services/account_sync_resolver_test.dart
+- FOUND: .planning/phases/21-sync-migration/21-01-SUMMARY.md
+- FOUND: cba98f1 (RED commit)
+- FOUND: 9ecf9ff (GREEN commit)
+- FOUND: 6330725 (SUMMARY commit)
