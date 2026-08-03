@@ -158,7 +158,41 @@ Plans:
   4. Migration is written as one all-or-nothing, server-acknowledged operation — a single transaction via `rpc()`, never three separate table writes — that never deletes local data, verified by an automated test that seeds realistic production-shaped local data and asserts the exact resulting row shape (MIG-05, MIG-06, MIG-07, MIG-08)
   5. One user cannot read or write another user's data — proven by an automated deny-case test run against the deployed row-level security policies, not only a local instance; the forecast cache and calendar-imported blocks stay local and never sync; the app behaves correctly with more than one web tab open; availability writes go out as one batched row write; and deleting an account is verified to actually remove the user's rows, not merely to be declared by `on delete cascade` (SYNC-08, SYNC-09, SYNC-10, SYNC-11, SYNC-12, AUTH-09)
 
-**Plans**: TBD
+**Plans**: 9 plans across 8 waves
+Plans:
+**Wave 1**
+
+- [ ] 21-01-PLAN.md — account_sync_resolver.dart (full resolveAccountSync) + unit tests
+- [ ] 21-02-PLAN.md — Postgres schema + RLS + migrate_account_data()/delete_own_account() + RLS deny-case test (checkpoint: apply migration)
+
+**Wave 2** *(blocked on 21-02)*
+
+- [ ] 21-03-PLAN.md — Offline outbox: Drift table + DAO + SyncOutboxService.drain()
+
+**Wave 3** *(blocked on 21-02, 21-03)*
+
+- [ ] 21-04-PLAN.md — Cloud sink for profile + availability (row-shape conversion, outbox wiring, foreground reconcile)
+
+**Wave 4** *(blocked on 21-04)*
+
+- [ ] 21-05-PLAN.md — Cloud sink for planned rides (per-ride outbox, union-merge reconcile)
+
+**Wave 5** *(blocked on 21-01, 21-04, 21-05)*
+
+- [ ] 21-06-PLAN.md — AccountSyncService (resolver + cloud composition, migrate_account_data RPC trigger, MIG-08 exact-shape test)
+
+**Wave 6** *(blocked on 21-06)*
+
+- [ ] 21-07-PLAN.md — Wire AccountSyncService into sign-in flow, sequential conflict dialogs (D-04/D-05), sync status text (D-06/D-07)
+
+**Wave 7** *(blocked on 21-02, 21-07)*
+
+- [ ] 21-08-PLAN.md — AUTH-09 account deletion UI (D-01/D-02/D-03) + deployed-project verification (checkpoint)
+
+**Wave 8** *(blocked on 21-08)*
+
+- [ ] 21-09-PLAN.md — REGRESSION-CHECKLIST-21.md, full suite/release gate, REG-03 cold-start remeasurement (checkpoint)
+
 **UI hint**: yes
 
 ### Phase 22: Account-backed feedback
@@ -205,7 +239,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
 | 19. Auth | v3.0 | 6/7 | In Progress|  |
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
-| 21. Sync + migration | v3.0 | 0/TBD | Not started | - |
+| 21. Sync + migration | v3.0 | 0/9 | Not started | - |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
