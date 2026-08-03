@@ -26,8 +26,9 @@ const _kLastSyncedUidKey = 'account.lastSyncedUid';
 CloudSyncReconciler cloudSyncReconciler(Ref ref) => CloudSyncReconciler(ref);
 
 /// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
-/// status indicator) — watched directly from `AccountSection`'s signed-in
-/// row.
+/// status indicator). Generated as `outboxPendingCountProvider` — watched
+/// directly from `AccountSection._buildSignedInRow()` via
+/// `ref.watch(outboxPendingCountProvider)`.
 @riverpod
 Stream<int> outboxPendingCount(Ref ref) =>
     ref.watch(appDatabaseProvider).syncOutboxDao.watchPendingCount();
