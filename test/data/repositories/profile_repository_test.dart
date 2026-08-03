@@ -1,6 +1,11 @@
+import 'dart:convert';
+
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/database/app_database.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/data/repositories/profile_repository.dart';
 import 'package:ridewindow/domain/models/user_profile.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
@@ -179,5 +184,83 @@ void main() {
     expect(prefs.containsKey('profile.notifMorningOf'), isFalse);
     expect(prefs.containsKey('profile.notifWeeklyDigest'), isFalse);
     expect(prefs.containsKey('profile.updatedAt'), isFalse);
+  });
+
+  group('outbox-aware save (Task 2, SYNC-01/SYNC-02)', () {
+    late AppDatabase db;
+
+    setUp(() {
+      db = AppDatabase(NativeDatabase.memory());
+    });
+
+    tearDown(() async {
+      await db.close();
+    });
+
+    const profile = UserProfile(
+      tolerances: WeatherTolerances(
+        tempMinIdealC: 8.0,
+        tempMaxIdealC: 24.0,
+        windMaxIdealKmh: 20.0,
+        rainMaxIdealMm: 1.0,
+      ),
+      allowedDurations: [2, 4],
+      theme: 'dark',
+      locale: 'en',
+      locationOverride: 'Utrecht',
+      userName: 'Joost',
+      notifEveningBefore: true,
+      notifMorningOf: false,
+      notifWeeklyDigest: true,
+    );
+
+    test(
+        'constructed with outbox+userId enqueues exactly one profile row '
+        'matching profile.toRow(userId)', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedInRepo =
+          ProfileRepository(prefs, outbox: db.syncOutboxDao, userId: 'uid-1');
+
+      await signedInRepo.save(profile);
+
+      final pending = await db.syncOutboxDao.pendingRows();
+      expect(pending, hasLength(1));
+      expect(pending.single.entity, kOutboxEntityProfile);
+      expect(pending.single.entityKey, 'uid-1');
+      expect(pending.single.operation, 'upsert');
+      expect(
+        jsonDecode(pending.single.payload),
+        equals(profile.toRow('uid-1')),
+      );
+    });
+
+    test(
+        'constructed without outbox/userId (existing background_task.dart '
+        'call shape) enqueues nothing', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final signedOutRepo = ProfileRepository(prefs);
+
+      await signedOutRepo.save(profile);
+
+      // No outbox was even constructed for this repo, so there is nothing
+      // to assert against a DAO — the guard (`_outbox != null && userId !=
+      // null`) is what's under test here: save() must not throw or behave
+      // differently just because outbox/userId are absent.
+      expect(prefs.getString('profile.userName'), 'Joost');
+    });
+
+    test('stampUpdatedAt(value) sets the exact epoch-ms value, not now()',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = ProfileRepository(prefs);
+      final known = DateTime.fromMillisecondsSinceEpoch(1700000000000);
+
+      await repo.stampUpdatedAt(known);
+
+      expect(repo.readUpdatedAt(), 1700000000000);
+    });
   });
 }
