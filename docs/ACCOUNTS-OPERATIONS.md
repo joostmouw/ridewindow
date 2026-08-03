@@ -39,6 +39,8 @@ A tester reports that sync isn't working, or data isn't appearing on their other
 
 ## 4. Retention, deletion and export
 
+**What actually triggers deletion.** A signed-in client cannot call `auth.admin.deleteUser()` directly — that admin API needs the service-role key, which never ships to the client. Instead, the app calls `supabase.rpc('delete_own_account')`, a `security definer` `plpgsql` function (`supabase/migrations/0001_accounts_sync.sql`) that derives the target row *only* from `auth.uid()` (never a client-supplied parameter, which would otherwise let a signed-in user delete someone else's account under `security definer` privilege) and runs `delete from auth.users where id = auth.uid()`. This is the real trigger AUTH-09 relies on — the mechanism below is what happens automatically once that row is gone, not an alternative to it.
+
 **What deletion removes.** Deleting a user's account removes their rows immediately, via `on delete cascade` from `auth.users`. This applies to `profiles`, `availability`, and `planned_rides` (or the equivalent tables landed in Phase 21) — once the auth user is deleted, Postgres removes the dependent rows as part of the same operation, not on a delayed job.
 
 **What survives, de-identified.** `feedback` rows are the one exception: they use `on delete set null`, so a deleted user's feedback rows survive with `user_id` set to `null`. The content of the feedback (score, weather inputs, tolerance settings at the time) is retained; the link back to the person is not. This must be stated plainly to anyone asking "is my data really gone" — the honest answer is "your rows are gone; your anonymised feedback text may remain."
