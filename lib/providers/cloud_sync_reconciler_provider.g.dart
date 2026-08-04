@@ -8,21 +8,61 @@ part of 'cloud_sync_reconciler_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// keepAlive: true (plan 21-11) -- both production call sites
+/// (`home_screen.dart:98`, `account_section.dart:317`) use a bare
+/// `ref.read`, which establishes no listener. A bare `@riverpod`
+/// (autoDispose by default in Riverpod 3) is disposed shortly after that
+/// read returns, and `CloudSyncReconciler` stores the `Ref` it was built
+/// with across `await` boundaries -- the next `_ref` access after any real
+/// I/O then throws "Cannot use the Ref of cloudSyncReconcilerProvider after
+/// it has been disposed." Found on a real device on 2026-08-04 (Oppo Find
+/// X9 Pro, app 1.0.15+16): both `reconcileOnForeground()` and
+/// `drainOutbox()` failed this way, silently swallowed by their own
+/// try/catch, leaving the account row stuck on "Syncing...". Do not "tidy"
+/// this back to a bare `@riverpod` -- see test/providers/
+/// outbox_drain_wiring_test.dart for the regression coverage.
 
 @ProviderFor(cloudSyncReconciler)
 final cloudSyncReconcilerProvider = CloudSyncReconcilerProvider._();
+
+/// keepAlive: true (plan 21-11) -- both production call sites
+/// (`home_screen.dart:98`, `account_section.dart:317`) use a bare
+/// `ref.read`, which establishes no listener. A bare `@riverpod`
+/// (autoDispose by default in Riverpod 3) is disposed shortly after that
+/// read returns, and `CloudSyncReconciler` stores the `Ref` it was built
+/// with across `await` boundaries -- the next `_ref` access after any real
+/// I/O then throws "Cannot use the Ref of cloudSyncReconcilerProvider after
+/// it has been disposed." Found on a real device on 2026-08-04 (Oppo Find
+/// X9 Pro, app 1.0.15+16): both `reconcileOnForeground()` and
+/// `drainOutbox()` failed this way, silently swallowed by their own
+/// try/catch, leaving the account row stuck on "Syncing...". Do not "tidy"
+/// this back to a bare `@riverpod` -- see test/providers/
+/// outbox_drain_wiring_test.dart for the regression coverage.
 
 final class CloudSyncReconcilerProvider extends $FunctionalProvider<
     CloudSyncReconciler,
     CloudSyncReconciler,
     CloudSyncReconciler> with $Provider<CloudSyncReconciler> {
+  /// keepAlive: true (plan 21-11) -- both production call sites
+  /// (`home_screen.dart:98`, `account_section.dart:317`) use a bare
+  /// `ref.read`, which establishes no listener. A bare `@riverpod`
+  /// (autoDispose by default in Riverpod 3) is disposed shortly after that
+  /// read returns, and `CloudSyncReconciler` stores the `Ref` it was built
+  /// with across `await` boundaries -- the next `_ref` access after any real
+  /// I/O then throws "Cannot use the Ref of cloudSyncReconcilerProvider after
+  /// it has been disposed." Found on a real device on 2026-08-04 (Oppo Find
+  /// X9 Pro, app 1.0.15+16): both `reconcileOnForeground()` and
+  /// `drainOutbox()` failed this way, silently swallowed by their own
+  /// try/catch, leaving the account row stuck on "Syncing...". Do not "tidy"
+  /// this back to a bare `@riverpod` -- see test/providers/
+  /// outbox_drain_wiring_test.dart for the regression coverage.
   CloudSyncReconcilerProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
           name: r'cloudSyncReconcilerProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -51,7 +91,7 @@ final class CloudSyncReconcilerProvider extends $FunctionalProvider<
 }
 
 String _$cloudSyncReconcilerHash() =>
-    r'eda8ca8ba30905816581f18f019e64e49f08ca32';
+    r'e0591342f0f35bae6af779f7a5367d247087f49d';
 
 /// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
 /// status indicator). Generated as `outboxPendingCountProvider` — watched
@@ -107,6 +147,15 @@ String _$outboxPendingCountHash() =>
 /// inline inside `CloudSyncReconciler.drainOutbox()`) so a test can override
 /// it with a fake service, matching this file's existing
 /// `accountSyncServiceProvider` seam.
+///
+/// keepAlive: true (plan 21-11) -- same disposed-Ref failure and same
+/// 2026-08-04 device date as `cloudSyncReconcilerProvider` above, plus a
+/// second, quieter bug this fixes: without keepAlive, every bare
+/// `_ref.read(syncOutboxServiceProvider)` constructs a *fresh*
+/// `SyncOutboxService`, so 21-10's `_inFlightDrain` re-entrancy guard (an
+/// instance field) never sees a second overlapping call -- two different
+/// instances each think they are the only drain in flight. Do not "tidy"
+/// this back to a bare `@riverpod`.
 
 @ProviderFor(syncOutboxService)
 final syncOutboxServiceProvider = SyncOutboxServiceProvider._();
@@ -117,6 +166,15 @@ final syncOutboxServiceProvider = SyncOutboxServiceProvider._();
 /// inline inside `CloudSyncReconciler.drainOutbox()`) so a test can override
 /// it with a fake service, matching this file's existing
 /// `accountSyncServiceProvider` seam.
+///
+/// keepAlive: true (plan 21-11) -- same disposed-Ref failure and same
+/// 2026-08-04 device date as `cloudSyncReconcilerProvider` above, plus a
+/// second, quieter bug this fixes: without keepAlive, every bare
+/// `_ref.read(syncOutboxServiceProvider)` constructs a *fresh*
+/// `SyncOutboxService`, so 21-10's `_inFlightDrain` re-entrancy guard (an
+/// instance field) never sees a second overlapping call -- two different
+/// instances each think they are the only drain in flight. Do not "tidy"
+/// this back to a bare `@riverpod`.
 
 final class SyncOutboxServiceProvider extends $FunctionalProvider<
     SyncOutboxService,
@@ -128,13 +186,22 @@ final class SyncOutboxServiceProvider extends $FunctionalProvider<
   /// inline inside `CloudSyncReconciler.drainOutbox()`) so a test can override
   /// it with a fake service, matching this file's existing
   /// `accountSyncServiceProvider` seam.
+  ///
+  /// keepAlive: true (plan 21-11) -- same disposed-Ref failure and same
+  /// 2026-08-04 device date as `cloudSyncReconcilerProvider` above, plus a
+  /// second, quieter bug this fixes: without keepAlive, every bare
+  /// `_ref.read(syncOutboxServiceProvider)` constructs a *fresh*
+  /// `SyncOutboxService`, so 21-10's `_inFlightDrain` re-entrancy guard (an
+  /// instance field) never sees a second overlapping call -- two different
+  /// instances each think they are the only drain in flight. Do not "tidy"
+  /// this back to a bare `@riverpod`.
   SyncOutboxServiceProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
           name: r'syncOutboxServiceProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -162,7 +229,7 @@ final class SyncOutboxServiceProvider extends $FunctionalProvider<
   }
 }
 
-String _$syncOutboxServiceHash() => r'131ce74676d267d936ba01523a88dd729ab8ba2d';
+String _$syncOutboxServiceHash() => r'8e100295f0d507e0cc7125f7dc7db35ae0d58e39';
 
 /// Constructs the real [AccountSyncService] (plan 21-06) with production
 /// dependencies (plan 21-07): the three repositories, the two cloud-read

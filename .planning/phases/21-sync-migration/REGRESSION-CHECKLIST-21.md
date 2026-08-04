@@ -214,7 +214,7 @@ traces back to Phase 19's own unclosed plan 19-07.**
       change rather than silently overwriting it with stale in-memory state (no data loss, no
       stale overwrite when tab B's own next write happens).
 
-## 5a. SYNC-05 — outbox drain proof (plan 21-10, gap closure)
+## 5a. SYNC-05 — outbox drain proof (plan 21-10, gap closure; plan 21-11, disposed-Ref fix)
 
 Do this **before** section 6 (delete-account is destructive to the test account). This section
 proves the fix for the defect found on-device 2026-08-04: `SyncOutboxService` was never
@@ -225,12 +225,24 @@ constructed and `drain()` was never called anywhere in `lib/`, so every local ch
 and into `AccountSection._runAccountSync()` (right after a sign-in's sync decisions settle) —
 this section is the only valid proof that either trigger actually reaches the cloud.
 
+A second defect was found on the same device, same session, right after 21-10's build
+(1.0.15+16): both triggers threw "Cannot use the Ref of cloudSyncReconcilerProvider after it
+has been disposed" every time, silently swallowed by their own try/catch, so the drain still
+never ran. Plan 21-11 fixed this (`cloudSyncReconciler`/`syncOutboxService` are now
+`@Riverpod(keepAlive: true)`). The logcat evidence line below is what to grep for to confirm
+that fix specifically, separate from the dashboard-level proof that the drain happened at all.
+
 - [ ] While still signed in from section 2 (same account, same session — **do not sign out and
       back in**), open Profile and change one setting you have not already changed today (e.g.
       a different weather-tolerance slider value, or toggle one more availability hour).
 - [ ] Background the app (send it to the home screen, do not force-kill it) and bring it back to
       the foreground — this fires `CloudSyncReconciler.reconcileOnForeground()`, which now drains
       the outbox as its last step.
+- [ ] **Logcat evidence (plan 21-11):** `adb logcat` captured across that background/foreground
+      cycle must contain **zero** occurrences of `Cannot use the Ref of
+      cloudSyncReconcilerProvider after it has been disposed` — grep for the literal substring
+      `cloudSyncReconcilerProvider after it has been disposed`. Any hit means the keepAlive fix
+      regressed and the drain below is masked again, exactly as it was on 1.0.15+16.
 - [ ] Open the Supabase Dashboard → Table Editor → `profiles` (or `availability`, matching
       whichever field you changed) and confirm the new value is present for this user's row —
       **without ever having signed out and back in**. This is the one thing that could not happen
