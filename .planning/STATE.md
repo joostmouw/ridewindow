@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 8/10 plannen met SUMMARY (21-10 outbox drain klaar). 21-08/21-09 wachten op toestel-checkpoint"
-last_updated: "2026-08-04T09:52:16.000Z"
+status: "Fase 21: 8/10 met SUMMARY. 21-08/21-09 auto-helften geauditeerd groen; alleen de toestelsessie (REGRESSION-CHECKLIST-21.md) blokkeert nog"
+last_updated: "2026-08-04T10:07:55.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
@@ -45,7 +45,26 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 Phase: 21 (sync-migration) — EXECUTING
 Plan: 8 of 10 voltooid (21-01 t/m 21-07 + 21-10); resteren 21-08 en 21-09, beide
 `autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
-SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint.
+SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint (taak 2, `gate="blocking"`).
+
+**Auto-helften geauditeerd 2026-08-04 -- allebei groen.** Beide plannen waren taak 1 gecommit
+zonder ooit tegen hun acceptatiecriteria afgetekend te zijn; dat is nu alsnog gedaan:
+- 21-08 taak 1: `kDeleteOwnAccountRpc` aanwezig; RPC staat strikt vóór `signOut()` binnen
+  dezelfde `try`, dus een mislukte RPC logt de gebruiker nooit uit (D-02); geen enkele
+  `resetToDefaults`/`clearAll` binnen `_confirmAndDeleteAccount()` -- die matches horen bij de
+  losstaande account-switch-tak (D-03 gerespecteerd); alle zes ARB-sleutels in EN+NL en in de
+  drie gegenereerde bestanden; EN/NL sleutelpariteit 380/380; de "kan niet ongedaan"-tekst
+  staat er letterlijk in beide talen.
+- 21-09 taak 1: suite 420/420, REG-05-test groen, `flutter build apk --release` exit 0,
+  REGRESSION-CHECKLIST-21.md bevat alle vier vereiste secties én de verplichte `BLOCKER`-regel
+  over de nooit-gemeten fase-19-basislijn.
+- Kanttekening: `verify.key-links` meldt 0/1 voor 21-08. Dat is een planningsartefact -- het
+  `from`-veld is proza ("the delete-account confirm dialog's Delete action") in plaats van een
+  bestandspad, dus de tool vindt geen bronbestand. Inhoudelijk handmatig geverifieerd, zie
+  hierboven. Geen codefout.
+
+**Geblokkeerd op één toestelsessie.** Beide resterende taken zijn door 21-09 taak 1 gebundeld
+tot één geordende sessie in REGRESSION-CHECKLIST-21.md. Niets in `lib/` staat nog open.
 Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;
 plan 21-10 heeft dat op 2026-08-04 gedicht (in code -- toestelverificatie staat nog open).
 
