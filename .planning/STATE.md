@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 9/11. 21-11 fixte de disposed-Ref (bevestigd op toestel, foutregel weg) MAAR de outbox-teller blijft op Syncing -- sends falen nu stil. Volgende stap: die stilte opheffen"
+status: "21-11 fixte disposed-Ref; outbox-teller nog niet op nul"
 last_updated: "2026-08-04T14:20:46.000Z"
 last_activity: 2026-08-04
 progress:
