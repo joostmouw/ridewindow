@@ -263,8 +263,16 @@ that fix specifically, separate from the dashboard-level proof that the drain ha
 ## 6. AUTH-09 — delete-account, verified against the deployed project (plan 21-08 Task 2, folded in)
 
 > **Laatste item, en dat is geen blokkade maar volgorde.** Deze sectie vernietigt het
-> wegwerp-testaccount onherroepelijk, en §3/§4/§5 hebben datzelfde account levend nodig. Draai
+> testaccount onherroepelijk, en §3/§4/§5 hebben datzelfde account levend nodig. Draai
 > §6 dus pas als die drie zijn afgetekend.
+>
+> **Accountkeuze, bevestigd door Joost op 2026-08-04: dit gebeurt met `joostmouw@gmail.com`,
+> zijn eigen account — niet met een wegwerpaccount.** De checklist schreef oorspronkelijk een
+> disposable account voor; die eis is hier bewust losgelaten. Wat dat betekent: na §6 zijn de
+> cloud-rijen van dit account weg en verdwijnt de `auth.users`-rij. De lokale data op het
+> toestel blijft onaangeroerd (D-03 — dat is juist wat §6 moet bewijzen), dus de eerstvolgende
+> login migreert diezelfde data gewoon opnieuw omhoog. Er gaat niets blijvend verloren; reken
+> alleen op een extra migratieronde na afloop.
 >
 > Eerder op 2026-08-04 was §6 uitgesteld naar een tweede sessie omdat de PWA stale was; die
 > blokkade is om 14:58 opgelost (zie het blok bovenaan dit bestand). Alles kan nu in één sessie.
