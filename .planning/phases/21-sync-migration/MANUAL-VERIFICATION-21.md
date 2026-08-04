@@ -419,3 +419,62 @@ ongeluk geplande rit is via "Unplan" teruggedraaid — dat terugdraaien is metee
    twee keer in de camera-app. De guard die vóór elke tik de voorgrond-app controleert was in dat
    ene script weggelaten. Werkwijze voor volgende keer: wacht in een lus tot de app voorgrond is,
    maak eerst een screenshot, en bepaal pas dán waar je tikt.
+
+## §4 — Web cold-start meting, 2026-08-04 20:15
+
+De BLOCKER in de checklist ("fase 19's eigen basislijn is nooit gemeten") is hiermee opgeheven:
+er ligt nu een getal mét vastgelegde methode en condities.
+
+| Veld | Waarde |
+|------|--------|
+| Toestel/browser | MacBook, Chrome (desktop) — **niet** de iPhone/Safari die §4 als voorbeeld noemt |
+| Verbinding | `navigator.connection`: `4g`, downlink 10 Mbit/s, niet gethrottled |
+| URL | `https://my-project-joost.web.app`, versie 1.0.19 build 20 |
+| Cachestand | **koud** — `main.dart.js` kwam met `transferSize` 955 kB echt over het netwerk |
+| Gemeten waarde | **`loadEventEnd` = 1,41 s** (`domContentLoaded` 0,18 s; `main.dart.js` download 0,46 s) |
+| Warme herhaling | `loadEventEnd` = 0,44–0,59 s (`transferSize` 0) |
+| Budgetcheck (2 s) | **Gehaald** op deze proxy |
+
+**Wat dit getal wel en niet is.** `loadEventEnd` is een proxy, geen echte "gebruiker ziet
+inhoud"-meting. Twee dingen maakten de directe meting onmogelijk:
+
+1. **Flutter levert geen paint-events.** `performance.getEntriesByType('paint')` is leeg en
+   first-contentful-paint/largest-contentful-paint zijn `null` — het canvas-renderpad registreert
+   ze niet. De gebruikelijke webmetrieken bestaan hier dus simpelweg niet.
+2. **Tool-latency.** Een poll op het eerste frame startte 13,5 s na de navigatie; tegen die tijd
+   stond de app er allang. Van buitenaf is het eerste frame niet te timen.
+
+Een echte waargenomen-tijd-meting vraagt dus om de stopwatch/schermopname-methode die §4 zelf
+beschrijft, op de iPhone. Wat hier ligt is een reproduceerbare bovengrens onder budget, geen
+vervanging daarvan.
+
+Terzijde: de PWA heeft **geen service worker** en geen Cache Storage (`getRegistrations()` en
+`caches.keys()` beide leeg). Hij leunt puur op HTTP-caching. Voor een app die "PWA" heet is dat
+een bewuste keuze waard — offline werkt zo niet.
+
+## §5 — SYNC-11 multi-tab: **GEBLOKKEERD**, en de reden is zelf een bevinding
+
+§5 vereist twee tabs die allebei op hetzelfde account zijn ingelogd. Dat lukte niet:
+**de PWA logt niet in.**
+
+Waargenomen in Chrome desktop, drie pogingen:
+
+- Profiel toont "Sign in with Google"; een klik toont de Google-knop "Sign in as Joost —
+  joostmouw@gmail.com" (Google herkent de sessie dus prima).
+- Een klik op die knop doet **niets**: geen popup, geen navigatie, geen wijziging in de
+  accountsectie, en na 8 s nog steeds de uitgelogde weergave.
+- De console bevat **geen enkele fout** — alleen Flutter-bootstrapregels en een
+  `WasmStorageImplementation.sharedIndexedDb`-melding.
+
+Dat "geen enkele fout" is het punt. Dit is exact het patroon dat deze fase al drie keer heeft
+gekost: een pad dat stil faalt. Op Android is precies dezelfde inlog wél gelukt (§2), dus het is
+webspecifiek — vermoedelijk de OAuth-clientconfiguratie voor het weborigin, of de
+`signInWithIdToken`-tak die op web een andere route neemt.
+
+**Gevolg voor de checklist:**
+- §5 kan niet worden uitgevoerd tot dit opgelost is.
+- **§3 loopt hetzelfde risico**: die vraagt om inloggen op de iPhone-PWA met hetzelfde account.
+  Reken daar niet op vóór dit gefixt is.
+
+Dit verdient een eigen plan; het is geen regressie van fase 21's syncwerk maar een aparte,
+onzichtbare faalroute in de web-auth.
