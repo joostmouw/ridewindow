@@ -46,6 +46,8 @@ Phase: 21 (sync-migration) — EXECUTING
 Plan: 8 of 10 voltooid (21-01 t/m 21-07 + 21-10); resteren 21-08 en 21-09, beide
 `autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
 SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint (taak 2, `gate="blocking"`).
+Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;
+plan 21-10 heeft dat op 2026-08-04 gedicht (in code -- toestelverificatie staat nog open).
 
 **Auto-helften geauditeerd 2026-08-04 -- allebei groen.** Beide plannen waren taak 1 gecommit
 zonder ooit tegen hun acceptatiecriteria afgetekend te zijn; dat is nu alsnog gedaan:
@@ -65,8 +67,9 @@ zonder ooit tegen hun acceptatiecriteria afgetekend te zijn; dat is nu alsnog ge
 
 **Geblokkeerd op één toestelsessie.** Beide resterende taken zijn door 21-09 taak 1 gebundeld
 tot één geordende sessie in REGRESSION-CHECKLIST-21.md. Niets in `lib/` staat nog open.
-Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;
-plan 21-10 heeft dat op 2026-08-04 gedicht (in code -- toestelverificatie staat nog open).
+Build voor die sessie: **1.0.15+16** (gebouwd 2026-08-04 11:57, eerste build mét de
+21-10-wiring). De artefacten van 1.0.14+15 zijn ongeschikt -- die dateren van 09:34, vóór
+21-10, dus sectie 5a kan er per definitie niet tegen slagen.
 
 **Opgelost door 21-10 (2026-08-04):** `syncOutboxServiceProvider` bouwt nu
 `SyncOutboxService` met echte Supabase-send-closures, en `drain()` heeft twee echte
