@@ -13,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ridewindow/core/app_version.dart';
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/features/profile/account_section.dart';
@@ -896,7 +897,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           ListTile(
             title: Text(s.version),
-            trailing: const Text('1.0.0'),
+            trailing: const Text(kAppVersionDisplay),
             onTap: () {
               _versionTapCount++;
               if (_versionTapCount >= 5) {
