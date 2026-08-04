@@ -24,7 +24,20 @@ part 'cloud_sync_reconciler_provider.g.dart';
 /// `profile_screen.dart`'s private `_SectionHeader` style).
 const _kLastSyncedUidKey = 'account.lastSyncedUid';
 
-@riverpod
+/// keepAlive: true (plan 21-11) -- both production call sites
+/// (`home_screen.dart:98`, `account_section.dart:317`) use a bare
+/// `ref.read`, which establishes no listener. A bare `@riverpod`
+/// (autoDispose by default in Riverpod 3) is disposed shortly after that
+/// read returns, and `CloudSyncReconciler` stores the `Ref` it was built
+/// with across `await` boundaries -- the next `_ref` access after any real
+/// I/O then throws "Cannot use the Ref of cloudSyncReconcilerProvider after
+/// it has been disposed." Found on a real device on 2026-08-04 (Oppo Find
+/// X9 Pro, app 1.0.15+16): both `reconcileOnForeground()` and
+/// `drainOutbox()` failed this way, silently swallowed by their own
+/// try/catch, leaving the account row stuck on "Syncing...". Do not "tidy"
+/// this back to a bare `@riverpod` -- see test/providers/
+/// outbox_drain_wiring_test.dart for the regression coverage.
+@Riverpod(keepAlive: true)
 CloudSyncReconciler cloudSyncReconciler(Ref ref) => CloudSyncReconciler(ref);
 
 /// Emits the current pending-outbox-row count (SYNC-06/D-06/D-07's sync
@@ -41,7 +54,16 @@ Stream<int> outboxPendingCount(Ref ref) =>
 /// inline inside `CloudSyncReconciler.drainOutbox()`) so a test can override
 /// it with a fake service, matching this file's existing
 /// `accountSyncServiceProvider` seam.
-@riverpod
+///
+/// keepAlive: true (plan 21-11) -- same disposed-Ref failure and same
+/// 2026-08-04 device date as `cloudSyncReconcilerProvider` above, plus a
+/// second, quieter bug this fixes: without keepAlive, every bare
+/// `_ref.read(syncOutboxServiceProvider)` constructs a *fresh*
+/// `SyncOutboxService`, so 21-10's `_inFlightDrain` re-entrancy guard (an
+/// instance field) never sees a second overlapping call -- two different
+/// instances each think they are the only drain in flight. Do not "tidy"
+/// this back to a bare `@riverpod`.
+@Riverpod(keepAlive: true)
 SyncOutboxService syncOutboxService(Ref ref) =>
     SyncOutboxService(ref.watch(appDatabaseProvider).syncOutboxDao);
 
@@ -149,16 +171,28 @@ class CloudSyncReconciler {
   /// drain always leaves its rows pending for the next attempt (never
   /// silently drops them — that's `SyncOutboxService.drain()`'s own
   /// contract).
+  ///
+  /// Plan 21-11: the `Supabase.instance.client` lookup deliberately lives
+  /// inside the `upsertFn`/`deleteFn` closures below, not as this method's
+  /// first statement. `Supabase.instance` throws when Supabase has not been
+  /// initialised (always true in this test suite, by design — see
+  /// test/providers/outbox_drain_wiring_test.dart's header comment), and
+  /// with the lookup at the top of this method that throw happened before
+  /// `_ref.read(syncOutboxServiceProvider)` was ever reached, silently
+  /// masking the real disposed-Ref bug this method also had. Moving it into
+  /// the closures means the method runs (and is testable) even without an
+  /// initialised Supabase, since the closures are only invoked once there is
+  /// a row to send — on a real device Supabase is always initialised long
+  /// before any drain.
   Future<void> drainOutbox() async {
     try {
-      final client = Supabase.instance.client;
       final outbox = _ref.read(syncOutboxServiceProvider);
 
       await outbox.drain(
         upsertFn: (entity, entityKey, payload) async {
           final table = _tableForEntity(entity);
           if (table == null) return;
-          await client.from(table).upsert(payload);
+          await Supabase.instance.client.from(table).upsert(payload);
         },
         deleteFn: (entity, entityKey) async {
           // Only `planned_rides` ever enqueues a delete today (plan 21-05)
@@ -172,7 +206,7 @@ class CloudSyncReconciler {
           if (separator < 0) return;
           final userId = entityKey.substring(0, separator);
           final rideId = entityKey.substring(separator + 1);
-          await client
+          await Supabase.instance.client
               .from(kPlannedRidesTable)
               .delete()
               .eq('user_id', userId)
