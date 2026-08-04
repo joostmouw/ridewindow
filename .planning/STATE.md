@@ -125,9 +125,9 @@ was voor een geslaagde migratie. Dat klopt niet -- die tekst telt outbox-rijen e
 gaat niet via de outbox, dus hij staat sowieso op "Gesynchroniseerd". Alleen rijen in het
 dashboard zijn bewijs.
 
-**Los, niet nieuw:** `.github/workflows/deploy-web.yml` faalt sinds 2026-07-26 op een ontbrekende
-repository-secret `FIREBASE_SERVICE_ACCOUNT`. De gedeployde PWA bevat dus geen fase 20/21-code,
-waardoor sectie 3 (iPhone) van de checklist geblokkeerd is tot die secret bestaat.
+**Los, inmiddels OPGELOST (2026-08-04 14:58):** `.github/workflows/deploy-web.yml` faalde sinds
+2026-07-26 op een ontbrekende repository-secret. Zie het blok "PWA-blokkade opgelost" hierboven
+voor wat er precies gebeurd is. Sectie 3 (iPhone) is niet langer geblokkeerd.
 
 **Wat af is (waves 1-6, alles gemerged op main):**
 - 21-01 `resolveAccountSync()` — pure beslisfunctie, 11 tests
