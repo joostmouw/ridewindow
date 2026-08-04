@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 9/10 plannen klaar. 21-10 (outbox drain) staat klaar; toestelverificatie deels gedaan"
-last_updated: "2026-08-03T18:10:09.726Z"
+status: "Fase 21: 8/10 plannen met SUMMARY (21-10 outbox drain klaar). 21-08/21-09 wachten op toestel-checkpoint"
+last_updated: "2026-08-04T09:52:16.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 25
-  completed_plans: 17
+  completed_plans: 18
   percent: 40
 ---
 
@@ -43,11 +43,23 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 21 (sync-migration) — EXECUTING
-Plan: 7 of 9 voltooid (21-01 t/m 21-07); resteren 21-08 en 21-09, beide `autonomous: false`
-Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen, maar SYNC-05 blijkt NIET
-geleverd -- nieuw plan 21-10 staat klaar om dat te dichten.
+Plan: 8 of 10 voltooid (21-01 t/m 21-07 + 21-10); resteren 21-08 en 21-09, beide
+`autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
+SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint.
+Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;
+plan 21-10 heeft dat op 2026-08-04 gedicht (in code -- toestelverificatie staat nog open).
 
-**Blokkerend defect gevonden op toestel (2026-08-04):** `SyncOutboxService` wordt nergens in
+**Opgelost door 21-10 (2026-08-04):** `syncOutboxServiceProvider` bouwt nu
+`SyncOutboxService` met echte Supabase-send-closures, en `drain()` heeft twee echte
+aanroepplekken: `CloudSyncReconciler.reconcileOnForeground()` en
+`AccountSection._runAccountSync()` (na sign-in, zodra conflictdialogen zijn afgehandeld).
+`drain()` kreeg een re-entrancy-guard. `test/providers/outbox_drain_wiring_test.dart`
+faalt zodra de wiring weer verdwijnt. Suite: 420/420 groen, `flutter analyze` schoon.
+Nog te doen op toestel: item §5a in REGRESSION-CHECKLIST-21.md -- wijzig een
+profielinstelling terwijl je ingelogd bent en controleer dat de `profiles`-rij in Supabase
+verandert ZONDER uit- en weer in te loggen.
+
+**Het defect zoals het gevonden werd (2026-08-04, nu gedicht):** `SyncOutboxService` werd nergens in
 `lib/` aangemaakt en `drain()` wordt nooit aangeroepen. De outbox is write-only in productie:
 repositories zetten er rijen in, niets haalt ze eruit. Eerste-login-migratie werkt wel (die
 roept de RPC rechtstreeks aan, buiten de outbox om), maar elke wijziging daarna bereikt de
