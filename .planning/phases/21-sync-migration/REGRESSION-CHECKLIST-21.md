@@ -12,32 +12,29 @@ be completed, leave it unchecked and write down why next to it in `MANUAL-VERIFI
 
 ---
 
-## Scope van de sessie van 2026-08-04 (tweede toestelsessie)
+## PWA-blokkade opgelost — 2026-08-04 14:58
 
-Deze checklist is geschreven als één sessie, maar valt uiteen in twee door de stale PWA. Vastgesteld
-2026-08-04: `my-project-joost.web.app` serveert `version.json` = **1.0.12+13** met `main.dart.js`
-Last-Modified **2026-07-26** — de laatste geslaagde deploy vóór `deploy-web.yml` ging falen op het
-ontbrekende repository-secret `FIREBASE_SERVICE_ACCOUNT`. Alles wat de PWA nodig heeft is daarmee
-vandaag onuitvoerbaar.
+Eerder op 2026-08-04 was deze checklist niet in één keer uitvoerbaar: §3/§4/§5 draaien tegen de
+gedeployde PWA, en die serveerde nog `version.json` = 1.0.12+13 met `main.dart.js` Last-Modified
+2026-07-26 — de laatste geslaagde deploy voordat `deploy-web.yml` ging falen. Oorzaak: de workflow
+verwees naar een repository-secret `FIREBASE_SERVICE_ACCOUNT` dat nooit is aangemaakt.
 
-| § | Onderwerp | Deze sessie | Waarom |
-|---|-----------|-------------|--------|
-| 0 | Upload naar Play Internal testing | **JA** | voorwaarde voor al het overige |
-| 1 | Lokale data zetten vóór eerste sign-in | **JA** | |
-| 2 | Android install via Play-link | **JA** | |
-| 5a | SYNC-05 outbox drain (plan 21-10) | **JA** | het hele doel van deze sessie |
-| 3 | iPhone PWA + SYNC-04 | nee | stale PWA |
-| 4 | REG-03 web cold-start | nee | stale PWA |
-| 5 | SYNC-11 multi-tab | nee | stale PWA |
-| 6 | AUTH-09 delete-account | nee | destructief; hoort bij de PWA-sessie (zie §6) |
+**Opgelost.** `firebase init hosting:github` maakte service account `github-action-1257243656` met
+de Firebase Hosting Admin-rol en zette de key als secret `FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST`;
+`deploy-web.yml` wijst nu naar die naam (commit `4e3957e`). Eerste geslaagde run: #3, 3m 8s. Live
+geverifieerd:
 
-**Wat deze sessie NIET afsluit.** Plan 21-08 (checkpoint = §6) en plan 21-09 (checkpoint = §4 + §3
-+ §5) blijven allebei open. Fase 21 blijft op 8/10 plannen met SUMMARY. Wat deze sessie wél levert
-is het toestelbewijs voor plan 21-10 — de fix voor het blokkerende SYNC-05-defect dat de eerste
-toestelsessie (2026-08-04, zie `MANUAL-VERIFICATION-21.md`) aan het licht bracht.
+```
+version.json   → {"version":"1.0.15","build_number":"16"}
+main.dart.js   → Last-Modified: Tue, 04 Aug 2026 12:57:48 GMT
+```
 
-**Sessie 2 (later), zodra het Firebase-secret bestaat en er een verse deploy live staat:**
-§3 → §4 → §5 → §6, in die volgorde, met een **vers wegwerp-Google-account** (§6 vernietigt het).
+**Gevolg: alle secties zijn nu uitvoerbaar, in één sessie, in de volgorde waarin ze hier staan.**
+De eerder genoteerde splitsing in twee sessies is daarmee vervallen. §6 blijft het laatste item —
+niet door een blokkade maar omdat het het testaccount vernietigt dat §3/§4/§5 levend nodig hebben.
+
+Gebruik **1.0.15+16** op Android (§0) — precies de build die nu ook als PWA live staat, dus beide
+kanten van §3's cross-device check draaien dezelfde code.
 
 **Automated baseline confirmed before this checklist was written (2026-08-04):**
 - `flutter test` (full suite): **418 passed / 0 failed** (run at 07:33 UTC, before the
@@ -248,15 +245,12 @@ this section is the only valid proof that either trigger actually reaches the cl
 
 ## 6. AUTH-09 — delete-account, verified against the deployed project (plan 21-08 Task 2, folded in)
 
-> **UITGESTELD — beslissing 2026-08-04.** Deze sectie wordt NIET gedraaid in de sessie van
-> 2026-08-04. Reden: §6 verwijdert het wegwerp-testaccount onherroepelijk, en §3/§4/§5 hebben
-> datzelfde account nog levend nodig. Die drie zijn vandaag geblokkeerd omdat de gedeployde PWA
-> stale is (`version.json` = 1.0.12+13, `main.dart.js` Last-Modified 2026-07-26 — de laatste
-> geslaagde deploy vóór `deploy-web.yml` ging falen op het ontbrekende `FIREBASE_SERVICE_ACCOUNT`
-> secret). §6 nu draaien zou een tweede wegwerpaccount kosten zodra de PWA wél deployt.
+> **Laatste item, en dat is geen blokkade maar volgorde.** Deze sectie vernietigt het
+> wegwerp-testaccount onherroepelijk, en §3/§4/§5 hebben datzelfde account levend nodig. Draai
+> §6 dus pas als die drie zijn afgetekend.
 >
-> **Draai §6 samen met §3/§4/§5**, in één sessie, zodra het Firebase-secret bestaat en er een
-> verse deploy live staat. §6 blijft ook dan het laatste item.
+> Eerder op 2026-08-04 was §6 uitgesteld naar een tweede sessie omdat de PWA stale was; die
+> blokkade is om 14:58 opgelost (zie het blok bovenaan dit bestand). Alles kan nu in één sessie.
 >
 > Gevolg voor de planning: plan **21-08 blijft open** tot deze sectie gedraaid is — dit ís zijn
 > taak 2 (`gate="blocking"`).
