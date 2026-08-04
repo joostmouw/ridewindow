@@ -16,8 +16,9 @@
 // "welke build draait hier eigenlijk?" — één keer omdat Play een oudere track
 // serveerde, één keer omdat een lokale build niet ververst was. Een versienaam
 // zonder buildnummer beantwoordt die vraag niet.
-const kAppVersionName = '1.0.18';
-const kAppBuildNumber = '19';
+const kAppVersionName = '1.0.19';
+const kAppBuildNumber = '20';
 
-/// Wat het profielscherm toont: `1.0.18 (19)`.
+/// Wat het profielscherm toont, in de vorm `<versienaam> (<buildnummer>)`.
+/// Bewust zonder concreet voorbeeld: dat zou bij elke bump verouderen.
 const kAppVersionDisplay = '$kAppVersionName ($kAppBuildNumber)';
