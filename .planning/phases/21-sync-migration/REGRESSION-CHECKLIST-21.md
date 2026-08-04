@@ -64,13 +64,21 @@ Signing SHA-1 matches the registered OAuth Android client** — a locally-built/
 cannot complete Google sign-in at all. No build has been uploaded to Play Internal Testing yet,
 so this is a hard prerequisite, not an optional nicety.
 
-- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.16+17**, built
-      2026-08-04 16:02) to the Play Console's **Internal testing** track.
+- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.17+18**) to the
+      Play Console's **Internal testing** track.
 
-      > Must be **+17 or later**. Build +16 was tested on device on 2026-08-04 and §5a FAILED on
-      > it: the drain was called but threw `Cannot use the Ref of cloudSyncReconcilerProvider
-      > after it has been disposed` on every foreground cycle, so nothing ever drained (see
-      > plan 21-11). +17 is the first build in which §5a can pass.
+      > Must be **+18 or later**. Two earlier builds were tested on device on 2026-08-04 and both
+      > failed §5a for different reasons, so neither is usable:
+      > - **+16** — the drain was called but threw `Cannot use the Ref of
+      >   cloudSyncReconcilerProvider after it has been disposed` on every foreground cycle, so
+      >   nothing ever drained (fixed by plan 21-11).
+      > - **+17** — the disposed error was gone (verified: `adb logcat | grep -i disposed` empty),
+      >   but the availability payload was the bare recurring map, so PostgREST was handed
+      >   `"1-9"`/`"6-14"` as column names and that row could never be accepted (fixed by plan
+      >   21-12). The status text stayed on "Syncing...".
+      >
+      > +18 is the first build in which §5a can pass. It also carries the attempt ceiling that
+      > clears the row wedged on the device by the two failed rounds above.
       >
       > Historical: build **+16 or later**. The earlier `1.0.14+15` artifact was built at 09:34, before
       > plan 21-10 wired `drain()` to a caller — section 5a below cannot pass against it, and

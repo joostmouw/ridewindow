@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "21-11 fixte disposed-Ref; outbox-teller nog niet op nul"
-last_updated: "2026-08-04T14:20:46.000Z"
+status: "21-12: availability-payload was geen rij; 1.0.17+18 klaar"
+last_updated: "2026-08-04T17:07:20.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
@@ -90,7 +90,24 @@ opnieuw deployen zodra +17 op main staat, zodat §3's beide kanten weer dezelfde
 **Wat de sessie afsluit:** §6 sluit plan 21-08, §4+§3+§5 sluiten plan 21-09. Draai je alles, dan
 kan fase 21 naar 10/10 en door naar verificatie. Niets in `lib/` staat nog open.
 
-**OPENSTAAND, hier verder oppakken (toestelsessie 2, 2026-08-04 16:20).** Op 1.0.16+17 is de
+**21-12 (2026-08-04, gevonden zonder toestel): de availability-payload was nooit een rij.**
+`AvailabilityRepository` enqueuede `jsonEncode(toRecurringRow(hours))`, dus
+`client.from('availability').upsert(payload)` bood `"1-9"` en `"6-14"` aan als KOLOMNAMEN van
+`public.availability` (kolommen: user_id, recurring, version, updated_at). Structureel
+onmogelijk, geen netwerkkwestie. `profiles` en `planned_rides` waren wel correct -- vandaar dat
+een profielwijziging leek te syncen terwijl de teller nooit nul haalde. Gevonden door het
+SQL-schema naast de Dart-payloads te leggen.
+
+Meegenomen: `_drainInternal` logt nu elke mislukte send (entity, key, poging, fout) in plaats van
+hem in de `lastError`-kolom te laten verdwijnen, en `kMaxSendAttempts = 5` met `dropRow()` zorgt
+dat een onverzendbare rij een toestel niet eeuwig op "Syncing..." vastzet -- Joost's telefoon had
+er zo een. Suite 431/431.
+
+**De les, nu drie keer:** 21-10 controleerde of de aanroep bestond, 21-11 of die zijn werk
+bereikte, 21-12 of de payload een legale rij was. Elke keer stopte de test één laag te vroeg. De
+nieuwe `outbox_payload_shape_test.dart` bewaakt die laatste laag tabelgedreven.
+
+**Historie, opgelost (toestelsessie 2, 2026-08-04 16:20).** Op 1.0.16+17 is de
 `disposed`-fout aantoonbaar wég -- `adb logcat | grep -i disposed` blijft leeg na een
 foreground-cyclus, waar diezelfde grep op +16 twee regels gaf. 21-11 heeft dus gedaan wat het
 moest doen. **Maar de statustekst staat nog steeds op "Syncing..."**, dus
