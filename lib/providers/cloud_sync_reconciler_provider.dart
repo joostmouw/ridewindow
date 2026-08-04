@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -11,6 +12,7 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/account_sync_service.dart';
 import 'package:ridewindow/services/cloud_reconcile_service.dart';
+import 'package:ridewindow/services/sync_outbox_service.dart';
 
 part 'cloud_sync_reconciler_provider.g.dart';
 
@@ -32,6 +34,16 @@ CloudSyncReconciler cloudSyncReconciler(Ref ref) => CloudSyncReconciler(ref);
 @riverpod
 Stream<int> outboxPendingCount(Ref ref) =>
     ref.watch(appDatabaseProvider).syncOutboxDao.watchPendingCount();
+
+/// Constructs the offline outbox's real production consumer (plan 21-10,
+/// SYNC-05/SYNC-06) — `SyncOutboxService` bound to the app's own
+/// `SyncOutboxDao`. Deliberately its own provider (rather than being built
+/// inline inside `CloudSyncReconciler.drainOutbox()`) so a test can override
+/// it with a fake service, matching this file's existing
+/// `accountSyncServiceProvider` seam.
+@riverpod
+SyncOutboxService syncOutboxService(Ref ref) =>
+    SyncOutboxService(ref.watch(appDatabaseProvider).syncOutboxDao);
 
 /// Constructs the real [AccountSyncService] (plan 21-06) with production
 /// dependencies (plan 21-07): the three repositories, the two cloud-read
@@ -113,6 +125,79 @@ class CloudSyncReconciler {
       await _reconcilePlannedRides(client, service, user.id);
     } catch (error) {
       debugPrint('CloudSyncReconciler.reconcileOnForeground failed: $error');
+    }
+
+    await drainOutbox();
+  }
+
+  /// Drains the offline outbox (SYNC-05/SYNC-06, plan 21-10) using the real
+  /// Supabase send closures, composed here (never inside
+  /// `sync_outbox_service.dart` itself, which stays cloud-SDK-free) from
+  /// `supabase_tables.dart`'s table-name constants. Called from
+  /// [reconcileOnForeground] above, and separately by
+  /// `AccountSection._runAccountSync` right after `AccountSyncService` has
+  /// finished a sign-in (including once every conflict prompt is resolved)
+  /// — an enqueue made during sign-in must not sit until the next foreground
+  /// event.
+  ///
+  /// This was the exact gap found on a real device on 2026-08-04 (see
+  /// `MANUAL-VERIFICATION-21.md`, "Device session" section): `drain()` was
+  /// thoroughly unit-tested but had no production caller anywhere, so the
+  /// outbox was write-only. Never throws — same "a background sync failure
+  /// must never crash or block the UI" reasoning as `reconcileOnForeground`
+  /// and `AccountSection._runAccountSync`'s own try/catch, and a failed
+  /// drain always leaves its rows pending for the next attempt (never
+  /// silently drops them — that's `SyncOutboxService.drain()`'s own
+  /// contract).
+  Future<void> drainOutbox() async {
+    try {
+      final client = Supabase.instance.client;
+      final outbox = _ref.read(syncOutboxServiceProvider);
+
+      await outbox.drain(
+        upsertFn: (entity, entityKey, payload) async {
+          final table = _tableForEntity(entity);
+          if (table == null) return;
+          await client.from(table).upsert(payload);
+        },
+        deleteFn: (entity, entityKey) async {
+          // Only `planned_rides` ever enqueues a delete today (plan 21-05)
+          // — profile/availability are single-row-per-user blobs that are
+          // only ever upserted. The compound filter lives in `entityKey`
+          // itself (`'$userId:$rideId'`, see
+          // `PlannedRidesRepository.remove()`), never in the payload —
+          // deletes always send `'{}'` as the payload.
+          if (entity != kOutboxEntityPlannedRide) return;
+          final separator = entityKey.indexOf(':');
+          if (separator < 0) return;
+          final userId = entityKey.substring(0, separator);
+          final rideId = entityKey.substring(separator + 1);
+          await client
+              .from(kPlannedRidesTable)
+              .delete()
+              .eq('user_id', userId)
+              .eq('ride_id', rideId);
+        },
+      );
+    } catch (error) {
+      debugPrint('CloudSyncReconciler.drainOutbox failed: $error');
+    }
+  }
+
+  /// Maps an outbox `entity` string to its Postgres table name for the
+  /// upsert path. `null` for an unrecognized entity — `upsertFn` treats that
+  /// as a no-op rather than throwing, since a corrupt/future entity string
+  /// must never crash the drain for every other pending row.
+  String? _tableForEntity(String entity) {
+    switch (entity) {
+      case kOutboxEntityProfile:
+        return kProfilesTable;
+      case kOutboxEntityAvailability:
+        return kAvailabilityTable;
+      case kOutboxEntityPlannedRide:
+        return kPlannedRidesTable;
+      default:
+        return null;
     }
   }
 
