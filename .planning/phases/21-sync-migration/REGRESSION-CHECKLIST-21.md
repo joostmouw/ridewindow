@@ -64,10 +64,15 @@ Signing SHA-1 matches the registered OAuth Android client** — a locally-built/
 cannot complete Google sign-in at all. No build has been uploaded to Play Internal Testing yet,
 so this is a hard prerequisite, not an optional nicety.
 
-- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.15+16**, built
-      2026-08-04 11:57) to the Play Console's **Internal testing** track.
+- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.16+17**, built
+      2026-08-04 16:02) to the Play Console's **Internal testing** track.
 
-      > Must be **+16 or later**. The earlier `1.0.14+15` artifact was built at 09:34, before
+      > Must be **+17 or later**. Build +16 was tested on device on 2026-08-04 and §5a FAILED on
+      > it: the drain was called but threw `Cannot use the Ref of cloudSyncReconcilerProvider
+      > after it has been disposed` on every foreground cycle, so nothing ever drained (see
+      > plan 21-11). +17 is the first build in which §5a can pass.
+      >
+      > Historical: build **+16 or later**. The earlier `1.0.14+15` artifact was built at 09:34, before
       > plan 21-10 wired `drain()` to a caller — section 5a below cannot pass against it, and
       > testing it would reproduce this phase's own versionCode false start. Verify the
       > installed build reports 1.0.15+16 before interpreting any behaviour (see section 2).
