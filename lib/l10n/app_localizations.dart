@@ -1189,6 +1189,42 @@ abstract class S {
   /// **'Wordt gesynchroniseerd...'**
   String get accountSyncStatusPending;
 
+  /// No description provided for @accountDeleteAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Account verwijderen'**
+  String get accountDeleteAction;
+
+  /// No description provided for @accountDeleteConfirmTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Account verwijderen?'**
+  String get accountDeleteConfirmTitle;
+
+  /// No description provided for @accountDeleteConfirmBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit kan niet ongedaan worden gemaakt. Je profiel, beschikbaarheid en geplande ritten worden permanent uit de cloud verwijderd.'**
+  String get accountDeleteConfirmBody;
+
+  /// No description provided for @accountDeleteConfirmAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verwijderen'**
+  String get accountDeleteConfirmAction;
+
+  /// No description provided for @accountDeletedSnackbar.
+  ///
+  /// In nl, this message translates to:
+  /// **'Account verwijderd'**
+  String get accountDeletedSnackbar;
+
+  /// No description provided for @accountDeleteError.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verwijderen mislukt. Probeer het opnieuw.'**
+  String get accountDeleteError;
+
   /// No description provided for @calendarMismatchWarning.
   ///
   /// In nl, this message translates to:

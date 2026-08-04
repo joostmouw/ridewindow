@@ -424,4 +424,88 @@ void main() {
     expect(find.text(s.accountSyncStatusSynced, skipOffstage: false), findsNothing);
     expect(find.text(s.accountSyncStatusPending, skipOffstage: false), findsNothing);
   });
+
+  testWidgets(
+      'Test 10 — tik op "Account verwijderen" opent bevestigingsdialoog met '
+      'expliciete onomkeerbaarheids-waarschuwing (AUTH-09, D-01)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.accountDeleteAction, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountDeleteConfirmTitle), findsOneWidget);
+    // Letterlijk vindbaar, niet alleen "een dialoog is open" -- de tekst
+    // moet de onomkeerbaarheid expliciet noemen (plan's <behavior>-eis).
+    expect(find.text(s.accountDeleteConfirmBody), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 11 — tik op Annuleren sluit de verwijder-dialoog zonder RPC-'
+      'aanroep of afmelding -- de ingelogde rij blijft ongewijzigd zichtbaar '
+      '(AUTH-09, D-03)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.accountDeleteAction, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountDeleteConfirmTitle), findsOneWidget);
+
+    await tester.tap(find.text(s.cancel));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountDeleteConfirmTitle), findsNothing);
+    // De ingelogde rij is nog steeds intact -- geen afmelding is gebeurd.
+    expect(find.text('Rider Test', skipOffstage: false), findsOneWidget);
+    expect(find.text(s.accountSignOut, skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 12 — tik op "Verwijderen" zonder geinitialiseerde Supabase-client '
+      'toont de foutmelding-snackbar, nooit de succes-snackbar (compenserende '
+      'dekking voor de RPC->signOut-volgorde: een gooiende RPC-aanroep mag '
+      'signOut() nooit bereiken -- zie SUMMARY voor waarom het succespad zelf '
+      'niet los te faken is zonder zware SupabaseClient-mocking)',
+      (tester) async {
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.accountDeleteAction, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.text(s.accountDeleteConfirmAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountDeleteError, skipOffstage: false), findsOneWidget);
+    expect(find.text(s.accountDeletedSnackbar, skipOffstage: false), findsNothing);
+    // signOut() is nooit bereikt: de ingelogde rij toont nog steeds de
+    // gebruiker (een echte signOut zou -- als de call uberhaupt zou slagen op
+    // een ongeinitialiseerde client, wat hij niet doet -- de auth-stream niet
+    // veranderen in deze test-harness, dus dit is een zwakke maar nuttige
+    // extra check dat de widget-boom niet is gecrasht).
+    expect(find.text('Rider Test', skipOffstage: false), findsOneWidget);
+  });
 }

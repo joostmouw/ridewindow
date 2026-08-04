@@ -15,6 +15,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/domain/services/account_switch_resolver.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -369,6 +370,63 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     }
   }
 
+  /// AUTH-09, D-01/D-02/D-03: verwijdert het account server-side via
+  /// `delete_own_account()` (plan 21-02), meldt zich daarna af, en toont een
+  /// korte snackbar. Geen apart bevestigingsscherm, geen type-to-confirm-veld,
+  /// geen her-authenticatie -- bewust vastgestelde scope in 21-CONTEXT.md.
+  ///
+  /// D-03, niet-onderhandelbaar: raakt nooit lokale data (resetToDefaults/
+  /// clearAll horen bij de aparte account-switch "opnieuw beginnen"-tak in
+  /// _checkAccountSwitch hierboven en blijven daar).
+  ///
+  /// De try/catch-volgorde is de kern van deze methode: signOut() staat in
+  /// dezelfde try als de RPC-aanroep en wordt dus nooit bereikt als de RPC
+  /// gooit -- een mislukte server-side verwijdering mag zich nooit voordoen
+  /// als een geslaagde (D-02's volgorde-eis).
+  Future<void> _confirmAndDeleteAccount(BuildContext context) async {
+    final s = S.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.accountDeleteConfirmTitle),
+        content: Text(s.accountDeleteConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(s.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(s.accountDeleteConfirmAction),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await Supabase.instance.client.rpc(kDeleteOwnAccountRpc);
+      await Supabase.instance.client.auth.signOut();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(s.accountDeletedSnackbar)),
+      );
+    } catch (e) {
+      debugPrint('AccountSection: delete_own_account mislukt: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(s.accountDeleteError)),
+      );
+      // Doet bewust GEEN signOut() bij een fout -- een mislukte server-side
+      // verwijdering mag nooit als geslaagd ogen (D-02's volgorde-eis).
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
@@ -449,30 +507,48 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     // a fabricated third status string is not).
     final pendingCountAsync = ref.watch(outboxPendingCountProvider);
 
-    return ListTile(
-      leading: Semantics(
-        label: s.accountAvatarSemanticLabel,
-        child: _AccountAvatar(avatarUrl: avatarUrl),
-      ),
-      title: Text(displayName),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (user.email != null) Text(user.email!),
-          pendingCountAsync.when(
-            data: (count) => Text(
-              count == 0 ? s.accountSyncStatusSynced : s.accountSyncStatusPending,
-            ),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        ListTile(
+          leading: Semantics(
+            label: s.accountAvatarSemanticLabel,
+            child: _AccountAvatar(avatarUrl: avatarUrl),
           ),
-        ],
-      ),
-      trailing: TextButton(
-        onPressed: () => _confirmAndSignOut(context),
-        child: Text(s.accountSignOut),
-      ),
+          title: Text(displayName),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (user.email != null) Text(user.email!),
+              pendingCountAsync.when(
+                data: (count) => Text(
+                  count == 0 ? s.accountSyncStatusSynced : s.accountSyncStatusPending,
+                ),
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+            ],
+          ),
+          trailing: TextButton(
+            onPressed: () => _confirmAndSignOut(context),
+            child: Text(s.accountSignOut),
+          ),
+        ),
+        // AUTH-09: destructive-styled, below the sign-out row so both
+        // actions are visually distinguishable (sign-out non-destructive,
+        // delete destructive) rather than two equal-weight buttons.
+        Padding(
+          padding: const EdgeInsets.only(right: 16, bottom: 4),
+          child: TextButton(
+            onPressed: () => _confirmAndDeleteAccount(context),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(s.accountDeleteAction),
+          ),
+        ),
+      ],
     );
   }
 }

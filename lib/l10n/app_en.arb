@@ -218,6 +218,12 @@
   "accountConflictKeepCloudAction": "Cloud",
   "accountSyncStatusSynced": "Synced",
   "accountSyncStatusPending": "Syncing…",
+  "accountDeleteAction": "Delete account",
+  "accountDeleteConfirmTitle": "Delete account?",
+  "accountDeleteConfirmBody": "This cannot be undone. Your profile, availability and planned rides will be permanently removed from the cloud.",
+  "accountDeleteConfirmAction": "Delete",
+  "accountDeletedSnackbar": "Account deleted",
+  "accountDeleteError": "Deletion failed. Please try again.",
   "calendarMismatchWarning": "Calendar connected to a different account: {email}",
 
   "privacyPolicy": "Privacy policy",

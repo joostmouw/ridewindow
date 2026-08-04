@@ -610,6 +610,25 @@ class SEn extends S {
   String get accountSyncStatusPending => 'Syncing…';
 
   @override
+  String get accountDeleteAction => 'Delete account';
+
+  @override
+  String get accountDeleteConfirmTitle => 'Delete account?';
+
+  @override
+  String get accountDeleteConfirmBody =>
+      'This cannot be undone. Your profile, availability and planned rides will be permanently removed from the cloud.';
+
+  @override
+  String get accountDeleteConfirmAction => 'Delete';
+
+  @override
+  String get accountDeletedSnackbar => 'Account deleted';
+
+  @override
+  String get accountDeleteError => 'Deletion failed. Please try again.';
+
+  @override
   String calendarMismatchWarning(String email) {
     return 'Calendar connected to a different account: $email';
   }

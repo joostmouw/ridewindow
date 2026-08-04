@@ -610,6 +610,25 @@ class SNl extends S {
   String get accountSyncStatusPending => 'Wordt gesynchroniseerd...';
 
   @override
+  String get accountDeleteAction => 'Account verwijderen';
+
+  @override
+  String get accountDeleteConfirmTitle => 'Account verwijderen?';
+
+  @override
+  String get accountDeleteConfirmBody =>
+      'Dit kan niet ongedaan worden gemaakt. Je profiel, beschikbaarheid en geplande ritten worden permanent uit de cloud verwijderd.';
+
+  @override
+  String get accountDeleteConfirmAction => 'Verwijderen';
+
+  @override
+  String get accountDeletedSnackbar => 'Account verwijderd';
+
+  @override
+  String get accountDeleteError => 'Verwijderen mislukt. Probeer het opnieuw.';
+
+  @override
   String calendarMismatchWarning(String email) {
     return 'Agenda gekoppeld aan een ander account: $email';
   }
