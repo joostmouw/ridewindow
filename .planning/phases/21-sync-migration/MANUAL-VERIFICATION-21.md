@@ -478,3 +478,28 @@ webspecifiek — vermoedelijk de OAuth-clientconfiguratie voor het weborigin, of
 
 Dit verdient een eigen plan; het is geen regressie van fase 21's syncwerk maar een aparte,
 onzichtbare faalroute in de web-auth.
+
+### Correctie op de §5-bevinding hierboven — zwakker dan ik hem opschreef
+
+Na doorprikken kan ik **niet** hard maken dat de web-login stuk is. Wat ik daadwerkelijk zag:
+
+1. Klikken op de door Google gerenderde knop leverde geen zichtbaar effect en geen console-fout.
+2. Maar bij een volgende poging **rende die knop helemaal niet meer** — dezelfde handeling, zelfde
+   pagina, andere uitkomst.
+3. En er staan **nul iframes** in de DOM, terwijl Google Identity Services zijn knop normaal in
+   een cross-origin iframe zet. Synthetische klikken (zoals die van mij) bereiken zulke content
+   vaak niet.
+
+Punt 3 betekent dat mijn eigen testmethode een even goede verdachte is als de app. Punt 2 wijst
+daarnaast op iets tijdsafhankelijks in het renderen van de knop, wat een derde verklaring is.
+
+**Wat wél vaststaat:** ik heb §5 niet kunnen uitvoeren, want ik kreeg geen tweede ingelogde tab.
+**Wat niet vaststaat:** dat dat aan de app ligt.
+
+**De goedkoopste manier om dit te beslechten** is een menselijke klik: open
+`https://my-project-joost.web.app/#/profile`, klik "Sign in with Google", en klik de
+Google-knop met de muis. Lukt het, dan was het mijn automatisering en kan §5 gewoon door. Lukt
+het niet, dan is er een echte webbug en verdient die een eigen plan — en dan staat ook §3
+(iPhone-PWA, zelfde inlogpad) op losse schroeven.
+
+De eerdere formulering "de PWA logt niet in" was te stellig voor het bewijs dat eronder lag.
