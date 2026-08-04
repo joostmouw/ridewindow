@@ -43,7 +43,7 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 21 (sync-migration) — EXECUTING
-Plan: 8 of 10 voltooid (21-01 t/m 21-07 + 21-10); resteren 21-08 en 21-09, beide
+Plan: 9 of 11 voltooid (21-01 t/m 21-07 + 21-10 + 21-11); resteren 21-08 en 21-09, beide
 `autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
 SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint (taak 2, `gate="blocking"`).
 Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;
@@ -84,8 +84,8 @@ bleef geldig).
 
 **Sessievolgorde nu:** §0 → §1 → §2 → §5a → §3 → §4 → §5 → §6, in één sessie. §6 blijft laatste
 omdat het het testaccount vernietigt dat §3/§4/§5 levend nodig hebben -- niet meer wegens een
-blokkade. Build: **1.0.15+16** op Android, exact dezelfde code die nu als PWA live staat, dus
-beide kanten van §3's cross-device check draaien hetzelfde.
+blokkade. Build: **1.0.16+17** (bevat de 21-11-fix; +16 faalde aantoonbaar op §5a). De PWA moet
+opnieuw deployen zodra +17 op main staat, zodat §3's beide kanten weer dezelfde code draaien.
 
 **Wat de sessie afsluit:** §6 sluit plan 21-08, §4+§3+§5 sluiten plan 21-09. Draai je alles, dan
 kan fase 21 naar 10/10 en door naar verificatie. Niets in `lib/` staat nog open.
