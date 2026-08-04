@@ -33,8 +33,13 @@ Signing SHA-1 matches the registered OAuth Android client** — a locally-built/
 cannot complete Google sign-in at all. No build has been uploaded to Play Internal Testing yet,
 so this is a hard prerequisite, not an optional nicety.
 
-- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version 1.0.14+15) to the
-      Play Console's **Internal testing** track.
+- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.15+16**, built
+      2026-08-04 11:57) to the Play Console's **Internal testing** track.
+
+      > Must be **+16 or later**. The earlier `1.0.14+15` artifact was built at 09:34, before
+      > plan 21-10 wired `drain()` to a caller — section 5a below cannot pass against it, and
+      > testing it would reproduce this phase's own versionCode false start. Verify the
+      > installed build reports 1.0.15+16 before interpreting any behaviour (see section 2).
 - [ ] Wait for it to finish processing, then copy the internal-testing opt-in/download link.
 - [ ] On the Android test device, install **via that Play Store link** — not the local APK,
       not `adb install`.
