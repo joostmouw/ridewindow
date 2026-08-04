@@ -246,6 +246,16 @@ void main() {
         logs.last,
         allOf(contains('2 pending'), contains('1 sent'), contains('1 failed')),
       );
+      // Plan 21-13: the summary must name which entity went through, not just
+      // count it. A bare "1 sent" was ambiguous enough on a real device that a
+      // successful profile send was mistaken for a successful availability
+      // send, while the availability row in Postgres was untouched.
+      expect(
+        logs.last,
+        contains('availability'),
+        reason: 'the successful entity must be attributable from the log alone',
+      );
+      expect(logs.last, isNot(contains('(profile')));
     });
   });
 }

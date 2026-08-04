@@ -67,6 +67,12 @@ class SyncOutboxService {
     final rows = await _dao.pendingRows();
     var sent = 0;
     var failed = 0;
+    // Plan 21-13: which entities actually went through. The first version of
+    // this logging only counted them, and that cost a full verification round:
+    // a drain reported "1 sent" while the `availability` row in Postgres was
+    // provably untouched, and there was no way to tell from the log which row
+    // that success belonged to. A count alone is not attributable.
+    final sentEntities = <String>[];
 
     for (final row in rows) {
       try {
@@ -81,6 +87,7 @@ class SyncOutboxService {
         }
         await _dao.markSent(row.id);
         sent++;
+        sentEntities.add(row.entity);
       } catch (e) {
         await _dao.markFailed(row.id, e.toString());
         failed++;
@@ -103,6 +110,10 @@ class SyncOutboxService {
     // drain never ran at all" are the two states this phase has repeatedly
     // confused, and only a line that is present in the first case can tell
     // them apart.
-    _log('SyncOutbox: drain done — ${rows.length} pending, $sent sent, $failed failed');
+    final sentDetail = sentEntities.isEmpty ? '' : ' (${sentEntities.join(', ')})';
+    _log(
+      'SyncOutbox: drain done — ${rows.length} pending, $sent sent$sentDetail, '
+      '$failed failed',
+    );
   }
 }
