@@ -218,4 +218,11 @@ RPC succeeded or failed. The only valid proof is rows in the dashboard.
 - Cold-start measurement (§4), SYNC-11 multi-tab (§5)
 - AUTH-09 delete-account (§6, plan 21-08 Task 2) — deliberately left last, destructive
 
+> **Update 2026-08-04 14:58 — de §3-blokkade hierboven is opgelost.** De regel blijft staan als
+> historisch verslag van wat er tijdens die sessie waar was. `deploy-web.yml` verwees naar een
+> secret dat nooit is aangemaakt; `firebase init hosting:github` heeft er een gemaakt onder de
+> naam `FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST` en de workflow wijst daar nu naartoe (commit
+> `4e3957e`, run #3 groen). De PWA serveert sindsdien 1.0.15+16 in plaats van 1.0.12+13.
+> §3, §4 en §5 zijn daarmee weer uitvoerbaar; zie het kopblok van `REGRESSION-CHECKLIST-21.md`.
+
 ---
