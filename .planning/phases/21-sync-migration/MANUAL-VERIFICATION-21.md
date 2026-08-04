@@ -312,3 +312,25 @@ De tijdstempel is het bewijs, de sleutelinspectie zou alleen extra comfort zijn.
 **Testdata die is achtergebleven:** zaterdag 00:00 staat nu op Busy in Joosts eigen
 beschikbaarheid, lokaal én in de cloud. Terugzetten mag; het is een testwijziging, geen bewuste
 instelling.
+
+### Tweede, onafhankelijke SYNC-05-meting — 2026-08-04 19:26-19:27, app 1.0.19+20
+
+Uitgevoerd bij het terugzetten van de testdata uit de vorige meting, dus met een wijziging in de
+**tegenovergestelde richting** (Busy → Free). Dat sluit uit dat de eerste meting op een
+toevallige eigenschap van "een uur bezet zetten" leunde.
+
+| Stap | Waarneming |
+|------|------------|
+| Wijziging | Zaterdag 00:00 van Busy terug naar **Free**, visueel bevestigd |
+| Logcat | `SyncOutbox: drain done — 2 pending, 2 sent (availability, profile), 0 failed` om 19:27:02.154 |
+| Supabase | `availability.updated_at` = **2026-08-04 17:27:02.351** UTC = 19:27 lokaal |
+
+De entiteitsnamen uit plan 21-13 doen hier meteen hun werk: `2 sent (availability, profile)` is
+ondubbelzinnig, waar `2 sent` dat niet was. Precies de ambiguïteit die de eerste ronde een
+onterechte PASS opleverde.
+
+Bijvangst, ook op dit toestel geverifieerd: het profielscherm toont nu **`1.0.19 (20)`** in
+plaats van het hardcoded `'1.0.0'`. "Welke build draait hier?" is daarmee vanaf het toestel zelf
+te beantwoorden, zonder adb.
+
+**Testdata is opgeruimd:** het rooster staat weer zoals Joost het had.
