@@ -334,3 +334,58 @@ plaats van het hardcoded `'1.0.0'`. "Welke build draait hier?" is daarmee vanaf 
 te beantwoorden, zonder adb.
 
 **Testdata is opgeruimd:** het rooster staat weer zoals Joost het had.
+
+## §2 — Play-installatie en signed-in flows, 2026-08-04 19:50-20:05, app 1.0.19+20
+
+Uitgevoerd via `adb` op de Oppo Find X9 Pro, met een guard die vóór elke tik controleert of
+RideWindow daadwerkelijk voorgrond heeft (na een eerder incident waarbij taps in een andere app
+landden). De guard heeft deze sessie twee keer correct afgebroken.
+
+### Buildidentiteit — PASS, en de reden dat dit nodig was
+
+`installerPackageName=com.android.vending`, `versionCode=20`, verse installatie om 19:50:46
+(`firstInstallTime` == `lastUpdateTime`).
+
+Let op: er bestonden op dat moment **twee verschillende builds met hetzelfde nummer +20** — een
+lokale sideload van de niet-samengevoegde tak, en de build uit main. Op het versienummer alleen
+waren die niet te onderscheiden. Het beslissende bewijs was de logprefix: de oude sideload logt
+`SyncOutbox:`, de samengevoegde build logt `SyncOutboxService:`. Waargenomen:
+
+```
+I/flutter: SyncOutboxService: drain done — 1 pending, 1 sent (profile), 0 failed
+```
+
+Dat is een bruikbare techniek voor volgende keer: laat een build zich in logcat identificeren op
+iets anders dan zijn versienummer.
+
+| Item | Uitkomst |
+|------|----------|
+| Startup | **PASS** — geen crash, "15 ride windows this week" |
+| Sign in met Google | **PASS** — signed-in view met naam/e-mail, geen fout; werkt op de Play-gesigneerde build |
+| Conflictdialogen | Geen getoond |
+| Clouddata terug na verse installatie | **PASS** — het rooster (ma-vr 00:00-07:00 werk, weekend vrij, "Weekend warrior") kwam ongeschonden terug. Tijdens onboarding was noodgedwongen preset "Weekends only" gekozen; de cloudversie heeft die overschreven, niet andersom |
+| "Add to Google Calendar" | **PASS** — event "Fietsrit 06:00–08:00" op zaterdag 8 augustus, 6:00–8:00, omschrijving `~15°C, droog, 5km/u wind`, komt exact overeen met het ritdetail (15°C, dry, 5km/h) |
+
+### Kanttekening bij het MIG-item
+
+De checklist vraagt om een **genuine first login** zonder bestaande cloudrij. Dat was dit niet:
+er stonden al rijen van vanochtend. Wat hier bewezen is, is het *terugkomen* van clouddata na een
+verse installatie (SYNC-04-achtig), niet de eerste-login-migratie zelf. MIG-05/06 zijn eerder al
+afgetekend; dit vervangt dat niet.
+
+### Nog open in §2
+
+- **Uitloggen** en **herstart → nog steeds ingelogd** (AUTH-04): niet uitgevoerd, het toestel
+  vergrendelde zichzelf halverwege.
+
+### Opruimen
+
+In de agenda staan nu twee testevents: `Fietsrit 06:00–08:00` (deze sessie) en
+`Fietsrit 09:00–11:00` (eerdere sessie), beide op zaterdag 8 augustus. Bewust niet verwijderd —
+events wissen uit een echte agenda is aan Joost.
+
+### i18n-observatie, geen regressie
+
+De agenda-omschrijving is Nederlands terwijl de app-UI op Engels stond. `calendar_service.dart`
+heeft geen `BuildContext` en valt daardoor buiten de `S.of(context)`-route — een bekend gat, al
+genoteerd in de i18n-status.
