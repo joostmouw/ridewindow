@@ -104,14 +104,14 @@ void main() {
     final repo = ProfileRepository(prefs, outbox: db.syncOutboxDao, userId: 'uid-1');
 
     await repo.save(
-      UserProfile(
-        tolerances: const WeatherTolerances(
+      const UserProfile(
+        tolerances: WeatherTolerances(
           tempMinIdealC: 12,
           tempMaxIdealC: 26,
           windMaxIdealKmh: 15,
           rainMaxIdealMm: 0.5,
         ),
-        allowedDurations: const [2, 3, 5],
+        allowedDurations: [2, 3, 5],
         theme: 'system',
         notifEveningBefore: false,
         notifMorningOf: false,

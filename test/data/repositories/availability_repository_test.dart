@@ -148,9 +148,15 @@ void main() {
       expect(pending.single.entity, kOutboxEntityAvailability);
       expect(pending.single.entityKey, 'uid-1');
       expect(pending.single.operation, 'upsert');
+      // Plan 21-12: the previous assertion here (`equals(toRecurringRow(hours))`)
+      // encoded the defect directly — it expected the enqueued payload to be
+      // the bare recurring map, which is not a legal `public.availability`
+      // row (PostgREST would receive weekday-hour keys as column names). Do
+      // not "restore" that shape; the wrapped row below is correct and
+      // matches `test/data/database/outbox_payload_shape_test.dart`.
       expect(
         jsonDecode(pending.single.payload),
-        equals(toRecurringRow(hours)),
+        equals({'user_id': 'uid-1', 'recurring': toRecurringRow(hours)}),
       );
     });
 
