@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 8/10 met SUMMARY. PWA-deploy hersteld (1.0.15+16 live); hele REGRESSION-CHECKLIST-21 is nu in een sessie uitvoerbaar en sluit 21-08 + 21-09"
-last_updated: "2026-08-04T13:00:26.000Z"
+status: "Fase 21: 9/11 met SUMMARY. 21-11 dicht de disposed-Ref-bug die 21-10's drain onbruikbaar maakte; 1.0.16+17 wacht op Play-upload voor S5a"
+last_updated: "2026-08-04T14:02:46.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
@@ -89,6 +89,21 @@ beide kanten van §3's cross-device check draaien hetzelfde.
 
 **Wat de sessie afsluit:** §6 sluit plan 21-08, §4+§3+§5 sluiten plan 21-09. Draai je alles, dan
 kan fase 21 naar 10/10 en door naar verificatie. Niets in `lib/` staat nog open.
+
+**21-10 was NIET genoeg -- 21-11 dicht de echte bug (2026-08-04, toestelsessie 2).** Op
+1.0.15+16 bleef de statustekst op "Syncing..." staan. Logcat na een foreground-cyclus:
+`CloudSyncReconciler.drainOutbox failed: Cannot use the Ref of cloudSyncReconcilerProvider
+after it has been disposed` -- en dezelfde regel voor `reconcileOnForeground`, dus SYNC-04 was
+sinds 21-04 al stuk op exact dat pad. Oorzaak: bare `@riverpod` is auto-dispose in Riverpod 3,
+beide callsites gebruiken `ref.read` (terecht), en `CloudSyncReconciler` bewaart de `Ref` over
+await-grenzen. Plan 21-11 zet beide providers op `@Riverpod(keepAlive: true)` en haalt de
+`Supabase.instance.client`-lookup uit `drainOutbox()` naar de send-closures, zodat de methode
+zonder Supabase testbaar is. Suite 423/423, de acht Supabase-ruisregels zijn weg.
+
+**De les, nu twee keer geleerd:** 21-10's test was een structurele broncode-scan die bewees dat
+de aanroep bestond. Deze bug leefde in of die aanroep zijn werk bereikte. 21-11 voegt een
+gedragstest toe die `drainOutbox()` via een kale `container.read` draait -- exact zoals productie
+-- en faalde aantoonbaar op de oude code met de letterlijke disposed-Ref-melding.
 
 **Opgelost door 21-10 (2026-08-04):** `syncOutboxServiceProvider` bouwt nu
 `SyncOutboxService` met echte Supabase-send-closures, en `drain()` heeft twee echte
