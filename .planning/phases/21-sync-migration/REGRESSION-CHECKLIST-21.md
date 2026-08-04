@@ -62,17 +62,32 @@ Source: install via the Play Store internal testing link only (see §0). Reused 
 `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` §1 — this was never run (plan 19-07 was left
 open) and is folded in here rather than left as a separate outstanding item.
 
+- [ ] **Assert the installed build FIRST — do not skip, do not interpret anything before this.**
+      ```
+      ~/Library/Android/sdk/platform-tools/adb shell dumpsys package ridewindow.joost.amsterdam | grep version
+      ```
+      The `versionCode` MUST match the build you just uploaded. On 2026-08-04 a full session was
+      spent diagnosing a "broken" sync that was simply an old binary: Play served versionCode 13
+      (the 26 July build, no Phase 20/21 code at all) because the device's account was opted into
+      the pre-existing **closed test** track and not into internal testing. Every symptom followed
+      from that. If the number is wrong, stop and fix the track opt-in — nothing below means
+      anything until it matches.
 - [ ] **Startup** — install via the Play Store internal testing link and open the app. Note:
       loads within a few seconds, no crash or white screen.
 - [ ] **Sign in** — tap "Inloggen met Google" in Profile's Account section, complete the Google
       flow. Note: the signed-in view (avatar/name/email) appears with no error.
 - [ ] **First-login migration proof (MIG, this plan's highest-value item)** — immediately after
       sign-in completes, watch for at most two sequential conflict dialogs (there should be
-      **none**, since this is a genuine first login with no prior cloud row) and watch the sync
-      status text under the email. Expect it to settle on "Gesynchroniseerd" within a few
-      seconds. Then open the Supabase Dashboard → Table Editor → `profiles` and `availability`
+      **none**, since this is a genuine first login with no prior cloud row). Then open the
+      Supabase Dashboard → Table Editor → `profiles` and `availability`
       (and `planned_rides` if you planned a ride in step 1) and confirm rows exist for this
       user containing the exact values you set in section 1 (not defaults).
+      - **Do NOT use the sync status text as proof — corrected 2026-08-04.** An earlier version
+        of this checklist told you to wait for "Gesynchroniseerd". That is invalid: the text is
+        driven by `outboxPendingCountProvider`, which counts rows in the local outbox queue, and
+        the first-login migration calls the RPC directly without touching the outbox. On a genuine
+        first login the queue is therefore empty and the text reads "Gesynchroniseerd" whether the
+        RPC succeeded or failed silently. **Rows in the dashboard are the only valid proof.**
       - **What a `migrate_account_data` signature failure looks like — read this before
         concluding "sign-in is broken":** Google sign-in itself is a separate, independent flow
         from the migration RPC. A signature mismatch does **not** block sign-in and does **not**

@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 7/9 plannen klaar. 21-08 en 21-09 wachten op toestelverificatie"
+status: "Fase 21: 9/10 plannen klaar. 21-10 (outbox drain) staat klaar; toestelverificatie deels gedaan"
 last_updated: "2026-08-03T18:10:09.726Z"
 last_activity: 2026-08-04
 progress:
@@ -44,7 +44,37 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 Phase: 21 (sync-migration) — EXECUTING
 Plan: 7 of 9 voltooid (21-01 t/m 21-07); resteren 21-08 en 21-09, beide `autonomous: false`
-Status: Alles wat zonder toestel kan is klaar. Volgende stap is handwerk op het toestel.
+Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen, maar SYNC-05 blijkt NIET
+geleverd -- nieuw plan 21-10 staat klaar om dat te dichten.
+
+**Blokkerend defect gevonden op toestel (2026-08-04):** `SyncOutboxService` wordt nergens in
+`lib/` aangemaakt en `drain()` wordt nooit aangeroepen. De outbox is write-only in productie:
+repositories zetten er rijen in, niets haalt ze eruit. Eerste-login-migratie werkt wel (die
+roept de RPC rechtstreeks aan, buiten de outbox om), maar elke wijziging daarna bereikt de
+cloud nooit. Oorzaak is een planning-gat, geen uitvoeringsfout: 21-03 wees het werk toe aan
+21-04/21-05, 21-04 wees het door naar 21-06/21-07, en die noemen `drain` nul keer. Suite is
+groen omdat `drain()` zelf goed getest is -- alleen roept niemand hem aan. Plan 21-10
+(gap_closure, wave 9) dicht dit en voegt een test toe die faalt zodra de wiring weer verdwijnt.
+
+**Wel bewezen op het toestel:** MIG-05/06 -- eerste login schreef profiel (echte waarden),
+availability (120 uurblokken) en 2 geplande ritten in EEN atomaire RPC, alle drie met tijdstempel
+2026-08-04 09:14:46. Daarmee is het grootste risico van deze fase (de 14-argumentsignatuur van
+`migrate_account_data`) definitief afgedekt. Geen fouten in logcat.
+
+**Procesles, opgenomen als item 0 van de checklist:** de eerste testronde leek volledig te
+falen; er ging ~40 minuten in serverdiagnose voordat bleek dat het toestel versionCode 13 draaide
+(de build van 26 juli, zonder fase 20/21-code). Play serveerde die omdat het account in de
+bestaande closed test zat en niet in interne tests. Controleer ALTIJD eerst de geinstalleerde
+versionCode voordat je gedrag interpreteert.
+
+**Ook gecorrigeerd:** REGRESSION-CHECKLIST-21.md zei dat de statustekst "Gesynchroniseerd" bewijs
+was voor een geslaagde migratie. Dat klopt niet -- die tekst telt outbox-rijen en de migratie
+gaat niet via de outbox, dus hij staat sowieso op "Gesynchroniseerd". Alleen rijen in het
+dashboard zijn bewijs.
+
+**Los, niet nieuw:** `.github/workflows/deploy-web.yml` faalt sinds 2026-07-26 op een ontbrekende
+repository-secret `FIREBASE_SERVICE_ACCOUNT`. De gedeployde PWA bevat dus geen fase 20/21-code,
+waardoor sectie 3 (iPhone) van de checklist geblokkeerd is tot die secret bestaat.
 
 **Wat af is (waves 1-6, alles gemerged op main):**
 - 21-01 `resolveAccountSync()` — pure beslisfunctie, 11 tests

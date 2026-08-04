@@ -122,3 +122,100 @@ both halves of the access story — RLS policies and table grants — are correc
 against the real deployed project.
 
 ---
+
+## Device session — 2026-08-04, Oppo Find X9 Pro (PLG110), app 1.0.14+15
+
+Executed on a real device installed from the Play Store **Internal testing** track
+(`installer=com.android.vending`), against the live project `hcdrydlgqpnmumfupgcx`.
+Everything below is an observed result, not an expectation.
+
+### False start worth recording
+
+The first attempt appeared to fail completely: no sync status text, and all four tables
+empty. Roughly forty minutes went into diagnosing the server side — RPC signature, table
+grants, PostgREST schema cache — before checking what was actually installed:
+
+```
+versionCode=13  versionName=1.0.12  installer=com.android.vending
+```
+
+The device was running the **26 July build**, which contains no Phase 20 or 21 code at all.
+Google Play had served it because the device's account was opted into the pre-existing
+**closed test** track (still on +13) and not into internal testing (+15). The symptoms were
+entirely explained by testing the wrong binary.
+
+**Lesson for future device sessions: assert the installed `versionCode` BEFORE interpreting
+any behaviour.** One `adb shell dumpsys package <id> | grep version` would have replaced the
+entire investigation. This step is now item 0 of the device checklist.
+
+The server-side checks made during that detour were not wasted, and are recorded here as
+genuine results:
+
+- `migrate_account_data` invoked at SQL level as the `authenticated` role with a real
+  `auth.users` id and all 14 named arguments: wrote **profiles 1 / availability 1 /
+  planned_rides 1**, inside a rolled-back transaction. The 14-argument signature resolves
+  correctly — this was the phase's single highest-rated risk and it is now retired.
+- `has_function_privilege('authenticated', ...)` is `true` for both `migrate_account_data`
+  and `delete_own_account`.
+- PostgREST schema cache reloaded via `notify pgrst, 'reload schema'` (precautionary; it was
+  not the cause).
+
+### MIG-05/06 — first-login migration: PASS
+
+After updating to 1.0.14+15 and signing in with genuine, non-default local data present:
+
+| table | rows | content |
+|-------|------|---------|
+| `profiles` | 1 | `Joost \| temp 12-26 \| wind 15 \| regen 0.5 \| duur {2,3,5}` |
+| `availability` | 1 | **120 hour blocks**, `{"1-0":"work","1-1":"work",…}` |
+| `planned_rides` | 2 | 9 Aug 06:00→08:00 and 9 Aug 11:00→13:00 |
+
+All three carry the identical timestamp `2026-08-04 09:14:46.68055+00` — one atomic RPC, three
+tables, at the moment of sign-in. The payload is unambiguously real user data (120 availability
+blocks cannot be a default), so this is not an empty push that succeeded by coincidence.
+No errors in `adb logcat` (`AccountSection`, `migrate_account_data`, `Postgrest` filters).
+
+### SYNC-05 — outbox drain: FAIL (blocking defect, see plan 21-10)
+
+After signing out and back in, the account row showed **"Wordt gesynchroniseerd..."** and
+stayed there. That status text is not cosmetic — it is `outboxPendingCountProvider` accurately
+reporting a queue that never empties.
+
+Cause, confirmed by source inspection: **`SyncOutboxService` is never constructed anywhere in
+`lib/`, and `drain()` is never called.** The only production consumer of the outbox is
+`watchPendingCount()`, which feeds the status text. Repositories enqueue; nothing dequeues.
+
+Impact confirmed against the live database — all three tables still read
+`2026-08-04 09:14:46`, unchanged by the second sign-in:
+
+- First-login migration works, because it calls the RPC directly and bypasses the outbox.
+- **Every local change after that never reaches the cloud.** Profile edits, availability
+  changes and newly planned rides enqueue and stay enqueued.
+
+How it was missed: responsibility for wiring the drain was deferred from plan to plan and then
+dropped. `21-03` states *"wave 3 (plans 21-04/21-05) is what actually wires ... the real
+Supabase calls into drain()'s callbacks"*; `21-04` states *"the drain step in plan 21-06/21-07
+adds user_id when it actually calls .upsert()"*; plans `21-06` and `21-07` do not mention
+`drain` at all. No executor deviated from its plan — the plan set never assigned this work.
+The full suite is green because `drain()` itself is well tested; only its caller is absent.
+
+This defect was found by the device session and by nothing else.
+
+### Correction to REGRESSION-CHECKLIST-21.md
+
+Section 2 instructed the tester to treat the status text reaching "Gesynchroniseerd" as proof
+that the first-login migration succeeded. **That instruction is wrong and has been corrected.**
+The status text counts outbox rows, and the first-login migration does not use the outbox — so
+on a genuine first login the queue is empty and the text reads "Gesynchroniseerd" whether the
+RPC succeeded or failed. The only valid proof is rows in the dashboard.
+
+### Still outstanding from this session
+
+- "Voeg toe aan agenda", sign-out, and restart-persistence (checklist §2, not reached)
+- iPhone PWA (§3) — **blocked**: the `deploy-web.yml` workflow has never succeeded since it was
+  added on 2026-07-26 (repository secret `FIREBASE_SERVICE_ACCOUNT` was never created), so the
+  deployed PWA does not contain Phase 20 or 21 code
+- Cold-start measurement (§4), SYNC-11 multi-tab (§5)
+- AUTH-09 delete-account (§6, plan 21-08 Task 2) — deliberately left last, destructive
+
+---
