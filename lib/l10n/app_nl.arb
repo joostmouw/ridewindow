@@ -285,6 +285,24 @@
   "debugAvailabilityReset": "Beschikbaarheid gereset.",
   "debugRefreshWeather": "Weer handmatig verversen",
   "debugWeatherRefreshing": "Weer wordt ververst.",
+  "debugOutbox": "Sync-outbox bekijken",
+  "debugOutboxTitle": "Sync-outbox",
+  "debugOutboxEmpty": "Outbox is leeg — alles is verzonden.",
+  "debugOutboxRowSubtitle": "{attempts} pogingen · {error}",
+  "@debugOutboxRowSubtitle": {
+    "placeholders": {
+      "attempts": {"type": "int"},
+      "error": {"type": "String"}
+    }
+  },
+  "debugOutboxNoError": "nog geen fout vastgelegd",
+  "debugOutboxClear": "Outbox wissen",
+  "debugOutboxCleared": "Outbox gewist ({count} rijen).",
+  "@debugOutboxCleared": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
 
   "detailTierPerfectDesc": "Ideaal fietsweer",
   "detailTierGreatDesc": "Prettig fietsweer",

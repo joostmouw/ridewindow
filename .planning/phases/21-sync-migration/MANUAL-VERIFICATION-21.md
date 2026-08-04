@@ -226,3 +226,111 @@ RPC succeeded or failed. The only valid proof is rows in the dashboard.
 > §3, §4 en §5 zijn daarmee weer uitvoerbaar; zie het kopblok van `REGRESSION-CHECKLIST-21.md`.
 
 ---
+
+## Device session 3 — 2026-08-04 18:11-18:18, Oppo Find X9 Pro (PLG110), app 1.0.17+18 → 1.0.18+19
+
+Uitgevoerd via `adb` (screenshots + `input tap`), niet handmatig. Verse installatie: het toestel
+was leeg na de mislukte sideload-poging, dus dit is meteen een first-install + first-login pad.
+
+### SYNC-05 — outbox drain: **PASS**, en de oorzaak van twee sessies falen gevonden
+
+**De fout, zichtbaar gemaakt door plan 21-12.** Direct na inloggen op 1.0.17+18:
+
+```
+I/flutter: SyncOutbox: send failed for availability/a1456a8d-f39c-45c5-94cf-35957fc4a555
+           (operation=upsert, attempt 1): PostgrestException(message: Could not find the
+           '1-0' column of 'availability' in the schema cache, code: PGRST204,
+           details: Bad Request, hint: null)
+I/flutter: SyncOutbox: drain done — 2 pending, 1 sent, 0 failed → 1 failed
+```
+
+Let op wat dit meteen weerlegt: dit was een **verse installatie**, dus de hypothese "oude
+vergiftigde rijen van vanochtend" is onjuist. `profile` ging wél door (1 sent), `availability`
+faalde structureel.
+
+**Oorzaak (plan 21-13).** `AvailabilityRepository` enqueuede `jsonEncode(toRecurringRow(hours))`
+— de kále urenmap — als outbox-payload, en `drainOutbox` doet daar
+`.from('availability').upsert(payload)` mee. PostgREST leest de sleutels van die map dus als
+kolomnamen: `'1-0'`, `'1-9'`, … Vergelijk `ProfileRepository`, dat wél `profile.toRow(userId)`
+stuurt — een echte rij met `user_id`. De leeskant (`parseAvailabilityRow`) verwachtte al de
+hele tijd `row['recurring']`, dus schrijf- en leeskant spraken elkaar tegen.
+
+De bijbehorende unittest assertte `equals(toRecurringRow(hours))` en **legde de foute vorm dus
+vast** — dat is waarom dit door alle 426 tests heen kwam.
+
+**Fix + herbewijs op 1.0.18+19,** zelfde toestel, zelfde sessie:
+
+1. Debugmenu → "Inspect sync outbox" toonde de vastgelopen rij mét `2 attempts` en de volledige
+   PGRST204-tekst, op het toestel zelf. Het gereedschap uit 21-12 deed precies waarvoor het
+   gebouwd is.
+2. "Clear outbox" getikt.
+3. Eén beschikbaarheidsuur gewijzigd (do 6 aug, 10:00) → achtergrond → voorgrond.
+4. Logcat: `SyncOutbox: drain done — 1 pending, 1 sent, 0 failed`.
+5. Accountsectie leest **"Synced"** in plaats van "Syncing..." — de statustekst die sinds
+   1.0.15+16 vastzat.
+
+### Nog niet afgetekend
+
+- Dashboardbevestiging van de `availability`-rij in Supabase. PostgREST accepteerde de upsert
+  zonder fout, wat sterk bewijs is, maar §5a vraagt expliciet om de rij in Table Editor te zien.
+  Vereist dashboardtoegang.
+- §2 (Play App Signing-route), §3 (iPhone-PWA), §4 (cold start), §5 (multi-tab), §6
+  (delete-account). Ongewijzigd open.
+
+### Correctie op de PASS hierboven — eerst te vroeg geclaimd, daarna alsnog echt bewezen
+
+De eerste versie van dit verslag zette SYNC-05 op PASS op grond van één logregel
+(`drain done — 1 pending, 1 sent, 0 failed`). Dat was **niet voldoende**, en de dashboardcheck
+liet zien waarom: `public.availability.updated_at` stond nog op `2026-08-04 09:14:46` UTC, van de
+eerste migratie diezelfde ochtend. De rij was dus níét geschreven door die drain. Twee fouten in
+die redenering:
+
+1. De agendatik die de wijziging moest maken, had niets gewijzigd — voor- en na-screenshot waren
+   identiek. Dat was niet gecontroleerd vóór de conclusie.
+2. De samenvattingsregel telde alleen (`1 sent`) en noemde de entity niet, dus een geslaagde
+   `profile`-send was niet te onderscheiden van een geslaagde `availability`-send. Plan 21-13
+   voegt de entiteitsnamen toe: `drain done — 2 pending, 2 sent (profile, availability), 0 failed`.
+
+**Het herbewijs, 2026-08-04 19:02-19:03, app 1.0.18+19, wél sluitend:**
+
+| Stap | Waarneming |
+|------|------------|
+| Wijziging | Profiel → "Edit my schedule" → zaterdag 00:00 van Free naar **Busy**; visueel bevestigd op de na-screenshot (oranje cel) |
+| Trigger | Achtergrond → voorgrond |
+| Logcat | `SyncOutbox: drain done — 2 pending, 2 sent, 0 failed` om 19:03:00.346 |
+| Supabase | `availability.updated_at` = **2026-08-04 17:03:00.527** UTC = 19:03 lokaal — exact het drainmoment, waar het daarvoor 09:14 was |
+| Vorm | `recurring` bevat de urenmap als jsonb ín de kolom (`{"1-0":"work", …}`), niet als losse kolommen |
+
+De tijdstempel verschoof naar precies het moment van de drain; dat gebeurt alleen als de upsert
+de rij daadwerkelijk heeft geschreven (`set_updated_at`-trigger). Daarmee is de keten
+toestel → outbox → drain → PostgREST → Postgres sluitend aangetoond.
+
+**Niet gedaan:** de volledige `recurring`-JSON uitlezen om de sleutel `6-0` te zien. De
+Table-Editor-cel opent een bewerkveld op productiedata; daar is bewust niet verder in geklikt.
+De tijdstempel is het bewijs, de sleutelinspectie zou alleen extra comfort zijn.
+
+**Testdata die is achtergebleven:** zaterdag 00:00 staat nu op Busy in Joosts eigen
+beschikbaarheid, lokaal én in de cloud. Terugzetten mag; het is een testwijziging, geen bewuste
+instelling.
+
+### Tweede, onafhankelijke SYNC-05-meting — 2026-08-04 19:26-19:27, app 1.0.19+20
+
+Uitgevoerd bij het terugzetten van de testdata uit de vorige meting, dus met een wijziging in de
+**tegenovergestelde richting** (Busy → Free). Dat sluit uit dat de eerste meting op een
+toevallige eigenschap van "een uur bezet zetten" leunde.
+
+| Stap | Waarneming |
+|------|------------|
+| Wijziging | Zaterdag 00:00 van Busy terug naar **Free**, visueel bevestigd |
+| Logcat | `SyncOutbox: drain done — 2 pending, 2 sent (availability, profile), 0 failed` om 19:27:02.154 |
+| Supabase | `availability.updated_at` = **2026-08-04 17:27:02.351** UTC = 19:27 lokaal |
+
+De entiteitsnamen uit plan 21-13 doen hier meteen hun werk: `2 sent (availability, profile)` is
+ondubbelzinnig, waar `2 sent` dat niet was. Precies de ambiguïteit die de eerste ronde een
+onterechte PASS opleverde.
+
+Bijvangst, ook op dit toestel geverifieerd: het profielscherm toont nu **`1.0.19 (20)`** in
+plaats van het hardcoded `'1.0.0'`. "Welke build draait hier?" is daarmee vanaf het toestel zelf
+te beantwoorden, zonder adb.
+
+**Testdata is opgeruimd:** het rooster staat weer zoals Joost het had.

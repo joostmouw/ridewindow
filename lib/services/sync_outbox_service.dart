@@ -74,6 +74,10 @@ class SyncOutboxService {
     required Future<void> Function(String entity, String entityKey) deleteFn,
   }) async {
     final rows = await _dao.pendingRows();
+    var sent = 0;
+    var failed = 0;
+    final sentEntities = <String>[];
+
     for (final row in rows) {
       try {
         if (row.operation == 'delete') {
@@ -86,7 +90,10 @@ class SyncOutboxService {
           );
         }
         await _dao.markSent(row.id);
+        sent++;
+        sentEntities.add(row.entity);
       } catch (e) {
+        failed++;
         final attemptNumber = row.attempts + 1;
         // The one debugPrint every failure gets — this is the part that
         // would have saved the whole 21-10/21-11/21-12 session: previously
@@ -114,5 +121,23 @@ class SyncOutboxService {
         // drain — one failing entity must not block every other pending row.
       }
     }
+
+    // Één regel per drain, óók als er niets te doen viel en óók als alles
+    // slaagde. Zonder deze regel is "de drain heeft niets gevonden" niet te
+    // onderscheiden van "de drain heeft nooit gedraaid" — en precies dat
+    // onderscheid is in 21-10 en 21-11 twee keer verkeerd gelezen, met een
+    // toestelsessie per keer als prijs.
+    //
+    // De entiteitsnamen staan erbij omdat een kale telling niet herleidbaar
+    // is: op 2026-08-04 meldde een drain "1 sent" terwijl de
+    // availability-rij in Postgres aantoonbaar onaangeroerd bleef — de
+    // geslaagde send was een profile-rij, en dat was uit de log niet te zien.
+    // Dat kostte een volledige verificatieronde en leverde bijna een
+    // onterechte PASS op.
+    final sentDetail = sentEntities.isEmpty ? '' : ' (${sentEntities.join(', ')})';
+    debugPrint(
+      'SyncOutboxService: drain done — ${rows.length} pending, '
+      '$sent sent$sentDetail, $failed failed',
+    );
   }
 }

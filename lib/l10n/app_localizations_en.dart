@@ -670,6 +670,31 @@ class SEn extends S {
   String get debugWeatherRefreshing => 'Weather is refreshing.';
 
   @override
+  String get debugOutbox => 'Inspect sync outbox';
+
+  @override
+  String get debugOutboxTitle => 'Sync outbox';
+
+  @override
+  String get debugOutboxEmpty => 'Outbox is empty — everything has been sent.';
+
+  @override
+  String debugOutboxRowSubtitle(int attempts, String error) {
+    return '$attempts attempts · $error';
+  }
+
+  @override
+  String get debugOutboxNoError => 'no error recorded yet';
+
+  @override
+  String get debugOutboxClear => 'Clear outbox';
+
+  @override
+  String debugOutboxCleared(int count) {
+    return 'Outbox cleared ($count rows).';
+  }
+
+  @override
   String get detailTierPerfectDesc => 'Ideal cycling weather';
 
   @override

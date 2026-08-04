@@ -81,4 +81,16 @@ class SyncOutboxDao extends DatabaseAccessor<AppDatabase>
   Future<void> dropRow(int id) {
     return (delete(syncOutboxEntries)..where((t) => t.id.equals(id))).go();
   }
+
+  /// Verwijdert elke openstaande rij en geeft terug hoeveel er weg zijn.
+  ///
+  /// Alleen gebruikt door het verborgen debugmenu ("Inspect sync outbox"): het
+  /// laat een vastgelopen outbox op het toestel zelf legen, waarmee "oude
+  /// rijen die nooit meer weg gaan" te onderscheiden is van "de drain faalt
+  /// structureel" — na een wis blijft de teller op 0, of hij klimt meteen
+  /// terug. Geen enkel productiepad roept dit aan; daar verdwijnen rijen
+  /// alleen via [markSent] (bevestigde send) of [dropRow] (attempt-plafond).
+  Future<int> clearAll() {
+    return delete(syncOutboxEntries).go();
+  }
 }

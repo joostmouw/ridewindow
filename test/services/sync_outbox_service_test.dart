@@ -197,15 +197,31 @@ void main() {
           deleteFn: (entity, key) async {},
         );
 
-        expect(messages, hasLength(1));
-        expect(messages.single, contains('availability'));
-        expect(messages.single, contains('uid1'));
-        expect(messages.single, contains('attempt 1'));
-        expect(messages.single, contains('network down'));
+        final failureLine = messages.firstWhere((m) => m.contains('send failed'));
+        expect(failureLine, contains('availability'));
+        expect(failureLine, contains('uid1'));
+        expect(failureLine, contains('attempt 1'));
+        expect(failureLine, contains('network down'));
       },
     );
 
-    test('a drain where every row succeeds logs nothing', () async {
+    // AANGEPAST bij het samenvoegen van twee parallelle 21-12/21-13-takken.
+    // Deze test heette "a drain where every row succeeds logs nothing" en eiste
+    // `expect(messages, isEmpty)`. Dat is bewust omgedraaid, op grond van wat er
+    // op 2026-08-04 op het toestel gebeurde:
+    //
+    // - Zwijgen bij succes maakt "de drain vond niets" niet te onderscheiden van
+    //   "de drain heeft nooit gedraaid". Dat onderscheid is in 21-10 en 21-11
+    //   twee keer verkeerd gelezen, met een toestelsessie per keer als prijs.
+    // - Een kale telling is bovendien niet herleidbaar: een drain meldde
+    //   "1 sent" terwijl de availability-rij in Postgres onaangeroerd bleef —
+    //   de geslaagde send was een profile-rij. Dat leverde bijna een onterechte
+    //   SYNC-05 PASS op.
+    //
+    // De prijs is één regel per foreground-cyclus in logcat. Dat is goedkoper
+    // dan een sessie diagnose.
+    test('elke drain logt één samenvatting, met de verzonden entiteiten',
+        () async {
       final dao = db.syncOutboxDao;
       await dao.enqueueOrCoalesce(
         entity: 'profile',
@@ -219,7 +235,31 @@ void main() {
         deleteFn: (entity, key) async {},
       );
 
-      expect(messages, isEmpty);
+      expect(messages, hasLength(1));
+      expect(
+        messages.single,
+        allOf(
+          contains('drain done'),
+          contains('1 pending'),
+          contains('1 sent'),
+          contains('(profile)'),
+          contains('0 failed'),
+        ),
+      );
+    });
+
+    test('een lege outbox logt óók een samenvatting', () async {
+      await service.drain(
+        upsertFn: (entity, key, payload) async {},
+        deleteFn: (entity, key) async {},
+      );
+
+      expect(
+        messages.single,
+        allOf(contains('0 pending'), contains('0 sent'), contains('0 failed')),
+        reason: 'juist deze regel onderscheidt "niets te doen" van '
+            '"nooit gedraaid"',
+      );
     });
 
     test(

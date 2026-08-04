@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "21-12: availability-payload was geen rij; 1.0.17+18 klaar"
+status: "Fase 21: SYNC-05 bewezen op toestel; rest is handmatig"
 last_updated: "2026-08-04T17:07:20.000Z"
 last_activity: 2026-08-04
 progress:
