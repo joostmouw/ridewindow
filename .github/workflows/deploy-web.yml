@@ -62,33 +62,41 @@
 # as a real risk. The version tag is kept as a trailing comment so bumping
 # is a deliberate, reviewable diff, not a silent drift.
 #
-# Setup required before this workflow can succeed (one-time, by the repo
-# owner):
-#   Repository secret FIREBASE_SERVICE_ACCOUNT -- a Firebase/GCP service
-#   account JSON key with the Firebase Hosting Admin role on the
-#   my-project-joost project.
+# Setup (DONE 2026-08-04 -- recorded here so the history is legible):
+#   Repository secret FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST -- a
+#   Firebase/GCP service account JSON key with the Firebase Hosting Admin
+#   role on the my-project-joost project. Created by running
+#   `firebase init hosting:github` from the repo root, which provisioned
+#   service account github-action-1257243656 and uploaded its JSON key to
+#   GitHub under that name (derived from the project ID).
 #
-#   Recommended: run `firebase init hosting:github` from the repo root on
-#   your machine. It is interactive (opens a browser / asks you to
-#   authorize against GitHub) so this is necessarily something you run
-#   yourself, not something this workflow or an agent can do for you. It
-#   creates the service account with the right role AND creates a GitHub
-#   secret for you -- but it names that secret
-#   FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST (derived from the project
-#   ID), not FIREBASE_SERVICE_ACCOUNT. After running it, rename the secret
-#   it created to exactly FIREBASE_SERVICE_ACCOUNT (repo -> Settings ->
-#   Secrets and variables -> Actions), or the guard step below will fail
-#   with a message telling you so. Decline the wizard's offer to write its
-#   own workflow YAML files -- this file replaces that output and already
-#   matches this repo's conventions.
+#   Why this file uses the wizard's secret name instead of a tidier
+#   FIREBASE_SERVICE_ACCOUNT: an earlier version of this comment told the
+#   reader to rename the secret after running the wizard. That advice was
+#   wrong and has been removed. GitHub Actions secrets cannot be renamed --
+#   the API and UI only support create, update and delete -- and a secret's
+#   value is write-only, so it cannot be read back and re-created under a
+#   different name. Renaming would mean generating a brand-new service
+#   account key. Pointing this workflow at the existing name is a one-line
+#   change with no credential handling, so that is what was done.
 #
-#   Manual alternative (no wizard): GCP Console -> IAM & Admin -> Service
-#   Accounts -> create one with the "Firebase Hosting Admin" role on
-#   my-project-joost -> Keys -> Add key -> JSON -> download it -> paste its
-#   full contents as the FIREBASE_SERVICE_ACCOUNT secret in GitHub.
+#   Decline the wizard's offer to write its own workflow YAML. It was run
+#   with those answers set to No, but it still emitted
+#   .github/workflows/firebase-hosting-pull-request.yml; that file was
+#   deleted in the same commit as this change. It was unusable here anyway:
+#   it deploys build/web without ever running `flutter build web`, and it
+#   pins third-party Actions to mutable tags (@v4, @v0), which contradicts
+#   the SHA-pinning policy stated above.
 #
-# Until that secret exists, the guard step below fails with a clear message
-# instead of an opaque auth error inside the deploy action.
+#   Manual alternative, if the key ever needs rotating without the wizard:
+#   GCP Console -> IAM & Admin -> Service Accounts -> the account above ->
+#   Keys -> Add key -> JSON -> download -> paste its full contents as the
+#   FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST secret in GitHub. Note there
+#   are two similarly-named Firebase projects on this account
+#   (my-project-joost and my-project-joost-becc7) -- this app is the first.
+#
+# If the secret is ever missing or emptied, the guard step below fails with
+# a clear message instead of an opaque auth error inside the deploy action.
 
 name: Deploy web to Firebase Hosting
 
@@ -113,10 +121,10 @@ jobs:
     name: Build and deploy build/web
     runs-on: ubuntu-latest
     steps:
-      - name: Verify FIREBASE_SERVICE_ACCOUNT is configured
+      - name: Verify FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST is configured
         run: |
-          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
-            echo "::error::FIREBASE_SERVICE_ACCOUNT (repository secret) is not set. Add it under Settings > Secrets and variables > Actions before this workflow can deploy -- see the comment block at the top of this file for the recommended 'firebase init hosting:github' setup and the exact secret name it expects."
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST }}" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST (repository secret) is not set. Add it under Settings > Secrets and variables > Actions before this workflow can deploy -- see the comment block at the top of this file."
             exit 1
           fi
 
@@ -138,7 +146,7 @@ jobs:
       - name: Deploy to Firebase Hosting (live channel)
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
         with:
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST }}
           projectId: my-project-joost
           channelId: live
           firebaseToolsVersion: 15.23.0 # pinned to the version already verified locally (the uploader.js timeout formula referenced above was read from this exact version)
