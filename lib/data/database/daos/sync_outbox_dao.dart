@@ -69,4 +69,16 @@ class SyncOutboxDao extends DatabaseAccessor<AppDatabase>
       ),
     );
   }
+
+  /// A row has crossed [SyncOutboxService.kMaxSendAttempts] and will never
+  /// be retried again — permanently removes it. Same underlying delete as
+  /// [markSent] (both take the row out of the table entirely), kept as a
+  /// separate name so a drain log line reading "dropped" vs. "sent" is
+  /// unambiguous about which one happened. Because this is a hard delete,
+  /// [pendingRows]/[watchPendingCount] — both unfiltered selects over this
+  /// table — automatically stop counting a dropped row; there is no
+  /// separate "dropped" flag to filter on.
+  Future<void> dropRow(int id) {
+    return (delete(syncOutboxEntries)..where((t) => t.id.equals(id))).go();
+  }
 }
