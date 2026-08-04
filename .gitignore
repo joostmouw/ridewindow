@@ -68,3 +68,10 @@ firebase-debug.log
 
 # Ondertekende juridische documenten -- horen niet in een publieke repo
 *DPA*.pdf
+
+# Claude Code assistant-geheugen — hoort in ~/.claude, niet in de repo
+.claude/projects/
+
+# Bronvideo's voor marketing/animatie — te groot voor een publieke repo,
+# niet nodig om de app te bouwen. Bewaar ze buiten git.
+photos/*.mp4
