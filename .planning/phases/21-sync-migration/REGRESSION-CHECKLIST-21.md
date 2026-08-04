@@ -64,13 +64,26 @@ Signing SHA-1 matches the registered OAuth Android client** — a locally-built/
 cannot complete Google sign-in at all. No build has been uploaded to Play Internal Testing yet,
 so this is a hard prerequisite, not an optional nicety.
 
-- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.16+17**, built
-      2026-08-04 16:02) to the Play Console's **Internal testing** track.
+- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.17+18**, built
+      2026-08-04 avond) to the Play Console's **Internal testing** track.
 
-      > Must be **+17 or later**. Build +16 was tested on device on 2026-08-04 and §5a FAILED on
-      > it: the drain was called but threw `Cannot use the Ref of cloudSyncReconcilerProvider
-      > after it has been disposed` on every foreground cycle, so nothing ever drained (see
-      > plan 21-11). +17 is the first build in which §5a can pass.
+      > **Waarom het via Play moet en niet via `adb install`, ook al hangt het toestel aan de
+      > kabel.** Naast de OAuth-reden hierboven speelt er nu een tweede: de app op het toestel is
+      > Play-geïnstalleerd (`installerPackageName=com.android.vending`) en dus met de Play
+      > App Signing-sleutel ondertekend. Een lokaal gebouwde APK draagt de *upload*-sleutel, dus
+      > `adb install -r` weigert en sideloaden vereist eerst de-installeren — wat de lokale Drift-
+      > database wist, inclusief **precies de vastgelopen outbox-rijen die §5a wil uitlezen**. Een
+      > Play-update behoudt app-data. Wis dat bewijs niet.
+
+      > Must be **+18 or later**. Build +17 loste de disposed-Ref op (bevestigd op toestel) maar
+      > liet de outbox-teller boven nul staan zónder enige log — plan 21-12 maakt die fouten
+      > zichtbaar en voegt het debugmenu-item toe waar §5a nu op leunt. +18 is de eerste build
+      > waarin §5a diagnosticeerbaar is.
+      >
+      > Historical: build **+17 or later**. Build +16 was tested on device on 2026-08-04 and §5a
+      > FAILED on it: the drain was called but threw `Cannot use the Ref of
+      > cloudSyncReconcilerProvider after it has been disposed` on every foreground cycle, so
+      > nothing ever drained (see plan 21-11).
       >
       > Historical: build **+16 or later**. The earlier `1.0.14+15` artifact was built at 09:34, before
       > plan 21-10 wired `drain()` to a caller — section 5a below cannot pass against it, and
@@ -248,6 +261,28 @@ that fix specifically, separate from the dashboard-level proof that the drain ha
       cloudSyncReconcilerProvider after it has been disposed` — grep for the literal substring
       `cloudSyncReconcilerProvider after it has been disposed`. Any hit means the keepAlive fix
       regressed and the drain below is masked again, exactly as it was on 1.0.15+16.
+- [ ] **Outbox-inhoud uitlezen (plan 21-12) — doe dit vóór het dashboard.** Profiel → verborgen
+      debugmenu → **"Sync-outbox bekijken"**. Noteer letterlijk wat er staat:
+      - *Leeg*, terwijl de statustekst nog "Wordt gesynchroniseerd..." toont → geen sendprobleem
+        maar een UI/stream-probleem in `watchPendingCount()` of de statusregel. Andere diagnose,
+        andere fix.
+      - *Rijen met een `lastError`* → **dat is het antwoord waar deze fase twee sessies op wacht.**
+        Schrijf de foutstring over in `MANUAL-VERIFICATION-21.md`; die bepaalt wat plan 21-13 wordt
+        (RLS-policy, kolomnaam, payloadvorm, netwerk — allemaal andere fixes).
+      - *Rijen met `nog geen fout vastgelegd`* → ze zijn nooit geprobeerd; de drain bereikt ze niet
+        eens. Grep dan logcat op `SyncOutbox: drain done` en vergelijk het `pending`-getal.
+- [ ] **Logcat-tegenbewijs (plan 21-12):** dezelfde background/foreground-cyclus moet nu mínstens
+      één regel `SyncOutbox: drain done — N pending, X sent, Y failed` opleveren. Ontbreekt die
+      regel volledig, dan draait de drain níét (in plaats van: draait wel en faalt) — dat is een
+      wezenlijk ander spoor dan alles wat tot nu toe onderzocht is.
+      ```
+      ~/Library/Android/sdk/platform-tools/adb logcat -d | grep -E "SyncOutbox|drainOutbox"
+      ```
+- [ ] **Vergiftigde-rijen-hypothese toetsen.** Pas nadat de fouten hierboven zijn overgeschreven:
+      tik "Outbox wissen" in datzelfde scherm, wijzig dan één instelling en doorloop opnieuw een
+      background/foreground-cyclus. Teller blijft op 0 en de wijziging verschijnt in het dashboard
+      → de oude rijen van vanochtend waren het probleem, de drain werkt. Teller klimt meteen terug
+      → de drain faalt structureel, en de reden staat nu in `lastError`.
 - [ ] Open the Supabase Dashboard → Table Editor → `profiles` (or `availability`, matching
       whichever field you changed) and confirm the new value is present for this user's row —
       **without ever having signed out and back in**. This is the one thing that could not happen
