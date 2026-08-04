@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
 
 /// Drains the offline outbox (SYNC-05). Deliberately network-agnostic: the
@@ -10,6 +11,24 @@ class SyncOutboxService {
   SyncOutboxService(this._dao);
 
   final SyncOutboxDao _dao;
+
+  /// A row that has failed to send this many times in a row is dropped
+  /// instead of retried again (plan 21-12). Deliberately NOT a backoff
+  /// schedule or a retry policy — REQUIREMENTS.md puts scheduled/backoff
+  /// retry out of scope for this phase (restated in 21-10/21-11). This is a
+  /// bounded refusal to keep silently retrying a payload that has already
+  /// proven, this many times in a row, that it cannot be sent — e.g. the
+  /// shape defect this plan fixes, where every single attempt failed the
+  /// exact same way forever.
+  ///
+  /// Chosen small on purpose: `drain()` runs on every foreground cycle
+  /// (`CloudSyncReconciler.reconcileOnForeground()`) and right after
+  /// sign-in, so 5 strikes means a wedged device clears within a handful of
+  /// app-switches — recovering visibly, not "forever" (the actual defect
+  /// this plan fixes), while still being high enough that a couple of
+  /// genuinely transient failures (e.g. two bad network blips in a row)
+  /// don't get mistaken for a permanently-broken payload.
+  static const kMaxSendAttempts = 5;
 
   /// Guards against a second `drain()` call racing an in-flight one (plan
   /// 21-10's re-entrancy requirement): `CloudSyncReconciler` now calls
@@ -68,7 +87,29 @@ class SyncOutboxService {
         }
         await _dao.markSent(row.id);
       } catch (e) {
-        await _dao.markFailed(row.id, e.toString());
+        final attemptNumber = row.attempts + 1;
+        // The one debugPrint every failure gets — this is the part that
+        // would have saved the whole 21-10/21-11/21-12 session: previously
+        // markFailed() swallowed the error into a database column with no
+        // logcat trace at all. A drain where every row succeeds logs
+        // nothing.
+        debugPrint(
+          'SyncOutboxService: send failed for ${row.entity}/${row.entityKey} '
+          '(attempt $attemptNumber/$kMaxSendAttempts): $e',
+        );
+        if (attemptNumber >= kMaxSendAttempts) {
+          // Crossed the ceiling — drop it instead of leaving it pending
+          // forever. The row is gone, so this is the only record of why;
+          // log loudly rather than let it vanish silently.
+          await _dao.dropRow(row.id);
+          debugPrint(
+            'SyncOutboxService: dropping ${row.entity}/${row.entityKey} '
+            'after $attemptNumber failed attempts — it will not be retried '
+            'again. Last error: $e',
+          );
+        } else {
+          await _dao.markFailed(row.id, e.toString());
+        }
         // Deliberately continue to the next row rather than abort the whole
         // drain — one failing entity must not block every other pending row.
       }

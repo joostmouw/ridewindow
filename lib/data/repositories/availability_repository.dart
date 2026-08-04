@@ -19,6 +19,15 @@ import 'package:ridewindow/domain/services/availability_key.dart';
 /// in die aanroep. Zonder outbox/userId is dit een stille no-op, exact zoals
 /// het patroon dat dit vervangt. Deze klasse importeert bewust nooit de
 /// cloud-SDK zelf (REG-05) — de outbox is een Drift-only afhankelijkheid.
+///
+/// De enqueuede payload is `{'user_id': userId, 'recurring': toRecurringRow(hours)}`
+/// — een echte rij voor `public.availability` (`user_id`, `recurring`,
+/// `version`, `updated_at`), niet de kale `toRecurringRow(hours)`-map zelf.
+/// Vóór plan 21-12 werd die kale map rechtstreeks geënqueued, waardoor
+/// PostgREST weekday-hour sleutels ("1-9", "6-14") als kolomnamen kreeg
+/// aangeboden — een schrijving die nooit kon slagen. Zie
+/// `test/data/database/outbox_payload_shape_test.dart` voor de invariant die
+/// dit nu bewaakt.
 class AvailabilityRepository {
   AvailabilityRepository(this._prefs, {SyncOutboxDao? outbox, this.userId})
       : _outbox = outbox;
@@ -72,7 +81,7 @@ class AvailabilityRepository {
         entity: kOutboxEntityAvailability,
         entityKey: userId!,
         operation: 'upsert',
-        payload: jsonEncode(toRecurringRow(hours)),
+        payload: jsonEncode({'user_id': userId!, 'recurring': toRecurringRow(hours)}),
       );
     }
   }
@@ -103,7 +112,7 @@ class AvailabilityRepository {
       entity: kOutboxEntityAvailability,
       entityKey: userId!,
       operation: 'upsert',
-      payload: jsonEncode(toRecurringRow(hours)),
+      payload: jsonEncode({'user_id': userId!, 'recurring': toRecurringRow(hours)}),
     );
   }
 }

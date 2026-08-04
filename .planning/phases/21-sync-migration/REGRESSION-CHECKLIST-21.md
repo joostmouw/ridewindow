@@ -219,7 +219,7 @@ traces back to Phase 19's own unclosed plan 19-07.**
       change rather than silently overwriting it with stale in-memory state (no data loss, no
       stale overwrite when tab B's own next write happens).
 
-## 5a. SYNC-05 — outbox drain proof (plan 21-10, gap closure; plan 21-11, disposed-Ref fix)
+## 5a. SYNC-05 — outbox drain proof (plan 21-10, gap closure; plan 21-11, disposed-Ref fix; plan 21-12, availability payload-shape fix)
 
 Do this **before** section 6 (delete-account is destructive to the test account). This section
 proves the fix for the defect found on-device 2026-08-04: `SyncOutboxService` was never
@@ -237,6 +237,30 @@ never ran. Plan 21-11 fixed this (`cloudSyncReconciler`/`syncOutboxService` are 
 `@Riverpod(keepAlive: true)`). The logcat evidence line below is what to grep for to confirm
 that fix specifically, separate from the dashboard-level proof that the drain happened at all.
 
+A third defect was found on the same 2026-08-04 device session, after the disposed-Ref fix
+made the drain actually run: `AvailabilityRepository` enqueued the bare
+`toRecurringRow(hours)` map (e.g. `{"1-9":"work","6-14":"custom"}`) instead of a real
+`public.availability` row, so PostgREST received weekday-hour strings as **column names** —
+a write that could never succeed under any network condition. `profiles`/`planned_rides` were
+already correct, which is why a profile change appeared to sync while the account row stayed
+stuck on "Wordt gesynchroniseerd..." forever. Plan 21-12 fixed the payload shape
+(`{'user_id': userId, 'recurring': toRecurringRow(hours)}`), added a `debugPrint` on every
+failed send (previously silent), and dropped rows that fail 5 times in a row so a
+pre-existing wedged row cannot block the account forever.
+
+- [ ] **Availability specifically (plan 21-12):** while still signed in, open Availability and
+      block or unblock at least one hour. Background/foreground the app (or wait for the next
+      foreground cycle) to trigger the drain, then open the Supabase Dashboard → Table Editor →
+      `availability` and confirm `recurring` for this user's row now reflects the change — this
+      is the exact write path that could never succeed before 21-12.
+- [ ] **Wedged row clears (plan 21-12):** the availability row enqueued in the broken shape
+      during the 2026-08-04 morning session (120 hour blocks) must stop blocking the account —
+      within a few foreground cycles after installing a build containing this plan, the
+      Account section's sync status text must settle on "Gesynchroniseerd", not stay stuck on
+      "Wordt gesynchroniseerd...". If it does not clear within 5 foreground cycles, check
+      logcat for a `SyncOutboxService: dropping availability/...` line (the attempt-ceiling
+      drop) rather than assuming the fix regressed — a dropped row is expected to be replaced
+      by the fresh write from the bullet above, not retried in its old broken shape.
 - [ ] While still signed in from section 2 (same account, same session — **do not sign out and
       back in**), open Profile and change one setting you have not already changed today (e.g.
       a different weather-tolerance slider value, or toggle one more availability hour).
