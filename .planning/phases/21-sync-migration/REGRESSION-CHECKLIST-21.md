@@ -178,6 +178,35 @@ traces back to Phase 19's own unclosed plan 19-07.**
       change rather than silently overwriting it with stale in-memory state (no data loss, no
       stale overwrite when tab B's own next write happens).
 
+## 5a. SYNC-05 — outbox drain proof (plan 21-10, gap closure)
+
+Do this **before** section 6 (delete-account is destructive to the test account). This section
+proves the fix for the defect found on-device 2026-08-04: `SyncOutboxService` was never
+constructed and `drain()` was never called anywhere in `lib/`, so every local change made
+*after* first-login migration stayed on the device forever (see
+`MANUAL-VERIFICATION-21.md`'s "Device session" entry, "SYNC-05 — outbox drain: FAIL"). Plan
+21-10 wired `drain()` into `CloudSyncReconciler.reconcileOnForeground()` (foreground trigger)
+and into `AccountSection._runAccountSync()` (right after a sign-in's sync decisions settle) —
+this section is the only valid proof that either trigger actually reaches the cloud.
+
+- [ ] While still signed in from section 2 (same account, same session — **do not sign out and
+      back in**), open Profile and change one setting you have not already changed today (e.g.
+      a different weather-tolerance slider value, or toggle one more availability hour).
+- [ ] Background the app (send it to the home screen, do not force-kill it) and bring it back to
+      the foreground — this fires `CloudSyncReconciler.reconcileOnForeground()`, which now drains
+      the outbox as its last step.
+- [ ] Open the Supabase Dashboard → Table Editor → `profiles` (or `availability`, matching
+      whichever field you changed) and confirm the new value is present for this user's row —
+      **without ever having signed out and back in**. This is the one thing that could not happen
+      before this plan: previously the row would stay frozen at its first-login migration values
+      forever.
+- [ ] In the app, confirm the Account section's sync status text reads "Gesynchroniseerd" (not
+      stuck on "Wordt gesynchroniseerd...") once the row above is visible in the dashboard.
+- [ ] (Optional, extra confidence) Repeat the same check for a change made immediately after a
+      fresh sign-in (sign out, sign back in, change a setting, then re-open the app) to prove the
+      post-sign-in drain trigger in `AccountSection._runAccountSync()` independently of the
+      foreground trigger above.
+
 ## 6. AUTH-09 — delete-account, verified against the deployed project (plan 21-08 Task 2, folded in)
 
 Plan 21-08's UI (dialog, RPC call, sign-out, snackbar) is built and committed (`139a4f8`), but

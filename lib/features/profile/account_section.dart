@@ -305,6 +305,17 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
         await service.markSynced(userId);
       }
 
+      // Plan 21-10 (SYNC-05 gap closure): drain the offline outbox right
+      // here, once AccountSyncService has fully settled this sign-in
+      // (including every prompt above). Without this, an enqueue made
+      // during sign-in (e.g. `enqueueCurrentState()` from a
+      // pushLocalToCloud decision) would sit until the next foreground
+      // event instead of reaching the cloud immediately -- exactly the
+      // "Wordt gesynchroniseerd..." symptom found on-device 2026-08-04
+      // (see MANUAL-VERIFICATION-21.md). `drainOutbox()` never throws, so
+      // this call cannot turn a background sync problem into a crash.
+      await ref.read(cloudSyncReconcilerProvider).drainOutbox();
+
       if (mounted) {
         ref.invalidate(profileProvider);
         ref.invalidate(availabilityProvider);

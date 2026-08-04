@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:drift/native.dart';
@@ -112,5 +113,48 @@ void main() {
       expect(upsertCalled, isFalse);
       expect(deleteCalled, isFalse);
     });
+
+    test(
+      'a second drain() call while one is still in flight does not double-send a row',
+      () async {
+        final dao = db.syncOutboxDao;
+        await dao.enqueueOrCoalesce(
+          entity: 'profile',
+          entityKey: 'uid1',
+          operation: 'upsert',
+          payload: '{}',
+        );
+
+        final releaseFirstCall = Completer<void>();
+        var callCount = 0;
+
+        // First drain() is deliberately not awaited yet — it blocks inside
+        // its own upsertFn until releaseFirstCall completes, simulating a
+        // real drain still in flight when a second trigger fires (e.g.
+        // foreground reconcile racing a post-sign-in drain).
+        final firstDrain = service.drain(
+          upsertFn: (entity, key, payload) async {
+            callCount++;
+            await releaseFirstCall.future;
+          },
+          deleteFn: (entity, key) async {},
+        );
+
+        // Second call while the first is still in flight — its own
+        // upsertFn must never run; only the first call's closures see rows.
+        final secondDrain = service.drain(
+          upsertFn: (entity, key, payload) async {
+            callCount++;
+          },
+          deleteFn: (entity, key) async {},
+        );
+
+        releaseFirstCall.complete();
+        await Future.wait([firstDrain, secondDrain]);
+
+        expect(callCount, 1);
+        expect(await dao.pendingRows(), isEmpty);
+      },
+    );
   });
 }
