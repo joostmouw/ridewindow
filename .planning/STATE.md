@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: executing
+status: "Fase 21: 7/9 plannen klaar. 21-08 en 21-09 wachten op toestelverificatie"
 last_updated: "2026-08-03T18:10:09.726Z"
-last_activity: 2026-08-03
+last_activity: 2026-08-04
 progress:
   total_phases: 5
   completed_phases: 2
@@ -43,16 +43,41 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 21 (sync-migration) — EXECUTING
-Plan: 2 of 9
-Status: Ready to execute
-gedeelde plain-Dart repositories (`AvailabilityRepository`, `ProfileRepository`,
-`PlannedRidesRepository`); `background_task.dart` leest via diezelfde repositories en is
-Supabase-vrij bewezen (REG-05); `PlannedRidesNotifier` is async en reageert op
-`authStateProvider`. Volle suite: 349 geslaagd / 1 gefaald (de vooraf bestaande
-datumgrens-bug in `notification_service_test.dart`, faalt alleen op de laatste dag van de
-maand — niet veroorzaakt door fase 20). `flutter build apk --release` slaagt.
-Nog open van fase 19: 19-07 blijft handwerk — `build/app/outputs/bundle/release/app-release.aab`
-(1.0.12+13, gebouwd 2026-07-26) uploaden naar de Play Console internal testing track, daarna
+Plan: 7 of 9 voltooid (21-01 t/m 21-07); resteren 21-08 en 21-09, beide `autonomous: false`
+Status: Alles wat zonder toestel kan is klaar. Volgende stap is handwerk op het toestel.
+
+**Wat af is (waves 1-6, alles gemerged op main):**
+- 21-01 `resolveAccountSync()` — pure beslisfunctie, 11 tests
+- 21-02 Postgres-schema live toegepast. **Belangrijk:** tijdens de checkpoint bleek dat RLS-
+  policies alléén niet volstaan — Postgres controleert tabelrechten vóór RLS, en Supabase's
+  defaults gaven de `authenticated`-rol geen DML. Zonder de toegevoegde `grant`-regels kon een
+  ingelogde gebruiker zelfs zijn eigen rijen niet lezen. Gefixt in `0001_accounts_sync.sql`
+  (commit 581cd73) en live toegepast. SYNC-08 bewezen: B select/update/delete van A's rij = 0/0/0,
+  A select eigen rij = 1. Zie MANUAL-VERIFICATION-21.md.
+- 21-03 offline outbox (Drift schemaVersion 1→2, additief)
+- 21-04 profile + availability via outbox naar cloud
+- 21-05 planned rides (per-rit outbox-sleutel, niet per gebruiker)
+- 21-06 first-login migratie via één `rpc('migrate_account_data', …)`
+- 21-07 sign-in UI + conflictdialogen, EN/NL beide 374 sleutels
+
+Volle suite: 414 geslaagd / 1 gefaald. Die ene is `notification_service_test.dart`
+"scheduleEveningBefore tijdberekening" — faalt **elke run na 19:00 UTC** (tijdsafhankelijke
+bug in de test zelf, niet de maandgrens die hier eerder stond; die is een tweede, aparte bug in
+dezelfde test). Geen regressie.
+
+**Open risico dat alleen op het toestel te bewijzen is:** `migrate_account_data` is gegrant met
+een exacte 14-argumentsignatuur. De Dart-aanroep in `lib/domain/services/migration_payload.dart`
+is statisch geverifieerd — alle 14 namen en types komen overeen — maar of Postgres de overload
+werkelijk resolvet blijkt pas bij een echte aanroep. Mismatch faalt at runtime en ziet eruit als
+een auth-fout, niet als een signatuurfout.
+
+Builds klaar (1.0.12+13, gebouwd 2026-08-04, bevat waves 1-6):
+`build/app/outputs/flutter-apk/app-release.apk` en `build/app/outputs/bundle/release/app-release.aab`.
+Let op: het versienummer +13 is hetzelfde als de fase-19-build van 2026-07-26 maar de inhoud is
+totaal anders — bump naar +14 vóór upload als +13 al gebruikt is.
+
+Nog open van fase 19: 19-07 blijft handwerk — de AAB uploaden naar de Play Console internal
+testing track, daarna
 installeren via de Store-link (nadrukkelijk niet een lokale APK — D-16/AUTH-10, alleen de Play
 App Signing SHA-1 bewijst het juiste OAuth-client) en
 `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` aflopen: Android in-/uitloggen + agenda-event
@@ -61,8 +86,7 @@ App Signing SHA-1 bewijst het juiste OAuth-client) en
 
 de koudestartmeting mét toestel, verbindingstype en methode (die methode wordt in fase 21
 letterlijk herhaald voor REG-03).
-Fase 21 (Sync + migration) heeft nog geen plannen (ROADMAP: TBD) — volgende stap na fase 20.
-Last activity: 2026-08-03
+Last activity: 2026-08-04
 en volle testsuite zelf geverifieerd op main.
 
 ## Performance Metrics
