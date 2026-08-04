@@ -389,3 +389,33 @@ events wissen uit een echte agenda is aan Joost.
 De agenda-omschrijving is Nederlands terwijl de app-UI op Engels stond. `calendar_service.dart`
 heeft geen `BuildContext` en valt daardoor buiten de `S.of(context)`-route — een bekend gat, al
 genoteerd in de i18n-status.
+
+### §2 afgerond — uitloggen en herstart, 20:05-20:11
+
+| Item | Uitkomst |
+|------|----------|
+| Uitloggen | **PASS** — dialoog "Your data on this device stays exactly as it is", daarna de uitgelogde weergave; lokale instellingen bleven staan (Evening before nog aan) |
+| Herstart → nog steeds ingelogd (AUTH-04) | **PASS** — na `am force-stop` en heropenen toont Home meteen "Good evening, Joost" en de accountsectie Joost / joostmouw@gmail.com / Synced. Geen tussenstand van uitgelogd |
+
+Vóór het uitloggen is de outbox bewust eerst leeggedraaid
+(`drain done — 2 pending, 2 sent (planned_ride, profile), 0 failed`), zodat er geen wijziging
+in de wachtrij bleef hangen bij een sessiewissel.
+
+**Testdata opgeruimd:** beide `Fietsrit`-events zijn uit Google Agenda verwijderd, en de per
+ongeluk geplande rit is via "Unplan" teruggedraaid — dat terugdraaien is meteen ook een geslaagde
+`planned_ride`-delete door de outbox geweest.
+
+### Twee observaties uit deze sessie
+
+1. **Google Agenda-status flipt naar "Not connected" na gebruik.** Om 19:26 stond de
+   profielsectie op "Connected"; ná een geslaagde "Add to Google Calendar" om 20:00 stond er
+   "Not connected", terwijl het event wél is aangemaakt. Waarschijnlijk een statusweergave die
+   niet meeloopt met de werkelijke tokenstaat. Verdient een eigen onderzoekje; het raakt D-12
+   (de agendakoppeling zou een sessiewissel moeten overleven), dus die check is met deze
+   waarneming niet schoon af te tekenen.
+
+2. **Blind tikken op een net gestarte app is onbetrouwbaar.** Na `am force-stop` was de activity
+   al "resumed" terwijl de Flutter-UI nog niet stond; een tik op de tabbalkpositie belandde toen
+   twee keer in de camera-app. De guard die vóór elke tik de voorgrond-app controleert was in dat
+   ene script weggelaten. Werkwijze voor volgende keer: wacht in een lus tot de app voorgrond is,
+   maak eerst een screenshot, en bepaal pas dán waar je tikt.
