@@ -2,7 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 10/12. 21-12 heft de stilte op -- mislukte sends loggen nu, lastError is leesbaar in het debugmenu en de outbox is daar te wissen. Volgende stap: toestelsessie 3, lees de fout"
+# Kort houden (<70 tekens): dit veld vult de statusline in de terminal.
+# Details horen in de body hieronder, niet hier.
+status: "Fase 21: 10/12 -- outbox-diagnose, toestelsessie 3 volgt"
 last_updated: "2026-08-04T18:40:00.000Z"
 last_activity: 2026-08-04
 progress:

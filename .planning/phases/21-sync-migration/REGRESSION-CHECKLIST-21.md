@@ -59,10 +59,24 @@ REG-05 groen, beide release builds exit 0. Actuele artefacten:
 
 ## 0. Prerequisite — upload before anything else
 
-Everything below that touches sign-in depends on this. Per D-16/AUTH-10, **only the Play App
-Signing SHA-1 matches the registered OAuth Android client** — a locally-built/sideloaded APK
-cannot complete Google sign-in at all. No build has been uploaded to Play Internal Testing yet,
-so this is a hard prerequisite, not an optional nicety.
+> **GECORRIGEERD 2026-08-04 avond — de premisse hieronder was verouderd en heeft deze fase
+> onnodig veel Play-uploads gekost.** De oorspronkelijke tekst luidde: "Per D-16/AUTH-10, **only
+> the Play App Signing SHA-1 matches the registered OAuth Android client** — a locally-built/
+> sideloaded APK cannot complete Google sign-in at all." Dat is sinds **2026-07-26** onwaar: er
+> bestaan sindsdien twéé Android OAuth-clients voor `ridewindow.joost.amsterdam` (zie
+> `docs/CONSOLE-SETUP-CHECKLIST.md` §"Android clients") — één op de Play App Signing SHA-1 en één
+> op de upload-key SHA-1 `B6:19:22:8F:…`, en die tweede dekt lokaal gebouwde release-APK's.
+> `flutter build apk --release` + `adb install` logt dus gewoon in met Google. Alleen een
+> *debug*-build kan dat niet.
+>
+> **Gevolg voor deze checklist:** een Play-upload is géén prerequisite voor alles wat inloggen
+> raakt. Hij is alleen een echte eis voor §2 zelf (AUTH-10 / fase 19-07 bewijst juist de
+> Play-App-Signing-route) — dat is per definitie lokaal niet te bewijzen. Al het overige,
+> inclusief §5a, kan met een lokale release-APK. Kies per sectie de lichtste route die het
+> betreffende ding daadwerkelijk bewijst.
+
+Everything below that touches sign-in depends on a build being installed. Het bewijzen van de
+Play-App-Signing-route zelf (§2) vereist een Play-installatie; de rest niet.
 
 - [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.17+18**, built
       2026-08-04 avond) to the Play Console's **Internal testing** track.
