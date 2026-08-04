@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 9/11. 21-11 fixte de disposed-Ref (bevestigd op toestel, foutregel weg) MAAR de outbox-teller blijft op Syncing -- sends falen nu stil. Volgende stap: die stilte opheffen"
-last_updated: "2026-08-04T14:20:46.000Z"
+status: "Fase 21: 10/12. 21-12 heft de stilte op -- mislukte sends loggen nu, lastError is leesbaar in het debugmenu en de outbox is daar te wissen. Volgende stap: toestelsessie 3, lees de fout"
+last_updated: "2026-08-04T18:40:00.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 25
-  completed_plans: 18
+  total_plans: 26
+  completed_plans: 19
   percent: 40
 ---
 
@@ -121,6 +121,24 @@ Volgende stappen, in deze volgorde:
    ergens zichtbaar te maken, al is het maar via het verborgen debugmenu). Zonder dat blijven we
    blind diagnosticeren.
 3. Pas daarna verder met §5a.
+
+**Stap 2 is gedaan (plan 21-12, 2026-08-04 avond, branch
+`worktree-21-12-outbox-observability`).** De blinddoek is af, in code:
+`SyncOutboxService._drainInternal` logt nu elke mislukte rij (entity, key, poging, fout) én sluit
+elke drain af met `SyncOutbox: drain done — N pending, X sent, Y failed` -- óók bij een lege
+outbox, want juist dát onderscheidt "niets te doen" van "nooit gedraaid". De twee stille
+wegwerp-paden in `drainOutbox` (onbekende entity; `entityKey` zonder `:`) deden `markSent`, dus
+gooiden rijen spoorloos wég; dat weggooien blijft (anders wedged de outbox), maar praat nu.
+Nieuw debugmenu-item "Sync-outbox bekijken" toont per rij entity/key/pogingen/`lastError` plus
+een "Outbox wissen"-actie -- dus stap 1 en 3 hieronder kunnen zónder adb en zónder laptop.
+426/426 tests groen (3 nieuwe die falen zodra het loggen weer verdwijnt), analyze 0 errors,
+release-APK exit 0, ARB-pariteit 387/387. Zie 21-12-SUMMARY.md.
+
+**Toestelsessie 3 begint hier:** debugmenu → Sync-outbox bekijken → lees `lastError`. Leeg
+terwijl de status "Syncing..." toont = UI/stream-probleem, geen sendprobleem. Rijen met een fout
+= dáár staat het antwoord. Wis daarna de outbox: teller blijft 0 en nieuwe wijzigingen syncen =
+oude vergiftigde rijen bevestigd; teller klimt meteen terug = drain faalt nog volledig, met nu
+een leesbare reden.
 
 **21-10 was NIET genoeg -- 21-11 dicht de echte bug (2026-08-04, toestelsessie 2).** Op
 1.0.15+16 bleef de statustekst op "Syncing..." staan. Logcat na een foreground-cyclus:

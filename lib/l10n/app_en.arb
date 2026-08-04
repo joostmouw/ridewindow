@@ -239,6 +239,24 @@
   "debugAvailabilityReset": "Availability reset.",
   "debugRefreshWeather": "Manually refresh weather",
   "debugWeatherRefreshing": "Weather is refreshing.",
+  "debugOutbox": "Inspect sync outbox",
+  "debugOutboxTitle": "Sync outbox",
+  "debugOutboxEmpty": "Outbox is empty — everything has been sent.",
+  "debugOutboxRowSubtitle": "{attempts} attempts · {error}",
+  "@debugOutboxRowSubtitle": {
+    "placeholders": {
+      "attempts": {"type": "int"},
+      "error": {"type": "String"}
+    }
+  },
+  "debugOutboxNoError": "no error recorded yet",
+  "debugOutboxClear": "Clear outbox",
+  "debugOutboxCleared": "Outbox cleared ({count} rows).",
+  "@debugOutboxCleared": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
 
   "detailTierPerfectDesc": "Ideal cycling weather",
   "detailTierGreatDesc": "Pleasant cycling weather",

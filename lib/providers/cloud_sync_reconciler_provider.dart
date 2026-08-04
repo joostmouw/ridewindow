@@ -191,7 +191,19 @@ class CloudSyncReconciler {
       await outbox.drain(
         upsertFn: (entity, entityKey, payload) async {
           final table = _tableForEntity(entity);
-          if (table == null) return;
+          if (table == null) {
+            // Plan 21-12: returning normally here makes the caller run
+            // markSent(), which deletes the row — an unrecognised entity is
+            // therefore silently discarded. That drop is deliberate (a row
+            // that can never be sent must not wedge the outbox forever, and
+            // the pending counter must be able to reach zero), but it must
+            // not be silent.
+            debugPrint(
+              'CloudSyncReconciler.drainOutbox: dropping row with unknown '
+              'entity "$entity" (key $entityKey)',
+            );
+            return;
+          }
           await Supabase.instance.client.from(table).upsert(payload);
         },
         deleteFn: (entity, entityKey) async {
@@ -201,9 +213,23 @@ class CloudSyncReconciler {
           // itself (`'$userId:$rideId'`, see
           // `PlannedRidesRepository.remove()`), never in the payload —
           // deletes always send `'{}'` as the payload.
-          if (entity != kOutboxEntityPlannedRide) return;
+          // Both early returns below end in markSent() too — same deliberate
+          // drop, same plan 21-12 reasoning as upsertFn above.
+          if (entity != kOutboxEntityPlannedRide) {
+            debugPrint(
+              'CloudSyncReconciler.drainOutbox: dropping delete row for '
+              'non-deletable entity "$entity" (key $entityKey)',
+            );
+            return;
+          }
           final separator = entityKey.indexOf(':');
-          if (separator < 0) return;
+          if (separator < 0) {
+            debugPrint(
+              'CloudSyncReconciler.drainOutbox: dropping delete row with '
+              'malformed entityKey "$entityKey" (expected "userId:rideId")',
+            );
+            return;
+          }
           final userId = entityKey.substring(0, separator);
           final rideId = entityKey.substring(separator + 1);
           await Supabase.instance.client

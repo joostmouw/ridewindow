@@ -55,6 +55,17 @@ class SyncOutboxDao extends DatabaseAccessor<AppDatabase>
     return (delete(syncOutboxEntries)..where((t) => t.id.equals(id))).go();
   }
 
+  /// Removes every pending row and returns how many were removed. Only used
+  /// by the hidden debug menu (plan 21-12): it lets a stuck outbox be emptied
+  /// on the device, which is what distinguishes "old rows poisoned by an
+  /// earlier broken drain" from "the drain still fails for everything" —
+  /// after a clear, the counter either stays at 0 or climbs straight back up.
+  /// Never called from any production sync path; rows are only ever removed
+  /// there by [markSent], i.e. after a confirmed send.
+  Future<int> clearAll() {
+    return delete(syncOutboxEntries).go();
+  }
+
   /// A row failed to send — increment its attempt counter and record the
   /// error, but leave it pending for the next drain.
   Future<void> markFailed(int id, String error) async {

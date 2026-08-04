@@ -19,6 +19,7 @@ import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
@@ -277,8 +278,107 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 );
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.outbox),
+              title: Text(s.debugOutbox),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                _showOutboxSheet(context);
+              },
+            ),
             const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Plan 21-12: makes the sync outbox readable on the device itself. Every
+  /// failed send already writes its error to `sync_outbox_entries.lastError`,
+  /// but until now nothing anywhere read that column, so diagnosing a stuck
+  /// pending counter required adb. Deliberately lives in the hidden debug
+  /// menu rather than the account section — it is a diagnostic, not a
+  /// user-facing feature.
+  void _showOutboxSheet(BuildContext context) {
+    final s = S.of(context);
+    final dao = ref.read(appDatabaseProvider).syncOutboxDao;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        child: FutureBuilder(
+          future: dao.pendingRows(),
+          builder: (ctx, snapshot) {
+            final rows = snapshot.data;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    s.debugOutboxTitle,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                if (rows == null)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularProgressIndicator(),
+                  )
+                else if (rows.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Text(s.debugOutboxEmpty),
+                  )
+                else
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: rows.length,
+                      itemBuilder: (_, i) {
+                        final row = rows[i];
+                        return ListTile(
+                          dense: true,
+                          title: Text('${row.entity} · ${row.operation}'),
+                          subtitle: Text(
+                            '${row.entityKey}\n'
+                            '${s.debugOutboxRowSubtitle(
+                              row.attempts,
+                              row.lastError ?? s.debugOutboxNoError,
+                            )}',
+                          ),
+                          isThreeLine: true,
+                        );
+                      },
+                    ),
+                  ),
+                if (rows != null && rows.isNotEmpty)
+                  ListTile(
+                    leading: const Icon(Icons.delete_sweep),
+                    title: Text(s.debugOutboxClear),
+                    onTap: () async {
+                      final cleared = await dao.clearAll();
+                      if (ctx.mounted) Navigator.of(ctx).pop();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(s.debugOutboxCleared(cleared)),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                const SizedBox(height: 8),
+              ],
+            );
+          },
         ),
       ),
     );

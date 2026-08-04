@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
 
 /// Drains the offline outbox (SYNC-05). Deliberately network-agnostic: the
@@ -7,9 +9,17 @@ import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
 /// class never imports the cloud SDK and stays fully unit testable without
 /// mocking a fluent query builder.
 class SyncOutboxService {
-  SyncOutboxService(this._dao);
+  SyncOutboxService(this._dao, {void Function(String message)? log})
+      : _log = log ?? _debugPrintLog;
 
   final SyncOutboxDao _dao;
+
+  /// Where this service's diagnostics go. Injectable purely so a test can
+  /// assert on them (plan 21-12) — production always gets `debugPrint`,
+  /// matching `CloudSyncReconciler`'s own logging.
+  final void Function(String message) _log;
+
+  static void _debugPrintLog(String message) => debugPrint(message);
 
   /// Guards against a second `drain()` call racing an in-flight one (plan
   /// 21-10's re-entrancy requirement): `CloudSyncReconciler` now calls
@@ -55,6 +65,9 @@ class SyncOutboxService {
     required Future<void> Function(String entity, String entityKey) deleteFn,
   }) async {
     final rows = await _dao.pendingRows();
+    var sent = 0;
+    var failed = 0;
+
     for (final row in rows) {
       try {
         if (row.operation == 'delete') {
@@ -67,11 +80,29 @@ class SyncOutboxService {
           );
         }
         await _dao.markSent(row.id);
+        sent++;
       } catch (e) {
         await _dao.markFailed(row.id, e.toString());
+        failed++;
+        // Plan 21-12: this log line is the whole point. Before it existed the
+        // error went only into Drift's `lastError` column, which nothing read
+        // or displayed, so a drain that failed on every single row looked
+        // exactly like a drain that had nothing to do. `attempts` is the
+        // pre-increment value from the row we just read, so +1 is the attempt
+        // that just failed.
+        _log(
+          'SyncOutbox: send failed for ${row.entity}/${row.entityKey} '
+          '(operation=${row.operation}, attempt ${row.attempts + 1}): $e',
+        );
         // Deliberately continue to the next row rather than abort the whole
         // drain — one failing entity must not block every other pending row.
       }
     }
+
+    // Always emitted, including for an empty outbox: "0 pending" and "the
+    // drain never ran at all" are the two states this phase has repeatedly
+    // confused, and only a line that is present in the first case can tell
+    // them apart.
+    _log('SyncOutbox: drain done — ${rows.length} pending, $sent sent, $failed failed');
   }
 }

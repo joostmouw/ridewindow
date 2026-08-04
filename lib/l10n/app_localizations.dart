@@ -1303,6 +1303,48 @@ abstract class S {
   /// **'Weer wordt ververst.'**
   String get debugWeatherRefreshing;
 
+  /// No description provided for @debugOutbox.
+  ///
+  /// In nl, this message translates to:
+  /// **'Sync-outbox bekijken'**
+  String get debugOutbox;
+
+  /// No description provided for @debugOutboxTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Sync-outbox'**
+  String get debugOutboxTitle;
+
+  /// No description provided for @debugOutboxEmpty.
+  ///
+  /// In nl, this message translates to:
+  /// **'Outbox is leeg — alles is verzonden.'**
+  String get debugOutboxEmpty;
+
+  /// No description provided for @debugOutboxRowSubtitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'{attempts} pogingen · {error}'**
+  String debugOutboxRowSubtitle(int attempts, String error);
+
+  /// No description provided for @debugOutboxNoError.
+  ///
+  /// In nl, this message translates to:
+  /// **'nog geen fout vastgelegd'**
+  String get debugOutboxNoError;
+
+  /// No description provided for @debugOutboxClear.
+  ///
+  /// In nl, this message translates to:
+  /// **'Outbox wissen'**
+  String get debugOutboxClear;
+
+  /// No description provided for @debugOutboxCleared.
+  ///
+  /// In nl, this message translates to:
+  /// **'Outbox gewist ({count} rijen).'**
+  String debugOutboxCleared(int count);
+
   /// No description provided for @detailTierPerfectDesc.
   ///
   /// In nl, this message translates to:

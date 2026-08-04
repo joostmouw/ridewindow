@@ -157,4 +157,95 @@ void main() {
       },
     );
   });
+
+  // Plan 21-12. These exist because phase 21 twice shipped a sync path that
+  // failed in complete silence: the error was written to Drift's `lastError`
+  // column and nothing ever read it, so "the drain fails on every row" and
+  // "the outbox is empty" produced identical logs. If someone removes the
+  // logging again, these fail.
+  group('SyncOutboxService drain logging', () {
+    late List<String> logs;
+    late SyncOutboxService loggingService;
+
+    setUp(() {
+      logs = <String>[];
+      loggingService = SyncOutboxService(db.syncOutboxDao, log: logs.add);
+    });
+
+    test('a failing row logs its entity, key and error alongside markFailed', () async {
+      final dao = db.syncOutboxDao;
+      await dao.enqueueOrCoalesce(
+        entity: 'profile',
+        entityKey: 'uid1',
+        operation: 'upsert',
+        payload: '{}',
+      );
+
+      await loggingService.drain(
+        upsertFn: (entity, key, payload) async => throw Exception('network down'),
+        deleteFn: (entity, key) async {},
+      );
+
+      final failureLine = logs.firstWhere(
+        (line) => line.contains('send failed'),
+        orElse: () => '',
+      );
+      expect(
+        failureLine,
+        isNotEmpty,
+        reason: 'a failed send must log, not only write lastError',
+      );
+      expect(failureLine, contains('profile'));
+      expect(failureLine, contains('uid1'));
+      expect(failureLine, contains('network down'));
+      expect(failureLine, contains('attempt 1'));
+
+      // The log must agree with what was persisted — a log line that says
+      // something different from `lastError` would be worse than none.
+      final remaining = await dao.pendingRows();
+      expect(remaining.single.lastError, contains('network down'));
+    });
+
+    test('every drain emits a summary line, including an empty one', () async {
+      await loggingService.drain(
+        upsertFn: (entity, key, payload) async {},
+        deleteFn: (entity, key) async {},
+      );
+
+      expect(
+        logs.single,
+        allOf(contains('0 pending'), contains('0 sent'), contains('0 failed')),
+        reason: 'an empty outbox must still say so, otherwise it is '
+            'indistinguishable from a drain that never ran',
+      );
+    });
+
+    test('the summary counts sent and failed rows separately', () async {
+      final dao = db.syncOutboxDao;
+      await dao.enqueueOrCoalesce(
+        entity: 'profile',
+        entityKey: 'uid1',
+        operation: 'upsert',
+        payload: '{}',
+      );
+      await dao.enqueueOrCoalesce(
+        entity: 'availability',
+        entityKey: 'uid1',
+        operation: 'upsert',
+        payload: '{}',
+      );
+
+      await loggingService.drain(
+        upsertFn: (entity, key, payload) async {
+          if (entity == 'profile') throw Exception('network down');
+        },
+        deleteFn: (entity, key) async {},
+      );
+
+      expect(
+        logs.last,
+        allOf(contains('2 pending'), contains('1 sent'), contains('1 failed')),
+      );
+    });
+  });
 }

@@ -670,6 +670,31 @@ class SNl extends S {
   String get debugWeatherRefreshing => 'Weer wordt ververst.';
 
   @override
+  String get debugOutbox => 'Sync-outbox bekijken';
+
+  @override
+  String get debugOutboxTitle => 'Sync-outbox';
+
+  @override
+  String get debugOutboxEmpty => 'Outbox is leeg — alles is verzonden.';
+
+  @override
+  String debugOutboxRowSubtitle(int attempts, String error) {
+    return '$attempts pogingen · $error';
+  }
+
+  @override
+  String get debugOutboxNoError => 'nog geen fout vastgelegd';
+
+  @override
+  String get debugOutboxClear => 'Outbox wissen';
+
+  @override
+  String debugOutboxCleared(int count) {
+    return 'Outbox gewist ($count rijen).';
+  }
+
+  @override
   String get detailTierPerfectDesc => 'Ideaal fietsweer';
 
   @override
