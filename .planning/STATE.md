@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 8/10 met SUMMARY. 21-08/21-09 auto-helften geauditeerd groen; alleen de toestelsessie (REGRESSION-CHECKLIST-21.md) blokkeert nog"
-last_updated: "2026-08-04T10:07:55.000Z"
+status: "Fase 21: 8/10 met SUMMARY. Toestelsessie gesplitst: sessie 1 (S0/1/2/5a) bewijst 21-10; 21-08+21-09 wachten op sessie 2 na het Firebase-secret"
+last_updated: "2026-08-04T12:08:04.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
@@ -65,8 +65,18 @@ zonder ooit tegen hun acceptatiecriteria afgetekend te zijn; dat is nu alsnog ge
   bestandspad, dus de tool vindt geen bronbestand. Inhoudelijk handmatig geverifieerd, zie
   hierboven. Geen codefout.
 
-**Geblokkeerd op één toestelsessie.** Beide resterende taken zijn door 21-09 taak 1 gebundeld
-tot één geordende sessie in REGRESSION-CHECKLIST-21.md. Niets in `lib/` staat nog open.
+**De toestelsessie valt uiteen in twee (beslissing 2026-08-04).** 21-09 taak 1 bundelde alles
+tot één sessie, maar dat gaat niet op: §3/§4/§5 draaien tegen de gedeployde PWA, en die is
+stale. Gemeten 2026-08-04: `my-project-joost.web.app/version.json` = 1.0.12+13, `main.dart.js`
+Last-Modified 2026-07-26 — de laatste geslaagde deploy vóór het `FIREBASE_SERVICE_ACCOUNT`-
+secret ging ontbreken. §6 is op verzoek uitgesteld omdat die het wegwerp-testaccount vernietigt
+dat §3/§4/§5 nog levend nodig hebben.
+- **Sessie 1 (nu):** §0, §1, §2, §5a — levert het toestelbewijs voor plan 21-10.
+- **Sessie 2 (na het Firebase-secret + verse deploy):** §3 → §4 → §5 → §6, vers wegwerpaccount.
+
+**Sessie 1 sluit geen enkel plan af.** 21-08's checkpoint ís §6; 21-09's checkpoint bestaat
+volledig uit §4/§3/§5. Fase 21 blijft dus op 8/10 na sessie 1. Niets in `lib/` staat nog open —
+de enige twee blokkades zijn het Firebase-secret en toestelwerk.
 Build voor die sessie: **1.0.15+16** (gebouwd 2026-08-04 11:57, eerste build mét de
 21-10-wiring). De artefacten van 1.0.14+15 zijn ongeschikt -- die dateren van 09:34, vóór
 21-10, dus sectie 5a kan er per definitie niet tegen slagen.

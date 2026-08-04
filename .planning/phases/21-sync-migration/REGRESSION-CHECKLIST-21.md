@@ -10,6 +10,35 @@ verification, was never executed).
 **Every checkbox below is filled in from an observed result, never assumed.** If a step cannot
 be completed, leave it unchecked and write down why next to it in `MANUAL-VERIFICATION-21.md`.
 
+---
+
+## Scope van de sessie van 2026-08-04 (tweede toestelsessie)
+
+Deze checklist is geschreven als één sessie, maar valt uiteen in twee door de stale PWA. Vastgesteld
+2026-08-04: `my-project-joost.web.app` serveert `version.json` = **1.0.12+13** met `main.dart.js`
+Last-Modified **2026-07-26** — de laatste geslaagde deploy vóór `deploy-web.yml` ging falen op het
+ontbrekende repository-secret `FIREBASE_SERVICE_ACCOUNT`. Alles wat de PWA nodig heeft is daarmee
+vandaag onuitvoerbaar.
+
+| § | Onderwerp | Deze sessie | Waarom |
+|---|-----------|-------------|--------|
+| 0 | Upload naar Play Internal testing | **JA** | voorwaarde voor al het overige |
+| 1 | Lokale data zetten vóór eerste sign-in | **JA** | |
+| 2 | Android install via Play-link | **JA** | |
+| 5a | SYNC-05 outbox drain (plan 21-10) | **JA** | het hele doel van deze sessie |
+| 3 | iPhone PWA + SYNC-04 | nee | stale PWA |
+| 4 | REG-03 web cold-start | nee | stale PWA |
+| 5 | SYNC-11 multi-tab | nee | stale PWA |
+| 6 | AUTH-09 delete-account | nee | destructief; hoort bij de PWA-sessie (zie §6) |
+
+**Wat deze sessie NIET afsluit.** Plan 21-08 (checkpoint = §6) en plan 21-09 (checkpoint = §4 + §3
++ §5) blijven allebei open. Fase 21 blijft op 8/10 plannen met SUMMARY. Wat deze sessie wél levert
+is het toestelbewijs voor plan 21-10 — de fix voor het blokkerende SYNC-05-defect dat de eerste
+toestelsessie (2026-08-04, zie `MANUAL-VERIFICATION-21.md`) aan het licht bracht.
+
+**Sessie 2 (later), zodra het Firebase-secret bestaat en er een verse deploy live staat:**
+§3 → §4 → §5 → §6, in die volgorde, met een **vers wegwerp-Google-account** (§6 vernietigt het).
+
 **Automated baseline confirmed before this checklist was written (2026-08-04):**
 - `flutter test` (full suite): **418 passed / 0 failed** (run at 07:33 UTC, before the
   documented pre-existing `notification_service_test.dart` "scheduleEveningBefore tijdberekening"
@@ -21,8 +50,13 @@ be completed, leave it unchecked and write down why next to it in `MANUAL-VERIFI
 - `flutter build appbundle --release`: **exit 0**.
 - Version bumped **1.0.13+14 → 1.0.14+15** (the +14 artifacts predate plan 21-08's commit
   `139a4f8` and are stale; +15 contains everything through 21-08 Task 1 and this plan's Task 1).
-  Fresh artifacts: `build/app/outputs/flutter-apk/app-release.apk`,
-  `build/app/outputs/bundle/release/app-release.aab`.
+
+**Herzien 2026-08-04 11:57 — gebruik +16, niet +15.** Plan 21-10 (outbox drain, gap closure)
+landde ná de baseline hierboven, dus ook +15 is inmiddels stale: §5a kan er per definitie niet
+tegen slagen. Opnieuw gebouwd op **1.0.15+16** (`versionCode 16`, `versionName 1.0.15` —
+geverifieerd met `aapt2 dump badging`), suite **420/420**, `flutter analyze` schoon,
+REG-05 groen, beide release builds exit 0. Actuele artefacten:
+`build/app/outputs/flutter-apk/app-release.apk`, `build/app/outputs/bundle/release/app-release.aab`.
 
 ---
 
@@ -213,6 +247,19 @@ this section is the only valid proof that either trigger actually reaches the cl
       foreground trigger above.
 
 ## 6. AUTH-09 — delete-account, verified against the deployed project (plan 21-08 Task 2, folded in)
+
+> **UITGESTELD — beslissing 2026-08-04.** Deze sectie wordt NIET gedraaid in de sessie van
+> 2026-08-04. Reden: §6 verwijdert het wegwerp-testaccount onherroepelijk, en §3/§4/§5 hebben
+> datzelfde account nog levend nodig. Die drie zijn vandaag geblokkeerd omdat de gedeployde PWA
+> stale is (`version.json` = 1.0.12+13, `main.dart.js` Last-Modified 2026-07-26 — de laatste
+> geslaagde deploy vóór `deploy-web.yml` ging falen op het ontbrekende `FIREBASE_SERVICE_ACCOUNT`
+> secret). §6 nu draaien zou een tweede wegwerpaccount kosten zodra de PWA wél deployt.
+>
+> **Draai §6 samen met §3/§4/§5**, in één sessie, zodra het Firebase-secret bestaat en er een
+> verse deploy live staat. §6 blijft ook dan het laatste item.
+>
+> Gevolg voor de planning: plan **21-08 blijft open** tot deze sectie gedraaid is — dit ís zijn
+> taak 2 (`gate="blocking"`).
 
 Plan 21-08's UI (dialog, RPC call, sign-out, snackbar) is built and committed (`139a4f8`), but
 its own device+dashboard verification was never run. **Do this last**, since it is destructive
