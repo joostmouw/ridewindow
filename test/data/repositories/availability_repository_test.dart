@@ -124,7 +124,7 @@ void main() {
 
     test(
         'a single save() with 5 hour changes enqueues exactly one outbox row '
-        'matching toRecurringRow(hours)', () async {
+        'shaped as a real public.availability row', () async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final signedInRepo = AvailabilityRepository(
@@ -148,9 +148,26 @@ void main() {
       expect(pending.single.entity, kOutboxEntityAvailability);
       expect(pending.single.entityKey, 'uid-1');
       expect(pending.single.operation, 'upsert');
+      // Plan 21-13. Deze assertie luidde `equals(toRecurringRow(hours))` en
+      // legde daarmee precies de bug vast die op 2026-08-04 op het toestel
+      // opdook: de kale urenmap werd als de rij zélf ge-upsert, dus Postgres
+      // las '1-9' als kolomnaam en antwoordde PGRST204 "Could not find the
+      // '1-0' column of 'availability'". De payload moet een echte rij zijn.
+      final payload = jsonDecode(pending.single.payload) as Map<String, dynamic>;
       expect(
-        jsonDecode(pending.single.payload),
-        equals(toRecurringRow(hours)),
+        payload,
+        equals(toAvailabilityRow('uid-1', hours)),
+      );
+      expect(payload['user_id'], 'uid-1');
+      expect(payload['recurring'], equals(toRecurringRow(hours)));
+
+      // De urensleutels mogen alleen binnen `recurring` voorkomen, nooit als
+      // kolomnaam op het hoogste niveau — dat is letterlijk het foutbeeld.
+      expect(
+        payload.keys.toSet(),
+        equals({'user_id', 'recurring'}),
+        reason: 'elke andere sleutel op dit niveau wordt door PostgREST als '
+            'kolomnaam gelezen',
       );
     });
 

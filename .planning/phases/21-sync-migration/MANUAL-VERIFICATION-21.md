@@ -226,3 +226,53 @@ RPC succeeded or failed. The only valid proof is rows in the dashboard.
 > §3, §4 en §5 zijn daarmee weer uitvoerbaar; zie het kopblok van `REGRESSION-CHECKLIST-21.md`.
 
 ---
+
+## Device session 3 — 2026-08-04 18:11-18:18, Oppo Find X9 Pro (PLG110), app 1.0.17+18 → 1.0.18+19
+
+Uitgevoerd via `adb` (screenshots + `input tap`), niet handmatig. Verse installatie: het toestel
+was leeg na de mislukte sideload-poging, dus dit is meteen een first-install + first-login pad.
+
+### SYNC-05 — outbox drain: **PASS** (eindelijk), en de oorzaak van twee sessies falen gevonden
+
+**De fout, zichtbaar gemaakt door plan 21-12.** Direct na inloggen op 1.0.17+18:
+
+```
+I/flutter: SyncOutbox: send failed for availability/a1456a8d-f39c-45c5-94cf-35957fc4a555
+           (operation=upsert, attempt 1): PostgrestException(message: Could not find the
+           '1-0' column of 'availability' in the schema cache, code: PGRST204,
+           details: Bad Request, hint: null)
+I/flutter: SyncOutbox: drain done — 2 pending, 1 sent, 0 failed → 1 failed
+```
+
+Let op wat dit meteen weerlegt: dit was een **verse installatie**, dus de hypothese "oude
+vergiftigde rijen van vanochtend" is onjuist. `profile` ging wél door (1 sent), `availability`
+faalde structureel.
+
+**Oorzaak (plan 21-13).** `AvailabilityRepository` enqueuede `jsonEncode(toRecurringRow(hours))`
+— de kále urenmap — als outbox-payload, en `drainOutbox` doet daar
+`.from('availability').upsert(payload)` mee. PostgREST leest de sleutels van die map dus als
+kolomnamen: `'1-0'`, `'1-9'`, … Vergelijk `ProfileRepository`, dat wél `profile.toRow(userId)`
+stuurt — een echte rij met `user_id`. De leeskant (`parseAvailabilityRow`) verwachtte al de
+hele tijd `row['recurring']`, dus schrijf- en leeskant spraken elkaar tegen.
+
+De bijbehorende unittest assertte `equals(toRecurringRow(hours))` en **legde de foute vorm dus
+vast** — dat is waarom dit door alle 426 tests heen kwam.
+
+**Fix + herbewijs op 1.0.18+19,** zelfde toestel, zelfde sessie:
+
+1. Debugmenu → "Inspect sync outbox" toonde de vastgelopen rij mét `2 attempts` en de volledige
+   PGRST204-tekst, op het toestel zelf. Het gereedschap uit 21-12 deed precies waarvoor het
+   gebouwd is.
+2. "Clear outbox" getikt.
+3. Eén beschikbaarheidsuur gewijzigd (do 6 aug, 10:00) → achtergrond → voorgrond.
+4. Logcat: `SyncOutbox: drain done — 1 pending, 1 sent, 0 failed`.
+5. Accountsectie leest **"Synced"** in plaats van "Syncing..." — de statustekst die sinds
+   1.0.15+16 vastzat.
+
+### Nog niet afgetekend
+
+- Dashboardbevestiging van de `availability`-rij in Supabase. PostgREST accepteerde de upsert
+  zonder fout, wat sterk bewijs is, maar §5a vraagt expliciet om de rij in Table Editor te zien.
+  Vereist dashboardtoegang.
+- §2 (Play App Signing-route), §3 (iPhone-PWA), §4 (cold start), §5 (multi-tab), §6
+  (delete-account). Ongewijzigd open.

@@ -114,6 +114,37 @@ Map<String, dynamic> toRecurringRow(Map<DateTime, BlockType> hours) {
   return recurring;
 }
 
+/// Levert een volledige **rij** van `public.availability`, zoals de outbox die
+/// naar `.from('availability').upsert(row)` moet sturen — dus met `user_id` en
+/// met de urenmap ingepakt in de `recurring`-kolom.
+///
+/// Plan 21-13. Dit bestond niet, en dáár ging het mis: beide outbox-payloads
+/// stuurden [toRecurringRow]'s kale map als de rij zelf, waardoor Postgres de
+/// urensleutels als kolomnamen las. Op het toestel op 2026-08-04 leverde dat
+/// bij elke drain:
+///
+/// ```
+/// PostgrestException(message: Could not find the '1-0' column of
+/// 'availability' in the schema cache, code: PGRST204)
+/// ```
+///
+/// [toRecurringRow] blijft ongemoeid — die vorm is wél correct voor de
+/// `migrate_account_data`-RPC, die de kale map als `p_availability_recurring`
+/// verwacht. Alleen de upsert-payload heeft de rij-omhulling nodig.
+///
+/// `version` en `updated_at` staan er bewust niet in: die hebben een default
+/// respectievelijk een `set_updated_at`-trigger in
+/// `supabase/migrations/0001_accounts_sync.sql` — meesturen zou de trigger
+/// juist tegenwerken. Zelfde vorm als `UserProfile.toRow(userId)`.
+Map<String, dynamic> toAvailabilityRow(
+  String userId,
+  Map<DateTime, BlockType> hours,
+) =>
+    {
+      'user_id': userId,
+      'recurring': toRecurringRow(hours),
+    };
+
 /// Reconstrueert een lokaal-opslagvormige map uit een gepulde cloud
 /// `recurring`-rij. Het cloud-formaat is weekdag+uur-abstract (geen
 /// concrete datum), dus elk slot wordt op [weekAnchor]'s week gelegd

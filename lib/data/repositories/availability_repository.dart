@@ -72,7 +72,7 @@ class AvailabilityRepository {
         entity: kOutboxEntityAvailability,
         entityKey: userId!,
         operation: 'upsert',
-        payload: jsonEncode(toRecurringRow(hours)),
+        payload: jsonEncode(toAvailabilityRow(userId!, hours)),
       );
     }
   }
@@ -103,7 +103,7 @@ class AvailabilityRepository {
       entity: kOutboxEntityAvailability,
       entityKey: userId!,
       operation: 'upsert',
-      payload: jsonEncode(toRecurringRow(hours)),
+      payload: jsonEncode(toAvailabilityRow(userId!, hours)),
     );
   }
 }

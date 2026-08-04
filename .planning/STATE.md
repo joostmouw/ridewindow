@@ -4,7 +4,7 @@ milestone: v3.0
 milestone_name: Accounts & Sociaal
 # Kort houden (<70 tekens): dit veld vult de statusline in de terminal.
 # Details horen in de body hieronder, niet hier.
-status: "Fase 21: 10/12 -- outbox-diagnose, toestelsessie 3 volgt"
+status: "Fase 21: 11/13 -- SYNC-05 bewezen op toestel, rest is handmatig"
 last_updated: "2026-08-04T18:40:00.000Z"
 last_activity: 2026-08-04
 progress:
@@ -136,11 +136,17 @@ een "Outbox wissen"-actie -- dus stap 1 en 3 hieronder kunnen zónder adb en zó
 426/426 tests groen (3 nieuwe die falen zodra het loggen weer verdwijnt), analyze 0 errors,
 release-APK exit 0, ARB-pariteit 387/387. Zie 21-12-SUMMARY.md.
 
-**Toestelsessie 3 begint hier:** debugmenu → Sync-outbox bekijken → lees `lastError`. Leeg
-terwijl de status "Syncing..." toont = UI/stream-probleem, geen sendprobleem. Rijen met een fout
-= dáár staat het antwoord. Wis daarna de outbox: teller blijft 0 en nieuwe wijzigingen syncen =
-oude vergiftigde rijen bevestigd; teller klimt meteen terug = drain faalt nog volledig, met nu
-een leesbare reden.
+**Toestelsessie 3 is uitgevoerd (2026-08-04 18:11-18:18) en SYNC-05 is PASS.** De fout stond
+binnen een minuut in logcat: `availability`-upserts stuurden de kale urenmap als rij, dus
+PostgREST las `'1-0'` als kolomnaam (PGRST204). Plan 21-13 fixt dat met `toAvailabilityRow()`;
+op 1.0.18+19 leest de accountsectie **"Synced"** en logt de drain `1 pending, 1 sent, 0 failed`.
+De hypothese "oude vergiftigde rijen" was onjuist — het was een verse installatie. Zie
+21-13-SUMMARY.md en de sectie "Device session 3" in MANUAL-VERIFICATION-21.md.
+
+**Wat fase 21 nog openhoudt** is vanaf hier volledig handmatig, geen code: dashboardbevestiging
+van de availability-rij (§5a's laatste vinkje), §2 Play-App-Signing-route, §3 iPhone-PWA, §4
+cold-start-meting, §5 multi-tab, §6 delete-account. Plus de SUMMARY's van 21-08 en 21-09, die op
+hun toestelcheckpoint wachten.
 
 **21-10 was NIET genoeg -- 21-11 dicht de echte bug (2026-08-04, toestelsessie 2).** Op
 1.0.15+16 bleef de statustekst op "Syncing..." staan. Logcat na een foreground-cyclus:
