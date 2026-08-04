@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 9/11 met SUMMARY. 21-11 dicht de disposed-Ref-bug die 21-10's drain onbruikbaar maakte; 1.0.16+17 wacht op Play-upload voor S5a"
-last_updated: "2026-08-04T14:02:46.000Z"
+status: "Fase 21: 9/11. 21-11 fixte de disposed-Ref (bevestigd op toestel, foutregel weg) MAAR de outbox-teller blijft op Syncing -- sends falen nu stil. Volgende stap: die stilte opheffen"
+last_updated: "2026-08-04T14:20:46.000Z"
 last_activity: 2026-08-04
 progress:
   total_phases: 5
@@ -89,6 +89,38 @@ opnieuw deployen zodra +17 op main staat, zodat §3's beide kanten weer dezelfde
 
 **Wat de sessie afsluit:** §6 sluit plan 21-08, §4+§3+§5 sluiten plan 21-09. Draai je alles, dan
 kan fase 21 naar 10/10 en door naar verificatie. Niets in `lib/` staat nog open.
+
+**OPENSTAAND, hier verder oppakken (toestelsessie 2, 2026-08-04 16:20).** Op 1.0.16+17 is de
+`disposed`-fout aantoonbaar wég -- `adb logcat | grep -i disposed` blijft leeg na een
+foreground-cyclus, waar diezelfde grep op +16 twee regels gaf. 21-11 heeft dus gedaan wat het
+moest doen. **Maar de statustekst staat nog steeds op "Syncing..."**, dus
+`watchPendingCount()` > 0 en er komen nog altijd rijen niet weg.
+
+Waarom we niks zien in logcat: `SyncOutboxService._drainInternal` vangt per rij en doet
+`_dao.markFailed(row.id, e.toString())` -- **zonder enige log**. De fout landt in de kolom
+`lastError` in Drift en wordt nergens getoond. Dat is de eerste zaak om te dichten; nu is elke
+mislukte send onzichtbaar, en dat is precies het patroon dat deze fase al twee keer heeft
+gebeten.
+
+Wat we wél weten:
+- `pendingRows()` en `watchPendingCount()` selecteren allebei ALLE rijen, zonder filter. Teller
+  boven nul betekent dus letterlijk: er staan rijen die niet verzonden krijgen.
+- `markSent()` verwijdert de rij; blijft de rij staan, dan is de send gefaald.
+- Sterke hypothese, nog niet bewezen: dit zijn **oude, vergiftigde rijen van vanochtend**,
+  aangemaakt toen de drain stuk was. Nieuwe wijzigingen syncen mogelijk prima terwijl de teller
+  door die oude rijen boven nul blijft. Dat onderscheid is nog niet gemaakt.
+
+Testwijziging die klaarstaat: "Evening before" is om 16:19 AAN gezet op het toestel (Joost's
+eigen instelling -- terugzetten mag). Als `profiles.notif_evening_before` in het Supabase-
+dashboard op true staat, dan werkt de nieuwe sync en zijn alleen de oude rijen stuk.
+
+Volgende stappen, in deze volgorde:
+1. Dashboard openen en `profiles.notif_evening_before` voor joostmouw@gmail.com controleren.
+   True = nieuwe sync werkt, alleen oude rijen vastgelopen. False = de drain faalt nog volledig.
+2. Hoe dan ook: een plan 21-12 dat `_drainInternal`'s catch laat loggen (en overweeg `lastError`
+   ergens zichtbaar te maken, al is het maar via het verborgen debugmenu). Zonder dat blijven we
+   blind diagnosticeren.
+3. Pas daarna verder met §5a.
 
 **21-10 was NIET genoeg -- 21-11 dicht de echte bug (2026-08-04, toestelsessie 2).** Op
 1.0.15+16 bleef de statustekst op "Syncing..." staan. Logcat na een foreground-cyclus:
