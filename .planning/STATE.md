@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: SYNC-05 bewezen op toestel; rest is handmatig"
+status: "Fase 21: 21-13 dicht duplicaatbug; wacht op toestelsessie"
 last_updated: "2026-08-04T17:07:20.000Z"
 last_activity: 2026-08-04
 progress:
@@ -44,6 +44,33 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 Phase: 21 (sync-migration) — EXECUTING
 
+**21-13 uitgevoerd 2026-08-05 (build 1.0.20+21).** Toestelsessie 4 legde bloot dat één tik op
+"Schedule" twee identieke ritkaarten opleverde. `rideId` kwam uit `start.toIso8601String()` en die
+string verschilt voor een lokale en een UTC-`DateTime`; alles wat door de `timestamptz`-kolom gaat
+komt als UTC terug, dus dezelfde rit kreeg twee sleutels en de union-merge hield ze allebei.
+
+Onderweg bleek er een **tweede** fout onder te zitten: `toRow()` schreef een offsetloze string, die
+Postgres in de sessiezone (UTC) leest. Een rit van 12:00 lokaal is dus opgeslagen als 12:00 UTC —
+hetzelfde klokgetal, twee uur verschoven. Bestaande cloud-rijen dragen daarom én een verkeerde
+sleutel én een verkeerd tijdstip, en de lokale lijst is de enige bron waar de bedoelde tijd nog
+klopt. Dat bepaalt de opruimstrategie: cloud-rij weggooien, lokale kopie opnieuw pushen.
+
+Suite 440/1 (de ene is de bekende post-19:00-UTC notificatietest), analyze 0 errors op de baseline
+van 162 infos, REG-05 groen. Toestelverificatie staat als §5b in REGRESSION-CHECKLIST-21.md, met
+de nadrukkelijke instructie om op convergentie ná een foreground-cyclus te oordelen en niet op het
+eerste scherm — de duplicaten zijn echte data.
+
+**Uit toestelsessie 4 ook vastgelegd:** §2's versie-assertie, startup, AUTH-04 en het agenda-event
+zijn afgetekend; alleen de uitlog-ronde resteert van §2. Het "Signing you in."-venster dat bij een
+koude start opkomt is Google Play Services' `AssistedSignInActivity`, niet onze app — AUTH-04 is
+dus groen, maar `calendar_service.dart` belooft in zijn commentaar nooit te prompten en dat klopt
+niet (backlog #56). Verder: elke koude start herschrijft profiel én beschikbaarheid zonder
+wijziging (#57), en agenda-events zijn hardcoded Nederlands (#58) met een hardcoded
+`Europe/Amsterdam` (#59).
+
+**Nog niet gepusht:** main loopt voor op origin. De PWA deployt van main, dus §3 en §5 draaien pas
+tegen 21-13-code zodra er gepusht is.
+
 **Post-merge gate op `631ef14` (2026-08-04 19:45) — groen.** De samenvoeging van de twee
 parallelle 21-12-takken is geverifieerd op main: suite **434/434**, `flutter analyze` 0 errors /
 0 warnings (162 pre-existing `info`s), REG-05-structuurtest groen. Release-artefacten opnieuw
@@ -62,7 +89,7 @@ MANUAL-VERIFICATION-21.md stond. Eén vinkje blijft bewust open: de statustekst
 klein risico, maar het betekent dat een beschikbaarheidswijziging stilzwijgend kan sneuvelen.
 Waard om er bewust ja tegen te zeggen in plaats van het te laten meeliften.
 
-Plan: 10 of 12 met SUMMARY (21-01 t/m 21-07 + 21-10 + 21-11 + 21-12); resteren 21-08 en 21-09, beide
+Plan: 11 of 13 met SUMMARY (21-01 t/m 21-07 + 21-10 t/m 21-13); resteren 21-08 en 21-09, beide
 `autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
 SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint (taak 2, `gate="blocking"`).
 Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;

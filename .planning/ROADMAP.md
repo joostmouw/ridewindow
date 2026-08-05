@@ -158,7 +158,7 @@ Plans:
   4. Migration is written as one all-or-nothing, server-acknowledged operation — a single transaction via `rpc()`, never three separate table writes — that never deletes local data, verified by an automated test that seeds realistic production-shaped local data and asserts the exact resulting row shape (MIG-05, MIG-06, MIG-07, MIG-08)
   5. One user cannot read or write another user's data — proven by an automated deny-case test run against the deployed row-level security policies, not only a local instance; the forecast cache and calendar-imported blocks stay local and never sync; the app behaves correctly with more than one web tab open; availability writes go out as one batched row write; and deleting an account is verified to actually remove the user's rows, not merely to be declared by `on delete cascade` (SYNC-08, SYNC-09, SYNC-10, SYNC-11, SYNC-12, AUTH-09)
 
-**Plans**: 9 plans across 8 waves
+**Plans**: 13 plans across 12 waves — 21-10 t/m 21-13 zijn gap-closures, toegevoegd nadat de toestelsessies van 2026-08-04/05 defecten blootlegden die de geautomatiseerde suite niet zag
 Plans:
 **Wave 1**
 
@@ -192,6 +192,22 @@ Plans:
 **Wave 8** *(blocked on 21-08)*
 
 - [ ] 21-09-PLAN.md — REGRESSION-CHECKLIST-21.md, full suite/release gate, REG-03 cold-start remeasurement (checkpoint)
+
+**Wave 9** *(gap closure, blocked on 21-03, 21-04, 21-05, 21-07)*
+
+- [x] 21-10-PLAN.md — De outbox had geen consument: SyncOutboxService werd nergens gebouwd en drain() nooit aangeroepen (SYNC-05)
+
+**Wave 10** *(gap closure, blocked on 21-10)*
+
+- [x] 21-11-PLAN.md — De drain draaide wel maar faalde op een disposed Ref; providers op keepAlive (SYNC-04, SYNC-05)
+
+**Wave 11** *(gap closure, blocked on 21-11)*
+
+- [x] 21-12-PLAN.md — De availability-payload was geen rij: uursleutels gingen als kolomnamen naar PostgREST (SYNC-02, SYNC-05, SYNC-06)
+
+**Wave 12** *(gap closure, blocked on 21-12)*
+
+- [x] 21-13-PLAN.md — rideId overleefde de timestamptz-rondgang niet, waardoor één rit als twee kaarten verscheen (SYNC-03, MIG-08)
 
 **UI hint**: yes
 
