@@ -43,7 +43,26 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 21 (sync-migration) — EXECUTING
-Plan: 9 of 11 voltooid (21-01 t/m 21-07 + 21-10 + 21-11); resteren 21-08 en 21-09, beide
+
+**Post-merge gate op `631ef14` (2026-08-04 19:45) — groen.** De samenvoeging van de twee
+parallelle 21-12-takken is geverifieerd op main: suite **434/434**, `flutter analyze` 0 errors /
+0 warnings (162 pre-existing `info`s), REG-05-structuurtest groen. Release-artefacten opnieuw
+gebouwd op **1.0.19+20** — de vorige lagen op 19:06 en dateerden van vóór de merge (nog +18);
+`versionName 1.0.19` geverifieerd in de AAB-manifest. De PWA staat op dezelfde code
+(`version.json` = 1.0.19/20, `main.dart.js` 17:44:53 GMT), dus beide kanten van §3 draaien
+identiek. §0 van de checklist wees nog naar +18 en is rechtgetrokken.
+
+**§5a afgetekend.** SYNC-05 is op toestel bewezen met twee metingen in tegengestelde richting;
+de vinkjes in REGRESSION-CHECKLIST-21.md stonden nog open terwijl het bewijs al in
+MANUAL-VERIFICATION-21.md stond. Eén vinkje blijft bewust open: de statustekst
+"Gesynchroniseerd" is nooit waargenomen, alleen afgeleid uit `0 failed`.
+
+**Openstaande beslissing voor Joost (uit 21-12-RECONCILIATION.md, geen actie van mij):** main's
+`kMaxSendAttempts = 5` gooit een rij na vijf mislukte pogingen wég. Nu de payloadbug gefixt is
+klein risico, maar het betekent dat een beschikbaarheidswijziging stilzwijgend kan sneuvelen.
+Waard om er bewust ja tegen te zeggen in plaats van het te laten meeliften.
+
+Plan: 10 of 12 met SUMMARY (21-01 t/m 21-07 + 21-10 + 21-11 + 21-12); resteren 21-08 en 21-09, beide
 `autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
 SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint (taak 2, `gate="blocking"`).
 Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;

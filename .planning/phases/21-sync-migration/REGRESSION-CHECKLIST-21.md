@@ -33,8 +33,9 @@ main.dart.js   → Last-Modified: Tue, 04 Aug 2026 12:57:48 GMT
 De eerder genoteerde splitsing in twee sessies is daarmee vervallen. §6 blijft het laatste item —
 niet door een blokkade maar omdat het het testaccount vernietigt dat §3/§4/§5 levend nodig hebben.
 
-Gebruik **1.0.15+16** op Android (§0) — precies de build die nu ook als PWA live staat, dus beide
-kanten van §3's cross-device check draaien dezelfde code.
+Gebruik **1.0.19+20** op Android (§0) — precies de build die nu ook als PWA live staat, dus beide
+kanten van §3's cross-device check draaien dezelfde code. (Deze regel noemde eerder 1.0.15+16;
+sinds de deploy van `631ef14` serveert de PWA 1.0.19+20, zie §0.)
 
 **Automated baseline confirmed before this checklist was written (2026-08-04):**
 - `flutter test` (full suite): **418 passed / 0 failed** (run at 07:33 UTC, before the
@@ -79,9 +80,25 @@ REG-05 groen, beide release builds exit 0. Actuele artefacten:
 Everything below that touches sign-in depends on a build being installed. No build has been uploaded to Play Internal Testing yet,
 so this is a hard prerequisite, not an optional nicety.
 
-- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.17+18**) to the
+- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.19+20**) to the
       Play Console's **Internal testing** track.
 
+      > **Herzien 2026-08-04 19:45 — gebruik +20, niet +18.** De samenvoeging van de twee
+      > parallelle 21-12-takken (`631ef14`) landde ná de +18-build en bumpte naar 1.0.19+20;
+      > de artefacten van 19:06 zijn dus stale. +20 is de eerste build die *beide* takken bevat:
+      > main's attempt-plafond én de samenvattingsregel met entiteitsnamen, het debugmenu
+      > "Inspect sync outbox" en de versieweergave op het profielscherm. Op +20 is §5a ook
+      > daadwerkelijk bewezen (zie hieronder). Verse artefacten gebouwd 2026-08-04 19:45:
+      > `build/app/outputs/bundle/release/app-release.aab` (66.2 MB, `versionName 1.0.19`
+      > geverifieerd in de AAB-manifest) en `build/app/outputs/flutter-apk/app-release.apk`
+      > (68.3 MB). Post-merge baseline op `631ef14`: suite **434/434**, `flutter analyze`
+      > 0 errors / 0 warnings, REG-05 groen.
+      >
+      > De gedeployde PWA staat op dezelfde code: `version.json` = `{"version":"1.0.19",
+      > "build_number":"20"}`, `main.dart.js` Last-Modified 2026-08-04 17:44:53 GMT. Beide
+      > kanten van §3's cross-device check draaien dus identieke code — controleer dat opnieuw
+      > als er nog een commit op main landt vóór de sessie.
+      >
       > Must be **+18 or later**. Two earlier builds were tested on device on 2026-08-04 and both
       > failed §5a for different reasons, so neither is usable:
       > - **+16** — the drain was called but threw `Cannot use the Ref of
@@ -271,7 +288,24 @@ stuck on "Wordt gesynchroniseerd..." forever. Plan 21-12 fixed the payload shape
 failed send (previously silent), and dropped rows that fail 5 times in a row so a
 pre-existing wedged row cannot block the account forever.
 
-- [ ] **Availability specifically (plan 21-12):** while still signed in, open Availability and
+> **UITGEVOERD EN GESLAAGD — 2026-08-04, twee onafhankelijke metingen op 1.0.18+19 en
+> 1.0.19+20.** Het volledige bewijs staat in `MANUAL-VERIFICATION-21.md`, secties "Device
+> session 3" en "Tweede, onafhankelijke SYNC-05-meting". Kort: een beschikbaarheidsuur is in
+> twee tegengestelde richtingen gewijzigd (Free→Busy, daarna Busy→Free), elke keer bevestigd
+> met zowel een logcat-regel (`drain done — 2 pending, 2 sent (availability, profile),
+> 0 failed`) als een `availability.updated_at` in Postgres die naar exact het drainmoment
+> sprong. De keten toestel → outbox → drain → PostgREST → Postgres is daarmee sluitend.
+>
+> Let op de correctie die in dat verslag staat: de éérste poging kreeg ten onrechte een PASS
+> op grond van alleen een logregel `1 sent`, terwijl `availability.updated_at` aantoonbaar
+> onaangeroerd bleef — die send was een `profile`-rij. Eén logregel is dus géén bewijs; de
+> dashboardtijdstempel is dat wel. Daarom staan de entiteitsnamen nu in de samenvattingsregel.
+>
+> Eén vinkje hieronder blijft bewust open: de statustekst "Gesynchroniseerd" is niet
+> vastgelegd in het verslag. De drain meldde `0 failed`, dus de teller hoort op nul te staan,
+> maar dat is afgeleid en niet waargenomen — controleer het in de eerstvolgende sessie.
+
+- [x] **Availability specifically (plan 21-12):** while still signed in, open Availability and
       block or unblock at least one hour. Background/foreground the app (or wait for the next
       foreground cycle) to trigger the drain, then open the Supabase Dashboard → Table Editor →
       `availability` and confirm `recurring` for this user's row now reflects the change — this
@@ -284,18 +318,18 @@ pre-existing wedged row cannot block the account forever.
       logcat for a `SyncOutboxService: dropping availability/...` line (the attempt-ceiling
       drop) rather than assuming the fix regressed — a dropped row is expected to be replaced
       by the fresh write from the bullet above, not retried in its old broken shape.
-- [ ] While still signed in from section 2 (same account, same session — **do not sign out and
+- [x] While still signed in from section 2 (same account, same session — **do not sign out and
       back in**), open Profile and change one setting you have not already changed today (e.g.
       a different weather-tolerance slider value, or toggle one more availability hour).
-- [ ] Background the app (send it to the home screen, do not force-kill it) and bring it back to
+- [x] Background the app (send it to the home screen, do not force-kill it) and bring it back to
       the foreground — this fires `CloudSyncReconciler.reconcileOnForeground()`, which now drains
       the outbox as its last step.
-- [ ] **Logcat evidence (plan 21-11):** `adb logcat` captured across that background/foreground
+- [x] **Logcat evidence (plan 21-11):** `adb logcat` captured across that background/foreground
       cycle must contain **zero** occurrences of `Cannot use the Ref of
       cloudSyncReconcilerProvider after it has been disposed` — grep for the literal substring
       `cloudSyncReconcilerProvider after it has been disposed`. Any hit means the keepAlive fix
       regressed and the drain below is masked again, exactly as it was on 1.0.15+16.
-- [ ] Open the Supabase Dashboard → Table Editor → `profiles` (or `availability`, matching
+- [x] Open the Supabase Dashboard → Table Editor → `profiles` (or `availability`, matching
       whichever field you changed) and confirm the new value is present for this user's row —
       **without ever having signed out and back in**. This is the one thing that could not happen
       before this plan: previously the row would stay frozen at its first-login migration values
