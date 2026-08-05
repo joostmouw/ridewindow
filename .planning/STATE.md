@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 21-13 dicht duplicaatbug; wacht op toestelsessie"
-last_updated: "2026-08-04T17:07:20.000Z"
-last_activity: 2026-08-04
+status: "Fase 21: 5b/5c/MIG-02 groen; rest van checklist open"
+last_updated: "2026-08-05T23:10:00.000Z"
+last_activity: 2026-08-05
 progress:
   total_phases: 5
   completed_phases: 2
@@ -44,6 +44,49 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 Phase: 21 (sync-migration) — EXECUTING
 
+## Stand na de avond van 2026-08-05 — lees dit eerst
+
+**Build op het toestel: 1.0.21+22, SIDELOAD (niet via Play).** Halverwege de avond is de
+Play-route verlaten: elke iteratie kostte 20+ minuten tegen 2 voor `adb install`, en §2 — de enige
+sectie die de Play App Signing-route echt moet bewijzen — was al afgetekend. `adb uninstall` +
+`adb install` van de lokale release-APK. Zolang dit een sideload is biedt Play geen updates meer
+aan (andere handtekening); aan het eind van de fase één Play-installatie als afsluiting.
+
+**Wat er die avond is gefixt (vier plannen, alle vier gevonden op het toestel):**
+- 21-11 disposed `Ref` — de drain draaide niet
+- 21-12 availability-payload was geen rij
+- 21-13 `rideId` overleefde de `timestamptz`-rondgang niet → één rit verscheen als twee
+- 21-14 push gebeurde ná pull → een verwijderde rit werd door de merge weer opgewekt
+
+**Groen op het toestel (sessie 5, 22:53-23:00):**
+- **MIG-02** — tweede toestel, leeg lokaal + gevulde cloud. Rooster identiek aan de opname van
+  vóór de wipe, profiel en taal terug, geen conflictdialoog. Stond in de requirements en was nog
+  nooit getest.
+- **§5b** — twee ritten op een verse installatie die alles uit de cloud trok. Sterkere vorm dan de
+  checklist vroeg: er was geen lokale staat die het resultaat kon maskeren.
+- **§5c** — verwijderde rit blijft weg na drie cycli; de delete is zichtbaar in de drain vóór de
+  pull.
+
+**Openstaand, en waarom:**
+- §5b's dashboardcontrole (`ride_id` op `Z`, `start_at` 10:00 UTC voor de 12:00-rit) — alleen Joost
+  komt in Supabase.
+- §2's uitlog-ronde — **geblokkeerd door mijn eigen sideload**: de OAuth-grant van Google Calendar
+  hing aan de vorige installatie en is meegegaan met de de-installatie. De koppeling staat nu op
+  "Not connected", dus D-12 (uitloggen mag de agendakoppeling niet meeslepen) is niet toetsbaar
+  tot de agenda opnieuw gekoppeld is. Dat had ik moeten voorzien; ik woog wel de lokale database
+  af, niet de OAuth-grant.
+- §3 (iPhone-PWA), §4 (koude start), §5 (multi-tab), §6 (account verwijderen).
+
+**Niet als bewezen wegschrijven:** 21-13's cloud-reparatiepad (`_repairNonCanonicalRideIds`) heeft
+nooit gedraaid — de spookrijen waren al uit de cloud verdwenen vóór de sideload. Zie
+MANUAL-VERIFICATION-21.md voor de redenering. Alleen unit-tests dekken dat pad.
+
+**Backlog-items uit deze avond:** #56 (agenda-mismatchcheck toont een Google-venster bij koude
+start, terwijl de code belooft nooit te prompten), #57 (elke start herschrijft profiel én
+availability zonder wijziging), #58/#59 (agenda-events hardcoded Nederlands en hardcoded
+`Europe/Amsterdam`), **#60 (CloudSyncReconciler injecteerbaar maken — vijf keer op rij de reden
+dat een bug pas op een toestel gevonden werd; het enige item dat dit patroon doorbreekt)**.
+
 **21-13 uitgevoerd 2026-08-05 (build 1.0.20+21).** Toestelsessie 4 legde bloot dat één tik op
 "Schedule" twee identieke ritkaarten opleverde. `rideId` kwam uit `start.toIso8601String()` en die
 string verschilt voor een lokale en een UTC-`DateTime`; alles wat door de `timestamptz`-kolom gaat
@@ -68,8 +111,8 @@ niet (backlog #56). Verder: elke koude start herschrijft profiel én beschikbaar
 wijziging (#57), en agenda-events zijn hardcoded Nederlands (#58) met een hardcoded
 `Europe/Amsterdam` (#59).
 
-**Nog niet gepusht:** main loopt voor op origin. De PWA deployt van main, dus §3 en §5 draaien pas
-tegen 21-13-code zodra er gepusht is.
+**Gepusht en gedeployd** (was eerder "nog niet gepusht"): de PWA serveert 1.0.21+22, dezelfde code
+als het toestel. §3 en §5 vergelijken dus appels met appels.
 
 **Post-merge gate op `631ef14` (2026-08-04 19:45) — groen.** De samenvoeging van de twee
 parallelle 21-12-takken is geverifieerd op main: suite **434/434**, `flutter analyze` 0 errors /
@@ -89,7 +132,7 @@ MANUAL-VERIFICATION-21.md stond. Eén vinkje blijft bewust open: de statustekst
 klein risico, maar het betekent dat een beschikbaarheidswijziging stilzwijgend kan sneuvelen.
 Waard om er bewust ja tegen te zeggen in plaats van het te laten meeliften.
 
-Plan: 11 of 13 met SUMMARY (21-01 t/m 21-07 + 21-10 t/m 21-13); resteren 21-08 en 21-09, beide
+Plan: 12 of 14 met SUMMARY (21-01 t/m 21-07 + 21-10 t/m 21-14); resteren 21-08 en 21-09, beide
 `autonomous: false` -- hun code/docs zijn gecommit (139a4f8, aaae7b6) maar er is nog GEEN
 SUMMARY.md, omdat beide nog wachten op hun toestel-checkpoint (taak 2, `gate="blocking"`).
 Status: Toestelsessie 2026-08-04 uitgevoerd. MIG-05/06 bewezen. SYNC-05 was NIET geleverd;
