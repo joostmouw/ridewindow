@@ -479,3 +479,68 @@ kaarten worden, en moet `planned_rides` per rit één rij houden.
 **Let op bij het beoordelen:** het toestel draait op het moment van deze screenshot nog de
 Play-build 1.0.19+20 van 2026-08-04 19:50. Dit is dus het verwachte gedrag van vóór de fix, geen
 bewijs dat 21-13 niet werkt.
+
+---
+
+## Device session 5 — 2026-08-05 22:53-23:00, Oppo Find X9 Pro, app 1.0.21+22 (sideload)
+
+**Aanpak gewijzigd:** de Play-route is verlaten voor de rest van de sessie. Elke iteratie kostte
+20+ minuten (uploaden, verwerken, uitrollen, opt-in, updaten) tegen 2 minuten voor een sideload,
+en §2 — de enige sectie die de Play App Signing-route echt moet bewijzen — was al afgetekend.
+`adb uninstall` + `adb install` van de lokaal gebouwde release-APK; versie-assertie
+`versionCode=22 versionName=1.0.21` bevestigd vóór elke interpretatie.
+
+De uninstall wist de lokale database. Dat was aanvaardbaar omdat het testmateriaal in Supabase
+staat, niet op het toestel — en het leverde een verificatie op die nog openstond.
+
+### MIG-02 — tweede toestel, leeg lokaal + gevulde cloud: **PASS**
+
+Nog nooit eerder op een toestel getest; tot nu toe was alleen de omgekeerde richting bewezen
+(leeg account, gevulde telefoon = MIG-05/06).
+
+| Gecontroleerd | Uitkomst |
+|---|---|
+| Conflictdialoog | Geen — correct, leeg lokaal is geen divergentie |
+| Beschikbaarheidsrooster | Identiek aan de opname van 22:46 vóór de uninstall: za 8 en zo 9 vrij vanaf 06:00, rest geblokkeerd |
+| Profielinstellingen | "Evening before" weer aan, zoals in de cloud |
+| Statustekst | "Synced" |
+
+### §5b — SYNC-03, één rit blijft één rit: **PASS**
+
+Op een verse installatie die alles uit de cloud moest halen toont PLANNED **twee** ritten:
+Saturday 12:00–15:00 en Sunday 08:00–10:00. Geen 14:00-kaart, geen 10:00-kaart, geen duplicaten.
+Dit is de sterkst mogelijke vorm van deze test: er was geen lokale staat die het resultaat kon
+maskeren.
+
+Nog te doen door Joost in het dashboard: bevestigen dat `planned_rides` één rij per rit houdt,
+met een `ride_id` dat op `Z` eindigt en `start_at` op 10:00 UTC voor de 12:00-rit.
+
+### §5c — SYNC-03, een verwijderde rit blijft verwijderd: **PASS**
+
+Zondagrit verwijderd via het prullenbak-icoon (bevestigingsdialoog "Unplan this ride?"), daarna
+drie voor/achtergrond-cycli:
+
+```
+22:59:10.479  drain done — 1 pending, 1 sent (planned_ride), 0 failed   <- de delete, in de
+                                                                           drain VOOR de pull
+22:59:18.898  drain done — 0 pending, 0 sent, 0 failed                  <- cyclus 2: niets
+22:59:27.464  drain done — 0 pending, 0 sent, 0 failed                  <- cyclus 3: niets
+```
+
+De rit is niet teruggekomen. De delete vertrok in de eerste drain van de cyclus, precies de
+volgorde die plan 21-14 herstelt; vóór 21-14 zou de pull de rit hier weer hebben opgewekt.
+
+Merk ook op dat 21-14's dubbele drain zichtbaar is in elke cyclus: één push vóór de reconcile,
+één erna voor wat de merge enqueuet.
+
+### Bevestigd, opnieuw: backlog #57
+
+Élke cyclus stuurt `availability` opnieuw op zonder dat er iets gewijzigd is
+(`1 sent (availability)` op 22:59:10, :19 en :27). Functioneel onschadelijk, maar het zijn
+schrijfacties zonder aanleiding en het maakt `updated_at` onbruikbaar als "wanneer wijzigde de
+gebruiker dit".
+
+### Nog open
+
+§5b's dashboardcontrole, §2's uitlog-ronde, §3 (iPhone), §4 (koude start), §5 (multi-tab),
+§6 (account verwijderen).
