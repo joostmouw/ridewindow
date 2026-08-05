@@ -386,6 +386,26 @@ sleutels voor dezelfde rit, dus de union-merge hield ze allebei.
       hoort er niet te staan; verschijnt hij toch, noteer de gelogde inhoud — dat is een rit die
       alleen in de cloud stond en niet te herstellen was.
 
+## 5c. SYNC-03 — een verwijderde rit blijft verwijderd (plan 21-14)
+
+Gevonden 2026-08-05 bij het opruimen van de duplicaten uit §5b: handmatig verwijderde ritten
+kwamen bij elke sync terug. `reconcileOnForeground()` las de cloud vóór het de outbox leegde, dus
+de union-merge zette een zojuist verwijderde rit terug voordat de delete ooit verstuurd was.
+Verwijderen wérkte daardoor helemaal niet zolang je ingelogd was.
+
+- [ ] Verwijder een geplande rit met het prullenbak-icoon. De kaart verdwijnt meteen.
+- [ ] Achtergrond/voorgrond de app **drie keer**. De rit mag niet terugkomen.
+- [ ] Supabase Dashboard → `planned_rides`: de rij is weg en blijft weg.
+- [ ] In `adb logcat` hoort de drain-regel vóór eventuele reconcile-activiteit te komen. Een
+      `drain done — ... sent (planned_ride...)` direct na een voorgrondcyclus is het teken dat de
+      delete daadwerkelijk vertrokken is.
+
+> **Gebruik dit meteen om de spookritten van §5b op te ruimen.** Saturday 14:00–17:00 en
+> Sunday 10:00–12:00 zijn kopieën met een verschoven tijdstip. Ze zijn intern consistent — de
+> sleutel klopt bij hun eigen `start_at` — dus 21-13's herstelroutine herkent ze niet als kapot,
+> en er bestaat geen heuristiek die ze van een echt geplande rit onderscheidt. Handmatig
+> verwijderen is de juiste route, en dankzij 21-14 blijft dat nu ook zitten.
+
 ## 6. AUTH-09 — delete-account, verified against the deployed project (plan 21-08 Task 2, folded in)
 
 > **Laatste item, en dat is geen blokkade maar volgorde.** Deze sectie vernietigt het

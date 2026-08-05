@@ -176,6 +176,62 @@ void main() {
     },
   );
 
+  // Plan 21-14. Dit is een BRONVOLGORDE-assertie en daarmee zwakker dan een
+  // gedragstest: hij bewijst dat de aanroep op de juiste plaats geschreven
+  // staat, niet dat de push tijdens runtime vóór de pull afrondt. Dat het niet
+  // gedragsmatig kan, is zelf de bevinding -- `CloudSyncReconciler` grijpt
+  // rechtstreeks naar `Supabase.instance.client` in de methodebody, dus de
+  // volgorde van zijn netwerkaanroepen is van buitenaf niet waarneembaar zonder
+  // een levende backend. Wordt dit gebied nog eens aangeraakt: maak die
+  // afhankelijkheden injecteerbaar, dan kan deze test echt worden.
+  test(
+    'reconcileOnForeground() draineert de outbox VOORDAT het de cloud leest '
+    '(SYNC-03) -- anders wekt de union-merge een verwijderde rit weer op',
+    () {
+      final source = _stripComments(
+        File('lib/providers/cloud_sync_reconciler_provider.dart')
+            .readAsStringSync(),
+      );
+
+      final start = source.indexOf('Future<void> reconcileOnForeground()');
+      expect(
+        start,
+        greaterThan(-1),
+        reason: 'reconcileOnForeground() moet bestaan om te kunnen ordenen',
+      );
+
+      // Body loopt tot de eerstvolgende methodedeclaratie op hetzelfde niveau;
+      // de volgende `Future<void> ` na de start is goed genoeg voor dit bestand.
+      final next = source.indexOf('Future<void> ', start + 1);
+      final body = next == -1 ? source.substring(start) : source.substring(start, next);
+
+      final firstDrain = body.indexOf('drainOutbox()');
+      final firstPull = RegExp(r'_reconcile[A-Z]\w*\(').firstMatch(body)?.start;
+
+      expect(
+        firstDrain,
+        greaterThan(-1),
+        reason: 'reconcileOnForeground() moet drainOutbox() aanroepen',
+      );
+      expect(
+        firstPull,
+        isNotNull,
+        reason: 'reconcileOnForeground() moet de cloud lezen',
+      );
+      expect(
+        firstDrain < firstPull!,
+        isTrue,
+        reason: 'De outbox moet gedraineerd worden vóór de eerste _reconcile*-'
+            'aanroep. De wachtrij bevat de intentie van de gebruiker, de cloud '
+            'de laatst overeengekomen stand; lees je die stand eerst, dan zet '
+            'de union-merge een zojuist verwijderde rit terug en pusht de '
+            'volgende cyclus hem weer omhoog. Op 2026-08-05 op het toestel '
+            'waargenomen: handmatig verwijderde ritten kwamen bij elke sync '
+            'terug.',
+      );
+    },
+  );
+
   group('Behavioural wiring (21-11): the call reaches its work, not just '
       'that a call site exists', () {
     late AppDatabase db;

@@ -135,6 +135,15 @@ class CloudSyncReconciler {
   /// codebase's existing pattern for non-critical background work (e.g.
   /// `background_task.dart`'s widget-update try/catch).
   Future<void> reconcileOnForeground() async {
+    // Eerst duwen, dan pas trekken (plan 21-14). De outbox bevat de *intentie*
+    // van de gebruiker, de cloud bevat de laatst *overeengekomen* stand. Lees je
+    // de overeengekomen stand vóórdat de intentie verstuurd is, dan gooi je die
+    // intentie weg: een verwijderde rit staat in de cloud nog gewoon te wachten,
+    // de union-merge zet hem lokaal terug, en de volgende cyclus pusht hem weer
+    // omhoog. Op 2026-08-05 op het toestel waargenomen -- handmatig verwijderde
+    // ritten kwamen bij elke sync terug.
+    await drainOutbox();
+
     try {
       final user = _ref.read(authStateProvider).value;
       if (user == null) return;
@@ -149,6 +158,10 @@ class CloudSyncReconciler {
       debugPrint('CloudSyncReconciler.reconcileOnForeground failed: $error');
     }
 
+    // Tweede drain: de merge hierboven enqueuet upserts voor ritten die alleen
+    // lokaal bestaan (`result.localOnly`). Zonder deze aanroep wachten die een
+    // hele cyclus. `drain()` heeft een re-entrancy-guard (21-10) en een lege
+    // wachtrij is een gelogde no-op, dus dit is goedkoop.
     await drainOutbox();
   }
 
