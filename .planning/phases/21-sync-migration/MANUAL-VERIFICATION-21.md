@@ -334,3 +334,103 @@ plaats van het hardcoded `'1.0.0'`. "Welke build draait hier?" is daarmee vanaf 
 te beantwoorden, zonder adb.
 
 **Testdata is opgeruimd:** het rooster staat weer zoals Joost het had.
+
+---
+
+## Device session 4 — 2026-08-05 20:39-20:50, Oppo Find X9 Pro (PLG110), app 1.0.19+20 via Play
+
+Uitgevoerd met Claude aan de USB-kant (adb: versie-assertie, logcat, screenshots) en Joost aan de
+tikkant. Die verdeling was nodig: ColorOS blokkeert door adb geïnitieerde app-starts, dus koude
+starts moeten met de hand.
+
+### §2 — versie-assertie en installatiebron: **PASS**
+
+```
+versionCode=20   versionName=1.0.19
+installerPackageName=com.android.vending
+firstInstallTime=2026-08-04 19:50:46
+```
+
+`com.android.vending` = geïnstalleerd via de Play Store, geen sideload. Daarmee is de
+AUTH-10-route (Play App Signing SHA-1) aantoonbaar de route die hier draait, en is de val van
+2026-08-04 — Play die versionCode 13 serveerde — uitgesloten in plaats van aangenomen.
+
+Let op: de op Play staande +20 is de build van de worktree-tak, niet de post-merge build van
+main. Verschil is uitsluitend main's attempt-plafond (`kMaxSendAttempts = 5`); geen enkele
+sectie van deze checklist raakt dat. De PWA draait wél de gemergede code.
+
+### §2 — startup: **PASS**
+
+App opent, Home rendert "15 ride windows this week", geen crash, geen wit scherm.
+
+### §2 — AUTH-04 (herstart → nog ingelogd): **PASS**
+
+Tijdlijn uit logcat, buffer vooraf geleegd:
+
+| Tijd | Regel |
+|------|-------|
+| 20:44:37.365 | `FlutterGeolocator: Stopping location service.` — oud proces sterft (weggeveegd uit recents) |
+| 20:44:41.662 | `nativeloader: Load ... libflutter.so`, **nieuw pid 3594** — echte koude start, geen resume |
+| 20:44:44.633 | `SyncOutboxService: drain done — 2 pending, 2 sent (profile, availability), 0 failed` |
+
+Eindstaat: Account-blok toont `Joost / joostmouw@gmail.com / Synced`.
+
+**Joost zag tijdens het opstarten wél een venster verschijnen** — "Signing you in.", van onderen
+opkomend. Onderzocht en het is **niet** RideWindow die zichzelf uitgelogd rendert; het is Google
+Play Services. Bewijs in hetzelfde log:
+
+```
+com.google.android.gms/.auth.api.credentials.assistedsignin.ui.AssistedSignInActivity
+com.android.credentialmanager/com.oplus.credentialmanager.CredentialSelectorActivity
+ServiceConnector: ...credman.service.GoogleIdService
+```
+
+AUTH-04 vraagt of de app zelf een uitgelogde staat toont vóór de sessie hersteld is. Dat gebeurt
+niet. PASS.
+
+### Nieuwe bevinding — de "nooit prompten"-belofte houdt niet op Android
+
+`lib/services/calendar_service.dart:275-290` documenteert `currentGoogleEmail()` als
+*"ZONDER ooit een OAuth-prompt/popup te tonen (D-11, AUTH-07)"*. Op Android loopt
+`attemptLightweightAuthentication()` via Credential Manager, en die toont assisted-sign-in-UI
+zodra hij niet precies één geautoriseerd account kan auto-selecteren.
+
+Aanroepketen: `ProfileScreen.initState()` → `_checkCalendarConnection()` →
+`_checkCalendarMismatch()` (alleen als de agenda gekoppeld is) → `currentGoogleEmail()`.
+
+`initState()` draait één keer per schermopbouw, dus alleen bij een koude start. Geverifieerd:
+tabwisselen Home → Profiel reproduceert de popup **niet**, wegvegen + heropenen **wel**.
+
+Cosmetisch — er verandert niets aan de login — maar een al ingelogde gebruiker een
+sign-in-venster tonen is verkeerd, en de code gaat er aantoonbaar van uit dat dit niet kan.
+Backlog #56. Geen fase-21-blokkade.
+
+### Nevenwaarneming — twee outbox-rijen bij élke koude start
+
+Beide koude starts loggen identiek `2 pending, 2 sent (profile, availability), 0 failed`, zonder
+dat er iets gewijzigd was. Elke app-start schrijft dus profiel én beschikbaarheid opnieuw naar
+Supabase. Functioneel correct, maar het zijn schrijfacties zonder aanleiding. Backlog #57.
+
+### SYNC-05 — derde, bevestigende waarneming
+
+Beide koude starts draineerden schoon: `0 failed`, nul `disposed`-regels (21-11 houdt stand op
+de Play-build), nul `PostgrestException` (21-12 houdt stand). **Bewust geen PASS-claim toegevoegd:
+er is deze sessie geen dashboardcontrole gedaan.** Het bewijs voor SYNC-05 blijft de twee
+metingen van 2026-08-04 die wél in Postgres bevestigd zijn; deze sluit daarop aan.
+
+Ook waargenomen en daarmee het laatste open vinkje van §5a gesloten: de statustekst leest
+**"Synced"**, niet "Syncing...". Die stond eerder alleen afgeleid uit `0 failed`.
+
+### Fout van Claude in deze sessie, ter lering vastgelegd
+
+Na een `force-stop` kwam RideWindow niet naar voren maar de app eronder (WiZ-verlichting). De
+uitvoer van het startcommando was naar `/dev/null` gestuurd, waarna er blind op de coördinaten
+van RideWindows Profiel-tab is getikt. Die tik landde op de tabbalk van de WiZ-app en wisselde
+daar van tabblad. Geen schade aan de verlichting waarneembaar, wel een tik in een vreemde app.
+Vanaf dat moment wordt `mCurrentFocus` gecontroleerd vóór elke tik, en die guard heeft daarna
+aantoonbaar een tweede blinde tik voorkomen (abort in plaats van tik).
+
+### Ongewijzigd open
+
+§2's agenda-event en uitlog-ronde, §3 (iPhone-PWA + SYNC-04), §4 (koude start), §5 (multi-tab),
+§6 (delete-account).

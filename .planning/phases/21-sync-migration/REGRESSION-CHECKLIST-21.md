@@ -143,7 +143,10 @@ Source: install via the Play Store internal testing link only (see §0). Reused 
 `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` §1 — this was never run (plan 19-07 was left
 open) and is folded in here rather than left as a separate outstanding item.
 
-- [ ] **Assert the installed build FIRST — do not skip, do not interpret anything before this.**
+- [x] **Assert the installed build FIRST — do not skip, do not interpret anything before this.**
+      *(Afgetekend 2026-08-05: `versionCode=20 versionName=1.0.19`,
+      `installerPackageName=com.android.vending`, `firstInstallTime=2026-08-04 19:50:46`.
+      Play-installatie bevestigd, geen sideload. Zie MANUAL-VERIFICATION-21.md, device session 4.)*
       ```
       ~/Library/Android/sdk/platform-tools/adb shell dumpsys package ridewindow.joost.amsterdam | grep version
       ```
@@ -153,8 +156,9 @@ open) and is folded in here rather than left as a separate outstanding item.
       the pre-existing **closed test** track and not into internal testing. Every symptom followed
       from that. If the number is wrong, stop and fix the track opt-in — nothing below means
       anything until it matches.
-- [ ] **Startup** — install via the Play Store internal testing link and open the app. Note:
+- [x] **Startup** — install via the Play Store internal testing link and open the app. Note:
       loads within a few seconds, no crash or white screen.
+      *(Afgetekend 2026-08-05: Home rendert "15 ride windows this week", geen crash, geen wit scherm.)*
 - [ ] **Sign in** — tap "Inloggen met Google" in Profile's Account section, complete the Google
       flow. Note: the signed-in view (avatar/name/email) appears with no error.
 - [ ] **First-login migration proof (MIG, this plan's highest-value item)** — immediately after
@@ -191,9 +195,13 @@ open) and is folded in here rather than left as a separate outstanding item.
 - [ ] **Sign out** — tap "Uitloggen" in the Account section, confirm the dialog. Note: returns to
       the signed-out view, and the calendar connection (if separately connected) stays intact per
       D-12.
-- [ ] **Restart → still signed in** — sign back in, fully kill the app (swipe from recent apps,
+- [x] **Restart → still signed in** — sign back in, fully kill the app (swipe from recent apps,
       not just backgrounding), reopen it. Note: the Account section shows the signed-in state
       immediately, no flash of "signed out" first (AUTH-04).
+      *(Afgetekend 2026-08-05. Koude start bewezen via een nieuw pid in logcat; Account-blok toont
+      direct `Joost / joostmouw@gmail.com / Synced`. Er verschijnt wél een "Signing you in."-venster,
+      maar dat is Google Play Services' `AssistedSignInActivity` — niet de app die zichzelf uitgelogd
+      rendert. Aparte bevinding, backlog #56. Zie MANUAL-VERIFICATION-21.md, device session 4.)*
 
 ## 3. iPhone PWA install + cross-device propagation (Phase 19 leftover §2, folded with SYNC-04)
 
@@ -334,8 +342,10 @@ pre-existing wedged row cannot block the account forever.
       **without ever having signed out and back in**. This is the one thing that could not happen
       before this plan: previously the row would stay frozen at its first-login migration values
       forever.
-- [ ] In the app, confirm the Account section's sync status text reads "Gesynchroniseerd" (not
+- [x] In the app, confirm the Account section's sync status text reads "Gesynchroniseerd" (not
       stuck on "Wordt gesynchroniseerd...") once the row above is visible in the dashboard.
+      *(Afgetekend 2026-08-05 — waargenomen, niet meer afgeleid: het Account-blok leest "Synced".
+      Dit was het laatste open vinkje van §5a.)*
 - [ ] (Optional, extra confidence) Repeat the same check for a change made immediately after a
       fresh sign-in (sign out, sign back in, change a setting, then re-open the app) to prove the
       post-sign-in drain trigger in `AccountSection._runAccountSync()` independently of the
