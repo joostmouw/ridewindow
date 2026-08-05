@@ -44,8 +44,17 @@ class PlannedRidesRepository {
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    return list
-        .map(PlannedRide.fromJson)
+    // Ontdubbelen op de UTC-instant (plan 21-13). Toestellen die vóór deze fix
+    // gedraaid hebben, dragen twee kopieën van dezelfde rit: één lokaal
+    // geschreven, één uit de cloud teruggelezen. De eerste kopie wint --
+    // `putIfAbsent` bewaart de vroegst opgeslagen. Dit hoort bij de
+    // leesoperatie, net als het filteren op voorbije ritten hieronder, zodat
+    // een bestaand toestel meteen goed toont zonder migratiestap.
+    final deduped = <String, PlannedRide>{};
+    for (final ride in list.map(PlannedRide.fromJson)) {
+      deduped.putIfAbsent(ride.rideId, () => ride);
+    }
+    return deduped.values
         .where((r) => r.end.isAfter(todayStart))
         .toList()
       ..sort((a, b) => a.start.compareTo(b.start));
@@ -77,7 +86,14 @@ class PlannedRidesRepository {
   /// 'upsert' outbox-rij voor deze ene rit wanneer ingelogd.
   Future<void> add(PlannedRide ride) async {
     final current = readLocal();
-    if (current.any((r) => r.start == ride.start && r.end == ride.end)) {
+    // `isAtSameMomentAs`, niet `==` (plan 21-13). Dart's `DateTime.==` is alleen
+    // waar als óók de `isUtc`-vlag gelijk is, dus een lokale en een uit de cloud
+    // teruggelezen kopie van dezelfde rit ontsnapten allebei aan deze guard.
+    // Dezelfde regel staat al in domain/services/availability_key.dart.
+    bool isSameRide(PlannedRide r) =>
+        r.start.isAtSameMomentAs(ride.start) &&
+        r.end.isAtSameMomentAs(ride.end);
+    if (current.any(isSameRide)) {
       return;
     }
     final next = [...current, ride]..sort((a, b) => a.start.compareTo(b.start));
@@ -98,8 +114,14 @@ class PlannedRidesRepository {
   /// niet uit de payload.
   Future<void> remove(PlannedRide ride) async {
     final current = readLocal();
-    final next =
-        current.where((r) => r.start != ride.start || r.end != ride.end).toList();
+    // Instant-vergelijking, spiegelbeeld van [add]'s guard (plan 21-13) --
+    // anders verwijdert dit de cloud-kopie van een rit niet.
+    final next = current
+        .where(
+          (r) => !(r.start.isAtSameMomentAs(ride.start) &&
+              r.end.isAtSameMomentAs(ride.end)),
+        )
+        .toList();
     await save(next);
     if (_outbox != null && userId != null) {
       await _outbox.enqueueOrCoalesce(

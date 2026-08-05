@@ -312,9 +312,18 @@ class CloudSyncReconciler {
     String userId,
   ) async {
     final repo = await _ref.read(plannedRidesRepositoryProvider.future);
-    final cloudRows = await readCloudPlannedRides(client, userId);
-    final cloudRides = service.parsePlannedRidesRows(cloudRows);
+    final allCloudRows = await readCloudPlannedRides(client, userId);
     final local = repo.readLocal();
+
+    // Rijen met een niet-canonieke sleutel worden uit de cloud verwijderd én
+    // hier buiten beschouwing gelaten, zodat de merge de lokale kopie als
+    // `localOnly` ziet en hem opnieuw pusht -- nu mét de juiste sleutel en het
+    // juiste tijdstip. Zouden ze in `cloudRows` blijven staan, dan denkt de
+    // merge dat de rit al in de cloud staat en duwt niemand hem terug.
+    final cloudRows =
+        await _repairNonCanonicalRideIds(client, allCloudRows, userId, local);
+
+    final cloudRides = service.parsePlannedRidesRows(cloudRows);
 
     final result = service.mergePlannedRides(local: local, cloud: cloudRides);
 
@@ -328,5 +337,89 @@ class CloudSyncReconciler {
       await repo.save(result.merged, stamp: false);
       _ref.invalidate(plannedRidesProvider);
     }
+  }
+
+  /// Herstelt rijen in `public.planned_rides` waarvan de opgeslagen `ride_id`
+  /// niet gelijk is aan de canonieke sleutel die uit hun eigen `start_at`
+  /// volgt (plan 21-13).
+  ///
+  /// Vóór 21-13 schreef `PlannedRide.toRow` een offsetloze string, die Postgres
+  /// in de sessiezone las. Zulke rijen dragen dus zowel een verkeerde sleutel
+  /// als een tijdstip dat met de lokale offset verschoven is. Ze blijven anders
+  /// bij elke pull terugkomen als extra kopie, dus opruimen is geen luxe.
+  ///
+  /// Bewust hier en niet in een aparte migratiestap: dit is een gewone
+  /// reconcile die toevallig opmerkt dat een rij verkeerd gesleuteld is. **Dit
+  /// mag weg zodra geen enkel toestel nog een rij van vóór 21-13 kan hebben** --
+  /// laat het geen permanente steiger worden.
+  ///
+  /// Een fout hier mag de rest van de reconcile nooit blokkeren; de rijen staan
+  /// er de volgende foreground gewoon nog.
+  /// Geeft de rijen terug die de merge mag gebruiken: alles met een canonieke
+  /// sleutel, plus rijen waarvan het verwijderen mislukte (die blijven immers
+  /// gewoon bestaan).
+  Future<List<Map<String, dynamic>>> _repairNonCanonicalRideIds(
+    SupabaseClient client,
+    List<Map<String, dynamic>> cloudRows,
+    String userId,
+    List<PlannedRide> local,
+  ) async {
+    final keep = <Map<String, dynamic>>[];
+
+    for (final row in cloudRows) {
+      final storedId = row['ride_id'] as String?;
+      if (storedId == null) {
+        keep.add(row);
+        continue;
+      }
+
+      final parsed = PlannedRide.fromRow(row);
+      if (storedId == parsed.rideId) {
+        keep.add(row);
+        continue;
+      }
+
+      // Een rij van vóór 21-13 draagt zowel een verkeerde sleutel als een
+      // tijdstip dat met de lokale offset verschoven is, omdat de offsetloze
+      // string in de sessiezone werd gelezen. De lokale lijst is daarom de
+      // betrouwbare bron, niet deze rij. Bestaat er geen lokale tegenhanger,
+      // dan is er niets om op terug te vallen -- dat wordt luid gelogd in
+      // plaats van stil weggegooid.
+      final hasLocalCounterpart = local.any(
+        (r) => r.rideId == parsed.rideId || r.rideId == storedId,
+      );
+
+      try {
+        await client
+            .from(kPlannedRidesTable)
+            .delete()
+            .eq('user_id', userId)
+            .eq('ride_id', storedId);
+
+        if (hasLocalCounterpart) {
+          debugPrint(
+            'CloudSyncReconciler: planned_rides-sleutel $storedId is niet '
+            'canoniek, rij verwijderd -- de lokale kopie wordt opnieuw gepusht',
+          );
+        } else {
+          debugPrint(
+            'CloudSyncReconciler: planned_rides-rij $storedId verwijderd '
+            'ZONDER lokale tegenhanger. Inhoud: ${row['start_at']} - '
+            '${row['end_at']}, score ${row['planned_score']}. Deze rit had een '
+            'verschoven tijdstip en is niet te herstellen zonder lokale bron.',
+          );
+        }
+      } catch (error) {
+        // Verwijderen mislukt: de rij bestaat nog, dus hij hoort nog wél in de
+        // merge thuis. Volgende foreground opnieuw proberen.
+        debugPrint(
+          'CloudSyncReconciler: herstel van planned_rides-sleutel $storedId '
+          'mislukt: $error',
+        );
+        keep.add(row);
+      }
+    }
+
+    return keep;
   }
 }

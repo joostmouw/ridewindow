@@ -308,4 +308,60 @@ void main() {
       expect(signedOutRepo.readLocal(), isEmpty);
     });
   });
+
+  group('duplicaten over de UTC/lokaal-grens (plan 21-13)', () {
+    test('add() met dezelfde rit, één keer lokaal en één keer als UTC, bewaart '
+        'er één', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final r = PlannedRidesRepository(prefs);
+
+      final start = DateTime.now().add(const Duration(days: 3));
+      final end = start.add(const Duration(hours: 3));
+
+      expect(
+        start.timeZoneOffset,
+        isNot(Duration.zero),
+        reason: 'moet in een niet-UTC tijdzone draaien om iets te bewijzen',
+      );
+
+      await r.add(
+        PlannedRide(start: start, end: end, plannedScore: 100.0),
+      );
+      await r.add(
+        PlannedRide(
+          start: start.toUtc(),
+          end: end.toUtc(),
+          plannedScore: 100.0,
+        ),
+      );
+
+      expect(r.readLocal(), hasLength(1));
+    });
+
+    test('readLocal() klapt bestaande duplicaten samen tot één rit', () async {
+      // Bootst na wat er op het toestel staat: twee opgeslagen kopieën van
+      // dezelfde rit, één lokaal geschreven en één uit de cloud gekomen.
+      final start = DateTime.now().add(const Duration(days: 3));
+      final end = start.add(const Duration(hours: 3));
+      SharedPreferences.setMockInitialValues({
+        'planned_rides': jsonEncode([
+          {
+            'start': start.toIso8601String(),
+            'end': end.toIso8601String(),
+            'plannedScore': 100.0,
+          },
+          {
+            'start': start.toUtc().toIso8601String(),
+            'end': end.toUtc().toIso8601String(),
+            'plannedScore': 100.0,
+          },
+        ]),
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final r = PlannedRidesRepository(prefs);
+
+      expect(r.readLocal(), hasLength(1));
+    });
+  });
 }

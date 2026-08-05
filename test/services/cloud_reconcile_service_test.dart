@@ -135,5 +135,49 @@ void main() {
       expect(result.merged.map((r) => r.rideId).toList(), [x.rideId]);
       expect(result.localOnly, isEmpty);
     });
+
+    // Plan 21-13. De `ride()`-helper hierboven bouwt beide kanten met een
+    // offsetloze string, dus lokaal én "cloud" zijn allebei lokale DateTimes en
+    // de splitsing kán zich in die tests niet voordoen. Deze test haalt de
+    // cloud-kant door de echte parse-route heen.
+    test('dezelfde rit, lokaal en teruggelezen uit Postgres, smelt samen tot één',
+        () {
+      final local = PlannedRide(
+        start: DateTime(2026, 8, 11, 9),
+        end: DateTime(2026, 8, 11, 11),
+        plannedScore: 75.0,
+      );
+
+      expect(
+        local.start.timeZoneOffset,
+        isNot(Duration.zero),
+        reason: 'moet in een niet-UTC tijdzone draaien om iets te bewijzen',
+      );
+
+      // Zoals PostgREST een timestamptz teruggeeft: UTC, met expliciete offset.
+      final fromCloud = PlannedRide.fromRow({
+        'user_id': 'uid-1',
+        'ride_id': local.rideId,
+        'start_at':
+            local.start.toUtc().toIso8601String().replaceFirst('Z', '+00:00'),
+        'end_at':
+            local.end.toUtc().toIso8601String().replaceFirst('Z', '+00:00'),
+        'planned_score': 75.0,
+      });
+
+      final result =
+          service.mergePlannedRides(local: [local], cloud: [fromCloud]);
+
+      expect(
+        result.merged,
+        hasLength(1),
+        reason: 'één rit die door de cloud is geweest blijft één rit',
+      );
+      expect(
+        result.localOnly,
+        isEmpty,
+        reason: 'de rit staat al in de cloud, dus er valt niets te pushen',
+      );
+    });
   });
 }
