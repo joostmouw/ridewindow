@@ -449,3 +449,33 @@ beschrijft: lokaal `2026-08-08T12-00-00-000`, uit Postgres teruggelezen `2026-08
 ### §2 — nog open
 
 Alleen de uitlog-ronde (uitloggen → agendakoppeling blijft intact per D-12 → weer inloggen).
+
+### §5b — vastgelegde "voor"-toestand, 2026-08-05 21:22, app 1.0.19+20 (Play)
+
+Screenshot: `~/Documents/O+ Connect/Screenshot_2026-08-05-21-22-35-88_...jpg` (niet in de repo —
+publieke repository, dus persoonlijke schermafdrukken blijven erbuiten).
+
+Home's PLANNED-sectie toont **vier** kaarten voor **twee** ritten:
+
+| Rit | Kaarten |
+|-----|---------|
+| Saturday 12:00–15:00 · 3u · Perfect | 2 |
+| Sunday 08:00–10:00 · 2u · Perfect | 2 |
+
+Twee dingen die dit toevoegt aan de diagnose van plan 21-13:
+
+1. **Het treft elke rit, niet één legacy-geval.** De zondagrit is ná 20:56 gepland (om 20:56
+   toonde "My Rides" alleen het zaterdagpaar) en dupliceerde meteen mee. De bug zit dus in het
+   normale pad, niet in oude data.
+2. **Het blijft staan op precies twee per rit.** Geen groei over meerdere foreground-cycli heen.
+   Dat is wat de diagnose voorspelt: zodra beide sleutels — de lokale en de uit Postgres
+   teruggelezen UTC-variant — in de lokale lijst staan, voegt `putIfAbsent` in de union-merge er
+   niets meer aan toe. Onbegrensde vermenigvuldiging zou op een ander mechanisme wijzen en de
+   21-13-verklaring ondermijnen.
+
+Deze toestand is de meetlat voor §5b: na installatie van 1.0.20+21 moeten dit vier kaarten → twee
+kaarten worden, en moet `planned_rides` per rit één rij houden.
+
+**Let op bij het beoordelen:** het toestel draait op het moment van deze screenshot nog de
+Play-build 1.0.19+20 van 2026-08-04 19:50. Dit is dus het verwachte gedrag van vóór de fix, geen
+bewijs dat 21-13 niet werkt.
