@@ -544,3 +544,29 @@ gebruiker dit".
 
 §5b's dashboardcontrole, §2's uitlog-ronde, §3 (iPhone), §4 (koude start), §5 (multi-tab),
 §6 (account verwijderen).
+
+### Open punt uit sessie 5 — 21-13's cloud-reparatie is niet geoefend
+
+`_repairNonCanonicalRideIds` heeft in deze sessie **geen enkele keer gelogd**, terwijl het bij elke
+niet-canonieke rij een regel hoort te schrijven. Uitgezocht wat dat betekent:
+
+Om 21:2x toonde het dashboard **4 rijen** in `planned_rides`. Om 22:53, na de verse installatie,
+kwamen er **2 ritten** terug. De twee spookritten waren dus al weg uit de cloud vóór de sideload.
+
+Dat is te herleiden. Zouden de spookrijen er nog gestaan hebben, dan waren er maar twee
+mogelijkheden geweest, en beide zijn uitgesloten door wat we zagen:
+
+1. Hun `ride_id` was niet-canoniek → de reparatie was gelopen en had gelogd. Er is niets gelogd.
+2. Hun `ride_id` was wél canoniek → ze waren gewoon opgehaald en hadden als kaarten van 14:00 en
+   10:00 in beeld gestaan. Die stonden er niet.
+
+Conclusie: Joosts handmatige deletes van eerder op de avond **hebben de cloud wél bereikt**. Wat
+telkens terugkwam was de lokale kopie, opgewekt door de pull die vóór de delete liep — precies de
+lus die plan 21-14 dicht. Toen de lokale database bij de sideload verdween, was er niets meer om
+de rijen opnieuw omhoog te duwen, en bleef de cloud schoon.
+
+**Gevolg voor de aftekening:** dit bevestigt 21-14's diagnose van een andere kant, maar het
+betekent ook dat 21-13's cloud-reparatiepad **niet op een toestel geoefend is** — er was niets
+meer te repareren. Die code is alleen door unit-tests gedekt. Dat is geen blokkade (het pad is
+per definitie een eenmalige opruiming voor rijen van vóór 21-13, en die zijn er niet meer), maar
+het hoort niet als "bewezen" te worden weggeschreven.
