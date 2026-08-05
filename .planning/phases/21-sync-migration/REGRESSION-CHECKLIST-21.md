@@ -116,6 +116,21 @@ so this is a hard prerequisite, not an optional nicety.
       > plan 21-10 wired `drain()` to a caller — section 5a below cannot pass against it, and
       > testing it would reproduce this phase's own versionCode false start. Verify the
       > installed build reports 1.0.15+16 before interpreting any behaviour (see section 2).
+> **De gewone Play Store-pagina van de app is NIET de route — vastgesteld 2026-08-05 22:32.**
+> Joosts account zit in de bestaande **closed test**, en de app-pagina serveert daarom de
+> Early-Access-listing ("You've got early access to this app", *Last updated Jul 26, 2026*). Er
+> verschijnt dan geen Update-knop, ook niet ná een geforceerde herstart van de Play Store, ook niet
+> als de internal-testing-release allang uitgerold is. Dat is geen vertraging en geen cache.
+>
+> Gebruik altijd de **opt-in-link van de internal test**: Play Console → Testing → Internal testing
+> → tabblad **Testers** → **Copy link** (`https://play.google.com/apps/internaltest/...`). Open die
+> op het toestel, bevestig deelname, en volg "Download it on Google Play". Zo zijn versies 20 en 21
+> er ook op gekomen.
+>
+> Dit is de derde keer dat de track-keuze tijd kost: op 2026-08-04 serveerde Play versionCode 13
+> (de closed-test-build van 26 juli) terwijl er internal-testing-builds klaarstonden, wat ~40
+> minuten serverdiagnose opleverde voor een probleem dat geen serverprobleem was.
+
 - [ ] Wait for it to finish processing, then copy the internal-testing opt-in/download link.
 - [ ] On the Android test device, install **via that Play Store link** — not the local APK,
       not `adb install`.
