@@ -189,9 +189,12 @@ open) and is folded in here rather than left as a separate outstanding item.
         `migrate_account_data` (e.g. "could not choose a best candidate function" or an
         argument-type/count mismatch), which is the concrete proof of a signature defect, not an
         auth defect.
-- [ ] **"Voeg toe aan agenda"** — open a Ride Detail screen and tap "Voeg toe aan agenda". Open
+- [x] **"Voeg toe aan agenda"** — open a Ride Detail screen and tap "Voeg toe aan agenda". Open
       the real Google Calendar app (or agenda.google.com) and confirm the event exists with the
       correct start/end time and the weather summary in the description.
+      *(Afgetekend 2026-08-05: event staat correct in Google Calendar. Let op de nevenwaarneming —
+      één agenda-event tegenover twee ritkaarten in de app, wat bevestigt dat de duplicatie uit
+      plan 21-13 pas bij de cloud-reconcile ontstaat en niet bij de tik zelf.)*
 - [ ] **Sign out** — tap "Uitloggen" in the Account section, confirm the dialog. Note: returns to
       the signed-out view, and the calendar connection (if separately connected) stays intact per
       D-12.

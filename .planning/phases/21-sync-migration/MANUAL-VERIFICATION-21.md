@@ -434,3 +434,18 @@ aantoonbaar een tweede blinde tik voorkomen (abort in plaats van tik).
 
 §2's agenda-event en uitlog-ronde, §3 (iPhone-PWA + SYNC-04), §4 (koude start), §5 (multi-tab),
 §6 (delete-account).
+
+### §2 — "Voeg toe aan agenda": **PASS** (2026-08-05)
+
+Event staat correct in Google Calendar, met de juiste start/eindtijd.
+
+**Nevenwaarneming die de 21-13-diagnose scherper maakt:** de tik leverde **één** agenda-event op,
+terwijl "My Rides" op dat moment **twee** identieke kaarten toonde (Saturday 8 Aug, 12:00-15:00,
+100 Perfect, beide met dezelfde weerregel). De agenda-schrijfactie gebeurt eenmalig op het moment
+van tikken; de duplicatie ontstaat pas daarna, in de cloud-reconcile. Dat sluit een dubbele
+tap/dubbele handler-aanroep uit als oorzaak en past exact bij de rideId-splitsing die plan 21-13
+beschrijft: lokaal `2026-08-08T12-00-00-000`, uit Postgres teruggelezen `2026-08-08T12-00-00-000Z`.
+
+### §2 — nog open
+
+Alleen de uitlog-ronde (uitloggen → agendakoppeling blijft intact per D-12 → weer inloggen).
