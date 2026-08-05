@@ -354,6 +354,38 @@ pre-existing wedged row cannot block the account forever.
       post-sign-in drain trigger in `AccountSection._runAccountSync()` independently of the
       foreground trigger above.
 
+## 5b. SYNC-03 — één geplande rit blijft één rit (plan 21-13)
+
+Gevonden op toestel 2026-08-05: één tik op "Schedule" leverde twee identieke kaarten in
+"My Rides" (Saturday 8 Aug, 12:00–15:00, 100 Perfect, tweemaal). `rideId` werd afgeleid uit de
+lokale ISO-string, en alles wat door de `timestamptz`-kolom gaat komt als UTC terug — twee
+sleutels voor dezelfde rit, dus de union-merge hield ze allebei.
+
+> **Lees dit vóór je oordeelt.** De duplicaten zijn echte data, lokaal én in
+> `public.planned_rides`, en er zit een tweede fout onder: rijen van vóór 21-13 zijn opgeslagen
+> met een tijdstip dat de lokale offset verschoven is (een offsetloze string werd door Postgres
+> in de sessiezone gelezen). Een build die alleen stopt met nieuwe duplicaten maken, toont dus
+> nog steeds twee kaarten tot de reparatie heeft gedraaid. **Beoordeel op convergentie na een
+> foreground-cyclus, niet op het eerste scherm na installatie.**
+
+- [ ] Open "My Rides" direct na installatie. Noteer wat je ziet — één of twee kaarten voor de
+      Saturday 8 Aug-rit. Eén kaart mag al meteen: `readLocal()` klapt lokale duplicaten samen
+      zonder netwerk.
+- [ ] Breng de app naar de achtergrond en weer naar de voorgrond (dat draait de reconcile), en
+      controleer in `adb logcat` op de regel
+      `CloudSyncReconciler: herstelde planned_rides-sleutel ... -> ...` of
+      `... niet canoniek, rij verwijderd`. Die regel is het bewijs dat de reparatie gelopen heeft.
+- [ ] Open de Supabase Dashboard → Table Editor → `planned_rides` en bevestig dat er voor deze
+      gebruiker **precies één** rij voor die rit staat, met een `ride_id` dat op `Z` eindigt.
+- [ ] Controleer dat `start_at` het júiste tijdstip bevat: voor een rit van 12:00 lokale tijd in
+      de zomer moet daar 10:00 UTC staan, niet 12:00 UTC. Stond er 12:00, dan is de verschoven
+      waarde blijven staan en is de reparatie niet gelopen.
+- [ ] Plan een verse rit, background/foreground de app drie keer, en bevestig dat er nooit een
+      tweede kaart bijkomt.
+- [ ] Let in logcat op `planned_rides-rij ... verwijderd ZONDER lokale tegenhanger`. Die regel
+      hoort er niet te staan; verschijnt hij toch, noteer de gelogde inhoud — dat is een rit die
+      alleen in de cloud stond en niet te herstellen was.
+
 ## 6. AUTH-09 — delete-account, verified against the deployed project (plan 21-08 Task 2, folded in)
 
 > **Laatste item, en dat is geen blokkade maar volgorde.** Deze sectie vernietigt het
