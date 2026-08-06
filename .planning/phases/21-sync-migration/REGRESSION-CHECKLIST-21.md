@@ -383,18 +383,24 @@ sleutels voor dezelfde rit, dus de union-merge hield ze allebei.
 > nog steeds twee kaarten tot de reparatie heeft gedraaid. **Beoordeel op convergentie na een
 > foreground-cyclus, niet op het eerste scherm na installatie.**
 
-- [ ] Open "My Rides" direct na installatie. Noteer wat je ziet — één of twee kaarten voor de
+- [x] Open "My Rides" direct na installatie. Noteer wat je ziet — één of twee kaarten voor de
       Saturday 8 Aug-rit. Eén kaart mag al meteen: `readLocal()` klapt lokale duplicaten samen
       zonder netwerk.
+      *(Afgetekend 2026-08-05, sessie 5: verse installatie, alles uit de cloud gehaald, twee
+      ritten in PLANNED en geen enkele duplicaat. Sterkere vorm dan hier gevraagd — er was geen
+      lokale staat die het resultaat kon maskeren.)*
 - [ ] Breng de app naar de achtergrond en weer naar de voorgrond (dat draait de reconcile), en
       controleer in `adb logcat` op de regel
       `CloudSyncReconciler: herstelde planned_rides-sleutel ... -> ...` of
       `... niet canoniek, rij verwijderd`. Die regel is het bewijs dat de reparatie gelopen heeft.
-- [ ] Open de Supabase Dashboard → Table Editor → `planned_rides` en bevestig dat er voor deze
+- [x] Open de Supabase Dashboard → Table Editor → `planned_rides` en bevestig dat er voor deze
       gebruiker **precies één** rij voor die rit staat, met een `ride_id` dat op `Z` eindigt.
-- [ ] Controleer dat `start_at` het júiste tijdstip bevat: voor een rit van 12:00 lokale tijd in
+      *(Afgetekend 2026-08-06 via SQL Editor: één rij, `ride_id = 2026-08-08T10-00-00-000Z`.)*
+- [x] Controleer dat `start_at` het júiste tijdstip bevat: voor een rit van 12:00 lokale tijd in
       de zomer moet daar 10:00 UTC staan, niet 12:00 UTC. Stond er 12:00, dan is de verschoven
       waarde blijven staan en is de reparatie niet gelopen.
+      *(Afgetekend 2026-08-06: `start_at = 2026-08-08 10:00:00+00`, `end_at = 13:00:00+00` —
+      exact 12:00-15:00 lokale tijd. Sleutel én tijdstip kloppen dus allebei.)*
 - [ ] Plan een verse rit, background/foreground de app drie keer, en bevestig dat er nooit een
       tweede kaart bijkomt.
 - [ ] Let in logcat op `planned_rides-rij ... verwijderd ZONDER lokale tegenhanger`. Die regel

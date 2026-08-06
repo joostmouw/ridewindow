@@ -570,3 +570,24 @@ betekent ook dat 21-13's cloud-reparatiepad **niet op een toestel geoefend is** 
 meer te repareren. Die code is alleen door unit-tests gedekt. Dat is geen blokkade (het pad is
 per definitie een eenmalige opruiming voor rijen van vóór 21-13, en die zijn er niet meer), maar
 het hoort niet als "bewezen" te worden weggeschreven.
+
+### §5b — dashboardbevestiging, 2026-08-06: **PASS**
+
+`select ride_id, start_at, end_at, planned_score from planned_rides order by start_at;`
+
+```
+ride_id                     start_at                end_at                  planned_score
+2026-08-08T10-00-00-000Z    2026-08-08 10:00:00+00  2026-08-08 13:00:00+00  100
+```
+
+Eén rij, en alle vier de eigenschappen die plan 21-13 voorspelt kloppen:
+
+- `ride_id` eindigt op `Z` — de sleutel komt uit de UTC-instant, niet uit de lokale ISO-string
+- `ride_id` codeert **10:00**, niet 12:00 — dus geen lokale klokwaarde in de sleutel
+- `start_at` = 10:00 UTC = 12:00 lokale zomertijd, `end_at` = 13:00 UTC = 15:00 lokaal — het
+  tijdstip is niet meer verschoven
+- geen tweede rij
+
+Daarmee is §5b volledig afgetekend: de duplicaat is weg **en** het opgeslagen tijdstip klopt. Dat
+onderscheid was het hele punt — een fix die alleen de sleutel repareerde zou hier 12:00 UTC hebben
+laten staan.
