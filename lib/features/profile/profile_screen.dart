@@ -214,12 +214,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _showDebugMenu(BuildContext context) {
     final s = S.of(context);
+    // `isScrollControlled` + een scrollende body (gevonden op toestel
+    // 2026-08-06): zonder deze twee klapt de sheet dicht op de standaardhoogte
+    // van een halve viewport en valt het laatste item — "Inspect sync outbox" —
+    // buiten beeld, onbereikbaar. Uitgerekend het item dat een vastgelopen
+    // outbox moet kunnen diagnosticeren was daardoor niet te openen.
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
@@ -279,16 +286,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 );
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.outbox),
-              title: Text(s.debugOutbox),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _showOutboxSheet(context);
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
+              ListTile(
+                leading: const Icon(Icons.outbox),
+                title: Text(s.debugOutbox),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _showOutboxSheet(context);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );

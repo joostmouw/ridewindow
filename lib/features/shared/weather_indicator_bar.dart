@@ -131,14 +131,20 @@ class WeatherIndicatorBar extends StatelessWidget {
 
   void _showInfo(BuildContext context) {
     final rw = context.rw;
+    // Zelfde behandeling als het debugmenu (2026-08-06): een sheet zonder
+    // `isScrollControlled` en zonder scrollende body knipt zijn onderkant af
+    // zodra de inhoud niet past. Hier is de tekst vertaald en dus van
+    // variabele lengte, wat dat risico reëel maakt.
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      isScrollControlled: true,
+      builder: (ctx) => SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               children: [
                 Icon(icon, size: 20, color: rw.scorePerfect),
@@ -149,12 +155,14 @@ class WeatherIndicatorBar extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              infoText!,
-              style: TextStyle(fontSize: 14, color: rw.textSecondary, height: 1.5),
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text(
+                infoText!,
+                style:
+                    TextStyle(fontSize: 14, color: rw.textSecondary, height: 1.5),
+              ),
+            ],
+          ),
         ),
       ),
     );
