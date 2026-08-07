@@ -51,7 +51,13 @@ intact** (D-03 — dat is het vinkje dat nooit mag breken).
 ### 4. Afsluiten
 
 Eén Play-installatie van de laatste build, zodat de fase eindigt op de distributieroute die
-gebruikers krijgen. Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de
+gebruikers krijgen.
+
+**De AAB staat klaar:** `build/app/outputs/bundle/release/app-release.aab`, versie **1.0.22 (23)**,
+gebouwd 2026-08-07 12:26. Version code 23 is vrij (Play staat op 20). Uploaden is handwerk in Play
+Console — er is geen service account, geen fastlane en geen Play-workflow in dit project, alleen de
+webdeploy is geautomatiseerd. Ruim bij het aanmaken van de release eerst de lege "Untitled"-draft
+op, anders laat Play je geen tweede draft maken. Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de
 fase-verificatie.
 
 ---
@@ -64,8 +70,7 @@ fase-verificatie.
   `lib/`, `web/`, `pubspec.*` en `firebase.json`, en `.planning/**` staat daar bewust niet bij. Een
   verse deploy forceer je via `workflow_dispatch` in de Actions-tab.
 - **Untitled draft-release** op de internal testing track in Play Console — leeg, zonder version
-  code. Doet geen kwaad, maar het is precies zo'n restje dat je over een maand doet twijfelen of
-  er iets niet uitgerold is. Verwijderen als je er toch bent.
+  code. Moet weg vóór stap 4: Play laat geen tweede draft naast een bestaande aanmaken.
 
 ---
 
