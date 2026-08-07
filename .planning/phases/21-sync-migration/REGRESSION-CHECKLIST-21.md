@@ -249,19 +249,31 @@ Chrome's "Zet op beginscherm" (which produces a real WebAPK) — not a desktop b
 emulator. Reused from `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` §2, combined here with
 SYNC-04's cross-device check.
 
-- [ ] **Install** — open the PWA URL in Chrome on Android, use "Zet op beginscherm" / "Installeer
+- [x] **Install** — open the PWA URL in Chrome on Android, use "Zet op beginscherm" / "Installeer
       app". Note: the correct app icon appears on the home screen, distinct from the native app's
       icon if both are installed.
-- [ ] **Open standalone** — open the PWA from its home-screen icon. Note: no Chrome address bar
+      *(PASS 2026-08-07. Chrome bood "Install and create shortcut" aan — dat verschijnt alleen bij
+      een manifest dat de installability-criteria haalt. Resultaat: pakket
+      `org.chromium.webapk.a5a380363e216c9c6_v2`, firstInstallTime 12:29:25. Echte WebAPK.)*
+- [x] **Open standalone** — open the PWA from its home-screen icon. Note: no Chrome address bar
       visible (standalone mode), opens on the Home screen.
-- [ ] **Navigate** — move between Home, a Ride Detail screen, and Profile. Note: no dead
+      *(PASS 2026-08-07. Vensterfocus `…webapps.SameTaskWebApkActivity`, niet `ChromeTabbedActivity`
+      — een ander venstertype, dus sterker bewijs dan een screenshot.)*
+- [x] **Navigate** — move between Home, a Ride Detail screen, and Profile. Note: no dead
       navigation ends, back buttons work, no white page on a route change.
+      *(PASS 2026-08-07. Home → Profiel → Home → Ride Detail → terug. Geen dood eind, geen witte
+      pagina.)*
 - [ ] **Sign in with the SAME account used on Android in section 2** — tap the rendered Google
       button (`renderButton()`, D-05/D-06 — deliberately different look from the native app's
       ListTile) in the Account section, complete the flow. Note: signed-in view appears with no
       error, and the values you set in section 1 (which now live in the cloud from section 2's
       migration) appear correctly on this second surface — this is the pull side of a normal
       (non-first-login) reconcile.
+      *(PASS 2026-08-07, met kanttekening. `Joost / joostmouw@gmail.com / Synced`; de WebAPK erft
+      Chromes opslag voor het domein, dus er was geen nieuwe login nodig. **Maar de PLANNED-lijst
+      was bij de eerste start leeg** en vulde zich pas na één achtergrond→voorgrond-cyclus — zie de
+      nieuwe bevinding in MANUAL-VERIFICATION-21.md, device session 7. De pull-kant werkt dus, maar
+      niet bij het laden.)*
 - [x] **SYNC-04 — cross-device propagation** — **PASS, 2026-08-07.** The two surfaces are the
       native Android app and the PWA. On the native app (still signed in), change one availability
       hour or plan a ride; background it; bring the PWA to the foreground and confirm the change
@@ -269,8 +281,10 @@ SYNC-04's cross-device check.
       ride replaced the stale July one. See `MANUAL-VERIFICATION-21.md`, "Web-sessie, vervolg —
       2026-08-07". Note that a *real* foreground transition is required — a simulated activation
       leaves `document.visibilityState` on `hidden` and proves nothing.
-- [ ] **"Voeg toe aan agenda"** — open a Ride Detail screen in the PWA and tap "Voeg toe aan
+- [x] **"Voeg toe aan agenda"** — open a Ride Detail screen in the PWA and tap "Voeg toe aan
       agenda". Confirm in the real Google Calendar that the event appears.
+      *(PASS 2026-08-07. Event "Fietsrit 06:00–08:00" staat op zaterdag 8 augustus in de echte
+      Google Calendar, naast de "Fietsrit 12:00–15:00" van de eerdere native test.)*
 
 **Uitgesteld naar v2 (niet afgetekend, niet vervallen):** installatie en standalone gedrag van de
 PWA op iOS/Safari. Hoort bij de iOS-scope van v2.

@@ -761,3 +761,66 @@ mee. Dat zijn twee onafhankelijke autorisaties en ze gedragen zich ook zo.
 - §4 — koude start meten (REG-03)
 - §6 — account verwijderen (AUTH-09), als laatste
 - Afsluitende Play-installatie
+
+---
+
+## Device session 7 — 2026-08-07 12:27-12:40, §3 op de PWA, WebAPK 1.0.22+23
+
+Zelfde methode als sessie 6 (`adb` + `uiautomator` + `input tap`), met één aanvulling die er
+inhoudelijk toe doet: **Flutter-web publiceert zijn semantics-boom pas nadat je Flutters eigen
+"Enable accessibility"-knop hebt aangetikt.** Zolang die uit staat ziet `uiautomator` precies één
+node, en dan lijkt élk scherm leeg. Dat is een valkuil die makkelijk voor een bevinding wordt
+aangezien — het is mij vandaag één keer overkomen (zie hieronder) en de controle ving het.
+Op een koude start staat de boom altijd weer uit; gebruik daar een **screenshot**, die is passief.
+
+### §3 — installatie: **PASS**
+
+| Stap | Waarneming |
+|---|---|
+| Installeerbaar | Chrome bood "Install and create shortcut" aan — dat verschijnt alleen als het manifest de installability-criteria haalt |
+| Geïnstalleerd | nieuw pakket `org.chromium.webapk.a5a380363e216c9c6_v2`, `firstInstallTime` 2026-08-07 12:29:25 — een **echte WebAPK**, geen bladwijzer |
+| Standalone | vensterfocus `com.android.chrome/…webapps.SameTaskWebApkActivity`, niet `ChromeTabbedActivity` — geen adresbalk, en dit is een sterker bewijs dan een screenshot omdat het een ander venstertype is |
+| Navigatie | Home → Profiel → Home → Ride Detail → terug: geen dood eind, geen witte pagina |
+| Ingelogd | `Joost / joostmouw@gmail.com / Synced`. De WebAPK erft de opslag van Chrome voor dat domein, dus er was geen nieuwe login nodig |
+| "Voeg toe aan agenda" | **geverifieerd in de echte agenda**: event "Fietsrit 06:00–08:00" staat op zaterdag 8 augustus, naast de "Fietsrit 12:00–15:00" van de eerdere native test |
+
+De ritkaarten op de PWA kwamen exact overeen met die op de native app (Saturday 07:00–09:00 en
+12:00–15:00), dus de cross-surface-controle uit §3 klopt ook aan deze kant.
+
+### **Nieuwe bevinding — een verse installatie haalt geplande ritten niet op tot je hem eenmaal wegzet**
+
+Dit is de opbrengst van §3, en precies de reden om de sectie niet te laten vervallen.
+
+| Toestand | PLANNED-sectie |
+|---|---|
+| Verse WebAPK, eerste start, lege lokale opslag, wél een geldige sessie | **leeg** |
+| Zelfde app, na één achtergrond → voorgrond-cyclus | **beide ritten** |
+| Zelfde app, koude start (force-stop + opnieuw), nu mét lokale data | **beide ritten, meteen** |
+
+Geen kwestie van te kort wachten: bij de eerste start had de app ruim een halve minuut gedraaid en
+was ik ondertussen naar Profiel en terug genavigeerd. De derde regel is de discriminator — koude
+start is niet het probleem, **lege lokale opslag** is het.
+
+**Wat dit betekent.** De pull van planned rides hangt uitsluitend aan de voorgrond-reconcile. Bij een
+normale login (`lastSyncedUid` staat al) draait de eerste-login-migratie niet, en de initiële load
+telt niet als voorgrond-overgang. Een gebruiker die de PWA op een nieuw toestel installeert en opent,
+ziet dus een lege PLANNED-lijst en concludeert redelijkerwijs dat de sync stuk is.
+
+**Dit is de grondoorzaak van de web-sessie van 2026-08-06/07.** Die vond wel het symptoom (de
+telefoon had een oude offsetloze julirit) en sloot zeven kandidaten uit, maar landde op "er was
+nooit een voorgrond-overgang". Dat klopte, maar het is de helft: de echte vraag is waarom een
+oppervlak dat een geldige sessie heeft en de cloud aantoonbaar kan lezen, niet uit zichzelf pullt
+bij het laden. Die vraag is nu beantwoord.
+
+**Nog niet vastgesteld:** of dit ook de native app raakt bij een verse installatie met lege lokale
+opslag. MIG-02 (device session 5) dekte "leeg lokaal + gevulde cloud" en slaagde daar — maar dat
+liep via een échte eerste login op dat toestel, dus via het migratiepad, niet via dit pad. Het
+verschil is precies `lastSyncedUid`.
+
+### Correctie binnen deze sessie
+
+Na de force-stop-proef las ik "GEEN PLANNED-sectie" uit een `uiautomator`-dump en stond op het punt
+dat als een tweede bevinding op te schrijven. De dump bevatte in werkelijkheid alleen
+`Enable accessibility` — de semantics-boom stond na de herstart weer uit. Het screenshot liet zien
+dat beide ritten er gewoon stonden, en de conclusie draaide 180 graden om. Vierde keer in deze fase
+dat de meetopstelling bijna een bevinding produceerde.
