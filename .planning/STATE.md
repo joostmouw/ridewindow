@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: web groen; 5 toestelstappen open"
-last_updated: "2026-08-07T10:20:00.000Z"
+status: "Fase 21: §2+§3 groen; bevinding #61 open"
+last_updated: "2026-08-07T12:50:00.000Z"
 last_activity: 2026-08-07
 progress:
   total_phases: 5
