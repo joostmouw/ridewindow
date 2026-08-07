@@ -210,9 +210,16 @@ open) and is folded in here rather than left as a separate outstanding item.
       *(Afgetekend 2026-08-05: event staat correct in Google Calendar. Let op de nevenwaarneming —
       één agenda-event tegenover twee ritkaarten in de app, wat bevestigt dat de duplicatie uit
       plan 21-13 pas bij de cloud-reconcile ontstaat en niet bij de tik zelf.)*
-- [ ] **Sign out** — tap "Uitloggen" in the Account section, confirm the dialog. Note: returns to
+- [x] **Sign out** — tap "Uitloggen" in the Account section, confirm the dialog. Note: returns to
       the signed-out view, and the calendar connection (if separately connected) stays intact per
       D-12.
+      *(Afgetekend 2026-08-07, gedreven via adb op de PLG110, app 1.0.21+22. Vóór: Account
+      `Joost / joostmouw@gmail.com / Synced`, Google Calendar **Connected**. Na uitloggen: Account
+      toont "Sign in with Google", en Google Calendar staat onveranderd op **Connected** met een
+      actieve "Disconnect"-knop — **D-12 PASS**. Ook naam "Joost", RIDE LENGTH en de
+      notificatie-instellingen bleven staan. Opnieuw ingelogd op hetzelfde account: "Synced", geen
+      foutmelding, en beide geplande ritten stonden nog op Home. Zie MANUAL-VERIFICATION-21.md,
+      device session 6.)*
 - [x] **Restart → still signed in** — sign back in, fully kill the app (swipe from recent apps,
       not just backgrounding), reopen it. Note: the Account section shows the signed-in state
       immediately, no flash of "signed out" first (AUTH-04).

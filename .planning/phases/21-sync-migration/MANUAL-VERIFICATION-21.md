@@ -703,3 +703,61 @@ vingerbeweging rust, is geen waarneming maar een vermoeden.
 Hiermee is SYNC-04 aangetoond op de webkant. Wat §3 daarnaast nog vroeg — installatie vanaf een
 iPhone via Safari — vervalt: zie de herschreven §3 in `REGRESSION-CHECKLIST-21.md`, waar iOS
 expliciet naar v2 is uitgesteld op grond van de Android-only-constraint in `CLAUDE.md`.
+
+---
+
+## Device session 6 — 2026-08-07 ~12:15, Oppo Find X9 Pro (PLG110), app 1.0.21+22 (sideload)
+
+**Methode, en waarom die deugt.** Gedreven vanaf de Mac over `adb`: `uiautomator dump` voor het
+uitlezen van de werkelijk gerenderde view-hiërarchie, `input tap` / `input swipe` voor de bediening.
+
+Dat is nadrukkelijk iets anders dan de webproeven die eerder in deze fase ongeldig bleken. `input
+tap` genereert een echt invoerevent op OS-niveau — het toestel kan niet zien dat er geen vinger aan
+te pas kwam — en `uiautomator` leest af wat er daadwerkelijk op het scherm staat, niet wat de code
+zegt dat er zou moeten staan. Waar de CDP-screenshot een tabblad níet activeerde, activeert deze
+methode de app wél. Schermafbeeldingen van elke stap staan in de scratchpad van die sessie.
+
+### Correctie op de aanname over de buildversie
+
+`MORGEN.md` meldde 1.0.22+23 op het toestel. Gemeten via `dumpsys package`: **1.0.21+22**, en het
+Version-blok in Profiel bevestigt "1.0.21 (22)". Het getal 1.0.22+23 sloeg op de PWA en op de
+bottom-sheet-fix, niet op wat er als APK geïnstalleerd staat. Afgeleid in plaats van gemeten;
+rechtgezet.
+
+### Correctie op de aanname over de agendakoppeling
+
+`MORGEN.md` meldde Google Calendar op "Not connected", met als verklaring dat de sideload de
+OAuth-grant meenam. Gemeten: **Connected**, met een actieve "Disconnect"-knop. Stap 1 van de
+overdracht was dus overbodig. Waarom de eerdere lezing anders was, is niet vast te stellen zonder
+het moment zelf; wat telt is dat er wél iets te behouden viel, dus dat de D-12-toets zinvol was.
+
+### §2 — SYNC-04, cross-surface web → native: **PASS** (nevenwaarneming)
+
+Bij het openen van de app stonden onder PLANNED **beide** ritten: Saturday 07:00–09:00 en
+12:00–15:00. De eerste is door mij in een desktop-webtabblad aangemaakt. De native app heeft die
+dus opgepikt — propagatie van web naar native, in dezelfde richting die §3 vroeg maar dan tussen de
+twee oppervlakken die v1 werkelijk uitbrengt.
+
+### §2 — uitlog-ronde (D-12): **PASS**
+
+| Moment | Account | Google Calendar |
+|---|---|---|
+| Vóór | `Joost / joostmouw@gmail.com / Synced` | **Connected** (+ Disconnect-knop) |
+| Na uitloggen | "Sign in with Google" | **Connected** (+ Disconnect-knop) |
+| Na opnieuw inloggen | `Joost / joostmouw@gmail.com / Synced` | onveranderd |
+
+De bevestigingsdialoog zegt "Your data on this device stays exactly as it is. You can always sign
+in again." — en dat klopte: naam "Joost", RIDE LENGTH en de drie notificatie-instellingen stonden
+er na het uitloggen nog. Beide geplande ritten stonden na de her-login nog op Home.
+
+**Daarmee is D-12 aangetoond:** uitloggen uit het account sleept de Google Calendar-koppeling niet
+mee. Dat zijn twee onafhankelijke autorisaties en ze gedragen zich ook zo.
+
+**§2 is hiermee compleet.**
+
+### Nog open na deze sessie
+
+- §3 — PWA installeren via "Zet op beginscherm" (nieuwe, herschreven vorm)
+- §4 — koude start meten (REG-03)
+- §6 — account verwijderen (AUTH-09), als laatste
+- Afsluitende Play-installatie
