@@ -48,6 +48,7 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 58 | **Agenda-events staan altijd in het Nederlands, ongeacht de app-taal** — gevonden op toestel 2026-08-05: de app draaide in het Engels, maar het aangemaakte Google Calendar-event heette "Fietsrit 12:00–15:00" met omschrijving "~24°C, droog, 7km/u wind". Twee hardcoded plekken in `lib/services/calendar_service.dart`: de titel op regel ~188 (`'Fietsrit ...'`) en `buildWeatherSummary()` (`'droog'`, `'km/u wind'`, `'Geen weerdata beschikbaar'`). Geen van beide loopt via de l10n-laag, terwijl de rest van de app EN/NL-pariteit heeft (380/380 sleutels). **Waarom dit is blijven liggen is het interessante deel:** `buildWeatherSummary` is bewust een `static` pure functie zonder `BuildContext` — precies wat hem makkelijk unit-testbaar maakte (`calendar_service_test.dart` test hem direct) — en precies daardoor is hij nooit langs `AppLocalizations` gekomen. Dezelfde eigenschap die de test mogelijk maakte, hield de vertaling buiten de deur. **Fix:** de opgemaakte strings als parameters injecteren of een `S`-instantie meegeven aan de aanroeper, zodat de functie puur blijft én vertaald wordt; de bestaande tests kunnen dan met een expliciete vertaaltabel draaien in plaats van met de Nederlandse literals | MEDIUM | S | Backlog |
 | 59 | **Agenda-events gebruiken een hardcoded `Europe/Amsterdam`** — `calendar_service.dart:197` en `:201` zetten `EventDateTime(timeZone: 'Europe/Amsterdam')` vast. Voor een gebruiker buiten die zone komt het event op het verkeerde tijdstip in zijn agenda te staan, en dat is een correctheidsfout, geen cosmetische. Anders dan #58 is dit geen ontbrekende vertaling maar een verkeerde aanname over waar de gebruiker is — dezelfde categorie als de rideId-tijdzonebug uit plan 21-13, en daarmee het derde tijdzone-incident in deze codebase. **De fix ligt al klaar:** `main.dart:44` haalt de echte IANA-zone van het toestel op via `FlutterTimezone.getLocalTimezone()` voor de notificaties. Diezelfde waarde doorgeven aan `EventDateTime` volstaat. Overweeg meteen of die zone niet één keer centraal beschikbaar gemaakt moet worden in plaats van per aanroeper opnieuw opgehaald — dan is er ook één plek om naar te kijken als er een vierde tijdzonebug opduikt | MEDIUM | S | Backlog |
 | 60 | **`CloudSyncReconciler` injecteerbaar maken — vijf keer op rij de beperkende factor** | HOOG | M | Backlog |
+| 61 | **Een verse installatie haalt geplande ritten niet op tot de app eenmaal is weggezet** | HOOG | S | Backlog |
 
 **Waarom dit item anders is dan de rest van deze lijst.** Fase 21 heeft vijf gap-closure-plannen nodig gehad (21-10 t/m 21-14) en bij élk daarvan gold dezelfde beperking: de defecte laag was niet gedragsmatig testbaar, dus het bewijs moest van een toestel komen of van een structurele broncode-scan. Vier keer landde een bug in productie die een gewone test had gevangen als het seam had bestaan.
 
@@ -119,3 +120,41 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 
 *Aangemaakt: 2026-06-06*
 *Laatst bijgewerkt: 2026-07-15 (items 31-39 toegevoegd n.a.v. Phase 15 Calendar-verificatie: OAuth consent screen, agenda-event bijwerken bij nieuwe weersdata, feedback-formulier, sticky "Plan ride"-knop, duidelijkere feedback bij niet-aaneengesloten selectie, Calendar-koppeling in Profile, regen-icoon bug bij droog weer (afgerond), tip over iOS Agenda-koppeling, en kwartier-precisie bij Adjust Time; items 17, 34, 35 afgerond — twee-tik-bereik selectiemodel op Availability + Agenda, sticky Planned-knop met unplan/delete, live losse-tijdvakken-teller); 2026-07-17 (item 31: fast-publish route gekozen voor OAuth consent screen, instructies klaargezet voor Joost, zie OAUTH-PUBLISH-CHECKLIST.md — bij controle in Cloud Console bleek Publishing status al "In production" te staan, dus item afgerond zonder dat de "Publish app"-klik nog nodig was); 2026-07-25 (items 49-51 toegevoegd n.a.v. beta-tester feedback via Slack: te doorzichtige onboarding coach-marks, permanente "tap share icon"-banner, en een voorgestelde nav-herstructurering met top app bar — schets in `/Users/joostmouw/Documents/O+ Connect/IMG_2991.jpg`); 2026-07-26 (item 53 toegevoegd: closed test heeft 12 opted-in testers nodig gedurende 14 dagen voordat productietoegang aangevraagd kan worden — stand 4 — met Reddit als wervings- én lanceerkanaal)*
+
+
+---
+
+## 61 — Een verse installatie haalt geplande ritten niet op tot de app eenmaal is weggezet
+
+**Waargenomen 2026-08-07** op een net geïnstalleerde PWA (WebAPK, 1.0.22+23), ingelogd als
+joostmouw@gmail.com, met twee geplande ritten in de cloud.
+
+| Toestand | PLANNED-sectie |
+|---|---|
+| Verse installatie, eerste start, lege lokale opslag, geldige sessie | **leeg** |
+| Zelfde app, na één achtergrond → voorgrond-cyclus | **beide ritten** |
+| Zelfde app, koude start (force-stop + opnieuw), nu mét lokale data | **beide ritten, meteen** |
+
+De derde regel is de discriminator: koude start is niet het probleem, **lege lokale opslag** is het.
+Het was ook geen kwestie van te kort wachten — de app had bij de eerste start ruim een halve minuut
+gedraaid en was ondertussen naar Profiel en terug genavigeerd.
+
+**Diagnose.** De pull van planned rides hangt uitsluitend aan de voorgrond-reconcile. Bij een
+normale login (`lastSyncedUid` staat al) draait de eerste-login-migratie niet, en de initiële load
+telt niet als voorgrond-overgang. Er is dus geen pad dat bij het opstarten uit de cloud leest.
+
+**Waarom dit HOOG is.** Dit is precies het eerste wat een gebruiker op een tweede toestel doet:
+installeren, inloggen, kijken of zijn ritten er zijn. Die ziet een lege lijst en concludeert
+redelijkerwijs dat de sync stuk is. Het is ook de grondoorzaak van de hele web-sessie van 6/7
+augustus, die anderhalve dag onderzoek heeft gekost voordat duidelijk was dat de code deed wat hij
+moest doen — alleen niet op het moment dat ertoe deed.
+
+**Nog niet vastgesteld.** Of de native app hetzelfde doet bij een verse installatie met lege lokale
+opslag. MIG-02 dekte "leeg lokaal + gevulde cloud" en slaagde, maar liep via een échte eerste login
+en dus via het migratiepad. Het verschil is precies `lastSyncedUid`.
+
+**Samenhang.** Raakt [[60]]: zolang `CloudSyncReconciler` rechtstreeks naar
+`Supabase.instance.client` grijpt, is dit gedrag niet in een test vast te leggen.
+
+Volledige waarneming: `.planning/phases/21-sync-migration/MANUAL-VERIFICATION-21.md`, device
+session 7.
