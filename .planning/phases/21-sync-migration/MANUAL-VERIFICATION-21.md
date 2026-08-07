@@ -649,3 +649,57 @@ vingerbeweging voor nodig — een tabwissel die het besturingssysteem als zodani
 
 Een geplande rit **Saturday 8 aug 07:00–09:00** (`start_at 05:00+00`), door mij aangemaakt in het
 desktop-tabblad als multi-tab-testwijziging. Mag weg met het prullenbak-icoon.
+
+---
+
+## Web-sessie, vervolg — 2026-08-07, twee waarnemingen door Joost
+
+De twee proeven die ik zelf niet kon doen, zijn gedaan. Beide vragen de tabovergang die een
+gesimuleerde activatie niet oplevert; beide zijn geslaagd.
+
+### SYNC-11 — multi-tab: **PASS**
+
+**Waarneming.** Joost klikt in zijn eigen desktop-tabblad, dat op dat moment al openstond en dus
+een echte voorgrond-overgang maakt. Onder PLANNED staan **twee** ritten: Saturday 07:00–09:00 én
+12:00–15:00.
+
+De eerste is de rit die ik in een **ander** tabblad had aangemaakt. Het tabblad van Joost heeft die
+wijziging dus opgepikt zonder herladen — dat is precies wat SYNC-11 vraagt.
+
+**Wat dit niet zegt.** Dit dekt de propagatierichting (tabblad B ziet wat tabblad A schreef). De
+overschrijfvraag uit §5 — of B's eigen volgende schrijfactie A's wijziging weer platslaat — is
+hiermee niet los getoetst; dat beide ritten naast elkaar staan in plaats van dat de een de ander
+verving, is het sterkste dat deze waarneming daarover zegt.
+
+### SYNC-04, webkant — **PASS**
+
+**Waarneming.** Op de telefoon (Chrome-tabblad): naar een ander tabblad, twee tellen wachten, terug.
+Daarna staat de **augustusrit** onder PLANNED, waar eerst de julirit stond.
+
+Dus: `reconcileOnForeground()` draait op web, het lifecycle-event vuurt in Chrome op Android, en de
+telefoon schrijft de planned-rides-merge alsnog in het nieuwe `Z`-formaat.
+
+### Correctie op de vorige sectie
+
+De hierboven genoteerde "openstaande vraag — draait `reconcileOnForeground()` op web?" is hiermee
+beantwoord met **ja**, en de daaraan gekoppelde verdenking is ingetrokken.
+
+De diagnose van 2026-08-06/07 klopte in wat ze uitsloot (account, netwerk, RLS, build, outbox,
+sign-in-sync, scherm) en klopte in wat ze als verschil vond (de telefoon had een oude offsetloze
+rit in `flutter.planned_rides` staan). Waar ze naartoe neigde — dat er mogelijk een echte bug in de
+voorgrond-reconcile zat — was **fout**. De oorzaak was dat de telefoon in die hele sessie nooit een
+voorgrond-overgang heeft gemaakt: mijn CDP-screenshot activeerde het tabblad niet, en zolang het
+tabblad `hidden` bleef was er niets om op te reageren. De stale julirit was geen symptoom van een
+kapotte reconcile maar van een reconcile die simpelweg nog niet gelopen had.
+
+Dat is de derde keer in deze fase dat een meetopstelling, niet de code, de bevinding produceerde.
+De eerdere twee staan hierboven bij "Twee eigen proeven die ongeldig bleken"; dit is het geval
+waarin ik die ongeldigheid pas achteraf zag. De les die ik meeneem: op web is een voorgrond-overgang
+niet van buitenaf af te dwingen, en elke conclusie over lifecycle-gedrag die niet op een echte
+vingerbeweging rust, is geen waarneming maar een vermoeden.
+
+### Gevolg voor §3
+
+Hiermee is SYNC-04 aangetoond op de webkant. Wat §3 daarnaast nog vroeg — installatie vanaf een
+iPhone via Safari — vervalt: zie de herschreven §3 in `REGRESSION-CHECKLIST-21.md`, waar iOS
+expliciet naar v2 is uitgesteld op grond van de Android-only-constraint in `CLAUDE.md`.
