@@ -591,3 +591,61 @@ Eén rij, en alle vier de eigenschappen die plan 21-13 voorspelt kloppen:
 Daarmee is §5b volledig afgetekend: de duplicaat is weg **en** het opgeslagen tijdstip klopt. Dat
 onderscheid was het hele punt — een fix die alleen de sleutel repareerde zou hier 12:00 UTC hebben
 laten staan.
+
+---
+
+## Web-sessie — 2026-08-06/07, PWA op desktop-Chrome én Chrome op Android
+
+Aanleiding: op de desktop-PWA werkt de sync, op de telefoon-PWA staat de account-status op
+"Syncing..." en verschijnt de geplande rit niet. Beide op 1.0.22+23, zelfde account.
+
+Gediagnosticeerd via het Chrome DevTools Protocol over `adb forward tcp:9222
+localabstract:chrome_devtools_remote`, met een minimale WS-client op stdlib (staat in de
+scratchpad, niet in de repo).
+
+### Uitgesloten, met bewijs
+
+| Kandidaat | Waarneming die hem uitsluit |
+|---|---|
+| Ander account | `uid = a1456a8d-f39c-45c5-94cf-35957fc4a555` op telefoon én desktop |
+| Netwerk / RLS / auth | Vanuit de **telefoonpagina zelf** een PostgREST-query op `planned_rides`: **status 200**, met de juiste rij (`ride_id 2026-08-08T10-00-00-000Z`, `start_at 10:00+00`) |
+| Stale build | Beide 1.0.22 (23); telefooncache is gewist met behoud van sitegegevens |
+| Vastgelopen outbox | Leeg (inspector én geen pending rijen) |
+| Sign-in-sync nooit voltooid | `flutter.account.lastSyncedUid` staat gezet op beide |
+| Verkeerd scherm | Router gebruikt `StatefulShellRoute.indexedStack`, dus HomeScreen — waar de lifecycle-observer op zit — blijft levend op elk tabblad |
+
+### Wat er wél anders is
+
+Telefoon: `flutter.planned_rides` bevat nog de rit van **31 juli**, in het oude offsetloze
+formaat (`"2026-07-31T20:00:00.000"`). Die is verleden tijd en wordt door `readLocal()` uitgefilterd,
+dus de lijst oogt leeg. Desktop: de augustusrit in het nieuwe formaat mét `Z`.
+
+De telefoon heeft dus sinds vóór 21-13 geen planned-rides-merge meer geschreven, terwijl hij de
+cloud aantoonbaar kan lezen.
+
+### Openstaande vraag — de kern
+
+Draait `reconcileOnForeground()` op web? Dat is **niet vastgesteld**, en de reden is belangrijk
+genoeg om op te schrijven: op web bereikt `debugPrint` de browserconsole niet. Op de desktop, waar
+de sync aantoonbaar wérkt, staat óók geen enkele `drain done`-regel in de console. Afwezigheid van
+logregels bewijst hier dus niets — precies de spiegelvorm van de fout die deze fase eerder maakte
+(een logregel als bewijs nemen).
+
+### Twee eigen proeven die ongeldig bleken
+
+Beide keren ving de controle achteraf het, niet de meting. Opgeschreven zodat ze niet herhaald
+worden:
+
+1. **`localStorage` rechtstreeks leegmaken en kijken of de reconcile hem hervult.** Werkt niet:
+   `shared_preferences` houdt op web een geheugencache aan, dus de app leest die bewerking nooit.
+2. **Een tabblad "activeren" met een CDP-screenshot.** Werkt niet: `document.visibilityState` bleef
+   `hidden` en `document.hasFocus()` `false`. Er was dus nooit een voorgrond-overgang, en de
+   conclusie "het tabblad pikt de wijziging niet op" was ongefundeerd.
+
+Gevolg: SYNC-11 (multi-tab) en de webkant van SYNC-04 zijn **nog niet gemeten**. Daar is een echte
+vingerbeweging voor nodig — een tabwissel die het besturingssysteem als zodanig registreert.
+
+### Testdata die is achtergebleven
+
+Een geplande rit **Saturday 8 aug 07:00–09:00** (`start_at 05:00+00`), door mij aangemaakt in het
+desktop-tabblad als multi-tab-testwijziging. Mag weg met het prullenbak-icoon.
