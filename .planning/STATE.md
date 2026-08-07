@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: 5b/5c/MIG-02 groen; rest van checklist open"
-last_updated: "2026-08-05T23:10:00.000Z"
-last_activity: 2026-08-05
+status: "Fase 21: web groen; 5 toestelstappen open"
+last_updated: "2026-08-07T10:20:00.000Z"
+last_activity: 2026-08-07
 progress:
   total_phases: 5
   completed_phases: 2
@@ -514,11 +514,12 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260725-knl | availability-key-mismatch | Beschikbaarheids-pipeline gerepareerd — canonieke uur-sleutel + migratie, weekpatroon-model, seedPreset merget, dedup symmetrisch, now-cutoff, stabiele sortering (audit A1/A2/A4/B2/B3/B4/B5/C1/C2/C3). Tests 282/2 → 306/0 (suite voor het eerst volledig groen) | 2026-07-25 | 82c9438 |
 | 260804-vb1 | bump-version-1-0-13-14 | Versie gebumpt naar 1.0.13+14 en release-AAB herbouwd (+13 was al gebruikt door de fase-19-build van 2026-07-26) | 2026-08-04 | 169b1d6 |
 | 260804-gi3 | gitignore-assistant-memory-en-videos | `.claude/projects/` (Claude-geheugen) en `photos/*.mp4` (~15 MB bronvideo) gegitignored — publieke repo, blijven anders permanent in de historie; `.claude/skills/material-3/` en de logo-PNG wel gecommit | 2026-08-04 | bd2cf78 |
+| 260807-gpz | fase-21-doc-afronding | Fase-21-docs bijgewerkt na drie antwoorden van Joost: SYNC-11 (multi-tab) en SYNC-04 (webkant) afgetekend als PASS op echte waarnemingen, mijn eerdere bugvermoeden uit de web-diagnose expliciet ingetrokken (de telefoon had nooit een voorgrond-overgang gemaakt — meetopstelling, niet code), en §3 herschreven naar Android-WebAPK met de iOS-PWA uitgesteld naar v2 op grond van de Android-only-constraint. MORGEN.md terug van zeven naar zes toestelstappen | 2026-08-07 | ca91cb8 |
 
 ## Session Continuity
 
-Last session: 2026-08-03T18:10:09.722Z
-Last activity: 2026-07-25 - v3.0 ROADMAP.md created (Phases 18-22: Preconditions, Auth, Repository refactor, Sync + migration, Account-backed feedback). REQUIREMENTS.md traceability filled (49/49 mapped). Next: /gsd:plan-phase 18
+Last session: 2026-08-07T10:20:00.000Z
+Last activity: 2026-08-07 - Fase 21 webkant afgerond: SYNC-11 en SYNC-04 afgetekend op echte waarnemingen, §3 herschreven naar Android-WebAPK (iOS naar v2), MORGEN.md opgeschoond. Fase 21 wacht nu enkel nog op vijf toestelstappen — zie `.planning/phases/21-sync-migration/MORGEN.md`. Daarna 21-08/21-09-SUMMARY en de fase-verificatie.
 
 ## Operator Next Steps
 
