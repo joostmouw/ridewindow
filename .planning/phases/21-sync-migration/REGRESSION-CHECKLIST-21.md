@@ -221,32 +221,52 @@ open) and is folded in here rather than left as a separate outstanding item.
       maar dat is Google Play Services' `AssistedSignInActivity` — niet de app die zichzelf uitgelogd
       rendert. Aparte bevinding, backlog #56. Zie MANUAL-VERIFICATION-21.md, device session 4.)*
 
-## 3. iPhone PWA install + cross-device propagation (Phase 19 leftover §2, folded with SYNC-04)
+## 3. PWA install + cross-device propagation (Phase 19 leftover §2, folded with SYNC-04)
 
-Source: the live PWA at `https://my-project-joost.web.app`, installed on a real iPhone via
-Safari — not desktop browser, not a simulator. Reused from
-`.planning/phases/19-auth/REGRESSION-CHECKLIST.md` §2, combined here with SYNC-04's cross-device
-check so the same sign-in session proves both at once.
+> **Herschreven 2026-08-07 — iOS uitgesteld naar v2.** Deze sectie vroeg oorspronkelijk om
+> installatie op een echte iPhone via Safari. Joost heeft geen iPhone, en `CLAUDE.md` legt vast dat
+> **v1 Android-only** is: geen Apple Developer-account tot Android het concept bewijst. Een
+> iOS-installatiecheck toetst dus een platform dat deze release niet uitbrengt.
+>
+> Wat vervalt: Safari-specifiek installatiegedrag (Add to Home Screen, standalone zonder
+> adresbalk, iOS-eigenaardigheden rond service workers). Dat is **niet** afgetekend maar
+> **uitgesteld** — het hoort bij de iOS-scope van v2, samen met de rest van het Apple-spoor.
+>
+> Wat blijft: alles wat de installatieroute toetst die webgebruikers van v1 daadwerkelijk krijgen.
+> "Zet op beginscherm" in Chrome op Android bouwt een echte WebAPK, dus installatie, standalone
+> modus en navigatie zijn hier volwaardig te toetsen — geen surrogaat maar een andere, even echte
+> installatie.
 
-- [ ] **Install** — open the PWA URL in Safari on the iPhone, use "Add to Home Screen". Note: the
-      correct app icon appears on the home screen.
-- [ ] **Open standalone** — open the app from the home-screen icon. Note: no Safari address bar
-      chrome visible (standalone mode), opens on the Home screen.
+Source: the live PWA at `https://my-project-joost.web.app`, installed on the Android device via
+Chrome's "Zet op beginscherm" (which produces a real WebAPK) — not a desktop browser, not an
+emulator. Reused from `.planning/phases/19-auth/REGRESSION-CHECKLIST.md` §2, combined here with
+SYNC-04's cross-device check.
+
+- [ ] **Install** — open the PWA URL in Chrome on Android, use "Zet op beginscherm" / "Installeer
+      app". Note: the correct app icon appears on the home screen, distinct from the native app's
+      icon if both are installed.
+- [ ] **Open standalone** — open the PWA from its home-screen icon. Note: no Chrome address bar
+      visible (standalone mode), opens on the Home screen.
 - [ ] **Navigate** — move between Home, a Ride Detail screen, and Profile. Note: no dead
       navigation ends, back buttons work, no white page on a route change.
 - [ ] **Sign in with the SAME account used on Android in section 2** — tap the rendered Google
-      button (`renderButton()`, D-05/D-06 — deliberately different look from Android's ListTile)
-      in the Account section, complete the flow. Note: signed-in view appears with no error, and
-      the values you set in section 1 (which now live in the cloud from section 2's migration)
-      appear correctly on this second device — this is the pull side of a normal (non-first-login)
-      reconcile.
-- [ ] **SYNC-04 — cross-device propagation** — on the Android device (still signed in), make a
-      small profile or availability change (e.g. toggle one more availability hour). Background
-      the Android app. On the iPhone PWA, bring the app to the foreground (or pull-to-refresh /
-      navigate away and back if there is no explicit foreground trigger). Confirm the change made
-      on Android appears on the iPhone within a reasonable time.
-- [ ] **"Voeg toe aan agenda"** — open a Ride Detail screen and tap "Voeg toe aan agenda". Confirm
-      in the real Google Calendar that the event appears.
+      button (`renderButton()`, D-05/D-06 — deliberately different look from the native app's
+      ListTile) in the Account section, complete the flow. Note: signed-in view appears with no
+      error, and the values you set in section 1 (which now live in the cloud from section 2's
+      migration) appear correctly on this second surface — this is the pull side of a normal
+      (non-first-login) reconcile.
+- [x] **SYNC-04 — cross-device propagation** — **PASS, 2026-08-07.** The two surfaces are the
+      native Android app and the PWA. On the native app (still signed in), change one availability
+      hour or plan a ride; background it; bring the PWA to the foreground and confirm the change
+      arrives. Observed: after a real tab switch away and back in Chrome on Android, the August
+      ride replaced the stale July one. See `MANUAL-VERIFICATION-21.md`, "Web-sessie, vervolg —
+      2026-08-07". Note that a *real* foreground transition is required — a simulated activation
+      leaves `document.visibilityState` on `hidden` and proves nothing.
+- [ ] **"Voeg toe aan agenda"** — open a Ride Detail screen in the PWA and tap "Voeg toe aan
+      agenda". Confirm in the real Google Calendar that the event appears.
+
+**Uitgesteld naar v2 (niet afgetekend, niet vervallen):** installatie en standalone gedrag van de
+PWA op iOS/Safari. Hoort bij de iOS-scope van v2.
 
 ## 4. Web cold-start measurement (D-19 / REG-03)
 
@@ -263,7 +283,8 @@ proves REG-03's 2-second budget holds in absolute terms), but note explicitly in
 `MANUAL-VERIFICATION-21.md` that no valid before/after comparison exists, and that this gap
 traces back to Phase 19's own unclosed plan 19-07.**
 
-- [ ] **Device:** _(e.g. "iPhone 13, iOS 18.x, Safari")_ — record the exact model and browser.
+- [ ] **Device:** _(e.g. "Oppo Find X9 Pro (PLG110), Android 15, Chrome")_ — record the exact model
+      and browser. Measure the installed PWA from section 3, not a browser tab.
 - [ ] **Connection type:** _(e.g. "4G, not throttled" or "Chrome DevTools Fast 3G throttling,
       measured on desktop" — pick one and record which)_.
 - [ ] **Measurement method:** time between tapping the PWA icon (or loading the URL in a cold tab
@@ -278,12 +299,16 @@ traces back to Phase 19's own unclosed plan 19-07.**
 
 ## 5. SYNC-11 — multi-tab safety (deployed PWA, desktop browser)
 
-- [ ] Open `https://my-project-joost.web.app` in two browser tabs, both signed into the same
+- [x] Open `https://my-project-joost.web.app` in two browser tabs, both signed into the same
       account used above.
-- [ ] In tab A, edit an availability hour or a profile setting.
-- [ ] Foreground tab B (switch to it, or bring it into focus). Confirm tab B picks up tab A's
+- [x] In tab A, edit an availability hour or a profile setting. **Done 2026-08-07:** a ride was
+      planned for Saturday 07:00–09:00 from a second tab.
+- [x] Foreground tab B (switch to it, or bring it into focus). Confirm tab B picks up tab A's
       change rather than silently overwriting it with stale in-memory state (no data loss, no
-      stale overwrite when tab B's own next write happens).
+      stale overwrite when tab B's own next write happens). **PASS 2026-08-07:** tab B showed
+      **both** rides (07:00–09:00 and 12:00–15:00) — the new one arrived and the existing one was
+      not replaced. See `MANUAL-VERIFICATION-21.md`, "Web-sessie, vervolg — 2026-08-07", including
+      the note on what this observation does *not* separately prove about the overwrite direction.
 
 ## 5a. SYNC-05 — outbox drain proof (plan 21-10, gap closure; plan 21-11, disposed-Ref fix; plan 21-12, availability payload-shape fix)
 
@@ -452,7 +477,7 @@ its own device+dashboard verification was never run. **Do this last**, since it 
 to the test account's cloud data and you will want SYNC-04/SYNC-11/first-login migration proven
 first against a still-alive account.
 
-- [ ] On the Android device (or the iPhone PWA — either surface exercises the same RPC), confirm
+- [ ] On the Android device (or the installed PWA — either surface exercises the same RPC), confirm
       you are signed in with the same disposable test account used above, and that it has real,
       non-empty rows in `profiles`/`availability` (and `planned_rides` if you planned a ride) —
       confirm via the sync status text ("Gesynchroniseerd") that everything has reached the
