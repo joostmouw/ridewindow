@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
-        android:label="ridewindow"
+        android:label="RideWindow"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
