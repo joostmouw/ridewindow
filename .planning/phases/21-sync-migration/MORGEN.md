@@ -1,8 +1,8 @@
 # Volgende sessie — wat jij moet doen
 
-> **Bijgewerkt 2026-09-01 (zesde keer).** Stap 0, §4 en de tegenproef op #61 zijn allemaal
-> afgetekend. **Er staan nog twee dingen open:** het verwijderen van het testaccount (§6) en de
-> Play-installatie.
+> **Bijgewerkt 2026-09-01 (zesde keer).** Stap 0, §4, de tegenproef op #61 én §6 zijn afgetekend.
+> **Er staat nog één ding op het toestel open: de Play-installatie** — plus drie
+> Supabase-dashboardcontroles die alleen jij kunt doen (zie stap 2).
 >
 > **Bevinding #61 is gefixt én tegengeproefd op het toestel** (quick 260901-nz7, `36f4fca` +
 > `abcf557`; proef in device session 9). De AAB is gebouwd op **1.0.23 (24)** en bevat de fix.
@@ -87,12 +87,25 @@ daarmee meet de PASS hierboven de fix en niet iets anders.
   voorgrond-overgang of na inloggen; een rit plannen enqueuet wel maar duwt niet, dus "Syncing…"
   bleef ~45s staan. Verwacht gedrag, geen vastloper — maar het ziet er bij het meten precies zo uit.
 
-### 2. §6 — account verwijderen (AUTH-09) — 3 min, nu aan de beurt
+### 2. §6 — account verwijderen (AUTH-09) — GEDAAN 2026-09-01 18:55, app-kant PASS
 
-Vernietigt het testaccount, dus pas als 1 en 1b klaar zijn — en dat zijn ze. Verwacht: automatische uitlog,
-snackbar, nul rijen in `profiles`/`availability`/`planned_rides`, `feedback` blijft bestaan met
-`user_id` NULL, account weg uit Authentication → Users, en **je lokale data op het toestel blijft
-intact** (D-03 — dat is het vinkje dat nooit mag breken).
+Uitgevoerd op de PWA 1.0.23+24 via `adb`. Eén dialoog met de "cannot be undone"-waarschuwing (D-01),
+automatische uitlog, snackbar "Account deleted".
+
+**D-03 is op drie schermen gecontroleerd tegen een "voor"-opname en houdt stand:** notificatie-
+instellingen ongewijzigd, beschikbaarheidsrooster identiek, en beide geplande ritten staan nog in
+"My Rides". Verwijderen haalt dus alleen de server-kant weg.
+
+> **Wat jij nog moet doen — de dashboardhelft.** Ik heb geen Supabase-toegang:
+>
+> - `profiles` / `availability` / `planned_rides` → nul rijen voor deze user
+> - `feedback` → rijen blijven bestaan met `user_id` NULL (alleen als je onder dit account
+>   testfeedback hebt ingestuurd)
+> - Authentication → Users → account niet meer in de lijst
+>
+> **Open de native app niet vóór die controle.** Hij houdt nog een sessie vast voor het verwijderde
+> account; ik heb hem force-stopped. Bij openen probeert hij zijn outbox te pushen — dat hoort te
+> falen, maar als het tóch slaagt zie je rijen die er niet horen te staan.
 
 ### 3. Afsluiten
 

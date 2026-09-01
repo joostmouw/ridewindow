@@ -980,5 +980,46 @@ Geen bevinding voor deze fase, wel iets om bij een volgende sync-ronde tegen het
 ### Testdata die is achtergebleven
 
 Twee geplande ritten op joostmouw@gmail.com: **Tuesday 1 sep 20:00–22:00** en
-**Saturday 5 sep 06:00–09:00**. Allebei van mij. §6 (account verwijderen) ruimt ze op; gaat §6 niet
-door, dan mag de prullenbak erover.
+**Saturday 5 sep 06:00–09:00**. Allebei van mij. §6 hieronder heeft de cloud-kant opgeruimd; de
+lokale kopieën staan er nog (dat is juist wat D-03 bewijst) en mogen de prullenbak in.
+
+## §6 — AUTH-09, account verwijderen — 2026-09-01 18:55, PWA 1.0.23+24
+
+Uitgevoerd direct na stap 1b, in dezelfde device-sessie, via `adb`. Bewust op de **PWA** en niet op
+de native app: die staat op dit toestel nog op 1.0.21+22, terwijl de PWA de code draait die ook in
+de AAB 1.0.23+24 zit.
+
+### App-kant: **PASS**, op alle punten
+
+| Verwachting | Waarneming |
+|---|---|
+| Uitgangspositie gesynchroniseerd | `Joost / joostmouw@gmail.com / Synced`, met twee geplande ritten in de cloud |
+| Eén AlertDialog met "cannot be undone" (D-01) | "Delete account?" — "This cannot be undone. Your profile, availability and planned rides will be permanently removed from the cloud." Cancel / Delete |
+| Automatische uitlog | Profile toont weer de signed-out weergave met de `renderButton()`-Google-knop |
+| Snackbar | "Account deleted" |
+| **Lokale data onaangeroerd (D-03)** | **PASS op alle drie**, gecontroleerd tegen een "voor"-opname van dezelfde schermen |
+
+D-03 is niet op één scherm afgetekend maar op drie, omdat dat de garantie is die nooit mag breken:
+
+- **Notificatie-instellingen** — "Evening before" nog aan, de andere twee nog uit.
+- **Beschikbaarheidsrooster** — identiek: doordeweeks geblokkeerd, weekend vrij, en Saturday 6–8
+  nog blauw gemarkeerd als gepland.
+- **Geplande ritten** — beide staan nog in "My Rides", mét hun score en weerregel.
+
+De app is volledig bruikbaar uitgelogd. Verwijderen haalt dus alleen de server-kant weg, precies
+zoals D-03 belooft.
+
+### Nog open — de dashboardhelft
+
+Drie controles kunnen alleen door Joost (ik heb geen Supabase-toegang):
+
+- `profiles` / `availability` / `planned_rides` → nul rijen voor deze user
+- `feedback` → rijen blijven bestaan met `user_id` NULL (alleen relevant bij testfeedback onder dit
+  account)
+- Authentication → Users → account niet meer in de lijst
+
+**Waarschuwing bij die controle:** de native app op het toestel houdt nog een sessie vast voor het
+zojuist verwijderde account. Ik heb hem `force-stop`'t. Wordt hij geopend vóór de dashboardcontrole,
+dan probeert hij zijn outbox te pushen; dat hoort te falen omdat de `auth.users`-rij weg is, maar
+mocht het toch slagen dan staan er rijen in het dashboard die er niet horen te staan en lijkt de
+verwijdering mislukt. Laat hem dus dicht tot je gekeken hebt.

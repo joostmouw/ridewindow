@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: #61 tegengeproefd; §6 + Play open"
-last_updated: "2026-09-01T16:50:00.000Z"
+status: "Fase 21: §6 app-kant PASS; Play + dashboard open"
+last_updated: "2026-09-01T17:00:00.000Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 5

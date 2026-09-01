@@ -518,22 +518,40 @@ its own device+dashboard verification was never run. **Do this last**, since it 
 to the test account's cloud data and you will want SYNC-04/SYNC-11/first-login migration proven
 first against a still-alive account.
 
-- [ ] On the Android device (or the installed PWA — either surface exercises the same RPC), confirm
+> **Uitgevoerd 2026-09-01 18:55 op de PWA 1.0.23+24, via `adb`.** Bewust de PWA en niet de native
+> app: die staat op dit toestel nog op 1.0.21+22, terwijl de PWA de code draait die ook in de AAB
+> zit. Zie `MANUAL-VERIFICATION-21.md`, device session 9. De app-kant is compleet; de
+> dashboardcontroles kunnen alleen door Joost en staan hieronder nog open.
+
+- [x] On the Android device (or the installed PWA — either surface exercises the same RPC), confirm
       you are signed in with the same disposable test account used above, and that it has real,
       non-empty rows in `profiles`/`availability` (and `planned_rides` if you planned a ride) —
       confirm via the sync status text ("Gesynchroniseerd") that everything has reached the
       cloud before proceeding.
-- [ ] Tap "Delete account" / "Account verwijderen", confirm the dialog (the single AlertDialog
+      *(PASS. `Joost / joostmouw@gmail.com / Synced`, met twee geplande ritten: Tuesday 1 sep
+      20:00–22:00 en Saturday 5 sep 06:00–09:00.)*
+- [x] Tap "Delete account" / "Account verwijderen", confirm the dialog (the single AlertDialog
       with the "this cannot be undone" warning — D-01). Expect: automatic sign-out, "Account
       verwijderd"/"Account deleted" snackbar, landing on the normal signed-out Profile view.
+      *(PASS. Eén dialoog "Delete account?" met "This cannot be undone. Your profile, availability
+      and planned rides will be permanently removed from the cloud." — Cancel/Delete. Daarna
+      automatische uitlog naar de signed-out Profile-weergave met de Google-knop, en de snackbar
+      "Account deleted".)*
 - [ ] Open the Supabase Dashboard → Table Editor. Check `profiles`, `availability`,
       `planned_rides` for that user's rows — expect **zero rows** in all three.
+      *(Alleen Joost komt in het dashboard. **Let op:** de native app op het toestel houdt nog een
+      sessie vast voor het verwijderde account. Hij is force-stopped; open hem niet vóór deze
+      controle, anders kan een outbox-push rijen tonen die er niet horen te staan.)*
 - [ ] Check `feedback` (only if you submitted test feedback under this account) — expect the
       row(s) to survive with `user_id` now `NULL`, not deleted (`on delete set null`).
 - [ ] Check Authentication → Users — expect the account no longer listed.
-- [ ] Confirm the app's local on-device data (profile settings, availability grid) on the test
+- [x] Confirm the app's local on-device data (profile settings, availability grid) on the test
       device is untouched and the app is fully usable signed-out (D-03) — this is the one
       guarantee that must never break: deletion only removes server-side rows.
+      *(PASS, op alle drie de vlakken gecontroleerd tegen een "voor"-opname: notificatie-instellingen
+      ongewijzigd, beschikbaarheidsrooster identiek (doordeweeks geblokkeerd, weekend vrij,
+      Saturday 6–8 nog als gepland gemarkeerd), en **beide geplande ritten staan er nog** in
+      "My Rides". De app is volledig bruikbaar uitgelogd.)*
 
 ## 7. Record everything
 
