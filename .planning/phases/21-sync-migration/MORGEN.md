@@ -5,8 +5,7 @@
 > en de Play-installatie.
 >
 > **Bevinding #61 is gefixt** (quick 260901-nz7, `36f4fca` + `abcf557`) maar alleen door tests
-> gedekt — vandaar stap 1b. De klaarstaande AAB dateert van vóór die fix; er moet opnieuw gebouwd
-> worden voordat stap 4 zinvol is.
+> gedekt — vandaar stap 1b. De AAB is opnieuw gebouwd op **1.0.23 (24)** en bevat de fix.
 
 **Op je toestel staat 1.0.21+22 als sideload.** Niet via Play. Play biedt daardoor geen updates
 meer aan — dat is verwacht en pas bij stap 4 relevant.
@@ -60,10 +59,12 @@ intact** (D-03 — dat is het vinkje dat nooit mag breken).
 Eén Play-installatie van de laatste build, zodat de fase eindigt op de distributieroute die
 gebruikers krijgen.
 
-**Let op: de klaarstaande AAB is verouderd.** `build/app/outputs/bundle/release/app-release.aab`,
-versie **1.0.22 (23)**, gebouwd 2026-08-07 12:26 — dat is vóór de #61-fix van 2026-09-01. Eerst
-opnieuw bouwen (en de versie bumpen als 23 inmiddels gebruikt is), anders upload je een build
-zonder de fix die stap 1b net bewezen heeft. Version code 23 is vrij (Play staat op 20). Uploaden is handwerk in Play
+**De AAB staat klaar, mét de #61-fix:** `build/app/outputs/bundle/release/app-release.aab`, versie
+**1.0.23 (24)**, gebouwd 2026-09-01 17:32. Geverifieerd in het packaged manifest:
+`versionCode="24"`, `versionName="1.0.23"`. Version code 24 is vrij — Play staat op 20.
+
+Bewust gebumpt van 1.0.22+23: die AAB bestond al zónder de fix, en twee bestanden met hetzelfde
+versienummer en verschillende inhoud is precies het soort verwarring dat een avond kost. Version code 23 is vrij (Play staat op 20). Uploaden is handwerk in Play
 Console — er is geen service account, geen fastlane en geen Play-workflow in dit project, alleen de
 webdeploy is geautomatiseerd. Ruim bij het aanmaken van de release eerst de lege "Untitled"-draft
 op, anders laat Play je geen tweede draft maken. Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de
