@@ -108,21 +108,37 @@ instellingen ongewijzigd, beschikbaarheidsrooster identiek, en beide geplande ri
 > **Nevenwaarneming:** er staan 11 accounts in `auth.users`, allemaal `voornaamachternaam.12345@
 > gmail.com`. Dat oogt gegenereerd. Geseed of echte closed-test-testers? Niets mee gedaan.
 
-### 3. Afsluiten
+### 3. Afsluiten — draft klaargezet, jij doet de laatste twee handelingen
 
 Eén Play-installatie van de laatste build, zodat de fase eindigt op de distributieroute die
 gebruikers krijgen.
 
 **De AAB staat klaar, mét de #61-fix:** `build/app/outputs/bundle/release/app-release.aab`, versie
-**1.0.23 (24)**, gebouwd 2026-09-01 17:32. Geverifieerd in het packaged manifest:
-`versionCode="24"`, `versionName="1.0.23"`. Version code 24 is vrij — Play staat op 20.
+**1.0.23 (24)**, 66 MB, gebouwd 2026-09-01 17:32. Geverifieerd in het packaged manifest:
+`versionCode="24"`, `versionName="1.0.23"`.
 
 Bewust gebumpt van 1.0.22+23: die AAB bestond al zónder de fix, en twee bestanden met hetzelfde
 versienummer en verschillende inhoud is precies het soort verwarring dat een avond kost.
 
-Uploaden is handwerk in Play Console — er is geen service account, geen fastlane en geen Play-workflow in dit project, alleen de
-webdeploy is geautomatiseerd. Ruim bij het aanmaken van de release eerst de lege "Untitled"-draft
-op, anders laat Play je geen tweede draft maken. Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de
+**Draft aangemaakt 2026-09-01 in Play Console**, internal testing track, release **"24 (1.0.23)"**
+met release notes in `en-GB`. Opgeslagen als draft, nog niet uitgerold.
+
+Wat jij nog doet, in die volgorde:
+
+1. **De AAB in de dropzone slepen.** Ik kan dat niet: de upload-tool van de browserextensie zit op
+   een limiet van 10 MB en het bestand is 66 MB.
+2. **"Start rollout to Internal testing"** indrukken, plus eventuele Play-akkoordschermen.
+3. Daarna de app één keer via Play installeren op het toestel.
+
+> **Twee dingen die dit bestand eerder verkeerd had, rechtgezet door te kijken:**
+> er was **geen lege "Untitled"-draft** om op te ruimen, en de internal testing track stond niet op
+> version code 20 maar op **23 (1.0.22)**, uitgebracht 7 augustus 12:32. Code 24 is nog steeds vrij,
+> dus de conclusie hield stand — het genoemde getal niet.
+>
+> Er is nog steeds geen service account, geen fastlane en geen Play-workflow in dit project; alleen
+> de webdeploy is geautomatiseerd.
+
+Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de
 fase-verificatie.
 
 ---
@@ -130,7 +146,8 @@ fase-verificatie.
 ## Kleine dingen als je er toch bent
 
 - **Testdata:** de geplande ritten **Tuesday 1 sep 20:00–22:00** en **Saturday 5 sep 06:00–09:00**
-  zijn van mij (stap 1b). §6 ruimt ze op; gaat §6 niet door, dan mag de prullenbak erover. Ook het
+  zijn van mij (stap 1b). Uit de cloud zijn ze weg via §6; de **lokale** kopieën staan nog op het
+  toestel (dat is juist wat D-03 bewijst) en mogen de prullenbak in. Ook het
   agenda-event **"Fietsrit 06:00–08:00"** op zaterdag 8 augustus is van mij (§3-test); dat mag uit
   je Google Calendar.
 - **Er staat nu een RideWindow-PWA op je beginscherm** naast de native app. Die heb ik voor §3
@@ -138,8 +155,9 @@ fase-verificatie.
 - **Main is gepusht** (`7cec4d8`). Let op: dat triggert géén deploy — `deploy-web.yml` filtert op
   `lib/`, `web/`, `pubspec.*` en `firebase.json`, en `.planning/**` staat daar bewust niet bij. Een
   verse deploy forceer je via `workflow_dispatch` in de Actions-tab.
-- **Untitled draft-release** op de internal testing track in Play Console — leeg, zonder version
-  code. Moet weg vóór stap 4: Play laat geen tweede draft naast een bestaande aanmaken.
+- ~~**Untitled draft-release** op de internal testing track in Play Console.~~ **Bestond niet.**
+  Nagekeken op 2026-09-01: de track had één release (23 / 1.0.22) en geen draft. Er viel niets op
+  te ruimen, en het aanmaken van de nieuwe draft ging zonder blokkade.
 
 ---
 
