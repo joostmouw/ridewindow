@@ -537,14 +537,21 @@ first against a still-alive account.
       and planned rides will be permanently removed from the cloud." — Cancel/Delete. Daarna
       automatische uitlog naar de signed-out Profile-weergave met de Google-knop, en de snackbar
       "Account deleted".)*
-- [ ] Open the Supabase Dashboard → Table Editor. Check `profiles`, `availability`,
+- [x] Open the Supabase Dashboard → Table Editor. Check `profiles`, `availability`,
       `planned_rides` for that user's rows — expect **zero rows** in all three.
-      *(Alleen Joost komt in het dashboard. **Let op:** de native app op het toestel houdt nog een
-      sessie vast voor het verwijderde account. Hij is force-stopped; open hem niet vóór deze
-      controle, anders kan een outbox-push rijen tonen die er niet horen te staan.)*
+      *(PASS 2026-09-01, via twee leesqueries in de SQL-editor. Getoetst als **nul weesrijen**
+      (rijen zonder bijbehorende `auth.users`) in plaats van "tabel leeg", want de tabellen bevatten
+      nog rijen van ándere accounts: `profiles` 3, `availability` 3, `planned_rides` 2. Uitkomst
+      0/0/0. Dat bewijst tegelijk dat de cascade niets heeft laten liggen én dat de nog-ingelogde
+      native app geen spookrijen heeft teruggeduwd — hij was tijdens de meting force-stopped.)*
 - [ ] Check `feedback` (only if you submitted test feedback under this account) — expect the
       row(s) to survive with `user_id` now `NULL`, not deleted (`on delete set null`).
-- [ ] Check Authentication → Users — expect the account no longer listed.
+      *(**Vervallen, niet gehaald.** `feedback` bevat nul rijen — er is nooit testfeedback onder dit
+      account ingestuurd, dus er viel niets te observeren. `on delete set null` is daarmee alleen
+      door het schema gedekt en niet op de echte database aangetoond. Wie dit wil sluiten: stuur
+      feedback in onder een account en verwijder dat account.)*
+- [x] Check Authentication → Users — expect the account no longer listed.
+      *(PASS 2026-09-01. `select count(*) from auth.users where email='joostmouw@gmail.com'` → **0**.)*
 - [x] Confirm the app's local on-device data (profile settings, availability grid) on the test
       device is untouched and the app is fully usable signed-out (D-03) — this is the one
       guarantee that must never break: deletion only removes server-side rows.

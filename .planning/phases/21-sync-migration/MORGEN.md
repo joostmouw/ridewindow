@@ -1,8 +1,8 @@
 # Volgende sessie — wat jij moet doen
 
-> **Bijgewerkt 2026-09-01 (zesde keer).** Stap 0, §4, de tegenproef op #61 én §6 zijn afgetekend.
-> **Er staat nog één ding op het toestel open: de Play-installatie** — plus drie
-> Supabase-dashboardcontroles die alleen jij kunt doen (zie stap 2).
+> **Bijgewerkt 2026-09-01 (zesde keer).** Stap 0, §4, de tegenproef op #61 én §6 zijn afgetekend,
+> inclusief de Supabase-kant. **Er staat nog één ding open: de Play-upload en -installatie** (stap 3,
+> handwerk in Play Console).
 >
 > **Bevinding #61 is gefixt én tegengeproefd op het toestel** (quick 260901-nz7, `36f4fca` +
 > `abcf557`; proef in device session 9). De AAB is gebouwd op **1.0.23 (24)** en bevat de fix.
@@ -96,16 +96,17 @@ automatische uitlog, snackbar "Account deleted".
 instellingen ongewijzigd, beschikbaarheidsrooster identiek, en beide geplande ritten staan nog in
 "My Rides". Verwijderen haalt dus alleen de server-kant weg.
 
-> **Wat jij nog moet doen — de dashboardhelft.** Ik heb geen Supabase-toegang:
->
-> - `profiles` / `availability` / `planned_rides` → nul rijen voor deze user
-> - `feedback` → rijen blijven bestaan met `user_id` NULL (alleen als je onder dit account
->   testfeedback hebt ingestuurd)
-> - Authentication → Users → account niet meer in de lijst
->
-> **Open de native app niet vóór die controle.** Hij houdt nog een sessie vast voor het verwijderde
-> account; ik heb hem force-stopped. Bij openen probeert hij zijn outbox te pushen — dat hoort te
-> falen, maar als het tóch slaagt zie je rijen die er niet horen te staan.
+**Dashboardhelft ook geverifieerd**, met twee leesqueries in de Supabase SQL-editor:
+
+- `auth.users` met `joostmouw@gmail.com` → **0**. Account weg.
+- Weesrijen in `profiles` / `availability` / `planned_rides` → **0 / 0 / 0**. De tabellen zijn niet
+  leeg (3/3/2), maar die rijen horen bij andere accounts — daarom getoetst op weesrijen en niet op
+  "tabel leeg". Bewijst meteen dat de nog-ingelogde native app geen spookrijen heeft teruggeduwd.
+- `feedback` → **vervallen, niet gehaald.** Nul rijen in de tabel, dus er viel niets te observeren.
+  `on delete set null` is alleen door het schema gedekt, niet op de database aangetoond.
+
+> **Nevenwaarneming:** er staan 11 accounts in `auth.users`, allemaal `voornaamachternaam.12345@
+> gmail.com`. Dat oogt gegenereerd. Geseed of echte closed-test-testers? Niets mee gedaan.
 
 ### 3. Afsluiten
 

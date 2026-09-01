@@ -1009,17 +1009,35 @@ D-03 is niet op één scherm afgetekend maar op drie, omdat dat de garantie is d
 De app is volledig bruikbaar uitgelogd. Verwijderen haalt dus alleen de server-kant weg, precies
 zoals D-03 belooft.
 
-### Nog open — de dashboardhelft
+### Dashboardhelft — geverifieerd 2026-09-01 19:0x via de SQL-editor
 
-Drie controles kunnen alleen door Joost (ik heb geen Supabase-toegang):
+Gedaan in Joost's eigen browser, met twee **lees**queries in de Supabase SQL-editor (project
+`hcdrydlgqpnmumfupgcx`). De native app was op dat moment `force-stop`'t, zodat een outbox-push van
+de nog-bestaande sessie de meting niet kon vervuilen.
 
-- `profiles` / `availability` / `planned_rides` → nul rijen voor deze user
-- `feedback` → rijen blijven bestaan met `user_id` NULL (alleen relevant bij testfeedback onder dit
-  account)
-- Authentication → Users → account niet meer in de lijst
+| Meting | Waarde | Oordeel |
+|---|---|---|
+| `auth.users` waar `email = 'joostmouw@gmail.com'` | **0** | **PASS** — account weg uit Authentication |
+| Weesrijen in `profiles` (geen bijbehorende `auth.users`) | **0** | **PASS** |
+| Weesrijen in `availability` | **0** | **PASS** |
+| Weesrijen in `planned_rides` | **0** | **PASS** |
+| `feedback` totaal / met `user_id` NULL | 0 / 0 | **n.v.t.** — zie hieronder |
 
-**Waarschuwing bij die controle:** de native app op het toestel houdt nog een sessie vast voor het
-zojuist verwijderde account. Ik heb hem `force-stop`'t. Wordt hij geopend vóór de dashboardcontrole,
-dan probeert hij zijn outbox te pushen; dat hoort te falen omdat de `auth.users`-rij weg is, maar
-mocht het toch slagen dan staan er rijen in het dashboard die er niet horen te staan en lijkt de
-verwijdering mislukt. Laat hem dus dicht tot je gekeken hebt.
+De weesrijen-vorm is bewust gekozen boven "tel de rijen in de tabel". Die tabellen zijn niet leeg —
+`profiles` 3, `availability` 3, `planned_rides` 2 — maar die rijen horen bij ándere accounts. Nul
+weesrijen bewijst twee dingen tegelijk: de rijen van het verwijderde account zijn weg, én de
+`on delete cascade` heeft niets laten liggen. Het bewijst bovendien dat de native app geen
+spookrijen heeft teruggeduwd.
+
+**De `feedback`-controle is niet gehaald maar vervallen.** De tabel bevat nul rijen, dus er is nooit
+testfeedback onder dit account ingestuurd. Het `on delete set null`-gedrag op `feedback.user_id`
+is daarmee **niet op de echte database bewezen** — alleen het schema belooft het. Wie dat alsnog wil
+aantonen moet eerst feedback insturen onder een account en dat account daarna verwijderen. Ik teken
+dit niet af als PASS.
+
+### Nevenwaarneming — 11 accounts in `auth.users`
+
+Naast de verwijderde staan er 11 accounts in `auth.users`, allemaal met adressen in het patroon
+`voornaamachternaam.<5 cijfers>@gmail.com`. Dat oogt machinaal gegenereerd in plaats van als een
+handvol echte bètatesters. Niet onderzocht en niets mee gedaan — het staat hier alleen genoteerd
+zodat het niet stilletjes verdwijnt. Vraag aan Joost: geseed, of zijn dit de closed-test-testers?
