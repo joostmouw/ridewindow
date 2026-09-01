@@ -10,7 +10,13 @@
 **Op je toestel staat 1.0.21+22 als sideload.** Niet via Play. Play biedt daardoor geen updates
 meer aan — dat is verwacht en pas bij stap 4 relevant.
 
-Werkboom schoon. Suite 441/1 (die ene is de bekende notificatietest die na 19:00 UTC faalt).
+Werkboom schoon. **Suite 451/451 — volledig groen**, voor het eerst in deze fase.
+
+> **Correctie op wat hier eerder stond.** Dit bestand meldde "441/1 (die ene is de bekende
+> notificatietest die na 19:00 UTC faalt)". Dat klopte niet: de notificatietest slaagde, en de enige
+> rode was `test/core/app_version_test.dart` — `lib/core/app_version.dart` stond nog op 1.0.22 (23)
+> terwijl `pubspec.yaml` al op 1.0.23+24 stond. Eén bekende flaky test maakt elke níéuwe rode
+> onzichtbaar zodra je "1 gefaald" leest in plaats van *welke*. Gefixt in quick 260901-r92.
 
 ---
 
@@ -114,8 +120,13 @@ Eén Play-installatie van de laatste build, zodat de fase eindigt op de distribu
 gebruikers krijgen.
 
 **De AAB staat klaar, mét de #61-fix:** `build/app/outputs/bundle/release/app-release.aab`, versie
-**1.0.23 (24)**, 66 MB, gebouwd 2026-09-01 17:32. Geverifieerd in het packaged manifest:
-`versionCode="24"`, `versionName="1.0.23"`.
+**1.0.23 (24)**, 66 MB, **opnieuw gebouwd 2026-09-01 19:37**.
+
+> **Gebruik niet de AAB van 17:32.** Die is overschreven, maar mocht je hem ergens bewaard hebben:
+> hij is gebouwd mét de foute `app_version.dart` en toont in de app "1.0.22 (23)" terwijl zijn
+> manifest 1.0.23 (24) zegt. De nieuwe is geverifieerd op twee niveaus: `versionName=1.0.23` in het
+> packaged manifest, én de string `1.0.23 (24)` letterlijk aanwezig in de gecompileerde Dart
+> (`base/lib/arm64-v8a/libapp.so`).
 
 Bewust gebumpt van 1.0.22+23: die AAB bestond al zónder de fix, en twee bestanden met hetzelfde
 versienummer en verschillende inhoud is precies het soort verwarring dat een avond kost.
