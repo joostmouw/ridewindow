@@ -16,6 +16,21 @@ Werkboom schoon. Suite 441/1 (die ene is de bekende notificatietest die na 19:00
 
 ## Wat nog open staat, in deze volgorde
 
+### 0. Eerst pushen, anders meet je oude code — 5 min, grotendeels wachten
+
+**De #61-fix staat alleen lokaal.** Main is niet gepusht, dus `deploy-web.yml` heeft nooit
+gedraaid en de PWA serveert nog 1.0.21+22. Je toestel draait diezelfde versie als sideload.
+
+Zou je §4 nú meten, dan meet je een koude start zónder de opstart-reconcile — precies de code die
+niet uitgeleverd wordt. En stap 1b zou sowieso falen, want de fix zit er niet in.
+
+1. `git push origin main` — de commits raken `lib/` en `pubspec.yaml`, dus dit tríggert de deploy
+   (in tegenstelling tot de docs-push van 7 augustus).
+2. Wacht op de groene run in de Actions-tab (~3 min).
+3. Controleer dat het echt live staat: `https://my-project-joost.web.app/version.json` moet
+   **1.0.23 / 24** teruggeven. Staat er nog 1.0.21, dan is er niets gedeployd en heeft doormeten
+   geen zin.
+
 ### 1. §4 — koude start (REG-03) — 2 min
 
 Stopwatch. Tijd tussen tikken op het **PWA-icoon** (staat sinds 2026-08-07 op je beginscherm, na
@@ -41,11 +56,27 @@ De fix staat er sinds 2026-09-01 (quick 260901-nz7), maar is **alleen door tests
 cloud-leeskant is zonder levende backend niet waarneembaar. Dit is de directe tegenproef van device
 session 7:
 
-De app opnieuw installeren (of app-data wissen), inloggen, en kijken of de PLANNED-sectie **meteen**
-gevuld is. Niet wegzetten, niet wachten op een voorgrond-cyclus — dat was juist de workaround.
-Blijft de lijst leeg, dan is de fix niet raak en moet #61 open blijven.
+Op de **PWA** — daar is de bug waargenomen, dus daar hoort de tegenproef. Kan zonder kabel:
 
-Let op: de fix zit pas in een build ná `abcf557`. De AAB van 12:26 op 2026-08-07 bevat hem niet.
+1. Zorg dat er minstens één geplande rit in de cloud staat (die van §4 volstaat).
+2. Android: Instellingen → Apps → **RideWindow** (de PWA, niet de native app) → Opslag →
+   **Gegevens wissen**. Dat maakt de lokale opslag leeg zonder het icoon te verwijderen — lege
+   lokale opslag is de discriminator, niet de koude start zelf.
+3. Open de PWA via het icoon, log in als joostmouw@gmail.com.
+4. **Kijk meteen naar de PLANNED-sectie.** Niet wegzetten, niet wachten op een
+   voorgrond-cyclus — dat was juist de workaround die de bug maskeerde.
+
+**PASS** = de ritten staan er bij het eerste scherm, zonder de app weg te zetten.
+**FAIL** = lijst leeg, en dan blijft #61 open. Zeg het dan meteen; dan is mijn fix niet raak en
+gaat hij niet mee in de release.
+
+> Let op: dit werkt alleen ná stap 0. De fix zit in een build ná `abcf557`; de PWA van 7 augustus
+> en de AAB van 12:26 die dag bevatten hem niet.
+>
+> Optioneel, als de kabel er toch aan hangt: dezelfde proef op de **native** app. Dat is de kant
+> die nog nooit is vastgesteld (MIG-02 liep via een échte eerste login en dus langs het
+> migratiepad — het verschil is precies `lastSyncedUid`). Zeg het even, dan bouw ik een release-APK
+> en installeer ik hem via `adb`.
 
 ### 2. §6 — account verwijderen (AUTH-09) — 3 min, als laatste
 
@@ -64,8 +95,9 @@ gebruikers krijgen.
 `versionCode="24"`, `versionName="1.0.23"`. Version code 24 is vrij — Play staat op 20.
 
 Bewust gebumpt van 1.0.22+23: die AAB bestond al zónder de fix, en twee bestanden met hetzelfde
-versienummer en verschillende inhoud is precies het soort verwarring dat een avond kost. Version code 23 is vrij (Play staat op 20). Uploaden is handwerk in Play
-Console — er is geen service account, geen fastlane en geen Play-workflow in dit project, alleen de
+versienummer en verschillende inhoud is precies het soort verwarring dat een avond kost.
+
+Uploaden is handwerk in Play Console — er is geen service account, geen fastlane en geen Play-workflow in dit project, alleen de
 webdeploy is geautomatiseerd. Ruim bij het aanmaken van de release eerst de lege "Untitled"-draft
 op, anders laat Play je geen tweede draft maken. Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de
 fase-verificatie.
