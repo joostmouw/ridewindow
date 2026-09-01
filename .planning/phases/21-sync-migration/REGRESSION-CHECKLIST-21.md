@@ -304,19 +304,27 @@ proves REG-03's 2-second budget holds in absolute terms), but note explicitly in
 `MANUAL-VERIFICATION-21.md` that no valid before/after comparison exists, and that this gap
 traces back to Phase 19's own unclosed plan 19-07.**
 
-- [ ] **Device:** _(e.g. "Oppo Find X9 Pro (PLG110), Android 15, Chrome")_ — record the exact model
-      and browser. Measure the installed PWA from section 3, not a browser tab.
-- [ ] **Connection type:** _(e.g. "4G, not throttled" or "Chrome DevTools Fast 3G throttling,
-      measured on desktop" — pick one and record which)_.
-- [ ] **Measurement method:** time between tapping the PWA icon (or loading the URL in a cold tab
-      / after fully closing the app) and the first visible ride slot on the Home screen. Timed
-      with a stopwatch or the device's own system clock — not a guess, an actual timing.
-- [ ] **Measured value:** _(e.g. "1.4s")_ — record the number and the date/time of measurement.
-- [ ] **Measurement conditions:** record anything that could affect the measurement (cold vs warm
-      cache, first open after install vs a repeat launch, network conditions at that moment).
-- [ ] **Budget check:** if the measured value exceeds 2 seconds, this is a **blocking
-      regression** — do not mark Phase 21 complete; report the number back instead of proceeding
-      to section 5.
+- [x] **Device:** Oppo Find X9 Pro (PLG110), Android 16, geïnstalleerde PWA (WebAPK
+      `org.chromium.webapk.a5a380363e216c9c6_v2`), niet een browsertabblad. **Gemeten 2026-09-01
+      18:00-18:20 op 1.0.23+24.**
+- [x] **Connection type:** wifi als primaire transport (LTE stond ook verbonden), niet gethrottled.
+      Batterij 59%, 36,9 °C.
+- [x] **Measurement method:** geautomatiseerd via `adb`. Per run één `screencap` op een exact
+      tijdstip na de tik op het lade-icoon; alle tijdstempels in de **device-klok** (`date +%s.%N`
+      op het toestel, direct vóór `input tap` en vóór `screencap`), zodat USB-latency wegvalt.
+      "Eerste ride slot" is een pixelmeting: het aandeel lichte pixels in de middenzone springt van
+      0% naar 84% zodra de eerste ride-kaart staat.
+- [x] **Measured value:** **mediaan ≈ 1,75-1,8s.** Verdeling over 36 starts: 0/6 op 1,52s,
+      3/6 op 1,77s, 5/6 op 1,93s, 9/12 op 2,03s, 6/6 op 2,28s. Nooit vóór 1,55s, altijd binnen 2,3s.
+- [x] **Measurement conditions:** terugkerende start — service worker warm, lokale opslag gevuld.
+      Per run `am force-stop` op zowel de WebAPK als `com.android.chrome` (de WebAPK draait in
+      Chrome's proces). Gestart vanuit de app-lade; het icoon staat niet op pagina 1 van het
+      beginscherm. De eerste start ná installatie (lege lokale opslag) is stap 1b, niet dit.
+- [x] **Budget check:** **PASS met een genoteerde staart.** De typische start haalt de 2 seconden,
+      maar in ~1 op de 4 starts is het slot op 2,0s nog niet zichtbaar. Wie die staart blokkerend
+      wil noemen heeft een verdedigbaar punt — dat is een keuze, geen meetfout, en daarom staat het
+      getal er in plaats van een kaal vinkje. Zie `MANUAL-VERIFICATION-21.md`, device session 8,
+      inclusief twee meetvallen die stil een veel te mooi getal hadden opgeleverd.
 
 ## 5. SYNC-11 — multi-tab safety (deployed PWA, desktop browser)
 

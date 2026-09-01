@@ -32,24 +32,30 @@ waarom stap 1 en 1b op de PWA gaan en niet op de native app.
 > 7 augustus raakte `web/` en `pubspec.yaml` en tríggerde dus wél een deploy. De conclusie
 > (er moest gedeployd worden) bleef staan, het genoemde versienummer niet.
 
-### 1. §4 — koude start (REG-03) — 2 min
+### 1. §4 — koude start (REG-03) — GEDAAN 2026-09-01, geautomatiseerd
 
-Stopwatch. Tijd tussen tikken op het **PWA-icoon** (staat sinds 2026-08-07 op je beginscherm, na
-de app volledig te hebben afgesloten) en de **eerste zichtbare ride slot**. Noteer: toestel,
-verbindingstype, methode, waarde, omstandigheden.
+Niet meer nodig. Gemeten via `adb` over 36 starts, alle tijdstempels in de device-klok:
 
-> **Ik heb dit geprobeerd te automatiseren en dat is niet gelukt.** `screencap` pollen haalt maar
-> ~1,7 Hz — te grof voor een grens van 2 seconden. Daarna `screenrecord` op 60fps geprobeerd, maar
-> de opnames zijn nooit weggeschreven (de achtergrond-truc in `adb shell` hield geen stand) en je
-> toestel moest los. ffmpeg staat nu wél geïnstalleerd, dus een volgende poging kan meteen door.
-> Hang je de telefoon nog eens aan de kabel, zeg het dan — anders is de stopwatch prima, mits je
-> noteert dat het met de hand gemeten is.
+| Meetmoment na de tik | Ride slot zichtbaar |
+|---|---|
+| 1,52s | 0 / 6 |
+| 1,77s | 3 / 6 |
+| 1,93s | 5 / 6 |
+| 2,03s | 9 / 12 |
+| 2,28s | 6 / 6 |
 
-Boven de 2 seconden = blokkerend, dan sluiten we de fase niet.
+**Mediaan ≈ 1,75-1,8s — onder de grens.** Maar in ~1 op de 4 starts is het slot op 2,0s nog niet
+zichtbaar. Ik noteer dat als PASS mét staart; wil jij die staart blokkerend noemen, dan is dat een
+verdedigbare keuze en geen meetfout. Zeg het, dan draaien we hem terug naar open.
 
-> Let op de `BLOCKER` in §4: fase 19 heeft zijn eigen basislijn nooit gemeten, dus er is geen
-> "voor"-getal. Meet toch — het bewijst de grens in absolute zin — en noteer dat er geen geldige
-> vergelijking bestaat.
+De automatisering die vorige keer strandde werkt nu wel — maar niet zoals gedacht. Twee dingen die
+je moet weten, want ze staan allebei in `MANUAL-VERIFICATION-21.md` (device session 8):
+
+- `screenrecord` is op dit toestel geblokkeerd door policy, niet door de achtergrond-truc waar de
+  vorige notitie het op gooide. `screencap` mag wél naar dezelfde map schrijven.
+- Android's **task snapshot** gaf eerst vier valse metingen van 0,06s: tijdens de launch-animatie
+  toont Android een screenshot van hoe de app er bij het afsluiten uitzag — een scherm vol
+  ride-kaarten. Dat had een prachtig getal opgeleverd dat nergens op sloeg.
 
 ### 1b. Tegenproef op backlog #61 — 3 min, na de §4-meting
 

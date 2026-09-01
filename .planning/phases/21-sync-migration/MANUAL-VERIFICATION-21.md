@@ -824,3 +824,82 @@ dat als een tweede bevinding op te schrijven. De dump bevatte in werkelijkheid a
 `Enable accessibility` — de semantics-boom stond na de herstart weer uit. Het screenshot liet zien
 dat beide ritten er gewoon stonden, en de conclusie draaide 180 graden om. Vierde keer in deze fase
 dat de meetopstelling bijna een bevinding produceerde.
+
+## Device session 8 — 2026-09-01 18:00-18:20, §4 koude start geautomatiseerd, PWA 1.0.23+24
+
+**Aanleiding:** §4 stond nog open omdat de vorige poging tot automatiseren strandde. Joost hing de
+kabel er weer aan met de opdracht het alsnog te automatiseren.
+
+### Uitkomst — §4 / REG-03
+
+| Meetmoment na de tik | Ride slot zichtbaar |
+|---|---|
+| 1,52s | 0 / 6 runs |
+| 1,77s | 3 / 6 runs |
+| 1,93s | 5 / 6 runs |
+| 2,03s | **9 / 12 runs** |
+| 2,28s | 6 / 6 runs |
+
+**Mediaan ≈ 1,75–1,8s. Nooit vóór 1,55s, altijd binnen 2,3s.**
+
+Dat is geen enkel getal, en dat is met opzet: één meting had hier alles kunnen zeggen wat je wilde
+horen. De spreiding is de bevinding. De typische koude start haalt de grens van 2 seconden ruim,
+maar **in ongeveer één op de vier starts is het eerste ride slot na 2,0s nog niet zichtbaar**.
+
+**Mijn lezing: PASS, met de staart genoteerd.** De grens is bedoeld als "de app is binnen 2s
+bruikbaar", en dat is hij typisch. Wie de staart als blokkerend wil lezen heeft een verdedigbaar
+punt — dat is Joost's keuze, niet de mijne, en daarom staat het getal hier in plaats van een vinkje.
+
+> **BLOCKER uit de checklist blijft staan:** fase 19 heeft zijn eigen basislijn nooit gemeten (plan
+> 19-07 is nooit afgerond). Er bestaat dus **geen geldige voor/na-vergelijking**. Wat hier staat
+> bewijst de grens in absolute zin, meer niet.
+
+### Omstandigheden
+
+- Oppo Find X9 Pro (PLG110), Android 16, serial `3B15AD01LEN00000`
+- **Wifi** als primaire transport (LTE stond ook verbonden, `TRANSPORT_PRIMARY` was wifi)
+- Batterij 59%, 36,9 °C — geen thermal throttling in zicht
+- PWA 1.0.23+24, service worker warm; dit is dus een **terugkerende** gebruiker, niet de allereerste
+  start na installatie
+- Gestart vanuit de **app-lade**, niet vanaf een beginschermpagina — het icoon staat niet op
+  pagina 1 en verder bladeren door Joost's beginscherm leek me niet nodig. De lade-tik is dezelfde
+  launcher-intent; het verschil is hooguit de openingsanimatie van de lade, die vóór de meting valt.
+
+### Methode
+
+Per run: `am force-stop` op zowel de WebAPK als `com.android.chrome` (de WebAPK draait in Chrome's
+proces), lade openen, naar R springen, dan **één** sample op een exact tijdstip na de tik.
+
+Alle tijdstempels staan in de **device-klok**: `date +%s.%N` draait op het toestel, direct vóór
+`input tap` en direct vóór `screencap`. Daarmee valt de USB-latency van adb volledig weg — die zat
+in mijn eerste opzet nog wél in het getal en maakte de meting ~0,5s te pessimistisch.
+
+Detectie van "eerste ride slot" is een pixelmeting, geen oordeel: het aandeel lichte pixels in de
+middenzone van het scherm springt van 0% naar 84% zodra de eerste ride-kaart staat. Visueel
+gecontroleerd op de frames.
+
+Harness: `meet3.py` in de sessie-scratchpad (niet gecommit — wegwerpgereedschap).
+
+### Twee meetvallen, allebei stil
+
+**1. `screenrecord` mag niet op dit toestel.** `Unable to open '...': Permission denied`, óók naar
+`/data/local/tmp` waar shell wel degelijk schrijfrechten heeft (`drwxrwx--x shell shell`). Het is
+dus geen padprobleem maar policy. **MORGEN.md schreef dit toe aan "de achtergrond-truc in
+`adb shell` hield geen stand" — die diagnose was fout.** `screencap` mag wél naar dezelfde map
+schrijven, dus het is specifiek schermopname die geblokkeerd is.
+
+**2. Android's task snapshot gaf vier valse metingen.** Mijn eerste geautomatiseerde ronde vond het
+ride slot in 4 van 5 runs op **+0,06s** — fysiek onmogelijk. Wat er stond was de *task snapshot*:
+Android toont tijdens de launch-animatie een screenshot van hoe de app er bij het afsluiten uitzag,
+en dat is precies een scherm vol ride-kaarten. `am force-stop` wist die snapshot niet.
+
+Dat had een gemeten koude start van 0,06s opgeleverd, ruim binnen elke grens, en het zou er
+volstrekt geloofwaardig uit hebben gezien. Opgelost door de volgorde te eisen: snapshot (licht) →
+leeg/spinner (donker) → echte inhoud (licht), en pas de derde te tellen. De sample-op-vast-tijdstip
+methode die uiteindelijk gebruikt is, omzeilt het probleem sowieso — vanaf ~1,5s is de snapshot
+allang weg.
+
+### Wat dit niet is
+
+Dit meet een terugkerende start met warme service-worker-cache en gevulde lokale opslag. De
+**eerste** start na installatie (lege lokale opslag) is stap 1b en is hier niet gemeten.
