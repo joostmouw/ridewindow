@@ -263,7 +263,7 @@ SYNC-04's cross-device check.
       navigation ends, back buttons work, no white page on a route change.
       *(PASS 2026-08-07. Home → Profiel → Home → Ride Detail → terug. Geen dood eind, geen witte
       pagina.)*
-- [ ] **Sign in with the SAME account used on Android in section 2** — tap the rendered Google
+- [x] **Sign in with the SAME account used on Android in section 2** — tap the rendered Google
       button (`renderButton()`, D-05/D-06 — deliberately different look from the native app's
       ListTile) in the Account section, complete the flow. Note: signed-in view appears with no
       error, and the values you set in section 1 (which now live in the cloud from section 2's
@@ -274,6 +274,18 @@ SYNC-04's cross-device check.
       was bij de eerste start leeg** en vulde zich pas na één achtergrond→voorgrond-cyclus — zie de
       nieuwe bevinding in MANUAL-VERIFICATION-21.md, device session 7. De pull-kant werkt dus, maar
       niet bij het laden.)*
+      *(**Kanttekening opgeheven 2026-09-01, device session 9.** Backlog #61 is gefixt en op het
+      toestel tegengeproefd op PWA 1.0.23+24: na een echte verse inlog — site-data gewist, dus lege
+      lokale opslag — stond de geplande rit meteen in PLANNED, zonder de app weg te zetten. Ook de
+      koude start mét geldige sessie haalt nu een cloud-only rit binnen. De pull-kant werkt dus
+      **wel** bij het laden.)*
+- [x] **Backlog #61 — geplande ritten komen binnen zonder voorgrond-cyclus** — de fix heeft twee
+      helften en die zijn apart geproefd (device session 9, 2026-09-01, PWA 1.0.23+24):
+      de inlogflow (`account_section.dart:328`) en de koude start
+      (`CloudSyncReconciler.reconcileOnStartup()` vanuit `HomeScreen.initState`). Beide **PASS**.
+      Negatieve controle op dezelfde telefoon: de native app 1.0.21+22 (vóór de fix), ingelogd met
+      dezelfde sessie en dezelfde cloud, toonde bij koude start géén PLANNED en vulde zich pas na
+      één achtergrond→voorgrond-cyclus. De proef meet dus de fix en niet iets anders.
 - [x] **SYNC-04 — cross-device propagation** — **PASS, 2026-08-07.** The two surfaces are the
       native Android app and the PWA. On the native app (still signed in), change one availability
       hour or plan a ride; background it; bring the PWA to the foreground and confirm the change

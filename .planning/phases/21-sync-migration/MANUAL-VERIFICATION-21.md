@@ -903,3 +903,82 @@ allang weg.
 
 Dit meet een terugkerende start met warme service-worker-cache en gevulde lokale opslag. De
 **eerste** start na installatie (lege lokale opslag) is stap 1b en is hier niet gemeten.
+
+## Device session 9 — 2026-09-01 18:29-18:42, stap 1b: tegenproef op backlog #61
+
+**Aanleiding:** de #61-fix (quick 260901-nz7, `36f4fca` + `abcf557`) was alleen door tests gedekt.
+De cloud-leeskant is zonder levende backend niet waarneembaar, dus dit is de directe tegenproef.
+Volledig via `adb` op de Oppo Find X9 Pro (PLG110), PWA **1.0.23+24** en native app **1.0.21+22**.
+
+### Uitkomst — backlog #61: **PASS aan beide kanten**
+
+De fix heeft twee helften, en die zijn apart geproefd. Dat onderscheid staat hier expliciet omdat
+één proef makkelijk voor beide door had kunnen gaan:
+
+| Helft van de fix | Waar hij zit | Proef | Uitkomst |
+|---|---|---|---|
+| Inlogflow | `account_section.dart:328` — `reconcileOnForeground()` in plaats van een kale `drainOutbox()` | site-data gewist, verse inlog, direct naar Home | **PASS** — rit staat er bij het eerste scherm |
+| Koude start | `CloudSyncReconciler.reconcileOnStartup()`, aangeroepen vanuit `HomeScreen.initState` (`home_screen.dart:83`) | rit die alleen in de cloud staat, force-stop, koude start | **PASS** — rit staat er bij het eerste scherm |
+
+**Negatieve controle, en dat is wat deze sessie boven een bevestiging uittilt:** de native app
+1.0.21+22 (dus **vóór** de fix) staat op hetzelfde toestel, is ingelogd met dezelfde geldige sessie
+en kijkt naar dezelfde cloud. Bij koude start toonde die **geen PLANNED-sectie**, terwijl
+Tuesday 20:00–22:00 aantoonbaar in de cloud stond; pas na één achtergrond→voorgrond-cyclus
+verscheen de rit. De bug reproduceert dus live naast de fix. Zonder die controle had een PASS ook
+"de rit stond er toch al" kunnen betekenen.
+
+### Opzet, stap voor stap
+
+1. **Precondition.** "My Rides" was leeg — de augustusritten zijn verleden tijd. Er is dus eerst
+   een rit gepland (Tuesday 1 sep 20:00–22:00) op de PWA.
+2. **Naar de cloud geduwd.** Zie de noot over de outbox hieronder; dit kostte een expliciete
+   voorgrond-cyclus. Bevestigd door de accountregel op `Synced`.
+3. **Lokale opslag gewist** (zie de correctie hieronder). Bevestigd doordat de PWA op het
+   welkomstscherm opstartte in plaats van op Home.
+4. **Verse inlog** als joostmouw@gmail.com via de account-chooser. Geen conflictprompt.
+   Direct daarna Home: **Tuesday stond er meteen**, zonder de app ooit weg te zetten.
+5. **Cloud-only rit gemaakt** voor de tweede helft: Saturday 5 sep 06:00–09:00 gepland vanaf de
+   **native** app en met een voorgrond-cyclus naar de cloud geduwd (`Synced`). De PWA had die rit
+   op dat moment lokaal niet.
+6. **Koude start** van de PWA: `am force-stop` op zowel de WebAPK als `com.android.chrome` (de
+   WebAPK draait in Chrome's proces), daarna via het launcher-intent geopend. Op het eerste scherm
+   stonden **beide** ritten, Tuesday én Saturday.
+
+Stap 6 is bewust immuun voor de task-snapshot-val uit sessie 8: de snapshot van de PWA bij
+afsluiten bevatte alléén Tuesday, dus Saturday kan er niet uit komen.
+
+### Correctie op MORGEN.md — de wisinstructie was fout voor een WebAPK
+
+`MORGEN.md` schreef voor: Instellingen → Apps → RideWindow → Opslag → **Gegevens wissen**. Dat is
+de juiste hendel voor een native app en de verkeerde voor een WebAPK. `org.chromium.webapk.
+a5a380363e216c9c6_v2` is een dunne launcher-shell; de localStorage en IndexedDB van de app leven in
+het **Chrome-profiel voor dat origin**. Die instructie was dus vermoedelijk een no-op geweest, en
+een lege proef die er als PASS uitziet is precies de meetval die deze fase al vier keer heeft
+opgeleverd.
+
+Gewist via: Chrome → Instellingen → Site-instellingen → Alle sites → `my-project-joost.web.app` →
+**Delete site data**. Chrome's eigen dialoog bevestigt de redenering letterlijk:
+
+> This will delete all data and cookies stored by https://my-project-joost.web.app **or by its app
+> on your Home screen**.
+
+De opslag was 7,5 kB + 1 cookie. Na het wissen startte de PWA op het welkomstscherm — de
+onafhankelijke bevestiging dat er echt niets meer stond.
+
+### De outbox loopt niet leeg als je een rit plant
+
+Na het plannen bleef de accountregel ~45 seconden op "Syncing…" staan, ook na hernavigeren. Dat is
+**verwacht gedrag, geen vastloper**: "Syncing…" is letterlijk `pendingCount != 0`
+(`account_section.dart:548`), en de enige drain-triggers zijn `reconcileOnStartup` (app-start),
+`reconcileOnForeground` (voorgrond-overgang) en de inlogflow. Een rit plannen enqueuet wel maar
+duwt niet. Eén voorgrond-cyclus zette hem op `Synced`.
+
+Genoteerd omdat het er bij het meten uitziet als een vastgelopen outbox — en omdat een gebruiker
+die een rit plant en meteen zijn telefoon weglegt, die rit pas bij de volgende opening verstuurt.
+Geen bevinding voor deze fase, wel iets om bij een volgende sync-ronde tegen het licht te houden.
+
+### Testdata die is achtergebleven
+
+Twee geplande ritten op joostmouw@gmail.com: **Tuesday 1 sep 20:00–22:00** en
+**Saturday 5 sep 06:00–09:00**. Allebei van mij. §6 (account verwijderen) ruimt ze op; gaat §6 niet
+door, dan mag de prullenbak erover.

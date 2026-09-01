@@ -1,11 +1,11 @@
 # Volgende sessie — wat jij moet doen
 
-> **Bijgewerkt 2026-09-01 (vijfde keer).** §2 én §3 zijn compleet, allebei via `adb` gedreven.
-> Vier stappen: een tijdmeting, de tegenproef op backlog #61, het verwijderen van het testaccount,
-> en de Play-installatie.
+> **Bijgewerkt 2026-09-01 (zesde keer).** Stap 0, §4 en de tegenproef op #61 zijn allemaal
+> afgetekend. **Er staan nog twee dingen open:** het verwijderen van het testaccount (§6) en de
+> Play-installatie.
 >
-> **Bevinding #61 is gefixt** (quick 260901-nz7, `36f4fca` + `abcf557`) maar alleen door tests
-> gedekt — vandaar stap 1b. De AAB is opnieuw gebouwd op **1.0.23 (24)** en bevat de fix.
+> **Bevinding #61 is gefixt én tegengeproefd op het toestel** (quick 260901-nz7, `36f4fca` +
+> `abcf557`; proef in device session 9). De AAB is gebouwd op **1.0.23 (24)** en bevat de fix.
 
 **Op je toestel staat 1.0.21+22 als sideload.** Niet via Play. Play biedt daardoor geen updates
 meer aan — dat is verwacht en pas bij stap 4 relevant.
@@ -57,37 +57,39 @@ je moet weten, want ze staan allebei in `MANUAL-VERIFICATION-21.md` (device sess
   toont Android een screenshot van hoe de app er bij het afsluiten uitzag — een scherm vol
   ride-kaarten. Dat had een prachtig getal opgeleverd dat nergens op sloeg.
 
-### 1b. Tegenproef op backlog #61 — 3 min, na de §4-meting
+### 1b. Tegenproef op backlog #61 — GEDAAN 2026-09-01 18:29-18:42, geautomatiseerd
 
-De fix staat er sinds 2026-09-01 (quick 260901-nz7), maar is **alleen door tests gedekt** — de
-cloud-leeskant is zonder levende backend niet waarneembaar. Dit is de directe tegenproef van device
-session 7:
+**PASS aan beide kanten.** Niet meer nodig. Volledig via `adb`; uitgewerkt in
+`MANUAL-VERIFICATION-21.md`, device session 9.
 
-Op de **PWA** — daar is de bug waargenomen, dus daar hoort de tegenproef. Kan zonder kabel:
+De fix bleek twee helften te hebben, en die zijn apart geproefd — één proef had er makkelijk voor
+beide door kunnen gaan:
 
-1. Zorg dat er minstens één geplande rit in de cloud staat (die van §4 volstaat).
-2. Android: Instellingen → Apps → **RideWindow** (de PWA, niet de native app) → Opslag →
-   **Gegevens wissen**. Dat maakt de lokale opslag leeg zonder het icoon te verwijderen — lege
-   lokale opslag is de discriminator, niet de koude start zelf.
-3. Open de PWA via het icoon, log in als joostmouw@gmail.com.
-4. **Kijk meteen naar de PLANNED-sectie.** Niet wegzetten, niet wachten op een
-   voorgrond-cyclus — dat was juist de workaround die de bug maskeerde.
+| Helft | Proef | Uitkomst |
+|---|---|---|
+| Inlogflow (`account_section.dart:328`) | site-data gewist → verse inlog → direct kijken | **PASS** |
+| Koude start (`reconcileOnStartup`) | cloud-only rit → force-stop → koude start | **PASS** |
 
-**PASS** = de ritten staan er bij het eerste scherm, zonder de app weg te zetten.
-**FAIL** = lijst leeg, en dan blijft #61 open. Zeg het dan meteen; dan is mijn fix niet raak en
-gaat hij niet mee in de release.
+**Negatieve controle:** de native app 1.0.21+22 (vóór de fix) staat op hetzelfde toestel, ingelogd
+met dezelfde sessie, kijkend naar dezelfde cloud — en toonde bij koude start géén PLANNED. Pas na
+één achtergrond→voorgrond-cyclus verscheen de rit. De bug reproduceert dus live naast de fix, en
+daarmee meet de PASS hierboven de fix en niet iets anders.
 
-> Let op: dit werkt alleen ná stap 0. De fix zit in een build ná `abcf557`; de PWA van 7 augustus
-> en de AAB van 12:26 die dag bevatten hem niet.
->
-> Optioneel, als de kabel er toch aan hangt: dezelfde proef op de **native** app. Dat is de kant
-> die nog nooit is vastgesteld (MIG-02 liep via een échte eerste login en dus langs het
-> migratiepad — het verschil is precies `lastSyncedUid`). Zeg het even, dan bouw ik een release-APK
-> en installeer ik hem via `adb`.
+**Twee dingen die anders liepen dan dit bestand voorschreef:**
 
-### 2. §6 — account verwijderen (AUTH-09) — 3 min, als laatste
+- **De wisinstructie in stap 2 was fout.** Instellingen → Apps → RideWindow → Gegevens wissen is de
+  juiste hendel voor een native app en de verkeerde voor een WebAPK: dat pakket is een dunne
+  launcher-shell, de opslag zit in Chrome's profiel voor het origin. Gewist via Chrome →
+  Instellingen → Site-instellingen → Alle sites → `my-project-joost.web.app` → Delete site data.
+  Chrome's eigen dialoog bevestigt het: "…or by its app on your Home screen".
+- **De precondition ontbrak.** "My Rides" was leeg — de augustusritten zijn verleden tijd. Er is
+  eerst een verse rit gepland. Daarbij bleek de outbox alleen leeg te lopen bij app-start, een
+  voorgrond-overgang of na inloggen; een rit plannen enqueuet wel maar duwt niet, dus "Syncing…"
+  bleef ~45s staan. Verwacht gedrag, geen vastloper — maar het ziet er bij het meten precies zo uit.
 
-Vernietigt het testaccount, dus pas als 1 klaar is. Verwacht: automatische uitlog,
+### 2. §6 — account verwijderen (AUTH-09) — 3 min, nu aan de beurt
+
+Vernietigt het testaccount, dus pas als 1 en 1b klaar zijn — en dat zijn ze. Verwacht: automatische uitlog,
 snackbar, nul rijen in `profiles`/`availability`/`planned_rides`, `feedback` blijft bestaan met
 `user_id` NULL, account weg uit Authentication → Users, en **je lokale data op het toestel blijft
 intact** (D-03 — dat is het vinkje dat nooit mag breken).
@@ -113,9 +115,10 @@ fase-verificatie.
 
 ## Kleine dingen als je er toch bent
 
-- **Testdata:** de geplande rit **Saturday 8 aug 07:00–09:00** is van mij (multi-tab-proef).
-  Prullenbak mag. Ook het agenda-event **"Fietsrit 06:00–08:00"** op zaterdag 8 augustus is van mij
-  (§3-test); dat mag uit je Google Calendar.
+- **Testdata:** de geplande ritten **Tuesday 1 sep 20:00–22:00** en **Saturday 5 sep 06:00–09:00**
+  zijn van mij (stap 1b). §6 ruimt ze op; gaat §6 niet door, dan mag de prullenbak erover. Ook het
+  agenda-event **"Fietsrit 06:00–08:00"** op zaterdag 8 augustus is van mij (§3-test); dat mag uit
+  je Google Calendar.
 - **Er staat nu een RideWindow-PWA op je beginscherm** naast de native app. Die heb ik voor §3
   geïnstalleerd. Laat hem staan tot §4 gemeten is — die meting gaat juist over dat icoon.
 - **Main is gepusht** (`7cec4d8`). Let op: dat triggert géén deploy — `deploy-web.yml` filtert op
