@@ -16,20 +16,21 @@ Werkboom schoon. Suite 441/1 (die ene is de bekende notificatietest die na 19:00
 
 ## Wat nog open staat, in deze volgorde
 
-### 0. Eerst pushen, anders meet je oude code — 5 min, grotendeels wachten
+### 0. Deployen — GEDAAN 2026-09-01 15:52 UTC
 
-**De #61-fix staat alleen lokaal.** Main is niet gepusht, dus `deploy-web.yml` heeft nooit
-gedraaid en de PWA serveert nog 1.0.21+22. Je toestel draait diezelfde versie als sideload.
+Main gepusht (`23d952c..1e299ed`), `deploy-web.yml` liep vanzelf omdat de commits `lib/` en
+`pubspec.yaml` raken. Live geverifieerd:
 
-Zou je §4 nú meten, dan meet je een koude start zónder de opstart-reconcile — precies de code die
-niet uitgeleverd wordt. En stap 1b zou sowieso falen, want de fix zit er niet in.
+- `version.json` = **1.0.23 / 24** (was 1.0.22 / 23)
+- `main.dart.js` `last-modified: Tue, 01 Sep 2026 15:52:36 GMT`, 5.559.673 bytes
 
-1. `git push origin main` — de commits raken `lib/` en `pubspec.yaml`, dus dit tríggert de deploy
-   (in tegenstelling tot de docs-push van 7 augustus).
-2. Wacht op de groene run in de Actions-tab (~3 min).
-3. Controleer dat het echt live staat: `https://my-project-joost.web.app/version.json` moet
-   **1.0.23 / 24** teruggeven. Staat er nog 1.0.21, dan is er niets gedeployd en heeft doormeten
-   geen zin.
+**De PWA draait dus de #61-fix; je toestel draait als sideload nog 1.0.21+22.** Dat is precies
+waarom stap 1 en 1b op de PWA gaan en niet op de native app.
+
+> Terzijde, een aanname die ik hier moest rechtzetten: dit bestand beweerde dat de PWA op
+> 1.0.21+22 stond. Dat klopte niet — hij stond op 1.0.22+23, want de branding-commit van
+> 7 augustus raakte `web/` en `pubspec.yaml` en tríggerde dus wél een deploy. De conclusie
+> (er moest gedeployd worden) bleef staan, het genoemde versienummer niet.
 
 ### 1. §4 — koude start (REG-03) — 2 min
 
