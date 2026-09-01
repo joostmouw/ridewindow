@@ -1,8 +1,12 @@
 # Volgende sessie — wat jij moet doen
 
-> **Bijgewerkt 2026-08-07 (vierde keer).** §2 én §3 zijn compleet, allebei via `adb` gedreven.
-> Er staat nog één echte bevinding open (zie onderaan) en drie stappen: een tijdmeting, het
-> verwijderen van het testaccount, en de Play-installatie.
+> **Bijgewerkt 2026-09-01 (vijfde keer).** §2 én §3 zijn compleet, allebei via `adb` gedreven.
+> Vier stappen: een tijdmeting, de tegenproef op backlog #61, het verwijderen van het testaccount,
+> en de Play-installatie.
+>
+> **Bevinding #61 is gefixt** (quick 260901-nz7, `36f4fca` + `abcf557`) maar alleen door tests
+> gedekt — vandaar stap 1b. De klaarstaande AAB dateert van vóór die fix; er moet opnieuw gebouwd
+> worden voordat stap 4 zinvol is.
 
 **Op je toestel staat 1.0.21+22 als sideload.** Niet via Play. Play biedt daardoor geen updates
 meer aan — dat is verwacht en pas bij stap 4 relevant.
@@ -32,6 +36,18 @@ Boven de 2 seconden = blokkerend, dan sluiten we de fase niet.
 > "voor"-getal. Meet toch — het bewijst de grens in absolute zin — en noteer dat er geen geldige
 > vergelijking bestaat.
 
+### 1b. Tegenproef op backlog #61 — 3 min, na de §4-meting
+
+De fix staat er sinds 2026-09-01 (quick 260901-nz7), maar is **alleen door tests gedekt** — de
+cloud-leeskant is zonder levende backend niet waarneembaar. Dit is de directe tegenproef van device
+session 7:
+
+De app opnieuw installeren (of app-data wissen), inloggen, en kijken of de PLANNED-sectie **meteen**
+gevuld is. Niet wegzetten, niet wachten op een voorgrond-cyclus — dat was juist de workaround.
+Blijft de lijst leeg, dan is de fix niet raak en moet #61 open blijven.
+
+Let op: de fix zit pas in een build ná `abcf557`. De AAB van 12:26 op 2026-08-07 bevat hem niet.
+
 ### 2. §6 — account verwijderen (AUTH-09) — 3 min, als laatste
 
 Vernietigt het testaccount, dus pas als 1 klaar is. Verwacht: automatische uitlog,
@@ -44,8 +60,10 @@ intact** (D-03 — dat is het vinkje dat nooit mag breken).
 Eén Play-installatie van de laatste build, zodat de fase eindigt op de distributieroute die
 gebruikers krijgen.
 
-**De AAB staat klaar:** `build/app/outputs/bundle/release/app-release.aab`, versie **1.0.22 (23)**,
-gebouwd 2026-08-07 12:26. Version code 23 is vrij (Play staat op 20). Uploaden is handwerk in Play
+**Let op: de klaarstaande AAB is verouderd.** `build/app/outputs/bundle/release/app-release.aab`,
+versie **1.0.22 (23)**, gebouwd 2026-08-07 12:26 — dat is vóór de #61-fix van 2026-09-01. Eerst
+opnieuw bouwen (en de versie bumpen als 23 inmiddels gebruikt is), anders upload je een build
+zonder de fix die stap 1b net bewezen heeft. Version code 23 is vrij (Play staat op 20). Uploaden is handwerk in Play
 Console — er is geen service account, geen fastlane en geen Play-workflow in dit project, alleen de
 webdeploy is geautomatiseerd. Ruim bij het aanmaken van de release eerst de lege "Untitled"-draft
 op, anders laat Play je geen tweede draft maken. Daarna schrijf ik `21-08-SUMMARY.md` en `21-09-SUMMARY.md` en draai ik de

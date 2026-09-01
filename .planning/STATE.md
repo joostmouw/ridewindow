@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: §2+§3 groen; bevinding #61 open"
-last_updated: "2026-08-07T12:50:00.000Z"
-last_activity: 2026-08-07
+status: "Fase 21: #61 gefixt; 3 toestelstappen open"
+last_updated: "2026-09-01T15:15:00.000Z"
+last_activity: 2026-09-01
 progress:
   total_phases: 5
   completed_phases: 2
@@ -515,12 +515,14 @@ Recente beslissingen die het huidige werk beinvloeden:
 | 260804-vb1 | bump-version-1-0-13-14 | Versie gebumpt naar 1.0.13+14 en release-AAB herbouwd (+13 was al gebruikt door de fase-19-build van 2026-07-26) | 2026-08-04 | 169b1d6 |
 | 260804-gi3 | gitignore-assistant-memory-en-videos | `.claude/projects/` (Claude-geheugen) en `photos/*.mp4` (~15 MB bronvideo) gegitignored — publieke repo, blijven anders permanent in de historie; `.claude/skills/material-3/` en de logo-PNG wel gecommit | 2026-08-04 | bd2cf78 |
 | 260807-gpz | fase-21-doc-afronding | Fase-21-docs bijgewerkt na drie antwoorden van Joost: SYNC-11 (multi-tab) en SYNC-04 (webkant) afgetekend als PASS op echte waarnemingen, mijn eerdere bugvermoeden uit de web-diagnose expliciet ingetrokken (de telefoon had nooit een voorgrond-overgang gemaakt — meetopstelling, niet code), en §3 herschreven naar Android-WebAPK met de iOS-PWA uitgesteld naar v2 op grond van de Android-only-constraint. MORGEN.md terug van zeven naar zes toestelstappen | 2026-08-07 | ca91cb8 |
+| 260901-nz7 | fix-backlog-61-startup-reconcile-voor-ee | Backlog #61: er was geen pad dat bij het opstarten uit de cloud las — `reconcileOnForeground()` had één aanroeper (`didChangeAppLifecycleState` op `resumed`) en die vuurt niet bij het starten, dus een verse installatie met een geldige sessie toonde een lege PLANNED-lijst tot de app eenmaal was weggezet. Nieuw `reconcileOnStartup()`, fire-and-forget vanuit `HomeScreen.initState`, one-shot per account per app-start. De sweep vond een tweede gat langs dezelfde vorm: `onSignIn()` dekt alleen profile+availability, dus een verse ínlog haalde zijn ritten evenmin op — `_runAccountSync()` sluit nu af met `reconcileOnForeground()` in plaats van een kale `drainOutbox()`. Onderweg gemeten en het bepaalde het ontwerp: een StreamProvider zonder listener abonneert zich nooit, dus `authStateProvider.value` is null bij `initState`; opgelost met een terugval op de herstelde sessie. Suite 451/451, analyze op baseline 162 (0 errors). **Niet op toestel geverifieerd** — zie SUMMARY | 2026-09-01 | 36f4fca, abcf557 |
 | 260807-nm1 | app-naam-gelijktrekken | De app heette op drie plekken anders: `android:label` en `web/index.html` stonden op `ridewindow`, `web/manifest.json` op `RideWindow` — zichtbaar geworden doordat de §3-PWA naast de native app op het beginscherm kwam te staan. Alle gebruikerszichtbare bronnen op `RideWindow` gezet (`pubspec.yaml`'s package-naam bewust ongemoeid). `test/web/app_display_name_test.dart` legt de invariant vast als "de bronnen zijn het onderling eens" in plaats van een letterlijke waarde — de les van quick-260726-ka2 — en is negatief geverifieerd. AAB opnieuw gebouwd; die van 12:26 droeg de oude naam. Suite 445/445, analyze op baseline 162 | 2026-08-07 | (zie commit) |
 
 ## Session Continuity
 
-Last session: 2026-08-07T10:20:00.000Z
-Last activity: 2026-08-07 - Fase 21 webkant afgerond: SYNC-11 en SYNC-04 afgetekend op echte waarnemingen, §3 herschreven naar Android-WebAPK (iOS naar v2), MORGEN.md opgeschoond. Fase 21 wacht nu enkel nog op vijf toestelstappen — zie `.planning/phases/21-sync-migration/MORGEN.md`. Daarna 21-08/21-09-SUMMARY en de fase-verificatie.
+Last session: 2026-09-01T15:15:00.000Z
+Last activity: 2026-09-01 - Backlog #61 gefixt (quick 260901-nz7): opstart-reconcile toegevoegd én dezelfde blinde vlek in de inlogflow gedicht. Suite 451/451. Nog niet op toestel bewezen — hangt aan dezelfde sessie als de resterende stappen in `.planning/phases/21-sync-migration/MORGEN.md` (§4 koude-startmeting, §6 account verwijderen, Play-installatie).
+Vorige sessie: 2026-08-07 - Fase 21 webkant afgerond: SYNC-11 en SYNC-04 afgetekend op echte waarnemingen, §3 herschreven naar Android-WebAPK (iOS naar v2), MORGEN.md opgeschoond. Fase 21 wacht nu enkel nog op vijf toestelstappen — zie `.planning/phases/21-sync-migration/MORGEN.md`. Daarna 21-08/21-09-SUMMARY en de fase-verificatie.
 
 ## Operator Next Steps
 

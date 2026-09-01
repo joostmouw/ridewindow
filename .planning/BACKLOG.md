@@ -126,6 +126,12 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 
 ## 61 — Een verse installatie haalt geplande ritten niet op tot de app eenmaal is weggezet
 
+> **Gefixt 2026-09-01** in quick 260901-nz7 (`36f4fca`, `abcf557`) — `reconcileOnStartup()` vanuit
+> `HomeScreen.initState`, plus dezelfde blinde vlek gedicht in de inlogflow (`_runAccountSync()`
+> reconcilet nu in plaats van alleen te drainen; `onSignIn()` dekte alleen profile en
+> availability). **Nog niet op een toestel bewezen** — de tegenproef staat in
+> `.planning/phases/21-sync-migration/MORGEN.md`. Blijft open tot die meting er is.
+
 **Waargenomen 2026-08-07** op een net geïnstalleerde PWA (WebAPK, 1.0.22+23), ingelogd als
 joostmouw@gmail.com, met twee geplande ritten in de cloud.
 
