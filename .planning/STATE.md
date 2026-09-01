@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: #61 gefixt; 3 toestelstappen open"
-last_updated: "2026-09-01T15:15:00.000Z"
+status: "Fase 21: §4 gemeten; 1b + §6 + Play open"
+last_updated: "2026-09-01T16:30:00.000Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 5
@@ -521,7 +521,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 ## Session Continuity
 
 Last session: 2026-09-01T15:15:00.000Z
-Last activity: 2026-09-01 - Backlog #61 gefixt (quick 260901-nz7): opstart-reconcile toegevoegd én dezelfde blinde vlek in de inlogflow gedicht. Suite 451/451. Nog niet op toestel bewezen — hangt aan dezelfde sessie als de resterende stappen in `.planning/phases/21-sync-migration/MORGEN.md` (§4 koude-startmeting, §6 account verwijderen, Play-installatie).
+Last activity: 2026-09-01 - Backlog #61 gefixt (quick 260901-nz7) en gedeployd (PWA op 1.0.23+24); §4 koude start geautomatiseerd gemeten en afgetekend (mediaan ~1,75-1,8s, PASS met een staart: ~1 op 4 starts haalt 2,0s niet). Meetharness blijvend gemaakt als `tools/measure_cold_start.py`. Resteren drie stappen met een toestel: 1b (tegenproef #61 op verse installatie), §6 (account verwijderen), en de Play-upload van 1.0.23+24 — zie `.planning/phases/21-sync-migration/MORGEN.md`.
 Vorige sessie: 2026-08-07 - Fase 21 webkant afgerond: SYNC-11 en SYNC-04 afgetekend op echte waarnemingen, §3 herschreven naar Android-WebAPK (iOS naar v2), MORGEN.md opgeschoond. Fase 21 wacht nu enkel nog op vijf toestelstappen — zie `.planning/phases/21-sync-migration/MORGEN.md`. Daarna 21-08/21-09-SUMMARY en de fase-verificatie.
 
 ## Operator Next Steps
