@@ -128,6 +128,76 @@ class CloudSyncReconciler {
 
   static const _noopBand = Duration(seconds: 5);
 
+  /// Het uid waarvoor [reconcileOnStartup] deze app-start al gelopen heeft.
+  /// Instantieveld op een `keepAlive`-provider, dus dit is "één keer per
+  /// app-start per account".
+  String? _startupReconciledUid;
+
+  /// Opstart-reconcile (backlog #61) -- het pad dat ontbrak.
+  ///
+  /// Tot deze methode bestond hing de pull van geplande ritten uitsluitend aan
+  /// de voorgrond-reconcile. Bij een normale login staat `lastSyncedUid` al,
+  /// dus de eerste-login-migratie draait niet, en de initiële load telt niet
+  /// als voorgrond-overgang: er was geen enkel pad dat bij het opstarten uit
+  /// de cloud las. Een verse installatie met een geldige sessie toonde daardoor
+  /// een lege PLANNED-lijst tot de gebruiker de app eenmaal wegzette -- precies
+  /// het eerste wat iemand op een tweede toestel doet. Waargenomen 2026-08-07
+  /// op een verse WebAPK-installatie (MANUAL-VERIFICATION-21.md, device
+  /// session 7).
+  ///
+  /// Leunt op [_signedInUser] in plaats van op `authStateProvider.value`
+  /// alleen -- zie daar. Uitgelogd zet de guard niet, zodat een aanroep ná het
+  /// inloggen het alsnog kan doen.
+  ///
+  /// Fire-and-forget vanaf `HomeScreen.initState` en nooit geawait door de UI:
+  /// §4's grens van 2 seconden tot het eerste zichtbare ride slot mag hier niet
+  /// aan hangen.
+  Future<void> reconcileOnStartup() async {
+    final user = _signedInUser();
+    if (user == null) return;
+    if (_startupReconciledUid == user.id) return;
+    _startupReconciledUid = user.id;
+
+    // Vangt zijn eigen fouten al af, dus geen tweede try/catch eromheen --
+    // die zou alleen de eigen logging van die methode verduisteren.
+    await reconcileOnForeground();
+  }
+
+  /// Wie is er ingelogd, zonder aan te nemen dat iemand anders naar
+  /// `authStateProvider` luistert.
+  ///
+  /// Dat laatste is geen theoretisch punt: een `StreamProvider` waar niemand
+  /// naar luistert, abonneert zich nooit op zijn bron, en blijft dus eeuwig
+  /// `AsyncLoading` -- `.value` is dan `null` voor een gewoon ingelogde
+  /// gebruiker. Gemeten in `test/providers/startup_reconcile_wiring_test.dart`.
+  /// [reconcileOnForeground] kwam daar weg mee omdat het pas bij een
+  /// voorgrond-overgang draait, wanneer de widgetboom die listener allang
+  /// houdt. Bij `HomeScreen.initState` is er nog geen enkele build geweest en
+  /// geldt die aanname niet meer.
+  ///
+  /// De terugval is dezelfde bron als de seed van `authState` zelf
+  /// (`auth_notifier.dart`): `Supabase.initialize()` is in `main()` geawait
+  /// vóór `runApp()`, dus de herstelde sessie is hier synchroon beschikbaar.
+  ///
+  /// Bewust géén `_ref.listen` om de provider wakker te maken: dat legt een
+  /// afhankelijkheidsrand van deze provider naar `authStateProvider`, en de
+  /// eerstvolgende auth-wijziging disposet dan de `Ref` die deze klasse over
+  /// `await`-grenzen heen vasthoudt -- exact de fout die plan 21-11 dichtte.
+  ///
+  /// De try/catch dekt een niet-geïnitialiseerde Supabase (`Supabase.instance`
+  /// gooit dan). Dat is de normale toestand in de testsuite, en daar is
+  /// "niemand ingelogd" het juiste antwoord.
+  User? _signedInUser() {
+    final fromProvider = _ref.read(authStateProvider).value;
+    if (fromProvider != null) return fromProvider;
+    try {
+      return Supabase.instance.client.auth.currentSession?.user;
+    } catch (error) {
+      debugPrint('CloudSyncReconciler: geen auth-staat beschikbaar: $error');
+      return null;
+    }
+  }
+
   /// Never awaited from the UI (SYNC-07) — called fire-and-forget from
   /// `HomeScreen.didChangeAppLifecycleState`. Wrapped in a try/catch that
   /// swallows and `debugPrint`s any error: a failed reconcile must never
@@ -145,7 +215,10 @@ class CloudSyncReconciler {
     await drainOutbox();
 
     try {
-      final user = _ref.read(authStateProvider).value;
+      // Zelfde bron als de opstart-reconcile (zie [_signedInUser]): zonder de
+      // terugval op de herstelde sessie hangt deze lezing aan de vraag of er
+      // toevallig al een listener op `authStateProvider` staat.
+      final user = _signedInUser();
       if (user == null) return;
 
       final client = Supabase.instance.client;

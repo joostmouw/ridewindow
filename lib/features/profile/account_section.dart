@@ -314,7 +314,18 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
       // "Wordt gesynchroniseerd..." symptom found on-device 2026-08-04
       // (see MANUAL-VERIFICATION-21.md). `drainOutbox()` never throws, so
       // this call cannot turn a background sync problem into a crash.
-      await ref.read(cloudSyncReconcilerProvider).drainOutbox();
+      //
+      // Backlog #61: dit was een kale `drainOutbox()`, en dat liet de inlogflow
+      // met dezelfde blinde vlek zitten als de koude start. `onSignIn()`
+      // hierboven behandelt uitsluitend `profile` en `availability`; geplande
+      // ritten komen daar alleen langs via de eerste-login-migratie-RPC, en die
+      // *pusht*. Een verse inlog op een tweede toestel haalde zijn ritten dus
+      // nooit op. `reconcileOnForeground()` begint zelf met een drain (21-14's
+      // push-vóór-pull-volgorde), dus 21-10's garantie blijft exact staan; de
+      // pull van planned_rides komt erbij. Bewust niet `reconcileOnStartup()`:
+      // die is one-shot per account en zou bij uitloggen + opnieuw inloggen met
+      // hetzelfde account (§2's uitlog-ronde) juist de drain overslaan.
+      await ref.read(cloudSyncReconcilerProvider).reconcileOnForeground();
 
       if (mounted) {
         ref.invalidate(profileProvider);

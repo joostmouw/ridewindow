@@ -72,6 +72,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Backlog #61: fire-and-forget opstart-reconcile. Zonder deze aanroep hing
+    // de pull uit de cloud uitsluitend aan didChangeAppLifecycleState hieronder,
+    // en die vuurt niet bij het opstarten -- een verse installatie met een
+    // geldige sessie toonde daardoor een lege PLANNED-lijst tot de gebruiker de
+    // app eenmaal wegzette. Bewust niet geawait en zonder setState: §4's grens
+    // van 2 seconden tot het eerste ride slot mag hier niet aan hangen. De
+    // methode is one-shot per account, dus opnieuw naar Home navigeren kost
+    // geen tweede reconcile.
+    ref.read(cloudSyncReconcilerProvider).reconcileOnStartup();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Delay to ensure all widgets have completed layout for spotlight measurement
       await Future.delayed(const Duration(milliseconds: 500));
