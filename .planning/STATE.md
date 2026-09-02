@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: alles op 1.0.23+24 behalve Play"
-last_updated: "2026-09-02T05:55:00.000Z"
+status: "Fase 21: alleen Play-installatie op toestel open"
+last_updated: "2026-09-02T06:10:00.000Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 5
@@ -522,8 +522,10 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-09-01T15:15:00.000Z
-Last activity: 2026-09-01 - Backlog #61 gefixt (quick 260901-nz7) en gedeployd (PWA op 1.0.23+24); §4 koude start geautomatiseerd gemeten en afgetekend (mediaan ~1,75-1,8s, PASS met een staart: ~1 op 4 starts haalt 2,0s niet). Meetharness blijvend gemaakt als `tools/measure_cold_start.py`. Resteren drie stappen met een toestel: 1b (tegenproef #61 op verse installatie), §6 (account verwijderen), en de Play-upload van 1.0.23+24 — zie `.planning/phases/21-sync-migration/MORGEN.md`.
+Last session: 2026-09-02T06:10:00.000Z
+Last activity: 2026-09-02 - Fase 21 vrijwel dicht. Stap 1b: backlog #61 tegengeproefd op het toestel, **PASS aan beide helften** (inlogflow én koude start), met een negatieve controle op de pre-fix build 1.0.21+22 die de bug live reproduceerde. §6 (AUTH-09) uitgevoerd op de PWA: app-kant PASS inclusief D-03 op drie schermen, en de Supabase-kant geverifieerd via twee leesqueries (nul weesrijen, account weg uit `auth.users`). De `feedback`-controle is **vervallen, niet gehaald** — die tabel is leeg, dus `on delete set null` is alleen door het schema gedekt. Onderweg gevonden en gefixt: `lib/core/app_version.dart` liep achter op `pubspec.yaml` (quick 260901-r92) — de rode test die dat aanwees was maandenlang afgedaan als "de bekende flaky notificatietest". Suite nu **451/451**. Alles staat op **1.0.23+24**: main gepusht, PWA live geverifieerd in de bundel, toestel bijgewerkt via `adb install -r` (data behouden), en Play internal testing uitgerold op 2026-09-02 08:00. `21-08-SUMMARY.md` geschreven (compleet), `21-09-SUMMARY.md` geschreven (**incomplete**).
+
+**Enige openstaande stap voor fase 21:** de app één keer via Play installeren op het toestel. Vereist eerst deïnstalleren (sideload vs. Play-signing) en wist daarmee lokale data + de Calendar-OAuth-grant. Let daarna specifiek op inloggen en Google Calendar — zie `.planning/phases/21-sync-migration/MORGEN.md` stap 3. Blijft daarnaast staan: fase 19's ontbrekende koude-start-basislijn (plan 19-07), waardoor REG-03 geen vóór/ná-vergelijking heeft.
 Vorige sessie: 2026-08-07 - Fase 21 webkant afgerond: SYNC-11 en SYNC-04 afgetekend op echte waarnemingen, §3 herschreven naar Android-WebAPK (iOS naar v2), MORGEN.md opgeschoond. Fase 21 wacht nu enkel nog op vijf toestelstappen — zie `.planning/phases/21-sync-migration/MORGEN.md`. Daarna 21-08/21-09-SUMMARY en de fase-verificatie.
 
 ## Operator Next Steps

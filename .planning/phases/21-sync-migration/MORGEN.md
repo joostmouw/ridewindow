@@ -1,8 +1,8 @@
 # Volgende sessie — wat jij moet doen
 
-> **Bijgewerkt 2026-09-01 (zesde keer).** Stap 0, §4, de tegenproef op #61 én §6 zijn afgetekend,
-> inclusief de Supabase-kant. **Er staat nog één ding open: de Play-upload en -installatie** (stap 3,
-> handwerk in Play Console).
+> **Bijgewerkt 2026-09-02 (zevende keer).** Stap 0, §4, de tegenproef op #61, §6 én de Play-upload
+> zijn allemaal afgetekend. **Er staat nog precies één ding open: de app één keer via Play
+> installeren op het toestel** (stap 3). Dat vereist eerst deïnstalleren — zie daar.
 >
 > **Bevinding #61 is gefixt én tegengeproefd op het toestel** (quick 260901-nz7, `36f4fca` +
 > `abcf557`; proef in device session 9). De AAB is gebouwd op **1.0.23 (24)** en bevat de fix.
@@ -119,32 +119,33 @@ instellingen ongewijzigd, beschikbaarheidsrooster identiek, en beide geplande ri
 > **Nevenwaarneming:** er staan 11 accounts in `auth.users`, allemaal `voornaamachternaam.12345@
 > gmail.com`. Dat oogt gegenereerd. Geseed of echte closed-test-testers? Niets mee gedaan.
 
-### 3. Afsluiten — draft klaargezet, jij doet de laatste twee handelingen
+### 3. Afsluiten — UITGEROLD 2026-09-02 08:00; alleen de Play-installatie rest
 
-Eén Play-installatie van de laatste build, zodat de fase eindigt op de distributieroute die
-gebruikers krijgen.
+**Play staat op 24 (1.0.23)**, internal testing track, "Available to internal testers", uitgerold
+door Joost op 2026-09-02 08:00. Geverifieerd in de Console: `Latest release: 24 (1.0.23)`.
 
-**De AAB staat klaar, mét de #61-fix:** `build/app/outputs/bundle/release/app-release.aab`, versie
-**1.0.23 (24)**, 66 MB, **opnieuw gebouwd 2026-09-01 19:37**.
+De geüploade AAB is die van **2026-09-01 19:37** — de herbouwde, mét de gecorrigeerde
+`app_version.dart`. Geverifieerd op twee niveaus vóór upload: `versionName=1.0.23` in het packaged
+manifest, én de string `1.0.23 (24)` letterlijk in de gecompileerde Dart
+(`base/lib/arm64-v8a/libapp.so`).
 
-> **Gebruik niet de AAB van 17:32.** Die is overschreven, maar mocht je hem ergens bewaard hebben:
-> hij is gebouwd mét de foute `app_version.dart` en toont in de app "1.0.22 (23)" terwijl zijn
-> manifest 1.0.23 (24) zegt. De nieuwe is geverifieerd op twee niveaus: `versionName=1.0.23` in het
-> packaged manifest, én de string `1.0.23 (24)` letterlijk aanwezig in de gecompileerde Dart
-> (`base/lib/arm64-v8a/libapp.so`).
+**Wat nog rest — en dit is het énige dat fase 21 nog openhoudt:**
 
-Bewust gebumpt van 1.0.22+23: die AAB bestond al zónder de fix, en twee bestanden met hetzelfde
-versienummer en verschillende inhoud is precies het soort verwarring dat een avond kost.
+> **Installeer de app één keer via Play op het toestel.**
+>
+> Dat kan niet als update: het toestel draagt een **sideload** met de upload-sleutel, Play levert een
+> **Play-gesigneerde** build. Je moet dus eerst deïnstalleren, en **dat wist de lokale Drift-database
+> én de Google Calendar-OAuth-grant** (dat laatste gebeurde ook op 5 augustus).
+>
+> Die prijs is nu laag: de lokale data is nog slechts testdata, en het D-03-bewijs is al vastgelegd.
+>
+> **Waarom het tóch moet:** Play hertekent de bundel met zijn eigen sleutel, dus testers draaien een
+> ánders gesigneerde app dan wat er nu op het toestel staat. In dit project is precies dát al een
+> keer misgegaan — Calendar werkte in een sideload en was stuk vanuit Play, door een niet-geregistreerde
+> SHA-1. Fase 19's AUTH-10 eist daarom expliciet een bewijs vanaf een échte Play-installatie.
+> Let na de installatie dus specifiek op **inloggen** en **Google Calendar**.
 
-**Draft aangemaakt 2026-09-01 in Play Console**, internal testing track, release **"24 (1.0.23)"**
-met release notes in `en-GB`. Opgeslagen als draft, nog niet uitgerold.
-
-Wat jij nog doet, in die volgorde:
-
-1. **De AAB in de dropzone slepen.** Ik kan dat niet: de upload-tool van de browserextensie zit op
-   een limiet van 10 MB en het bestand is 66 MB.
-2. **"Start rollout to Internal testing"** indrukken, plus eventuele Play-akkoordschermen.
-3. Daarna de app één keer via Play installeren op het toestel.
+Daarna kan `21-09-SUMMARY.md` van `incomplete` naar `complete` en kan de fase-verificatie draaien.
 
 > **Twee dingen die dit bestand eerder verkeerd had, rechtgezet door te kijken:**
 > er was **geen lege "Untitled"-draft** om op te ruimen, en de internal testing track stond niet op

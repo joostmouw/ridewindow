@@ -46,12 +46,18 @@ completed: null
 
 ## Status: incomplete
 
-Wat nog moet gebeuren voordat dit plan dicht kan:
+Wat nog moet gebeuren voordat dit plan dicht kan — nog **één** ding:
 
-1. De AAB **1.0.23 (24)** uploaden naar de internal testing track (draft staat klaar) en uitrollen.
-2. De app één keer via Play installeren, zodat de fase eindigt op de distributieroute die gebruikers krijgen.
+> **De app één keer via Play installeren op het toestel**, zodat de fase eindigt op de
+> distributieroute die gebruikers krijgen. Dat vereist eerst deïnstalleren van de sideload (andere
+> handtekening), en dat wist de lokale data én de Calendar-OAuth-grant. Let na installatie specifiek
+> op **inloggen** en **Google Calendar** — dat is wat een Play-gesigneerde build bewijst en een
+> sideload niet kan (AUTH-10; Calendar is in dit project al eens precies zo stukgegaan).
 
-Het uploaden is handwerk: er is geen service account, geen fastlane en geen Play-workflow in dit project.
+Afgerond op 2026-09-02 08:00: de AAB **1.0.23 (24)** is geüpload en uitgerold naar de internal
+testing track. Geverifieerd in de Console: `Latest release: 24 (1.0.23)`, "Available to internal
+testers". Dat was handwerk — er is geen service account, geen fastlane en geen Play-workflow in dit
+project.
 
 ## Wat er wél is afgetekend
 
