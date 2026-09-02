@@ -1,19 +1,29 @@
 # Volgende sessie — wat jij moet doen
 
-> **Bijgewerkt 2026-09-02 (zevende keer).** Stap 0, §4, de tegenproef op #61, §6 én de Play-upload
-> zijn allemaal afgetekend. **Er staat nog precies één ding open: de app één keer via Play
-> installeren op het toestel** (stap 3). Dat vereist eerst deïnstalleren — zie daar.
+> **Bijgewerkt 2026-09-02 08:25 (achtste keer). Er staat niets meer open in fase 21.** De laatste
+> stap — de app via Play installeren — is om 08:06 uitgevoerd en AUTH-10 is aan alle kanten
+> afgetekend. Wat hieronder staat is historie; lees het alleen als je wilt weten hoe iets gelopen is.
 >
-> **Bevinding #61 is gefixt én tegengeproefd op het toestel** (quick 260901-nz7, `36f4fca` +
-> `abcf557`; proef in device session 9). De AAB is gebouwd op **1.0.23 (24)** en bevat de fix.
+> **Wat er nog van jou wordt gevraagd, en geen van beide is blokkerend:**
+>
+> 1. **Zet je beschikbaarheidsrooster opnieuw.** De app staat op het onboarding-preset "Evenings &
+>    weekends". Je eigen rooster is niet vandaag verdwenen: de cloudkopie ging weg met §6 (account
+>    verwijderd) en de lokale met de verplichte deïnstallatie. Dat was de vooraf benoemde prijs.
+> 2. **Ruim mijn testdata op:** de geplande rit **woensdag 2 september 20:00–22:00** in de app, en
+>    het agenda-event **"Fietsrit 20:00–22:00"** op diezelfde dag in je echte Google Calendar.
+>
+> Optioneel, dertig seconden: kijk in de Supabase Table Editor of de rijen van vandaag in
+> `profiles` / `availability` staan. Het RPC-pad zelf is al bewezen (4 augustus, met echte waarden),
+> dus dit is de laatste centimeter en geen gat.
 
-**Op je toestel staat sinds 2026-09-02 07:5x de sideload 1.0.23+24**, bijgewerkt via
-`adb install -r` — dus zónder deïnstallatie, waardoor de lokale data én de Google
-Calendar-koppeling behouden zijn. Geverifieerd op twee niveaus: `versionCode=24` /
-`versionName=1.0.23` in `dumpsys package`, en `Version 1.0.23 (24)` in het profielscherm zelf.
+**Op je toestel staat sinds 2026-09-02 08:06 de Play-installatie 1.0.23+24** —
+`installerPackageName=com.android.vending`, dus Play-gesigneerd en niet langer een sideload. Play
+biedt vanaf nu weer gewoon updates aan.
 
-Het blijft een **sideload**, dus Play-gesigneerd is het niet en Play biedt geen updates aan. Dat is
-verwacht en pas bij stap 3 relevant.
+> **Historie:** hiervóór stond er sinds 5 augustus een sideload met de upload-sleutel. Die kon via
+> `adb install -r` bijgewerkt worden met behoud van data, maar terug naar Play vereiste
+> deïnstalleren, en dát wiste de lokale database en de Calendar-grant. Beide zijn na de installatie
+> opnieuw opgebouwd.
 
 Werkboom schoon. **Suite 451/451 — volledig groen**, voor het eerst in deze fase.
 
@@ -119,7 +129,27 @@ instellingen ongewijzigd, beschikbaarheidsrooster identiek, en beide geplande ri
 > **Nevenwaarneming:** er staan 11 accounts in `auth.users`, allemaal `voornaamachternaam.12345@
 > gmail.com`. Dat oogt gegenereerd. Geseed of echte closed-test-testers? Niets mee gedaan.
 
-### 3. Afsluiten — UITGEROLD 2026-09-02 08:00; alleen de Play-installatie rest
+### 3. Afsluiten — GEDAAN 2026-09-02 08:06. Fase 21 is dicht.
+
+**De Play-installatie is uitgevoerd en AUTH-10 is afgetekend.** Bewijs, in volgorde van gewicht:
+
+| Wat | Uitkomst |
+|---|---|
+| Bron van de installatie | `installerPackageName=com.android.vending` — Play, geen sideload |
+| Versie | `versionCode=24 / versionName=1.0.23`, in-app "Version 1.0.23 (24)" |
+| Inloggen | joostmouw@gmail.com, **geen `ApiException: 10`**, status "Synced", overleeft een koude start |
+| Google Calendar lezen | import gaf blauwe Calendar-blokken; profiel toont "Connected" |
+| Google Calendar schrijven | `Fietsrit 20:00–22:00` staat in je echte agenda, op het juiste tijdstip |
+
+Eén valstrik voor een volgende keer: een `market://`-intent opent op dit toestel **HeyTap Market**,
+Oppo's eigen store. Gebruik `-d "https://play.google.com/store/apps/details?id=..." -p
+com.android.vending`.
+
+Volledig in `MANUAL-VERIFICATION-21.md`, device session 10.
+
+---
+
+### 3 (historie). Wat hier stond toen de installatie nog open was
 
 **Play staat op 24 (1.0.23)**, internal testing track, "Available to internal testers", uitgerold
 door Joost op 2026-09-02 08:00. Geverifieerd in de Console: `Latest release: 24 (1.0.23)`.
@@ -129,7 +159,7 @@ De geüploade AAB is die van **2026-09-01 19:37** — de herbouwde, mét de geco
 manifest, én de string `1.0.23 (24)` letterlijk in de gecompileerde Dart
 (`base/lib/arm64-v8a/libapp.so`).
 
-**Wat nog rest — en dit is het énige dat fase 21 nog openhoudt:**
+**Wat toen nog restte — inmiddels gedaan, zie hierboven:**
 
 > **Installeer de app één keer via Play op het toestel.**
 >
@@ -145,7 +175,7 @@ manifest, én de string `1.0.23 (24)` letterlijk in de gecompileerde Dart
 > SHA-1. Fase 19's AUTH-10 eist daarom expliciet een bewijs vanaf een échte Play-installatie.
 > Let na de installatie dus specifiek op **inloggen** en **Google Calendar**.
 
-Daarna kan `21-09-SUMMARY.md` van `incomplete` naar `complete` en kan de fase-verificatie draaien.
+`21-09-SUMMARY.md` staat inmiddels op `complete` (2026-09-02); de fase-verificatie kan draaien.
 
 > **Twee dingen die dit bestand eerder verkeerd had, rechtgezet door te kijken:**
 > er was **geen lege "Untitled"-draft** om op te ruimen, en de internal testing track stond niet op

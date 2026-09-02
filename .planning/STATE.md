@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: alleen Play-installatie op toestel open"
-last_updated: "2026-09-02T06:10:00.000Z"
-last_activity: 2026-09-01
+status: "Fase 21 uitgevoerd: 14/14 plannen, klaar voor verificatie"
+last_updated: "2026-09-02T06:30:00.000Z"
+last_activity: 2026-09-02
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 25
-  completed_plans: 18
-  percent: 40
+  total_plans: 26
+  completed_plans: 26
+  percent: 50
 ---
 
 # Project State
@@ -42,9 +42,51 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 ## Current Position
 
-Phase: 21 (sync-migration) — EXECUTING
+Phase: 21 (sync-migration) — UITGEVOERD, wacht op verificatie
 
-## Stand na de avond van 2026-08-05 — lees dit eerst
+## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
+
+**Fase 21 is uitgevoerd. Alle 14 plannen hebben een SUMMARY, de laatste (21-09) staat sinds
+vandaag op `complete`.** De teller hierboven: 26 plannen over de fases 19–21, allemaal af;
+`completed_phases` blijft op 2 tot de fase-verificatie van 21 gedraaid heeft, vandaar `percent: 50`
+in plaats van 60 — dat getal is een schatting, geen meting.
+
+**Wat vandaag de fase sloot: de Play-installatie (AUTH-10 / D-16), device session 10, 08:06.**
+Sinds 5 augustus draaide alles op een sideload met de upload-sleutel. Play hertekent met zijn eigen
+sleutel, en juist dat verschil is in dit project al eens fataal geweest (Calendar werkte
+gesideload, was stuk vanuit Play, door een SHA-1 die niet bij de OAuth-client stond). Vandaar dat
+alleen deze route telt:
+
+| Wat | Bewijs |
+|---|---|
+| Bron | `installerPackageName=com.android.vending` — geen sideload |
+| Versie | `versionCode=24 / versionName=1.0.23`, in-app "Version 1.0.23 (24)" |
+| Inloggen | joostmouw@gmail.com, **geen `ApiException: 10`**, "Synced", overleeft koude start |
+| Calendar lezen | import → blauwe Calendar-blokken; profiel "Connected" |
+| Calendar schrijven | `Fietsrit 20:00–22:00`, `dtstart` = wo 2 sep 20:00 CEST — exact het venster |
+
+Meegenomen in dezelfde sessie: §5b's laatste twee vinkjes (verse rit, drie voor/achtergrond-cycli,
+**precies één** kaart) en §5a's optionele post-sign-in-drain — die laatste in sterkere vorm dan
+gevraagd, want de status haalde "Synced" zonder één voorgrondcyclus.
+
+**Drie vinkjes blijven bewust open, met reden en niet weggewerkt:** 21-13's reparatiepad
+(`_repairNonCanonicalRideIds`) is niet meer uit te lokken — de niet-canonieke rijen bestaan niet
+meer, dus alleen unit-tests dekken het; §5c's dashboardcontrole op de verwijderde rij is alleen
+indirect gedekt; en `feedback`'s `on delete set null` verviel bij gebrek aan rijen.
+
+**Nieuw voor de backlog, beide bevestigd vanaf een Play-build:** #58 reproduceert (agenda-event
+heet "Fietsrit" terwijl de app op Engels staat), en de Calendar-rij in Profiel ververst zijn status
+pas na een koude start omdat `_checkCalendarConnection()` alleen in `initState()` draait — dezelfde
+keten als #56. Verder is **epic #62 "Peloton"** vastgelegd in BACKLOG.md op aangeven van Joost:
+vrienden toevoegen en elkaar uitnodigen voor een ride window dat voor beide partijen schikt.
+Consolideert #41 en #48; het zwaarste punt daar is dat RLS fundamenteel verandert.
+
+**Voor Joost, geen van beide blokkerend:** het beschikbaarheidsrooster staat op het
+onboarding-preset (eigen rooster ging weg met §6 en de deïnstallatie — vooraf benoemde prijs), en
+er staat testdata van mij: de rit van woensdag 2 september 20:00–22:00 en het gelijknamige
+agenda-event.
+
+## Stand na de avond van 2026-08-05 — historie
 
 **Build op het toestel: 1.0.21+22, SIDELOAD (niet via Play).** Halverwege de avond is de
 Play-route verlaten: elke iteratie kostte 20+ minuten tegen 2 voor `adb install`, en §2 — de enige

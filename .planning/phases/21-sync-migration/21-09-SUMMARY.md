@@ -3,7 +3,7 @@ phase: 21-sync-migration
 plan: 09
 subsystem: verification
 tags: [regression, cold-start, manual-verification, reg-03, adb]
-status: incomplete
+status: complete
 
 # Dependency graph
 requires:
@@ -11,7 +11,7 @@ requires:
     provides: "21-08: de delete-account-flow, waarvan §6 hier de toestelverificatie is"
 provides:
   - "REGRESSION-CHECKLIST-21.md — de handmatige verificatieroute voor de hele fase"
-  - "MANUAL-VERIFICATION-21.md — negen device/web-sessies met de werkelijke waarnemingen"
+  - "MANUAL-VERIFICATION-21.md — tien device/web-sessies met de werkelijke waarnemingen"
 affects: []
 
 # Tech tracking
@@ -36,28 +36,46 @@ key-decisions:
 requirements-completed: [REG-03]
 
 # Metrics
-duration: "verspreid over negen sessies, 2026-08-04 t/m 2026-09-01"
-completed: null
+duration: "verspreid over tien sessies, 2026-08-04 t/m 2026-09-02"
+completed: 2026-09-02
 ---
 
 # Phase 21 Plan 09: Regressie + handmatige verificatie Summary
 
-**De verificatieroute van fase 21 is grotendeels afgelopen — §2 t/m §6 zijn afgetekend, de koude start is geautomatiseerd gemeten, en backlog #61 is op het toestel tegengeproefd. Eén ding staat nog open: de afsluitende Play-installatie.**
+**De verificatieroute van fase 21 is afgelopen — §2 t/m §6 afgetekend, de koude start geautomatiseerd gemeten, backlog #61 tegengeproefd, en de fase eindigt waar hij moest eindigen: op een echte Play-installatie.**
 
-## Status: incomplete
+## Status: complete
 
-Wat nog moet gebeuren voordat dit plan dicht kan — nog **één** ding:
+De AAB **1.0.23 (24)** is op 2026-09-02 08:00 uitgerold naar de internal testing track
+(`Latest release: 24 (1.0.23)`, "Available to internal testers") en om 08:06 vanaf Play op het
+toestel geïnstalleerd. Handwerk aan beide kanten — er is geen service account, geen fastlane en geen
+Play-workflow in dit project.
 
-> **De app één keer via Play installeren op het toestel**, zodat de fase eindigt op de
-> distributieroute die gebruikers krijgen. Dat vereist eerst deïnstalleren van de sideload (andere
-> handtekening), en dat wist de lokale data én de Calendar-OAuth-grant. Let na installatie specifiek
-> op **inloggen** en **Google Calendar** — dat is wat een Play-gesigneerde build bewijst en een
-> sideload niet kan (AUTH-10; Calendar is in dit project al eens precies zo stukgegaan).
+### AUTH-10 / D-16 — waarom die laatste installatie er werkelijk toe deed
 
-Afgerond op 2026-09-02 08:00: de AAB **1.0.23 (24)** is geüpload en uitgerold naar de internal
-testing track. Geverifieerd in de Console: `Latest release: 24 (1.0.23)`, "Available to internal
-testers". Dat was handwerk — er is geen service account, geen fastlane en geen Play-workflow in dit
-project.
+Sinds 5 augustus draaide alles op een sideload met de upload-sleutel. Play hertekent de bundel met
+zijn eigen sleutel, dus testers draaien een ánders gesigneerde app — en in dit project is precies
+dát al een keer misgegaan: Calendar werkte in een sideload en was stuk vanuit Play, door een
+SHA-1 die niet bij de OAuth-client stond. Vandaar dat deze twee dingen alleen vanaf een
+Play-installatie tellen:
+
+| Wat | Bewijs, 2026-09-02 |
+|---|---|
+| Play-gesigneerd | `installerPackageName=com.android.vending`, `versionCode=24`, in-app "Version 1.0.23 (24)" |
+| Inloggen | accountkiezer → joostmouw@gmail.com, **geen `ApiException: 10`**, status naar "Synced", overleeft een koude start |
+| Calendar lezen | import levert blauwe Calendar-blokken; profiel toont "Connected" |
+| Calendar schrijven | `title=Fietsrit 20:00–22:00, dtstart=1788372000000` — wo 2 sep 20:00 CEST, exact het geplande venster |
+
+De de-installatie die hieraan voorafging wiste de lokale Drift-database en de Calendar-OAuth-grant.
+Die prijs was vooraf benoemd en bewust betaald: het D-03-bewijs stond al vast en de lokale data was
+nog slechts testdata.
+
+Twee dingen die deze sessie bevestigde en géén PASS zijn: backlog **#58** reproduceert vanaf een
+Play-build (het event heet "Fietsrit" terwijl de app op Engels staat), en de Calendar-rij in Profiel
+ververst zijn status pas na een koude start, omdat `_checkCalendarConnection()` alleen in
+`initState()` draait — dezelfde keten als backlog #56.
+
+Volledig uitgeschreven in `MANUAL-VERIFICATION-21.md`, device session 10.
 
 ## Wat er wél is afgetekend
 
@@ -71,6 +89,13 @@ project.
 | §5b/§5c — één rit blijft één rit, verwijderd blijft verwijderd | PASS, 2026-08-05 |
 | §6 — account verwijderen (AUTH-09) | PASS app-kant én Supabase-kant, 2026-09-01 |
 | Backlog #61 — tegenproef | PASS aan beide kanten, 2026-09-01 |
+| §0/§2 — Play-upload, Play-installatie, AUTH-10 | PASS, 2026-09-02 |
+
+Drie vinkjes in de checklist staan bewust nog open, elk met de reden erbij in plaats van
+weggewerkt: het reparatiepad van 21-13 is niet meer uit te lokken (de niet-canonieke rijen bestaan
+niet meer — alleen unit-tests dekken het), de dashboardcontrole op de verwijderde rij van §5c is
+alleen indirect gedekt, en `feedback`'s `on delete set null` verviel bij gebrek aan rijen. Dat zijn
+grenzen aan wat er te observeren viel, geen uitvoeringsgaten.
 
 ## §4 — het getal, en waarom het geen enkel getal is
 

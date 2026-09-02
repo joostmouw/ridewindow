@@ -1041,3 +1041,106 @@ Naast de verwijderde staan er 11 accounts in `auth.users`, allemaal met adressen
 `voornaamachternaam.<5 cijfers>@gmail.com`. Dat oogt machinaal gegenereerd in plaats van als een
 handvol echte bètatesters. Niet onderzocht en niets mee gedaan — het staat hier alleen genoteerd
 zodat het niet stilletjes verdwijnt. Vraag aan Joost: geseed, of zijn dit de closed-test-testers?
+
+---
+
+## Device session 10 — 2026-09-02 08:06-08:15, de Play-installatie (AUTH-10 / D-16)
+
+**Oppo Find X9 Pro (PLG110), volledig via `adb`.** Dit is de sessie die fase 21 sluit: de laatste
+open stap was de app één keer vanaf Google Play installeren, omdat alles sinds 5 augustus op een
+sideload met de upload-sleutel draaide en Play zijn eigen sleutel gebruikt.
+
+### De de-installatie, en wat die kostte
+
+`adb uninstall ridewindow.joost.amsterdam` → `Success`. Dat wist zoals voorzien de lokale
+Drift-database én de Google Calendar-OAuth-grant. Beide zijn hierna opnieuw opgebouwd, dus de kosten
+waren alleen tijd.
+
+### Eén ding dat anders liep dan verwacht
+
+`am start -a android.intent.action.VIEW -d "market://details?id=..."` opende **HeyTap Market**, de
+eigen store van Oppo, niet Google Play. Dat scheelde geen fout maar wel een verkeerde
+installatiebron — precies het soort verschil dat deze sectie moet bewaken. Met
+`-d "https://play.google.com/store/apps/details?id=..." -p com.android.vending` erbij komt Play zelf
+naar voren. Op dit toestel is het `-p com.android.vending` dat het werk doet.
+
+### De installatie zelf — **PASS**
+
+Play toonde de kaart "RideWindow (Internal Early Access)" met de rode regel "This app is for
+developer testing and may be unsecure or unstable", en na de Install-tik "You're an internal tester".
+Geverifieerd na afloop:
+
+| Controle | Uitkomst |
+|---|---|
+| `installerPackageName` | **`com.android.vending`** — geen sideload |
+| `versionCode` / `versionName` | **24 / 1.0.23** |
+| `firstInstallTime` | 2026-09-02 08:06:52 |
+| In-app profielscherm | **Version 1.0.23 (24)** |
+
+Nevenwaarneming: `minSdk` leest nu **32** waar de sideload 24 gaf. Dat is Play die een
+toestelgerichte split levert, geen wijziging in `build.gradle`.
+
+### Inloggen vanaf een Play-gesigneerde build — **PASS** (AUTH-10, eerste helft)
+
+Verse start: welkomstscherm → onboarding ("Evenings & weekends") → Home met echte forecast
+("32 ride windows this week"). Daarna Profiel → "Sign in with Google" → accountkiezer → 
+joostmouw@gmail.com.
+
+- De accountkiezer verscheen en de inlog voltooide **zonder `ApiException: 10`** — dat is de fout die
+  je krijgt als de SHA-1 van de Play App Signing-sleutel niet bij de OAuth-client staat, en precies
+  het risico waarvoor D-16/AUTH-10 een échte Play-installatie eisen.
+- Statustekst ging van "Syncing…" naar **"Synced"**.
+- Na `am force-stop` + koude start: nog steeds ingelogd, **"Synced"**, geen flits van uitgelogd.
+
+**Geen conflictdialoog**, zoals het hoort bij een eerste login zonder eerdere cloudrij — het account
+was in §6 verwijderd, dus dit was werkelijk een verse migratie.
+
+### Google Calendar vanaf een Play-gesigneerde build — **PASS** (AUTH-10, tweede helft)
+
+Beide richtingen geproefd, want een koppeling die alleen leest bewijst de schrijfkant niet:
+
+| Richting | Proef | Uitkomst |
+|---|---|---|
+| Lezen | Profiel → Edit my schedule → import-knop | blauwe **Calendar**-blokken in het rooster |
+| Status | koude start → Profiel | **"Connected"** |
+| Schrijven | Ride Detail → "Add to Google Calendar" | event in de echte agenda |
+
+Het geschreven event, uitgelezen uit de agenda-provider van het toestel:
+
+```
+Row: 3812 title=Fietsrit 20:00–22:00, dtstart=1788372000000, dtend=1788379200000, calendar_id=10
+```
+
+`1788372000000` is woensdag 2 september 2026 20:00 CEST, `1788379200000` is 22:00 — exact het
+geplande venster. Het event was al naar het toestel gesynchroniseerd op het moment van meten.
+
+### Twee dingen die deze sessie bevestigde en die géén PASS zijn
+
+- **Backlog #58 reproduceert vanaf een Play-build.** De app stond in het Engels; het event heet
+  "Fietsrit 20:00–22:00". De hardcoded Nederlandse titel in `calendar_service.dart` is dus niet iets
+  van de sideload-omgeving.
+- **De Google Calendar-rij in Profiel ververst zijn status niet.** Direct na de import stond hij nog
+  op "Not connected" en pas na een koude start op "Connected". Oorzaak is zichtbaar in de code:
+  `_checkCalendarConnection()` draait alleen in `initState()`, en terugnavigeren vanuit "My schedule"
+  bouwt `ProfileScreen` niet opnieuw op. Cosmetisch, maar het leest als een kapotte koppeling op het
+  moment dat je hem net gelegd hebt. Raakt backlog #56, dat over dezelfde `initState`-keten gaat.
+
+### Wat deze sessie **niet** bewijst
+
+De rijen die de eerste-login-migratie vandaag in `profiles` / `availability` heeft geschreven zijn
+**niet in het Supabase-dashboard nagekeken** — alleen Joost komt daar. Het RPC-pad zelf is wel
+bewezen, op 2026-08-04 (device session 4, MIG-05/06: profiel, 120 uurblokken en 2 ritten in één
+atomaire RPC, met echte waarden in het dashboard). Wat vandaag daar bovenop staat is dat dezelfde
+keten vanaf een Play-gesigneerde build draait en dat de sessie een koude start overleeft. Wie de
+laatste centimeter wil: `select count(*) from profiles where id = auth.uid()`-achtige controle in de
+SQL-editor, of gewoon de Table Editor.
+
+### Testdata die is achtergebleven
+
+- Geplande rit **woensdag 2 september 20:00–22:00** in de app — van mij.
+- Agenda-event **"Fietsrit 20:00–22:00"** op woensdag 2 september in Joost's echte Google Calendar —
+  van mij, mag weg.
+- De beschikbaarheid staat nu op het onboarding-preset "Evenings & weekends", niet op Joost's eigen
+  rooster. Dat is geen verlies dat vandaag ontstond: de cloudkopie ging al weg met §6 (account
+  verwijderd) en de lokale kopie met de de-installatie van vanochtend. Joost zal zijn rooster
+  opnieuw moeten zetten — dat is de prijs die in MORGEN.md vooraf is benoemd en geaccepteerd.

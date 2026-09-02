@@ -80,8 +80,16 @@ REG-05 groen, beide release builds exit 0. Actuele artefacten:
 Everything below that touches sign-in depends on a build being installed. No build has been uploaded to Play Internal Testing yet,
 so this is a hard prerequisite, not an optional nicety.
 
-- [ ] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.19+20**) to the
+- [x] Upload `build/app/outputs/bundle/release/app-release.aab` (version **1.0.19+20**) to the
       Play Console's **Internal testing** track.
+
+      > **Uiteindelijk gelopen op 1.0.23+24, niet op +20 (2026-09-01/02).** De fase heeft na deze
+      > regel nog vier plannen en een reeks fixes gehad; de AAB die daadwerkelijk naar Play ging is
+      > die van 2026-09-01 19:37, met de #61-fix én de gecorrigeerde `app_version.dart`. Vóór upload
+      > op twee niveaus geverifieerd: `versionName=1.0.23` in het packaged manifest, en de string
+      > `1.0.23 (24)` letterlijk in `base/lib/arm64-v8a/libapp.so` — die tweede controle bestaat
+      > omdat het versienummer op 2026-09-01 één keer uiteen is gelopen tussen manifest en
+      > profielscherm.
 
       > **Herzien 2026-08-04 19:45 — gebruik +20, niet +18.** De samenvoeging van de twee
       > parallelle 21-12-takken (`631ef14`) landde ná de +18-build en bumpte naar 1.0.19+20;
@@ -131,21 +139,41 @@ so this is a hard prerequisite, not an optional nicety.
 > (de closed-test-build van 26 juli) terwijl er internal-testing-builds klaarstonden, wat ~40
 > minuten serverdiagnose opleverde voor een probleem dat geen serverprobleem was.
 
-- [ ] Wait for it to finish processing, then copy the internal-testing opt-in/download link.
-- [ ] On the Android test device, install **via that Play Store link** — not the local APK,
+- [x] Wait for it to finish processing, then copy the internal-testing opt-in/download link.
+      *(Afgerond 2026-09-02 08:00 door Joost: release **24 (1.0.23)** uitgerold op de internal
+      testing track, "Available to internal testers", geverifieerd in de Console als
+      `Latest release: 24 (1.0.23)`.)*
+- [x] On the Android test device, install **via that Play Store link** — not the local APK,
       not `adb install`.
+      *(Afgetekend 2026-09-02 08:06. Eerst `adb uninstall` — verplicht, want het toestel droeg een
+      sideload met de upload-sleutel en Play levert een Play-gesigneerde build; dat wiste de lokale
+      Drift-database én de Calendar-OAuth-grant, beide vooraf ingecalculeerd. Daarna geïnstalleerd
+      vanaf de Play-kaart. Bewijs: `installerPackageName=com.android.vending`,
+      `firstInstallTime=2026-09-02 08:06:52`. **Let op voor een volgende keer:** een `market://`-intent
+      opent op dit toestel HeyTap Market, niet Google Play — gebruik
+      `-d "https://play.google.com/store/apps/details?id=..." -p com.android.vending`.)*
 
 ## 1. Set up distinguishing local data BEFORE first sign-in (feeds MIG signature proof, section 5)
 
 Do this on the Android device, signed out, before tapping "Inloggen with Google" for the first
 time with the test account:
 
-- [ ] In Profile, change at least one weather tolerance value and the display name/theme away
+- [x] In Profile, change at least one weather tolerance value and the display name/theme away
       from its default.
-- [ ] In Availability, mark a handful of hours across at least two different days (a mix of
+- [x] In Availability, mark a handful of hours across at least two different days (a mix of
       recurring blocks, not just one cell).
-- [ ] (Optional but recommended) Plan at least one ride, so `planned_rides` also has a
+- [x] (Optional but recommended) Plan at least one ride, so `planned_rides` also has a
       non-empty payload for the migration RPC to carry.
+
+      *(Alle drie afgetekend op 2026-08-04, device session 4 — dat is de run waar dit voor bedoeld
+      was. De eerste login droeg een profiel met echte waarden, 120 uurblokken beschikbaarheid en
+      2 geplande ritten, alle drie in één atomaire RPC met tijdstempel 09:14:46. Precies de
+      niet-lege, niet-default payload waar deze sectie om vraagt, en daarmee het bewijs dat de
+      14-argumentsignatuur van `migrate_account_data` in Postgres werkelijk resolvet.*
+      *De herhaling op 2026-09-02 vanaf de Play-installatie is bewust **zwakker** op dit punt:
+      daar stond het onboarding-preset en niet een handmatig afwijkend rooster. Dat is geen
+      verzuim — het risico dat deze sectie afdekt was al weg — maar wie de sessie van vandaag
+      naleest moet niet denken dat die de sessie van 4 augustus vervangt.)*
 
 This matters because a `migrate_account_data` signature mismatch is easiest to prove wrong
 against real, non-empty, non-default data — an empty/all-default payload could silently
@@ -174,9 +202,15 @@ open) and is folded in here rather than left as a separate outstanding item.
 - [x] **Startup** — install via the Play Store internal testing link and open the app. Note:
       loads within a few seconds, no crash or white screen.
       *(Afgetekend 2026-08-05: Home rendert "15 ride windows this week", geen crash, geen wit scherm.)*
-- [ ] **Sign in** — tap "Inloggen met Google" in Profile's Account section, complete the Google
+- [x] **Sign in** — tap "Inloggen met Google" in Profile's Account section, complete the Google
       flow. Note: the signed-in view (avatar/name/email) appears with no error.
-- [ ] **First-login migration proof (MIG, this plan's highest-value item)** — immediately after
+      *(Afgetekend 2026-09-02 op de **Play-installatie** 1.0.23+24 —
+      `installerPackageName=com.android.vending`. Accountkiezer verscheen, joostmouw@gmail.com
+      gekozen, geen `ApiException: 10`, geen enkele foutmelding; Account-blok toont
+      `Joost / joostmouw@gmail.com` en de status liep door naar **Synced**. Dit is de assertie
+      waar D-16/AUTH-10 om draaien: dat de Play App Signing-SHA-1 bij de OAuth-client staat, blijkt
+      alleen uit een echte Play-installatie. Zie MANUAL-VERIFICATION-21.md, device session 10.)*
+- [x] **First-login migration proof (MIG, this plan's highest-value item)** — immediately after
       sign-in completes, watch for at most two sequential conflict dialogs (there should be
       **none**, since this is a genuine first login with no prior cloud row). Then open the
       Supabase Dashboard → Table Editor → `profiles` and `availability`
@@ -204,6 +238,16 @@ open) and is folded in here rather than left as a separate outstanding item.
         `migrate_account_data` (e.g. "could not choose a best candidate function" or an
         argument-type/count mismatch), which is the concrete proof of a signature defect, not an
         auth defect.
+      - **Afgetekend, maar lees hoe het bewijs verdeeld is (2026-09-02).** De dashboardhelft van dit
+        vinkje rust op **device session 4 (2026-08-04)**: daar stonden profiel (echte waarden),
+        120 uurblokken beschikbaarheid en 2 geplande ritten met identieke tijdstempel in de
+        Table Editor — één atomaire RPC, precies waar het risico van de 14-argumentsignatuur zat.
+        Wat **device session 10 (2026-09-02)** daar bovenop legt: dezelfde keten draait vanaf een
+        Play-gesigneerde build, met een werkelijk verse migratie (het account was in §6 verwijderd),
+        **zonder conflictdialogen**, en de sessie overleeft een force-stop + koude start op "Synced".
+        Niet nagekeken: de rijen die vandáág geschreven zijn, want alleen Joost komt in het
+        dashboard. Wie die laatste centimeter wil, opent de Table Editor — het is een controle van
+        dertig seconden, geen fase-blokkade.
 - [x] **"Voeg toe aan agenda"** — open a Ride Detail screen and tap "Voeg toe aan agenda". Open
       the real Google Calendar app (or agenda.google.com) and confirm the event exists with the
       correct start/end time and the weather summary in the description.
@@ -402,7 +446,7 @@ pre-existing wedged row cannot block the account forever.
       foreground cycle) to trigger the drain, then open the Supabase Dashboard → Table Editor →
       `availability` and confirm `recurring` for this user's row now reflects the change — this
       is the exact write path that could never succeed before 21-12.
-- [ ] **Wedged row clears (plan 21-12):** the availability row enqueued in the broken shape
+- [x] **Wedged row clears (plan 21-12):** the availability row enqueued in the broken shape
       during the 2026-08-04 morning session (120 hour blocks) must stop blocking the account —
       within a few foreground cycles after installing a build containing this plan, the
       Account section's sync status text must settle on "Gesynchroniseerd", not stay stuck on
@@ -410,6 +454,13 @@ pre-existing wedged row cannot block the account forever.
       logcat for a `SyncOutboxService: dropping availability/...` line (the attempt-ceiling
       drop) rather than assuming the fix regressed — a dropped row is expected to be replaced
       by the fresh write from the bullet above, not retried in its old broken shape.
+      *(Afgetekend 2026-09-02, maar niet doordat de rij alsnog wegliep: de vastgelopen rij bestond
+      op geen enkel toestel meer. Hij leefde in de lokale Drift-database, en die is tweemaal
+      vernietigd — bij de sideload van 5 augustus en bij de de-installatie van vandaag. Op de verse
+      Play-installatie liep de teller na inloggen binnen één cyclus naar nul en staat de status op
+      **"Synced"**, óók na een koude start. Wat hiermee bewezen is, is dat de huidige code geen
+      nieuwe vastloper produceert; dat de oude rij door het attempt-plafond zou zijn opgeruimd is
+      nooit waargenomen en zal dat ook niet meer worden.)*
 - [x] While still signed in from section 2 (same account, same session — **do not sign out and
       back in**), open Profile and change one setting you have not already changed today (e.g.
       a different weather-tolerance slider value, or toggle one more availability hour).
@@ -430,10 +481,16 @@ pre-existing wedged row cannot block the account forever.
       stuck on "Wordt gesynchroniseerd...") once the row above is visible in the dashboard.
       *(Afgetekend 2026-08-05 — waargenomen, niet meer afgeleid: het Account-blok leest "Synced".
       Dit was het laatste open vinkje van §5a.)*
-- [ ] (Optional, extra confidence) Repeat the same check for a change made immediately after a
+- [x] (Optional, extra confidence) Repeat the same check for a change made immediately after a
       fresh sign-in (sign out, sign back in, change a setting, then re-open the app) to prove the
       post-sign-in drain trigger in `AccountSection._runAccountSync()` independently of the
       foreground trigger above.
+      *(Afgetekend 2026-09-02, in een sterkere vorm dan hier beschreven: op de verse
+      Play-installatie stonden er ná onboarding al outbox-rijen (profiel + beschikbaarheid) klaar
+      vóór de eerste login. Direct na het inloggen liep de status van "Syncing…" naar **"Synced"**
+      **zonder ook maar één achtergrond/voorgrond-cyclus** — de app is tussen de inlog en de
+      waarneming niet uit beeld geweest. Alleen `_runAccountSync()` kan die drain dan gedaan
+      hebben.)*
 
 ## 5b. SYNC-03 — één geplande rit blijft één rit (plan 21-13)
 
@@ -459,6 +516,13 @@ sleutels voor dezelfde rit, dus de union-merge hield ze allebei.
       controleer in `adb logcat` op de regel
       `CloudSyncReconciler: herstelde planned_rides-sleutel ... -> ...` of
       `... niet canoniek, rij verwijderd`. Die regel is het bewijs dat de reparatie gelopen heeft.
+      *(**Blijft open en zal dat blijven — 2026-09-02.** Dit vinkje is niet meer te halen: de
+      niet-canonieke rijen waar `_repairNonCanonicalRideIds` op moet aanslaan waren al uit de cloud
+      verdwenen vóór de sideload van 5 augustus, en het account dat ze droeg is in §6 verwijderd.
+      Er bestaat geen rij meer die de reparatie kan uitlokken. Het pad is daarmee **alleen door
+      unit-tests gedekt**, en dat moet zo genoteerd blijven staan in plaats van stilzwijgend als
+      bewezen mee te liften. Wie het alsnog wil: een niet-canonieke `ride_id` met de hand in
+      `planned_rides` zetten en een voorgrondcyclus draaien.)*
 - [x] Open de Supabase Dashboard → Table Editor → `planned_rides` en bevestig dat er voor deze
       gebruiker **precies één** rij voor die rit staat, met een `ride_id` dat op `Z` eindigt.
       *(Afgetekend 2026-08-06 via SQL Editor: één rij, `ride_id = 2026-08-08T10-00-00-000Z`.)*
@@ -467,11 +531,22 @@ sleutels voor dezelfde rit, dus de union-merge hield ze allebei.
       waarde blijven staan en is de reparatie niet gelopen.
       *(Afgetekend 2026-08-06: `start_at = 2026-08-08 10:00:00+00`, `end_at = 13:00:00+00` —
       exact 12:00-15:00 lokale tijd. Sleutel én tijdstip kloppen dus allebei.)*
-- [ ] Plan een verse rit, background/foreground de app drie keer, en bevestig dat er nooit een
+- [x] Plan een verse rit, background/foreground de app drie keer, en bevestig dat er nooit een
       tweede kaart bijkomt.
-- [ ] Let in logcat op `planned_rides-rij ... verwijderd ZONDER lokale tegenhanger`. Die regel
+      *(Afgetekend 2026-09-02 op de Play-installatie 1.0.23+24. Verse rit gepland (woensdag
+      2 september 20:00–22:00), daarna drie volledige achtergrond/voorgrond-cycli via `adb`. Home
+      toont **precies één** kaart `Wednesday / 20:00 – 22:00 · 2u / Perfect`. Zie
+      MANUAL-VERIFICATION-21.md, device session 10.)*
+- [x] Let in logcat op `planned_rides-rij ... verwijderd ZONDER lokale tegenhanger`. Die regel
       hoort er niet te staan; verschijnt hij toch, noteer de gelogde inhoud — dat is een rit die
       alleen in de cloud stond en niet te herstellen was.
+      *(Afgetekend 2026-09-02: die regel komt in de drie cycli niet voor. Wat er wél staat is
+      viermaal `drain done — 0 pending, 0 sent, 0 failed` — twee drains per cyclus, het
+      dubbele-drain-patroon van plan 21-14. **Nevenwaarneming die tegen backlog #57 in gaat:**
+      in sessie 5 stuurde élke cyclus `1 sent (availability)` zonder wijziging, vandaag is dat
+      `0 sent`. Niet verder onderzocht — het verschil kan aan de verse installatie liggen en niet
+      aan een fix. #57 blijft dus openstaan, maar wie hem oppakt moet weten dat het gedrag niet
+      onvoorwaardelijk optreedt.)*
 
 ## 5c. SYNC-03 — een verwijderde rit blijft verwijderd (plan 21-14)
 
@@ -480,12 +555,21 @@ kwamen bij elke sync terug. `reconcileOnForeground()` las de cloud vóór het de
 de union-merge zette een zojuist verwijderde rit terug voordat de delete ooit verstuurd was.
 Verwijderen wérkte daardoor helemaal niet zolang je ingelogd was.
 
-- [ ] Verwijder een geplande rit met het prullenbak-icoon. De kaart verdwijnt meteen.
-- [ ] Achtergrond/voorgrond de app **drie keer**. De rit mag niet terugkomen.
+- [x] Verwijder een geplande rit met het prullenbak-icoon. De kaart verdwijnt meteen.
+      *(Afgetekend 2026-08-05, sessie 5: zondagrit verwijderd via het prullenbak-icoon,
+      bevestigingsdialoog "Unplan this ride?".)*
+- [x] Achtergrond/voorgrond de app **drie keer**. De rit mag niet terugkomen.
+      *(Afgetekend 2026-08-05: drie cycli om 22:59:10, :19 en :27 — de rit bleef weg.)*
 - [ ] Supabase Dashboard → `planned_rides`: de rij is weg en blijft weg.
-- [ ] In `adb logcat` hoort de drain-regel vóór eventuele reconcile-activiteit te komen. Een
+      *(Niet apart in het dashboard nagekeken. Wél indirect gedekt: op 2026-08-06 stond er precies
+      één rij voor de overgebleven rit, en op 2026-09-01 leverde de weesrijen-controle van §6
+      0/0/0 op. Vinkje bewust open — indirect bewijs is geen directe waarneming.)*
+- [x] In `adb logcat` hoort de drain-regel vóór eventuele reconcile-activiteit te komen. Een
       `drain done — ... sent (planned_ride...)` direct na een voorgrondcyclus is het teken dat de
       delete daadwerkelijk vertrokken is.
+      *(Afgetekend 2026-08-05: `22:59:10.479 drain done — 1 pending, 1 sent (planned_ride),
+      0 failed` in de eerste cyclus, gevolgd door twee lege drains. De delete vertrok dus vóór de
+      pull — exact de volgorde die plan 21-14 herstelt.)*
 
 > **Gebruik dit meteen om de spookritten van §5b op te ruimen.** Saturday 14:00–17:00 en
 > Sunday 10:00–12:00 zijn kopieën met een verschoven tijdstip. Ze zijn intern consistent — de
@@ -562,6 +646,12 @@ first against a still-alive account.
 
 ## 7. Record everything
 
-- [ ] Fill in every checkbox above in `.planning/phases/21-sync-migration/MANUAL-VERIFICATION-21.md`
+- [x] Fill in every checkbox above in `.planning/phases/21-sync-migration/MANUAL-VERIFICATION-21.md`
       with the real observed outcome, not an assumption. This file plus that log together form
       the phase's permanent verification record.
+      *(Afgerond 2026-09-02. MANUAL-VERIFICATION-21.md loopt van device session 1 t/m 10. Drie
+      vinkjes staan bewust nog open en zijn ieder van een reden voorzien in plaats van
+      weggewerkt: het reparatiepad van 21-13 (§5b, niet meer uit te lokken — alleen unit-tests),
+      de dashboardcontrole op de verwijderde rij (§5c, alleen indirect gedekt), en `feedback`'s
+      `on delete set null` (§6, vervallen bij gebrek aan rijen). Dat zijn geen gaten in de
+      uitvoering maar grenzen aan wat er nog te observeren viel.)*
