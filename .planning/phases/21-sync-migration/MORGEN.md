@@ -7,8 +7,13 @@
 > **Bevinding #61 is gefixt én tegengeproefd op het toestel** (quick 260901-nz7, `36f4fca` +
 > `abcf557`; proef in device session 9). De AAB is gebouwd op **1.0.23 (24)** en bevat de fix.
 
-**Op je toestel staat 1.0.21+22 als sideload.** Niet via Play. Play biedt daardoor geen updates
-meer aan — dat is verwacht en pas bij stap 4 relevant.
+**Op je toestel staat sinds 2026-09-02 07:5x de sideload 1.0.23+24**, bijgewerkt via
+`adb install -r` — dus zónder deïnstallatie, waardoor de lokale data én de Google
+Calendar-koppeling behouden zijn. Geverifieerd op twee niveaus: `versionCode=24` /
+`versionName=1.0.23` in `dumpsys package`, en `Version 1.0.23 (24)` in het profielscherm zelf.
+
+Het blijft een **sideload**, dus Play-gesigneerd is het niet en Play biedt geen updates aan. Dat is
+verwacht en pas bij stap 3 relevant.
 
 Werkboom schoon. **Suite 451/451 — volledig groen**, voor het eerst in deze fase.
 
