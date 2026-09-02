@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Fase 21: suite 451/451; AAB herbouwd, jij uploadt"
-last_updated: "2026-09-01T17:40:00.000Z"
+status: "Fase 21: alles op 1.0.23+24 behalve Play"
+last_updated: "2026-09-02T05:55:00.000Z"
 last_activity: 2026-09-01
 progress:
   total_phases: 5
