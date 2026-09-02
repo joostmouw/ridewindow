@@ -97,6 +97,7 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 
 | # | Item | Waarde | Effort | Status |
 |---|------|--------|--------|--------|
+| 62 | **Epic "Peloton" — vrienden + gezamenlijke ride windows** — overkoepelende richting waar #41 en #48 onder vallen; zie de uitgewerkte sectie onderaan | HOOG | XL | Backlog — epic, nog geen scope |
 | 40 | **Wear OS companion** — tile/complication die volgende slot toont op smartwatch | MEDIUM | L | Backlog |
 | 41 | **Sociaal / groepsritten** — "Wanneer kunnen wij allemaal?" met gedeelde beschikbaarheid. Tester-verduidelijking (Jacco, Phase 15 iPhone-test): concreter, kleiner startpunt zou zijn iemand uitnodigen voor één specifieke rit, die persoon accepteert en ziet 'm terug in zijn eigen app — evt. uitgebreid met het zien van elkaars beschikbaarheid om een overlap te vinden | MEDIUM | XL | Backlog — opgenomen in milestone v3.0, zie `.planning/milestones/v3.0-ACCOUNTS.md` |
 | 48 | **Lokale ride-matching** — gebruikers in dezelfde omgeving die zich voor hetzelfde slot aanmelden kunnen samen een rit plannen | MEDIUM | XL | Backlog |
@@ -164,3 +165,48 @@ en dus via het migratiepad. Het verschil is precies `lastSyncedUid`.
 
 Volledige waarneming: `.planning/phases/21-sync-migration/MANUAL-VERIFICATION-21.md`, device
 session 7.
+
+---
+
+## 62 — Epic "Peloton": vrienden toevoegen en elkaar uitnodigen voor een gedeeld ride window
+
+> Vastgelegd 2026-09-02 op aangeven van Joost, tijdens het afsluiten van fase 21. Richting, geen
+> scope: er is nog niets besloten over fasering, datamodel of UI.
+
+**Wat het is.** De accounts uit v3.0 zijn nu nog eenzijdig — ze bestaan om jouw eigen data tussen
+jouw eigen toestellen te laten meereizen. Peloton draait dat om: accounts worden onderling
+zichtbaar. Gebruikers voegen elkaar toe als vriend en nodigen elkaar uit voor een ride window dat
+voor beide partijen schikt — het snijvlak van beider beschikbaarheid, gescoord op hetzelfde
+weermodel dat de app al gebruikt.
+
+**Waarom het nu pas kan.** Dit is de eerste feature die een gedeelde server-kant écht nodig heeft.
+Tot v3.0 was de server een gemak (sync); hier is hij de functie zelf — twee gebruikers moeten
+elkaars beschikbaarheid kunnen zien zonder elkaars toestel. Fase 21 heeft daarvoor het fundament
+gelegd: Supabase Auth, RLS die per gebruiker afschermt, en `availability` en `planned_rides` die al
+server-side staan.
+
+**Wat er conceptueel bij komt kijken, zonder er nu keuzes over te maken:**
+
+- **RLS wordt fundamenteel ingewikkelder.** De huidige policies zeggen "je ziet alleen je eigen
+  rijen" — dat is precies wat SYNC-08 bewijst. Peloton vereist "je ziet ook de beschikbaarheid van
+  wie jou als vriend heeft geaccepteerd", en dat is de klasse fouten waar dit soort apps op
+  omvalt. Dit verdient een eigen security-fase, geen policy-aanpassing onderweg.
+- **Beschikbaarheid wordt gedeelde data.** Vandaag staat het weekrooster server-side maar leest
+  niemand het behalve jijzelf. Zodra een vriend het mag zien, is het persoonsgegeven-met-publiek —
+  het privacybeleid en de sub-processors-uitleg moeten mee.
+- **Het snijvlak zelf is nieuwe domeinlogica**, geen UI-werk: twee (of meer) roosters kruisen,
+  daaroverheen de weerscore, en dan de bestaande slot-generator. Dat is precies de kern van de app,
+  dus het hoort met dezelfde teststrengheid als `SlotGenerator`.
+- **Uitnodigen is een toestandsmachine** (uitgenodigd → geaccepteerd → afgewezen → afgezegd), en
+  die moet offline overleven — de outbox uit fase 21 kent nu alleen upserts van eigen data.
+- **Agenda-koppeling krijgt een tweede betekenis:** een geaccepteerde uitnodiging hoort in beide
+  agenda's te belanden. Raakt #32 (event bijwerken) en #58/#59 (taal en tijdzone van events, allebei
+  nu nog hardcoded — en bij twee deelnemers in verschillende zones is #59 geen cosmetisch item meer).
+- **De 100-user OAuth-cap (#31) wordt relevant.** Een sociale feature waarvan het nut met het
+  aantal deelnemers groeit, botst op een lifetime-cap van 100 unieke Google-gebruikers zolang de
+  `calendar.events`-scope niet formeel geverifieerd is.
+
+**Samenhang.** Consolideert [[41]] (sociaal/groepsritten — Jacco's kleinere startpunt: één persoon
+uitnodigen voor één rit, die accepteert en ziet 'm in zijn eigen app) en [[48]] (lokale
+ride-matching). #41's startpunt is waarschijnlijk de eerste bruikbare slice van deze epic; #48 is de
+uitbreiding naar mensen die je nog niet kent en hoort daar nadrukkelijk ná.
