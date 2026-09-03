@@ -12,6 +12,7 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/account_sync_service.dart';
 import 'package:ridewindow/services/cloud_reconcile_service.dart';
+import 'package:ridewindow/services/cloud_sync_gateway.dart';
 import 'package:ridewindow/services/sync_outbox_service.dart';
 
 part 'cloud_sync_reconciler_provider.g.dart';
@@ -123,8 +124,22 @@ Future<AccountSyncService> accountSyncService(Ref ref) async {
 /// noop band so the two mechanisms never disagree about what counts as
 /// "changed".
 class CloudSyncReconciler {
-  CloudSyncReconciler(this._ref);
+  /// [gateway] is de cloudkant als vervangbare poort (backlog #60). Weglaten
+  /// geeft de productie-implementatie, precies zoals `RideDetailScreen`'s
+  /// `calendarServiceFactory` en `notificationServiceFactory` dat doen — dit is
+  /// het bestaande DI-patroon van dit project, niet een nieuw.
+  ///
+  /// Zonder deze parameter was van buitenaf niet waarneembaar wát deze klasse
+  /// deed, en dat is de reden dat fase 21 vijf gap-closure-plannen nodig had die
+  /// stuk voor stuk pas op een toestel werden gevonden. Zie
+  /// `cloud_sync_gateway.dart` voor de volledige redenering, en
+  /// `test/providers/cloud_sync_reconciler_gateway_test.dart` voor wat er nu
+  /// wél vast ligt.
+  CloudSyncReconciler(this._ref, {CloudSyncGateway? gateway})
+      : _gateway = gateway ?? const SupabaseCloudSyncGateway();
+
   final Ref _ref;
+  final CloudSyncGateway _gateway;
 
   static const _noopBand = Duration(seconds: 5);
 
@@ -153,10 +168,10 @@ class CloudSyncReconciler {
   /// §4's grens van 2 seconden tot het eerste zichtbare ride slot mag hier niet
   /// aan hangen.
   Future<void> reconcileOnStartup() async {
-    final user = _signedInUser();
-    if (user == null) return;
-    if (_startupReconciledUid == user.id) return;
-    _startupReconciledUid = user.id;
+    final userId = _signedInUserId();
+    if (userId == null) return;
+    if (_startupReconciledUid == userId) return;
+    _startupReconciledUid = userId;
 
     // Vangt zijn eigen fouten al af, dus geen tweede try/catch eromheen --
     // die zou alleen de eigen logging van die methode verduisteren.
@@ -185,13 +200,17 @@ class CloudSyncReconciler {
   /// `await`-grenzen heen vasthoudt -- exact de fout die plan 21-11 dichtte.
   ///
   /// De try/catch dekt een niet-geïnitialiseerde Supabase (`Supabase.instance`
-  /// gooit dan). Dat is de normale toestand in de testsuite, en daar is
-  /// "niemand ingelogd" het juiste antwoord.
-  User? _signedInUser() {
+  /// gooit dan, binnen in de poort). Dat is de normale toestand in de
+  /// testsuite, en daar is "niemand ingelogd" het juiste antwoord.
+  ///
+  /// De volgorde is niet vrijblijvend: eerst de provider, dán de poort. Zie de
+  /// alinea's hierboven — de terugval bestaat juist voor het moment waarop nog
+  /// niemand naar `authStateProvider` luistert.
+  String? _signedInUserId() {
     final fromProvider = _ref.read(authStateProvider).value;
-    if (fromProvider != null) return fromProvider;
+    if (fromProvider != null) return fromProvider.id;
     try {
-      return Supabase.instance.client.auth.currentSession?.user;
+      return _gateway.currentSessionUserId();
     } catch (error) {
       debugPrint('CloudSyncReconciler: geen auth-staat beschikbaar: $error');
       return null;
@@ -218,15 +237,14 @@ class CloudSyncReconciler {
       // Zelfde bron als de opstart-reconcile (zie [_signedInUser]): zonder de
       // terugval op de herstelde sessie hangt deze lezing aan de vraag of er
       // toevallig al een listener op `authStateProvider` staat.
-      final user = _signedInUser();
-      if (user == null) return;
+      final userId = _signedInUserId();
+      if (userId == null) return;
 
-      final client = Supabase.instance.client;
       final service = CloudReconcileService();
 
-      await _reconcileProfile(client, service, user.id);
-      await _reconcileAvailability(client, service, user.id);
-      await _reconcilePlannedRides(client, service, user.id);
+      await _reconcileProfile(service, userId);
+      await _reconcileAvailability(service, userId);
+      await _reconcilePlannedRides(service, userId);
     } catch (error) {
       debugPrint('CloudSyncReconciler.reconcileOnForeground failed: $error');
     }
@@ -258,18 +276,16 @@ class CloudSyncReconciler {
   /// silently drops them — that's `SyncOutboxService.drain()`'s own
   /// contract).
   ///
-  /// Plan 21-11: the `Supabase.instance.client` lookup deliberately lives
-  /// inside the `upsertFn`/`deleteFn` closures below, not as this method's
-  /// first statement. `Supabase.instance` throws when Supabase has not been
-  /// initialised (always true in this test suite, by design — see
-  /// test/providers/outbox_drain_wiring_test.dart's header comment), and
-  /// with the lookup at the top of this method that throw happened before
-  /// `_ref.read(syncOutboxServiceProvider)` was ever reached, silently
-  /// masking the real disposed-Ref bug this method also had. Moving it into
-  /// the closures means the method runs (and is testable) even without an
-  /// initialised Supabase, since the closures are only invoked once there is
-  /// a row to send — on a real device Supabase is always initialised long
-  /// before any drain.
+  /// Plan 21-11: de `Supabase.instance.client`-lookup hoort binnen de
+  /// `upsertFn`/`deleteFn`-closures thuis, niet als eerste statement van deze
+  /// methode. `Supabase.instance` gooit wanneer Supabase niet geïnitialiseerd
+  /// is (altijd waar in deze testsuite, met opzet — zie de header van
+  /// test/providers/outbox_drain_wiring_test.dart), en met de lookup bovenaan
+  /// deze methode gebeurde die throw vóórdat
+  /// `_ref.read(syncOutboxServiceProvider)` ooit bereikt werd, wat de echte
+  /// disposed-Ref-bug maskeerde. Sinds backlog #60 zit die lookup in
+  /// [SupabaseCloudSyncGateway] en is hij daar een getter per aanroep, om
+  /// exact dezelfde reden — de eis is dus niet verdwenen, alleen verhuisd.
   Future<void> drainOutbox() async {
     try {
       final outbox = _ref.read(syncOutboxServiceProvider);
@@ -278,7 +294,7 @@ class CloudSyncReconciler {
         upsertFn: (entity, entityKey, payload) async {
           final table = _tableForEntity(entity);
           if (table == null) return;
-          await Supabase.instance.client.from(table).upsert(payload);
+          await _gateway.upsertRow(table, payload);
         },
         deleteFn: (entity, entityKey) async {
           // Only `planned_rides` ever enqueues a delete today (plan 21-05)
@@ -292,11 +308,7 @@ class CloudSyncReconciler {
           if (separator < 0) return;
           final userId = entityKey.substring(0, separator);
           final rideId = entityKey.substring(separator + 1);
-          await Supabase.instance.client
-              .from(kPlannedRidesTable)
-              .delete()
-              .eq('user_id', userId)
-              .eq('ride_id', rideId);
+          await _gateway.deletePlannedRide(userId: userId, rideId: rideId);
         },
       );
     } catch (error) {
@@ -322,16 +334,11 @@ class CloudSyncReconciler {
   }
 
   Future<void> _reconcileProfile(
-    SupabaseClient client,
     CloudReconcileService service,
     String userId,
   ) async {
     final profileRepo = await _ref.read(profileRepositoryProvider.future);
-    final row = await client
-        .from(kProfilesTable)
-        .select()
-        .eq('user_id', userId)
-        .maybeSingle();
+    final row = await _gateway.readProfileRow(userId);
     final cloudProfile = service.parseProfileRow(row);
     if (cloudProfile == null) return;
 
@@ -346,17 +353,12 @@ class CloudSyncReconciler {
   }
 
   Future<void> _reconcileAvailability(
-    SupabaseClient client,
     CloudReconcileService service,
     String userId,
   ) async {
     final availabilityRepo =
         await _ref.read(availabilityRepositoryProvider.future);
-    final row = await client
-        .from(kAvailabilityTable)
-        .select()
-        .eq('user_id', userId)
-        .maybeSingle();
+    final row = await _gateway.readAvailabilityRow(userId);
     final cloudAvailability = service.parseAvailabilityRow(row);
     if (cloudAvailability == null) return;
 
@@ -371,19 +373,16 @@ class CloudSyncReconciler {
     }
   }
 
-  /// Reads `public.planned_rides` for [userId] — kept on [CloudSyncReconciler]
-  /// rather than [CloudReconcileService] (see that class's `parsePlannedRidesRows`
-  /// doc comment) because the actual `.from(...).select()...` network call is
-  /// the unverified-by-automated-test seam, matching `_reconcileProfile`/
-  /// `_reconcileAvailability`'s own shape.
-  Future<List<Map<String, dynamic>>> readCloudPlannedRides(
-    SupabaseClient client,
-    String userId,
-  ) async {
-    final rows =
-        await client.from(kPlannedRidesTable).select().eq('user_id', userId);
-    return (rows as List).cast<Map<String, dynamic>>();
-  }
+  /// Leest `public.planned_rides` voor [userId].
+  ///
+  /// Stond hier oorspronkelijk (en niet op [CloudReconcileService], zie de
+  /// doc-comment van `parsePlannedRidesRows`) omdat de echte
+  /// `.from(...).select()...`-aanroep de door tests onbereikbare naad was. Sinds
+  /// backlog #60 is die naad [CloudSyncGateway] en is dit een gewone
+  /// doorgeefmethode — bewust behouden zodat `_reconcilePlannedRides` dezelfde
+  /// vorm houdt als `_reconcileProfile`/`_reconcileAvailability`.
+  Future<List<Map<String, dynamic>>> readCloudPlannedRides(String userId) =>
+      _gateway.readPlannedRideRows(userId);
 
   /// Union-merge foreground reconcile for planned rides (plan 21-05,
   /// SYNC-03) — deliberately NOT the timestamp-comparison path
@@ -393,12 +392,11 @@ class CloudSyncReconciler {
   /// pulls in any cloud-only ride, without ever deleting a ride from either
   /// side as a side effect.
   Future<void> _reconcilePlannedRides(
-    SupabaseClient client,
     CloudReconcileService service,
     String userId,
   ) async {
     final repo = await _ref.read(plannedRidesRepositoryProvider.future);
-    final allCloudRows = await readCloudPlannedRides(client, userId);
+    final allCloudRows = await readCloudPlannedRides(userId);
     final local = repo.readLocal();
 
     // Rijen met een niet-canonieke sleutel worden uit de cloud verwijderd én
@@ -407,7 +405,7 @@ class CloudSyncReconciler {
     // juiste tijdstip. Zouden ze in `cloudRows` blijven staan, dan denkt de
     // merge dat de rit al in de cloud staat en duwt niemand hem terug.
     final cloudRows =
-        await _repairNonCanonicalRideIds(client, allCloudRows, userId, local);
+        await _repairNonCanonicalRideIds(allCloudRows, userId, local);
 
     final cloudRides = service.parsePlannedRidesRows(cloudRows);
 
@@ -445,7 +443,6 @@ class CloudSyncReconciler {
   /// sleutel, plus rijen waarvan het verwijderen mislukte (die blijven immers
   /// gewoon bestaan).
   Future<List<Map<String, dynamic>>> _repairNonCanonicalRideIds(
-    SupabaseClient client,
     List<Map<String, dynamic>> cloudRows,
     String userId,
     List<PlannedRide> local,
@@ -476,11 +473,7 @@ class CloudSyncReconciler {
       );
 
       try {
-        await client
-            .from(kPlannedRidesTable)
-            .delete()
-            .eq('user_id', userId)
-            .eq('ride_id', storedId);
+        await _gateway.deletePlannedRide(userId: userId, rideId: storedId);
 
         if (hasLocalCounterpart) {
           debugPrint(

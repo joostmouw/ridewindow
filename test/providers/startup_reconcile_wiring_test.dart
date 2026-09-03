@@ -19,16 +19,26 @@
 // event-loop-onderbreking, en een `_RecordingSyncOutboxService` op de
 // `syncOutboxServiceProvider`-seam.
 //
-// **Wat deze test bewust NIET bewijst.** Dat de cloud-lezing zelf slaagt.
-// `CloudSyncReconciler` grijpt in zijn methodebody rechtstreeks naar
-// `Supabase.instance.client`, dus zonder levende backend is de leeskant van
-// buitenaf niet waarneembaar -- in deze suite gooit die lezing (Supabase is
-// hier nooit geïnitialiseerd) en wordt door `reconcileOnForeground()`'s eigen
-// try/catch opgevangen. De drain vóór die lezing is dan het waarneembare
-// bewijs dat de methode überhaupt gedraaid heeft. Backlog #60
-// (`CloudSyncReconciler` injecteerbaar maken) is de ingreep die dit echt
-// testbaar maakt; tot die tijd staat de beperking hier expliciet in plaats van
-// stilzwijgend.
+// **Wat deze test bewust NIET bewijst, en waar dat inmiddels wél gebeurt.**
+// Deze test kijkt alleen naar de drain als teken van leven: hij gebruikt de
+// echte `CloudSyncReconciler`, dus de cloud-lezing gooit hier (Supabase is in
+// deze suite nooit geïnitialiseerd) en wordt door `reconcileOnForeground()`'s
+// eigen try/catch opgevangen.
+//
+// Dat was tot 2026-09-03 een principiële beperking -- de reconciler greep in
+// zijn methodebody naar `Supabase.instance.client` en was van buitenaf niet
+// waarneembaar. Backlog #60 heeft dat opgeheven: de cloudkant loopt nu door
+// `CloudSyncGateway` en `test/providers/cloud_sync_reconciler_gateway_test.dart`
+// legt vast wát er gebeurt -- de push-vóór-pull-volgorde van 21-14, de twee
+// drains per cyclus, dat de opstart-reconcile werkelijk leest, en de reparatie
+// van niet-canonieke `ride_id`'s uit 21-13 die op een echt toestel niet meer
+// uit te lokken is.
+//
+// Deze test blijft naast die andere staan en is geen duplicaat: hij bewaakt de
+// *bedrading* (bestaat het opstartpad, komt de aanroep uit `initState`) via de
+// echte provider zonder enige injectie. Die andere bewaakt het *gedrag*. Haal
+// deze niet weg omdat de nieuwe "meer" test -- dan verdwijnt de dekking op
+// precies de vraag die backlog #61 opleverde.
 import 'dart:async';
 import 'dart:io';
 
