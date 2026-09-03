@@ -454,5 +454,20 @@
   "cellStatusBlocked": "Blocked",
   "dayHeaderToggleHint": "Double tap to toggle all hours for this day",
   "hourHeaderToggleHint": "Double tap to toggle this hour across all days",
-  "addToHomeScreenHint": "Tap the Share icon, then \"Add to Home Screen\" to install RideWindow."
+  "addToHomeScreenHint": "Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.",
+  "ridesTabMine": "My rides",
+  "ridesTabPeloton": "Peloton",
+  "pelotonEmptyTitle": "Ride together",
+  "pelotonEmptyHint": "Share a ride window with a friend. They open your link, join, and the ride lands in their app.",
+  "pelotonInvitesSent": "Invitations you sent",
+  "pelotonJoinWithCode": "Have a code? Enter it",
+  "pelotonCodeHint": "Invitation code",
+  "pelotonJoin": "Join",
+  "pelotonNobodyYet": "Nobody has joined yet",
+  "pelotonJoinedCount": "{count, plural, =1{1 rider joined} other{{count} riders joined}}",
+  "@pelotonJoinedCount": {
+    "placeholders": {
+      "count": {"type": "num", "format": "compact"}
+    }
+  }
 }

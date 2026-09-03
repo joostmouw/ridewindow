@@ -1296,4 +1296,48 @@ class SNl extends S {
   @override
   String get addToHomeScreenHint =>
       'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.';
+
+  @override
+  String get ridesTabMine => 'Mijn ritten';
+
+  @override
+  String get ridesTabPeloton => 'Peloton';
+
+  @override
+  String get pelotonEmptyTitle => 'Samen fietsen';
+
+  @override
+  String get pelotonEmptyHint =>
+      'Deel een ridewindow met een maatje. Hij opent je link, doet mee, en de rit staat in zijn app.';
+
+  @override
+  String get pelotonInvitesSent => 'Uitnodigingen die jij stuurde';
+
+  @override
+  String get pelotonJoinWithCode => 'Heb je een code? Vul \'m in';
+
+  @override
+  String get pelotonCodeHint => 'Uitnodigingscode';
+
+  @override
+  String get pelotonJoin => 'Meedoen';
+
+  @override
+  String get pelotonNobodyYet => 'Nog niemand aangemeld';
+
+  @override
+  String pelotonJoinedCount(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString fietsers doen mee',
+      one: '1 fietser doet mee',
+    );
+    return '$_temp0';
+  }
 }

@@ -1293,4 +1293,48 @@ class SEn extends S {
   @override
   String get addToHomeScreenHint =>
       'Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.';
+
+  @override
+  String get ridesTabMine => 'My rides';
+
+  @override
+  String get ridesTabPeloton => 'Peloton';
+
+  @override
+  String get pelotonEmptyTitle => 'Ride together';
+
+  @override
+  String get pelotonEmptyHint =>
+      'Share a ride window with a friend. They open your link, join, and the ride lands in their app.';
+
+  @override
+  String get pelotonInvitesSent => 'Invitations you sent';
+
+  @override
+  String get pelotonJoinWithCode => 'Have a code? Enter it';
+
+  @override
+  String get pelotonCodeHint => 'Invitation code';
+
+  @override
+  String get pelotonJoin => 'Join';
+
+  @override
+  String get pelotonNobodyYet => 'Nobody has joined yet';
+
+  @override
+  String pelotonJoinedCount(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString riders joined',
+      one: '1 rider joined',
+    );
+    return '$_temp0';
+  }
 }

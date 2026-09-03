@@ -2418,6 +2418,66 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.'**
   String get addToHomeScreenHint;
+
+  /// No description provided for @ridesTabMine.
+  ///
+  /// In nl, this message translates to:
+  /// **'Mijn ritten'**
+  String get ridesTabMine;
+
+  /// No description provided for @ridesTabPeloton.
+  ///
+  /// In nl, this message translates to:
+  /// **'Peloton'**
+  String get ridesTabPeloton;
+
+  /// No description provided for @pelotonEmptyTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Samen fietsen'**
+  String get pelotonEmptyTitle;
+
+  /// No description provided for @pelotonEmptyHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deel een ridewindow met een maatje. Hij opent je link, doet mee, en de rit staat in zijn app.'**
+  String get pelotonEmptyHint;
+
+  /// No description provided for @pelotonInvitesSent.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodigingen die jij stuurde'**
+  String get pelotonInvitesSent;
+
+  /// No description provided for @pelotonJoinWithCode.
+  ///
+  /// In nl, this message translates to:
+  /// **'Heb je een code? Vul \'m in'**
+  String get pelotonJoinWithCode;
+
+  /// No description provided for @pelotonCodeHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodigingscode'**
+  String get pelotonCodeHint;
+
+  /// No description provided for @pelotonJoin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Meedoen'**
+  String get pelotonJoin;
+
+  /// No description provided for @pelotonNobodyYet.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nog niemand aangemeld'**
+  String get pelotonNobodyYet;
+
+  /// No description provided for @pelotonJoinedCount.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 fietser doet mee} other{{count} fietsers doen mee}}'**
+  String pelotonJoinedCount(num count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

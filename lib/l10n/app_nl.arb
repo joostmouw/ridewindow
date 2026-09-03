@@ -592,5 +592,20 @@
   "cellStatusBlocked": "Geblokkeerd",
   "dayHeaderToggleHint": "Dubbeltik om alle uren voor deze dag te wisselen",
   "hourHeaderToggleHint": "Dubbeltik om dit uur voor alle dagen te wisselen",
-  "addToHomeScreenHint": "Tik op het Deel-icoon en kies 'Zet op beginscherm' om RideWindow te installeren."
+  "addToHomeScreenHint": "Tik op het Deel-icoon en kies 'Zet op beginscherm' om RideWindow te installeren.",
+  "ridesTabMine": "Mijn ritten",
+  "ridesTabPeloton": "Peloton",
+  "pelotonEmptyTitle": "Samen fietsen",
+  "pelotonEmptyHint": "Deel een ridewindow met een maatje. Hij opent je link, doet mee, en de rit staat in zijn app.",
+  "pelotonInvitesSent": "Uitnodigingen die jij stuurde",
+  "pelotonJoinWithCode": "Heb je een code? Vul 'm in",
+  "pelotonCodeHint": "Uitnodigingscode",
+  "pelotonJoin": "Meedoen",
+  "pelotonNobodyYet": "Nog niemand aangemeld",
+  "pelotonJoinedCount": "{count, plural, =1{1 fietser doet mee} other{{count} fietsers doen mee}}",
+  "@pelotonJoinedCount": {
+    "placeholders": {
+      "count": {"type": "num", "format": "compact"}
+    }
+  }
 }
