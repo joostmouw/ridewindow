@@ -1337,4 +1337,69 @@ class SEn extends S {
     );
     return '$_temp0';
   }
+
+  @override
+  String get pelotonSignedOut => 'Sign in to ride together';
+
+  @override
+  String get pelotonSignedOutHint =>
+      'Peloton needs an account, so your buddies can find you. Everything else in the app keeps working without one.';
+
+  @override
+  String get pelotonFriends => 'Buddies';
+
+  @override
+  String get pelotonNoFriends => 'No buddies yet';
+
+  @override
+  String get pelotonNoFriendsHint =>
+      'Send someone your code. Once they enter it, you can invite each other to rides.';
+
+  @override
+  String get pelotonInviteFriend => 'Invite a buddy';
+
+  @override
+  String pelotonInviteShare(String code) {
+    return 'Ride with me on RideWindow. Open the app and enter code $code.';
+  }
+
+  @override
+  String pelotonYourCode(String code) {
+    return 'Your code: $code';
+  }
+
+  @override
+  String get pelotonRemoveFriend => 'Remove buddy';
+
+  @override
+  String get pelotonPendingInvites => 'Invitations for you';
+
+  @override
+  String get pelotonAccept => 'Join';
+
+  @override
+  String get pelotonDecline => 'Can\'t make it';
+
+  @override
+  String get pelotonOwnedRides => 'Rides you organise';
+
+  @override
+  String pelotonFriendAdded(String name) {
+    return '$name is now your buddy';
+  }
+
+  @override
+  String get pelotonCodeInvalid =>
+      'That code doesn\'t work — it may have expired.';
+
+  @override
+  String get pelotonUnnamedFriend => 'Rider';
+
+  @override
+  String pelotonInvitedBy(String name) {
+    return 'From $name';
+  }
+
+  @override
+  String get pelotonRetry => 'Try again';
 }

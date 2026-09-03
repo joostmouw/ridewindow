@@ -469,5 +469,27 @@
     "placeholders": {
       "count": {"type": "num", "format": "compact"}
     }
-  }
+  },
+  "pelotonSignedOut": "Sign in to ride together",
+  "pelotonSignedOutHint": "Peloton needs an account, so your buddies can find you. Everything else in the app keeps working without one.",
+  "pelotonFriends": "Buddies",
+  "pelotonNoFriends": "No buddies yet",
+  "pelotonNoFriendsHint": "Send someone your code. Once they enter it, you can invite each other to rides.",
+  "pelotonInviteFriend": "Invite a buddy",
+  "pelotonInviteShare": "Ride with me on RideWindow. Open the app and enter code {code}.",
+  "pelotonYourCode": "Your code: {code}",
+  "pelotonRemoveFriend": "Remove buddy",
+  "pelotonPendingInvites": "Invitations for you",
+  "pelotonAccept": "Join",
+  "pelotonDecline": "Can't make it",
+  "pelotonOwnedRides": "Rides you organise",
+  "pelotonFriendAdded": "{name} is now your buddy",
+  "pelotonCodeInvalid": "That code doesn't work — it may have expired.",
+  "pelotonUnnamedFriend": "Rider",
+  "pelotonInvitedBy": "From {name}",
+  "pelotonRetry": "Try again",
+  "@pelotonInviteShare": {"placeholders": {"code": {"type": "String"}}},
+  "@pelotonYourCode": {"placeholders": {"code": {"type": "String"}}},
+  "@pelotonFriendAdded": {"placeholders": {"name": {"type": "String"}}},
+  "@pelotonInvitedBy": {"placeholders": {"name": {"type": "String"}}}
 }

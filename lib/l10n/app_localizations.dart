@@ -2478,6 +2478,114 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'{count, plural, =1{1 fietser doet mee} other{{count} fietsers doen mee}}'**
   String pelotonJoinedCount(num count);
+
+  /// No description provided for @pelotonSignedOut.
+  ///
+  /// In nl, this message translates to:
+  /// **'Log in om samen te fietsen'**
+  String get pelotonSignedOut;
+
+  /// No description provided for @pelotonSignedOutHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Peloton heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.'**
+  String get pelotonSignedOutHint;
+
+  /// No description provided for @pelotonFriends.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maatjes'**
+  String get pelotonFriends;
+
+  /// No description provided for @pelotonNoFriends.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nog geen maatjes'**
+  String get pelotonNoFriends;
+
+  /// No description provided for @pelotonNoFriendsHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.'**
+  String get pelotonNoFriendsHint;
+
+  /// No description provided for @pelotonInviteFriend.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nodig een maatje uit'**
+  String get pelotonInviteFriend;
+
+  /// No description provided for @pelotonInviteShare.
+  ///
+  /// In nl, this message translates to:
+  /// **'Fiets met me mee in RideWindow. Open de app en vul code {code} in.'**
+  String pelotonInviteShare(String code);
+
+  /// No description provided for @pelotonYourCode.
+  ///
+  /// In nl, this message translates to:
+  /// **'Jouw code: {code}'**
+  String pelotonYourCode(String code);
+
+  /// No description provided for @pelotonRemoveFriend.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maatje verwijderen'**
+  String get pelotonRemoveFriend;
+
+  /// No description provided for @pelotonPendingInvites.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodigingen voor jou'**
+  String get pelotonPendingInvites;
+
+  /// No description provided for @pelotonAccept.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ik ga mee'**
+  String get pelotonAccept;
+
+  /// No description provided for @pelotonDecline.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kan niet'**
+  String get pelotonDecline;
+
+  /// No description provided for @pelotonOwnedRides.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ritten die jij organiseert'**
+  String get pelotonOwnedRides;
+
+  /// No description provided for @pelotonFriendAdded.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is nu je maatje'**
+  String pelotonFriendAdded(String name);
+
+  /// No description provided for @pelotonCodeInvalid.
+  ///
+  /// In nl, this message translates to:
+  /// **'Die code werkt niet — hij kan verlopen zijn.'**
+  String get pelotonCodeInvalid;
+
+  /// No description provided for @pelotonUnnamedFriend.
+  ///
+  /// In nl, this message translates to:
+  /// **'Fietser'**
+  String get pelotonUnnamedFriend;
+
+  /// No description provided for @pelotonInvitedBy.
+  ///
+  /// In nl, this message translates to:
+  /// **'Van {name}'**
+  String pelotonInvitedBy(String name);
+
+  /// No description provided for @pelotonRetry.
+  ///
+  /// In nl, this message translates to:
+  /// **'Opnieuw proberen'**
+  String get pelotonRetry;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

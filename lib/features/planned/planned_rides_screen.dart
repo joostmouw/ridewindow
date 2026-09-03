@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/features/peloton/peloton_tab.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -85,6 +86,10 @@ String _fmtTime(DateTime dt) => '${dt.hour.toString().padLeft(2, '0')}:00';
 const _cardMargin = EdgeInsets.symmetric(horizontal: 12, vertical: 4);
 const double _cardRadius = 24;
 
+/// Rides bestaat sinds epic #62 uit twee tabs: je eigen geplande ritten en
+/// Peloton, waar je met je maatjes schakelt. Bewust tabs en geen aparte
+/// bottom-nav-ingang -- de twee horen bij elkaar, want uitnodigen begint bij
+/// een rit die je zelf al gepland hebt.
 class PlannedRidesScreen extends ConsumerStatefulWidget {
   const PlannedRidesScreen({super.key});
 
@@ -92,8 +97,10 @@ class PlannedRidesScreen extends ConsumerStatefulWidget {
   ConsumerState<PlannedRidesScreen> createState() => _PlannedRidesScreenState();
 }
 
-class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
+class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
+    with SingleTickerProviderStateMixin {
   bool _showHints = false;
+  late final TabController _tabController;
 
   // Keys for spotlight coach marks
   final _firstRideKey = GlobalKey();
@@ -101,6 +108,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Delay to ensure ListView has laid out the first card for spotlight measurement
       await Future.delayed(const Duration(milliseconds: 500));
@@ -108,6 +116,12 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
         setState(() => _showHints = true);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   List<HintItem> _ridesHints(BuildContext context) {
@@ -145,8 +159,54 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: Text(S.of(context).ridesTitle)),
-          body: upcoming.isEmpty
+          appBar: AppBar(
+            title: Text(S.of(context).ridesTitle),
+            bottom: TabBar(
+              controller: _tabController,
+              tabs: [
+                Tab(text: S.of(context).ridesTabMine),
+                Tab(text: S.of(context).ridesTabPeloton),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildMyRides(
+                context,
+                upcoming,
+                allScores,
+                forecasts,
+                cityName,
+                theme,
+              ),
+              const PelotonTab(),
+            ],
+          ),
+        ),
+        if (_showHints && upcoming.isNotEmpty)
+          ScreenHintOverlay(
+            hints: _ridesHints(context),
+            onDismiss: () {
+              markHintSeen('rides');
+              setState(() => _showHints = false);
+            },
+          ),
+      ],
+    );
+  }
+
+  /// De oorspronkelijke inhoud van dit scherm, ongewijzigd -- alleen verhuisd
+  /// naar een eigen methode zodat hij als tab-inhoud kan dienen.
+  Widget _buildMyRides(
+    BuildContext context,
+    List<PlannedRide> upcoming,
+    List<HourlyScore> allScores,
+    List<HourlyForecast> forecasts,
+    String cityName,
+    ThemeData theme,
+  ) {
+    return upcoming.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(32),
@@ -181,18 +241,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen> {
                     forecasts: forecasts,
                     cityName: cityName,
                   ),
-                ),
-        ),
-        if (_showHints && upcoming.isNotEmpty)
-          ScreenHintOverlay(
-            hints: _ridesHints(context),
-            onDismiss: () {
-              markHintSeen('rides');
-              setState(() => _showHints = false);
-            },
-          ),
-      ],
-    );
+                );
   }
 }
 

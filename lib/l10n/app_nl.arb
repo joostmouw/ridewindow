@@ -607,5 +607,27 @@
     "placeholders": {
       "count": {"type": "num", "format": "compact"}
     }
-  }
+  },
+  "pelotonSignedOut": "Log in om samen te fietsen",
+  "pelotonSignedOutHint": "Peloton heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.",
+  "pelotonFriends": "Maatjes",
+  "pelotonNoFriends": "Nog geen maatjes",
+  "pelotonNoFriendsHint": "Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.",
+  "pelotonInviteFriend": "Nodig een maatje uit",
+  "pelotonInviteShare": "Fiets met me mee in RideWindow. Open de app en vul code {code} in.",
+  "pelotonYourCode": "Jouw code: {code}",
+  "pelotonRemoveFriend": "Maatje verwijderen",
+  "pelotonPendingInvites": "Uitnodigingen voor jou",
+  "pelotonAccept": "Ik ga mee",
+  "pelotonDecline": "Kan niet",
+  "pelotonOwnedRides": "Ritten die jij organiseert",
+  "pelotonFriendAdded": "{name} is nu je maatje",
+  "pelotonCodeInvalid": "Die code werkt niet — hij kan verlopen zijn.",
+  "pelotonUnnamedFriend": "Fietser",
+  "pelotonInvitedBy": "Van {name}",
+  "pelotonRetry": "Opnieuw proberen",
+  "@pelotonInviteShare": {"placeholders": {"code": {"type": "String"}}},
+  "@pelotonYourCode": {"placeholders": {"code": {"type": "String"}}},
+  "@pelotonFriendAdded": {"placeholders": {"name": {"type": "String"}}},
+  "@pelotonInvitedBy": {"placeholders": {"name": {"type": "String"}}}
 }

@@ -1340,4 +1340,69 @@ class SNl extends S {
     );
     return '$_temp0';
   }
+
+  @override
+  String get pelotonSignedOut => 'Log in om samen te fietsen';
+
+  @override
+  String get pelotonSignedOutHint =>
+      'Peloton heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.';
+
+  @override
+  String get pelotonFriends => 'Maatjes';
+
+  @override
+  String get pelotonNoFriends => 'Nog geen maatjes';
+
+  @override
+  String get pelotonNoFriendsHint =>
+      'Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.';
+
+  @override
+  String get pelotonInviteFriend => 'Nodig een maatje uit';
+
+  @override
+  String pelotonInviteShare(String code) {
+    return 'Fiets met me mee in RideWindow. Open de app en vul code $code in.';
+  }
+
+  @override
+  String pelotonYourCode(String code) {
+    return 'Jouw code: $code';
+  }
+
+  @override
+  String get pelotonRemoveFriend => 'Maatje verwijderen';
+
+  @override
+  String get pelotonPendingInvites => 'Uitnodigingen voor jou';
+
+  @override
+  String get pelotonAccept => 'Ik ga mee';
+
+  @override
+  String get pelotonDecline => 'Kan niet';
+
+  @override
+  String get pelotonOwnedRides => 'Ritten die jij organiseert';
+
+  @override
+  String pelotonFriendAdded(String name) {
+    return '$name is nu je maatje';
+  }
+
+  @override
+  String get pelotonCodeInvalid =>
+      'Die code werkt niet — hij kan verlopen zijn.';
+
+  @override
+  String get pelotonUnnamedFriend => 'Fietser';
+
+  @override
+  String pelotonInvitedBy(String name) {
+    return 'Van $name';
+  }
+
+  @override
+  String get pelotonRetry => 'Opnieuw proberen';
 }
