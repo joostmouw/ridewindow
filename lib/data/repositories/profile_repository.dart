@@ -95,7 +95,28 @@ class ProfileRepository {
   /// `locationOverride` en `userName` gebruiken `remove()` bij `null` in
   /// plaats van een lege string schrijven (D-01) -- dat onderscheid is
   /// zichtbaar in het opslagformaat.
-  Future<void> save(UserProfile profile, {bool stamp = true}) async {
+  ///
+  /// [enqueue] false betekent: deze schrijving kwam *uit* de cloud, dus hij
+  /// hoeft er niet naartoe. Zonder die vlag voedt een adoptie zichzelf
+  /// (backlog #57): `_reconcileProfile` neemt een nieuwere cloud-rij over met
+  /// `stamp: false`, `save()` enqueuet hem onvoorwaardelijk terug, de drain
+  /// duwt hem omhoog, en de trigger `profiles_set_updated_at` (`before update`,
+  /// migratie 0001) zet `updated_at = now()`. De volgende koude start ziet de
+  /// cloud dan opnieuw als nieuwer, met het hele verstreken tijdsverschil, en
+  /// begint van voren af aan. Waargenomen op 2026-08-05: twee koude starts op
+  /// rij stuurden allebei profiel én beschikbaarheid op zonder enige wijziging.
+  ///
+  /// **Bewust een eigen vlag en niet aan [stamp] gekoppeld**, hoe verleidelijk
+  /// kort dat ook is: `ProfileNotifier.setUserNameFromSignIn()` schrijft met
+  /// `stamp: false` én moet de cloud wél bereiken. Twee vlaggen die meestal
+  /// samenvallen op één vlag samentrekken is precies hoe deze bug ontstond --
+  /// `stamp` dekte de tijdstempel en niemand merkte dat de enqueue eronderuit
+  /// liep.
+  Future<void> save(
+    UserProfile profile, {
+    bool stamp = true,
+    bool enqueue = true,
+  }) async {
     await _prefs.setDouble(kTempMinKey, profile.tolerances.tempMinIdealC);
     await _prefs.setDouble(kTempMaxKey, profile.tolerances.tempMaxIdealC);
     await _prefs.setDouble(kWindMaxKey, profile.tolerances.windMaxIdealKmh);
@@ -127,7 +148,7 @@ class ProfileRepository {
       );
     }
 
-    if (_outbox != null && userId != null) {
+    if (enqueue && _outbox != null && userId != null) {
       await _outbox.enqueueOrCoalesce(
         entity: kOutboxEntityProfile,
         entityKey: userId!,

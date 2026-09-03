@@ -346,7 +346,12 @@ class CloudSyncReconciler {
     final local =
         localMs == null ? null : DateTime.fromMillisecondsSinceEpoch(localMs);
     if (local == null || cloudProfile.updatedAt.difference(local) > _noopBand) {
-      await profileRepo.save(cloudProfile.profile, stamp: false);
+      // `enqueue: false` (backlog #57): deze rij komt uit de cloud, dus hem
+      // terugduwen is niet alleen overbodig maar schadelijk -- de
+      // `before update`-trigger zet `updated_at` op nu, waarna de volgende
+      // koude start de cloud opnieuw als nieuwer ziet en dezelfde adoptie
+      // uitvoert. Een lus die zichzelf voedt.
+      await profileRepo.save(cloudProfile.profile, stamp: false, enqueue: false);
       await profileRepo.stampUpdatedAt(cloudProfile.updatedAt);
       _ref.invalidate(profileProvider);
     }
@@ -367,7 +372,12 @@ class CloudSyncReconciler {
         localMs == null ? null : DateTime.fromMillisecondsSinceEpoch(localMs);
     if (local == null ||
         cloudAvailability.updatedAt.difference(local) > _noopBand) {
-      await availabilityRepo.save(cloudAvailability.hours, stamp: false);
+      // Zelfde lus als bij het profiel hierboven (backlog #57).
+      await availabilityRepo.save(
+        cloudAvailability.hours,
+        stamp: false,
+        enqueue: false,
+      );
       await availabilityRepo.stampUpdatedAt(cloudAvailability.updatedAt);
       _ref.invalidate(availabilityProvider);
     }

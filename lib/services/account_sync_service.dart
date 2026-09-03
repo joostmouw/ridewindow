@@ -201,7 +201,10 @@ class AccountSyncService {
         await profileRepo.enqueueCurrentState();
       case SyncDecision.pullCloudToLocal:
         if (meta == null) return;
-        await profileRepo.save(meta.profile, stamp: false);
+        // `enqueue: false` (backlog #57) -- dit is een pull, dus de rij staat
+        // al in de cloud. Hem terugduwen bumpt alleen `updated_at` en maakt de
+        // cloud kunstmatig nieuwer dan lokaal.
+        await profileRepo.save(meta.profile, stamp: false, enqueue: false);
         await profileRepo.stampUpdatedAt(meta.updatedAt);
       case SyncDecision.noop:
       case SyncDecision.promptUser:
@@ -219,7 +222,8 @@ class AccountSyncService {
         await availabilityRepo.enqueueCurrentState();
       case SyncDecision.pullCloudToLocal:
         if (meta == null) return;
-        await availabilityRepo.save(meta.hours, stamp: false);
+        // Zelfde reden als bij het profiel (backlog #57).
+        await availabilityRepo.save(meta.hours, stamp: false, enqueue: false);
         await availabilityRepo.stampUpdatedAt(meta.updatedAt);
       case SyncDecision.noop:
       case SyncDecision.promptUser:

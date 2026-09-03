@@ -236,6 +236,58 @@ void main() {
     });
 
     test(
+      'save(enqueue: false) schrijft lokaal maar laat de outbox met rust -- '
+      'anders duwt een geadopteerde cloud-rij zichzelf terug (backlog #57)',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final repo =
+            ProfileRepository(prefs, outbox: db.syncOutboxDao, userId: 'uid-1');
+
+        await repo.save(profile, stamp: false, enqueue: false);
+
+        expect(
+          prefs.getString('profile.userName'),
+          'Joost',
+          reason: 'De lokale schrijving moet gewoon gebeuren -- alleen de '
+              'terugweg naar de cloud vervalt.',
+        );
+        expect(
+          await db.syncOutboxDao.pendingRows(),
+          isEmpty,
+          reason: 'Deze rij kwam uit de cloud. Enqueuet save() hem toch, dan '
+              'bumpt de `before update`-trigger `updated_at` naar nu, ziet de '
+              'volgende koude start de cloud opnieuw als nieuwer, en '
+              'adopteert hij weer -- de lus van backlog #57.',
+        );
+      },
+    );
+
+    test(
+      'enqueue is een eigen vlag, niet afgeleid van stamp -- '
+      'setUserNameFromSignIn() schrijft met stamp:false én moet de cloud halen',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final repo =
+            ProfileRepository(prefs, outbox: db.syncOutboxDao, userId: 'uid-1');
+
+        await repo.save(profile, stamp: false);
+
+        expect(
+          await db.syncOutboxDao.pendingRows(),
+          hasLength(1),
+          reason: 'Koppel `enqueue` niet aan `stamp`, hoe verleidelijk kort '
+              'dat ook is. `ProfileNotifier.setUserNameFromSignIn()` schrijft '
+              'de naam uit het Google-account zonder te stampen (anders leest '
+              'fase 21 elke eerste inlog op een nieuw toestel als een echte '
+              'wijziging) en die naam moet wél naar de cloud. Twee vlaggen die '
+              'meestal samenvallen samentrekken is precies hoe #57 ontstond.',
+        );
+      },
+    );
+
+    test(
         'constructed without outbox/userId (existing background_task.dart '
         'call shape) enqueues nothing', () async {
       SharedPreferences.setMockInitialValues({});

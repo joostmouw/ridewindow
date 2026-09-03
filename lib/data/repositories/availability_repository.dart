@@ -62,7 +62,16 @@ class AvailabilityRepository {
 
   /// Schrijft [hours] weg in het bestaande formaat. Als [stamp] true is
   /// (default), wordt [kUpdatedAtKey] bijgewerkt naar nu (epoch-ms).
-  Future<void> save(Map<DateTime, BlockType> hours, {bool stamp = true}) async {
+  ///
+  /// [enqueue] false betekent: deze schrijving kwam *uit* de cloud, dus hij
+  /// hoeft er niet naartoe. Zie [ProfileRepository.save] voor de volledige
+  /// redenering — dit is dezelfde lus (backlog #57), met dezelfde
+  /// `before update`-trigger op `public.availability`.
+  Future<void> save(
+    Map<DateTime, BlockType> hours, {
+    bool stamp = true,
+    bool enqueue = true,
+  }) async {
     await _prefs.setStringList(
       kBlockedHoursKey,
       hours.entries
@@ -76,7 +85,7 @@ class AvailabilityRepository {
       );
     }
 
-    if (_outbox != null && userId != null) {
+    if (enqueue && _outbox != null && userId != null) {
       await _outbox.enqueueOrCoalesce(
         entity: kOutboxEntityAvailability,
         entityKey: userId!,

@@ -40,6 +40,7 @@ import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/cloud_sync_gateway.dart';
 import 'package:ridewindow/services/sync_outbox_service.dart';
 
@@ -69,6 +70,9 @@ class _FakeGateway implements CloudSyncGateway {
   /// heeft en de test over volgorde gaat en niet over merge-gedrag.
   List<Map<String, dynamic>> plannedRows;
 
+  /// Wat `profiles` teruggeeft. Default `null` (geen cloud-rij).
+  Map<String, dynamic>? profileRow;
+
   final deletedRideIds = <String>[];
 
   @override
@@ -80,7 +84,7 @@ class _FakeGateway implements CloudSyncGateway {
   @override
   Future<Map<String, dynamic>?> readProfileRow(String userId) async {
     _log.add('readProfileRow');
-    return null;
+    return profileRow;
   }
 
   @override
@@ -302,6 +306,68 @@ void main() {
           reason: 'Anders betaalt elke navigatie naar Home een volledige '
               'cloud-rondgang.');
     });
+  });
+
+  group('een geadopteerde cloud-rij duwt zichzelf niet terug (backlog #57)', () {
+    /// Een volledige `public.profiles`-rij, ver in het verleden zodat hij
+    /// buiten de noop-band van 5 seconden valt en dus werkelijk geadopteerd
+    /// wordt. Blijft de adoptie uit, dan meet de test hieronder niets -- vandaar
+    /// dat hij dat apart toetst.
+    Map<String, dynamic> cloudProfileRow(String updatedAt) => {
+          'user_id': 'u-1',
+          'temp_min_ideal_c': 8.0,
+          'temp_max_ideal_c': 24.0,
+          'wind_max_ideal_kmh': 20.0,
+          'rain_max_ideal_mm': 0.5,
+          'allowed_durations': [2, 3],
+          'theme': 'system',
+          'locale': 'nl',
+          'location_override': null,
+          'user_name': 'Joost',
+          'notif_evening_before': true,
+          'notif_morning_of': false,
+          'notif_weekly_digest': false,
+          'updated_at': updatedAt,
+        };
+
+    test(
+      'het overnemen van een nieuwere cloud-rij laat de outbox leeg -- anders '
+      'voedt de reconcile zichzelf bij elke koude start',
+      () async {
+        gateway.profileRow = cloudProfileRow('2026-08-01T10:00:00.000Z');
+
+        final container = containerFor(Stream<User?>.value(_fakeUser('u-1')));
+        final reconciler = reconcilerIn(container);
+        await Future<void>.delayed(Duration.zero);
+
+        await reconciler.reconcileOnForeground();
+
+        // Eerst: is er überhaupt geadopteerd? Zonder deze controle zou een
+        // reconcile die niets doet ook "outbox leeg" opleveren en zou de test
+        // groen blijven om de verkeerde reden.
+        final repo = await container.read(profileRepositoryProvider.future);
+        expect(
+          repo.readLocal().userName,
+          'Joost',
+          reason: 'De cloud-rij moet werkelijk overgenomen zijn, anders toetst '
+              'de assertie hieronder niets.',
+        );
+
+        final pending = await db.syncOutboxDao.pendingRows();
+        expect(
+          pending.where((r) => r.entity == 'profile'),
+          isEmpty,
+          reason: 'Deze rij kwam uit de cloud. Duw je hem terug, dan zet de '
+              'trigger `profiles_set_updated_at` (`before update`) '
+              '`updated_at` op nu, ziet de volgende koude start de cloud '
+              'opnieuw als nieuwer, en adopteert hij weer -- een lus die '
+              'zichzelf voedt en `updated_at` onbruikbaar maakt als "wanneer '
+              'wijzigde de gebruiker dit". Waargenomen 2026-08-05 als twee '
+              'koude starts die allebei profiel én beschikbaarheid opstuurden '
+              'zonder wijziging (backlog #57).',
+        );
+      },
+    );
   });
 
   group('niet-canonieke ride_id wordt gerepareerd (plan 21-13)', () {
