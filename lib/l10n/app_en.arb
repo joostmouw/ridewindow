@@ -491,5 +491,10 @@
   "@pelotonInviteShare": {"placeholders": {"code": {"type": "String"}}},
   "@pelotonYourCode": {"placeholders": {"code": {"type": "String"}}},
   "@pelotonFriendAdded": {"placeholders": {"name": {"type": "String"}}},
-  "@pelotonInvitedBy": {"placeholders": {"name": {"type": "String"}}}
+  "@pelotonInvitedBy": {"placeholders": {"name": {"type": "String"}}},
+  "pelotonInviteToRide": "Invite a buddy",
+  "pelotonPickFriends": "Who's coming?",
+  "pelotonInviteSent": "Invitation sent",
+  "pelotonNeedFriendsFirst": "Add a buddy first — Rides, tab Peloton.",
+  "pelotonInviteAction": "Invite"
 }

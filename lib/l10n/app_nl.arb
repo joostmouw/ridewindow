@@ -629,5 +629,10 @@
   "@pelotonInviteShare": {"placeholders": {"code": {"type": "String"}}},
   "@pelotonYourCode": {"placeholders": {"code": {"type": "String"}}},
   "@pelotonFriendAdded": {"placeholders": {"name": {"type": "String"}}},
-  "@pelotonInvitedBy": {"placeholders": {"name": {"type": "String"}}}
+  "@pelotonInvitedBy": {"placeholders": {"name": {"type": "String"}}},
+  "pelotonInviteToRide": "Nodig een maatje uit",
+  "pelotonPickFriends": "Wie gaat er mee?",
+  "pelotonInviteSent": "Uitnodiging verstuurd",
+  "pelotonNeedFriendsFirst": "Voeg eerst een maatje toe — Rides, tab Peloton.",
+  "pelotonInviteAction": "Uitnodigen"
 }

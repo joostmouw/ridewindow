@@ -1402,4 +1402,20 @@ class SEn extends S {
 
   @override
   String get pelotonRetry => 'Try again';
+
+  @override
+  String get pelotonInviteToRide => 'Invite a buddy';
+
+  @override
+  String get pelotonPickFriends => 'Who\'s coming?';
+
+  @override
+  String get pelotonInviteSent => 'Invitation sent';
+
+  @override
+  String get pelotonNeedFriendsFirst =>
+      'Add a buddy first — Rides, tab Peloton.';
+
+  @override
+  String get pelotonInviteAction => 'Invite';
 }

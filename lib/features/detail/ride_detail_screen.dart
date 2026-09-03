@@ -14,6 +14,8 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart'
     show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
+import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
@@ -879,6 +881,25 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             label: Text(S.of(context).addToGoogleCalendar),
           ),
           const SizedBox(height: 10),
+          // Peloton (epic #62): uitnodigen begint bij een rit die je al bekijkt.
+          // Alleen zichtbaar als je ingelogd bent -- uitgelogd mag van het hele
+          // epic niets te merken zijn (REQUIREMENTS.md regel 8).
+          if (ref.watch(currentUserIdProvider) != null) ...[
+            OutlinedButton.icon(
+              onPressed: _isLoading
+                  ? null
+                  : () => showInviteBuddiesSheet(
+                        context,
+                        ref,
+                        start: widget.slot.start,
+                        end: widget.slot.end,
+                        plannedScore: widget.slot.overallScore,
+                      ),
+              icon: const Icon(Icons.group_add_outlined, size: 18),
+              label: Text(S.of(context).pelotonInviteToRide),
+            ),
+            const SizedBox(height: 10),
+          ],
           FilledButton.tonalIcon(
             onPressed: () async {
               final notifService = widget.notificationServiceFactory();

@@ -2586,6 +2586,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Opnieuw proberen'**
   String get pelotonRetry;
+
+  /// No description provided for @pelotonInviteToRide.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nodig een maatje uit'**
+  String get pelotonInviteToRide;
+
+  /// No description provided for @pelotonPickFriends.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wie gaat er mee?'**
+  String get pelotonPickFriends;
+
+  /// No description provided for @pelotonInviteSent.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodiging verstuurd'**
+  String get pelotonInviteSent;
+
+  /// No description provided for @pelotonNeedFriendsFirst.
+  ///
+  /// In nl, this message translates to:
+  /// **'Voeg eerst een maatje toe — Rides, tab Peloton.'**
+  String get pelotonNeedFriendsFirst;
+
+  /// No description provided for @pelotonInviteAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodigen'**
+  String get pelotonInviteAction;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

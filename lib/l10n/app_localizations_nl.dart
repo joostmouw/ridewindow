@@ -1405,4 +1405,20 @@ class SNl extends S {
 
   @override
   String get pelotonRetry => 'Opnieuw proberen';
+
+  @override
+  String get pelotonInviteToRide => 'Nodig een maatje uit';
+
+  @override
+  String get pelotonPickFriends => 'Wie gaat er mee?';
+
+  @override
+  String get pelotonInviteSent => 'Uitnodiging verstuurd';
+
+  @override
+  String get pelotonNeedFriendsFirst =>
+      'Voeg eerst een maatje toe — Rides, tab Peloton.';
+
+  @override
+  String get pelotonInviteAction => 'Uitnodigen';
 }
