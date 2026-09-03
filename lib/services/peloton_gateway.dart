@@ -135,10 +135,12 @@ class SupabasePelotonGateway implements PelotonGateway {
     }
 
     return rides
-        .map((r) => GroupRide.fromRow(
-              r,
-              participants: byRide[r['id'] as String] ?? const [],
-            ))
+        .map(
+          (r) => GroupRide.fromRow(
+            r,
+            participants: byRide[r['id'] as String] ?? const [],
+          ),
+        )
         .toList();
   }
 

@@ -2616,6 +2616,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Uitnodigen'**
   String get pelotonInviteAction;
+
+  /// No description provided for @pelotonJoinTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodiging van een maatje'**
+  String get pelotonJoinTitle;
+
+  /// No description provided for @pelotonJoining.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je wordt toegevoegd…'**
+  String get pelotonJoining;
+
+  /// No description provided for @pelotonSignInToJoin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Log eerst in en vul deze code daarna in onder Rides, tab Peloton.'**
+  String get pelotonSignInToJoin;
+
+  /// No description provided for @pelotonGoToPeloton.
+  ///
+  /// In nl, this message translates to:
+  /// **'Naar Peloton'**
+  String get pelotonGoToPeloton;
+
+  /// No description provided for @pelotonInviteShareLink.
+  ///
+  /// In nl, this message translates to:
+  /// **'Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Rides, tab Peloton.'**
+  String pelotonInviteShareLink(String link, String code);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

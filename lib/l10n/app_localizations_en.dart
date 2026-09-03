@@ -1418,4 +1418,22 @@ class SEn extends S {
 
   @override
   String get pelotonInviteAction => 'Invite';
+
+  @override
+  String get pelotonJoinTitle => 'Buddy invitation';
+
+  @override
+  String get pelotonJoining => 'Adding you…';
+
+  @override
+  String get pelotonSignInToJoin =>
+      'Sign in first, then enter this code under Rides, tab Peloton.';
+
+  @override
+  String get pelotonGoToPeloton => 'Go to Peloton';
+
+  @override
+  String pelotonInviteShareLink(String link, String code) {
+    return 'Ride with me on RideWindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Peloton.';
+  }
 }

@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/services/invite_code.dart';
+import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
@@ -52,10 +53,12 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
         final code =
             await ref.read(pelotonGatewayProvider).createFriendInvite();
         if (!mounted) return;
-        // De code staat óók in de tekst zelf, niet alleen in een link: een
-        // deep-link route bestaat nog niet, en een link die nergens op
-        // uitkomt is erger dan geen link.
-        await Share.share(s.pelotonInviteShare(code));
+        // De code staat óók in de tekst, niet alleen in de link: de link opent
+        // vandaag de PWA en niet de native app (daarvoor zijn Android App
+        // Links nodig), dus wie de app al heeft is met overtypen sneller uit.
+        await Share.share(
+          s.pelotonInviteShareLink(inviteLinkFor(code), code),
+        );
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(s.pelotonYourCode(code))),

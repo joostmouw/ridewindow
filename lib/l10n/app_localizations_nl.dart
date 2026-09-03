@@ -1421,4 +1421,22 @@ class SNl extends S {
 
   @override
   String get pelotonInviteAction => 'Uitnodigen';
+
+  @override
+  String get pelotonJoinTitle => 'Uitnodiging van een maatje';
+
+  @override
+  String get pelotonJoining => 'Je wordt toegevoegd…';
+
+  @override
+  String get pelotonSignInToJoin =>
+      'Log eerst in en vul deze code daarna in onder Rides, tab Peloton.';
+
+  @override
+  String get pelotonGoToPeloton => 'Naar Peloton';
+
+  @override
+  String pelotonInviteShareLink(String link, String code) {
+    return 'Fiets met me mee in RideWindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Rides, tab Peloton.';
+  }
 }

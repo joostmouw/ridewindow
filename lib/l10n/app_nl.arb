@@ -634,5 +634,11 @@
   "pelotonPickFriends": "Wie gaat er mee?",
   "pelotonInviteSent": "Uitnodiging verstuurd",
   "pelotonNeedFriendsFirst": "Voeg eerst een maatje toe — Rides, tab Peloton.",
-  "pelotonInviteAction": "Uitnodigen"
+  "pelotonInviteAction": "Uitnodigen",
+  "pelotonJoinTitle": "Uitnodiging van een maatje",
+  "pelotonJoining": "Je wordt toegevoegd…",
+  "pelotonSignInToJoin": "Log eerst in en vul deze code daarna in onder Rides, tab Peloton.",
+  "pelotonGoToPeloton": "Naar Peloton",
+  "pelotonInviteShareLink": "Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Rides, tab Peloton.",
+  "@pelotonInviteShareLink": {"placeholders": {"link": {"type": "String"}, "code": {"type": "String"}}}
 }

@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/app/scaffold_with_nav.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
+import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
@@ -151,6 +152,16 @@ GoRouter router(Ref ref) {
         ],
       ),
 
+      // Peloton (epic #62): waar een gedeelde uitnodigingslink op uitkomt.
+      // Buiten de shell, want dit scherm hoort niet bij een bottom-nav-tab --
+      // je komt hier van buiten de app binnen.
+      GoRoute(
+        path: '/invite/:code',
+        pageBuilder: (context, state) => _fadeTransition(
+          state,
+          InviteLandingScreen(code: state.pathParameters['code'] ?? ''),
+        ),
+      ),
       GoRoute(
         path: '/availability',
         pageBuilder: (context, state) {

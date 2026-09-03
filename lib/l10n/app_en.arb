@@ -496,5 +496,11 @@
   "pelotonPickFriends": "Who's coming?",
   "pelotonInviteSent": "Invitation sent",
   "pelotonNeedFriendsFirst": "Add a buddy first — Rides, tab Peloton.",
-  "pelotonInviteAction": "Invite"
+  "pelotonInviteAction": "Invite",
+  "pelotonJoinTitle": "Buddy invitation",
+  "pelotonJoining": "Adding you…",
+  "pelotonSignInToJoin": "Sign in first, then enter this code under Rides, tab Peloton.",
+  "pelotonGoToPeloton": "Go to Peloton",
+  "pelotonInviteShareLink": "Ride with me on RideWindow: {link}\n\nNo app yet? The link works in your browser. Or enter code {code} under Rides, tab Peloton.",
+  "@pelotonInviteShareLink": {"placeholders": {"link": {"type": "String"}, "code": {"type": "String"}}}
 }
