@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Backlog #60 en #57 opgelost; fase 21 wacht op verificatie"
-last_updated: "2026-09-03T06:20:00.000Z"
-last_activity: 2026-09-03
+status: "Peloton: alles gebouwd, 2-accountstest open"
+last_updated: "2026-09-06T00:00:00.000Z"
+last_activity: 2026-09-06
 progress:
   total_phases: 5
   completed_phases: 2
@@ -43,6 +43,7 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 21 (sync-migration) — UITGEVOERD, wacht op verificatie
+Actief werk: **epic "Peloton" (#62) — zie `.planning/PELOTON.md`, begin daar.**
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
