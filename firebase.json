@@ -9,6 +9,20 @@
       {
         "source": "**/*.wasm",
         "headers": [{ "key": "Content-Type", "value": "application/wasm" }]
+      },
+      {
+        "comment": "Firebase Hosting geeft standaard 'max-age=3600' aan alles wat het niet als statisch asset herkent. Dat gold hier ook voor index.html, flutter_bootstrap.js en main.dart.js -- en juist die drie dragen de app zelf. Gevolg: een uur lang na elke deploy bleef een toestel dat de app al geopend had de oude code draaien, ongeacht herladen of herstarten. Op 2026-09-03 en opnieuw op 2026-09-06 is daar een halve sessie aan verloren gegaan, beide keren met de service worker als verdachte -- ten onrechte, want Flutter serveert hier zijn zelf-uitschrijvende worker, die niets cachet. Geen van deze bestanden draagt een hash in zijn naam, dus revalidatie per request is de enige veilige stand.",
+        "source": "/{index.html,flutter_bootstrap.js,flutter_service_worker.js,manifest.json,version.json}",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate, max-age=0" }
+        ]
+      },
+      {
+        "comment": "main.dart.js is de volledige app-bundel en heeft evenmin een content-hash in zijn naam. 'no-cache' betekent hier niet 'niet opslaan' maar 'altijd revalideren': de ETag doet het werk, dus een ongewijzigde bundel kost een 304 en geen 5,7 MB.",
+        "source": "**/main.dart.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate, max-age=0" }
+        ]
       }
     ]
   }
