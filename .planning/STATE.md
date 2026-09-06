@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Peloton: alles gebouwd, 2-accountstest open"
-last_updated: "2026-09-06T00:00:00.000Z"
+status: "Peloton: vriendschap bewezen, RLS blokkeert uitnodigen"
+last_updated: "2026-09-06T20:55:00.000Z"
 last_activity: 2026-09-06
 progress:
   total_phases: 5
