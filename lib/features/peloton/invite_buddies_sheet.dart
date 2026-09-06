@@ -77,8 +77,15 @@ Future<void> showInviteBuddiesSheet(
   } catch (error) {
     // Een uitnodiging die niet aankomt mag geen scherm laten crashen; de rit
     // zelf is niet veranderd, dus opnieuw proberen is veilig.
+    //
+    // Bewust een eigen melding en niet `pelotonCodeInvalid` ("die code werkt
+    // niet"). Dat hergebruik heeft op 2026-09-06 een halve sessie gekost: het
+    // uitnodigen faalde op een RLS-fout in `group_rides`, maar het scherm
+    // sprak over een verlopen code terwijl er in dit pad helemaal geen code
+    // bestaat. Een foutmelding die naar de verkeerde oorzaak wijst is erger
+    // dan een vage.
     debugPrint('Peloton: uitnodigen mislukt: $error');
-    messenger.showSnackBar(SnackBar(content: Text(s.pelotonCodeInvalid)));
+    messenger.showSnackBar(SnackBar(content: Text(s.pelotonInviteFailed)));
   }
 }
 

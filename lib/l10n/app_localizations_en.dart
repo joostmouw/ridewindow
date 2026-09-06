@@ -1413,6 +1413,9 @@ class SEn extends S {
   String get pelotonInviteSent => 'Invitation sent';
 
   @override
+  String get pelotonInviteFailed => 'Couldn\'t send the invitation. Try again.';
+
+  @override
   String get pelotonNeedFriendsFirst =>
       'Add a buddy first — Rides, tab Peloton.';
 

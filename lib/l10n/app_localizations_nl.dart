@@ -1416,6 +1416,10 @@ class SNl extends S {
   String get pelotonInviteSent => 'Uitnodiging verstuurd';
 
   @override
+  String get pelotonInviteFailed =>
+      'Uitnodigen is niet gelukt. Probeer het opnieuw.';
+
+  @override
   String get pelotonNeedFriendsFirst =>
       'Voeg eerst een maatje toe — Rides, tab Peloton.';
 

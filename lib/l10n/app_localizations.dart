@@ -2605,6 +2605,12 @@ abstract class S {
   /// **'Uitnodiging verstuurd'**
   String get pelotonInviteSent;
 
+  /// No description provided for @pelotonInviteFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodigen is niet gelukt. Probeer het opnieuw.'**
+  String get pelotonInviteFailed;
+
   /// No description provided for @pelotonNeedFriendsFirst.
   ///
   /// In nl, this message translates to:
