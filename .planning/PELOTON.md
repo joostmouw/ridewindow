@@ -69,10 +69,10 @@ uur werk, zinvol pas als Peloton in een Play-build zit.
 
 ## Openstaande punten
 
-- **`CLAUDE.md` klopt niet meer:** daar staat "één server-side functie". Het zijn er nu vijf
-  (`migrate_account_data`, `delete_own_account`, `is_ride_member`, `redeem_friend_invite`,
-  `friend_profiles`). Elke toevoeging is verantwoord in `0002_peloton.sql`, maar de constraint-tekst
-  moet bijgewerkt worden zodat hij geen onwaarheid meer beweert.
+- ~~**`CLAUDE.md` klopt niet meer**~~ — **opgelost 2026-09-06.** De constraint noemt nu zes functies
+  en waarom elk er staat. Het waren er zes, niet vijf: naast de vier `rpc()`-functies
+  (`migrate_account_data`, `delete_own_account`, `friend_profiles`, `redeem_friend_invite`) telt ook
+  de RLS-helper `is_ride_member` mee én de trigger-functie `set_updated_at` uit `0001`.
 - **Privacybeleid**: een maatje ziet nu je naam en de ritten waarvoor je uitgenodigd bent. Dat staat
   nog niet in het gepubliceerde beleid.
 - Namen worden gedenormaliseerd gekopieerd bij accepteren; wie later zijn naam wijzigt, blijft bij
