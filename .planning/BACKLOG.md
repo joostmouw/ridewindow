@@ -99,6 +99,7 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 | # | Item | Waarde | Effort | Status |
 |---|------|--------|--------|--------|
 | 62 | **Epic "Peloton" — vrienden + gezamenlijke ride windows** — overkoepelende richting waar #41 en #48 onder vallen; zie de uitgewerkte sectie onderaan | HOOG | XL | Backlog — epic, nog geen scope |
+| 64 | **Epic "Eigen gezicht" — merkidentiteit: typografie, iconografie en emoji die van deze app zijn** — het logo bestaat al en is het vertrekpunt; zie de uitgewerkte sectie onderaan | HOOG | L | Backlog — epic, nog geen scope |
 | 40 | **Wear OS companion** — tile/complication die volgende slot toont op smartwatch | MEDIUM | L | Backlog |
 | 41 | **Sociaal / groepsritten** — "Wanneer kunnen wij allemaal?" met gedeelde beschikbaarheid. Tester-verduidelijking (Jacco, Phase 15 iPhone-test): concreter, kleiner startpunt zou zijn iemand uitnodigen voor één specifieke rit, die persoon accepteert en ziet 'm terug in zijn eigen app — evt. uitgebreid met het zien van elkaars beschikbaarheid om een overlap te vinden | MEDIUM | XL | Backlog — opgenomen in milestone v3.0, zie `.planning/milestones/v3.0-ACCOUNTS.md` |
 | 48 | **Lokale ride-matching** — gebruikers in dezelfde omgeving die zich voor hetzelfde slot aanmelden kunnen samen een rit plannen | MEDIUM | XL | Backlog |
@@ -211,3 +212,60 @@ server-side staan.
 uitnodigen voor één rit, die accepteert en ziet 'm in zijn eigen app) en [[48]] (lokale
 ride-matching). #41's startpunt is waarschijnlijk de eerste bruikbare slice van deze epic; #48 is de
 uitbreiding naar mensen die je nog niet kent en hoort daar nadrukkelijk ná.
+
+---
+
+## 64 — Epic "Eigen gezicht": typografie, iconografie en emoji die van deze app zijn
+
+**De vraag van Joost (2026-09-06).** De app moet een eigen merk en imago dragen — lettertype, emoji
+en beeldtaal die niet ergens vandaan gepakt zijn maar bij déze app horen en bij wat hij doet. Het
+logo is al gemaakt en is het vertrekpunt, niet een los element.
+
+**Waar de app nu staat — dit is geen groen veld.** Wat al af is verdient het om niet opnieuw
+gedaan te worden:
+
+- **Kleur is al eigen.** `lib/theme/app_colors.dart` draagt de officiële merkkleuren
+  `brandLight #C5D4B6` en `brandDark #234934`, en `seed = brandDark` voedt het hele
+  Material 3-schema. De getinte oppervlaktetrappen en de contrastcontroles (4.5:1) zijn doorgemeten.
+- **Vorm en beweging staan apart** in `app_shapes.dart` en `app_motion.dart` — er is dus al een
+  tokenlaag om aan te haken, geen losse waarden door de schermen heen.
+- **Het logo bestaat**: `photos/app_icon_rounded_square.png`, met `tools/make_icons.py` dat alle
+  formaten regenereert.
+
+**Wat er dus werkelijk ontbreekt — de twee gaten waar deze epic over gaat:**
+
+1. **Er is geen eigen lettertype.** `pubspec.yaml` heeft geen `fonts:`-blok en nergens in
+   `lib/theme/` staat een `fontFamily`. De app draait dus op het systeemlettertype: Roboto op
+   Android, San Francisco op iOS, iets anders op het web. De app ziet er op de iPhone van de tester
+   letterlijk anders uit dan op het toestel hier, en geen van beide is een keuze geweest. Dit is het
+   grootste enkele verschil tussen "een Material-app" en "deze app".
+2. **De emoji zijn systeememoji.** `lib/features/shared/clothing_tip.dart` zet het kledingadvies
+   neer als losse Unicode-tekens (`\u{1F455}` t-shirt, `\u{1FA73}` korte broek, `\u{1F9E5}` jas)
+   in een `Text` met `fontSize: 20`. Die worden door het besturingssysteem getekend — dus Android's
+   Noto, Apple's eigen set, en op het web weer wat anders. Precies "ergens vandaan gepakt". Het is
+   bovendien de plek waar de app zijn karakter laat zien (kledingadvies is het meest menselijke
+   stukje van het product), dus het is de eerste plaats om eigen beeldtaal neer te zetten.
+
+**Randvoorwaarden die deze epic sturen:**
+
+- **€0/maand blijft staan.** Een licentie voor een commercieel lettertype botst met de begroting
+  uit `CLAUDE.md`. Zoek in de open-source hoek (SIL OFL) en kies bewust — een OFL-font mag mee in
+  de app-bundel, ook commercieel.
+- **APK-grootte is een echte kostenpost.** Een variabel font in twee gewichten is al snel
+  honderden kB; icoonassets als SVG of als eigen icoonfont schelen daarin. Subset op de tekens die
+  de app werkelijk gebruikt (EN + NL, dus geen volledige Latin-Extended).
+- **Toegankelijkheid mag niet inleveren.** De contrastratio's in `app_colors.dart` zijn met zorg op
+  4.5:1 gezet; een nieuw lettertype verandert de waargenomen zwaarte van tekst. Herweeg de
+  hint-kleuren na de wissel in plaats van aan te nemen dat ze blijven kloppen.
+- **Emoji vervangen raakt de leesbaarheid van betekenis.** Een eigen pictogram voor "lange mouw"
+  moet zonder tekst herkenbaar zijn, anders is een systeememoji die iedereen kent beter. Toets dat
+  op iemand die de app niet kent, niet op onszelf.
+
+**Waar het logo binnenkomt.** Het icoon draagt al een vormtaal (rondingen, lijndikte, de
+groentonen). Die is de bron voor zowel de icoonset als de fontkeuze — de volgorde is dus: eerst het
+logo ontleden tot een paar expliciete regels, dán font en iconen daaraan toetsen. Andersom levert
+een verzameling losse smaken op.
+
+**Samenhang.** Raakt de MD3-herontwerpplannen (zie het geheugenitem "MD3 visual redesign") en
+#58/#59 zijdelings: `clothing_tip.dart` bevat naast emoji ook Nederlandse labels ("kort/kort") in
+een verder Engelse app, dus wie dit bestand toch openlegt kan die hardcoded taal meteen meenemen.
