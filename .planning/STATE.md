@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Peloton: vriendschap bewezen, RLS blokkeert uitnodigen"
-last_updated: "2026-09-06T20:55:00.000Z"
+status: "Peloton: lus rond; geaccepteerde rit nog onzichtbaar"
+last_updated: "2026-09-07T09:15:00.000Z"
 last_activity: 2026-09-06
 progress:
   total_phases: 5

@@ -1,11 +1,11 @@
 # Epic "Peloton" — stand van zaken
 
-> Bijgewerkt 2026-09-06 (avond, na de tweeaccountstest). Epic staat als **#62** in `BACKLOG.md`.
-> Dit bestand is de werkstand; begin hier als je de draad oppakt.
+> Bijgewerkt 2026-09-07. Epic staat als **#62** in `BACKLOG.md`. Dit bestand is de werkstand;
+> begin hier als je de draad oppakt.
 >
-> **Stand in één zin:** vriendschap tussen twee accounts is bewezen; uitnodigen is geblokkeerd door
-> een RLS-weigering op `group_rides`, en `supabase/migrations/0003_peloton_policy_repair.sql` staat
-> klaar om in de Supabase SQL-editor gedraaid te worden.
+> **Stand in één zin:** de hele lus is op een toestel bewezen — vriendschap, uitnodigen, accepteren
+> — maar een geaccepteerde rit is bij de genodigde nergens zichtbaar, en dat is de eerstvolgende
+> slice. Begin bij "De lus is rond" hieronder.
 
 ## Wat Joost heeft gekozen (2026-09-03, niet opnieuw ter discussie stellen)
 
@@ -55,45 +55,94 @@ Commits `be63137` t/m `efa6f99`, alles op main en gepusht. Suite 470/470, analyz
 **Nog niet bewezen, en geblokkeerd door een echte bug:** uitnodigen → accepteren → rit bij de ander
 → deelnemersteller. Zie de sectie hieronder.
 
-**Hoe je veilig tussen de accounts wisselt.** Bij inloggen met een ander account vraagt de app
-"Keep data" of "Start fresh". **Keep data** is de veilige keuze: die raakt Joosts lokale profiel en
-beschikbaarheid niet aan. De prijs is dat het testaccount B Joosts profielnaam erft — B heet daarom
-in de app ook "Joost", wat de maatjeslijst dubbelzinnig maakt. **Start fresh** wist lokaal profiel,
-beschikbaarheid en geplande ritten; dat is herstelbaar zolang de cloud bij is (`save([])` schrijft
-alleen SharedPreferences en enqueuet géén cloud-deletes, dus de rijen van het andere account
-blijven staan), maar het leunt op een sync die compleet was. Niet doen zonder reden.
+**Hoe je tussen de accounts wisselt.** Bij inloggen met een ander account vraagt de app "Keep data"
+of "Start fresh". **Keep data** laat de lokale data van het vórige account meereizen naar het
+nieuwe — dat vervuilt elke test (B erfde zo Joosts profielnaam en heet in de app ook "Joost").
+**Start fresh** is sinds `89d0c7a` de juiste keuze: die wist lokaal en laat de cloud de rest
+herstellen. Vóór die commit was het destructief — zie punt 3 hieronder.
 
-## De blokkade: RLS weigert de insert op `group_rides`
+## De blokkade die er was: RLS weigerde de insert op `group_rides` — OPGELOST
 
-Uitnodigen faalt met:
-
-```
-PostgrestException(message: new row violates row-level security policy
-for table "group_rides", code: 42501)
-```
+Uitnodigen faalde met `new row violates row-level security policy for table "group_rides" (42501)`.
 
 **Waarom dit lang onzichtbaar bleef.** De catch in `invite_buddies_sheet.dart` toonde
-`pelotonCodeInvalid` — "die code werkt niet, hij kan verlopen zijn" — terwijl er in dit pad
-helemaal geen code bestaat. Die melding wees naar de verkeerde oorzaak. Inmiddels vervangen door
-een eigen string (`pelotonInviteFailed`, EN + NL).
+`pelotonCodeInvalid` — "die code werkt niet, hij kan verlopen zijn" — terwijl er in dat pad
+helemaal geen code bestaat. Die melding wees naar de verkeerde oorzaak. Vervangen door een eigen
+string (`pelotonInviteFailed`, EN + NL).
 
-**Wat het patroon zegt.** Alles wat wérkt loopt via `SECURITY DEFINER`-functies
-(`friend_profiles()`, `redeem_friend_invite()`) en slaat RLS dus over. Dit is het eerste pad dat
-echt op een policy leunt, en het is meteen raak. De policy in `0002_peloton.sql` klopt
-(`with check (owner_id = auth.uid())`) en de app schrijft `owner_id` letterlijk uit
-`auth.currentSession.user.id`. Postgres geeft deze fout in twee gevallen: de check is onwaar, óf er
-geldt geen enkele insertpolicy. Het eerste kan hier niet — dus vermoedelijk staan de
-`group_rides`-policies niet (volledig) op de live database, terwijl RLS er wél aan staat.
+**De eerste diagnose was fout en is weerlegd.** Ik vermoedde ontbrekende policies; `pg_policies`
+liet zien dat alle acht er gewoon stonden. Het herstelscript dat daarop gebaseerd was is verwijderd
+zonder ooit gedraaid te zijn.
 
-**Uitgesloten, dus niet opnieuw onderzoeken:** de tabellen bestáán (PostgREST geeft
-`42501 permission denied`, niet `PGRST205 not found`), de tabelnamen in
-`supabase_tables.dart` kloppen, de grants staan in de migratie, en `id` heeft
-`default gen_random_uuid()`.
+**De echte oorzaak.** `createGroupRide` doet `.insert(...).select()`, dus `INSERT ... RETURNING`, en
+bij RETURNING past Postgres óók de SELECT-policy toe op de nieuwe rij. Die policy was
+`is_ride_member(id)`, en die functie is `stable` en zoekt de rit op in `group_rides` zelf — in de
+snapshot van het begin van de statement, waarin die rij nog niet bestaat. Dus `false`, dus
+geweigerd. De insert-check `owner_id = auth.uid()` slaagde altijd al; het *teruglezen* faalde.
 
-**De volgende stap is één ding:** `supabase/migrations/0003_peloton_policy_repair.sql` draaien in de
-Supabase SQL-editor, met de controlequery onderaan dat bestand **vóór en ná**. Staan alle acht
-policies er vooraf al, dan is de diagnose fout en moet de zoektocht verder — noteer dat hier.
-Daarna de rest van de lus in één keer: uitnodigen → accepteren als A → rit verschijnt → teller.
+**De fix** (`supabase/migrations/0003_group_rides_select_own_row.sql`, door Joost gedraaid op
+2026-09-07): de SELECT-policy krijgt een snapshot-vrije tak `owner_id = auth.uid()` vóór de helper.
+Die leest de kolom van de rij die voorligt, zonder tabellookup.
+
+**Les die breder geldt:** een `stable` SECURITY DEFINER-functie in een SELECT-policy ziet de rij niet
+die in dezelfde statement wordt aangemaakt. Elke `.insert().select()` op een tabel waarvan de
+SELECT-policy zo'n functie gebruikt, loopt hier tegenaan. `group_ride_participants` ontsnapt er
+alleen aan doordat `inviteToRide` géén `.select()` doet.
+
+## De lus is rond — en wat er onderweg stukging (2026-09-07)
+
+Na de policy-fix (`0003_group_rides_select_own_row.sql`, door Joost gedraaid) is de hele keten op
+het toestel doorlopen: **uitnodigen slaagt** ("Invitation sent"), B ziet de rit onder "Rides you
+organise" met "Nobody has joined yet", **A krijgt de uitnodiging** ("From Joost, 17:00 – 20:00") en
+kan hem accepteren. Dat is het bewijs dat de epic zocht.
+
+Drie dingen werken daarna níét, en twee ervan zijn nieuw gevonden.
+
+### 1. Een geaccepteerde rit is bij de genodigde nergens te zien — dit is het gat dat telt
+
+Na "Join" verdwijnt de uitnodiging uit "Invitations for you" en komt hij **nergens** terug: niet in
+"My rides", niet op Home onder PLANNED, niet elders op de Peloton-tab. Dat is geen renderfout maar
+een ontbrekend stuk: `peloton_tab.dart` toont drie dingen — openstaande uitnodigingen
+(`pendingRideInvites`, dus status `invited`), maatjes, en ritten die jíj organiseert
+(`ownedGroupRides`). Een geaccepteerde rit van iemand anders valt in geen van drieën. En accepteren
+maakt géén rij in `planned_rides`, want dat blijft strikt persoonlijk (keuze 2).
+
+De belofte van de epic is "de rit verschijnt bij de ander". Dat is dus nog niet waar. Dit is de
+eerstvolgende slice: een geaccepteerde gedeelde rit moet net zo goed op Home en in "My rides"
+verschijnen als een eigen geplande rit, met zichtbaar wie er meerijdt.
+
+### 2. Maatjes zijn eenzijdig zichtbaar: B ziet A, A ziet B niet
+
+Na de wederzijdse vriendschap toont A's Peloton-tab "No buddies yet" — ook na pull-to-refresh —
+terwijl B A gewoon in zijn lijst heeft staan. De vriendschapsrij is symmetrisch en
+`friend_profiles()` behandelt beide volgordes correct, dus daar zit het niet.
+
+**Waarschijnlijke oorzaak:** `friend_profiles()` doet `from public.profiles p where p.user_id in
+(...)`. Je bent voor je maatje dus alleen zichtbaar als je een rij in `profiles` hebt. B is een vers
+account dat inlogde met "Keep data" en daarna niets wijzigde — en `ProfileRepository.save()`
+enqueuet alleen bij een échte wijziging. Er is dus nooit een profielrij voor B weggeschreven.
+
+Dat maakt dit geen randgeval maar het normale pad: **iedereen die via een invite-code binnenkomt en
+niets aanpast, blijft onzichtbaar in de maatjeslijst van degene die hem uitnodigde.** Te bevestigen
+met `select user_id, user_name from public.profiles;` — staat B daar niet bij, dan is het dit. De
+fix hoort bij het inloggen te liggen (bij een nieuw account altijd een profielrij aanleggen), niet
+in een `left join` in de functie, want een maatje zonder naam moet je nog steeds kunnen uitnodigen.
+
+### 3. "Start fresh" wiste een echt weekrooster — opgelost (`89d0c7a`)
+
+Bij het wisselen naar A koos ik "Start fresh" om te voorkomen dat B's lokale rit meereisde. Dat
+wiste Joosts beschikbaarheid lokaal én in de cloud: `clearAll()` loopt via `save()`, die
+`updatedAt` op nu stempelt en een upsert enqueuet. De reconcile haalt de cloud-rij daarna nooit
+meer terug (lokaal lijkt nieuwer) en de outbox duwt de leegte omhoog. Free tier, dus geen backup.
+
+Hersteld uit een uitgelogde kopie in de desktop-browser (`flutter.availability.blockedHours`, 120
+uur, ma–vr `work`) — wat exact de preset "Weekends only" bleek. Gerepareerd in code met
+`resetForAccountSwitch()`, dat de sleutel én de tijdstempel verwijdert en niets enqueuet, precies
+zoals `ProfileRepository.resetToDefaults()` dat al deed. Met regressietest.
+
+**Les voor de volgende accountwissel:** "Keep data" laat het vorige account zijn lokale data
+meenemen naar het nieuwe (vervuilt de test), "Start fresh" was tot vandaag destructief. Sinds
+`89d0c7a` is "Start fresh" de juiste keuze en herstelt de cloud de rest.
 
 ## Vallen waar ik in ben gelopen — niet opnieuw
 
