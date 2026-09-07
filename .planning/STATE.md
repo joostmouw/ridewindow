@@ -26,6 +26,7 @@ progress:
 | 2026-09-07 | [stap-3-typografie](quick/260907-kqr-fase-23-stap-3-typografische-schaal-echt/) | Stap 3: de beste kaart op 24/45, de rest op 16/28. Zonder schaduw of staaf wijst maat de kaart nu aan. |
 | 2026-09-07 | [stap-5-dagstrip-en-filter](quick/260907-s5x-fase-23-stap-5-dagstrip-en-periodefilter/) | Stap 5: kwaliteit werd een onderstreping, selectie een tonale vulling; filter werd een tekstrij. Plus: kleine ritkaarten zijn uitklapbaar. |
 | 2026-09-07 | Peloton-kaarten (`41217d9`, `63770c2`) | Peloton kreeg `SectionCard` (verhuisd uit Profiel); `cardTheme` bleek een tweede kaartsoort te hebben en is gelijkgetrokken. Elke ritkaart kan nu open én dicht. |
+| 2026-09-07 | [home-verfijning](quick/260907-hzt-home-verfijning-na-fase-23/) | Zes rondes na fase 23: dagstrip op vier niveaus, lijstplafonds, compactere kaarten, en uitleg waarom een score die score is. **Lees de drie vondsten daar** — icon-tree-shaking, gen-l10n-volgorde, en de verouderde bundel. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -38,6 +39,16 @@ Peloton-kaarten. De volgende vraag is welke fase van v4.0 aan de beurt is:
 fase 24 (iconografie: het kledingadvies tekent nu losse Unicode-emoji, die op
 elk platform anders worden getekend) of fase 25 (de wrijving die op 2026-09-07
 is waargenomen, uitgeschreven in `EIGEN-GEZICHT.md`).
+
+**De Play-build loopt inmiddels ver achter.** Op het toestel staat 1.0.23+24,
+zónder Peloton en zónder iets van v4.0. Alle testers zien dus nog de app waar
+de klacht "hij ziet er hetzelfde uit" over ging. `PELOTON.md` zegt: batch een
+Play-release pas als de epic een testbare mijlpaal heeft — en die is er nu.
+Doen ná fase 25, zodat de wrijvingspunten niet meegaan naar de testers.
+
+**Deploy-hygiëne:** gebruik bij elke deploy waarvan je het resultaat gaat
+beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op
+2026-09-07 meermaals een oudere bundel ondanks de `no-cache`-headers.
 
 **Twee dingen die nog los liggen en niet bij een fase horen:**
 
