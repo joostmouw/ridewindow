@@ -622,6 +622,7 @@
   "pelotonDecline": "Kan niet",
   "pelotonOwnedRides": "Ritten die jij organiseert",
   "pelotonJoinedRides": "Ritten waar je aan meedoet",
+  "accountSyncFailed": "Synchroniseren lukte nu even niet. De app probeert het vanzelf opnieuw.",
   "pelotonCopyCode": "Code kopiëren",
   "pelotonCodeCopied": "Code gekopieerd",
   "pelotonSignInAction": "Inloggen",

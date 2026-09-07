@@ -1387,6 +1387,10 @@ class SEn extends S {
   String get pelotonJoinedRides => 'Rides you\'re joining';
 
   @override
+  String get accountSyncFailed =>
+      'Couldn\'t sync your account just now. It will retry automatically.';
+
+  @override
   String get pelotonCopyCode => 'Copy code';
 
   @override

@@ -250,6 +250,7 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     // captured BEFORE either `prefs.setString` call above -- AccountSyncService
     // needs that pre-write snapshot, never the already-overwritten value).
     await _runAccountSync(signedInUid, lastSyncedUid);
+    await _ensureCloudProfileRow();
 
     // Kwam deze gebruiker binnen via een gedeelde uitnodigingslink, dan ligt
     // zijn code klaar. Hem nu verzilveren is het verschil tussen een link die
@@ -257,6 +258,37 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     // Rides → Peloton en de code overtypen die de app allang kende. Zie
     // PendingInviteStore.
     await _redeemPendingInvite();
+  }
+
+  /// Zorgt dat er hoe dan ook een rij in `public.profiles` staat.
+  ///
+  /// **Waarom dit een vangnet nodig heeft.** Op 2026-09-07 bleek een echt
+  /// account (`joost.oppo`) na inloggen géén profielrij te hebben, terwijl het
+  /// scherm gewoon "Synced" zei. Gevolg: `friend_profiles()` joint op
+  /// `profiles`, dus die gebruiker was onzichtbaar in de maatjeslijst van
+  /// degene die hem had uitgenodigd -- precies de nieuwe gebruiker die je niet
+  /// wilt kwijtraken. Een ander account (Jacco) kwam er wél in, maar alleen
+  /// doordat zijn naam bij de eerste login werd weggeschreven en díé schrijving
+  /// de rij omhoog duwde. De rij hing dus aan een toevallige bijwerking.
+  ///
+  /// De onderliggende oorzaak is niet de RPC: `migrate_account_data` is
+  /// afzonderlijk getoetst en werkt. Ergens vóór dat punt viel `onSignIn` uit,
+  /// en `_runAccountSync` slikte dat in. Dit vangnet repareert het symptoom
+  /// onafhankelijk van welke stap precies faalde, en herstelt bovendien
+  /// bestaande accounts bij hun eerstvolgende login.
+  ///
+  /// Bewust een blinde enqueue en geen "bestaat de rij al?"-controle: een
+  /// upsert met dezelfde waarden is onschadelijk, terwijl een extra leesactie
+  /// weer een stap is die kan falen. Nooit stempelen -- dit is de app die
+  /// bijwerkt, niet de gebruiker die iets wijzigt.
+  Future<void> _ensureCloudProfileRow() async {
+    try {
+      final repo = await ref.read(profileRepositoryProvider.future);
+      await repo.enqueueCurrentState();
+      await ref.read(cloudSyncReconcilerProvider).drainOutbox();
+    } catch (e) {
+      debugPrint('AccountSection: profielrij garanderen mislukt: $e');
+    }
   }
 
   /// Verzilvert een code die vóór het inloggen is klaargelegd.
@@ -371,7 +403,16 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
         ref.invalidate(availabilityProvider);
       }
     } catch (e) {
+      // Niet alleen loggen. Een stille mislukking hier betekende dat de
+      // eerste-login-migratie niets deed terwijl het scherm "Synced" toonde --
+      // zie _ensureCloudProfileRow voor wat dat op 2026-09-07 heeft gekost.
+      // Bewust een melding en géén derde statusregel: D-06/D-07 legt vast dat
+      // er precies twee statusteksten bestaan, en die keuze staat.
       debugPrint('AccountSection: _runAccountSync mislukt: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context).accountSyncFailed)),
+      );
     }
   }
 

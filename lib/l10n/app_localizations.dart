@@ -2563,6 +2563,12 @@ abstract class S {
   /// **'Ritten waar je aan meedoet'**
   String get pelotonJoinedRides;
 
+  /// No description provided for @accountSyncFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Synchroniseren lukte nu even niet. De app probeert het vanzelf opnieuw.'**
+  String get accountSyncFailed;
+
   /// No description provided for @pelotonCopyCode.
   ///
   /// In nl, this message translates to:

@@ -484,6 +484,7 @@
   "pelotonDecline": "Can't make it",
   "pelotonOwnedRides": "Rides you organise",
   "pelotonJoinedRides": "Rides you're joining",
+  "accountSyncFailed": "Couldn't sync your account just now. It will retry automatically.",
   "pelotonCopyCode": "Copy code",
   "pelotonCodeCopied": "Code copied",
   "pelotonSignInAction": "Sign in",

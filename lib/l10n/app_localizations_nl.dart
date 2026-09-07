@@ -1390,6 +1390,10 @@ class SNl extends S {
   String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
 
   @override
+  String get accountSyncFailed =>
+      'Synchroniseren lukte nu even niet. De app probeert het vanzelf opnieuw.';
+
+  @override
   String get pelotonCopyCode => 'Code kopiëren';
 
   @override
