@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 25 op #63 na af — volgende: Play-release"
-last_updated: "2026-09-07T17:20:00.000Z"
+status: "1.0.24+25 live op internal testing — wacht op feedback"
+last_updated: "2026-09-07T18:40:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -48,6 +48,15 @@ terugkomt uit het beschikbaarheidsscherm. Dat is niet op te lossen zonder
 iPhone; de knop bestáát in alle drie de takken, dus het is een
 safe-area-kwestie op iOS-standalone.
 
+**1.0.24+25 staat op Play, internal testing** (uitgerold 2026-09-07 door Joost).
+Dat is de eerste Play-build met v4.0 én Peloton: de testers gingen in één sprong
+van 1.0.23 naar fase 21 t/m 25. **Vraag als eerste om hun reactie** — de hele
+epic begon met "de app ziet er hetzelfde uit" en dit is de eerste keer dat
+iemand anders dan Joost het nieuwe uiterlijk ziet.
+
+Er zijn 3 van de 12 testers die Google wil zien voor productietoegang, en een
+closed test moet 14 dagen lopen.
+
 **Play-release: ik kan hem bouwen, niet uploaden.** Vastgesteld 2026-09-07.
 `flutter build appbundle --release` levert een ondertekende AAB (`key.properties`
 staat goed) op `build/app/outputs/bundle/release/app-release.aab`, ~67 MB. Het
@@ -59,11 +68,16 @@ uploaden lukt niet vanaf hier:
 - **De Play Developer API is niet ingericht.** Geen service-account-JSON in het
   project, geen `gcloud`, geen fastlane.
 
-Wil je dit wél geautomatiseerd, dan is dat een eenmalige inrichting: service
-account in GCP-project `my-project-joost`, die uitnodigen in Play Console onder
-Users & permissions met release-rechten, sleutel opslaan buiten de repo. Daarna
-is elke release één commando. Tot die tijd is uploaden handwerk in de Play
-Console.
+De poging is echt gedaan, niet beredeneerd: `file_upload` antwoordde
+letterlijk `total upload size would exceed 10 MB` op een bestand van 67,3 MB.
+Splitsen kan niet, een AAB is één bestand.
+
+**Openstaand aanbod:** de Play Developer API kent die grens niet. Eenmalige
+inrichting — service account in GCP-project `my-project-joost`, uitnodigen in
+Play Console onder *Users and permissions* met release-rechten, sleutel buiten
+de repo. Stap 2 en 3 zijn rechtenwijzigingen op Joosts account en dus zijn hand;
+het script is mijn deel en is nog niet geschreven. Daarna is elke release één
+commando.
 
 **De Play-build loopt inmiddels ver achter.** Op het toestel staat 1.0.23+24,
 zónder Peloton en zónder iets van v4.0. Alle testers zien dus nog de app waar
