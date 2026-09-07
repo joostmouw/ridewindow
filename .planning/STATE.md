@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23: alle 6 stappen klaar — rest: Peloton-haarlijn"
+status: "Fase 23 af — volgende: fase 24 of 25 kiezen"
 last_updated: "2026-09-07T17:20:00.000Z"
 last_activity: 2026-09-07
 progress:
@@ -25,6 +25,7 @@ progress:
 | 2026-09-07 | [profiel-secties-in-kaarten](quick/260907-k35-profiel-scherm-secties-in-kaarten/) | Profiel-kaarten per sectie (het laatste scherm zonder papier-behandeling), plus Joost's twee punten over Home. |
 | 2026-09-07 | [stap-3-typografie](quick/260907-kqr-fase-23-stap-3-typografische-schaal-echt/) | Stap 3: de beste kaart op 24/45, de rest op 16/28. Zonder schaduw of staaf wijst maat de kaart nu aan. |
 | 2026-09-07 | [stap-5-dagstrip-en-filter](quick/260907-s5x-fase-23-stap-5-dagstrip-en-periodefilter/) | Stap 5: kwaliteit werd een onderstreping, selectie een tonale vulling; filter werd een tekstrij. Plus: kleine ritkaarten zijn uitklapbaar. |
+| 2026-09-07 | Peloton-kaarten (`41217d9`, `63770c2`) | Peloton kreeg `SectionCard` (verhuisd uit Profiel); `cardTheme` bleek een tweede kaartsoort te hebben en is gelijkgetrokken. Elke ritkaart kan nu open én dicht. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -32,13 +33,21 @@ progress:
 **https://my-project-joost.web.app** (Firebase Hosting; `main.dart.js` heeft `no-cache`, dus daar
 volstaat een gewone herlaad). De Play-build loopt bewust achter op 1.0.23+24.
 
-**Fase 23 is af — alle zes de stappen uit schets 001 staan.** Wat nog rest is
-één klein punt uit de sweep: **Peloton-kaarten missen hun haarlijn.**
+**Fase 23 is af** — alle zes de stappen uit schets 001 staan, plus de
+Peloton-kaarten. De volgende vraag is welke fase van v4.0 aan de beurt is:
+fase 24 (iconografie: het kledingadvies tekent nu losse Unicode-emoji, die op
+elk platform anders worden getekend) of fase 25 (de wrijving die op 2026-09-07
+is waargenomen, uitgeschreven in `EIGEN-GEZICHT.md`).
 
-Daarna is de vraag welke fase van v4.0 aan de beurt is — fase 24 (iconografie:
-het kledingadvies tekent nu losse Unicode-emoji, die op elk platform anders
-worden getekend) of fase 25 (de wrijving die op 2026-09-07 is waargenomen,
-uitgeschreven in `EIGEN-GEZICHT.md`).
+**Twee dingen die nog los liggen en niet bij een fase horen:**
+
+1. **De radii vormen geen systeem.** 24 op ritkaarten, 24 in `cardTheme`, 18 op
+   de detail- en sectiekaarten, 16 op de PLANNED-regels, 12 en 3 elders.
+   Material 3 kent 12 (medium), 16 (large) en 20 (large-increased); 18 en 24
+   zijn geen token. Een aparte opruimronde waard.
+2. **`ScoreBadge` en `ScoreDisplay` staan naast elkaar** met verschillende
+   vormtaal. Bewust — zie de klassennoot in `score_display.dart` — maar het is
+   nooit tegen het nieuwe papier-uiterlijk aan gehouden.
 
 **Afgerond op 2026-09-07, tweede sessie** (zie
 `quick/260907-k35-profiel-scherm-secties-in-kaarten/SUMMARY.md`):
