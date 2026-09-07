@@ -116,6 +116,9 @@ abstract final class AppColors {
   static const lightSurface = lightSurfaceContainerLowest;
   static const lightSurfaceDim = Color(0xFFDAE2CC);
   static const lightBorder = Color(0xFFA9B79C);
+  /// Geblokkeerd uur in de roosters. Zie `RideWindowTheme.gridBlocked`
+  /// voor waarom dit neutraal is en niet uit de merkfamilie komt.
+  static const lightGridBlocked = Color(0xFFEAEAE7);
   static const lightBorderLight = Color(0xFFB6C2AA);
   static const lightBorderDim = Color(0xFFC0CCB4);
 
@@ -161,6 +164,7 @@ abstract final class AppColors {
   static const darkSurface = Color(0xFF1E1E1E);
   static const darkSurfaceDim = Color(0xFF2C2C2C);
   static const darkBorder = Color(0xFF424242);
+  static const darkGridBlocked = Color(0xFF2A2A2A);
   static const darkBorderLight = Color(0xFF383838);
   static const darkBorderDim = Color(0xFF333333);
 

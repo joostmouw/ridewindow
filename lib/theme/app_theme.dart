@@ -15,6 +15,7 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     required this.surface,
     required this.surfaceDim,
     required this.border,
+    required this.gridBlocked,
     required this.borderLight,
     required this.borderDim,
     required this.scorePerfect,
@@ -52,6 +53,21 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
   final Color surface;
   final Color surfaceDim;
   final Color border;
+
+  /// De vulling van een geblokkeerd uur in de roosters (Agenda,
+  /// Beschikbaarheid).
+  ///
+  /// Bewust neutraal en niet uit de merkfamilie. Tot v4.0 was dit
+  /// `surfaceContainerHighest` -- een olijftint die wegviel tegen de toen nog
+  /// groene achtergrond, en dat was precies de bedoeling: geblokkeerd betekent
+  /// "hier is niets". Sinds de achtergrond papier is, werd diezelfde tint juist
+  /// het zwaarste vlak van het scherm en schreeuwde hij harder dan de
+  /// tier-kleuren die er wél toe doen. De betekenis was omgekeerd zonder dat er
+  /// iets aan de code veranderde.
+  ///
+  /// Neutraal grijs herstelt de rangorde: kleur betekent in het rooster nog
+  /// maar één ding, namelijk "hier kun je fietsen".
+  final Color gridBlocked;
   final Color borderLight;
   final Color borderDim;
   final Color scorePerfect;
@@ -89,6 +105,7 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     surface: AppColors.lightSurface,
     surfaceDim: AppColors.lightSurfaceDim,
     border: AppColors.lightBorder,
+    gridBlocked: AppColors.lightGridBlocked,
     borderLight: AppColors.lightBorderLight,
     borderDim: AppColors.lightBorderDim,
     scorePerfect: AppColors.lightScorePerfect,
@@ -127,6 +144,7 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     surface: AppColors.darkSurface,
     surfaceDim: AppColors.darkSurfaceDim,
     border: AppColors.darkBorder,
+    gridBlocked: AppColors.darkGridBlocked,
     borderLight: AppColors.darkBorderLight,
     borderDim: AppColors.darkBorderDim,
     scorePerfect: AppColors.darkScorePerfect,
@@ -166,6 +184,7 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     Color? surface,
     Color? surfaceDim,
     Color? border,
+    Color? gridBlocked,
     Color? borderLight,
     Color? borderDim,
     Color? scorePerfect,
@@ -203,6 +222,7 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       surface: surface ?? this.surface,
       surfaceDim: surfaceDim ?? this.surfaceDim,
       border: border ?? this.border,
+      gridBlocked: gridBlocked ?? this.gridBlocked,
       borderLight: borderLight ?? this.borderLight,
       borderDim: borderDim ?? this.borderDim,
       scorePerfect: scorePerfect ?? this.scorePerfect,
@@ -245,6 +265,7 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       surface: Color.lerp(surface, other.surface, t)!,
       surfaceDim: Color.lerp(surfaceDim, other.surfaceDim, t)!,
       border: Color.lerp(border, other.border, t)!,
+      gridBlocked: Color.lerp(gridBlocked, other.gridBlocked, t)!,
       borderLight: Color.lerp(borderLight, other.borderLight, t)!,
       borderDim: Color.lerp(borderDim, other.borderDim, t)!,
       scorePerfect: Color.lerp(scorePerfect, other.scorePerfect, t)!,

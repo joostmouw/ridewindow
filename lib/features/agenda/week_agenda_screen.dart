@@ -367,7 +367,20 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
               for (var di = 0; di < days.length; di++)
                 Expanded(
                   child: Container(
-                    color: days[di] == today ? theme.colorScheme.primaryContainer : null,
+                    // Vandaag krijgt een onderstreping, geen vulling. Als
+                    // gevuld blokje concurreerde deze kop met de tier-kleuren
+                    // in het rooster eronder, en die zijn hier het enige dat
+                    // kleur mag dragen.
+                    decoration: days[di] == today
+                        ? BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: theme.colorScheme.primary,
+                                width: 2,
+                              ),
+                            ),
+                          )
+                        : null,
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -537,7 +550,7 @@ class _CellWidget extends ConsumerWidget {
             color: isSelected
                 ? Theme.of(context).colorScheme.surfaceContainerLowest
                 : blocked
-                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    ? rw.gridBlocked
                     : color,
             borderRadius: BorderRadius.circular(3),
             border: isSelected
@@ -547,7 +560,10 @@ class _CellWidget extends ConsumerWidget {
                     : null,
           ),
           child: blocked && !isSelected
-              ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint.withAlpha(120)))
+              // Het slotje mag nu op volle sterkte: op de oude olijfvulling was
+              // 120 alpha nodig om het niet te laten schreeuwen, op een
+              // neutrale vulling verdween het daardoor bijna.
+              ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint))
               : isSelected
                   ? Center(
                       child: Icon(Icons.check, size: 12, color: rw.tiers.perfectFg),

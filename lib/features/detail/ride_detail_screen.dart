@@ -663,12 +663,15 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: cs.surface,
+        // Was `cs.surface` met een handmatige schaduw. Sinds v4.0 ís surface
+        // papier, dus een kaart in diezelfde kleur is geen kaart meer — hij
+        // zweefde op een achtergrond van precies zijn eigen tint en de schaduw
+        // moest het alleen doen. Nu wit met een haarlijn, dezelfde behandeling
+        // als de niet-beste ritkaarten op Home. Hiermee is ook de laatste
+        // handmatige `BoxShadow` uit de app verdwenen.
+        color: cs.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-              color: rw.shadow, blurRadius: 8, offset: const Offset(0, 2)),
-        ],
+        border: Border.all(color: cs.surfaceContainerHigh),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

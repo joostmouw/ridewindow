@@ -451,7 +451,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               (permission == LocationPermission.denied ||
                   permission == LocationPermission.deniedForever))
             Card(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              // Tonaal, niet vol groen. Dit is een terugvalstaat -- er ging
+              // iets mis met je locatie -- en op de papieren achtergrond was
+              // `primaryContainer` het meest verzadigde vlak van het hele
+              // scherm geworden. Daarmee trok een foutmelding meer aandacht dan
+              // je account. De groene rand houdt de urgentie vast zonder het
+              // gewicht.
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.primary.withAlpha(90),
+                ),
+              ),
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Padding(
                 padding: const EdgeInsets.all(12),
