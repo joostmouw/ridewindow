@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>RideWindow — Home hiërarchie (sketch 001)</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: #6d7a66;
+    color: var(--text-primary);
+    padding: 64px 24px 48px;
+  }
+
+  /* ─────────── Werkbalk ─────────── */
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #1d2a22; color: #e6ede0;
+    border-bottom: 1px solid #33453a;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: system-ui, sans-serif; font-size: 12px;
+  }
+  #bar .name { font-weight: 700; letter-spacing: .04em; margin-right: 8px; opacity: .75; }
+  #bar .sep { width: 1px; height: 20px; background: #3c5145; margin: 0 4px; }
+  #bar button, #bar select {
+    font: inherit; color: #e6ede0; background: #2b3b31;
+    border: 1px solid #3c5145; border-radius: 999px;
+    padding: 5px 12px; cursor: pointer; transition: all .15s ease;
+  }
+  #bar button:hover { background: #3a5044; }
+  #bar button.on { background: var(--brand-light); color: #1d2a22; border-color: var(--brand-light); font-weight: 700; }
+  #bar .grow { flex: 1; }
+
+  /* ─────────── Podium ─────────── */
+  #rail { display: flex; gap: 28px; align-items: flex-start; justify-content: flex-start; }
+  #rail.solo { justify-content: center; }
+
+  .slot { flex: 0 0 auto; transform-origin: top center; transition: transform .2s ease; }
+  .caption {
+    font-family: system-ui, sans-serif; color: #e9f0e3;
+    margin-bottom: 10px; width: 390px; height: 78px;
+  }
+  .caption b { display: block; font-size: 15px; letter-spacing: .01em; }
+  .caption span { font-size: 12px; opacity: .72; line-height: 1.4; display: block; margin-top: 2px; }
+  .caption .star { color: #ffd54f; }
+
+  /* Telefoonframe */
+  .phone {
+    width: 390px; height: 800px;
+    border-radius: 34px;
+    overflow: hidden;
+    box-shadow: 0 18px 44px rgba(0,0,0,.34);
+    border: 8px solid #101712;
+    background: var(--sc-lowest);
+    position: relative;
+  }
+  .screen { height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+  .screen::-webkit-scrollbar { width: 4px; }
+  .screen::-webkit-scrollbar-thumb { background: rgba(0,0,0,.18); border-radius: 2px; }
+
+  /* Statusbalk-imitatie, zodat het als scherm leest en niet als webpagina */
+  .status {
+    height: 26px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; font-size: 11px; font-weight: 600; opacity: .55; flex: none;
+  }
+
+  /* Navigatiebalk onderaan — in alle varianten identiek, doet niet mee */
+  .navbar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 62px;
+    display: flex; align-items: center; justify-content: space-around;
+    background: rgba(255,255,255,.86); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-dim);
+    font-size: 10px; letter-spacing: .02em;
+  }
+  .navbar div { display: flex; flex-direction: column; align-items: center; gap: 3px; opacity: .5; }
+  .navbar div.on { opacity: 1; color: var(--brand-dark); font-weight: 700; }
+  .pad-nav { height: 78px; }
+
+  svg { display: block; }
+  button { font-family: inherit; }
+
+  /* ═══════════ NU (huidige app) ═══════════ */
+  .v0 .screen { background: var(--surface); }
+  .v0 .hdr { padding: 6px 16px 10px; background: var(--surface); position: sticky; top: 0; z-index: 5; }
+  .v0 .greet { font-size: var(--title-large); font-weight: 700; line-height: 1.27; }
+  .v0 .sub { display: flex; align-items: center; gap: 4px; font-size: var(--body-small); color: var(--on-surface-variant); margin-top: 1px; }
+
+  .v0 .strip { display: flex; padding: 8px 12px 4px; gap: 4px; }
+  .v0 .day {
+    flex: 1; border-radius: var(--radius-chip); padding: 8px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; transition: all .18s ease;
+  }
+  .v0 .day .d { font-size: var(--label-small); font-weight: 500; color: var(--on-surface-variant); }
+  .v0 .day .n { font-size: var(--title-small); font-weight: 600; }
+  .v0 .day.good { background: var(--perfect-bg); } .v0 .day.good .n { color: var(--score-perfect); }
+  .v0 .day.ok   { background: var(--acceptable-bg); } .v0 .day.ok .n { color: var(--acceptable-fg); }
+  .v0 .day.bad  { background: var(--poor-bg); } .v0 .day.bad .n { color: var(--poor-fg); }
+  .v0 .day.today { border: 1px solid var(--outline); }
+  .v0 .day.sel { outline: 2px solid var(--brand-dark); outline-offset: -2px; transform: scale(1.06); }
+
+  .v0 .seg { display: flex; margin: 8px 20px 4px; border: 1px solid var(--outline); border-radius: var(--radius-full); overflow: hidden; }
+  .v0 .seg button {
+    flex: 1; border: 0; border-right: 1px solid var(--outline); background: transparent;
+    padding: 7px 0; font-size: var(--label-small); font-weight: 500; letter-spacing: .5px;
+    color: var(--on-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .v0 .seg button:last-child { border-right: 0; }
+  .v0 .seg button.on { background: #b6c9a4; font-weight: 700; }
+
+  .v0 .seclabel { padding: 16px 20px 8px; font-size: var(--label-medium); font-weight: 500; letter-spacing: .5px; color: var(--on-surface-variant); }
+
+  .v0 .planned {
+    margin: 8px 16px; background: var(--sc-high); border-radius: var(--radius-card);
+    padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .v0 .planned .t { flex: 1; }
+  .v0 .planned .t b { display: block; font-size: var(--title-medium); font-weight: 700; }
+  .v0 .planned .t span { font-size: var(--body-medium); color: var(--on-surface-variant); }
+  .v0 .pill { border-radius: 999px; padding: 3px 10px; font-size: var(--label-small); font-weight: 700; }
+
+  .v0 .card {
+    margin: 6px 16px; border-radius: var(--radius-card); padding: 20px;
+    background: var(--sc-high); transition: background .15s ease;
+  }
+  .v0 .card.best { background: var(--sc-lowest); border: 1.5px solid rgba(35,73,52,.47); }
+  .v0 .bestpill {
+    display: inline-flex; align-items: center; gap: 4px; background: #b6c9a4;
+    border-radius: 20px; padding: 5px 12px; font-size: var(--label-small); font-weight: 700;
+    color: var(--brand-dark); margin-bottom: 10px;
+  }
+  .v0 .crow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .v0 .cday { font-size: var(--title-medium); font-weight: 700; }
+  .v0 .ctime { font-size: var(--body-medium); color: var(--on-surface-variant); }
+  .v0 .score { text-align: right; line-height: 1; }
+  .v0 .score .n { font-size: var(--display-small); font-weight: 600; line-height: 1; }
+  .v0 .score .w { font-size: var(--title-small); font-weight: 500; margin-top: 2px; }
+  .v0 .bars { margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .v0 .barrow { display: flex; align-items: center; gap: 6px; }
+  .v0 .barrow .val { width: 46px; text-align: right; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .v0 .barrow .ideal { width: 52px; text-align: right; font-size: 9px; font-weight: 500; color: var(--score-perfect); font-variant-numeric: tabular-nums; }
+  .v0 .track { flex: 1; height: 12px; border-radius: 6px; background: var(--border); position: relative; overflow: hidden; }
+  .v0 .zone { position: absolute; top: 0; bottom: 0; background: var(--score-green-tint); }
+  .v0 .dot { position: absolute; top: 0; width: 12px; height: 12px; border-radius: 50%; }
+  .v0 .cbtn { display: flex; justify-content: flex-end; margin-top: 14px; }
+  .v0 .cbtn button {
+    border: 0; background: #b6c9a4; color: var(--brand-dark); border-radius: 999px;
+    padding: 10px 18px; font-size: var(--label-large); font-weight: 500; display: flex; align-items: center; gap: 8px; cursor: pointer;
+  }
+
+  /* ═══════════ A — Held bovenaan ═══════════ */
+  .va .screen { background: var(--sc-lowest); }
+  .va .hdr { padding: 4px 20px 12px; display: flex; align-items: baseline; justify-content: space-between; }
+  .va .greet { font-size: var(--body-large); font-weight: 500; color: var(--text-secondary); }
+  .va .sub { font-size: var(--label-small); color: var(--text-hint); letter-spacing: .04em; text-transform: uppercase; }
+
+  .va .hero {
+    background: var(--brand-dark); color: #e9f2e2;
+    border-radius: 0 0 36px 36px; padding: 22px 24px 24px; position: relative; overflow: hidden;
+  }
+  .va .hero::after {
+    content: ''; position: absolute; right: -70px; top: -70px; width: 220px; height: 220px;
+    border-radius: 50%; border: 1.5px solid rgba(197,212,182,.16);
+  }
+  .va .kicker { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(197,212,182,.72); }
+  .va .herotop { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 12px; gap: 16px; }
+  .va .heroday { font-size: var(--headline-large); font-weight: 500; line-height: 1.05; letter-spacing: -.01em; }
+  .va .herotime { font-size: var(--body-large); color: rgba(233,242,226,.76); margin-top: 4px; }
+  .va .heroscore { text-align: right; line-height: .88; }
+  .va .heroscore .n { font-size: 64px; font-weight: 600; color: var(--brand-light); letter-spacing: -.03em; }
+  .va .heroscore .w { font-size: var(--label-medium); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(197,212,182,.8); margin-top: 6px; }
+
+  .va .readouts { display: flex; gap: 10px; margin-top: 20px; position: relative; }
+  .va .ro { flex: 1; background: rgba(197,212,182,.11); border-radius: 16px; padding: 10px 12px 11px; }
+  .va .ro .k { display: flex; align-items: center; gap: 5px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(233,242,226,.6); }
+  .va .ro .v { font-size: 20px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .va .ro .v small { font-size: 11px; font-weight: 500; opacity: .65; }
+  .va .ro .verdict { font-size: 10px; font-weight: 600; margin-top: 3px; color: #a8d5a2; }
+  .va .ro .verdict.warn { color: #ffc46b; }
+
+  .va .herobtn {
+    width: 100%; margin-top: 18px; border: 0; border-radius: 999px; cursor: pointer;
+    background: var(--brand-light); color: var(--brand-dark);
+    padding: 15px 0; font-size: var(--title-medium); font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .12s ease, filter .15s ease; position: relative;
+  }
+  .va .herobtn:hover { filter: brightness(1.06); }
+  .va .herobtn:active { transform: scale(.985); }
+
+  .va .strip { display: flex; padding: 20px 16px 6px; gap: 2px; }
+  .va .day {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 6px 0 8px; cursor: pointer; border-radius: 12px; transition: background .15s ease;
+  }
+  .va .day:hover { background: var(--sc-low); }
+  .va .day .d { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-hint); }
+  .va .day .n { font-size: var(--body-large); font-weight: 500; color: var(--text-secondary); }
+  .va .day .q { width: 5px; height: 5px; border-radius: 50%; }
+  .va .day.good .q { background: var(--score-perfect); }
+  .va .day.ok .q { background: var(--score-acceptable); }
+  .va .day.bad .q { background: var(--score-poor); }
+  .va .day.today .n { color: var(--brand-dark); font-weight: 700; }
+  .va .day.today { background: var(--sc); }
+
+  .va .tabs { display: flex; gap: 20px; padding: 6px 22px 0; border-bottom: 1px solid var(--border-dim); }
+  .va .tabs button {
+    border: 0; background: none; cursor: pointer; padding: 8px 0 9px;
+    font-size: var(--label-medium); font-weight: 500; color: var(--text-hint);
+    border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s ease;
+  }
+  .va .tabs button.on { color: var(--brand-dark); font-weight: 700; border-bottom-color: var(--brand-dark); }
+
+  .va .seclabel { padding: 18px 22px 4px; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-hint); }
+  .va .row {
+    display: flex; align-items: center; gap: 14px; padding: 14px 22px;
+    border-bottom: 1px solid var(--sc); cursor: pointer; transition: background .15s ease;
+  }
+  .va .row:hover { background: var(--sc-low); }
+  .va .row .t { flex: 1; min-width: 0; }
+  .va .row .t b { display: block; font-size: var(--title-medium); font-weight: 600; }
+  .va .row .t span { display: block; font-size: var(--body-medium); color: var(--text-tertiary); margin-top: 1px; }
+  .va .row .t em { display: block; font-style: normal; font-size: var(--label-small); color: var(--text-hint); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .va .row .s { text-align: right; line-height: 1; }
+  .va .row .s .n { font-size: var(--headline-small); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .va .row .s .w { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+
+  .va .planned {
+    margin: 6px 22px 0; border-left: 3px solid var(--planned); padding: 8px 0 8px 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .va .planned b { font-size: var(--body-large); font-weight: 600; }
+  .va .planned span { font-size: var(--body-medium); color: var(--text-tertiary); }
+
+  /* ═══════════ B — Papier en inkt ═══════════ */
+  .vb .screen { background: var(--sc-lowest); }
+  .vb .hdr { padding: 6px 20px 14px; }
+  .vb .greet { font-size: var(--headline-small); font-weight: 600; letter-spacing: -.01em; }
+  .vb .sub { display: flex; align-items: center; gap: 5px; font-size: var(--label-medium); color: var(--text-hint); margin-top: 3px; }
+
+  .vb .strip { display: flex; padding: 0 16px 2px; gap: 4px; }
+  .vb .day {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 7px 0 0; cursor: pointer; border-radius: 12px 12px 0 0; transition: background .15s ease;
+  }
+  .vb .day:hover { background: var(--sc-low); }
+  .vb .day .d { font-size: 10px; letter-spacing: .05em; text-transform: uppercase; color: var(--text-hint); }
+  .vb .day .n { font-size: var(--title-medium); font-weight: 500; color: var(--text-secondary); }
+  .vb .day .q { width: 100%; height: 3px; border-radius: 2px; margin-top: 7px; }
+  .vb .day.good .q { background: var(--score-perfect); }
+  .vb .day.ok .q { background: var(--score-acceptable); }
+  .vb .day.bad .q { background: var(--border-dim); }
+  .vb .day.today .n, .vb .day.today .d { color: var(--brand-dark); font-weight: 700; }
+
+  .vb .tabs { display: flex; gap: 22px; padding: 14px 22px 0; border-bottom: 1px solid var(--sc-high); }
+  .vb .tabs button {
+    border: 0; background: none; cursor: pointer; padding: 4px 0 9px;
+    font-size: var(--label-medium); font-weight: 600; color: var(--text-hint);
+    border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s ease;
+  }
+  .vb .tabs button.on { color: var(--brand-dark); border-bottom-color: var(--brand-dark); }
+
+  .vb .planned {
+    margin: 14px 18px 0; border-radius: 14px; background: #eaf2fb;
+    padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .vb .planned .t { flex: 1; }
+  .vb .planned .t b { display: block; font-size: var(--body-large); font-weight: 600; color: #0d3f7a; }
+  .vb .planned .t span { font-size: var(--body-small); color: #4a6a8f; }
+
+  .vb .seclabel { padding: 20px 22px 6px; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-hint); }
+
+  .vb .card { margin: 8px 18px; border-radius: 20px; background: #fff; padding: 16px 18px; border: 1px solid var(--sc-high); }
+  .vb .card.best {
+    padding: 22px 20px 20px; border: 0; border-left: 5px solid var(--brand-dark);
+    border-radius: 8px 22px 22px 8px;
+    box-shadow: 0 14px 30px -8px rgba(27,42,32,.30), 0 2px 6px rgba(27,42,32,.10);
+    margin: 4px 18px 18px;
+  }
+  .vb .bestpill { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--brand-dark); display: flex; align-items: center; gap: 5px; }
+  .vb .crow { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+  .vb .card.best .cday { font-size: var(--headline-small); font-weight: 600; line-height: 1.1; letter-spacing: -.01em; margin-top: 8px; }
+  .vb .card.best .ctime { font-size: var(--body-large); color: var(--text-tertiary); margin-top: 2px; }
+  .vb .cday { font-size: var(--title-medium); font-weight: 600; }
+  .vb .ctime { font-size: var(--body-medium); color: var(--text-tertiary); }
+  .vb .score { text-align: right; line-height: .9; }
+  .vb .card.best .score .n { font-size: 46px; font-weight: 600; letter-spacing: -.03em; color: var(--brand-dark); }
+  .vb .card.best .score .w { font-size: var(--label-medium); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--score-perfect); margin-top: 5px; }
+  .vb .score .n { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .vb .score .w { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+
+  .vb .bars { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .vb .barrow .top { display: flex; align-items: baseline; gap: 6px; margin-bottom: 5px; }
+  .vb .barrow .k { font-size: var(--label-medium); font-weight: 600; color: var(--text-secondary); flex: 1; display: flex; align-items: center; gap: 6px; }
+  .vb .barrow .v { font-size: var(--body-large); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .vb .barrow .verdict { font-size: var(--label-small); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .vb .barrow .verdict.ok { color: var(--score-perfect); }
+  .vb .barrow .verdict.warn { color: #A46A0A; }
+  .vb .barrow .verdict.bad { color: var(--error); }
+  .vb .track2 { height: 6px; border-radius: 3px; background: var(--sc-high); position: relative; }
+  .vb .zone2 { position: absolute; top: 0; bottom: 0; background: rgba(46,125,50,.26); border-radius: 3px; }
+  .vb .mark { position: absolute; top: -4px; width: 3px; height: 14px; border-radius: 2px; }
+  .vb .scale { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-hint); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .vb .compact { margin-top: 10px; display: flex; gap: 16px; font-size: var(--label-medium); color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+  .vb .compact span { display: flex; align-items: center; gap: 5px; }
+  .vb .cbtn { margin-top: 18px; }
+  .vb .cbtn button {
+    width: 100%; border: 0; border-radius: 999px; cursor: pointer;
+    background: var(--brand-dark); color: #e9f2e2; padding: 14px 0;
+    font-size: var(--title-medium); font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .12s ease, filter .15s ease;
+  }
+  .vb .cbtn button:hover { filter: brightness(1.15); }
+  .vb .cbtn button:active { transform: scale(.985); }
+
+  /* ═══════════ C — Weerbaan ═══════════ */
+  .vc .screen { background: var(--sc-low); }
+  .vc .hdr { padding: 6px 20px 12px; display: flex; align-items: baseline; justify-content: space-between; }
+  .vc .greet { font-size: var(--title-large); font-weight: 600; }
+  .vc .sub { font-size: var(--label-small); color: var(--text-hint); }
+
+  .vc .legend { display: flex; padding: 0 20px 5px; gap: 0; }
+  .vc .legend .sp { width: 42px; }
+  .vc .legend .p { flex: 1; text-align: center; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-hint); }
+  .vc .weekband { padding: 0 20px 4px; }
+  .vc .drow { display: flex; align-items: center; gap: 0; padding: 2px 0; cursor: pointer; border-radius: 8px; transition: background .15s ease; }
+  .vc .drow:hover { background: var(--sc); }
+  .vc .drow .lbl { width: 42px; font-size: var(--label-medium); font-weight: 600; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+  .vc .drow.today .lbl { color: var(--brand-dark); font-weight: 700; }
+  .vc .drow .cell { flex: 1; height: 15px; margin-right: 3px; border-radius: 3px; }
+  .vc .drow .cell:last-child { margin-right: 0; }
+  .vc .c-perfect { background: #2E7D32; }
+  .vc .c-great { background: #6BAE6F; }
+  .vc .c-ok { background: #E8B45A; }
+  .vc .c-none { background: var(--sc-high); }
+
+  .vc .seclabel { padding: 16px 20px 6px; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-hint); }
+
+  .vc .planned { margin: 10px 16px 0; border-radius: 12px; background: #e6effa; padding: 9px 13px; display: flex; align-items: center; gap: 9px; font-size: var(--body-medium); }
+  .vc .planned b { color: #0d3f7a; font-weight: 600; }
+  .vc .planned span { color: #4a6a8f; }
+
+  .vc .hero { margin: 4px 16px 14px; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 26px -10px rgba(27,42,32,.34); }
+  .vc .herohead { background: var(--brand-dark); color: #e9f2e2; padding: 15px 18px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .vc .herohead .kicker { font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: rgba(197,212,182,.7); }
+  .vc .herohead .d { font-size: var(--headline-small); font-weight: 600; line-height: 1.1; margin-top: 3px; }
+  .vc .herohead .t { font-size: var(--body-medium); color: rgba(233,242,226,.75); margin-top: 1px; }
+  .vc .herohead .s { text-align: right; line-height: .9; }
+  .vc .herohead .s .n { font-size: 42px; font-weight: 600; color: var(--brand-light); letter-spacing: -.03em; }
+  .vc .herohead .s .w { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(197,212,182,.78); margin-top: 4px; }
+  .vc .herobody { background: #fff; padding: 14px 16px 16px; }
+
+  .vc .band { display: flex; gap: 4px; padding-left: 22px; }
+  .vc .hcol { flex: 1; }
+  .vc .hcol .hr { font-size: 10px; font-weight: 600; color: var(--text-hint); text-align: center; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .vc .hcol .tempcell {
+    border-radius: 8px; padding: 9px 0 8px; text-align: center;
+    font-size: var(--title-medium); font-weight: 600; color: #fff; font-variant-numeric: tabular-nums;
+  }
+  .vc .hcol .tempcell.light { color: #1B2A20; }
+  .vc .metricrow { display: flex; gap: 4px; align-items: center; margin-top: 6px; }
+  .vc .metricrow .mk { width: 22px; flex: none; color: var(--text-hint); display: flex; align-items: center; }
+  .vc .metricrow .mcell { flex: 1; height: 7px; border-radius: 2px; background: var(--sc-high); position: relative; overflow: hidden; }
+  .vc .metricrow .mcell.empty { background: repeating-linear-gradient(45deg, var(--sc), var(--sc) 3px, var(--sc-low) 3px, var(--sc-low) 6px); }
+  .vc .metricrow .mcell i { position: absolute; left: 0; bottom: 0; top: 0; display: block; }
+  .vc .mlegend { display: flex; align-items: center; gap: 6px; font-size: var(--label-small); color: var(--text-tertiary); margin-top: 9px; }
+  .vc .mlegend .sw { display: flex; align-items: center; gap: 5px; }
+  .vc .mlegend b { font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .vc .cbtn { margin-top: 14px; }
+  .vc .cbtn button {
+    width: 100%; border: 0; border-radius: 999px; cursor: pointer;
+    background: var(--brand-dark); color: #e9f2e2; padding: 13px 0;
+    font-size: var(--title-medium); font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px; transition: filter .15s ease, transform .12s ease;
+  }
+  .vc .cbtn button:hover { filter: brightness(1.15); }
+  .vc .cbtn button:active { transform: scale(.985); }
+
+  .vc .row {
+    margin: 6px 16px; background: #fff; border-radius: 14px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 13px; cursor: pointer; transition: transform .12s ease;
+    border: 1px solid var(--sc-high);
+  }
+  .vc .row:hover { transform: translateY(-1px); }
+  .vc .row .t { flex: 1; min-width: 0; }
+  .vc .row .t b { display: block; font-size: var(--title-medium); font-weight: 600; }
+  .vc .row .t span { font-size: var(--body-small); color: var(--text-tertiary); }
+  .vc .row .miniband { display: flex; gap: 2px; margin-top: 7px; }
+  .vc .row .miniband div { flex: 1; height: 6px; border-radius: 2px; }
+  .vc .row .s { text-align: right; line-height: .9; }
+  .vc .row .s .n { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .vc .row .s .w { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1d2a22; color: #e9f2e2; padding: 12px 22px; border-radius: 999px;
+    font-family: system-ui, sans-serif; font-size: 13px; z-index: 10000;
+    opacity: 0; pointer-events: none; transition: all .25s ease;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <span class="name">SKETCH 001 · HOME-HIËRARCHIE</span>
+  <div class="sep"></div>
+  <button id="m-all" class="on" onclick="setMode('all')">Naast elkaar</button>
+  <button id="m-0" onclick="setMode('0')">Nu</button>
+  <button id="m-a" onclick="setMode('a')">A · Held</button>
+  <button id="m-b" onclick="setMode('b')">B · Papier</button>
+  <button id="m-c" onclick="setMode('c')">C · Weerbaan</button>
+  <div class="sep"></div>
+  <span style="opacity:.6">zoom</span>
+  <button onclick="zoom(-1)">−</button><span id="zlabel" style="width:34px;text-align:center">70%</span><button onclick="zoom(1)">+</button>
+  <div class="sep"></div>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="default">Thema: default</option>
+  </select>
+  <div class="grow"></div>
+  <span style="opacity:.55">Outfit · brandLight #C5D4B6 · brandDark #234934</span>
+</div>
+
+<div id="rail"></div>
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   Eén bron van waarheid voor de inhoud. Alle vier de kolommen
+   tekenen exact dezelfde dag, dezelfde ritten en dezelfde
+   weerwaarden — het verschil dat je ziet is dus puur hiërarchie.
+   Waarden komen uit de echte app: tolerantie-defaults uit
+   UserProfile (12–26 °C, ≤0,5 mm, ≤15 km/u).
+   ═══════════════════════════════════════════════════════════════ */
+
+const DAYS = [
+  { d:'Mon', n:7,  q:'good', today:true,  band:['great','perfect','great'] },
+  { d:'Tue', n:8,  q:'ok',                band:['none','none','ok'] },
+  { d:'Wed', n:9,  q:'ok',                band:['ok','ok','great'] },
+  { d:'Thu', n:10, q:'bad',               band:['none','none','none'] },
+  { d:'Fri', n:11, q:'ok',                band:['none','ok','ok'] },
+  { d:'Sat', n:12, q:'good',              band:['perfect','perfect','great'] },
+  { d:'Sun', n:13, q:'good',              band:['great','perfect','none'] },
+];
+
+const RANGE = {
+  temp: { min:-10, max:45, idealMin:12, idealMax:26, unit:'°',    zoom:[0,35]  },
+  rain: { min:0,   max:10, idealMax:0.5, unit:' mm', zoom:[0,3]   },
+  wind: { min:0,   max:60, idealMax:15,  unit:' km/h', zoom:[0,40] },
+};
+
+const SLOTS = [
+  { day:'Saturday', short:'Sat 12', start:'09:00', end:'13:00', hours:4, score:96,
+    tier:'perfect', word:'Perfect', best:true,
+    temp:18, rain:0, wind:11,
+    hourly:[ {h:'09',t:16,r:0,w:9,q:'great'}, {h:'10',t:17,r:0,w:10,q:'perfect'},
+             {h:'11',t:19,r:0,w:12,q:'perfect'}, {h:'12',t:20,r:0,w:13,q:'perfect'} ] },
+  { day:'Sunday', short:'Sun 13', start:'10:00', end:'14:00', hours:4, score:81,
+    tier:'great', word:'Great',
+    temp:16, rain:0.2, wind:18,
+    hourly:[ {h:'10',t:14,r:0,w:16,q:'great'}, {h:'11',t:15,r:0.1,w:18,q:'great'},
+             {h:'12',t:17,r:0.1,w:19,q:'perfect'}, {h:'13',t:17,r:0,w:18,q:'great'} ] },
+  { day:'Tuesday', short:'Tue 8', start:'17:00', end:'20:00', hours:3, score:64,
+    tier:'acceptable', word:'Acceptable',
+    temp:21, rain:1.4, wind:24,
+    hourly:[ {h:'17',t:22,r:0.4,w:23,q:'ok'}, {h:'18',t:21,r:0.6,w:25,q:'ok'},
+             {h:'19',t:20,r:0.4,w:24,q:'great'} ] },
+];
+
+const PLANNED = { day:'Wednesday', short:'Wed 9', start:'20:00', end:'22:00', score:74, tier:'great', word:'Great' };
+
+const TIER_FG  = { perfect:'var(--perfect-fg)', great:'var(--great-fg)', acceptable:'var(--acceptable-fg)', poor:'var(--poor-fg)' };
+const TIER_BG  = { perfect:'var(--perfect-bg)', great:'var(--great-bg)', acceptable:'var(--acceptable-bg)', poor:'var(--poor-bg)' };
+const BAND_HEX = { perfect:'#2E7D32', great:'#6BAE6F', ok:'#E8B45A', none:'#E4EAD7' };
+
+/* ── Iconen: inline SVG, één definitie, overal hergebruikt ── */
+const ICO = {
+  temp:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 14.76V4a2 2 0 1 0-4 0v10.76a4 4 0 1 0 4 0z"/></svg>`,
+  rain:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.7s6 6.4 6 10.3a6 6 0 0 1-12 0C6 9.1 12 2.7 12 2.7z"/></svg>`,
+  wind:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h9"/></svg>`,
+  pin:   s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  star:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z"/></svg>`,
+  cal:   s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M9 15l2 2 4-4"/></svg>`,
+  sun:   s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
+  cloud: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h11a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.5 3.5 0 0 0 6 18z"/></svg>`,
+  moon:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>`,
+  home:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`,
+  list:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
+  users: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 5M18 20a6.4 6.4 0 0 0-2-4.6"/></svg>`,
+  user:  s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>`,
+};
+
+/* ── Balkgeometrie, identiek aan _BarPainter in Dart ── */
+function frac(v, r) { return Math.max(0, Math.min(1, (v - r.min) / (r.max - r.min))); }
+function fracZoom(v, r) { const [a,b] = r.zoom; return Math.max(0, Math.min(1, (v - a) / (b - a))); }
+function inIdeal(v, r) {
+  if (r.idealMin !== undefined) return v >= r.idealMin && v <= r.idealMax;
+  return v <= r.idealMax;
+}
+function dotColor(v, r) {
+  if (inIdeal(v, r)) return 'var(--score-perfect)';
+  const d = r.idealMin !== undefined && v < r.idealMin
+    ? (r.idealMin - v) / (r.max - r.min)
+    : (v - r.idealMax) / (r.max - r.min);
+  return d > 0.3 ? 'var(--error)' : 'var(--warning)';
+}
+function verdict(kind, v) {
+  const r = RANGE[kind];
+  if (kind === 'rain') return v === 0 ? ['Dry','ok'] : v <= r.idealMax ? ['Light','ok'] : v < 2 ? ['Showers','warn'] : ['Wet','bad'];
+  if (kind === 'wind') return v <= r.idealMax ? ['Calm','ok'] : v < 25 ? ['Breezy','warn'] : ['Gusty','bad'];
+  return inIdeal(v, r) ? ['Ideal','ok'] : v < r.idealMin ? ['Chilly','warn'] : ['Warm','warn'];
+}
+const fmt = { temp:v => v + '°', rain:v => (v === 0 ? '0' : v) + ' mm', wind:v => v + ' km/h' };
+
+function navbar() {
+  return `<div class="navbar">
+    <div class="on">${ICO.home(20)}Home</div>
+    <div>${ICO.list(20)}Rides</div>
+    <div>${ICO.users(20)}Peloton</div>
+    <div>${ICO.user(20)}Profile</div>
+  </div>`;
+}
+const STATUS = `<div class="status"><span>08:12</span><span>RideWindow</span><span>82%</span></div>`;
+
+/* ═══════════ NU — de app zoals hij nu is ═══════════ */
+function bar0(kind, v) {
+  const r = RANGE[kind];
+  const f = frac(v, r) * 100;
+  const zA = r.idealMin !== undefined ? frac(r.idealMin, r) * 100 : 0;
+  const zB = frac(r.idealMax, r) * 100;
+  const ideal = r.idealMin !== undefined
+    ? `${r.idealMin}–${r.idealMax}${r.unit.trim()}`
+    : `≤${Math.round(r.idealMax)}${r.unit.trim()}`;
+  return `<div class="barrow">
+    <span style="color:var(--text-tertiary)">${ICO[kind](14)}</span>
+    <span class="val">${Math.round(v)}${r.unit.trim()}</span>
+    <span class="track"><span class="zone" style="left:${zA}%;width:${zB-zA}%"></span>
+      <span class="dot" style="left:calc(${f}% - 6px);background:${dotColor(v,r)}"></span></span>
+    <span class="ideal">${ideal}</span>
+  </div>`;
+}
+function card0(s) {
+  return `<div class="card${s.best ? ' best' : ''}" onclick="toast('Ride detail — ${s.day} ${s.start}')">
+    ${s.best ? `<div class="bestpill">${ICO.star(12)} Best choice</div>` : ''}
+    <div class="crow">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <span style="color:${TIER_FG[s.tier]}">${s.tier === 'acceptable' ? ICO.cloud(24) : ICO.sun(24)}</span>
+        <div><div class="cday">${s.day}</div>
+          <div class="ctime">${s.start} – ${s.end} · ${s.hours}u</div></div>
+      </div>
+      <div class="score" style="color:${TIER_FG[s.tier]}">
+        <div class="n">${s.score}</div><div class="w">${s.word}</div></div>
+    </div>
+    <div class="bars">${bar0('temp', s.temp)}${bar0('rain', s.rain)}${bar0('wind', s.wind)}</div>
+    <div class="cbtn"><button onclick="event.stopPropagation();toast('Ride planned')">${ICO.cal(16)} Schedule</button></div>
+  </div>`;
+}
+function render0() {
+  return `<div class="screen">${STATUS}
+    <div class="hdr">
+      <div class="greet">Good morning, Joost</div>
+      <div class="sub">${ICO.pin(14)} 5 ride windows · updated 08:12</div>
+    </div>
+    <div class="strip">${DAYS.map((d,i) => `<div class="day ${d.q}${d.today?' today':''}" onclick="pick(this)"><div class="d">${d.d}</div><div class="n">${d.n}</div></div>`).join('')}</div>
+    <div class="seg">
+      <button class="on" onclick="seg(this)">${ICO.sun(14)} Morning</button>
+      <button class="on" onclick="seg(this)">${ICO.cloud(14)} Afternoon</button>
+      <button class="on" onclick="seg(this)">${ICO.moon(14)} Evening</button>
+    </div>
+    <div class="seclabel">PLANNED</div>
+    <div class="planned" onclick="toast('Planned ride — ${PLANNED.day}')">
+      <span style="color:var(--planned)">${ICO.cal(20)}</span>
+      <div class="t"><b>${PLANNED.day}</b><span>${PLANNED.start} – ${PLANNED.end}</span></div>
+      <span class="pill" style="background:${TIER_BG[PLANNED.tier]};color:${TIER_FG[PLANNED.tier]}">${PLANNED.score} ${PLANNED.word}</span>
+    </div>
+    <div class="seclabel">RIDE TIMES</div>
+    ${SLOTS.map(card0).join('')}
+    <div class="pad-nav"></div>
+  </div>${navbar()}`;
+}
+
+/* ═══════════ A — Held bovenaan ═══════════ */
+function readout(kind, v) {
+  const [w, cls] = verdict(kind, v);
+  const label = kind === 'temp' ? 'Temp' : kind === 'rain' ? 'Rain' : 'Wind';
+  const parts = fmt[kind](v).split(' ');
+  return `<div class="ro">
+    <div class="k">${ICO[kind](11)} ${label}</div>
+    <div class="v">${parts[0]}${parts[1] ? ` <small>${parts.slice(1).join(' ')}</small>` : ''}</div>
+    <div class="verdict${cls === 'ok' ? '' : ' warn'}">${w}</div>
+  </div>`;
+}
+function renderA() {
+  const best = SLOTS[0], rest = SLOTS.slice(1);
+  return `<div class="screen">${STATUS}
+    <div class="hdr">
+      <div class="greet">Good morning, Joost</div>
+      <div class="sub">Amsterdam · 08:12</div>
+    </div>
+    <div class="hero">
+      <div class="kicker">Best window this week</div>
+      <div class="herotop">
+        <div><div class="heroday">${best.day}</div>
+          <div class="herotime">${best.start} – ${best.end} · ${best.hours}h</div></div>
+        <div class="heroscore"><div class="n">${best.score}</div><div class="w">${best.word}</div></div>
+      </div>
+      <div class="readouts">${readout('temp', best.temp)}${readout('rain', best.rain)}${readout('wind', best.wind)}</div>
+      <button class="herobtn" onclick="toast('Ride planned — ${best.day} ${best.start}')">${ICO.cal(18)} Schedule this ride</button>
+    </div>
+    <div class="strip">${DAYS.map(d => `<div class="day ${d.q}${d.today?' today':''}" onclick="pick(this)"><div class="d">${d.d}</div><div class="n">${d.n}</div><div class="q"></div></div>`).join('')}</div>
+    <div class="tabs">
+      <button class="on" onclick="tab(this)">Morning</button>
+      <button class="on" onclick="tab(this)">Afternoon</button>
+      <button class="on" onclick="tab(this)">Evening</button>
+    </div>
+    <div class="seclabel">Planned</div>
+    <div class="planned" onclick="toast('Planned ride — ${PLANNED.day}')">
+      <div style="flex:1"><b>${PLANNED.day}</b> <span>${PLANNED.start} – ${PLANNED.end}</span></div>
+      <span style="font-size:12px;font-weight:700;color:${TIER_FG[PLANNED.tier]}">${PLANNED.score}</span>
+    </div>
+    <div class="seclabel">Other windows</div>
+    ${rest.map(s => `<div class="row" onclick="toast('Ride detail — ${s.day} ${s.start}')">
+      <div class="t"><b>${s.day}</b><span>${s.start} – ${s.end} · ${s.hours}h</span>
+        <em>${fmt.temp(s.temp)} · ${verdict('rain', s.rain)[0].toLowerCase()} · ${fmt.wind(s.wind)}</em></div>
+      <div class="s" style="color:${TIER_FG[s.tier]}"><div class="n">${s.score}</div><div class="w">${s.word}</div></div>
+    </div>`).join('')}
+    <div class="pad-nav"></div>
+  </div>${navbar()}`;
+}
+
+/* ═══════════ B — Papier en inkt ═══════════ */
+function bar2(kind, v) {
+  const r = RANGE[kind];
+  const [w, cls] = verdict(kind, v);
+  const [a, b] = r.zoom;
+  const f = fracZoom(v, r) * 100;
+  const zA = r.idealMin !== undefined ? fracZoom(r.idealMin, r) * 100 : 0;
+  const zB = fracZoom(r.idealMax, r) * 100;
+  const label = kind === 'temp' ? 'Temperature' : kind === 'rain' ? 'Rain' : 'Wind';
+  const unit = r.unit.trim();
+  return `<div class="barrow">
+    <div class="top">
+      <span class="k">${ICO[kind](13)} ${label}</span>
+      <span class="v">${fmt[kind](v)}</span>
+      <span class="verdict ${cls}">${w}</span>
+    </div>
+    <div class="track2">
+      <span class="zone2" style="left:${zA}%;width:${Math.max(zB - zA, 4)}%"></span>
+      <span class="mark" style="left:calc(${f}% - 1.5px);background:${dotColor(v, r)}"></span>
+    </div>
+    <div class="scale"><span>${a}${unit}</span><span style="color:var(--score-perfect);font-weight:600">your range ${r.idealMin !== undefined ? r.idealMin + '–' + r.idealMax : '≤' + r.idealMax}${unit}</span><span>${b}${unit}</span></div>
+  </div>`;
+}
+function renderB() {
+  const best = SLOTS[0], rest = SLOTS.slice(1);
+  return `<div class="screen">${STATUS}
+    <div class="hdr">
+      <div class="greet">Good morning, Joost</div>
+      <div class="sub">${ICO.pin(13)} Amsterdam · 5 windows · updated 08:12</div>
+    </div>
+    <div class="strip">${DAYS.map(d => `<div class="day ${d.q}${d.today?' today':''}" onclick="pick(this)"><div class="d">${d.d}</div><div class="n">${d.n}</div><div class="q"></div></div>`).join('')}</div>
+    <div class="tabs">
+      <button class="on" onclick="tab(this)">Morning</button>
+      <button class="on" onclick="tab(this)">Afternoon</button>
+      <button class="on" onclick="tab(this)">Evening</button>
+    </div>
+    <div class="planned" onclick="toast('Planned ride — ${PLANNED.day}')">
+      <span style="color:var(--planned)">${ICO.cal(18)}</span>
+      <div class="t"><b>${PLANNED.day} ${PLANNED.start}</b><span>Planned · ${PLANNED.score} ${PLANNED.word}</span></div>
+    </div>
+    <div class="seclabel">Best this week</div>
+    <div class="card best" onclick="toast('Ride detail — ${best.day} ${best.start}')">
+      <div class="bestpill">${ICO.star(11)} Best choice</div>
+      <div class="crow">
+        <div><div class="cday">${best.day}</div>
+          <div class="ctime">${best.start} – ${best.end} · ${best.hours}h</div></div>
+        <div class="score"><div class="n">${best.score}</div><div class="w">${best.word}</div></div>
+      </div>
+      <div class="bars">${bar2('temp', best.temp)}${bar2('rain', best.rain)}${bar2('wind', best.wind)}</div>
+      <div class="cbtn"><button onclick="event.stopPropagation();toast('Ride planned')">${ICO.cal(17)} Schedule this ride</button></div>
+    </div>
+    <div class="seclabel">Also rideable</div>
+    ${rest.map(s => `<div class="card" onclick="toast('Ride detail — ${s.day} ${s.start}')">
+      <div class="crow">
+        <div><div class="cday">${s.day}</div>
+          <div class="ctime">${s.start} – ${s.end} · ${s.hours}h</div></div>
+        <div class="score" style="color:${TIER_FG[s.tier]}"><div class="n">${s.score}</div><div class="w">${s.word}</div></div>
+      </div>
+      <div class="compact">
+        <span>${ICO.temp(12)} ${fmt.temp(s.temp)}</span>
+        <span>${ICO.rain(12)} ${verdict('rain', s.rain)[0]}</span>
+        <span>${ICO.wind(12)} ${fmt.wind(s.wind)}</span>
+      </div>
+    </div>`).join('')}
+    <div class="pad-nav"></div>
+  </div>${navbar()}`;
+}
+
+/* ═══════════ C — Weerbaan ═══════════ */
+function tempCell(t) {
+  const r = RANGE.temp;
+  const bg = inIdeal(t, r) ? '#2E7D32' : t < r.idealMin ? '#6E8FA8' : '#D98A3A';
+  return `<div class="tempcell" style="background:${bg}">${t}°</div>`;
+}
+function renderC() {
+  const best = SLOTS[0], rest = SLOTS.slice(1);
+  return `<div class="screen">${STATUS}
+    <div class="hdr">
+      <div class="greet">Good morning, Joost</div>
+      <div class="sub">Amsterdam · 08:12</div>
+    </div>
+    <div class="legend"><span class="sp"></span><span class="p">Morning</span><span class="p">Afternoon</span><span class="p">Evening</span></div>
+    <div class="weekband">
+      ${DAYS.map(d => `<div class="drow${d.today?' today':''}" onclick="pick(this)">
+        <span class="lbl">${d.d} ${d.n}</span>
+        ${d.band.map(q => `<span class="cell c-${q}"></span>`).join('')}
+      </div>`).join('')}
+    </div>
+    <div class="planned" onclick="toast('Planned ride — ${PLANNED.day}')">
+      <span style="color:var(--planned)">${ICO.cal(16)}</span>
+      <b>${PLANNED.day} ${PLANNED.start}</b><span>planned · ${PLANNED.score}</span>
+    </div>
+    <div class="seclabel">Best window</div>
+    <div class="hero" onclick="toast('Ride detail — ${best.day} ${best.start}')">
+      <div class="herohead">
+        <div><div class="kicker">Best this week</div>
+          <div class="d">${best.day}</div>
+          <div class="t">${best.start} – ${best.end} · ${best.hours}h</div></div>
+        <div class="s"><div class="n">${best.score}</div><div class="w">${best.word}</div></div>
+      </div>
+      <div class="herobody">
+        <div class="band">${best.hourly.map(h => `<div class="hcol"><div class="hr">${h.h}</div>${tempCell(h.t)}</div>`).join('')}</div>
+        <div class="metricrow"><span class="mk">${ICO.rain(11)}</span>${best.hourly.map(h => `<span class="mcell${h.r === 0 ? ' empty' : ''}" title="${h.h}:00 · ${h.r} mm"><i style="width:${Math.min(h.r / 2, 1) * 100}%;background:#4A90D9"></i></span>`).join('')}</div>
+        <div class="metricrow"><span class="mk">${ICO.wind(11)}</span>${best.hourly.map(h => `<span class="mcell" title="${h.h}:00 · ${h.w} km/h"><i style="width:${Math.min(h.w / 40, 1) * 100}%;background:${h.w <= 15 ? '#6BAE6F' : '#E8B45A'}"></i></span>`).join('')}</div>
+        <div class="mlegend">
+          <span class="sw">${ICO.rain(12)} <b>${verdict('rain', best.rain)[0]}</b></span>
+          <span style="opacity:.4">·</span>
+          <span class="sw">${ICO.wind(12)} <b>${fmt.wind(best.wind)}</b> avg</span>
+          <span style="opacity:.4">·</span>
+          <span class="sw">${ICO.temp(12)} <b>${fmt.temp(best.temp)}</b> avg</span>
+        </div>
+        <div class="cbtn"><button onclick="event.stopPropagation();toast('Ride planned')">${ICO.cal(17)} Schedule this ride</button></div>
+      </div>
+    </div>
+    <div class="seclabel">Other windows</div>
+    ${rest.map(s => `<div class="row" onclick="toast('Ride detail — ${s.day} ${s.start}')">
+      <div class="t"><b>${s.day}</b> <span>${s.start} – ${s.end} · ${s.hours}h</span>
+        <div class="miniband">${s.hourly.map(h => `<div style="background:${BAND_HEX[h.q]}"></div>`).join('')}</div></div>
+      <div class="s" style="color:${TIER_FG[s.tier]}"><div class="n">${s.score}</div><div class="w">${s.word}</div></div>
+    </div>`).join('')}
+    <div class="pad-nav"></div>
+  </div>${navbar()}`;
+}
+
+/* ═══════════ Podium ═══════════ */
+const VARIANTS = [
+  { id:'0', cls:'v0', title:'Nu — de app van vandaag', note:'Achtergrond, dagstrip, filter en kaarten wegen allemaal even zwaar. De regenbalk heeft een groene zone van 5% op een schaal van 0–10 mm.', render:render0 },
+  { id:'a', cls:'va', title:'A · Held bovenaan', star:true, note:'De beste rit is een donkergroen paneel bovenaan met de score op 64px. De rest is een rustige lijst, geen kaarten. Groen wordt anker in plaats van behang.', render:renderA },
+  { id:'b', cls:'vb', title:'B · Papier en inkt', note:'Achtergrond wordt papier; groen wordt inkt. Beste kaart licht op met schaduw en donkere rand. Balken herschaald naar jouw eigen bereik, met een woord erbij.', render:renderB },
+  { id:'c', cls:'vc', title:'C · Weerbaan', note:'Het weer wordt het beeld: per uur een gekleurde cel met de temperatuur. De weekstrip spreekt dezelfde taal en vervangt het periodefilter.', render:renderC },
+];
+
+let mode = 'all', scale = 0.7;
+
+function draw() {
+  const rail = document.getElementById('rail');
+  const show = mode === 'all' ? VARIANTS : VARIANTS.filter(v => v.id === mode);
+  const sc = mode === 'all' ? scale : 1;
+  rail.className = mode === 'all' ? '' : 'solo';
+  rail.innerHTML = show.map(v => `
+    <div class="slot" style="transform:scale(${sc})">
+      <div class="caption"><b>${v.star ? '<span class="star">★</span> ' : ''}${v.title}</b><span>${v.note}</span></div>
+      <div class="phone ${v.cls}">${v.render()}</div>
+    </div>`).join('');
+  // Zorgt dat de geschaalde kolommen elkaar niet overlappen.
+  rail.querySelectorAll('.slot').forEach(s => {
+    s.style.width = (390 * sc) + 'px';
+    s.style.marginBottom = (-800 * (1 - sc)) + 'px';
+  });
+  document.querySelectorAll('#bar button[id^=m-]').forEach(b => b.classList.toggle('on', b.id === 'm-' + mode));
+  document.getElementById('zlabel').textContent = Math.round(scale * 100) + '%';
+}
+function setMode(m) { mode = m; draw(); }
+function zoom(d) { scale = Math.max(0.4, Math.min(1, +(scale + d * 0.05).toFixed(2))); draw(); }
+
+/* ── Interactie: alles wat klikbaar lijkt, doet iets ── */
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1600);
+}
+function pick(el) {
+  const p = el.parentElement;
+  const was = el.classList.contains('sel') || el.dataset.sel === '1';
+  p.querySelectorAll('.day, .drow').forEach(d => { d.classList.remove('sel'); d.dataset.sel = '0'; d.style.outline = ''; });
+  if (!was) {
+    el.classList.add('sel'); el.dataset.sel = '1';
+    if (!el.closest('.v0')) { el.style.outline = '2px solid var(--brand-dark)'; el.style.outlineOffset = '-2px'; }
+    toast('Day filter: ' + el.textContent.trim().replace(/\s+/g, ' '));
+  } else {
+    toast('Day filter cleared');
+  }
+}
+function seg(el) { el.classList.toggle('on'); toast('Period filter changed'); }
+function tab(el) { el.classList.toggle('on'); toast('Period filter changed'); }
+
+draw();
+</script>
+</body>
+</html>

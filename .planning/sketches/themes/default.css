@@ -1,0 +1,91 @@
+/* RideWindow sketch theme — tokens overgenomen uit lib/theme/app_colors.dart
+   en lib/theme/app_typography.dart, zodat een schets die hier goed oogt ook
+   in Dart haalbaar is met bestaande tokens. */
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../../../assets/fonts/Outfit.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+:root {
+  /* ── Merk ── */
+  --brand-light: #C5D4B6;
+  --brand-dark: #234934;
+
+  /* ── Oppervlakken (light) — exact uit app_colors.dart ── */
+  --surface: #C5D4B6;            /* lightSurface == brandLight */
+  --sc-lowest: #FCFDF8;
+  --sc-low: #F4F7EC;
+  --sc: #EDF1E2;
+  --sc-high: #E4EAD7;
+  --sc-highest: #DAE2CC;
+
+  /* ── Tekst ── */
+  --on-surface: #1B2A20;
+  --on-surface-variant: #414F45;
+  --text-primary: #1A2A20;
+  --text-secondary: #3A4A40;
+  --text-tertiary: #4C5C52;
+  --text-hint: #4E5C54;
+
+  /* ── Lijnen ── */
+  --outline: #6B7663;
+  --outline-variant: #A9B79C;
+  --border: #A9B79C;
+  --border-light: #B6C2AA;
+  --border-dim: #C0CCB4;
+
+  /* ── Score / tiers ── */
+  --score-perfect: #2E7D32;
+  --score-great: #26A69A;
+  --score-acceptable: #FFA726;
+  --score-poor: #BDBDBD;
+  --score-green-tint: rgba(46, 125, 50, 0.18);
+
+  --perfect-fg: #1B5E20;
+  --perfect-bg: #E8F5E9;
+  --great-fg: #006457;
+  --great-bg: #E0F2F1;
+  --acceptable-fg: #A42E0A;
+  --acceptable-bg: #FFF3E0;
+  --poor-fg: #585858;
+  --poor-bg: #F5F5F5;
+
+  --planned: #1565C0;
+  --planned-light: #64B5F6;
+  --warning: #FF9800;
+  --error: #E53935;
+
+  /* ── Typografie: Outfit, M3-schaal uit app_typography.dart ── */
+  --font: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  --display-small: 36px;
+  --headline-large: 32px;
+  --headline-medium: 28px;
+  --headline-small: 24px;
+  --title-large: 22px;
+  --title-medium: 16px;
+  --title-small: 14px;
+  --body-large: 16px;
+  --body-medium: 14px;
+  --body-small: 12px;
+  --label-large: 14px;
+  --label-medium: 12px;
+  --label-small: 11px;
+
+  /* ── Vorm (app_shapes.dart / bestaande kaarten) ── */
+  --radius-card: 24px;
+  --radius-chip: 16px;
+  --radius-full: 999px;
+
+  /* ── Ritme ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+}
