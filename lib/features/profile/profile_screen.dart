@@ -18,7 +18,7 @@ import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
-import 'package:ridewindow/features/profile/settings_section.dart';
+import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
@@ -445,14 +445,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const AccountSection(),
 
           // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
-          SettingsSection(
+          SectionCard(
             title: s.sectionLocation,
             children: [
               // ELEMENT 0 — Web-only promoted city picker CTA (LOC-07 primary path)
               if (isWebPlatform &&
                   (permission == LocationPermission.denied ||
                       permission == LocationPermission.deniedForever))
-                SettingsBanner(
+                SectionBanner(
                   // Tonaal, niet vol groen. Dit is een terugvalstaat -- er ging
                   // iets mis met je locatie -- en op de papieren achtergrond was
                   // `primaryContainer` het meest verzadigde vlak van het hele
@@ -487,7 +487,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
               // ELEMENT 1 — GPS-geblokkeerd banner (deniedForever)
               if (permission == LocationPermission.deniedForever)
-                SettingsBanner(
+                SectionBanner(
                   color: Theme.of(context).colorScheme.errorContainer,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -549,7 +549,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: NOTIFICATIES (NOTIF-01, NOTIF-02, NOTIF-03)
-          SettingsSection(
+          SectionCard(
             title: s.sectionNotifications,
             children: [
               SwitchListTile(
@@ -593,7 +593,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: TAAL
-          SettingsSection(
+          SectionCard(
             title: s.sectionLanguage,
             children: [
               Padding(
@@ -618,7 +618,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: THEMA (D-06-09: SegmentedButton, PROF-04)
-          SettingsSection(
+          SectionCard(
             title: s.sectionTheme,
             children: [
               Padding(
@@ -652,7 +652,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: TOLERANTIES
-          SettingsSection(
+          SectionCard(
             title: s.sectionTolerances,
             children: [
               // --- Temperatuurbereik (RangeSlider) ---
@@ -844,7 +844,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: RIJLENGTE
-          SettingsSection(
+          SectionCard(
             title: s.sectionRideLength,
             children: [
               Padding(
@@ -893,7 +893,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: NAAM
-          SettingsSection(
+          SectionCard(
             title: s.sectionName,
             children: [
               ListTile(
@@ -906,7 +906,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: OVER (REL-03: privacybeleid + versie)
-          SettingsSection(
+          SectionCard(
             title: s.sectionAbout,
             children: [
               ListTile(
@@ -1245,5 +1245,5 @@ class _AnimatedWindFlagState extends State<_AnimatedWindFlag>
 }
 
 // `_SectionHeader` stond hier tot v4.0 fase 23. Hij is opgegaan in
-// `SettingsSection` (settings_section.dart), omdat een kop zonder het vlak
+// `SectionCard` (settings_section.dart), omdat een kop zonder het vlak
 // eronder geen groep maakt -- en dat vlak is precies wat dit scherm miste.

@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/services/invite_code.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
+import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
@@ -119,88 +120,108 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
       child: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          if (invites.value?.isNotEmpty ?? false) ...[
-            _SectionHeader(s.pelotonPendingInvites),
-            for (final ride in invites.value!)
-              _InviteCard(
-                ride: ride,
-                busy: _busy,
-                onAccept: () => _respond(ride, accepted: true),
-                onDecline: () => _respond(ride, accepted: false),
-              ),
-          ],
-          _SectionHeader(s.pelotonFriends),
-          friends.when(
-            loading: () => const Padding(
-              padding: EdgeInsets.all(24),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (_, __) => _ErrorRow(
-              label: s.pelotonRetry,
-              onRetry: _invalidateAll,
-            ),
-            data: (list) => list.isEmpty
-                ? _EmptyFriends(s: s, theme: theme)
-                : Column(
-                    children: [
-                      for (final friend in list)
-                        _FriendRow(
-                          friend: friend,
-                          fallback: s.pelotonUnnamedFriend,
-                          onRemove: _busy
-                              ? null
-                              : () => _run(() async {
-                                    await ref
-                                        .read(pelotonGatewayProvider)
-                                        .removeFriend(friend.userId);
-                                    _invalidateAll();
-                                  }),
-                        ),
-                    ],
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: FilledButton.tonalIcon(
-              onPressed: _busy ? null : _shareInvite,
-              icon: const Icon(Icons.person_add_alt),
-              label: Text(s.pelotonInviteFriend),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Row(
+          if (invites.value?.isNotEmpty ?? false)
+            SectionCard(
+              title: s.pelotonPendingInvites,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _codeController,
-                    textCapitalization: TextCapitalization.characters,
-                    decoration: InputDecoration(
-                      labelText: s.pelotonCodeHint,
-                      border: const OutlineInputBorder(),
-                      isDense: true,
-                    ),
-                    onSubmitted: (_) => _redeemCode(),
+                for (final ride in invites.value!)
+                  _InviteRow(
+                    ride: ride,
+                    busy: _busy,
+                    onAccept: () => _respond(ride, accepted: true),
+                    onDecline: () => _respond(ride, accepted: false),
                   ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _busy ? null : _redeemCode,
-                  child: Text(s.pelotonJoin),
-                ),
               ],
             ),
+          SectionCard(
+            title: s.pelotonFriends,
+            children: [
+              friends.when(
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (_, __) => _ErrorRow(
+                  label: s.pelotonRetry,
+                  onRetry: _invalidateAll,
+                ),
+                data: (list) => list.isEmpty
+                    ? _EmptyFriends(s: s, theme: theme)
+                    : Column(
+                        children: [
+                          for (final friend in list)
+                            _FriendRow(
+                              friend: friend,
+                              fallback: s.pelotonUnnamedFriend,
+                              onRemove: _busy
+                                  ? null
+                                  : () => _run(() async {
+                                        await ref
+                                            .read(pelotonGatewayProvider)
+                                            .removeFriend(friend.userId);
+                                        _invalidateAll();
+                                      }),
+                            ),
+                        ],
+                      ),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              // De twee manieren om er een maatje bij te krijgen staan ín de
+              // maatjeskaart, niet eronder als losse besturingselementen. Ze
+              // hóren bij die lijst -- dat is wat een kaart zegt.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.tonalIcon(
+                    onPressed: _busy ? null : _shareInvite,
+                    icon: const Icon(Icons.person_add_alt),
+                    label: Text(s.pelotonInviteFriend),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _codeController,
+                        textCapitalization: TextCapitalization.characters,
+                        decoration: InputDecoration(
+                          labelText: s.pelotonCodeHint,
+                          border: const OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        onSubmitted: (_) => _redeemCode(),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      onPressed: _busy ? null : _redeemCode,
+                      child: Text(s.pelotonJoin),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          if (joined.value?.isNotEmpty ?? false) ...[
-            _SectionHeader(s.pelotonJoinedRides),
-            for (final ride in joined.value!)
-              _JoinedRideRow(ride: ride, s: s),
-          ],
-          if (owned.value?.isNotEmpty ?? false) ...[
-            _SectionHeader(s.pelotonOwnedRides),
-            for (final ride in owned.value!)
-              _OwnedRideRow(ride: ride, s: s),
-          ],
+          if (joined.value?.isNotEmpty ?? false)
+            SectionCard(
+              title: s.pelotonJoinedRides,
+              children: [
+                for (final ride in joined.value!)
+                  _JoinedRideRow(ride: ride, s: s),
+              ],
+            ),
+          if (owned.value?.isNotEmpty ?? false)
+            SectionCard(
+              title: s.pelotonOwnedRides,
+              children: [
+                for (final ride in owned.value!)
+                  _OwnedRideRow(ride: ride, s: s),
+              ],
+            ),
           const SizedBox(height: 24),
         ],
       ),
@@ -269,26 +290,10 @@ class _EmptyFriends extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        label.toUpperCase(),
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.primary,
-          letterSpacing: 0.8,
-        ),
-      ),
-    );
-  }
-}
+// `_SectionHeader` stond hier tot 2026-09-07 en was de dérde kopie van
+// dezelfde koptekst in dit project. Hij zit nu in `SectionCard`
+// (features/shared/), samen met het vlak eronder -- want een kop zonder
+// dat vlak maakt geen groep, en dat is precies wat deze tab miste.
 
 class _FriendRow extends StatelessWidget {
   const _FriendRow({
@@ -316,8 +321,11 @@ class _FriendRow extends StatelessWidget {
   }
 }
 
-class _InviteCard extends StatelessWidget {
-  const _InviteCard({
+/// Was een eigen `Card` met eigen marge. Sinds de uitnodigingen in een
+/// [SectionCard] staan zou dat een kaart in een kaart zijn, dus dit is nu een
+/// gewone regel met dezelfde inspringing als de tegels eromheen.
+class _InviteRow extends StatelessWidget {
+  const _InviteRow({
     required this.ride,
     required this.busy,
     required this.onAccept,
@@ -333,37 +341,34 @@ class _InviteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              s.pelotonInvitedBy(ride.ownerName ?? s.pelotonUnnamedFriend),
-              style: theme.textTheme.labelLarge
-                  ?.copyWith(color: theme.colorScheme.primary),
-            ),
-            const SizedBox(height: 4),
-            Text(_formatRide(ride), style: theme.textTheme.titleMedium),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: busy ? null : onDecline,
-                  child: Text(s.pelotonDecline),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: busy ? null : onAccept,
-                  child: Text(s.pelotonAccept),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            s.pelotonInvitedBy(ride.ownerName ?? s.pelotonUnnamedFriend),
+            style: theme.textTheme.labelLarge
+                ?.copyWith(color: theme.colorScheme.primary),
+          ),
+          const SizedBox(height: 4),
+          Text(_formatRide(ride), style: theme.textTheme.titleMedium),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: busy ? null : onDecline,
+                child: Text(s.pelotonDecline),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: busy ? null : onAccept,
+                child: Text(s.pelotonAccept),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -17,7 +17,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/domain/services/account_switch_resolver.dart';
-import 'package:ridewindow/features/profile/settings_section.dart';
+import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -551,7 +551,7 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     });
     final authAsync = ref.watch(authStateProvider);
 
-    return SettingsSection(
+    return SectionCard(
       title: s.sectionAccount,
       children: [
         authAsync.when(
@@ -691,5 +691,5 @@ class _AccountAvatarState extends State<_AccountAvatar> {
 
 // `_AccountSectionHeader` was een letterlijk duplicaat van profile_screen.dart's
 // `_SectionHeader`, want Dart-privacy is per bestand en er was geen gedeelde
-// plek. Die is er nu wel: `SettingsSection` is publiek, dus het duplicaat kon
+// plek. Die is er nu wel: `SectionCard` is publiek, dus het duplicaat kon
 // weg en beide schermen gebruiken dezelfde kop én hetzelfde vlak.

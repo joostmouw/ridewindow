@@ -1,17 +1,25 @@
-// lib/features/profile/settings_section.dart
-// Eén sectie op het Profielscherm: kop op de achtergrond, inhoud op een kaart.
+// lib/features/shared/section_card.dart
+// Eén sectie: kop op de achtergrond, inhoud op een kaart.
 //
-// Vóór v4.0 was Profiel één platte `ListView` waarin de secties alleen door een
-// koptekst gescheiden werden. Op de papieren achtergrond (`lightSurface` is
-// sinds fase 23 `#FCFDF8`) leest dat als één doorlopende lijst: er is geen vlak
-// dat zegt waar een groep begint of eindigt. Deze widget geeft elke groep de
-// behandeling die Home en Ride Detail al hebben — wit op papier, met een
-// haarlijn in plaats van een schaduw.
+// Vóór v4.0 waren Profiel en Peloton platte lijsten waarin de secties alleen
+// door een koptekst gescheiden werden. Op de papieren achtergrond
+// (`lightSurface` is sinds fase 23 `#FCFDF8`) leest dat als één doorlopende
+// lijst: er is geen vlak dat zegt waar een groep begint of eindigt. Deze widget
+// geeft elke groep de behandeling die Home en Ride Detail al hebben — wit op
+// papier, met een haarlijn in plaats van een schaduw.
+//
+// Stond tot 2026-09-07 in `features/profile/` en heette `SettingsSection`. Toen
+// Peloton dezelfde behandeling nodig had bleek de naam te smal: een lijst met
+// maatjes is geen instelling. Verhuisd naar `shared/` en hernoemd, waarmee ook
+// de dérde kopie van dezelfde sectiekop kon verdwijnen — er stond er één in
+// `profile_screen.dart`, één in `account_section.dart` en één in
+// `peloton_tab.dart`, want Dart-privacy is per bestand en er was geen gedeelde
+// plek.
 
 import 'package:flutter/material.dart';
 
-class SettingsSection extends StatelessWidget {
-  const SettingsSection({
+class SectionCard extends StatelessWidget {
+  const SectionCard({
     super.key,
     required this.title,
     required this.children,
@@ -51,7 +59,7 @@ class SettingsSection extends StatelessWidget {
                   ),
             ),
           ),
-          _SettingsCard(children: children),
+          _CardSurface(children: children),
         ],
       ),
     );
@@ -59,8 +67,8 @@ class SettingsSection extends StatelessWidget {
 }
 
 /// Het witte vlak zelf.
-class _SettingsCard extends StatelessWidget {
-  const _SettingsCard({required this.children});
+class _CardSurface extends StatelessWidget {
+  const _CardSurface({required this.children});
 
   final List<Widget> children;
 
@@ -83,7 +91,7 @@ class _SettingsCard extends StatelessWidget {
         side: BorderSide(color: cs.surfaceContainerHigh),
       ),
       // Geen eigen binnenmarge: `ListTile` brengt zijn eigen hoogte mee, en een
-      // strook (`SettingsBanner`) moet juist tot de rand kunnen lopen. Kinderen
+      // strook (`SectionBanner`) moet juist tot de rand kunnen lopen. Kinderen
       // die géén tegel zijn — sliders, `SegmentedButton`, chips — houden hun
       // eigen `horizontal: 16`, zodat ze in de rooilijn van de tegels staan.
       child: Column(
@@ -101,8 +109,8 @@ class _SettingsCard extends StatelessWidget {
 /// sectiekaart en breken juist de groep die deze epic wil maken. Als strook
 /// hoort de melding zichtbaar bij het blok, en omdat de kaart `Clip.antiAlias`
 /// heeft rondt hij vanzelf mee af — de strook heeft zelf geen radius nodig.
-class SettingsBanner extends StatelessWidget {
-  const SettingsBanner({
+class SectionBanner extends StatelessWidget {
+  const SectionBanner({
     super.key,
     required this.color,
     required this.child,

@@ -146,13 +146,26 @@ ThemeData _buildTheme(Brightness brightness) {
     ),
 
     // ── Cards (M3 Expressive: larger radii) ──
+    //
+    // Sinds v4.0 fase 23 hebben Home en Ride Detail hun kaarten lokaal op
+    // papier-wit gezet: `surfaceContainerLowest` met een haarlijn in
+    // `surfaceContainerHigh`. Dit thema bleef ondertussen op
+    // `surfaceContainerLow` staan met een rand van `outlineVariant` op 120
+    // alpha, en dus had de app twee soorten kaarten — welke je kreeg hing
+    // ervan af of dat scherm in de sweep was meegenomen. Op "My rides" was dat
+    // meteen te zien: groenige kaarten naast Home's witte.
+    //
+    // Nu is het thema de papierbehandeling en zijn de lokale overschrijvingen
+    // op Home en Ride Detail de uitzondering die ze horen te zijn (die staan
+    // er om andere redenen — een `ClipRRect` die geen `elevation` doorlaat, en
+    // een `Container` die ook een `BoxShadow` droeg).
     cardTheme: CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: colorScheme.outlineVariant.withAlpha(120)),
+        side: BorderSide(color: colorScheme.surfaceContainerHigh),
       ),
-      color: colorScheme.surfaceContainerLow,
+      color: colorScheme.surfaceContainerLowest,
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
     ),
 
