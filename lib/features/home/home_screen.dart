@@ -848,11 +848,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
 
       // Dart's List.sort is niet stabiel, dus binnen een tier moet de tiebreak
-      // expliciet; anders wisselt de kaartvolgorde per rebuild.
+      // expliciet; anders wisselt de kaartvolgorde per rebuild. Binnen een tier
+      // blijft de lijst chronologisch — dat leest als een agenda, en dat is wat
+      // je van een lijst tijdvakken verwacht.
       slots.sort((a, b) {
         final byTier = _tierOrder(a.tier).compareTo(_tierOrder(b.tier));
         return byTier != 0 ? byTier : a.start.compareTo(b.start);
       });
+
+      // ...met één uitzondering: het best scorende slot wordt naar voren
+      // gehaald. Zonder dit droeg de kaart op plek 0 het "Best choice"-label
+      // terwijl dat de vroegste van de beste tier was en niet de beste — een
+      // rit van 99 boven een 100. Zolang die kaart nauwelijks opviel bleef dat
+      // onopgemerkt; sinds hij met schaduw en accentrand domineert, wijst het
+      // scherm met nadruk de verkeerde aan. Zie [indexOfBestSlot].
+      final bestIndex = indexOfBestSlot(slots);
+      if (bestIndex > 0) {
+        slots.insert(0, slots.removeAt(bestIndex));
+      }
 
       return SliverList.builder(
         itemCount: slots.length,

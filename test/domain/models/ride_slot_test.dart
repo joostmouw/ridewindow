@@ -48,4 +48,47 @@ void main() {
       expect(slot.hours.any((h) => h.time == end), isFalse);
     });
   });
+
+  group('indexOfBestSlot', () {
+    RideSlot at(int hour, double score) {
+      final s = DateTime(2025, 7, 5, hour);
+      final e = s.add(const Duration(hours: 2));
+      return RideSlot(
+        start: s,
+        end: e,
+        overallScore: score,
+        tier: rideTierFromScore(score),
+        hours: [_score(s)],
+      );
+    }
+
+    test('kiest de hoogste score, ook als die later op de dag ligt', () {
+      // Precies de situatie die op 2026-09-07 op het scherm stond: de lijst is
+      // chronologisch binnen dezelfde tier, en de vroegste rit scoorde 99
+      // terwijl de rit erna 100 haalde. Voor deze fix won plek 0 altijd.
+      final slots = [at(6, 99), at(8, 100), at(10, 98)];
+      expect(indexOfBestSlot(slots), 1);
+    });
+
+    test('bij een gelijke score wint de vroegste rit', () {
+      final slots = [at(6, 92), at(8, 92)];
+      expect(indexOfBestSlot(slots), 0);
+    });
+
+    test('een gelijke score verderop in de lijst kaapt het label niet', () {
+      // Andersom dan hierboven: de winnaar staat vooraan en een latere rit
+      // evenaart hem. `>` alleen zou hier al goed gaan, maar de expliciete
+      // tiebreak moet ook standhouden als de lijst ooit anders gesorteerd wordt.
+      final slots = [at(12, 88), at(6, 88)];
+      expect(indexOfBestSlot(slots), 1, reason: '06:00 ligt vóór 12:00');
+    });
+
+    test('één slot is zijn eigen beste', () {
+      expect(indexOfBestSlot([at(9, 71)]), 0);
+    });
+
+    test('een lege lijst geeft -1 en crasht niet', () {
+      expect(indexOfBestSlot(const []), -1);
+    });
+  });
 }
