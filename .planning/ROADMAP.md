@@ -8,7 +8,8 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 
 - ✅ **v1.0 Android App** - Phases 1–10 (shipped, Internal testing track live)
 - ✅ **v2.0 iOS Web App (PWA)** - Phases 11–17 (shipped 2026-07-17) — see `.planning/milestones/v2.0-ROADMAP.md`
-- 🚧 **v3.0 Accounts & Sociaal (phases 1–2 only)** - Phases 18–22 (in progress) — see `.planning/milestones/v3.0-ACCOUNTS.md`. Milestone phases 3–5 (friends, shared availability, ride invites, server-side push) are explicitly deferred.
+- ✅ **v3.0 Accounts & Sociaal** - Phases 18–22 (shipped 2026-09-07) — see `.planning/milestones/v3.0-ACCOUNTS.md`. Milestone phases 3–5 waren gepland als uitgesteld, maar de sociale laag is er tijdens deze milestone alsnog gekomen als epic #62 "Peloton" (vrienden, uitnodigen voor een gedeelde rit, accepteren) — zie `.planning/PELOTON.md`. Wat wél uitgesteld blijft: gedeelde beschikbaarheid en server-side push, nu belegd in epic #65.
+- 🚧 **v3.1 Eigen gezicht** - Phases 23–25 (in progress) — merkidentiteit en UI/UX: typografie, hiërarchie, iconografie. Zie backlog-epic #64.
 
 ## Phases
 
@@ -257,5 +258,8 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
 | 21. Sync + migration | v3.0 | 14/14 | Complete   | 2026-09-02 |
 | 22. Account-backed feedback | v3.0 | 1/1 | Complete   | 2026-09-07 |
+| 23. Typografie & hiërarchie | v3.1 | 0/TBD | In Progress|  |
+| 24. Iconografie & eigen beeldtaal | v3.1 | 0/TBD | Not started | - |
+| 25. Wrijving wegwerken | v3.1 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).

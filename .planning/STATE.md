@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.0
-milestone_name: Accounts & Sociaal
-status: "v3.0 bijna dicht: 0004 draaien + maatjeslijst-bug"
-last_updated: "2026-09-07T10:40:00.000Z"
+milestone: v3.1
+milestone_name: Eigen gezicht
+status: "v3.0 gesloten; v3.1 gestart met Outfit + score"
+last_updated: "2026-09-07T11:10:00.000Z"
 last_activity: 2026-09-06
 progress:
-  total_phases: 5
-  completed_phases: 2
-  total_plans: 26
-  completed_plans: 26
-  percent: 50
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
