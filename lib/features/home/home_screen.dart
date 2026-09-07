@@ -653,7 +653,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         color: rw.plannedRide.withAlpha(18),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: rw.plannedRide.withAlpha(60)),
+          // Op volle sterkte, en 2px, precies zoals de agendacel (zie
+          // `week_agenda_screen.dart`: een geplande cel houdt zijn scorekleur en
+          // krijgt er een volle `plannedRide`-rand omheen). De rand stond hier
+          // op alpha 60 en las daardoor als grijsblauw: zelfde token, ander
+          // ding — terwijl het in beide schermen letterlijk dezelfde geplande
+          // rit is. Joost zag dat direct (2026-09-07). De vulling blijft licht;
+          // die draagt het blauw niet, de rand doet dat.
+          side: BorderSide(color: rw.plannedRide, width: 2),
         ),
         // `Material.clipBehavior` staat standaard op `Clip.none`, en dan volgt
         // de inkt van de `InkWell` de rechthoek in plaats van de afgeronde
@@ -1005,284 +1012,241 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // niet langer een compromis met een detail hoeft te sluiten.
     final radius = BorderRadius.circular(_rideCardRadius);
 
-    // Extra ruimte onder de beste kaart: zonder dat valt zijn slagschaduw over
-    // de kaart eronder heen en lijkt die vies in plaats van vlak.
-    final margin =
-        isBest ? const EdgeInsets.fromLTRB(20, 6, 20, 18) : _rideCardMargin;
+    // Alle kaarten dezelfde marge. De beste kaart had er onderaan extra, omdat
+    // zijn slagschaduw anders over de kaart eronder viel; die schaduw is er
+    // niet meer (zie hieronder), dus die uitzondering ook niet.
+    const margin = _rideCardMargin;
 
     // Zelfde constructie als op Rides: de hele Dismissible in een afgeronde clip,
     // met de marge erbuiten. Alleen de achtergrond afronden volstaat niet — dan
     // schuift de kaart nog steeds als rechthoek weg.
     //
-    // De `DecoratedBox` eromheen bestaat om één reden: een `ClipRRect` snijdt
-    // alles weg wat buiten zijn rechthoek valt, en een slagschaduw valt daar per
-    // definitie buiten. Zet je de schaduw op de `Card` binnen de clip, dan is
-    // hij onzichtbaar — dat is waarom deze kaart tot v4.0 op `elevation: 0`
-    // stond. Hier tekent de ouder de schaduw, buiten de clip om, terwijl de
-    // clip zelf blijft doen waar hij voor zit: de swipe naar "Schedule".
+    // Hier zat tot 2026-09-07 een `DecoratedBox` met een slagschaduw omheen: een
+    // `ClipRRect` snijdt alles weg wat buiten zijn rechthoek valt en een schaduw
+    // valt daar per definitie buiten, dus die moest van de ouder komen. Hij is
+    // weg omdat de beste kaart nu alleen nog door zijn pil wordt aangewezen —
+    // zie de noot bij `isBest` verderop. De constructie eromheen blijft nodig
+    // voor de swipe, alleen zonder schaduw.
     return SpringPressEffect(
       child: Padding(
         padding: margin,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            boxShadow: isBest
-                ? const [
-                    BoxShadow(
-                      color: Color(0x4D1B2A20),
-                      blurRadius: 30,
-                      spreadRadius: -8,
-                      offset: Offset(0, 14),
-                    ),
-                    BoxShadow(
-                      color: Color(0x1A1B2A20),
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ]
-                : null,
-          ),
-          child: ClipRRect(
-            borderRadius: radius,
-            child: Dismissible(
-              key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),
-              direction: DismissDirection.startToEnd,
-              confirmDismiss: (_) async {
-                HapticFeedback.mediumImpact();
-                _planRide(slot);
-                return false;
-              },
-              // Geen gekleurd vlak achter de kaart, alleen een icoon en een
-              // woord op de gewone achtergrond.
-              //
-              // Er heeft hier een groen blok gezeten, en dat was niet rond te
-              // krijgen. `Dismissible` knipt zijn achtergrond zélf af tot het
-              // onthulde stuk, en die knip loopt kaarsrecht langs de rand van
-              // de kaart. Een `borderRadius` op dat blok deed daar niets tegen:
-              // links werd hij netjes rond, rechts hield hij een hoek van 90°,
-              // met een wig achtergrond ertussen omdat de kaart daar juist wél
-              // rond is. Op een echt toestel met een echte vinger was dat het
-              // eerste wat opviel (Joost, 2026-09-07, na drie rondes waarin ik
-              // steeds naar de kaart keek in plaats van naar het vlak erachter).
-              //
-              // Wat niet bestaat kan ook niet vierkant afgeknipt worden. De
-              // knip valt nu op de achtergrond zelf en is daarmee onzichtbaar.
-              background: Padding(
-                padding: const EdgeInsets.only(left: 24),
-                child: Row(
-                  children: [
-                    // Groen op papier in plaats van op een groen vlak, dus de
-                    // kleur moet nu zelf het contrast dragen.
-                    Icon(Icons.event_available, color: cs.primary, size: 22),
-                    const SizedBox(width: 8),
-                    Text(
-                      S.of(context).schedule,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: cs.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-              // Deze `ClipRRect` maakt van de meeschuivende kaart een écht
-              // afgerond blok. Zonder hem kreeg je bij het slepen een kaars-
-              // rechte voorrand met een harde naad tussen het groene vlak en de
-              // kaart — precies wat je op een scherm vol radius-24 niet wilt
-              // zien (waargenomen door Joost, 2026-09-07). De `shape` op de
-              // `Card` hieronder rondt alleen zijn eigen rustpositie af; zodra
-              // hij binnen de clip van de ouder verschuift, is het de ouder die
-              // de vorm bepaalt. Vandaar een clip die mét de kaart meebeweegt.
-              //
-              // De buitenste `ClipRRect` blijft ook staan: die houdt het groene
-              // onthulvlak binnen dezelfde ronding en voorkomt dat de kaart aan
-              // de rechterkant buiten zijn plek schuift.
-              //
-              // Beide kaarten zijn hetzelfde wit. Dat is opzet: het onderscheid
-              // komt niet meer uit kleur maar uit licht en rand — de beste kaart
-              // heeft de schaduw hierboven plus de 5px linkerrand hieronder, de
-              // rest is vlak met een haarlijn. Kleur werkte hier nooit, want de
-              // trappen in de oppervlakkenladder liggen te dicht op elkaar om een
-              // eerste en tweede plek mee te maken.
-              child: ClipRRect(
-                borderRadius: radius,
-                child: Card(
-                  // De schaduw zit bewust op de `DecoratedBox` buiten de clip, niet
-                  // hier — zie de noot daar. `elevation` binnen een `ClipRRect` is
-                  // weggegooid werk.
-                  elevation: 0,
-                  margin: EdgeInsets.zero,
-                  color: cs.surfaceContainerLowest,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: radius,
-                    side: isBest
-                        ? BorderSide.none
-                        : BorderSide(color: cs.surfaceContainerHigh),
-                  ),
-                  child: Stack(
-                    children: [
-                      // De accentrand van de beste kaart, als losse staaf ín de
-                      // kaart in plaats van als rand eráán.
-                      //
-                      // Als `Border(left:)` liep hij tot in de hoeken, en om
-                      // hem daar niet als sikkel te laten eindigen kreeg de
-                      // kaart links maar 8px radius. Dat maakte de kaart bij
-                      // het slepen tot een vrijwel vierkant blok op een scherm
-                      // waar alles radius 24 heeft. Nu de staaf een eigen
-                      // afgerond blokje is dat de hoeken niet raakt, mag de
-                      // kaart weer volledig rond zijn — en de streep blijft
-                      // recht. Beide problemen weg, geen compromis meer.
-                      if (isBest)
-                        const Positioned(
-                          left: 10,
-                          top: 16,
-                          bottom: 16,
-                          width: 5,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: AppColors.brandDark,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(3)),
-                            ),
-                          ),
+        child: ClipRRect(
+          borderRadius: radius,
+          child: Dismissible(
+            key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),
+            direction: DismissDirection.startToEnd,
+            confirmDismiss: (_) async {
+              HapticFeedback.mediumImpact();
+              _planRide(slot);
+              return false;
+            },
+            // Geen gekleurd vlak achter de kaart, alleen een icoon en een
+            // woord op de gewone achtergrond.
+            //
+            // Er heeft hier een groen blok gezeten, en dat was niet rond te
+            // krijgen. `Dismissible` knipt zijn achtergrond zélf af tot het
+            // onthulde stuk, en die knip loopt kaarsrecht langs de rand van
+            // de kaart. Een `borderRadius` op dat blok deed daar niets tegen:
+            // links werd hij netjes rond, rechts hield hij een hoek van 90°,
+            // met een wig achtergrond ertussen omdat de kaart daar juist wél
+            // rond is. Op een echt toestel met een echte vinger was dat het
+            // eerste wat opviel (Joost, 2026-09-07, na drie rondes waarin ik
+            // steeds naar de kaart keek in plaats van naar het vlak erachter).
+            //
+            // Wat niet bestaat kan ook niet vierkant afgeknipt worden. De
+            // knip valt nu op de achtergrond zelf en is daarmee onzichtbaar.
+            background: Padding(
+              padding: const EdgeInsets.only(left: 24),
+              child: Row(
+                children: [
+                  // Groen op papier in plaats van op een groen vlak, dus de
+                  // kleur moet nu zelf het contrast dragen.
+                  Icon(Icons.event_available, color: cs.primary, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    S.of(context).schedule,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: cs.primary,
+                          fontWeight: FontWeight.w600,
                         ),
-                      InkWell(
-                        borderRadius: radius,
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          context.push(
-                            '/detail',
-                            extra: DetailArgs(
-                              slot: slot,
-                              forecasts: slotForecasts,
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // "Beste keuze" label
-                              if (isBest)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: cs.primaryContainer,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(20)),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.star_rounded,
-                                            size: 14,
-                                            color: cs.onPrimaryContainer),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          S.of(context).bestChoice,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                                color: cs.onPrimaryContainer,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              // Card top: dag + badge
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        WeatherIcon(tier: slot.tier, size: 24),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                _formatDayName(slot.start),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleMedium
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                              ),
-                                              Text(
-                                                '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color:
-                                                          cs.onSurfaceVariant,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  ScoreDisplay(
-                                    score: slot.overallScore,
-                                    tier: slot.tier,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              // Alleen de beste kaart krijgt de volle balken. Drie
-                              // balken op élke kaart is de reden dat de lijst als
-                              // één massa leest — dat was op de schets meteen te
-                              // zien. De rest krijgt één regel, zodat het verschil
-                              // tussen eerste en tweede plek ook overeind blijft
-                              // als je scrollt.
-                              if (avgTemp != null ||
-                                  totalPrecip != null ||
-                                  avgWind != null)
-                                isBest
-                                    ? _buildWeatherBars(
-                                        avgTemp: avgTemp,
-                                        totalPrecip: totalPrecip,
-                                        avgWind: avgWind,
-                                      )
-                                    : _buildWeatherSummary(
-                                        avgTemp: avgTemp,
-                                        totalPrecip: totalPrecip,
-                                        avgWind: avgWind,
-                                      ),
-                              const SizedBox(height: 14),
-                              // Footer: Plan het knop
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: FilledButton.tonalIcon(
-                                  onPressed: () => _planRide(slot),
-                                  icon: const Icon(Icons.event_available,
-                                      size: 16),
-                                  label: Text(S.of(context).schedule),
-                                ),
-                              ),
-                            ],
+                  ),
+                ],
+              ),
+            ),
+            // Deze `ClipRRect` maakt van de meeschuivende kaart een écht
+            // afgerond blok. Zonder hem kreeg je bij het slepen een kaars-
+            // rechte voorrand met een harde naad tussen het groene vlak en de
+            // kaart — precies wat je op een scherm vol radius-24 niet wilt
+            // zien (waargenomen door Joost, 2026-09-07). De `shape` op de
+            // `Card` hieronder rondt alleen zijn eigen rustpositie af; zodra
+            // hij binnen de clip van de ouder verschuift, is het de ouder die
+            // de vorm bepaalt. Vandaar een clip die mét de kaart meebeweegt.
+            //
+            // De buitenste `ClipRRect` blijft ook staan: die houdt het groene
+            // onthulvlak binnen dezelfde ronding en voorkomt dat de kaart aan
+            // de rechterkant buiten zijn plek schuift.
+            //
+            // Alle kaarten zijn volledig gelijk: hetzelfde wit, dezelfde
+            // haarlijn, geen schaduw. De beste wordt aangewezen door zijn pil
+            // "Beste keuze" en verder door niets — Joost's keuze op
+            // 2026-09-07, nadat de kaart drie markeringen tegelijk droeg (pil,
+            // staaf én schaduw) voor één en hetzelfde feit.
+            //
+            // Wat hier weg is en waarom het niet terug moet sluipen: een 5px
+            // `brandDark`-staaf links ín de kaart. Als `Border(left:)` liep
+            // hij tot in de hoeken en werd hij daar een sikkel, en de
+            // omweg daaromheen (links maar 8px radius) maakte de kaart bij
+            // het slepen tot een bijna vierkant blok op een scherm waar
+            // alles radius 24 heeft.
+            child: ClipRRect(
+              borderRadius: radius,
+              child: Card(
+                // `elevation` binnen een `ClipRRect` is weggegooid werk — de
+                // clip snijdt de schaduw weg. Niet ongedaan maken zonder de
+                // schaduw óók buiten de clip te zetten; zo stond het tot
+                // vandaag en dat is bewust vervallen.
+                elevation: 0,
+                margin: EdgeInsets.zero,
+                color: cs.surfaceContainerLowest,
+                shape: RoundedRectangleBorder(
+                  borderRadius: radius,
+                  side: BorderSide(color: cs.surfaceContainerHigh),
+                ),
+                child: Stack(
+                  children: [
+                    InkWell(
+                      borderRadius: radius,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        context.push(
+                          '/detail',
+                          extra: DetailArgs(
+                            slot: slot,
+                            forecasts: slotForecasts,
                           ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // "Beste keuze" label
+                            if (isBest)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: cs.primaryContainer,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.star_rounded,
+                                          size: 14,
+                                          color: cs.onPrimaryContainer),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        S.of(context).bestChoice,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color: cs.onPrimaryContainer,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            // Card top: dag + badge
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      WeatherIcon(tier: slot.tier, size: 24),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _formatDayName(slot.start),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    color: cs.onSurfaceVariant,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                ScoreDisplay(
+                                  score: slot.overallScore,
+                                  tier: slot.tier,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            // Alleen de beste kaart krijgt de volle balken. Drie
+                            // balken op élke kaart is de reden dat de lijst als
+                            // één massa leest — dat was op de schets meteen te
+                            // zien. De rest krijgt één regel, zodat het verschil
+                            // tussen eerste en tweede plek ook overeind blijft
+                            // als je scrollt.
+                            if (avgTemp != null ||
+                                totalPrecip != null ||
+                                avgWind != null)
+                              isBest
+                                  ? _buildWeatherBars(
+                                      avgTemp: avgTemp,
+                                      totalPrecip: totalPrecip,
+                                      avgWind: avgWind,
+                                    )
+                                  : _buildWeatherSummary(
+                                      avgTemp: avgTemp,
+                                      totalPrecip: totalPrecip,
+                                      avgWind: avgWind,
+                                    ),
+                            const SizedBox(height: 14),
+                            // Footer: Plan het knop
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: FilledButton.tonalIcon(
+                                onPressed: () => _planRide(slot),
+                                icon:
+                                    const Icon(Icons.event_available, size: 16),
+                                label: Text(S.of(context).schedule),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
