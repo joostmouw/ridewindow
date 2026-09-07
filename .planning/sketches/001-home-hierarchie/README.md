@@ -82,13 +82,32 @@ daaronder volgt daaruit. Dit is de lijst zoals hij uit de schets volgt, niet een
 fase 23 zelf.
 
 1. **`lightSurface` van `brandLight` naar `surfaceContainerLowest` (`#FCFDF8`).** Dit is de
-   ingreep waar de hele variant op rust: pas als de achtergrond papier is, heeft de
-   oppervlakkenladder bereik en kan een kaart daadwerkelijk oplichten. Let op de keerzijde, en
-   toets die op een toestel: de contrastratio's uit backlog #9 zijn gemeten *op brandLight*.
-   `lightTextTertiary` (`#4C5C52`) en `lightTextHint` (`#4E5C54`) zijn indertijd juist
-   donkerder gemaakt om op die groene achtergrond te halen; op papier worden ze onnodig zwaar en
-   mag er weer lucht in. `brandLight` blijft in gebruik als accent (chips, tonale knoppen), dus de
-   waarde verdwijnt niet uit het thema.
+   ingreep waar de hele variant op rust, en het is belangrijk om de reden goed te hebben. Het gaat
+   niet alleen om bereik in de oppervlakkenladder — de eigenlijke breker is dat **een slagschaduw
+   niet leest op een middentoon.** Schaduw is het gereedschap waarmee je één ding vóór de rest
+   zet, en juist dat gereedschap werkt niet op `#C5D4B6`. In B zijn beide kaarten wit; het
+   onderscheid komt uit schaduw en rand, en dat kan alleen op een lichte, neutrale grond.
+   `brandLight` blijft in gebruik als accent (chips, tonale knoppen), dus de waarde verdwijnt niet
+   uit het thema.
+
+   **Contrast gemeten (2026-09-07, WCAG 2.1, tekst op de achtergrond — de slechtste plek):** de
+   verwachte keerzijde blijkt een meevaller. Elke tekstkleur krijgt op papier méér ruimte, en de
+   twee die destijds speciaal voor brandLight zijn aangescherpt het meest.
+
+   | Token | op `#C5D4B6` | op `#FCFDF8` |
+   |---|---|---|
+   | `lightTextPrimary` `#1A2A20` | 9,65:1 | 14,72:1 |
+   | `lightTextSecondary` `#3A4A40` | 6,03:1 | 9,20:1 |
+   | `lightOnSurfaceVariant` `#414F45` | 5,54:1 | 8,46:1 |
+   | `lightTextTertiary` `#4C5C52` | 4,55:1 | 6,94:1 |
+   | `lightTextHint` `#4E5C54` | 4,51:1 | 6,89:1 |
+
+   De twee onderste zaten met de hakken over de sloot van 4,5 en hebben nu ruim twee punten lucht.
+   Dat is geen bijvangst maar bruikbaar materiaal: ze **mogen weer lichter**, en dat is precies de
+   marge die hiërarchie nodig heeft — blijft alle tekst even donker, dan is de vlakheid alleen van
+   kleur naar typografie verplaatst. Kanttekening: dit is berekend, niet gezien. Backlog #9 is op
+   Roboto gemeten en Outfit oogt lichter; controleer 11–12 punt op de Oppo vóór je iets lichter
+   zet.
 2. **De beste kaart krijgt echt gewicht:** wit, slagschaduw, en een 5px linkerrand in `brandDark`.
    De overige kaarten worden vlak met een haarlijn — géén tweede schaduw, anders is er weer geen
    eerste plek. Let op: `_buildRideCard` wikkelt de kaart nu in een `ClipRRect` voor de

@@ -72,14 +72,24 @@ geen 8% helderheidsverschil. Dáárom veranderde de MD3-ronde niets: de tokens k
 oppervlakkenladder had geen bereik om verschil mee te maken. B zet `lightSurface` op
 `surfaceContainerLowest` (`#FCFDF8`) en degradeert `brandLight` van behang naar accent.
 
-Twee dingen die gaan bijten en die je niet mag aannemen:
+Preciezer nog: het gaat niet alleen om bereik in de ladder. De eigenlijke breker is dat **een
+slagschaduw niet leest op een middentoon** — en schaduw is nu juist hét gereedschap om één ding
+vóór de rest te zetten. In B zijn beide kaarten wit en komt het onderscheid uit schaduw en rand,
+wat alleen kan op een lichte, neutrale grond.
 
-- **De contrastratio's uit backlog #9 zijn *op brandLight* gemeten.** `lightTextTertiary`
-  (`#4C5C52`) en `lightTextHint` (`#4E5C54`) zijn destijds juist donkerder gemaakt om het op groen
-  te halen; op papier worden ze onnodig zwaar. Opnieuw meten.
+Twee dingen om te weten voor je begint:
+
+- **De contrastvraag is gemeten en valt mee** (2026-09-07). De ratio's uit backlog #9 zijn op
+  brandLight gemeten, dus ze golden niet meer — maar élke tekstkleur krijgt op papier méér ruimte.
+  `lightTextTertiary` gaat van 4,55:1 naar 6,94:1 en `lightTextHint` van 4,51:1 naar 6,89:1. De
+  volledige tabel staat in de README van schets 001. **Gebruik die marge:** die twee mogen weer
+  lichter, en zonder dat verschil verplaats je de vlakheid alleen van kleur naar typografie.
+  Berekend, niet gezien — #9 is op Roboto gemeten en Outfit oogt lichter, dus 11–12 punt op de
+  Oppo controleren vóór je iets lichter zet.
 - **De beste kaart wil een slagschaduw, maar `_buildRideCard` wikkelt hem in een `ClipRRect`** voor
   de `Dismissible`, en die snijdt `elevation` weg — het commentaar in de code waarschuwt daar al
-  voor. De schaduw moet buiten die clip.
+  voor. De schaduw moet buiten die clip, zonder de swipe-to-schedule te breken. Dit is de enige
+  echt onzekere ingreep van de fase.
 
 Verder ongewijzigd geldig: de weerbalken zijn onleesbaar per constructie (ideaalzone `≤0,5 mm` op
 een schaal van `0–10 mm` is 5% van de balk), en de typografische schaal staat er wel maar wordt
