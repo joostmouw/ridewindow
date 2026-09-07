@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23 af — volgende: fase 24 of 25 kiezen"
+status: "Fase 25 op #63 na af — volgende: Play-release"
 last_updated: "2026-09-07T17:20:00.000Z"
 last_activity: 2026-09-07
 progress:
@@ -39,6 +39,14 @@ Peloton-kaarten. De volgende vraag is welke fase van v4.0 aan de beurt is:
 fase 24 (iconografie: het kledingadvies tekent nu losse Unicode-emoji, die op
 elk platform anders worden getekend) of fase 25 (de wrijving die op 2026-09-07
 is waargenomen, uitgeschreven in `EIGEN-GEZICHT.md`).
+
+**Fase 25 is af op één punt na.** Peloton-volgorde, de lege staat van "My
+rides", één route naar een rit, en al het Nederlands uit de Engelse interface
+(behalve waar geen `BuildContext` is: de Android-widget en de
+agenda-omschrijving). Open blijft **backlog #63** — de iPhone-tester die niet
+terugkomt uit het beschikbaarheidsscherm. Dat is niet op te lossen zonder
+iPhone; de knop bestáát in alle drie de takken, dus het is een
+safe-area-kwestie op iOS-standalone.
 
 **De Play-build loopt inmiddels ver achter.** Op het toestel staat 1.0.23+24,
 zónder Peloton en zónder iets van v4.0. Alle testers zien dus nog de app waar
