@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23: stap 1,2,4 klaar — rest is 3, 5, 6"
-last_updated: "2026-09-07T18:10:00.000Z"
+status: "Fase 23: 1,2,4,6 klaar — open: 3, 5, Profiel-kaarten"
+last_updated: "2026-09-07T14:30:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -19,7 +19,44 @@ progress:
 
 | Datum | Taak | Resultaat |
 |---|---|---|
-| 2026-09-07 | [home-papier-en-inkt](quick/20260907-home-papier-en-inkt/) | Fase 23 stap 1+2: achtergrond wordt papier, beste ritkaart licht op met een schaduw buiten de `ClipRRect`. Suite 479/479, analyze onveranderd. Openstaande vraag voor Joost in de SUMMARY: "Best choice" staat op de vroegste `Perfect`, niet op de hoogste score. |
+| 2026-09-07 | [home-papier-en-inkt](quick/20260907-home-papier-en-inkt/) | Fase 23 stap 1+2: achtergrond wordt papier, beste ritkaart licht op met een schaduw buiten de `ClipRRect`. |
+| 2026-09-07 | [weerbalken](quick/20260907-weerbalken/) | Stap 4: ingezoomd bereik plus een uitgeschreven oordeel (Dry/Calm/Ideal). Alleen de beste kaart houdt balken. |
+| 2026-09-07 | [sweep](quick/20260907-sweep/) | Stap 6: Agenda, Profiel-banner en Ride Detail naar papier. **Deels** — Profiel-kaarten per sectie staan nog open. |
+
+## Stand na 2026-09-07 — lees dit eerst voor v4.0
+
+**Fase 23 staat op stap 1, 2, 4 en 6.** Alles draait, is getest en staat live op
+**https://my-project-joost.web.app** (Firebase Hosting; `main.dart.js` heeft `no-cache`, dus daar
+volstaat een gewone herlaad). De Play-build loopt bewust achter op 1.0.23+24.
+
+**Open in fase 23, in volgorde van mijn voorkeur:**
+
+1. **Profiel: kaarten per sectie.** Joost heeft dit gekozen, het is niet gebouwd. `profile_screen.dart`
+   is een `ListView` van ~1200 regels met de secties als losse kinderen, deels achter
+   `if (isWebPlatform && …)` en met de sign-in-flow ertussen. Herstructurering, geen kleurwijziging —
+   verdient een eigen pass met eigen verificatie.
+2. **Stap 3** — de typografische schaal echt gebruiken.
+3. **Stap 5** — dagstrip en periodefilter rustiger.
+4. Kleiner: notificatie-toggles in Profiel ogen dood (M3-track uit het oude schema), Peloton-kaarten
+   missen hun haarlijn.
+
+**Wat een halve dag kostte en niet nog eens moet gebeuren.** Er zijn vier rondes gegaan naar
+vierkante hoeken bij het slepen. Drie oorzaken achter elkaar, en ik verifieerde elke keer verkeerd:
+
+- De `Card` rondt alleen zijn rústpositie af. Zodra een `Dismissible` hem verschuift bepaalt de
+  ouder de vorm → er hoort een `ClipRRect` ín de `Dismissible`, om de `Card` heen.
+- `Dismissible` knipt zijn eigen achtergrond kaarsrecht af tot het onthulde stuk. **Een gekleurd
+  vlak achter een veegbare kaart is daarom nooit rond te krijgen**, hoeveel radius je er ook op
+  zet. Beide zijn nu een icoon op de gewone achtergrond.
+- `Material.clipBehavior` staat standaard op `Clip.none`, dus de inkt van een `InkWell` vult de
+  rechthoek en niet de afgeronde vorm. Zichtbaar zodra je indrukt.
+
+En de procesles: ik testte in Chrome met synthetische pointer-events terwijl Joost naar een echt
+toestel keek — die gaven zichtbaar verschillende plaatjes. **Bij een klacht over aanraakgedrag
+verifieer je op het toestel.** De Oppo hangt aan adb; `input motionevent DOWN/MOVE/UP` laat je een
+sleep halverwege stilzetten, en dat is de enige manier om zo'n hoek te beoordelen. Draai de veeg
+terug vóór `UP`, anders wijzig je Joosts echte data (ik heb per ongeluk een rit ingepland en weer
+moeten verwijderen).
 
 ## Deferred Items
 

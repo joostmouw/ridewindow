@@ -4,9 +4,13 @@
 > Backlog-epic: **#64** in `BACKLOG.md`. Voorganger: v3.0, afgesloten — zie
 > `.planning/milestones/v3.0-CLOSEOUT.md`.
 >
-> **Stand in één zin:** het lettertype staat er, de hiërarchierichting is gekozen (schets 001,
-> variant B "Papier en inkt"), en wat rest is die richting in Dart uitvoeren — te beginnen bij de
-> omkering die alles draagt: de achtergrond is nu de merkkleur en moet papier worden.
+> **Stand in één zin (2026-09-07, eind van de dag):** variant B is uitgevoerd — de achtergrond is
+> papier, de beste kaart domineert, de weerbalken zijn leesbaar en de sweep is gedaan; wat rest is
+> stap 3 (typografie), stap 5 (dagstrip/filter) en de kaarten per sectie in Profiel.
+> **Begin bij het blok "Stand na 2026-09-07" in `STATE.md`** — daar staat ook wat een halve dag
+> kostte aan vierkante sleephoeken, zodat je die valkuilen niet opnieuw inloopt.
+>
+> Live: **https://my-project-joost.web.app**
 
 ## Waar deze epic over gaat, en waarom hij nodig is
 
