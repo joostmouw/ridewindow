@@ -232,7 +232,7 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
           );
           try {
             await ref.read(profileProvider.notifier).resetToDefaults();
-            await ref.read(availabilityProvider.notifier).clearAll();
+            await ref.read(availabilityProvider.notifier).resetForAccountSwitch();
             await ref.read(plannedRidesProvider.notifier).clearAll();
           } finally {
             availabilitySub.close();

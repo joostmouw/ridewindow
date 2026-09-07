@@ -161,6 +161,54 @@ void main() {
     });
 
     test(
+        'resetForAccountSwitch() wist de uren zonder tijdstempel en zonder '
+        'outbox-rij -- de cloudkopie van het nieuwe account blijft heel',
+        () async {
+      // Regressie voor het dataverlies van 2026-09-07. De "Start fresh"-tak
+      // van de accountwissel riep clearAll() aan, en die gaat via save():
+      // stempelt updatedAt op nu en enqueuet een upsert. Gevolg: de reconcile
+      // zag lokaal-leeg als nieuwer dan de cloud en haalde het echte rooster
+      // nooit terug, en de outbox duwde de leegte omhoog. Het weekrooster van
+      // een echte gebruiker is daarmee lokaal en server-side verdwenen.
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = AvailabilityRepository(
+        prefs,
+        outbox: db.syncOutboxDao,
+        userId: 'uid-1',
+      );
+
+      await repo.save({
+        DateTime(2026, 7, 27, 9): BlockType.work,
+        DateTime(2026, 7, 27, 10): BlockType.work,
+      });
+      expect(repo.readLocal(), hasLength(2));
+      expect(repo.readUpdatedAt(), isNotNull);
+
+      final beforeReset = (await db.syncOutboxDao.pendingRows()).length;
+
+      await repo.resetForAccountSwitch();
+
+      // Lokaal leeg, maar zonder tijdstempel: readUpdatedAt() moet null zijn,
+      // want daarop hangt de `local == null`-tak van
+      // CloudSyncReconciler._reconcileAvailability die de cloud-rij
+      // onvoorwaardelijk overneemt.
+      expect(repo.readLocal(), isEmpty);
+      expect(
+        repo.readUpdatedAt(),
+        isNull,
+        reason: 'een tijdstempel op "nu" laat lokaal-leeg de cloud verslaan',
+      );
+
+      // En geen enkele nieuwe outbox-rij: de leegte mag nooit omhoog.
+      expect(
+        (await db.syncOutboxDao.pendingRows()).length,
+        beforeReset,
+        reason: 'resetForAccountSwitch mag niets naar de cloud enqueuen',
+      );
+    });
+
+    test(
         'constructed without outbox/userId enqueues nothing and keeps '
         'existing local-write behaviour', () async {
       SharedPreferences.setMockInitialValues({});

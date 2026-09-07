@@ -137,4 +137,14 @@ class AvailabilityNotifier extends _$AvailabilityNotifier {
     await repo.save(const {});
     state = const AsyncData(<DateTime, BlockType>{});
   }
+
+  /// Wist de uren bij een accountwissel ("Start fresh"). Bewust géén
+  /// [clearAll]: die stempelt en enqueuet, en zou de serverdata van het
+  /// *nieuwe* account overschrijven met leegte. Zie
+  /// [AvailabilityRepository.resetForAccountSwitch] voor het volledige verhaal.
+  Future<void> resetForAccountSwitch() async {
+    final repo = await ref.read(availabilityRepositoryProvider.future);
+    await repo.resetForAccountSwitch();
+    state = const AsyncData(<DateTime, BlockType>{});
+  }
 }

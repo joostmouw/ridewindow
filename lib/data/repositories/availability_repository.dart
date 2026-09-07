@@ -101,6 +101,33 @@ class AvailabilityRepository {
   Future<void> stampUpdatedAt(DateTime value) =>
       _prefs.setInt(kUpdatedAtKey, value.millisecondsSinceEpoch);
 
+  /// Wist de lokale uren bij het wisselen van account ("Start fresh"), zónder
+  /// tijdstempel en zónder outbox-schrijving. Spiegelt
+  /// [ProfileRepository.resetToDefaults], die om dezelfde reden óók zijn
+  /// `updatedAt` weggooit.
+  ///
+  /// **Waarom dit niet gewoon `save(const {})` mag zijn** — die weg heeft op
+  /// 2026-09-07 het weekrooster van een echte gebruiker vernietigd, lokaal én
+  /// in de cloud. `save` stempelt standaard `updatedAt` op *nu* en enqueuet
+  /// standaard een upsert. Twee gevolgen die elkaar versterken: de reconcile
+  /// adopteert de cloud-rij alleen als die nieuwer is dan lokaal, dus een
+  /// zojuist op "nu" gezette lege stand wint altijd en de cloudkopie wordt
+  /// nooit meer teruggehaald; en de outbox duwt diezelfde lege stand bij de
+  /// eerstvolgende drain omhoog, waarmee de cloudkopie ook echt weg is. Op de
+  /// Supabase-free-tier bestaat geen backup (zie CLAUDE.md), dus dat is
+  /// definitief.
+  ///
+  /// "Start fresh" betekent *"neem de data van het vorige account niet mee op
+  /// dit toestel"*. Het mag nooit betekenen *"gooi de serverdata van het
+  /// nieuwe account weg"*. Door beide sleutels te verwijderen is `readUpdatedAt()`
+  /// weer `null`, en neemt `CloudSyncReconciler._reconcileAvailability` via zijn
+  /// `local == null`-tak de cloud-rij onvoorwaardelijk over — precies wat het
+  /// profiel al deed en waarom dát wél terugkwam.
+  Future<void> resetForAccountSwitch() async {
+    await _prefs.remove(kBlockedHoursKey);
+    await _prefs.remove(kUpdatedAtKey);
+  }
+
   /// Geeft het epoch-ms tijdstip van de laatste [save]-aanroep, of `null` als
   /// dat veld nog nooit geschreven is.
   ///
