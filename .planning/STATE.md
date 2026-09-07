@@ -1,8 +1,8 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.1
+milestone: v4.0
 milestone_name: Eigen gezicht
-status: "v3.0 gesloten; v3.1 gestart met Outfit + score"
+status: "v4.0 Eigen gezicht — start bij EIGEN-GEZICHT.md"
 last_updated: "2026-09-07T11:10:00.000Z"
 last_activity: 2026-09-06
 progress:
