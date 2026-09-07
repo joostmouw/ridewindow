@@ -59,7 +59,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 - [ ] **Phase 19: Auth** - Google Sign-In via Supabase `signInWithIdToken`, sign-out, cross-restart persistence, and a shared native/web bootstrap that reuses — rather than races — the existing Calendar integration's init gate
 - [x] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement (20-01 through 20-05 complete 2026-07-31) (completed 2026-07-31)
 - [ ] **Phase 21: Sync + migration** - Postgres sync of profile/availability/planned rides, an offline outbox, first-login and second-device conflict handling, row-level security, and account deletion
-- [ ] **Phase 22: Account-backed feedback** - In-app feedback (signed-in or anonymous) carrying scoring context, replacing the `mailto:` flow
+- [x] **Phase 22: Account-backed feedback** - In-app feedback (signed-in or anonymous) carrying scoring context, replacing the `mailto:` flow
 
 ## Phase Details
 
@@ -256,6 +256,6 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 19. Auth | v3.0 | 7/7 | Complete   | 2026-09-07 |
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
 | 21. Sync + migration | v3.0 | 14/14 | Complete   | 2026-09-02 |
-| 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
+| 22. Account-backed feedback | v3.0 | 1/1 | Complete   | 2026-09-07 |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).

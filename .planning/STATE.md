@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Accounts & Sociaal
-status: "Peloton: rit landt nu bij genodigde; maatjeslijst open"
-last_updated: "2026-09-07T09:50:00.000Z"
+status: "v3.0 bijna dicht: 0004 draaien + maatjeslijst-bug"
+last_updated: "2026-09-07T10:40:00.000Z"
 last_activity: 2026-09-06
 progress:
   total_phases: 5
