@@ -65,20 +65,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// null = toon alle slots; non-null = filter op dag.
   DateTime? _selectedDay;
 
-  /// Welke niet-beste ritkaarten hun volle weerbalken tonen, op begintijd.
+  /// Ritkaarten die de gebruiker zélf open of dicht heeft gezet, op begintijd.
   ///
-  /// De beste kaart staat altijd open; die staat hier nooit in. Joost's
-  /// verzoek (2026-09-07): *"ik wil dat je alle kleinere tijdvakken ook kan
-  /// openklikken zodat ze ook zo groot worden als het ideaal voorgestelde
-  /// tijdvak."* De compacte regel blijft de rusttoestand — drie volle balken op
-  /// élke kaart is precies waarom de lijst als één massa las — maar wie de
-  /// cijfers achter een kaart wil zien hoeft daarvoor niet meer naar het
-  /// detailscherm.
+  /// Bewust een `Map` en geen `Set`, want er zijn drie toestanden en geen twee:
+  /// niet aangeraakt (volg de standaard), expliciet open, expliciet dicht. De
+  /// standaard is de beste kaart open en de rest dicht — de compacte regel is
+  /// de rusttoestand, want drie volle balken op élke kaart is precies waarom de
+  /// lijst als één massa las.
+  ///
+  /// **Élke kaart kan open én dicht, ook de beste.** In de eerste versie stond
+  /// de beste permanent open; Joost merkte terecht op dat één kaart die als
+  /// enige niet gehoorzaamt aan een interactie die alle andere wél hebben, geen
+  /// keuze is maar een half afgemaakte feature.
   ///
   /// `slot.start` is de sleutel omdat een `RideSlot` geen id heeft en de lijst
   /// bij elke weerverversing opnieuw wordt opgebouwd; de begintijd overleeft
-  /// dat en een index niet.
-  final Set<DateTime> _expandedSlots = {};
+  /// dat en een index niet — anders staat na een refresh een ándere kaart open
+  /// dan die je hebt aangetikt.
+  final Map<DateTime, bool> _cardExpanded = {};
 
   /// Dagdeel filter: ochtend (6-12), middag (12-17), avond (17-22).
   /// Standaard: alle drie actief (geen filtering).
@@ -1097,6 +1101,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // niet langer een compromis met een detail hoeft te sluiten.
     final radius = BorderRadius.circular(_rideCardRadius);
 
+    // Standaard: de beste open, de rest dicht. Zodra de gebruiker zelf een
+    // kaart heeft aangetikt wint die keuze — ook op de beste kaart.
+    final isExpanded = _cardExpanded[slot.start] ?? isBest;
+
     // Alle kaarten dezelfde marge. De beste kaart had er onderaan extra, omdat
     // zijn slagschaduw anders over de kaart eronder viel; die schaduw is er
     // niet meer (zie hieronder), dus die uitzondering ook niet.
@@ -1308,53 +1316,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ],
                             ),
                             const SizedBox(height: 14),
-                            // De beste kaart staat altijd open met de volle
-                            // balken; de rest staat dicht op één compacte regel.
-                            // Drie balken op élke kaart is de reden dat de lijst
-                            // als één massa las — dat was op de schets meteen te
-                            // zien — dus dat blijft de rusttoestand.
+                            // Open toont de volle balken, dicht één compacte
+                            // regel. De beste kaart begint open en de rest
+                            // dicht, maar dat is een startwaarde en geen wet:
+                            // elke kaart kan beide kanten op.
                             //
-                            // Maar dicht is nu geen eindstation meer: tik op de
-                            // regel en de kaart klapt open tot dezelfde balken
-                            // als de beste. De tik op de kaart zelf gaat nog
-                            // steeds naar het detailscherm; de binnenste
-                            // `InkWell` wint de hit-test, dus die twee bijten
-                            // elkaar niet.
+                            // `AnimatedCrossFade` en niet `AnimatedSize` met
+                            // een omgewisseld kind: die laatste liet de inhoud
+                            // hard verspringen terwijl alleen de hoogte
+                            // meebewoog. Hier vervagen de twee in elkaar
+                            // terwijl de hoogte meeloopt — één beweging in
+                            // plaats van twee die langs elkaar heen lopen.
+                            //
+                            // De tik op de kaart zelf gaat nog steeds naar het
+                            // detailscherm; de `InkWell` van de chevron wint de
+                            // hit-test, dus die twee bijten elkaar niet.
                             if (avgTemp != null ||
                                 totalPrecip != null ||
-                                avgWind != null)
-                              AnimatedSize(
-                                duration: AppMotion.spatialDuration,
-                                curve: AppMotion.spatialCurve,
+                                avgWind != null) ...[
+                              AnimatedCrossFade(
+                                duration: AppMotion.emphasizedDuration,
+                                sizeCurve: AppMotion.emphasizedCurve,
+                                firstCurve: AppMotion.emphasizedCurve,
+                                secondCurve: AppMotion.emphasizedCurve,
                                 alignment: Alignment.topCenter,
-                                child: (isBest ||
-                                        _expandedSlots.contains(slot.start))
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          _buildWeatherBars(
-                                            avgTemp: avgTemp,
-                                            totalPrecip: totalPrecip,
-                                            avgWind: avgWind,
-                                          ),
-                                          if (!isBest)
-                                            _buildExpandToggle(
-                                              slot,
-                                              expanded: true,
-                                            ),
-                                        ],
-                                      )
-                                    : _buildExpandToggle(
-                                        slot,
-                                        expanded: false,
-                                        summary: _buildWeatherSummary(
-                                          avgTemp: avgTemp,
-                                          totalPrecip: totalPrecip,
-                                          avgWind: avgWind,
-                                        ),
-                                      ),
+                                crossFadeState: isExpanded
+                                    ? CrossFadeState.showFirst
+                                    : CrossFadeState.showSecond,
+                                firstChild: _buildWeatherBars(
+                                  avgTemp: avgTemp,
+                                  totalPrecip: totalPrecip,
+                                  avgWind: avgWind,
+                                ),
+                                secondChild: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 2),
+                                  child: _buildWeatherSummary(
+                                    avgTemp: avgTemp,
+                                    totalPrecip: totalPrecip,
+                                    avgWind: avgWind,
+                                  ),
+                                ),
                               ),
+                              _buildExpandToggle(slot, expanded: isExpanded),
+                            ],
                             const SizedBox(height: 14),
                             // Footer: Plan het knop
                             Align(
@@ -1436,18 +1441,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// af zit, en dat is een vraag die je alleen stelt over de rit die je
   /// overweegt. Voor de rest volstaat het oordeel \u2014 dat is precies het woord
   /// dat de balk hierboven ook al draagt.
-  /// Het open-/dichtklapvlak van een niet-beste ritkaart.
+  /// De open-/dichtklapknop van een ritkaart. Staat onder de weerinhoud en is
+  /// op élke kaart hetzelfde — ook op de beste.
   ///
-  /// Dicht is het de compacte weerregel mét een chevron erachter, zodat de
-  /// regel zélf de knop is — een losse knop naast een regel die al de hele
-  /// breedte vult, zou er een tweede ding bij zetten waar er één nodig is.
-  /// Open is het alleen de chevron, gecentreerd onder de balken, want daar is
-  /// de inhoud eboven al het antwoord.
-  Widget _buildExpandToggle(
-    RideSlot slot, {
-    required bool expanded,
-    Widget? summary,
-  }) {
+  /// Eén chevron die draait in plaats van twee iconen die elkaar vervangen:
+  /// bij een wissel springt het beeld, bij een draai zie je waar de beweging
+  /// heen gaat. Dat is dezelfde gedachte als de kruisvervaging van de inhoud
+  /// erboven, en het is wat Material bedoelt met een overgang die begint en
+  /// eindigt op het scherm.
+  Widget _buildExpandToggle(RideSlot slot, {required bool expanded}) {
     final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
 
@@ -1460,26 +1462,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         borderRadius: BorderRadius.circular(8),
         onTap: () {
           HapticFeedback.selectionClick();
-          setState(() {
-            if (expanded) {
-              _expandedSlots.remove(slot.start);
-            } else {
-              _expandedSlots.add(slot.start);
-            }
-          });
+          setState(() => _cardExpanded[slot.start] = !expanded);
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            children: [
-              if (summary != null) Expanded(child: summary) else const Spacer(),
-              Icon(
-                expanded ? Icons.expand_less : Icons.expand_more,
+        child: SizedBox(
+          height: 28,
+          child: Center(
+            child: AnimatedRotation(
+              turns: expanded ? 0.5 : 0.0,
+              duration: AppMotion.emphasizedDuration,
+              curve: AppMotion.emphasizedCurve,
+              child: Icon(
+                Icons.expand_more,
                 size: 20,
                 color: cs.onSurfaceVariant,
               ),
-              if (summary == null) const Spacer(),
-            ],
+            ),
           ),
         ),
       ),

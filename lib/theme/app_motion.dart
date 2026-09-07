@@ -70,6 +70,21 @@ class AppMotion {
     damping: 40.0,
   );
 
+  // -- Emphasized easing: voor transities, niet voor componenten ----------
+
+  /// M3's "emphasized" easing, voor een overgang die op het scherm begínt én
+  /// eíndigt — een kaart die open- of dichtklapt is daar het schoolvoorbeeld
+  /// van. Material 3 houdt hiervoor bewust de klassieke easing aan; de
+  /// spring-fysica hierboven is voor cómponenten (een chip die selecteert, een
+  /// kaart die indrukt), niet voor het onthullen van inhoud.
+  ///
+  /// **Gebruik hier geen [SpringCurve].** Beide springs in dit bestand zijn
+  /// onderkritisch gedempt en schieten dus door tot boven 1.0 — precies wat ze
+  /// levendig maakt op positie en schaal. Op een opacity-animatie is dat een
+  /// gefaalde assert (`Opacity` eist 0..1), en `AnimatedCrossFade` stuurt zijn
+  /// curves nu juist naar opacity.
+  static const emphasizedCurve = Cubic(0.2, 0.0, 0.0, 1.0);
+
   // -- Durations ---------------------------------------------------------
   // Springs are time-independent, but AnimatedContainer/TweenAnimationBuilder
   // need a duration. These are generous enough for the spring to settle.
@@ -82,6 +97,10 @@ class AppMotion {
 
   /// Duration for effects spring animations (opacity, color).
   static const effectsDuration = Duration(milliseconds: 350);
+
+  /// Hoort bij [emphasizedCurve] — M3's 500ms voor een overgang die op het
+  /// scherm begint en eindigt.
+  static const emphasizedDuration = Duration(milliseconds: 500);
 
   /// Short micro-interaction (press feedback).
   static const microDuration = Duration(milliseconds: 150);
