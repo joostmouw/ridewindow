@@ -216,6 +216,10 @@ uur werk, zinvol pas als Peloton in een Play-build zit.
 - Namen worden gedenormaliseerd gekopieerd bij accepteren; wie later zijn naam wijzigt, blijft bij
   bestaande uitnodigingen onder de oude naam staan. Bewust, maar het wordt zichtbaar zodra iemand
   het opmerkt.
-- **Volgende feature-slice**: het snijvlak van beider beschikbaarheid ("wanneer kunnen wij allebei"),
-  met de weerscore eroverheen. Dat vereist dat A B's rooster mag lezen — de zwaarste RLS-vraag van
-  de epic, en de reden dat hij bewust nog niet gebouwd is.
+- **Volgende feature-slices staan nu uitgewerkt als epic #65 in `BACKLOG.md`** ("Peloton v2"),
+  afgeleid uit een vergelijking met Partiful, Komoot, Howbout en Strava. Kern: nodig niet uit voor
+  één rit maar voor de best scorende vensters van de week, en laat iemand meekijken zónder account.
+  De volgorde begint bij de twee gaten hierboven — een geaccepteerde rit die nergens zichtbaar is,
+  en de eenzijdige maatjeslijst. Het snijvlak van beider beschikbaarheid ("wanneer kunnen wij
+  allebei") is daar slice 3; dat vereist dat A B's rooster mag lezen, de zwaarste RLS-vraag van het
+  geheel, en is de reden dat het bewust nog niet gebouwd is.

@@ -100,6 +100,7 @@ Ideen die pas relevant worden als v1+v2 gevalideerd zijn.
 |---|------|--------|--------|--------|
 | 62 | **Epic "Peloton" — vrienden + gezamenlijke ride windows** — overkoepelende richting waar #41 en #48 onder vallen; zie de uitgewerkte sectie onderaan | HOOG | XL | Backlog — epic, nog geen scope |
 | 64 | **Epic "Eigen gezicht" — merkidentiteit: typografie, iconografie en emoji die van deze app zijn** — het logo bestaat al en is het vertrekpunt; zie de uitgewerkte sectie onderaan | HOOG | L | Backlog — epic, nog geen scope |
+| 65 | **Epic "Peloton v2" — samen plannen zoals de goede apps het doen** — uitnodigen voor geschoorde vensters in plaats van één vast moment, meekijken zonder account, en maatjes vinden via gebruikersnaam. Afgeleid uit Partiful, Komoot, Howbout en Strava; zie de uitgewerkte sectie onderaan | HOOG | XL | Backlog — epic, volgorde vast, scope per slice open |
 | 40 | **Wear OS companion** — tile/complication die volgende slot toont op smartwatch | MEDIUM | L | Backlog |
 | 41 | **Sociaal / groepsritten** — "Wanneer kunnen wij allemaal?" met gedeelde beschikbaarheid. Tester-verduidelijking (Jacco, Phase 15 iPhone-test): concreter, kleiner startpunt zou zijn iemand uitnodigen voor één specifieke rit, die persoon accepteert en ziet 'm terug in zijn eigen app — evt. uitgebreid met het zien van elkaars beschikbaarheid om een overlap te vinden | MEDIUM | XL | Backlog — opgenomen in milestone v3.0, zie `.planning/milestones/v3.0-ACCOUNTS.md` |
 | 48 | **Lokale ride-matching** — gebruikers in dezelfde omgeving die zich voor hetzelfde slot aanmelden kunnen samen een rit plannen | MEDIUM | XL | Backlog |
@@ -269,3 +270,119 @@ een verzameling losse smaken op.
 **Samenhang.** Raakt de MD3-herontwerpplannen (zie het geheugenitem "MD3 visual redesign") en
 #58/#59 zijdelings: `clothing_tip.dart` bevat naast emoji ook Nederlandse labels ("kort/kort") in
 een verder Engelse app, dus wie dit bestand toch openlegt kan die hardcoded taal meteen meenemen.
+
+---
+
+## 65 — Epic "Peloton v2": samen plannen zoals de goede apps het doen
+
+Vervolg op [[62]], opgesteld 2026-09-07 na een vergelijking van vier apps die dit probleem al hebben
+opgelost. Volgorde ligt vast, scope per slice niet.
+
+### Het uitgangspunt: wat wij kunnen en zij niet
+
+Partiful, Komoot, Howbout en Strava plannen allemaal **een moment**. Geen van vier weet of dat
+moment goed weer is om te fietsen. Dat is precies wat deze app als enige kan, en daar hoort de
+sociale laag omheen te zitten. De richtinggevende zin van deze epic:
+
+> **Nodig niet uit voor één rit, maar voor de beste vensters van deze week.** De eigenaar vinkt twee
+> of drie geschoorde vensters aan ("za 09:00–13:00 — Perfect", "zo 07:00–09:00 — Great"), de maatjes
+> vinken aan wat hen past, en de app bevestigt het hoogst scorende venster dat iedereen kan.
+
+Dat is Partiful's datumpoll × Howbout's beschikbaarheidsoverlap × onze weerscore. De eerste twee
+kunnen die derde stap niet zetten. Het leunt bovendien op de bestaande `SlotGenerator` in plaats van
+op iets nieuws — de kandidaten zijn gewoon de best scorende slots.
+
+### Wat we van wie overnemen
+
+| App | Wat zij doen | Wat wij ervan nemen |
+|---|---|---|
+| **Partiful** | Uitnodiging opent in de browser, gast reageert met alleen een naam — geen account, geen installatie. Meerdere datumopties, gasten vinken meerdere aan | Slice 1 en 2 hieronder. Dit is de grootste bereikwinst én de zwaarste ingreep |
+| **Komoot** | Group Tours: deelnemers via QR (ook printbaar, voor een terugkerende clubrit), via wie je volgt of via een link. Past de eigenaar de route aan, dan krijgt iedereen dat direct | Slice 4 (wijziging propageert met melding) en slice 6 (QR). Het datamodel kan de eerste al — één gedeelde rit, keuze 2 uit [[62]] — er is alleen geen melding |
+| **Howbout** | 10M gebruikers, puur hierop gebouwd: zie meteen wanneer vrienden vrij zijn, met Google/Outlook/iCloud eroverheen zodat niets botst. Stemmen over tijden | Slice 3. Bevestigt dat het snijvlak van roosters de kern is en geen extraatje — dat stond al als [[41]] |
+| **Strava** | Herkent achteraf dat jullie samen reden en koppelt de activiteiten. Clubs als vaste groep naast losse vrienden | Later: clubs (slice 7). De automatische koppeling achteraf vereist opgenomen ritten en die heeft deze app niet |
+
+### Volgorde
+
+**Slice 0 — eerst dichten wat kapot is.** Geen van het onderstaande heeft zin zolang deze twee open
+staan; beide zijn op 2026-09-07 op een toestel vastgesteld en staan uitgewerkt in
+`.planning/PELOTON.md`:
+
+- Een **geaccepteerde rit is bij de genodigde nergens zichtbaar** — niet in "My rides", niet op
+  Home, niet op de Peloton-tab. De belofte "de rit verschijnt bij de ander" is daarmee nog niet
+  waar. Dit is het echte gat.
+- **Profielzichtbaarheid klopt niet**: B ziet A in zijn maatjeslijst, A ziet B niet. Oorzaak nog
+  onbekend, kandidaten en de beslissende query staan in `PELOTON.md`. Wie onzichtbaar is in een
+  maatjeslijst, is ook onvindbaar via gebruikersnaam of contacten — dit is de fundering onder
+  slice 5.
+
+**Slice 1 — meekijken zonder account** (Partiful). Vandaag moet je maatje eerst een account maken
+voordat hij weet waarvoor hij wordt uitgenodigd. Dit draait dat om: `/invite/:code` toont de rit
+mét weerscore en de "wat trek je aan"-tip, en hij kan reageren; een account is pas nodig als hij de
+app zelf wil gebruiken. **Dit is architectureel de zwaarste stap:** alle RLS gaat nu uit van
+`authenticated`, dus er moet een pad komen waarin een niet-ingelogde bezoeker precies één rit mag
+zien en precies één antwoord mag geven, op grond van een token in de URL — en niets anders. Dat is
+een eigen security-ontwerp, geen policy-aanpassing onderweg.
+
+**Slice 2 — meerdere vensters voorleggen.** Het idee uit het uitgangspunt. Bouwt op slice 1 (ook
+gasten moeten kunnen stemmen) en op de bestaande slot-generator.
+
+**Slice 3 — "wanneer kunnen wij allebei"** (Howbout, was [[41]]). Het snijvlak van beider roosters
+met de weerscore eroverheen. Vereist dat A B's beschikbaarheid mag lezen: de zwaarste RLS-vraag van
+het hele epic, en de reden dat dit bewust nog niet gebouwd is. Beschikbaarheid wordt hiermee gedeelde
+data, dus het privacybeleid moet mee.
+
+**Slice 4 — verzet de eigenaar de tijd, dan weet iedereen het** (Komoot). Het model kan dit al;
+wat ontbreekt is de notificatie. Raakt de bestaande `flutter_local_notifications`-laag.
+
+**Slice 5 — maatjes vinden** *(keuze van Joost, 2026-09-07)*. De deel-link blijft altijd bestaan.
+Daarnaast, in deze volgorde:
+
+- **Gebruikersnaam + zoeken.** Je kiest zelf een unieke handle; anderen zoeken daarop. Opt-in, en je
+  e-mailadres komt er nooit aan te pas — dat laatste is de reden dat zoeken op e-mailadres eerder is
+  afgewezen ([[62]]): daarmee kun je uitproberen welke adressen een account hebben, en dat lek dicht
+  je achteraf niet. **Let op de consequentie:** vandaag is vriend worden meteen definitief, en dat
+  mag omdat de code een gedeeld geheim is. Zodra iemand je kan vínden, vervalt die aanname en is een
+  **verzoek-en-accepteren-stap nodig** — anders zet een willekeurige vreemde zichzelf in je lijst.
+  Vereist verder: een `handle`-kolom op `profiles` met uniciteit (hoofdletterongevoelig), een
+  zoek-RPC die alleen naam en handle teruggeeft, en snelheidsbegrenzing.
+- **Contacten matchen.** Joost wil dit expliciet. Bewust achteraan: het vraagt contacten-permissie,
+  hashing die niet triviaal terug te rekenen is (een kale SHA-256 van een telefoonnummer is dat wél,
+  de zoekruimte is klein), een aparte alinea in het privacybeleid en een extra verklaring in Play's
+  Data Safety. En het levert pas iets op als er genoeg gebruikers zijn — met een handvol testers
+  matcht het niets.
+- **QR-code** (Komoot). Goedkoop en meteen nuttig als je naast elkaar staat: de code en de
+  `/invite/:code`-route bestaan al, er komt alleen een scherm met een QR en een scanner bij.
+
+**Slice 6 — ga / misschien / kan niet.** Alle vier de apps hebben drie toestanden; wij hebben er
+twee (`accepted`/`declined`, plus `invited`). "Misschien" is precies het antwoord dat mensen willen
+geven als het weer nog kan omslaan — bij deze app dus extra relevant.
+
+**Slice 7 — clubs** (Strava). Een vaste groep in plaats van losse maatjes, voor de dinsdagochtendrit.
+Pas zinvol als slice 1 t/m 3 staan.
+
+### Wat we bewust niet overnemen
+
+- **Chat per rit** (Howbout). WhatsApp heeft dat gewonnen. Bouw liever een goede deelknop
+  dáárnaartoe — de app deelt nu al een tekst met code en link via `Share.share`.
+- **Challenges en ranglijsten** (Strava). Andere app, andere missie. Dit gaat over "wanneer kan ik
+  rijden", niet over wie het hardst ging.
+- **Live tracking tijdens de rit** (Komoot, Strava). Batterij, privacy, en het valt buiten de
+  kernwaarde.
+
+### Randvoorwaarden die over de hele epic gelden
+
+- **€0/maand.** Notificaties naar deelnemers mogen geen betaalde push-dienst vereisen; blijf bij
+  lokale notificaties plus de bestaande Supabase-vrije-laag zolang dat kan.
+- **De 100-user OAuth-cap ([[31]])** wordt hier pijnlijk: een sociale feature waarvan het nut groeit
+  met het aantal deelnemers, botst op een lifetime-cap van 100 unieke Google-gebruikers zolang de
+  `calendar.events`-scope niet formeel geverifieerd is. Slice 1 verzacht dit deels, want een gast
+  heeft geen Google-login nodig.
+- **Het privacybeleid loopt achter.** Sinds [[62]] ziet een maatje al je naam en de ritten waarvoor
+  je uitgenodigd bent, en dat staat er nog niet in. Slice 3 (gedeelde beschikbaarheid) en slice 5
+  (contacten) maken die achterstand groter, niet kleiner.
+
+**Bronnen:** [Komoot Group Tours](https://support.komoot.com/hc/en-us/articles/360022828232-How-to-create-a-group-Tour-and-invite-people-to-it),
+[Komoot QR-uitnodiging](https://support.komoot.com/hc/en-us/articles/6382678428698-Invite-participants-with-QR-code-to-a-group-Tour),
+[Partiful RSVP](https://help.partiful.com/en-us/articles/15525505-how-do-i-rsvp-to-an-event-on-partiful),
+[Partiful](https://partiful.com/), [Howbout](https://howbout.app/),
+[Strava Group Activities](https://support.strava.com/hc/en-us/articles/216919497-Group-Activities).
