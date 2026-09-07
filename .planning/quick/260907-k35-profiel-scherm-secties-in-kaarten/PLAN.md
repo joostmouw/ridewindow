@@ -4,7 +4,7 @@ slug: profiel-scherm-secties-in-kaarten
 date: 2026-09-07
 milestone: v4.0
 phase: 23
-status: in-progress
+status: complete
 ---
 
 # Profiel: kaarten per sectie

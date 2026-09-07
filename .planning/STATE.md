@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23: 1,2,4,6 klaar — open: 3, 5, Profiel-kaarten"
-last_updated: "2026-09-07T14:30:00.000Z"
+status: "Fase 23: 1,2,4,6 + Profiel-kaarten klaar — open: 3, 5"
+last_updated: "2026-09-07T17:20:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -22,6 +22,7 @@ progress:
 | 2026-09-07 | [home-papier-en-inkt](quick/20260907-home-papier-en-inkt/) | Fase 23 stap 1+2: achtergrond wordt papier, beste ritkaart licht op met een schaduw buiten de `ClipRRect`. |
 | 2026-09-07 | [weerbalken](quick/20260907-weerbalken/) | Stap 4: ingezoomd bereik plus een uitgeschreven oordeel (Dry/Calm/Ideal). Alleen de beste kaart houdt balken. |
 | 2026-09-07 | [sweep](quick/20260907-sweep/) | Stap 6: Agenda, Profiel-banner en Ride Detail naar papier. **Deels** — Profiel-kaarten per sectie staan nog open. |
+| 2026-09-07 | [profiel-secties-in-kaarten](quick/260907-k35-profiel-scherm-secties-in-kaarten/) | Profiel-kaarten per sectie (het laatste scherm zonder papier-behandeling), plus Joost's twee punten over Home. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -31,14 +32,20 @@ volstaat een gewone herlaad). De Play-build loopt bewust achter op 1.0.23+24.
 
 **Open in fase 23, in volgorde van mijn voorkeur:**
 
-1. **Profiel: kaarten per sectie.** Joost heeft dit gekozen, het is niet gebouwd. `profile_screen.dart`
-   is een `ListView` van ~1200 regels met de secties als losse kinderen, deels achter
-   `if (isWebPlatform && …)` en met de sign-in-flow ertussen. Herstructurering, geen kleurwijziging —
-   verdient een eigen pass met eigen verificatie.
-2. **Stap 3** — de typografische schaal echt gebruiken.
-3. **Stap 5** — dagstrip en periodefilter rustiger.
-4. Kleiner: notificatie-toggles in Profiel ogen dood (M3-track uit het oude schema), Peloton-kaarten
-   missen hun haarlijn.
+1. **Stap 3** — de typografische schaal echt gebruiken.
+2. **Stap 5** — dagstrip en periodefilter rustiger.
+3. Kleiner: Peloton-kaarten missen hun haarlijn.
+
+**Afgerond op 2026-09-07, tweede sessie** (zie
+`quick/260907-k35-profiel-scherm-secties-in-kaarten/SUMMARY.md`):
+Profiel-kaarten per sectie; de beste kaart op Home draagt nog maar één markering
+(pil, geen staaf en geen schaduw — Joost's keuze op een HTML-specimen); het
+planned-blauw op Home is gelijkgetrokken met de agendacel; de notificatie-toggles
+ogen niet meer dood (`switchTheme` miste `trackOutlineColor`).
+
+**Nieuw geleerd:** Chrome scrollt de Flutter-canvas niet met synthetische
+wielgebeurtenissen. Wil je een scherm voorbij de eerste viewport beoordelen, dan
+is dat het toestel — net als bij aanraakgedrag.
 
 **Wat een halve dag kostte en niet nog eens moet gebeuren.** Er zijn vier rondes gegaan naar
 vierkante hoeken bij het slepen. Drie oorzaken achter elkaar, en ik verifieerde elke keer verkeerd:
