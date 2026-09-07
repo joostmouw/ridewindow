@@ -36,10 +36,18 @@ class SettingsSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
             child: Text(
-              title,
+              // De kop wordt hier gekapitaliseerd, niet in de vertaling. Acht
+              // van de negen `section*`-strings stonden al in kapitalen in de
+              // `.arb` en `sectionAccount` niet -- die viel er zichtbaar uit
+              // zodra de secties kaarten werden. Kapitalisatie is een
+              // presentatiekeuze en hoort dus hier; op een string die al
+              // schreeuwt verandert dit niets, dus de vertalingen konden met
+              // rust blijven.
+              title.toUpperCase(),
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: cs.primary,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 0.6,
                   ),
             ),
           ),

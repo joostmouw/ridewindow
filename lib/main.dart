@@ -226,6 +226,17 @@ ThemeData _buildTheme(Brightness brightness) {
         }
         return colorScheme.surfaceContainerHighest;
       }),
+      // Zonder deze rand is een uitgeschakelde schakelaar een randloze olijf-
+      // vlek: op de papieren achtergrond van v4.0 leest hij dan niet als "uit"
+      // maar als "kapot". Material 3 schrijft de omtrek voor en die ontbrak --
+      // vandaar dat de notificatie-toggles in Profiel dood ogen. Aan verdwijnt
+      // hij, want daar draagt de gevulde track de staat al.
+      trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.transparent;
+        }
+        return colorScheme.outline;
+      }),
     ),
   );
 }
