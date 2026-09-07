@@ -44,7 +44,19 @@ niet-geselecteerde preset-tegel gebruikte óók `colorScheme.surface` en zou dus
 geworden — een wijziging aan precies het scherm dat ongemoeid moest blijven. Nu expliciet
 `brandLight`.
 
-## Gevonden, niet gerepareerd — "Best choice" staat op de verkeerde kaart
+## Gevonden én gerepareerd — "Best choice" stond op de verkeerde kaart
+
+> **Bijgewerkt 2026-09-07:** Joost heeft beslist (hoogste score wint) en de fix zit in `0eee226`.
+> De analyse hieronder blijft staan omdat ze verklaart hoe dit zo lang onopgemerkt kon blijven.
+> Bij gelijke score wint de vroegste rit. De keuze zit nu in `indexOfBestSlot` naast `RideSlot`,
+> met vijf tests — waaronder letterlijk de situatie van vandaag.
+>
+> **Kosten een kwartier, dus onthouden:** na een `flutter build web --release` toont een gewone
+> herlaad in Chrome nog de óúde bundel uit de geheugencache. Geen service worker, geen
+> HTTP-cachekop — `caches.keys()` was leeg en `getRegistrations()` gaf nul. Alleen ⌘⇧R hielp. Ik
+> heb daardoor even geconcludeerd dat mijn code fout was terwijl hij goed was. Bij het beoordelen
+> van een verse web-build dus altijd hard herladen.
+
 
 Op de web-build draagt de kaart met score **99** het "Best choice"-label, terwijl de kaart
 eronder **100** scoort. Dat is geen regressie van deze taak; het zit in `_buildCardsSliver`:
