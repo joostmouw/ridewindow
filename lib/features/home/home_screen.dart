@@ -642,26 +642,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ),
               ),
               const SizedBox(height: 2),
+              // Het dagnummer draagt dezelfde kleur als het streepje eronder:
+              // de dag néémt de kleur van zijn beste rit over in plaats van
+              // hem alleen als randje mee te krijgen. Joost's keuze
+              // (2026-09-07) toen bleek dat één streepje van 3px te weinig was
+              // om het verschil tussen een perfecte en een goede dag te zien.
+              //
+              // Dit blijft één kanaal, geen twee: kleur is kwaliteit, en
+              // selectie is nog steeds uitsluitend de vulling. Alle vier de
+              // tierkleuren zijn donker (#1B5E20, #006457, #A42E0A, #585858),
+              // dus dit kost geen leesbaarheid op papier.
               Text(
                 '${day.day}',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: cs.onSurface,
+                      color: qualityColor,
                       fontWeight:
                           isSelected ? FontWeight.w800 : FontWeight.w600,
                     ),
               ),
               const SizedBox(height: 5),
-              // De kwaliteit van de dag: 3px, in de tierkleur, en verder niets.
-              // Genoeg om een goede dag te vinden zonder dat zeven vlakken het
-              // scherm overnemen.
-              AnimatedContainer(
-                duration: AppMotion.effectsDuration,
-                curve: AppMotion.effectsCurve,
-                height: 3,
-                width: 18,
-                decoration: BoxDecoration(
-                  color: qualityColor,
-                  borderRadius: BorderRadius.circular(2),
+              // De kwaliteit van de dag, als balk over de volle breedte van de
+              // dag in plaats van een streepje van 18px.
+              //
+              // Op 3×18 was de kleur niet af te lezen: de vier tierkleuren zijn
+              // allemaal donker, en op zo'n oppervlak zien #1B5E20 (perfect) en
+              // #006457 (great) er allebei uit als zwart. Kleur heeft oppervlak
+              // nodig om kleur te zíjn. Vier px over de volle dagbreedte is nog
+              // steeds geen gevuld blok — de reden dat de gekleurde chips
+              // moesten verdwijnen blijft staan — maar wel genoeg om groen van
+              // teal te onderscheiden zonder erop te turen.
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: AnimatedContainer(
+                  duration: AppMotion.effectsDuration,
+                  curve: AppMotion.effectsCurve,
+                  height: 4,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: qualityColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
             ],
