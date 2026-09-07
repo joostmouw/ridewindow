@@ -112,6 +112,7 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
     final friends = ref.watch(friendsProvider);
     final invites = ref.watch(pendingRideInvitesProvider);
     final owned = ref.watch(ownedGroupRidesProvider);
+    final joined = ref.watch(joinedGroupRidesProvider);
 
     return RefreshIndicator(
       onRefresh: () async => _invalidateAll(),
@@ -190,6 +191,11 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
               ],
             ),
           ),
+          if (joined.value?.isNotEmpty ?? false) ...[
+            _SectionHeader(s.pelotonJoinedRides),
+            for (final ride in joined.value!)
+              _JoinedRideRow(ride: ride, s: s),
+          ],
           if (owned.value?.isNotEmpty ?? false) ...[
             _SectionHeader(s.pelotonOwnedRides),
             for (final ride in owned.value!)
@@ -357,6 +363,32 @@ class _InviteCard extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Een gedeelde rit van iemand anders waar jij ja op hebt gezegd.
+///
+/// Bewust met de naam van de organisator in de ondertitel en niet met een
+/// deelnemersteller: bij een rit die niet van jou is, is "van wie is dit" de
+/// eerste vraag, niet "hoeveel man gaat er mee".
+class _JoinedRideRow extends StatelessWidget {
+  const _JoinedRideRow({required this.ride, required this.s});
+
+  final GroupRide ride;
+  final S s;
+
+  @override
+  Widget build(BuildContext context) {
+    final owner = ride.ownerName?.trim();
+    return ListTile(
+      leading: const Icon(Icons.groups),
+      title: Text(_formatRide(ride)),
+      subtitle: Text(
+        s.pelotonWithOwner(
+          owner == null || owner.isEmpty ? s.pelotonUnnamedFriend : owner,
         ),
       ),
     );

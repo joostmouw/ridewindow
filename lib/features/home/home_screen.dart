@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
@@ -20,6 +21,7 @@ import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
+import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
@@ -574,8 +576,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildPlannedRidesSliver() {
     final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
-    if (plannedRides.isEmpty)
+    // Gedeelde ritten van een maatje waar je ja op hebt gezegd horen hier
+    // net zo goed te staan als je eigen ritten -- dat is het hele punt van
+    // accepteren. Ze krijgen geen rij in `planned_rides` (die blijft strikt
+    // persoonlijk), dus dit is een weergavelaag: twee bronnen, één lijst,
+    // gesorteerd op begintijd zodat je week klopt in plaats van dat de
+    // gedeelde ritten er als blok onder hangen.
+    final joinedRides =
+        ref.watch(joinedGroupRidesProvider).value ?? const <GroupRide>[];
+    if (plannedRides.isEmpty && joinedRides.isEmpty)
       return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+    final entries = <_PlannedEntry>[
+      for (final r in plannedRides) _PlannedEntry(ride: r),
+      for (final g in joinedRides)
+        _PlannedEntry(
+          // Een wegwerp-`PlannedRide` puur om te tonen en om het detailscherm
+          // te kunnen openen -- hij wordt nooit opgeslagen. `planned_rides`
+          // blijft strikt persoonlijk (keuze 2 van epic #62); een gedeelde rit
+          // hoort in `group_rides` en nergens anders.
+          ride: PlannedRide(
+            start: g.start,
+            end: g.end,
+            plannedScore: g.plannedScore,
+          ),
+          ownerName: g.ownerName,
+        ),
+    ]..sort((a, b) => a.ride.start.compareTo(b.ride.start));
 
     final rw = context.rw;
     final cs = Theme.of(context).colorScheme;
@@ -595,82 +622,101 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
             ),
             const SizedBox(height: 8),
-            ...plannedRides.map(
-              (ride) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Material(
-                  color: rw.plannedRide.withAlpha(18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: rw.plannedRide.withAlpha(60)),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => _openPlannedRideDetail(ride),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      child: Row(
-                        children: [
-                          Icon(Icons.event_available,
-                              size: 20, color: rw.plannedRide),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _formatDayName(ride.start),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: rw.plannedRide,
-                                      ),
+            ...entries.map(_buildPlannedRideCard),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Eén kaart onder PLANNED. Twee soorten, bewust in dezelfde vorm: je eigen
+  /// geplande rit, en een gedeelde rit van een maatje waar je ja op hebt
+  /// gezegd. Het verschil zit in twee dingen en verder niets — de gedeelde rit
+  /// draagt de naam van de organisator, en hij heeft geen prullenbak, want je
+  /// kunt de rit van een ander niet weggooien. Afzeggen gebeurt op de
+  /// Peloton-tab, waar ook de rest van de gedeelde ritten staat.
+  Widget _buildPlannedRideCard(_PlannedEntry entry) {
+    final ride = entry.ride;
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
+    final s = S.of(context);
+    final owner = entry.ownerName?.trim();
+    final isShared = entry.isShared;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Material(
+        color: rw.plannedRide.withAlpha(18),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: rw.plannedRide.withAlpha(60)),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _openPlannedRideDetail(ride),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(isShared ? Icons.groups : Icons.event_available,
+                    size: 20, color: rw.plannedRide),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _formatDayName(ride.start),
+                        style:
+                            Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: rw.plannedRide,
                                 ),
-                                Text(
-                                  '${_formatTime(ride.start)} – ${_formatTime(ride.end)} · ${ride.durationHours}u',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: cs.onSurfaceVariant,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ScoreBadge(
-                              tier: rideTierFromScore(ride.plannedScore)),
-                          const SizedBox(width: 4),
-                          IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: s.removePlannedRideTooltip,
-                            color: cs.error,
-                            onPressed: () async {
-                              final confirmed =
-                                  await showUnplanConfirmDialog(context);
-                              if (!confirmed) return;
-                              ref
-                                  .read(plannedRidesProvider.notifier)
-                                  .remove(ride);
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(S.of(context).rideRemoved)),
-                                );
-                              }
-                            },
-                          ),
-                        ],
                       ),
-                    ),
+                      Text(
+                        '${_formatTime(ride.start)} – ${_formatTime(ride.end)} · ${ride.durationHours}u',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                      ),
+                      if (isShared)
+                        Text(
+                          s.pelotonWithOwner(
+                            owner == null || owner.isEmpty
+                                ? s.pelotonUnnamedFriend
+                                : owner,
+                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: rw.plannedRide,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                        ),
+                    ],
                   ),
                 ),
-              ),
+                ScoreBadge(tier: rideTierFromScore(ride.plannedScore)),
+                if (!isShared) ...[
+                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    tooltip: s.removePlannedRideTooltip,
+                    color: cs.error,
+                    onPressed: () async {
+                      final confirmed = await showUnplanConfirmDialog(context);
+                      if (!confirmed) return;
+                      ref.read(plannedRidesProvider.notifier).remove(ride);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(S.of(context).rideRemoved)),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -1370,4 +1416,20 @@ class _GreetingWithWhisperNameState extends State<_GreetingWithWhisperName>
       ],
     );
   }
+}
+
+/// Eén regel onder PLANNED op Home, ongeacht waar hij vandaan komt.
+///
+/// [ownerName] is `null` voor je eigen geplande rit en gevuld voor een gedeelde
+/// rit van een maatje. Dat ene veld is het hele verschil: het bepaalt of de
+/// kaart een naam toont en of er een prullenbak op staat. Bewust geen twee
+/// aparte widgets — de rit is voor de gebruiker hetzelfde ding, alleen met een
+/// andere herkomst, en dat hoort de kaart ook uit te stralen.
+class _PlannedEntry {
+  const _PlannedEntry({required this.ride, this.ownerName});
+
+  final PlannedRide ride;
+  final String? ownerName;
+
+  bool get isShared => ownerName != null;
 }

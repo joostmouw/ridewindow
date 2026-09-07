@@ -483,6 +483,8 @@
   "pelotonAccept": "Join",
   "pelotonDecline": "Can't make it",
   "pelotonOwnedRides": "Rides you organise",
+  "pelotonJoinedRides": "Rides you're joining",
+  "pelotonWithOwner": "With {name}",
   "pelotonFriendAdded": "{name} is now your buddy",
   "pelotonCodeInvalid": "That code doesn't work — it may have expired.",
   "pelotonUnnamedFriend": "Rider",

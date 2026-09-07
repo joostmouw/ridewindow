@@ -2557,6 +2557,18 @@ abstract class S {
   /// **'Ritten die jij organiseert'**
   String get pelotonOwnedRides;
 
+  /// No description provided for @pelotonJoinedRides.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ritten waar je aan meedoet'**
+  String get pelotonJoinedRides;
+
+  /// No description provided for @pelotonWithOwner.
+  ///
+  /// In nl, this message translates to:
+  /// **'Met {name}'**
+  String pelotonWithOwner(String name);
+
   /// No description provided for @pelotonFriendAdded.
   ///
   /// In nl, this message translates to:

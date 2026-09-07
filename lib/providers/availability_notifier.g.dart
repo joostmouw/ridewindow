@@ -123,7 +123,7 @@ final class AvailabilityNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$availabilityNotifierHash() =>
-    r'f95c802298f2f0b46891b6ae154888e827465167';
+    r'1d2874a0b298938dd79a121ae3c2ef86b0be16df';
 
 /// AvailabilityNotifier beheert de geblokkeerde uren als `Map<DateTime, BlockType>`.
 ///

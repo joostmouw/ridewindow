@@ -1384,6 +1384,14 @@ class SEn extends S {
   String get pelotonOwnedRides => 'Rides you organise';
 
   @override
+  String get pelotonJoinedRides => 'Rides you\'re joining';
+
+  @override
+  String pelotonWithOwner(String name) {
+    return 'With $name';
+  }
+
+  @override
   String pelotonFriendAdded(String name) {
     return '$name is now your buddy';
   }

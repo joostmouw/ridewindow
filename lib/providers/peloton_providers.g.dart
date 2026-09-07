@@ -231,3 +231,72 @@ final class OwnedGroupRidesProvider extends $FunctionalProvider<
 }
 
 String _$ownedGroupRidesHash() => r'41f4a83f7586b8120831c75e1425a1b212e648bd';
+
+/// Gedeelde ritten van iemand anders waar jij ja op hebt gezegd.
+///
+/// Dit was het gat dat de tweeaccountstest van 2026-09-07 blootlegde: na
+/// accepteren viel een rit tussen alle bestaande providers door. Hij is niet
+/// meer `invited` (dus weg uit [pendingRideInvites]), hij is niet van jou (dus
+/// niet in [ownedGroupRides]), en accepteren maakt met opzet geen rij in
+/// `planned_rides` — die blijft strikt persoonlijk. Resultaat: je zei ja en de
+/// rit verdween. Deze provider is de ontbrekende derde categorie.
+///
+/// Alleen `accepted`, niet `declined`: wie heeft afgezegd hoeft de rit niet
+/// meer op zijn Home te zien staan.
+
+@ProviderFor(joinedGroupRides)
+final joinedGroupRidesProvider = JoinedGroupRidesProvider._();
+
+/// Gedeelde ritten van iemand anders waar jij ja op hebt gezegd.
+///
+/// Dit was het gat dat de tweeaccountstest van 2026-09-07 blootlegde: na
+/// accepteren viel een rit tussen alle bestaande providers door. Hij is niet
+/// meer `invited` (dus weg uit [pendingRideInvites]), hij is niet van jou (dus
+/// niet in [ownedGroupRides]), en accepteren maakt met opzet geen rij in
+/// `planned_rides` — die blijft strikt persoonlijk. Resultaat: je zei ja en de
+/// rit verdween. Deze provider is de ontbrekende derde categorie.
+///
+/// Alleen `accepted`, niet `declined`: wie heeft afgezegd hoeft de rit niet
+/// meer op zijn Home te zien staan.
+
+final class JoinedGroupRidesProvider extends $FunctionalProvider<
+        AsyncValue<List<GroupRide>>, List<GroupRide>, FutureOr<List<GroupRide>>>
+    with $FutureModifier<List<GroupRide>>, $FutureProvider<List<GroupRide>> {
+  /// Gedeelde ritten van iemand anders waar jij ja op hebt gezegd.
+  ///
+  /// Dit was het gat dat de tweeaccountstest van 2026-09-07 blootlegde: na
+  /// accepteren viel een rit tussen alle bestaande providers door. Hij is niet
+  /// meer `invited` (dus weg uit [pendingRideInvites]), hij is niet van jou (dus
+  /// niet in [ownedGroupRides]), en accepteren maakt met opzet geen rij in
+  /// `planned_rides` — die blijft strikt persoonlijk. Resultaat: je zei ja en de
+  /// rit verdween. Deze provider is de ontbrekende derde categorie.
+  ///
+  /// Alleen `accepted`, niet `declined`: wie heeft afgezegd hoeft de rit niet
+  /// meer op zijn Home te zien staan.
+  JoinedGroupRidesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'joinedGroupRidesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$joinedGroupRidesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<GroupRide>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<GroupRide>> create(Ref ref) {
+    return joinedGroupRides(ref);
+  }
+}
+
+String _$joinedGroupRidesHash() => r'eea3a06a01e52001c403ef901f5923ecfe245e6b';

@@ -56,3 +56,28 @@ Future<List<GroupRide>> ownedGroupRides(Ref ref) async {
   final rides = await ref.watch(groupRidesProvider.future);
   return rides.where((r) => r.isOwnedBy(userId)).toList();
 }
+
+/// Gedeelde ritten van iemand anders waar jij ja op hebt gezegd.
+///
+/// Dit was het gat dat de tweeaccountstest van 2026-09-07 blootlegde: na
+/// accepteren viel een rit tussen alle bestaande providers door. Hij is niet
+/// meer `invited` (dus weg uit [pendingRideInvites]), hij is niet van jou (dus
+/// niet in [ownedGroupRides]), en accepteren maakt met opzet geen rij in
+/// `planned_rides` — die blijft strikt persoonlijk. Resultaat: je zei ja en de
+/// rit verdween. Deze provider is de ontbrekende derde categorie.
+///
+/// Alleen `accepted`, niet `declined`: wie heeft afgezegd hoeft de rit niet
+/// meer op zijn Home te zien staan.
+@riverpod
+Future<List<GroupRide>> joinedGroupRides(Ref ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const [];
+  final rides = await ref.watch(groupRidesProvider.future);
+  return rides
+      .where(
+        (r) =>
+            !r.isOwnedBy(userId) &&
+            r.statusFor(userId) == ParticipantStatus.accepted,
+      )
+      .toList();
+}

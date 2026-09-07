@@ -1387,6 +1387,14 @@ class SNl extends S {
   String get pelotonOwnedRides => 'Ritten die jij organiseert';
 
   @override
+  String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
+
+  @override
+  String pelotonWithOwner(String name) {
+    return 'Met $name';
+  }
+
+  @override
   String pelotonFriendAdded(String name) {
     return '$name is nu je maatje';
   }
