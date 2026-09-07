@@ -7,7 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/features/peloton/peloton_tab.dart';
+import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -207,6 +209,18 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
     String cityName,
     ThemeData theme,
   ) {
+    // De lege staat mag niet liegen.
+    //
+    // Hij zei "nog geen ritten gepland" terwijl er één tab verder een gedeelde
+    // rit stond waar je ja op had gezegd (waargenomen door Joost, fase 25 in
+    // EIGEN-GEZICHT.md). Dat een gedeelde rit hier niet staat is een bewuste
+    // keuze -- `planned_rides` blijft strikt persoonlijk, keuze 2 van epic #62
+    // -- maar die keuze mag de gebruiker niet als tegenspraak voorgeschoteld
+    // krijgen. Dus: benoem wat er wél is, en zet de stap ernaartoe als knop
+    // neer in plaats van iemand zelf te laten zoeken.
+    final joined =
+        ref.watch(joinedGroupRidesProvider).value ?? const <GroupRide>[];
+
     return upcoming.isEmpty
         ? Center(
             child: Padding(
@@ -221,12 +235,22 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
                       style: theme.textTheme.titleMedium),
                   const SizedBox(height: 8),
                   Text(
-                    S.of(context).ridesEmptyHint,
+                    joined.isEmpty
+                        ? S.of(context).ridesEmptyHint
+                        : S.of(context).ridesEmptySharedHint(joined.length),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  if (joined.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    FilledButton.tonalIcon(
+                      onPressed: () => _tabController.animateTo(1),
+                      icon: const Icon(Icons.groups, size: 18),
+                      label: Text(S.of(context).ridesEmptyGoToPeloton),
+                    ),
+                  ],
                 ],
               ),
             ),

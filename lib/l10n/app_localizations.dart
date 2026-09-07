@@ -601,6 +601,12 @@ abstract class S {
   /// **'Offline — toont laatst bekende rijvensters'**
   String get staleDataBannerNoTime;
 
+  /// No description provided for @unitKmh.
+  ///
+  /// In nl, this message translates to:
+  /// **'km/u'**
+  String get unitKmh;
+
   /// No description provided for @windCalm.
   ///
   /// In nl, this message translates to:
@@ -2052,6 +2058,18 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Plan een rit vanuit Home of selecteer uren in de Agenda.'**
   String get ridesEmptyHint;
+
+  /// No description provided for @ridesEmptySharedHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je hebt zelf nog niets gepland, maar je doet mee aan {count} gedeelde rit. Die staan op het tabblad Peloton.'**
+  String ridesEmptySharedHint(Object count);
+
+  /// No description provided for @ridesEmptyGoToPeloton.
+  ///
+  /// In nl, this message translates to:
+  /// **'Naar Peloton'**
+  String get ridesEmptyGoToPeloton;
 
   /// No description provided for @rideRemoved.
   ///

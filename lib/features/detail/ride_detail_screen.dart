@@ -236,7 +236,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       return s.windFrom(
           avg.round().toString(), _compassDirection(context, avgDir));
     }
-    return '${avg.round()}km/u';
+    return '${avg.round()}${s.unitKmh}';
   }
 
   // ---------------------------------------------------------------------------
@@ -497,8 +497,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         ? row.windspeedKmh! < 5
             ? '\u{1F4A8} ${s.hourlyWindstil}'
             : row.windspeedKmh! < 15 || row.winddirectionDeg == null
-                ? '\u{1F4A8} ${row.windspeedKmh!.round()}km/u'
-                : '\u{1F4A8} ${row.windspeedKmh!.round()}km/u ${_compassDirection(context, row.winddirectionDeg!)}'
+                ? '\u{1F4A8} ${row.windspeedKmh!.round()}${s.unitKmh}'
+                : '\u{1F4A8} ${row.windspeedKmh!.round()}${s.unitKmh} ${_compassDirection(context, row.winddirectionDeg!)}'
         : '\u{1F4A8} \u2014';
 
     // Subtiele achtergrondkleur op basis van uur-score
@@ -815,7 +815,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   Widget _buildPlanRideBar(BuildContext context) {
     final rw = context.rw;
-    final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
+    final plannedRides =
+        ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     final slot = _effectiveSlot;
     final isPlanned = plannedRides.any(
       (r) => r.start == slot.start && r.end == slot.end,

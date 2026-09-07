@@ -305,6 +305,9 @@ class SNl extends S {
       'Offline — toont laatst bekende rijvensters';
 
   @override
+  String get unitKmh => 'km/u';
+
+  @override
   String get windCalm => 'Windstil';
 
   @override
@@ -1105,6 +1108,14 @@ class SNl extends S {
   @override
   String get ridesEmptyHint =>
       'Plan een rit vanuit Home of selecteer uren in de Agenda.';
+
+  @override
+  String ridesEmptySharedHint(Object count) {
+    return 'Je hebt zelf nog niets gepland, maar je doet mee aan $count gedeelde rit. Die staan op het tabblad Peloton.';
+  }
+
+  @override
+  String get ridesEmptyGoToPeloton => 'Naar Peloton';
 
   @override
   String get rideRemoved => 'Rit verwijderd';

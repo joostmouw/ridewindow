@@ -133,6 +133,33 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
                   ),
               ],
             ),
+          // Volgorde: eerst waar je aan meedoet, dan wat je organiseert, en
+          // pas daarna het beheer van je maatjes.
+          //
+          // Het stond andersom, en dan hing de inhoud die ertoe doet onder een
+          // invulveld voor een uitnodigingscode -- je opent deze tab om te zien
+          // welke ritten er lopen, niet om een code in te tikken (waargenomen
+          // door Joost op het toestel, fase 25 in EIGEN-GEZICHT.md).
+          //
+          // Voor een verse gebruiker verandert er niets: zonder ritten zijn de
+          // twee blokken hierboven verborgen en is de maatjeskaart met zijn
+          // uitnodigingsknop meteen het eerste wat je ziet.
+          if (joined.value?.isNotEmpty ?? false)
+            SectionCard(
+              title: s.pelotonJoinedRides,
+              children: [
+                for (final ride in joined.value!)
+                  _JoinedRideRow(ride: ride, s: s),
+              ],
+            ),
+          if (owned.value?.isNotEmpty ?? false)
+            SectionCard(
+              title: s.pelotonOwnedRides,
+              children: [
+                for (final ride in owned.value!)
+                  _OwnedRideRow(ride: ride, s: s),
+              ],
+            ),
           SectionCard(
             title: s.pelotonFriends,
             children: [
@@ -206,22 +233,6 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
               ),
             ],
           ),
-          if (joined.value?.isNotEmpty ?? false)
-            SectionCard(
-              title: s.pelotonJoinedRides,
-              children: [
-                for (final ride in joined.value!)
-                  _JoinedRideRow(ride: ride, s: s),
-              ],
-            ),
-          if (owned.value?.isNotEmpty ?? false)
-            SectionCard(
-              title: s.pelotonOwnedRides,
-              children: [
-                for (final ride in owned.value!)
-                  _OwnedRideRow(ride: ride, s: s),
-              ],
-            ),
           const SizedBox(height: 24),
         ],
       ),

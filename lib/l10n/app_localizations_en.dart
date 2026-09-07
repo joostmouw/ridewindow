@@ -304,6 +304,9 @@ class SEn extends S {
       'Offline — showing last-known ride windows';
 
   @override
+  String get unitKmh => 'km/h';
+
+  @override
   String get windCalm => 'Calm';
 
   @override
@@ -1104,6 +1107,14 @@ class SEn extends S {
   @override
   String get ridesEmptyHint =>
       'Plan a ride from Home or select hours in the Agenda.';
+
+  @override
+  String ridesEmptySharedHint(Object count) {
+    return 'You have no rides of your own yet, but you are joined on $count shared. Those live on the Peloton tab.';
+  }
+
+  @override
+  String get ridesEmptyGoToPeloton => 'Open Peloton';
 
   @override
   String get rideRemoved => 'Ride removed';

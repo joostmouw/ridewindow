@@ -804,7 +804,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _windDescription(context, _windMax),
                         ),
                         Text(
-                          '${_windMax.round()} km/u',
+                          '${_windMax.round()} ${s.unitKmh}',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.primary,

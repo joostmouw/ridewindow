@@ -240,7 +240,8 @@ class InsightsSheet extends StatelessWidget {
 
           // Meta
           Text(
-            '$day $startTime \u2013 $endTime \u00B7 ${durationHours}u',
+            '$day $startTime \u2013 $endTime \u00B7 '
+            '${S.of(context).durationHours(durationHours)}',
             style: TextStyle(
               fontSize: 13,
               color: rw.textTertiary,

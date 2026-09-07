@@ -105,6 +105,7 @@
   },
   "staleDataBannerNoTime": "Offline — showing last-known ride windows",
 
+  "unitKmh": "km/h",
   "windCalm": "Calm",
   "durationHours": "{hours}h",
 
@@ -389,6 +390,8 @@
   "ridesTitle": "My Rides",
   "ridesEmpty": "No rides planned yet",
   "ridesEmptyHint": "Plan a ride from Home or select hours in the Agenda.",
+  "ridesEmptySharedHint": "You have no rides of your own yet, but you are joined on {count} shared. Those live on the Peloton tab.",
+  "ridesEmptyGoToPeloton": "Open Peloton",
   "rideRemoved": "Ride removed",
   "rideSincePlanning": "{delta} since planning",
   "ridesPerHour": "Per hour",

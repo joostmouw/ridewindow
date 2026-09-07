@@ -868,7 +868,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             ),
                       ),
                       Text(
-                        '${_formatTime(ride.start)} – ${_formatTime(ride.end)} · ${ride.durationHours}u',
+                        '${_formatTime(ride.start)} – ${_formatTime(ride.end)} · ${s.durationHours(ride.durationHours)}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: cs.onSurfaceVariant,
                             ),
@@ -1412,7 +1412,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               ),
                                             ),
                                             Text(
-                                              '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
+                                              '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${S.of(context).durationHours(_durationHours(slot))}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyMedium
@@ -1595,7 +1595,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             icon: Icons.air,
             label: s.weatherWind,
             value: avgWind,
-            unit: ' km/h',
+            unit: ' ${s.unitKmh}',
             idealMax: windMax,
             infoText: s.infoWind,
             score: windScore,

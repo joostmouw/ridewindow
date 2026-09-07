@@ -136,6 +136,7 @@
   },
   "staleDataBannerNoTime": "Offline — toont laatst bekende rijvensters",
 
+  "unitKmh": "km/u",
   "windCalm": "Windstil",
   "durationHours": "{hours}u",
   "@durationHours": {
@@ -491,6 +492,8 @@
   "ridesTitle": "Mijn Ritten",
   "ridesEmpty": "Nog geen ritten gepland",
   "ridesEmptyHint": "Plan een rit vanuit Home of selecteer uren in de Agenda.",
+  "ridesEmptySharedHint": "Je hebt zelf nog niets gepland, maar je doet mee aan {count} gedeelde rit. Die staan op het tabblad Peloton.",
+  "ridesEmptyGoToPeloton": "Naar Peloton",
   "rideRemoved": "Rit verwijderd",
   "rideSincePlanning": "{delta} sinds planning",
   "@rideSincePlanning": {
