@@ -50,14 +50,30 @@ class TierColors {
 /// Semantic colour tokens used throughout the app.
 abstract final class AppColors {
   // ── Brand ──
-  /// Officiele merkkleuren. brandLight draagt de achtergrond, brandDark is de
-  /// mark in het logo en de seed van het kleurenschema.
+  /// Officiele merkkleuren. brandDark is de mark in het logo en de seed van het
+  /// kleurenschema.
+  ///
+  /// **brandLight droeg tot v4.0 de achtergrond van de hele app en doet dat
+  /// niet meer** (epic #64, schets 001 variant B). Dat is geen smaakkwestie: op
+  /// een middentoon van deze helderheid leest een slagschaduw niet, en schaduw
+  /// is nu juist het gereedschap waarmee je een ding vóór de rest zet. Zolang
+  /// `surface` brandLight was, moest het verschil tussen de beste rit en de
+  /// rest volledig uit kleur komen -- en tussen `#C5D4B6` en `#E4EAD7` zit geen
+  /// 8% helderheidsverschil, dus dat lukte niet. Vandaar dat de ritkaart
+  /// jarenlang op `elevation: 0` stond.
+  ///
+  /// brandLight blijft wel bestaan en blijft in gebruik: als accent (chips,
+  /// tonale knoppen) en als achtergrond van de twee schermen waar een groot
+  /// groen vlak wél een merkmoment is in plaats van behang -- Welcome en
+  /// Onboarding, expliciete keuze van Joost (2026-09-07). Die twee zetten hem
+  /// zelf, ze erven hem niet meer.
   static const brandLight = Color(0xFFC5D4B6);
   static const brandDark = Color(0xFF234934);
   static const seed = brandDark;
 
-  /// Oppervlakken in light mode: getinte trappen afgeleid van [brandLight].
-  /// Kaarten zijn lichter dan de achtergrond, zodat ze naar voren komen.
+  /// Oppervlakken in light mode. De trappen houden een lichte groenzweem, zodat
+  /// het scherm papier is en geen steriel wit, maar de basis is licht genoeg om
+  /// schaduw en haarlijn te laten lezen.
   static const lightSurfaceContainerLowest = Color(0xFFFCFDF8);
   static const lightSurfaceContainerLow = Color(0xFFF4F7EC);
   static const lightSurfaceContainer = Color(0xFFEDF1E2);
@@ -69,15 +85,35 @@ abstract final class AppColors {
   static const lightOutlineVariant = Color(0xFFA9B79C);
 
   // ── Light semantic ──
-  static const lightTextPrimary = Color(0xFF1A2A20);
-  static const lightTextSecondary = Color(0xFF3A4A40);
-  // 4.55:1 op brandLight — opnieuw gewogen toen de achtergrond getint werd
-  static const lightTextTertiary = Color(0xFF4C5C52);
-  // 4.51:1 op brandLight (was 0xFF6B6B6B, zakte naar 3.67:1 toen de achtergrond
-  // van #F5F5F5 naar #C5D4B6 ging)
-  static const lightTextHint = Color(0xFF4E5C54);
+  //
+  // Alle ratio's hieronder zijn gemeten op [lightSurface] (`#FCFDF8`) volgens
+  // WCAG 2.1 -- tekst op de achtergrond, oftewel de slechtste plek. Op een
+  // kaart (wit) is er nog iets meer ruimte.
+  //
+  // Tertiary en hint zijn in v4.0 lichter gezet, en de reden daarvoor is niet
+  // "het mocht". Op de oude groene achtergrond haalden ze 4.55:1 en 4.51:1 --
+  // allebei nét over de drempel, en daardoor **praktisch niet van elkaar te
+  // onderscheiden**. Twee tokens met één visueel gewicht is precies de
+  // vlakheid waar epic #64 over gaat. Op papier is er marge om ze uit elkaar te
+  // trekken, en die marge is hier opgemaakt in plaats van opgepot.
+  static const lightTextPrimary = Color(0xFF1A2A20);   // 14.72:1
+  static const lightTextSecondary = Color(0xFF3A4A40); //  9.20:1
+  static const lightTextTertiary = Color(0xFF5A6B60);  //  5.54:1 (was #4C5C52)
+  static const lightTextHint = Color(0xFF66756B);      //  4.75:1 (was #4E5C54)
 
-  static const lightSurface = brandLight;
+  /// De oude, donkerdere waarden van [lightTextTertiary] en [lightTextHint].
+  ///
+  /// Ze bestaan nog omdat Welcome en Onboarding hun brandLight-achtergrond
+  /// houden, en daar halen de nieuwe waarden de AA-drempel niet (3.63:1 en
+  /// 3.12:1 op `#C5D4B6`). Deze twee doen het daar wél: 4.55:1 en 4.51:1 --
+  /// het meetwerk uit backlog #9, bewaard op de enige plek waar het nog nodig
+  /// is. Gebruik ze nergens anders; op papier zijn ze onnodig zwaar.
+  static const brandScreenTextTertiary = Color(0xFF4C5C52);
+  static const brandScreenTextHint = Color(0xFF4E5C54);
+
+  /// De achtergrond van de app. Zie de noot bij [brandLight] voor waarom dit
+  /// sinds v4.0 papier is en niet meer de merkkleur.
+  static const lightSurface = lightSurfaceContainerLowest;
   static const lightSurfaceDim = Color(0xFFDAE2CC);
   static const lightBorder = Color(0xFFA9B79C);
   static const lightBorderLight = Color(0xFFB6C2AA);

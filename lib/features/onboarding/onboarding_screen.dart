@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
@@ -90,7 +91,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final greenBg = context.rw.tiers.perfectBg;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      // Expliciet brandLight -- zie de gelijkluidende noot in
+      // `welcome_screen.dart`. Dit scherm en Welcome houden hun groene vlak;
+      // de rest van de app is sinds v4.0 papier.
+      backgroundColor: AppColors.brandLight,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
@@ -121,9 +125,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Subtitel
               Text(
                 S.of(context).onboardingSubtitle,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
-                  color: context.rw.textTertiary,
+                  // Niet `rw.textTertiary`: die is in v4.0 lichter gezet voor
+                  // de papieren achtergrond en haalt op brandLight nog maar
+                  // 3.63:1. Deze waarde haalt 4.55:1 op groen.
+                  color: AppColors.brandScreenTextTertiary,
                   height: 1.55,
                 ),
               ),
@@ -183,7 +190,12 @@ class _PresetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final rw = context.rw;
     final borderColor = isSelected ? green : rw.borderLight;
-    final backgroundColor = isSelected ? greenBg : Theme.of(context).colorScheme.surface;
+    // Een niet-geselecteerde tegel gaat op in de achtergrond en wordt alleen
+    // door zijn rand begrensd -- dat was zo en blijft zo. Daarom brandLight en
+    // niet `colorScheme.surface`: die is sinds v4.0 papier, en een witte tegel
+    // op een groen scherm is een verandering aan Onboarding die niet gevraagd
+    // is. Dit scherm blijft er precies zo uitzien als voorheen.
+    final backgroundColor = isSelected ? greenBg : AppColors.brandLight;
 
     Widget tileContent = Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
@@ -235,9 +247,11 @@ class _PresetTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   option.sub,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: rw.textHint,
+                    // Zie de noot bij de subtitel hierboven: `rw.textHint`
+                    // zakt op brandLight naar 3.12:1, deze waarde haalt 4.51:1.
+                    color: AppColors.brandScreenTextHint,
                   ),
                 ),
               ],

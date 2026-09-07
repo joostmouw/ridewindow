@@ -97,13 +97,15 @@ ThemeData _buildTheme(Brightness brightness) {
   );
   final isLight = brightness == Brightness.light;
 
-  // In light mode dragen de oppervlakken de merkkleur in plaats van MD3's
-  // bijna-witte standaard: brandLight is de achtergrond, containers zijn
-  // lichter zodat kaarten er bovenop komen te liggen. Dark mode volgt het
-  // afgeleide schema van de seed.
+  // In light mode houden de oppervlakken een lichte groenzweem in plaats van
+  // MD3's neutrale grijs, zodat het scherm papier is en geen steriel wit --
+  // maar de achtergrond is sinds v4.0 wél licht (`lightSurface`), niet
+  // brandLight. Zie de noot bij `AppColors.brandLight`: op een middentoon leest
+  // een slagschaduw niet, en zonder schaduw is er geen manier om de beste rit
+  // vóór de rest te zetten. Dark mode volgt het afgeleide schema van de seed.
   final colorScheme = isLight
       ? seeded.copyWith(
-          surface: AppColors.brandLight,
+          surface: AppColors.lightSurface,
           surfaceContainerLowest: AppColors.lightSurfaceContainerLowest,
           surfaceContainerLow: AppColors.lightSurfaceContainerLow,
           surfaceContainer: AppColors.lightSurfaceContainer,

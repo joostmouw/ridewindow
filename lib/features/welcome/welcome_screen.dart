@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
-import 'package:ridewindow/theme/app_theme.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -68,7 +68,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      // Expliciet brandLight, niet `colorScheme.surface`. Sinds v4.0 is surface
+      // papier (zie de noot bij `AppColors.brandLight`), maar op dit scherm en
+      // op Onboarding is een groot groen vlak juist een merkmoment in plaats
+      // van behang -- je ziet het één keer en het zet de toon. Keuze van Joost,
+      // 2026-09-07. Deze twee schermen erven de achtergrond dus niet meer.
+      backgroundColor: AppColors.brandLight,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
