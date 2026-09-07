@@ -12,6 +12,7 @@ import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/score_display.dart';
@@ -1193,15 +1194,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             ],
                           ),
                           const SizedBox(height: 14),
-                          // Weather indicator bars
+                          // Alleen de beste kaart krijgt de volle balken. Drie
+                          // balken op élke kaart is de reden dat de lijst als
+                          // één massa leest — dat was op de schets meteen te
+                          // zien. De rest krijgt één regel, zodat het verschil
+                          // tussen eerste en tweede plek ook overeind blijft
+                          // als je scrollt.
                           if (avgTemp != null ||
                               totalPrecip != null ||
                               avgWind != null)
-                            _buildWeatherBars(
-                              avgTemp: avgTemp,
-                              totalPrecip: totalPrecip,
-                              avgWind: avgWind,
-                            ),
+                            isBest
+                                ? _buildWeatherBars(
+                                    avgTemp: avgTemp,
+                                    totalPrecip: totalPrecip,
+                                    avgWind: avgWind,
+                                  )
+                                : _buildWeatherSummary(
+                                    avgTemp: avgTemp,
+                                    totalPrecip: totalPrecip,
+                                    avgWind: avgWind,
+                                  ),
                           const SizedBox(height: 14),
                           // Footer: Plan het knop
                           Align(
@@ -1242,45 +1254,110 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       children: [
         if (avgTemp != null)
           WeatherIndicatorBar(
+            metric: WeatherMetric.temperature,
             icon: Icons.thermostat,
             label: s.weatherTemperature,
             value: avgTemp,
             unit: '\u00B0',
-            min: -10,
-            max: 45,
             idealMin: tempMin,
             idealMax: tempMax,
             infoText: s.infoTemp,
           ),
-        if (totalPrecip != null) ...[
-          const SizedBox(height: 4),
+        if (totalPrecip != null)
           WeatherIndicatorBar(
+            metric: WeatherMetric.rain,
             icon: Icons.water_drop,
             label: s.weatherRain,
             value: totalPrecip,
-            unit: 'mm',
-            min: 0,
-            max: 10,
+            unit: ' mm',
             idealMax: rainMax,
             infoText: s.infoRain,
           ),
-        ],
-        if (avgWind != null) ...[
-          const SizedBox(height: 4),
+        if (avgWind != null)
           WeatherIndicatorBar(
+            metric: WeatherMetric.wind,
             icon: Icons.air,
             label: s.weatherWind,
             value: avgWind,
-            unit: 'km/h',
-            min: 0,
-            max: 60,
+            unit: ' km/h',
             idealMax: windMax,
             infoText: s.infoWind,
           ),
-        ],
       ],
     );
   }
+
+  /// De compacte weerregel voor de kaarten die n\u00ED\u00E9t de beste zijn.
+  ///
+  /// Bewust geen balken: die zijn er om af te lezen h\u00F3e ver iets van je ideaal
+  /// af zit, en dat is een vraag die je alleen stelt over de rit die je
+  /// overweegt. Voor de rest volstaat het oordeel \u2014 dat is precies het woord
+  /// dat de balk hierboven ook al draagt.
+  Widget _buildWeatherSummary({
+    double? avgTemp,
+    double? totalPrecip,
+    double? avgWind,
+  }) {
+    final s = S.of(context);
+    final rw = context.rw;
+    final profile = ref.watch(profileProvider).value;
+    final tol = profile?.tolerances;
+    // Alleen regen krijgt hier een oordeel in plaats van een getal: "Dry" zegt
+    // meteen alles, terwijl "0 mm" je nog laat nadenken. Temperatuur en wind
+    // zijn als getal juist directer.
+    final rainMax = tol?.rainMaxIdealMm ?? 0.5;
+
+    final style = Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: rw.textTertiary,
+          fontFeatures: const [FontFeature.tabularFigures()],
+        );
+
+    Widget item(IconData icon, String text) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: rw.textHint),
+            const SizedBox(width: 5),
+            Text(text, style: style),
+          ],
+        );
+
+    return Row(
+      children: [
+        if (avgTemp != null) ...[
+          item(Icons.thermostat, '${avgTemp.round()}\u00B0'),
+          const SizedBox(width: 16),
+        ],
+        if (totalPrecip != null) ...[
+          item(
+            Icons.water_drop,
+            _verdictText(
+              s,
+              weatherVerdictFor(
+                WeatherMetric.rain,
+                totalPrecip,
+                idealMax: rainMax,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
+        if (avgWind != null) item(Icons.air, '${avgWind.round()} km/h'),
+      ],
+    );
+  }
+
+  String _verdictText(S s, WeatherVerdict verdict) => switch (verdict) {
+        WeatherVerdict.dry => s.verdictDry,
+        WeatherVerdict.light => s.verdictLight,
+        WeatherVerdict.showers => s.verdictShowers,
+        WeatherVerdict.wet => s.verdictWet,
+        WeatherVerdict.calm => s.verdictCalm,
+        WeatherVerdict.breezy => s.verdictBreezy,
+        WeatherVerdict.gusty => s.verdictGusty,
+        WeatherVerdict.chilly => s.verdictChilly,
+        WeatherVerdict.ideal => s.verdictIdeal,
+        WeatherVerdict.warm => s.verdictWarm,
+      };
 
   // ---------------------------------------------------------------------------
   // Plan ride (in-app)

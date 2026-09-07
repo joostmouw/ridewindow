@@ -1399,6 +1399,72 @@ abstract class S {
   /// **'Wind'**
   String get weatherWind;
 
+  /// Label onder een weerbalk met het eigen ideaalbereik, bijv. 'jouw bereik 12-26°'.
+  ///
+  /// In nl, this message translates to:
+  /// **'jouw bereik {range}'**
+  String weatherYourRange(String range);
+
+  /// No description provided for @verdictDry.
+  ///
+  /// In nl, this message translates to:
+  /// **'Droog'**
+  String get verdictDry;
+
+  /// No description provided for @verdictLight.
+  ///
+  /// In nl, this message translates to:
+  /// **'Motregen'**
+  String get verdictLight;
+
+  /// No description provided for @verdictShowers.
+  ///
+  /// In nl, this message translates to:
+  /// **'Buien'**
+  String get verdictShowers;
+
+  /// No description provided for @verdictWet.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nat'**
+  String get verdictWet;
+
+  /// No description provided for @verdictCalm.
+  ///
+  /// In nl, this message translates to:
+  /// **'Windstil'**
+  String get verdictCalm;
+
+  /// No description provided for @verdictBreezy.
+  ///
+  /// In nl, this message translates to:
+  /// **'Briesje'**
+  String get verdictBreezy;
+
+  /// No description provided for @verdictGusty.
+  ///
+  /// In nl, this message translates to:
+  /// **'Winderig'**
+  String get verdictGusty;
+
+  /// No description provided for @verdictChilly.
+  ///
+  /// In nl, this message translates to:
+  /// **'Fris'**
+  String get verdictChilly;
+
+  /// No description provided for @verdictIdeal.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ideaal'**
+  String get verdictIdeal;
+
+  /// No description provided for @verdictWarm.
+  ///
+  /// In nl, this message translates to:
+  /// **'Warm'**
+  String get verdictWarm;
+
   /// No description provided for @weatherHourly.
   ///
   /// In nl, this message translates to:

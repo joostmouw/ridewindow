@@ -722,6 +722,41 @@ class SEn extends S {
   String get weatherWind => 'Wind';
 
   @override
+  String weatherYourRange(String range) {
+    return 'your range $range';
+  }
+
+  @override
+  String get verdictDry => 'Dry';
+
+  @override
+  String get verdictLight => 'Light';
+
+  @override
+  String get verdictShowers => 'Showers';
+
+  @override
+  String get verdictWet => 'Wet';
+
+  @override
+  String get verdictCalm => 'Calm';
+
+  @override
+  String get verdictBreezy => 'Breezy';
+
+  @override
+  String get verdictGusty => 'Gusty';
+
+  @override
+  String get verdictChilly => 'Chilly';
+
+  @override
+  String get verdictIdeal => 'Ideal';
+
+  @override
+  String get verdictWarm => 'Warm';
+
+  @override
   String get weatherHourly => 'HOURLY';
 
   @override

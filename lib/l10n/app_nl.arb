@@ -314,6 +314,22 @@
   "weatherTemperature": "Temperatuur",
   "weatherRain": "Neerslag",
   "weatherWind": "Wind",
+
+  "weatherYourRange": "jouw bereik {range}",
+  "@weatherYourRange": {
+    "description": "Label onder een weerbalk met het eigen ideaalbereik, bijv. 'jouw bereik 12-26°'.",
+    "placeholders": { "range": { "type": "String" } }
+  },
+  "verdictDry": "Droog",
+  "verdictLight": "Motregen",
+  "verdictShowers": "Buien",
+  "verdictWet": "Nat",
+  "verdictCalm": "Windstil",
+  "verdictBreezy": "Briesje",
+  "verdictGusty": "Winderig",
+  "verdictChilly": "Fris",
+  "verdictIdeal": "Ideaal",
+  "verdictWarm": "Warm",
   "weatherHourly": "UURLIJKS",
   "feelsLike": "voelt als {temp}\u00b0C",
   "@feelsLike": {

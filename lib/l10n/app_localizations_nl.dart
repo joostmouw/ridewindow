@@ -722,6 +722,41 @@ class SNl extends S {
   String get weatherWind => 'Wind';
 
   @override
+  String weatherYourRange(String range) {
+    return 'jouw bereik $range';
+  }
+
+  @override
+  String get verdictDry => 'Droog';
+
+  @override
+  String get verdictLight => 'Motregen';
+
+  @override
+  String get verdictShowers => 'Buien';
+
+  @override
+  String get verdictWet => 'Nat';
+
+  @override
+  String get verdictCalm => 'Windstil';
+
+  @override
+  String get verdictBreezy => 'Briesje';
+
+  @override
+  String get verdictGusty => 'Winderig';
+
+  @override
+  String get verdictChilly => 'Fris';
+
+  @override
+  String get verdictIdeal => 'Ideaal';
+
+  @override
+  String get verdictWarm => 'Warm';
+
+  @override
   String get weatherHourly => 'UURLIJKS';
 
   @override
