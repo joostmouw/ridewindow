@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "v4.0 Eigen gezicht — start bij EIGEN-GEZICHT.md"
-last_updated: "2026-09-07T11:10:00.000Z"
-last_activity: 2026-09-06
+status: "Fase 23: schets 001 → variant B gekozen, nu in Dart"
+last_updated: "2026-09-07T14:30:00.000Z"
+last_activity: 2026-09-07
 progress:
   total_phases: 3
   completed_phases: 0

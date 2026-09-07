@@ -4,8 +4,9 @@
 > Backlog-epic: **#64** in `BACKLOG.md`. Voorganger: v3.0, afgesloten — zie
 > `.planning/milestones/v3.0-CLOSEOUT.md`.
 >
-> **Stand in één zin:** het lettertype en de score-hiërarchie staan er; de rest van Home is de
-> volgende stap, en de openstaande vraag is of dat eerst geschetst wordt.
+> **Stand in één zin:** het lettertype staat er, de hiërarchierichting is gekozen (schets 001,
+> variant B "Papier en inkt"), en wat rest is die richting in Dart uitvoeren — te beginnen bij de
+> omkering die alles draagt: de achtergrond is nu de merkkleur en moet papier worden.
 
 ## Waar deze epic over gaat, en waarom hij nodig is
 
@@ -39,6 +40,7 @@ durven contrasteren.
 |---|---|---|
 | Huisletter Outfit (variabel, 111 kB) | `assets/fonts/Outfit.ttf`, `lib/theme/app_typography.dart` | `750189f` |
 | Score als groot getal + woord i.p.v. smiley-pil | `lib/features/shared/score_display.dart`, gebruikt op de ritkaarten van Home | `750189f` |
+| Hiërarchierichting gekozen: **B "Papier en inkt"** | `.planning/sketches/001-home-hierarchie/` (schets + implementatielijst) | `65d8cc1`, `8eedba0` |
 
 **De regels die het logo oplegt** (het icoon is een RW-monogram in één ononderbroken lijn):
 
@@ -59,15 +61,33 @@ betrouwbaarder dan beschrijven. Herhaal dat voor de hiërarchieslag.
 
 ## De volgende stap
 
-**Fase 23 afmaken: hiërarchie op Home.** Concreet:
+**Fase 23 uitvoeren: variant B in Dart.** De richting ligt vast, de vraag "eerst schetsen of
+meteen in Dart" is beantwoord — er is geschetst (`.planning/sketches/001-home-hierarchie/`) en
+Joost koos op 2026-09-07 variant **B "Papier en inkt"**. De volledige implementatielijst staat
+onderaan de README van die schets; hieronder alleen wat je moet weten vóór je begint.
 
-- De "Best choice"-kaart écht laten domineren in plaats van dat alles even zwaar weegt.
-- De weerbalken van versiering naar informatie maken — nu drie bijna identieke streepjes.
-- Dagstrip en periodefilter rustiger, zodat ze het oog niet van de inhoud wegtrekken.
-- De nieuwe typografische schaal echt gebruiken: duidelijke stappen in plaats van alles even groot.
+**De omkering die alles draagt:** `AppColors.lightSurface == brandLight` (`#C5D4B6`). De
+achtergrond *is* de merkkleur, en de ritkaarten staan op `surfaceContainerHigh` (`#E4EAD7`) —
+geen 8% helderheidsverschil. Dáárom veranderde de MD3-ronde niets: de tokens klopten, maar de
+oppervlakkenladder had geen bereik om verschil mee te maken. B zet `lightSurface` op
+`surfaceContainerLowest` (`#FCFDF8`) en degradeert `brandLight` van behang naar accent.
 
-**Openstaande vraag aan Joost:** eerst twee varianten van Home schetsen (zoals bij de lettertypes),
-of meteen in Dart? De schetsroute is voorgesteld en nog niet beantwoord.
+Twee dingen die gaan bijten en die je niet mag aannemen:
+
+- **De contrastratio's uit backlog #9 zijn *op brandLight* gemeten.** `lightTextTertiary`
+  (`#4C5C52`) en `lightTextHint` (`#4E5C54`) zijn destijds juist donkerder gemaakt om het op groen
+  te halen; op papier worden ze onnodig zwaar. Opnieuw meten.
+- **De beste kaart wil een slagschaduw, maar `_buildRideCard` wikkelt hem in een `ClipRRect`** voor
+  de `Dismissible`, en die snijdt `elevation` weg — het commentaar in de code waarschuwt daar al
+  voor. De schaduw moet buiten die clip.
+
+Verder ongewijzigd geldig: de weerbalken zijn onleesbaar per constructie (ideaalzone `≤0,5 mm` op
+een schaal van `0–10 mm` is 5% van de balk), en de typografische schaal staat er wel maar wordt
+niet gebruikt — op Home is vrijwel alles even groot.
+
+**Consistentie-sweep hoort hierbij, niet erna:** de oppervlakomkering raakt élk scherm. Rides,
+Ride Detail (waar ook de laatste handmatige `BoxShadow` staat), Peloton, Profiel, Beschikbaarheid,
+en de twee overlays met hardcoded kleuren.
 
 ## Fase 25 — wrijving die op 2026-09-07 is waargenomen
 
