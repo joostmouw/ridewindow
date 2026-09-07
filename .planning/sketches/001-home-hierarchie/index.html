@@ -412,7 +412,7 @@
   <button id="m-all" class="on" onclick="setMode('all')">Naast elkaar</button>
   <button id="m-0" onclick="setMode('0')">Nu</button>
   <button id="m-a" onclick="setMode('a')">A · Held</button>
-  <button id="m-b" onclick="setMode('b')">B · Papier</button>
+  <button id="m-b" onclick="setMode('b')">B · Papier ★</button>
   <button id="m-c" onclick="setMode('c')">C · Weerbaan</button>
   <div class="sep"></div>
   <span style="opacity:.6">zoom</span>
@@ -759,8 +759,8 @@ function renderC() {
 /* ═══════════ Podium ═══════════ */
 const VARIANTS = [
   { id:'0', cls:'v0', title:'Nu — de app van vandaag', note:'Achtergrond, dagstrip, filter en kaarten wegen allemaal even zwaar. De regenbalk heeft een groene zone van 5% op een schaal van 0–10 mm.', render:render0 },
-  { id:'a', cls:'va', title:'A · Held bovenaan', star:true, note:'De beste rit is een donkergroen paneel bovenaan met de score op 64px. De rest is een rustige lijst, geen kaarten. Groen wordt anker in plaats van behang.', render:renderA },
-  { id:'b', cls:'vb', title:'B · Papier en inkt', note:'Achtergrond wordt papier; groen wordt inkt. Beste kaart licht op met schaduw en donkere rand. Balken herschaald naar jouw eigen bereik, met een woord erbij.', render:renderB },
+  { id:'a', cls:'va', title:'A · Held bovenaan', note:'De beste rit is een donkergroen paneel bovenaan met de score op 64px. De rest is een rustige lijst, geen kaarten. Groen wordt anker in plaats van behang.', render:renderA },
+  { id:'b', cls:'vb', title:'B · Papier en inkt', star:true, note:'GEKOZEN (2026-09-07). Achtergrond wordt papier; groen wordt inkt. Beste kaart licht op met schaduw en donkere rand. Balken herschaald naar jouw eigen bereik, met een woord erbij.', render:renderB },
   { id:'c', cls:'vc', title:'C · Weerbaan', note:'Het weer wordt het beeld: per uur een gekleurde cel met de temperatuur. De weekstrip spreekt dezelfde taal en vervangt het periodefilter.', render:renderC },
 ];
 

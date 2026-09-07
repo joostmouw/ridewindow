@@ -34,4 +34,15 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 
 | # | Naam | Design Question | Winnaar | Tags |
 |---|------|-----------------|---------|------|
-| 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | — | home, hierarchie, typografie, weerbalken, fase-23 |
+| 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | **B — Papier en inkt** | home, hierarchie, typografie, weerbalken, fase-23 |
+
+## Beslissingen die doorwerken
+
+- **001 → B (2026-09-07).** Groen is behang en wordt accent: `lightSurface` gaat van `brandLight`
+  naar `surfaceContainerLowest`, zodat de oppervlakkenladder eindelijk bereik heeft en een kaart
+  kán oplichten. `brandLight` blijft als accent in gebruik. Dit raakt élk scherm, niet alleen Home
+  — zie de implementatielijst onderaan `001-home-hierarchie/README.md`. Let bij het uitvoeren op de
+  contrastratio's uit backlog #9: die zijn *op brandLight* gemeten.
+- **Weerbalken krijgen een leesbaar bereik plus een woord.** De absolute schaal blijft eerlijk maar
+  wordt ingezoomd (regen 0–3 mm i.p.v. 0–10 mm), en er komt een oordeel naast de waarde. Dat is de
+  ingreep die "versiering" naar "informatie" tilt.
