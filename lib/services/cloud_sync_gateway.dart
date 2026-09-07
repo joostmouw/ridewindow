@@ -37,6 +37,16 @@ abstract class CloudSyncGateway {
 
   Future<void> upsertRow(String table, Map<String, dynamic> payload);
 
+  /// Schrijft een nieuwe rij weg zonder upsert-semantiek.
+  ///
+  /// Bestaat naast [upsertRow] omdat `public.feedback` alleen een INSERT-grant
+  /// heeft: een upsert stuurt `resolution=merge-duplicates` mee, en Postgres
+  /// eist voor `on conflict do update` ook UPDATE-rechten -- ook wanneer er
+  /// geen conflict optreedt. Bewust géén `.select()` erachter: de tabel heeft
+  /// met opzet geen select-policy (FB-05), dus terugleze zou de schrijfactie
+  /// laten falen. Dat is exact de val waar `group_rides` op 2026-09-07 in liep.
+  Future<void> insertRow(String table, Map<String, dynamic> payload);
+
   Future<void> deletePlannedRide({
     required String userId,
     required String rideId,
@@ -92,6 +102,11 @@ class SupabaseCloudSyncGateway implements CloudSyncGateway {
   @override
   Future<void> upsertRow(String table, Map<String, dynamic> payload) async {
     await _client.from(table).upsert(payload);
+  }
+
+  @override
+  Future<void> insertRow(String table, Map<String, dynamic> payload) async {
+    await _client.from(table).insert(payload);
   }
 
   @override

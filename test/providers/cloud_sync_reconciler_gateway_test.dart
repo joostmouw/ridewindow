@@ -42,6 +42,7 @@ import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/cloud_sync_gateway.dart';
+import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/services/sync_outbox_service.dart';
 
 User _fakeUser(String id) => User(
@@ -102,6 +103,11 @@ class _FakeGateway implements CloudSyncGateway {
   @override
   Future<void> upsertRow(String table, Map<String, dynamic> payload) async {
     _log.add('upsertRow:$table');
+  }
+
+  @override
+  Future<void> insertRow(String table, Map<String, dynamic> payload) async {
+    _log.add('insertRow:$table');
   }
 
   @override
@@ -180,6 +186,89 @@ void main() {
 
   CloudSyncReconciler reconcilerIn(ProviderContainer container) =>
       container.read(cloudSyncReconcilerProvider);
+
+  group('feedback-tak in drainOutbox (fase 22, FB-04/FB-05)', () {
+    /// Deze groep gebruikt de **échte** SyncOutboxService, niet de logging-fake
+    /// hierboven. Die fake overschrijft `drain()` met een no-op, wat prima is
+    /// voor de volgorde-tests -- daar gaat het om wanneer er gedraind wordt,
+    /// niet wat de drain doet. Hier gaat het juist om wat de drain doet: welke
+    /// gateway-methode een feedbackrij bereikt.
+    ProviderContainer containerWithRealOutbox(Stream<User?> authStream) {
+      final container = ProviderContainer(
+        overrides: [
+          authStateProvider.overrideWith((ref) => authStream),
+          syncOutboxServiceProvider
+              .overrideWith((ref) => SyncOutboxService(db.syncOutboxDao)),
+          appDatabaseProvider.overrideWith((ref) => db),
+          cloudSyncReconcilerProvider.overrideWith(
+            (ref) => CloudSyncReconciler(ref, gateway: gateway),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final sub = container.listen(authStateProvider, (_, __) {});
+      addTearDown(sub.close);
+      return container;
+    }
+
+    test(
+      'een feedbackrij gaat via insertRow, niet via upsertRow',
+      () async {
+        // Dit is geen stijlkwestie. `public.feedback` heeft alleen een
+        // INSERT-grant: geen SELECT (FB-05 -- schrijven mag, teruglezen nooit)
+        // en geen UPDATE. PostgREST's upsert stuurt `resolution=merge-
+        // duplicates` mee, en Postgres eist voor die `on conflict`-tak
+        // UPDATE-rechten óók als er geen conflict optreedt. Een upsert op deze
+        // tabel faalt dus altijd, ongeacht de inhoud. Draait deze test rood,
+        // dan is feedback stilzwijgend onverzendbaar geworden.
+        await db.syncOutboxDao.enqueueOrCoalesce(
+          entity: kOutboxEntityFeedback,
+          entityKey: 'ffffffff-ffff-4fff-bfff-ffffffffffff',
+          operation: 'upsert',
+          payload: '{"id":"ffffffff-ffff-4fff-bfff-ffffffffffff","rating":5}',
+        );
+
+        final container = containerWithRealOutbox(Stream<User?>.value(null));
+        await Future<void>.delayed(Duration.zero);
+
+        await reconcilerIn(container).drainOutbox();
+
+        expect(
+          log.events,
+          contains('insertRow:feedback'),
+          reason: 'feedback hoort met een gewone insert te vertrekken',
+        );
+        expect(
+          log.events.where((e) => e.startsWith('upsertRow:')),
+          isEmpty,
+          reason: 'een upsert op feedback strandt op de ontbrekende '
+              'UPDATE-grant',
+        );
+      },
+    );
+
+    test(
+      'werkt uitgelogd -- FB-03 stelt dat anonieme feedback moet vertrekken',
+      () async {
+        await db.syncOutboxDao.enqueueOrCoalesce(
+          entity: kOutboxEntityFeedback,
+          entityKey: 'aaaaaaaa-aaaa-4aaa-baaa-aaaaaaaaaaaa',
+          operation: 'upsert',
+          payload: '{"id":"aaaaaaaa-aaaa-4aaa-baaa-aaaaaaaaaaaa","user_id":null}',
+        );
+
+        // Geen ingelogde gebruiker. De drain draait bewust vóór de
+        // "wie is ingelogd"-controle in reconcileOnForeground, anders zou de
+        // feedback van precies de groep die nog geen account nam blijven staan.
+        final container = containerWithRealOutbox(Stream<User?>.value(null));
+        await Future<void>.delayed(Duration.zero);
+
+        await reconcilerIn(container).reconcileOnForeground();
+
+        expect(log.events, contains('insertRow:feedback'));
+      },
+    );
+  });
 
   group('reconcileOnForeground() -- volgorde (plan 21-14)', () {
     test(

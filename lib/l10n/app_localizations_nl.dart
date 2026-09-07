@@ -1390,6 +1390,13 @@ class SNl extends S {
   String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
 
   @override
+  String get feedbackThanks => 'Dank je — je feedback is onderweg.';
+
+  @override
+  String get feedbackFailed =>
+      'Je feedback kon niet worden opgeslagen. Probeer het opnieuw.';
+
+  @override
   String scoreSemanticLabel(int score, String tier) {
     return 'Score $score van 100 — $tier';
   }

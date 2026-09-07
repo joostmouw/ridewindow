@@ -1,39 +1,27 @@
 // lib/features/profile/feedback_dialog.dart
-// Backlog #33: "Send feedback" dialog — 1-5 star rating + free-text comment,
-// submitted via a mailto: URI (no backend, no new dependency, no network call).
+// Backlog #33 / fase 22: "Send feedback" dialoog — 1-5 sterren + vrije tekst,
+// weggeschreven naar `public.feedback` via de outbox in plaats van naar een
+// mailto:.
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ridewindow/core/app_version.dart';
+import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:ridewindow/domain/services/feedback_payload.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/location_provider.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/slots_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/services/feedback_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
-const _kFeedbackRecipient = 'joostmouw@gmail.com';
-const _kFeedbackSubject = 'RideWindow feedback';
-
-/// Pure function — builds the mailto: URI for the feedback email.
-///
-/// Uses the `Uri(queryParameters: {...})` constructor (not string
-/// concatenation) so special characters in [comment] are automatically
-/// percent-encoded and cannot break the URI or inject extra mailto fields
-/// (e.g. `cc=`, `bcc=`).
-Uri buildFeedbackMailtoUri({required int rating, required String comment}) {
-  final stars = '★' * rating + '☆' * (5 - rating);
-  final trimmedComment = comment.trim();
-  final commentText = trimmedComment.isEmpty ? '(none)' : trimmedComment;
-  final body = '$stars ($rating/5)\n\nComment:\n$commentText';
-
-  return Uri(
-    scheme: 'mailto',
-    path: _kFeedbackRecipient,
-    queryParameters: {
-      'subject': _kFeedbackSubject,
-      'body': body,
-    },
-  );
-}
-
-/// Opens the feedback dialog.
+/// Opent de feedbackdialoog.
 Future<void> showFeedbackDialog(BuildContext context) {
   return showDialog<void>(
     context: context,
@@ -41,15 +29,16 @@ Future<void> showFeedbackDialog(BuildContext context) {
   );
 }
 
-class _FeedbackDialog extends StatefulWidget {
+class _FeedbackDialog extends ConsumerStatefulWidget {
   const _FeedbackDialog();
 
   @override
-  State<_FeedbackDialog> createState() => _FeedbackDialogState();
+  ConsumerState<_FeedbackDialog> createState() => _FeedbackDialogState();
 }
 
-class _FeedbackDialogState extends State<_FeedbackDialog> {
+class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
   int _rating = 0;
+  bool _sending = false;
   final _controller = TextEditingController();
 
   @override
@@ -58,15 +47,69 @@ class _FeedbackDialogState extends State<_FeedbackDialog> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final uri = buildFeedbackMailtoUri(
-      rating: _rating,
-      comment: _controller.text,
+  /// Vriest de context in op het moment van versturen (FB-02).
+  ///
+  /// Alles hiervoor komt uit providers die het scherm tóch al heeft; er wordt
+  /// niets extra's opgehaald en er gaat geen netwerkverzoek aan vooraf. Faalt
+  /// een van de lezingen, dan blijft dat veld leeg in plaats van dat het
+  /// versturen mislukt -- feedback zonder context is nog altijd beter dan geen
+  /// feedback.
+  Map<String, dynamic> _buildContext() {
+    final profile = ref.read(profileProvider).value;
+    final slotsState = ref.read(slotsProvider);
+    final RideSlot? topSlot =
+        slotsState is SlotsLoaded && slotsState.slots.isNotEmpty
+            ? slotsState.slots.first
+            : null;
+    final forecasts =
+        ref.read(weatherProvider).value ?? const <HourlyForecast>[];
+    final slotForecasts = topSlot == null
+        ? const <HourlyForecast>[]
+        : forecasts
+            .where((f) =>
+                !f.time.isBefore(topSlot.start) && f.time.isBefore(topSlot.end))
+            .toList();
+
+    if (profile == null) return const {};
+    return buildFeedbackContext(
+      profile: profile,
+      topSlot: topSlot,
+      slotForecasts: slotForecasts,
+      city: ref.read(locationProvider).value?.city,
+      appVersion: kAppVersionDisplay,
+      platform: isWebPlatform ? 'web' : 'android',
     );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+  }
+
+  Future<void> _submit() async {
+    setState(() => _sending = true);
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    try {
+      final service = FeedbackService(
+        ref.read(appDatabaseProvider).syncOutboxDao,
+      );
+      await service.submit(
+        // `null` wanneer niemand is ingelogd -- dat is de anonieme route van
+        // FB-03, niet een foutgeval.
+        userId: ref.read(currentUserIdProvider),
+        rating: _rating,
+        comment: _controller.text,
+        context: _buildContext(),
+      );
+      navigator.pop();
+      messenger.showSnackBar(SnackBar(content: Text(s.feedbackThanks)));
+    } catch (error) {
+      // De rij staat in de outbox of hij staat er niet; in beide gevallen mag
+      // een mislukking geen scherm laten crashen. Zelfde afweging als bij de
+      // sync-drain.
+      debugPrint('Feedback versturen mislukt: $error');
+      if (!mounted) return;
+      setState(() => _sending = false);
+      messenger.showSnackBar(SnackBar(content: Text(s.feedbackFailed)));
     }
-    if (mounted) Navigator.of(context).pop();
   }
 
   @override
@@ -115,7 +158,7 @@ class _FeedbackDialogState extends State<_FeedbackDialog> {
           child: Text(s.cancel),
         ),
         TextButton(
-          onPressed: _rating == 0 ? null : _submit,
+          onPressed: _rating == 0 || _sending ? null : _submit,
           child: Text(s.feedbackSendButton),
         ),
       ],

@@ -17,3 +17,10 @@
 const kOutboxEntityProfile = 'profile';
 const kOutboxEntityAvailability = 'availability';
 const kOutboxEntityPlannedRide = 'planned_ride';
+
+/// Feedback (FB-04). Wijkt af van de drie hierboven: die zijn *upserts* van
+/// één rij per gebruiker, feedback is een *insert* van een nieuwe rij per
+/// inzending. `public.feedback` heeft dan ook alleen een INSERT-grant en geen
+/// UPDATE -- en PostgREST's upsert vraagt om UPDATE-rechten, dus die weg is
+/// hier fysiek afgesloten. Zie de aparte tak in `CloudSyncReconciler.drainOutbox`.
+const kOutboxEntityFeedback = 'feedback';

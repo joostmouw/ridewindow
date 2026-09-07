@@ -292,6 +292,16 @@ class CloudSyncReconciler {
 
       await outbox.drain(
         upsertFn: (entity, entityKey, payload) async {
+          // Feedback is de enige entiteit die een échte insert nodig heeft in
+          // plaats van een upsert (FB-04). `public.feedback` heeft alleen een
+          // INSERT-grant, en PostgREST's upsert vraagt om UPDATE-rechten voor
+          // zijn `on conflict`-tak -- ook als er geen conflict is. Deze tak
+          // hoort daarom hier en niet in `SyncOutboxService`, dat bewust niets
+          // van tabellen of van de cloud-SDK weet.
+          if (entity == kOutboxEntityFeedback) {
+            await _gateway.insertRow(kFeedbackTable, payload);
+            return;
+          }
           final table = _tableForEntity(entity);
           if (table == null) return;
           await _gateway.upsertRow(table, payload);

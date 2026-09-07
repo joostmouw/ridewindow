@@ -1387,6 +1387,12 @@ class SEn extends S {
   String get pelotonJoinedRides => 'Rides you\'re joining';
 
   @override
+  String get feedbackThanks => 'Thanks — your feedback is on its way.';
+
+  @override
+  String get feedbackFailed => 'Couldn\'t save your feedback. Try again.';
+
+  @override
   String scoreSemanticLabel(int score, String tier) {
     return 'Score $score of 100 — $tier';
   }

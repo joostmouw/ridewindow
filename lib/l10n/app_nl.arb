@@ -622,6 +622,8 @@
   "pelotonDecline": "Kan niet",
   "pelotonOwnedRides": "Ritten die jij organiseert",
   "pelotonJoinedRides": "Ritten waar je aan meedoet",
+  "feedbackThanks": "Dank je — je feedback is onderweg.",
+  "feedbackFailed": "Je feedback kon niet worden opgeslagen. Probeer het opnieuw.",
   "scoreSemanticLabel": "Score {score} van 100 — {tier}",
   "@scoreSemanticLabel": {"placeholders": {"score": {"type": "int"}, "tier": {"type": "String"}}},
   "pelotonWithOwner": "Met {name}",

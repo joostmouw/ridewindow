@@ -2563,6 +2563,18 @@ abstract class S {
   /// **'Ritten waar je aan meedoet'**
   String get pelotonJoinedRides;
 
+  /// No description provided for @feedbackThanks.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dank je — je feedback is onderweg.'**
+  String get feedbackThanks;
+
+  /// No description provided for @feedbackFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je feedback kon niet worden opgeslagen. Probeer het opnieuw.'**
+  String get feedbackFailed;
+
   /// No description provided for @scoreSemanticLabel.
   ///
   /// In nl, this message translates to:

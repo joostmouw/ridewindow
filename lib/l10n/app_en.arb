@@ -484,6 +484,8 @@
   "pelotonDecline": "Can't make it",
   "pelotonOwnedRides": "Rides you organise",
   "pelotonJoinedRides": "Rides you're joining",
+  "feedbackThanks": "Thanks — your feedback is on its way.",
+  "feedbackFailed": "Couldn't save your feedback. Try again.",
   "scoreSemanticLabel": "Score {score} of 100 — {tier}",
   "@scoreSemanticLabel": {"placeholders": {"score": {"type": "int"}, "tier": {"type": "String"}}},
   "pelotonWithOwner": "With {name}",
