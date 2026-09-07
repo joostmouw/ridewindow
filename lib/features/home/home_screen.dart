@@ -655,6 +655,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(color: rw.plannedRide.withAlpha(60)),
         ),
+        // `Material.clipBehavior` staat standaard op `Clip.none`, en dan volgt
+        // de inkt van de `InkWell` de rechthoek in plaats van de afgeronde
+        // vorm. In rust zie je daar niets van; zodra je indrukt of sleept komt
+        // er een vierkant vlak onder je vinger vandaan op een rij die rond
+        // hoort te zijn. Dat is wat Joost zag (2026-09-07) en het is precies
+        // wat Material Design hier niet voorschrijft.
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () => _openPlannedRideDetail(ride),

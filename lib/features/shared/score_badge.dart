@@ -45,24 +45,19 @@ class _ScoreBadgeState extends State<ScoreBadge>
     final t = context.rw.tiers;
     final Color bg;
     final Color fg;
-    final IconData icon;
     switch (widget.tier) {
       case Perfect():
         bg = t.perfectBg;
         fg = t.perfectFg;
-        icon = Icons.sentiment_very_satisfied;
       case Great():
         bg = t.greatBg;
         fg = t.greatFg;
-        icon = Icons.sentiment_satisfied;
       case Acceptable():
         bg = t.acceptableBg;
         fg = t.acceptableFg;
-        icon = Icons.sentiment_neutral;
       case Poor():
         bg = t.poorBg;
         fg = t.poorFg;
-        icon = Icons.sentiment_dissatisfied;
     }
 
     Widget badge = Container(
@@ -71,11 +66,14 @@ class _ScoreBadgeState extends State<ScoreBadge>
         color: bg,
         borderRadius: BorderRadius.circular(20),
       ),
+      // Geen smiley meer. Die verdween in v4.0 al van de ritkaarten toen de
+      // score daar een groot getal werd (zie `ScoreDisplay`), maar hij bleef
+      // hier staan -- en daarmee stond dezelfde beoordeling op twee plekken in
+      // twee talen. De pil draagt het woord; een gezichtje zegt daar niets
+      // bovenop wat er niet al staat.
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: fg),
-          const SizedBox(width: 4),
           Text(
             switch (widget.tier) {
               Perfect() => S.of(context).tierPerfect,

@@ -3,7 +3,7 @@
 //
 // TDD RED: Written before implementation. Tests define expected behavior:
 //   - AppBar toont start/eindtijd van slot
-//   - Score-banner toont tier-emoji en label
+//   - Score-banner toont het tier-woord (geen smiley sinds v4.0)
 //   - Info-kaart "Uurlijks" toont rijen per HourlyRow
 //   - "i"-knop opent InsightsSheet via showModalBottomSheet
 //   - Placeholder-knoppen tonen een SnackBar
@@ -178,7 +178,7 @@ void main() {
       expect(find.textContaining('13:00'), findsWidgets);
     });
 
-    testWidgets('Score-banner toont tier-emoji voor Perfect slot',
+    testWidgets('Score-banner toont het tier-woord voor Perfect slot, zonder smiley',
         (tester) async {
       final slot = makeSlot(tier: const Perfect());
       final forecasts = makeForecasts(slot.start);
@@ -190,13 +190,20 @@ void main() {
       ));
       await tester.pump();
 
-      // Perfect tier's ScoreBadge shows a satisfied-face Material icon
-      // (production migrated from emoji text to Icons during the MD3
-      // redesign — see lib/features/shared/score_badge.dart).
-      expect(find.byIcon(Icons.sentiment_very_satisfied), findsWidgets);
+      // De smiley is in v4.0 uit `ScoreBadge` verwijderd (epic #64). Hij
+      // verdween eerder al van de ritkaarten toen de score daar een groot
+      // getal werd, maar bleef hier staan -- dezelfde beoordeling in twee
+      // talen tegelijk. De pil draagt sindsdien alleen het woord.
+      //
+      // Deze test borgde eerst juist die smiley. Hij is omgedraaid en niet
+      // weggegooid: zonder de negatieve assertie sluipt een gezichtje er zo
+      // weer in.
+      expect(find.byIcon(Icons.sentiment_very_satisfied), findsNothing);
+      expect(find.text('Perfect'), findsWidgets);
     });
 
-    testWidgets('Score-banner toont tier-emoji voor Poor slot', (tester) async {
+    testWidgets('Score-banner toont het tier-woord voor Poor slot, zonder smiley',
+        (tester) async {
       final slot = makeSlot(
         tier: const Poor(),
         score: 30,
@@ -219,10 +226,8 @@ void main() {
       ));
       await tester.pump();
 
-      // Poor tier's ScoreBadge shows a dissatisfied-face Material icon
-      // (production migrated from emoji text to Icons during the MD3
-      // redesign — see lib/features/shared/score_badge.dart).
-      expect(find.byIcon(Icons.sentiment_dissatisfied), findsWidgets);
+      // Zie de noot bij de Perfect-variant hierboven.
+      expect(find.byIcon(Icons.sentiment_dissatisfied), findsNothing);
     });
 
     testWidgets('Score-banner toont beschrijvingstekst voor Perfect',
