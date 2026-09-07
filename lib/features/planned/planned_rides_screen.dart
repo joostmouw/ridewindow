@@ -22,13 +22,6 @@ import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
-Color _scoreColor(double score, RideWindowTheme rw) {
-  if (score >= 85) return rw.scorePerfect;
-  if (score >= 70) return rw.scoreGreat;
-  if (score >= 50) return rw.scoreAcceptable;
-  return rw.scorePoor;
-}
-
 ({Color bg, Color fg}) _scoreTonal(double score, RideWindowTheme rw) {
   final t = rw.tiers;
   if (score >= 85) return (bg: t.perfectBg, fg: t.perfectFg);
@@ -412,8 +405,21 @@ class _RideCard extends ConsumerWidget {
               margin: EdgeInsets.zero,
               child: InkWell(
                 borderRadius: BorderRadius.circular(_cardRadius),
-                onTap: () => _showDetail(context, ref, scores, rideForecasts,
-                    currentScore, avgWindDir),
+                // Rechtstreeks naar het detailscherm, precies zoals een tik
+                // op een ritkaart op Home doet.
+                onTap: () {
+                  final slot = RideSlot(
+                    start: ride.start,
+                    end: ride.end,
+                    overallScore: currentScore ?? ride.plannedScore,
+                    tier: rideTierFromScore(currentScore ?? ride.plannedScore),
+                    hours: scores,
+                  );
+                  context.push(
+                    '/detail',
+                    extra: DetailArgs(slot: slot, forecasts: rideForecasts),
+                  );
+                },
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
@@ -562,261 +568,17 @@ class _RideCard extends ConsumerWidget {
     );
   }
 
-  void _showDetail(
-    BuildContext context,
-    WidgetRef ref,
-    List<HourlyScore> scores,
-    List<HourlyForecast> rideForecasts,
-    double? currentScore,
-    double? avgWindDir,
-  ) {
-    final theme = Theme.of(context);
-    final rw = context.rw;
-    final dayFmt = DateFormat(
-        'EEEE d MMMM',
-        Localizations.localeOf(context).languageCode == 'en'
-            ? 'en_US'
-            : 'nl_NL');
-    final tonal = currentScore != null
-        ? _scoreTonal(currentScore, rw)
-        : (bg: rw.tiers.poorBg, fg: rw.tiers.poorFg);
-    final tierText =
-        currentScore != null ? _tierLabel(currentScore, context) : '?';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.6,
-        minChildSize: 0.3,
-        maxChildSize: 0.85,
-        builder: (_, controller) => ListView(
-          controller: controller,
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-          children: [
-            // Header
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(dayFmt.format(ride.start),
-                          style: theme.textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold)),
-                      Text(
-                          '${_fmtTime(ride.start)} – ${_fmtTime(ride.end)}  (${ride.durationHours}u)',
-                          style: theme.textTheme.bodyLarge),
-                      if (cityName.isNotEmpty)
-                        Text(cityName, style: theme.textTheme.bodySmall),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                      color: tonal.bg, borderRadius: BorderRadius.circular(16)),
-                  child: Text(
-                    currentScore != null
-                        ? '${currentScore.round()} $tierText'
-                        : '?',
-                    style: TextStyle(
-                        color: tonal.fg,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-
-            // Wind advice
-            if (avgWindDir != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withAlpha(80),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Transform.rotate(
-                      angle: avgWindDir * math.pi / 180,
-                      child: Icon(Icons.navigation,
-                          size: 20, color: theme.colorScheme.primary),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        S.of(context).ridesWindFrom(
-                            _windDirection(avgWindDir, context),
-                            _tailwindAdvice(avgWindDir, context)),
-                        style: TextStyle(
-                            fontSize: 13, color: theme.colorScheme.primary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 16),
-            Text(S.of(context).ridesPerHour, style: theme.textTheme.labelLarge),
-            const SizedBox(height: 8),
-
-            // Hourly breakdown table
-            for (var i = 0; i < rideForecasts.length; i++) ...[
-              _HourRow(
-                forecast: rideForecasts[i],
-                score: i < scores.length ? scores[i] : null,
-              ),
-              if (i < rideForecasts.length - 1) const Divider(height: 1),
-            ],
-
-            // Score breakdown (averages)
-            if (scores.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Text(S.of(context).ridesAvgScoreBreakdown,
-                  style: theme.textTheme.labelLarge),
-              const SizedBox(height: 8),
-              _ScoreBar(
-                  label: S.of(context).weatherTemperature,
-                  value: scores.fold(0.0, (s, h) => s + h.temperatureScore) /
-                      scores.length),
-              const SizedBox(height: 4),
-              _ScoreBar(
-                  label: S.of(context).agendaRain,
-                  value: scores.fold(0.0, (s, h) => s + h.rainScore) /
-                      scores.length),
-              const SizedBox(height: 4),
-              _ScoreBar(
-                  label: S.of(context).weatherWind,
-                  value: scores.fold(0.0, (s, h) => s + h.windScore) /
-                      scores.length),
-            ],
-
-            // Full detail
-            if (scores.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    final slot = RideSlot(
-                      start: ride.start,
-                      end: ride.end,
-                      overallScore: currentScore ?? ride.plannedScore,
-                      tier:
-                          rideTierFromScore(currentScore ?? ride.plannedScore),
-                      hours: scores,
-                    );
-                    context.push('/detail',
-                        extra:
-                            DetailArgs(slot: slot, forecasts: rideForecasts));
-                  },
-                  icon: const Icon(Icons.open_in_new, size: 18),
-                  label: Text(S.of(context).agendaViewDetails),
-                ),
-              ),
-            ],
-
-            // Delete
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: theme.colorScheme.error,
-                side: BorderSide(color: theme.colorScheme.error),
-              ),
-              onPressed: () {
-                ref.read(plannedRidesProvider.notifier).remove(ride);
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(S.of(context).rideRemoved)),
-                );
-              },
-              icon: const Icon(Icons.delete_outline, size: 18),
-              label: Text(S.of(context).ridesDeleteRide),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// -- Hourly row in detail sheet --
-
-class _HourRow extends StatelessWidget {
-  const _HourRow({required this.forecast, this.score});
-  final HourlyForecast forecast;
-  final HourlyScore? score;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 40,
-            child: Text(
-              '${forecast.time.hour}:00',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-          if (score != null)
-            Builder(builder: (_) {
-              final t = _scoreTonal(score!.overall, context.rw);
-              return Container(
-                width: 32,
-                height: 20,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: t.bg,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '${score!.overall.round()}',
-                  style: TextStyle(
-                      color: t.fg, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              );
-            })
-          else
-            const SizedBox(width: 32),
-          const SizedBox(width: 8),
-          Icon(Icons.thermostat,
-              size: 14, color: theme.colorScheme.onSurfaceVariant),
-          Text(' ${forecast.temperatureC?.round() ?? '?'}°',
-              style: const TextStyle(fontSize: 12)),
-          const SizedBox(width: 8),
-          Icon(Icons.water_drop,
-              size: 14, color: theme.colorScheme.onSurfaceVariant),
-          Text(' ${forecast.precipitationProbability?.round() ?? '?'}%',
-              style: const TextStyle(fontSize: 12)),
-          const SizedBox(width: 8),
-          Icon(Icons.air, size: 14, color: theme.colorScheme.onSurfaceVariant),
-          Expanded(
-            child: Text(
-              forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
-                  ? ' ${S.of(context).hourlyWindstil}'
-                  : forecast.windspeedKmh != null &&
-                          forecast.windspeedKmh! >= 15 &&
-                          forecast.winddirectionDeg != null
-                      ? ' ${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg, context)}'
-                      : ' ${forecast.windspeedKmh?.round() ?? '?'} km/h',
-              style: const TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Hier stond `_showDetail`: een bottom sheet met de rit, een knop "View
+  // details" naar het detailscherm, en een verwijderknop.
+  //
+  // Weg, omdat dezelfde rit daarmee op twee manieren openging -- vanaf Home
+  // rechtstreeks het detailscherm, vanaf hier eerst een tussenscherm dat je nog
+  // een keer moest laten doorklikken (waargenomen door Joost, fase 25 in
+  // EIGEN-GEZICHT.md). Twee routes naar hetzelfde ding is er een te veel, en de
+  // route via Home was de kortere.
+  //
+  // Verwijderen kan nog steeds: veeg de kaart weg (daar wijst de hint
+  // `hintSwipeDelete` ook op), of gebruik de knop op het detailscherm zelf.
 }
 
 // -- Helpers --
@@ -834,42 +596,6 @@ class _WeatherChip extends StatelessWidget {
         Icon(icon, size: 14, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 3),
         Text(value, style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-}
-
-class _ScoreBar extends StatelessWidget {
-  const _ScoreBar({required this.label, required this.value});
-  final String label;
-  final double value;
-
-  @override
-  Widget build(BuildContext context) {
-    final rw = context.rw;
-    return Row(
-      children: [
-        SizedBox(
-            width: 90,
-            child: Text(label, style: const TextStyle(fontSize: 12))),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: value / 100,
-              minHeight: 8,
-              backgroundColor: rw.border,
-              valueColor: AlwaysStoppedAnimation(_scoreColor(value, rw)),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 28,
-          child: Text('${value.round()}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.end),
-        ),
       ],
     );
   }

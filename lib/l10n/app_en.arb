@@ -106,6 +106,10 @@
   "staleDataBannerNoTime": "Offline — showing last-known ride windows",
 
   "unitKmh": "km/h",
+  "comboShortShort": "Short/short",
+  "comboLongShort": "Long/short",
+  "comboLongLong": "Long/long",
+  "comboLongLongExtra": "Long/long +",
   "windCalm": "Calm",
   "durationHours": "{hours}h",
 

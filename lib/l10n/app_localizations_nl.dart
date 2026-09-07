@@ -308,6 +308,18 @@ class SNl extends S {
   String get unitKmh => 'km/u';
 
   @override
+  String get comboShortShort => 'Kort/kort';
+
+  @override
+  String get comboLongShort => 'Lang/kort';
+
+  @override
+  String get comboLongLong => 'Lang/lang';
+
+  @override
+  String get comboLongLongExtra => 'Lang/lang +';
+
+  @override
   String get windCalm => 'Windstil';
 
   @override

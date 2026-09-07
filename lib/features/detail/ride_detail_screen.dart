@@ -166,7 +166,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   String _fmtDuration(DateTime start, DateTime end) {
     final diff = end.difference(start);
     final hours = diff.inMinutes ~/ 60;
-    return '${hours}u';
+    return S.of(context).durationHours(hours);
   }
 
   // ---------------------------------------------------------------------------
@@ -759,7 +759,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${_end.difference(_start).inHours}u',
+                  S.of(context).durationHours(_end.difference(_start).inHours),
                   style: const TextStyle(
                       fontSize: 12, fontWeight: FontWeight.w600),
                 ),

@@ -137,6 +137,10 @@
   "staleDataBannerNoTime": "Offline — toont laatst bekende rijvensters",
 
   "unitKmh": "km/u",
+  "comboShortShort": "Kort/kort",
+  "comboLongShort": "Lang/kort",
+  "comboLongLong": "Lang/lang",
+  "comboLongLongExtra": "Lang/lang +",
   "windCalm": "Windstil",
   "durationHours": "{hours}u",
   "@durationHours": {

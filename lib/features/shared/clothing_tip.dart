@@ -141,16 +141,16 @@ class ClothingTip extends StatelessWidget {
     switch (advice.combo) {
       case ClothingCombo.shortShort:
         emoji = '\u{1F455}\u{1FA73}'; // t-shirt + shorts
-        label = 'Kort/kort';
+        label = S.of(context).comboShortShort;
       case ClothingCombo.longShort:
         emoji = '\u{1F9E5}\u{1FA73}'; // long sleeve + shorts
-        label = 'Lang/kort';
+        label = S.of(context).comboLongShort;
       case ClothingCombo.longLong:
         emoji = '\u{1F9E5}\u{1F456}'; // long sleeve + pants
-        label = 'Lang/lang';
+        label = S.of(context).comboLongLong;
       case ClothingCombo.longLongExtra:
         emoji = '\u{1F9E5}\u{1F9E5}'; // double layer
-        label = 'Lang/lang +';
+        label = S.of(context).comboLongLongExtra;
     }
 
     return Container(
@@ -167,8 +167,8 @@ class ClothingTip extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: cs.onSurfaceVariant,
-            ),
+                  color: cs.onSurfaceVariant,
+                ),
           ),
         ],
       ),

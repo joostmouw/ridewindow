@@ -607,6 +607,30 @@ abstract class S {
   /// **'km/u'**
   String get unitKmh;
 
+  /// No description provided for @comboShortShort.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kort/kort'**
+  String get comboShortShort;
+
+  /// No description provided for @comboLongShort.
+  ///
+  /// In nl, this message translates to:
+  /// **'Lang/kort'**
+  String get comboLongShort;
+
+  /// No description provided for @comboLongLong.
+  ///
+  /// In nl, this message translates to:
+  /// **'Lang/lang'**
+  String get comboLongLong;
+
+  /// No description provided for @comboLongLongExtra.
+  ///
+  /// In nl, this message translates to:
+  /// **'Lang/lang +'**
+  String get comboLongLongExtra;
+
   /// No description provided for @windCalm.
   ///
   /// In nl, this message translates to:

@@ -307,6 +307,18 @@ class SEn extends S {
   String get unitKmh => 'km/h';
 
   @override
+  String get comboShortShort => 'Short/short';
+
+  @override
+  String get comboLongShort => 'Long/short';
+
+  @override
+  String get comboLongLong => 'Long/long';
+
+  @override
+  String get comboLongLongExtra => 'Long/long +';
+
+  @override
   String get windCalm => 'Calm';
 
   @override
