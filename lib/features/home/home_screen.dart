@@ -1063,168 +1063,186 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
               ),
+              // Deze `ClipRRect` maakt van de meeschuivende kaart een écht
+              // afgerond blok. Zonder hem kreeg je bij het slepen een kaars-
+              // rechte voorrand met een harde naad tussen het groene vlak en de
+              // kaart — precies wat je op een scherm vol radius-24 niet wilt
+              // zien (waargenomen door Joost, 2026-09-07). De `shape` op de
+              // `Card` hieronder rondt alleen zijn eigen rustpositie af; zodra
+              // hij binnen de clip van de ouder verschuift, is het de ouder die
+              // de vorm bepaalt. Vandaar een clip die mét de kaart meebeweegt.
+              //
+              // De buitenste `ClipRRect` blijft ook staan: die houdt het groene
+              // onthulvlak binnen dezelfde ronding en voorkomt dat de kaart aan
+              // de rechterkant buiten zijn plek schuift.
+              //
               // Beide kaarten zijn hetzelfde wit. Dat is opzet: het onderscheid
               // komt niet meer uit kleur maar uit licht en rand — de beste kaart
               // heeft de schaduw hierboven plus de 5px linkerrand hieronder, de
               // rest is vlak met een haarlijn. Kleur werkte hier nooit, want de
               // trappen in de oppervlakkenladder liggen te dicht op elkaar om een
               // eerste en tweede plek mee te maken.
-              child: Card(
-                // De schaduw zit bewust op de `DecoratedBox` buiten de clip, niet
-                // hier — zie de noot daar. `elevation` binnen een `ClipRRect` is
-                // weggegooid werk.
-                elevation: 0,
-                margin: EdgeInsets.zero,
-                color: cs.surfaceContainerLowest,
-                shape: RoundedRectangleBorder(
-                  borderRadius: radius,
-                  side: isBest
-                      ? BorderSide.none
-                      : BorderSide(color: cs.surfaceContainerHigh),
-                ),
-                child: Container(
-                  // De accentrand van de beste kaart. Een `Container` met een
-                  // enkelzijdige `Border` schuift zijn kind netjes 5px op; dat
-                  // kan alleen zonder `borderRadius` (Flutter staat een
-                  // niet-uniforme rand met radius niet toe), en dat hoeft ook
-                  // niet — de `ClipRRect` eromheen rondt hem al af.
-                  decoration: isBest
-                      ? const BoxDecoration(
-                          border: Border(
-                            left: BorderSide(
-                              color: AppColors.brandDark,
-                              width: 5,
-                            ),
-                          ),
-                        )
-                      : null,
-                  child: InkWell(
+              child: ClipRRect(
+                borderRadius: radius,
+                child: Card(
+                  // De schaduw zit bewust op de `DecoratedBox` buiten de clip, niet
+                  // hier — zie de noot daar. `elevation` binnen een `ClipRRect` is
+                  // weggegooid werk.
+                  elevation: 0,
+                  margin: EdgeInsets.zero,
+                  color: cs.surfaceContainerLowest,
+                  shape: RoundedRectangleBorder(
                     borderRadius: radius,
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      context.push(
-                        '/detail',
-                        extra: DetailArgs(
-                          slot: slot,
-                          forecasts: slotForecasts,
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // "Beste keuze" label
-                          if (isBest)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: cs.primaryContainer,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(20)),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.star_rounded,
-                                        size: 14, color: cs.onPrimaryContainer),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      S.of(context).bestChoice,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            color: cs.onPrimaryContainer,
-                                          ),
-                                    ),
-                                  ],
-                                ),
+                    side: isBest
+                        ? BorderSide.none
+                        : BorderSide(color: cs.surfaceContainerHigh),
+                  ),
+                  child: Container(
+                    // De accentrand van de beste kaart. Een `Container` met een
+                    // enkelzijdige `Border` schuift zijn kind netjes 5px op; dat
+                    // kan alleen zonder `borderRadius` (Flutter staat een
+                    // niet-uniforme rand met radius niet toe), en dat hoeft ook
+                    // niet — de `ClipRRect` eromheen rondt hem al af.
+                    decoration: isBest
+                        ? const BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: AppColors.brandDark,
+                                width: 5,
                               ),
                             ),
-                          // Card top: dag + badge
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    WeatherIcon(tier: slot.tier, size: 24),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            _formatDayName(slot.start),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
-                                          Text(
-                                            '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: cs.onSurfaceVariant,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              ScoreDisplay(
-                                score: slot.overallScore,
-                                tier: slot.tier,
-                              ),
-                            ],
+                          )
+                        : null,
+                    child: InkWell(
+                      borderRadius: radius,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        context.push(
+                          '/detail',
+                          extra: DetailArgs(
+                            slot: slot,
+                            forecasts: slotForecasts,
                           ),
-                          const SizedBox(height: 14),
-                          // Alleen de beste kaart krijgt de volle balken. Drie
-                          // balken op élke kaart is de reden dat de lijst als
-                          // één massa leest — dat was op de schets meteen te
-                          // zien. De rest krijgt één regel, zodat het verschil
-                          // tussen eerste en tweede plek ook overeind blijft
-                          // als je scrollt.
-                          if (avgTemp != null ||
-                              totalPrecip != null ||
-                              avgWind != null)
-                            isBest
-                                ? _buildWeatherBars(
-                                    avgTemp: avgTemp,
-                                    totalPrecip: totalPrecip,
-                                    avgWind: avgWind,
-                                  )
-                                : _buildWeatherSummary(
-                                    avgTemp: avgTemp,
-                                    totalPrecip: totalPrecip,
-                                    avgWind: avgWind,
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // "Beste keuze" label
+                            if (isBest)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: cs.primaryContainer,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20)),
                                   ),
-                          const SizedBox(height: 14),
-                          // Footer: Plan het knop
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: FilledButton.tonalIcon(
-                              onPressed: () => _planRide(slot),
-                              icon: const Icon(Icons.event_available, size: 16),
-                              label: Text(S.of(context).schedule),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.star_rounded,
+                                          size: 14,
+                                          color: cs.onPrimaryContainer),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        S.of(context).bestChoice,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color: cs.onPrimaryContainer,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            // Card top: dag + badge
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      WeatherIcon(tier: slot.tier, size: 24),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _formatDayName(slot.start),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    color: cs.onSurfaceVariant,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                ScoreDisplay(
+                                  score: slot.overallScore,
+                                  tier: slot.tier,
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 14),
+                            // Alleen de beste kaart krijgt de volle balken. Drie
+                            // balken op élke kaart is de reden dat de lijst als
+                            // één massa leest — dat was op de schets meteen te
+                            // zien. De rest krijgt één regel, zodat het verschil
+                            // tussen eerste en tweede plek ook overeind blijft
+                            // als je scrollt.
+                            if (avgTemp != null ||
+                                totalPrecip != null ||
+                                avgWind != null)
+                              isBest
+                                  ? _buildWeatherBars(
+                                      avgTemp: avgTemp,
+                                      totalPrecip: totalPrecip,
+                                      avgWind: avgWind,
+                                    )
+                                  : _buildWeatherSummary(
+                                      avgTemp: avgTemp,
+                                      totalPrecip: totalPrecip,
+                                      avgWind: avgWind,
+                                    ),
+                            const SizedBox(height: 14),
+                            // Footer: Plan het knop
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: FilledButton.tonalIcon(
+                                onPressed: () => _planRide(slot),
+                                icon:
+                                    const Icon(Icons.event_available, size: 16),
+                                label: Text(S.of(context).schedule),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1308,9 +1326,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final rainMax = tol?.rainMaxIdealMm ?? 0.5;
 
     final style = Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: rw.textTertiary,
-          fontFeatures: const [FontFeature.tabularFigures()],
-        );
+      color: rw.textTertiary,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
 
     Widget item(IconData icon, String text) => Row(
           mainAxisSize: MainAxisSize.min,
