@@ -146,7 +146,8 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final rides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
+    final rides =
+        ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     final allScores = ref.watch(allHourlyScoresProvider);
     final forecasts = ref.watch(weatherProvider).value ?? <HourlyForecast>[];
     final cityName = ref.watch(locationProvider).value?.city ?? '';
@@ -207,41 +208,40 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
     ThemeData theme,
   ) {
     return upcoming.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.directions_bike,
-                            size: 48,
-                            color: theme.colorScheme.onSurfaceVariant),
-                        const SizedBox(height: 16),
-                        Text(S.of(context).ridesEmpty,
-                            style: theme.textTheme.titleMedium),
-                        const SizedBox(height: 8),
-                        Text(
-                          S.of(context).ridesEmptyHint,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+        ? Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.directions_bike,
+                      size: 48, color: theme.colorScheme.onSurfaceVariant),
+                  const SizedBox(height: 16),
+                  Text(S.of(context).ridesEmpty,
+                      style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  Text(
+                    S.of(context).ridesEmptyHint,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: upcoming.length,
-                  itemBuilder: (context, i) => _RideCard(
-                    key: i == 0 ? _firstRideKey : null,
-                    ride: upcoming[i],
-                    allScores: allScores,
-                    forecasts: forecasts,
-                    cityName: cityName,
-                  ),
-                );
+                ],
+              ),
+            ),
+          )
+        : ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: upcoming.length,
+            itemBuilder: (context, i) => _RideCard(
+              key: i == 0 ? _firstRideKey : null,
+              ride: upcoming[i],
+              allScores: allScores,
+              forecasts: forecasts,
+              cityName: cityName,
+            ),
+          );
   }
 }
 
@@ -356,15 +356,19 @@ class _RideCard extends ConsumerWidget {
           key: ValueKey(
               '${ride.start.toIso8601String()}_${ride.end.toIso8601String()}'),
           direction: DismissDirection.endToStart,
-          background: ColoredBox(
-            color: theme.colorScheme.errorContainer,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 24),
-                child: Icon(Icons.delete,
-                    color: theme.colorScheme.onErrorContainer),
-              ),
+          // Geen gekleurd vlak, alleen het icoon op de gewone achtergrond —
+          // dezelfde behandeling als de ritkaarten op Home (2026-09-07).
+          //
+          // `Dismissible` knipt zijn achtergrond af tot het onthulde stuk, en
+          // die knip loopt kaarsrecht langs de rand van de kaart. Een gekleurd
+          // blok houdt daar dus altijd een hoek van 90° over, hoeveel radius je
+          // er ook op zet — op een scherm vol radius 24 valt dat meteen op. Wat
+          // niet bestaat kan ook niet vierkant afgeknipt worden.
+          background: Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 24),
+              child: Icon(Icons.delete, color: theme.colorScheme.error),
             ),
           ),
           onDismissed: (_) {
@@ -373,149 +377,158 @@ class _RideCard extends ConsumerWidget {
               SnackBar(content: Text(S.of(context).rideRemoved)),
             );
           },
-          child: Card(
-            margin: EdgeInsets.zero,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(_cardRadius),
-              onTap: () => _showDetail(context, ref, scores, rideForecasts,
-                  currentScore, avgWindDir),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                DateFormat(
-                                        'EEEE d MMM',
-                                        Localizations.localeOf(context)
-                                                    .languageCode ==
-                                                'en'
-                                            ? 'en_US'
-                                            : 'nl_NL')
-                                    .format(ride.start),
-                                style: theme.textTheme.titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                '${_fmtTime(ride.start)} – ${_fmtTime(ride.end)}  (${ride.durationHours}u)',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                              if (cityName.isNotEmpty)
-                                Text(cityName,
-                                    style: theme.textTheme.bodySmall),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                  color: tonal.bg,
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: Text(
-                                currentScore != null
-                                    ? '${currentScore.round()} $tierText'
-                                    : '?',
-                                style: TextStyle(
-                                    color: tonal.fg,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12),
-                              ),
-                            ),
-                            if (delta != null && delta.abs() >= 2) ...[
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    delta > 0
-                                        ? Icons.trending_up
-                                        : Icons.trending_down,
-                                    size: 14,
-                                    color:
-                                        delta > 0 ? rw.scorePerfect : rw.error,
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    S.of(context).rideSincePlanning(
-                                        '${delta > 0 ? '+' : ''}${delta.round()}'),
-                                    style: TextStyle(
-                                        fontSize: 11,
-                                        color: delta > 0
-                                            ? rw.scorePerfect
-                                            : rw.error),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                    if (avgTemp != null) ...[
-                      const SizedBox(height: 10),
-                      const Divider(height: 1),
-                      const SizedBox(height: 10),
+          // Deze clip beweegt mét de kaart mee en maakt er een écht afgerond
+          // blok van. De `ClipRRect` hierboven staat stil en zou de kaart bij
+          // het wegschuiven langs een rechte lijn afsnijden; de `shape` van de
+          // `Card` rondt alleen zijn rustpositie af. Zelfde constructie als op
+          // Home.
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_cardRadius),
+            child: Card(
+              margin: EdgeInsets.zero,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(_cardRadius),
+                onTap: () => _showDetail(context, ref, scores, rideForecasts,
+                    currentScore, avgWindDir),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Row(
                         children: [
-                          _WeatherChip(
-                              icon: Icons.thermostat,
-                              value: avgApparent != null &&
-                                      (avgApparent - avgTemp!).abs() >= 2
-                                  ? '${avgTemp.round()}° (${avgApparent.round()}°)'
-                                  : '${avgTemp.round()}°C'),
-                          const SizedBox(width: 12),
-                          _WeatherChip(
-                              icon: Icons.water_drop,
-                              value: avgRainProb != null && avgRainProb > 0
-                                  ? '${avgRain!.toStringAsFixed(1)}mm (${avgRainProb.round()}%)'
-                                  : '${avgRain!.toStringAsFixed(1)}mm'),
-                          const SizedBox(width: 12),
-                          _WeatherChip(
-                              icon: Icons.air,
-                              value: avgWind! < 5
-                                  ? S.of(context).windCalm
-                                  : avgWindDir != null
-                                      ? '${avgWind.round()} km/h ${_windDirection(avgWindDir, context)}'
-                                      : '${avgWind.round()} km/h'),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  DateFormat(
+                                          'EEEE d MMM',
+                                          Localizations.localeOf(context)
+                                                      .languageCode ==
+                                                  'en'
+                                              ? 'en_US'
+                                              : 'nl_NL')
+                                      .format(ride.start),
+                                  style: theme.textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '${_fmtTime(ride.start)} – ${_fmtTime(ride.end)}  (${ride.durationHours}u)',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                if (cityName.isNotEmpty)
+                                  Text(cityName,
+                                      style: theme.textTheme.bodySmall),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                    color: tonal.bg,
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: Text(
+                                  currentScore != null
+                                      ? '${currentScore.round()} $tierText'
+                                      : '?',
+                                  style: TextStyle(
+                                      color: tonal.fg,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12),
+                                ),
+                              ),
+                              if (delta != null && delta.abs() >= 2) ...[
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      delta > 0
+                                          ? Icons.trending_up
+                                          : Icons.trending_down,
+                                      size: 14,
+                                      color: delta > 0
+                                          ? rw.scorePerfect
+                                          : rw.error,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      S.of(context).rideSincePlanning(
+                                          '${delta > 0 ? '+' : ''}${delta.round()}'),
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: delta > 0
+                                              ? rw.scorePerfect
+                                              : rw.error),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
                         ],
                       ),
-                      // Wind advice
-                      if (avgWind != null &&
-                          avgWind >= 5 &&
-                          avgWindDir != null) ...[
-                        const SizedBox(height: 6),
+                      if (avgTemp != null) ...[
+                        const SizedBox(height: 10),
+                        const Divider(height: 1),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
-                            Transform.rotate(
-                              angle: (avgWindDir ?? 0) * math.pi / 180,
-                              child: Icon(Icons.navigation,
-                                  size: 14, color: theme.colorScheme.primary),
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                _tailwindAdvice(avgWindDir, context),
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: theme.colorScheme.primary,
-                                    fontStyle: FontStyle.italic),
-                              ),
-                            ),
+                            _WeatherChip(
+                                icon: Icons.thermostat,
+                                value: avgApparent != null &&
+                                        (avgApparent - avgTemp!).abs() >= 2
+                                    ? '${avgTemp.round()}° (${avgApparent.round()}°)'
+                                    : '${avgTemp.round()}°C'),
+                            const SizedBox(width: 12),
+                            _WeatherChip(
+                                icon: Icons.water_drop,
+                                value: avgRainProb != null && avgRainProb > 0
+                                    ? '${avgRain!.toStringAsFixed(1)}mm (${avgRainProb.round()}%)'
+                                    : '${avgRain!.toStringAsFixed(1)}mm'),
+                            const SizedBox(width: 12),
+                            _WeatherChip(
+                                icon: Icons.air,
+                                value: avgWind! < 5
+                                    ? S.of(context).windCalm
+                                    : avgWindDir != null
+                                        ? '${avgWind.round()} km/h ${_windDirection(avgWindDir, context)}'
+                                        : '${avgWind.round()} km/h'),
                           ],
                         ),
+                        // Wind advice
+                        if (avgWind != null &&
+                            avgWind >= 5 &&
+                            avgWindDir != null) ...[
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Transform.rotate(
+                                angle: (avgWindDir ?? 0) * math.pi / 180,
+                                child: Icon(Icons.navigation,
+                                    size: 14, color: theme.colorScheme.primary),
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  _tailwindAdvice(avgWindDir, context),
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      color: theme.colorScheme.primary,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
