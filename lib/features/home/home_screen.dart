@@ -1044,8 +1044,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 _planRide(slot);
                 return false;
               },
-              background: ColoredBox(
-                color: cs.primaryContainer,
+              // Het onthulvlak is een eigen afgerond blok, geen vulling die
+              // toevallig door de buitenste clip links wordt afgerond. Zonder
+              // die eigen ronding hield het aan de kant van de kaart vierkante
+              // hoeken over — op een scherm waar alles radius 24 heeft viel dat
+              // meteen op (Joost, 2026-09-07, tweede opname).
+              background: Container(
+                decoration: BoxDecoration(
+                  color: cs.primaryContainer,
+                  borderRadius: radius,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 24),
                   child: Row(
