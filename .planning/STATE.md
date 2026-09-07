@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23 stap 1+2 draait — papier + beste kaart"
-last_updated: "2026-09-07T16:05:00.000Z"
+status: "Fase 23: stap 1,2,4 klaar — rest is 3, 5, 6"
+last_updated: "2026-09-07T18:10:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
