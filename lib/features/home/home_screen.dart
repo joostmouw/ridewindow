@@ -987,15 +987,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final avgWind =
         winds.isEmpty ? null : winds.reduce((a, b) => a + b) / winds.length;
 
-    // De beste kaart krijgt een bijna rechte linkerkant, zodat de 5px rand
-    // hieronder als een streep leest en niet als een sikkel. Rechts blijft de
-    // volle radius, dus de kaart houdt zijn vorm.
-    final radius = isBest
-        ? const BorderRadius.horizontal(
-            left: Radius.circular(8),
-            right: Radius.circular(_rideCardRadius),
-          )
-        : BorderRadius.circular(_rideCardRadius);
+    // Alle kaarten dezelfde volle radius, ook de beste.
+    //
+    // Dat was even anders: de beste kaart had links 8px, zodat de accentrand
+    // als rechte streep zou lezen in plaats van als sikkel. Die redenering
+    // klopte voor de rand en niet voor de kaart -- bij het slepen kwam er een
+    // vrijwel vierkant blok tevoorschijn op een scherm waar verder alles radius
+    // 24 heeft, en dat viel Joost meteen op (2026-09-07). De rand is opgelost
+    // door hem naar binnen te halen (zie hieronder), zodat de vorm van de kaart
+    // niet langer een compromis met een detail hoeft te sluiten.
+    final radius = BorderRadius.circular(_rideCardRadius);
 
     // Extra ruimte onder de beste kaart: zonder dat valt zijn slagschaduw over
     // de kaart eronder heen en lijkt die vies in plaats van vlak.
@@ -1105,154 +1106,169 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ? BorderSide.none
                         : BorderSide(color: cs.surfaceContainerHigh),
                   ),
-                  child: Container(
-                    // De accentrand van de beste kaart. Een `Container` met een
-                    // enkelzijdige `Border` schuift zijn kind netjes 5px op; dat
-                    // kan alleen zonder `borderRadius` (Flutter staat een
-                    // niet-uniforme rand met radius niet toe), en dat hoeft ook
-                    // niet — de `ClipRRect` eromheen rondt hem al af.
-                    decoration: isBest
-                        ? const BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: AppColors.brandDark,
-                                width: 5,
-                              ),
+                  child: Stack(
+                    children: [
+                      // De accentrand van de beste kaart, als losse staaf ín de
+                      // kaart in plaats van als rand eráán.
+                      //
+                      // Als `Border(left:)` liep hij tot in de hoeken, en om
+                      // hem daar niet als sikkel te laten eindigen kreeg de
+                      // kaart links maar 8px radius. Dat maakte de kaart bij
+                      // het slepen tot een vrijwel vierkant blok op een scherm
+                      // waar alles radius 24 heeft. Nu de staaf een eigen
+                      // afgerond blokje is dat de hoeken niet raakt, mag de
+                      // kaart weer volledig rond zijn — en de streep blijft
+                      // recht. Beide problemen weg, geen compromis meer.
+                      if (isBest)
+                        const Positioned(
+                          left: 10,
+                          top: 16,
+                          bottom: 16,
+                          width: 5,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: AppColors.brandDark,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(3)),
                             ),
-                          )
-                        : null,
-                    child: InkWell(
-                      borderRadius: radius,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        context.push(
-                          '/detail',
-                          extra: DetailArgs(
-                            slot: slot,
-                            forecasts: slotForecasts,
                           ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // "Beste keuze" label
-                            if (isBest)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: cs.primaryContainer,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.star_rounded,
-                                          size: 14,
-                                          color: cs.onPrimaryContainer),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        S.of(context).bestChoice,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                              color: cs.onPrimaryContainer,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            // Card top: dag + badge
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      WeatherIcon(tier: slot.tier, size: 24),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              _formatDayName(slot.start),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                            Text(
-                                              '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                    color: cs.onSurfaceVariant,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                ScoreDisplay(
-                                  score: slot.overallScore,
-                                  tier: slot.tier,
-                                ),
-                              ],
+                        ),
+                      InkWell(
+                        borderRadius: radius,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          context.push(
+                            '/detail',
+                            extra: DetailArgs(
+                              slot: slot,
+                              forecasts: slotForecasts,
                             ),
-                            const SizedBox(height: 14),
-                            // Alleen de beste kaart krijgt de volle balken. Drie
-                            // balken op élke kaart is de reden dat de lijst als
-                            // één massa leest — dat was op de schets meteen te
-                            // zien. De rest krijgt één regel, zodat het verschil
-                            // tussen eerste en tweede plek ook overeind blijft
-                            // als je scrollt.
-                            if (avgTemp != null ||
-                                totalPrecip != null ||
-                                avgWind != null)
-                              isBest
-                                  ? _buildWeatherBars(
-                                      avgTemp: avgTemp,
-                                      totalPrecip: totalPrecip,
-                                      avgWind: avgWind,
-                                    )
-                                  : _buildWeatherSummary(
-                                      avgTemp: avgTemp,
-                                      totalPrecip: totalPrecip,
-                                      avgWind: avgWind,
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // "Beste keuze" label
+                              if (isBest)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: cs.primaryContainer,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(20)),
                                     ),
-                            const SizedBox(height: 14),
-                            // Footer: Plan het knop
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: FilledButton.tonalIcon(
-                                onPressed: () => _planRide(slot),
-                                icon:
-                                    const Icon(Icons.event_available, size: 16),
-                                label: Text(S.of(context).schedule),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.star_rounded,
+                                            size: 14,
+                                            color: cs.onPrimaryContainer),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          S.of(context).bestChoice,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: cs.onPrimaryContainer,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              // Card top: dag + badge
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        WeatherIcon(tier: slot.tier, size: 24),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                _formatDayName(slot.start),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                              Text(
+                                                '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      color:
+                                                          cs.onSurfaceVariant,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  ScoreDisplay(
+                                    score: slot.overallScore,
+                                    tier: slot.tier,
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 14),
+                              // Alleen de beste kaart krijgt de volle balken. Drie
+                              // balken op élke kaart is de reden dat de lijst als
+                              // één massa leest — dat was op de schets meteen te
+                              // zien. De rest krijgt één regel, zodat het verschil
+                              // tussen eerste en tweede plek ook overeind blijft
+                              // als je scrollt.
+                              if (avgTemp != null ||
+                                  totalPrecip != null ||
+                                  avgWind != null)
+                                isBest
+                                    ? _buildWeatherBars(
+                                        avgTemp: avgTemp,
+                                        totalPrecip: totalPrecip,
+                                        avgWind: avgWind,
+                                      )
+                                    : _buildWeatherSummary(
+                                        avgTemp: avgTemp,
+                                        totalPrecip: totalPrecip,
+                                        avgWind: avgWind,
+                                      ),
+                              const SizedBox(height: 14),
+                              // Footer: Plan het knop
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: FilledButton.tonalIcon(
+                                  onPressed: () => _planRide(slot),
+                                  icon: const Icon(Icons.event_available,
+                                      size: 16),
+                                  label: Text(S.of(context).schedule),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
