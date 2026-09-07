@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>RideWindow — Iconografie (sketch 002)</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: #6d7a66;
+    color: var(--text-primary);
+    padding: 62px 24px 64px;
+  }
+
+  /* ─────────── Werkbalk ─────────── */
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #1d2a22; color: #e6ede0;
+    border-bottom: 1px solid #33453a;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: system-ui, sans-serif; font-size: 12px;
+  }
+  #bar .name { font-weight: 700; letter-spacing: .04em; margin-right: 8px; opacity: .75; }
+  #bar .sep { width: 1px; height: 20px; background: #3c5145; margin: 0 4px; }
+  #bar button {
+    font: inherit; color: #e6ede0; background: #2b3b31;
+    border: 1px solid #3c5145; border-radius: 999px;
+    padding: 5px 12px; cursor: pointer; transition: all .15s ease;
+  }
+  #bar button:hover { background: #3a5044; }
+  #bar button.on { background: var(--brand-light); color: #1d2a22; border-color: var(--brand-light); font-weight: 700; }
+  #bar .grow { flex: 1; }
+  #bar .hint { opacity: .5; }
+
+  /* ─────────── Pagina ─────────── */
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .page { display: none; }
+  .page.on { display: block; }
+
+  .lede {
+    color: #eef3e9; margin-bottom: 26px;
+    font-family: system-ui, sans-serif;
+  }
+  .lede h1 { font-family: var(--font); font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+  .lede h1 .star { color: #ffd54f; }
+  .lede p { font-size: 13px; line-height: 1.55; opacity: .78; max-width: 74ch; margin-top: 6px; }
+
+  section {
+    background: var(--sc-lowest);
+    border-radius: var(--radius-card);
+    padding: 22px 24px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 26px rgba(0,0,0,.20);
+  }
+  section.dim { background: var(--sc-high); }
+  h2 {
+    font-size: 15px; font-weight: 600; letter-spacing: .01em;
+    color: var(--text-primary); margin-bottom: 2px;
+  }
+  h2 .n {
+    display: inline-block; width: 20px; height: 20px; line-height: 20px;
+    text-align: center; border-radius: 999px;
+    background: var(--brand-dark); color: #fff;
+    font-size: 11px; font-weight: 700; margin-right: 8px; vertical-align: 2px;
+  }
+  .sub {
+    font-family: system-ui, sans-serif; font-size: 12px; line-height: 1.5;
+    color: var(--text-tertiary); margin: 4px 0 18px 28px; max-width: 76ch;
+  }
+
+  /* ─────────── Iconen ─────────── */
+  .ic { display: block; }
+  .mono  { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+  .solid { fill: var(--ink); stroke: none; }
+  .duo   { fill: var(--brand-light); stroke: var(--ink); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+  .ic { --ink: #1A2A20; }
+  .on-dark .ic { --ink: #FCFDF8; }
+
+  /* ─────────── De echte kledingpil ─────────── */
+  .pillrow { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+  .pillcase { text-align: center; }
+  .pill {
+    display: inline-flex; flex-direction: column; align-items: center;
+    padding: 6px 10px; border-radius: 12px;
+    background: var(--sc-high);
+    min-width: 78px;
+  }
+  section.dim .pill { background: var(--sc-lowest); }
+  .pill .glyphs { display: flex; align-items: flex-end; gap: 3px; min-height: 22px; }
+  .pill .emoji { font-size: 20px; line-height: 22px; }
+  .pill .lbl {
+    font-size: 11px; line-height: 1.25; margin-top: 3px;
+    color: var(--on-surface-variant); white-space: nowrap;
+  }
+  .cap {
+    font-family: system-ui, sans-serif; font-size: 11px;
+    color: var(--text-hint); margin-top: 7px;
+  }
+
+  /* twee kolommen: nu vs voorstel */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .compare > div { border: 1px solid var(--border-dim); border-radius: 16px; padding: 16px; }
+  .compare h3 {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text-tertiary); margin-bottom: 12px;
+  }
+  .compare .now { background: #f6f4ef; }
+
+  /* ─────────── Grote specimens ─────────── */
+  .spec { display: flex; flex-wrap: wrap; gap: 10px; }
+  .spec figure {
+    width: 108px; padding: 14px 8px 10px;
+    border: 1px solid var(--border-dim); border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    background: var(--sc-lowest);
+  }
+  .spec figcaption {
+    font-family: system-ui, sans-serif; font-size: 11px; line-height: 1.3;
+    color: var(--text-tertiary); text-align: center;
+  }
+
+  /* ─────────── Blindtest ─────────── */
+  .blind { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+  .blind .slot { text-align: center; }
+  .blind .key {
+    font-family: system-ui, sans-serif; font-size: 11px; font-weight: 700;
+    color: var(--text-hint); margin-bottom: 8px;
+  }
+  .blind .answer {
+    font-family: system-ui, sans-serif; font-size: 11px; margin-top: 8px;
+    color: var(--score-perfect); visibility: hidden; font-weight: 600;
+  }
+  body.reveal .blind .answer { visibility: visible; }
+  .btn {
+    font-family: system-ui, sans-serif; font-size: 12px;
+    background: var(--brand-dark); color: #fff; border: 0;
+    border-radius: 999px; padding: 7px 16px; cursor: pointer;
+  }
+
+  /* ─────────── Rest van de set ─────────── */
+  .weather { display: flex; gap: 26px; flex-wrap: wrap; align-items: center; }
+  .wrow { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-secondary); }
+
+  /* donkere strook om contrast te toetsen */
+  .darkstrip {
+    background: #12211a; border-radius: 18px; padding: 18px 20px; margin-top: 16px;
+    display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
+  }
+  .darkstrip .t {
+    font-family: system-ui, sans-serif; font-size: 11px; color: #9fb096;
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ Icoon-definities ══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+
+  <!-- ── Kledingstukken, los (24×24) ── -->
+  <symbol id="g-jersey-short" viewBox="0 0 24 24">
+    <path d="M9.4 3.2 C10 4.6 10.9 5.3 12 5.3 C13.1 5.3 14 4.6 14.6 3.2
+             L18.2 4.6 L21.1 6.8 L18.6 11 L15.8 9.4 L15.8 20.8
+             L8.2 20.8 L8.2 9.4 L5.4 11 L2.9 6.8 L5.8 4.6 Z"/>
+  </symbol>
+
+  <symbol id="g-jersey-long" viewBox="0 0 24 24">
+    <path d="M9.4 3.2 C10 4.6 10.9 5.3 12 5.3 C13.1 5.3 14 4.6 14.6 3.2
+             L18.2 4.6 L21.1 6.9 L19.4 17.8 L16.6 17.4 L15.8 9.4 L15.8 20.8
+             L8.2 20.8 L8.2 9.4 L7.4 17.4 L4.6 17.8 L2.9 6.9 L5.8 4.6 Z"/>
+  </symbol>
+
+  <!-- jas = lange mouw + opstaande kraag + korte rits -->
+  <symbol id="g-jacket" viewBox="0 0 24 24">
+    <path d="M9.2 4.4 L9.7 1.9 L14.3 1.9 L14.8 4.4
+             L18.2 5.4 L21.1 7.6 L19.4 18.2 L16.6 17.8 L15.8 10 L15.8 21
+             L8.2 21 L8.2 10 L7.4 17.8 L4.6 18.2 L2.9 7.6 L5.8 5.4 Z"/>
+    <path d="M12 5.6 V18.4" fill="none" stroke="currentColor" stroke-width="1.3"
+          stroke-linecap="round" class="cut"/>
+  </symbol>
+
+  <symbol id="g-shorts" viewBox="0 0 24 24">
+    <path d="M7.4 3.6 L16.6 3.6 L16.9 16.5 L13 16.5 L12 7.6 L11 16.5 L7.1 16.5 Z"/>
+    <path d="M7.5 6.2 H16.5" fill="none" stroke="currentColor" stroke-width="1.3"
+          stroke-linecap="round" class="cut"/>
+  </symbol>
+
+  <symbol id="g-pants" viewBox="0 0 24 24">
+    <path d="M7.4 3.6 L16.6 3.6 L16.6 21.4 L12.9 21.4 L12 8.6 L11.1 21.4 L7.4 21.4 Z"/>
+    <path d="M7.5 6.2 H16.5" fill="none" stroke="currentColor" stroke-width="1.3"
+          stroke-linecap="round" class="cut"/>
+  </symbol>
+
+  <!-- ── Eén tenue: shirt + broek als één figuur (24×38) ── -->
+  <symbol id="k-ss" viewBox="0 0 24 38">
+    <g transform="translate(0,-1)">
+      <use href="#g-jersey-short" width="24" height="24"/>
+      <use href="#g-shorts" width="24" height="24" y="16.4"/>
+    </g>
+  </symbol>
+  <symbol id="k-ls" viewBox="0 0 24 38">
+    <g transform="translate(0,-1)">
+      <use href="#g-jersey-long" width="24" height="24"/>
+      <use href="#g-shorts" width="24" height="24" y="16.4"/>
+    </g>
+  </symbol>
+  <symbol id="k-ll" viewBox="0 0 24 38">
+    <g transform="translate(0,-1)">
+      <use href="#g-jersey-long" width="24" height="24"/>
+      <use href="#g-pants" width="24" height="24" y="16.4"/>
+    </g>
+  </symbol>
+  <symbol id="k-llx" viewBox="0 0 24 38">
+    <g transform="translate(0,-1)">
+      <use href="#g-jacket" width="24" height="24"/>
+      <use href="#g-pants" width="24" height="24" y="16.4"/>
+    </g>
+  </symbol>
+
+  <!-- ── De renner: figuur met blote of bedekte ledematen (26×46) ── -->
+  <symbol id="r-ss" viewBox="0 0 26 46">
+    <path d="M13 6.4 V11.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" class="limb"/>
+    <circle cx="13" cy="4" r="3.1"/>
+    <path d="M5.2 16.2 L3.5 23.4 M20.8 16.2 L22.5 23.4" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="1.9"/>
+    <path d="M10 39.1 L9.5 45 M16 39.1 L16.5 45" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="2.2"/>
+    <use href="#g-jersey-short" width="24" height="24" x="1" y="7"/>
+    <use href="#g-shorts" width="24" height="24" x="1" y="22.6"/>
+  </symbol>
+  <symbol id="r-ls" viewBox="0 0 26 46">
+    <path d="M13 6.4 V11.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" class="limb"/>
+    <circle cx="13" cy="4" r="3.1"/>
+    <path d="M7 24.6 L6.2 27.4 M19 24.6 L19.8 27.4" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="1.9"/>
+    <path d="M10 39.1 L9.5 45 M16 39.1 L16.5 45" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="2.2"/>
+    <use href="#g-jersey-long" width="24" height="24" x="1" y="7"/>
+    <use href="#g-shorts" width="24" height="24" x="1" y="22.6"/>
+  </symbol>
+  <symbol id="r-ll" viewBox="0 0 26 46">
+    <path d="M13 6.4 V11.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" class="limb"/>
+    <circle cx="13" cy="4" r="3.1"/>
+    <path d="M7 24.6 L6.2 27.4 M19 24.6 L19.8 27.4" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="1.9"/>
+    <path d="M10.25 44 L10.15 45.6 M15.75 44 L15.85 45.6" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="2.2"/>
+    <use href="#g-jersey-long" width="24" height="24" x="1" y="7"/>
+    <use href="#g-pants" width="24" height="24" x="1" y="22.6"/>
+  </symbol>
+  <symbol id="r-llx" viewBox="0 0 26 46">
+    <path d="M13 6.4 V11.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" class="limb"/>
+    <circle cx="13" cy="4" r="3.1"/>
+    <path d="M7 24.6 L6.2 27.4 M19 24.6 L19.8 27.4" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="1.9"/>
+    <path d="M10.25 44 L10.15 45.6 M15.75 44 L15.85 45.6" fill="none" stroke="currentColor" stroke-linecap="round" class="limb" stroke-width="2.2"/>
+    <use href="#g-jacket" width="24" height="24" x="1" y="7"/>
+    <use href="#g-pants" width="24" height="24" x="1" y="22.6"/>
+  </symbol>
+
+  <!-- ── Weer ── -->
+  <symbol id="w-temp" viewBox="0 0 24 24">
+    <path d="M14.6 13.9 V5.6 a2.6 2.6 0 0 0 -5.2 0 V13.9 a4.7 4.7 0 1 0 5.2 0 Z"/>
+    <path d="M12 8.6 V16.4" fill="none" stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" class="cut"/>
+  </symbol>
+  <symbol id="w-rain" viewBox="0 0 24 24">
+    <path d="M7 4.4 c0 0 -2.7 3.4 -2.7 5 a2.7 2.7 0 0 0 5.4 0 c0 -1.6 -2.7 -5 -2.7 -5 Z"/>
+    <path d="M17 4.4 c0 0 -2.7 3.4 -2.7 5 a2.7 2.7 0 0 0 5.4 0 c0 -1.6 -2.7 -5 -2.7 -5 Z"/>
+    <path d="M12 12.6 c0 0 -2.7 3.4 -2.7 5 a2.7 2.7 0 0 0 5.4 0 c0 -1.6 -2.7 -5 -2.7 -5 Z"/>
+  </symbol>
+  <symbol id="w-wind" viewBox="0 0 24 24">
+    <path d="M2.8 8.4 H13.6 a2.7 2.7 0 1 0 -2.6 -3.4" fill="none" stroke="currentColor"
+          stroke-width="1.7" stroke-linecap="round" class="stroke-only"/>
+    <path d="M2.8 12.4 H17.6 a2.8 2.8 0 1 1 -2.8 3.2" fill="none" stroke="currentColor"
+          stroke-width="1.7" stroke-linecap="round" class="stroke-only"/>
+    <path d="M2.8 16.6 H10.2 a2.4 2.4 0 1 1 -2.3 3.1" fill="none" stroke="currentColor"
+          stroke-width="1.7" stroke-linecap="round" class="stroke-only"/>
+  </symbol>
+
+  <!-- ── Renner op de fiets (welcome / rider types) ── -->
+  <symbol id="b-bike" viewBox="0 0 24 24">
+    <circle cx="5.4" cy="17.4" r="4.1" fill="none" stroke="currentColor" stroke-width="1.6" class="stroke-only"/>
+    <circle cx="18.6" cy="17.4" r="4.1" fill="none" stroke="currentColor" stroke-width="1.6" class="stroke-only"/>
+    <path d="M5.4 17.4 L12 17.4 L14.7 10.2 L8.9 10.2 L12 17.4 M14.7 10.2 L18.6 17.4
+             M14.7 10.2 L16.5 8.5 L18.1 8.9 M8.9 10.2 L7.7 8.7 L9.7 8.7"
+          fill="none" stroke="currentColor" stroke-width="1.6"
+          stroke-linejoin="round" stroke-linecap="round" class="stroke-only"/>
+    <circle cx="15.2" cy="4.3" r="1.9" fill="none" stroke="currentColor" stroke-width="1.6" class="stroke-only"/>
+    <path d="M13.8 6.1 L11.4 9.4 L11.2 13.6 L12 17.4 M13.9 6.7 L16.3 8.6"
+          fill="none" stroke="currentColor" stroke-width="1.6"
+          stroke-linejoin="round" stroke-linecap="round" class="stroke-only"/>
+  </symbol>
+
+</defs>
+</svg>
+
+<!-- ══════════ Werkbalk ══════════ -->
+<div id="bar">
+  <span class="name">SKETCH 002 · ICONOGRAFIE</span>
+  <button data-v="A" class="on">A — Lijn</button>
+  <button data-v="B">B — Vlak</button>
+  <button data-v="C">C — Renner</button>
+  <span class="sep"></span>
+  <button id="revealBtn">Toon antwoorden</button>
+  <span class="grow"></span>
+  <span class="hint">fase 24 · v4.0 Eigen gezicht</span>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════ VARIANT A ══════════════════ -->
+<div class="page on" id="page-A">
+  <div class="lede">
+    <h1>A — Lijn: twee losse kledingstukken</h1>
+    <p>De veiligste stap. Precies de structuur van vandaag — twee pictogrammen naast elkaar —
+       maar getekend in één monoline met ronde uiteinden, dezelfde taal als het RW-app-icoon.
+       Het risico staat er ook meteen in: bij 20 px is het verschil tussen korte en lange mouw
+       een paar pixels sleeflengte.</p>
+  </div>
+
+  <section>
+    <h2><span class="n">1</span>Op ware grootte, in de échte pil</h2>
+    <p class="sub">Zoals hij op Ride Detail staat: <code>padding 10/6</code>, radius 12,
+       <code>surfaceContainerHigh</code>, glyph 20 px, label 11 px. Links wat er nu staat,
+       rechts het voorstel. Let op: de emoji links tekent jouw Mac — op de Oppo, op een iPhone
+       en op het web ziet diezelfde tekst er anders uit. Dát is de reden voor deze fase.</p>
+    <div class="compare">
+      <div class="now">
+        <h3>Nu — systeememoji</h3>
+        <div class="pillrow" id="now-A"></div>
+      </div>
+      <div>
+        <h3>Voorstel A</h3>
+        <div class="pillrow" data-combos="A"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Blindtest — zonder label, op 20 px</h2>
+    <p class="sub">De eis uit <code>EIGEN-GEZICHT.md</code>: een eigen pictogram voor "lange mouw"
+       moet zonder tekst herkenbaar zijn, anders is een systeememoji die iedereen kent beter.
+       Wijs aan welke <b>lange mouw + lange broek</b> is voor je op "Toon antwoorden" drukt.</p>
+    <div class="blind" data-blind="A"></div>
+    <p style="margin-top:16px"><button class="btn" onclick="document.body.classList.toggle('reveal')">Toon antwoorden</button></p>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>De losse stukken groot</h2>
+    <p class="sub">64 px — hier beoordeel je de tekening zelf: lijndikte, hoe de schouder valt,
+       of de mouw als mouw leest.</p>
+    <div class="spec" data-spec="A"></div>
+  </section>
+
+  <section class="dim">
+    <h2><span class="n">4</span>De rest van de set in dezelfde hand</h2>
+    <p class="sub">Iconografie is niet alleen kleding. Dit zijn de andere emoji die nu in de app
+       staan: 🌡 🌧 💨 op Ride Detail en in het weervenster, 🚴 op Welcome en bij de rider-types.
+       Als de stijl hier niet doorloopt, klopt de keuze niet.</p>
+    <div class="weather" data-weather="A"></div>
+    <div class="darkstrip on-dark" data-weather-dark="A">
+      <span class="t">op donker</span>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════ VARIANT B ══════════════════ -->
+<div class="page" id="page-B">
+  <div class="lede">
+    <h1>B — Vlak: één tenue per combo</h1>
+    <p>Geen twee losse stukken meer, maar één silhouet van het complete tenue: shirt en broek
+       aan elkaar. Massief ingevuld in één inktkleur, zoals een verkeersbord. Daarmee zijn de vier
+       adviezen vier duidelijk verschillende <em>vormen</em> — je hoeft geen mouwlengte te meten,
+       je ziet een ander plaatje. Dat is precies wat bij 20 px telt.</p>
+  </div>
+
+  <section>
+    <h2><span class="n">1</span>Op ware grootte, in de échte pil</h2>
+    <p class="sub">Eén glyph in plaats van twee: de pil wordt smaller, en zes pixels hoger omdat een tenue staand is. Dat is de prijs van deze variant.</p>
+    <div class="compare">
+      <div class="now">
+        <h3>Nu — systeememoji</h3>
+        <div class="pillrow" id="now-B"></div>
+      </div>
+      <div>
+        <h3>Voorstel B</h3>
+        <div class="pillrow" data-combos="B"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Blindtest — zonder label, op 20 px</h2>
+    <p class="sub">Zelfde test. Wijs <b>lange mouw + lange broek</b> aan.</p>
+    <div class="blind" data-blind="B"></div>
+    <p style="margin-top:16px"><button class="btn" onclick="document.body.classList.toggle('reveal')">Toon antwoorden</button></p>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>De vier tenues groot</h2>
+    <p class="sub">64 px hoog. De vierde verschilt van de derde in het silhouet zelf: een
+       <em>opstaande kraag</em> steekt boven de schouder uit. De rits is een snede in papierkleur.
+       Een verschil in omtrek overleeft het verkleinen; een extra lijntje niet.</p>
+    <div class="spec" data-spec="B"></div>
+  </section>
+
+  <section class="dim">
+    <h2><span class="n">4</span>De rest van de set in dezelfde hand</h2>
+    <p class="sub">Massief werkt goed voor druppels en thermometer; wind blijft lijnwerk, want
+       wind ís lijnwerk — dat is in elke iconenset zo.</p>
+    <div class="weather" data-weather="B"></div>
+    <div class="darkstrip on-dark" data-weather-dark="B">
+      <span class="t">op donker</span>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════ VARIANT C ══════════════════ -->
+<div class="page" id="page-C">
+  <div class="lede">
+    <h1>C — Renner: een gekleed figuur, duotone</h1>
+    <p>Een klein figuurtje dat het advies <em>draagt</em>. Kledingstukken zijn merkgroen gevuld met
+       een inktcontour; armen en benen zijn kale lijnen. Daardoor is lange mouw geen kwestie van
+       sleeflengte meer maar van <b>blote onderarm of niet</b> — een verschil dat je bij 20 px nog
+       ziet. Het duurste voorstel om te tekenen, en het meest menselijke.</p>
+  </div>
+
+  <section>
+    <h2><span class="n">1</span>Op ware grootte, in de échte pil</h2>
+    <p class="sub">Het figuur is hoger dan breed, dus de glyph loopt tot 24 px en de pil wordt
+       één regel hoger dan nu.</p>
+    <div class="compare">
+      <div class="now">
+        <h3>Nu — systeememoji</h3>
+        <div class="pillrow" id="now-C"></div>
+      </div>
+      <div>
+        <h3>Voorstel C</h3>
+        <div class="pillrow" data-combos="C"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Blindtest — zonder label, op 20 px</h2>
+    <p class="sub">Zelfde test. Wijs <b>lange mouw + lange broek</b> aan.</p>
+    <div class="blind" data-blind="C"></div>
+    <p style="margin-top:16px"><button class="btn" onclick="document.body.classList.toggle('reveal')">Toon antwoorden</button></p>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>De vier renners groot</h2>
+    <p class="sub">64 px hoog. Let op of het merkgroen op papier genoeg contrast houdt —
+       <code>#C5D4B6</code> op <code>#FCFDF8</code> is licht, de contour draagt de vorm.</p>
+    <div class="spec" data-spec="C"></div>
+  </section>
+
+  <section class="dim">
+    <h2><span class="n">4</span>De rest van de set in dezelfde hand</h2>
+    <p class="sub">Duotone op weer-iconen: gevuld in merkgroen, contour in inkt.</p>
+    <div class="weather" data-weather="C"></div>
+    <div class="darkstrip on-dark" data-weather-dark="C">
+      <span class="t">op donker</span>
+    </div>
+  </section>
+</div>
+
+</div>
+
+<script>
+// ── data ─────────────────────────────────────────────────────────────────
+const COMBOS = [
+  { key:'ss',  label:'Kort / kort',   emoji:'\u{1F455}\u{1FA73}', parts:['g-jersey-short','g-shorts'], kit:'k-ss',  rider:'r-ss'  },
+  { key:'ls',  label:'Lang / kort',   emoji:'\u{1F9E5}\u{1FA73}', parts:['g-jersey-long','g-shorts'],  kit:'k-ls',  rider:'r-ls'  },
+  { key:'ll',  label:'Lang / lang',   emoji:'\u{1F9E5}\u{1F456}', parts:['g-jersey-long','g-pants'],   kit:'k-ll',  rider:'r-ll'  },
+  { key:'llx', label:'Lang / lang +', emoji:'\u{1F9E5}\u{1F9E5}', parts:['g-jacket','g-pants'],        kit:'k-llx', rider:'r-llx' },
+];
+
+const STYLE = { A:'mono', B:'solid', C:'duo' };
+
+const PARTNAMES = {
+  'g-jersey-short':'korte mouw', 'g-jersey-long':'lange mouw', 'g-jacket':'jas / extra laag',
+  'g-shorts':'korte broek', 'g-pants':'lange broek',
+};
+
+const WEATHER = [
+  { id:'w-temp', txt:'12 °C gevoel' },
+  { id:'w-rain', txt:'0,4 mm' },
+  { id:'w-wind', txt:'18 km/u ZW' },
+  { id:'b-bike', txt:'Zaterdag 09:00' },
+];
+
+// ── helpers ──────────────────────────────────────────────────────────────
+function icon(id, h, variant, extraClass) {
+  let w = h;
+  if (id.startsWith('k-')) w = h * 24 / 38;
+  else if (id.startsWith('r-')) w = h * 26 / 46;
+  const cls = STYLE[variant] + (extraClass ? ' ' + extraClass : '');
+  return `<svg class="ic ${cls}" width="${w.toFixed(1)}" height="${h}" aria-hidden="true"><use href="#${id}"/></svg>`;
+}
+
+function glyphsFor(variant, c, h) {
+  if (variant === 'A') return c.parts.map(p => icon(p, h, variant)).join('');
+  if (variant === 'B') return icon(c.kit, h * 1.3, variant);
+  return icon(c.rider, h * 1.4, variant);
+}
+
+// ── render ───────────────────────────────────────────────────────────────
+['A','B','C'].forEach(v => {
+
+  // huidige emoji-kolom
+  document.getElementById('now-' + v).innerHTML = COMBOS.map(c => `
+    <div class="pillcase">
+      <div class="pill">
+        <div class="glyphs"><span class="emoji">${c.emoji}</span></div>
+        <div class="lbl">${c.label}</div>
+      </div>
+    </div>`).join('');
+
+  // voorstel-kolom
+  document.querySelector(`[data-combos="${v}"]`).innerHTML = COMBOS.map(c => `
+    <div class="pillcase">
+      <div class="pill">
+        <div class="glyphs">${glyphsFor(v, c, 20)}</div>
+        <div class="lbl">${c.label}</div>
+      </div>
+    </div>`).join('');
+
+  // blindtest — vaste door-elkaar-volgorde, zodat het echt een test is
+  const shuffled = [COMBOS[2], COMBOS[0], COMBOS[3], COMBOS[1]];
+  document.querySelector(`[data-blind="${v}"]`).innerHTML = shuffled.map((c, i) => `
+    <div class="slot">
+      <div class="key">${i + 1}</div>
+      <div class="glyphs" style="display:flex;gap:3px;align-items:flex-end;justify-content:center;">
+        ${glyphsFor(v, c, 20)}
+      </div>
+      <div class="answer">${c.label}</div>
+    </div>`).join('');
+
+  // grote specimens
+  let spec;
+  if (v === 'A') {
+    spec = Object.keys(PARTNAMES).map(p => `
+      <figure>${icon(p, 64, v)}<figcaption>${PARTNAMES[p]}</figcaption></figure>`).join('');
+  } else if (v === 'B') {
+    spec = COMBOS.map(c => `
+      <figure>${icon(c.kit, 78, v)}<figcaption>${c.label}</figcaption></figure>`).join('');
+  } else {
+    spec = COMBOS.map(c => `
+      <figure>${icon(c.rider, 78, v)}<figcaption>${c.label}</figcaption></figure>`).join('');
+  }
+  document.querySelector(`[data-spec="${v}"]`).innerHTML = spec;
+
+  // weer + fiets
+  const w = WEATHER.map(x => `
+    <div class="wrow">${icon(x.id, 26, v)}<span>${x.txt}</span></div>`).join('');
+  document.querySelector(`[data-weather="${v}"]`).innerHTML = w;
+  document.querySelector(`[data-weather-dark="${v}"]`).innerHTML =
+    '<span class="t">op donker</span>' +
+    WEATHER.map(x => `<div class="wrow" style="color:#dbe5d4">${icon(x.id, 26, v)}<span>${x.txt}</span></div>`).join('') +
+    COMBOS.map(c => `<div class="wrow">${glyphsFor(v, c, 22)}</div>`).join('');
+});
+
+// snede-lijnen (rits, kraag, kwikkolom) volgen het oppervlak, niet de inkt
+function paintCuts() {
+  // in mono/duo is de snede gewoon inkt; in solid moet hij de achtergrond zijn
+  document.querySelectorAll('.ic.solid').forEach(svg => svg.style.color = 'var(--sc-lowest)');
+  document.querySelectorAll('.ic.mono, .ic.duo').forEach(svg => svg.style.color = 'var(--ink)');
+  document.querySelectorAll('.pill .ic.solid').forEach(svg => svg.style.color = 'var(--sc-high)');
+  document.querySelectorAll('section.dim .pill .ic.solid').forEach(svg => svg.style.color = 'var(--sc-lowest)');
+  document.querySelectorAll('.darkstrip .ic.solid').forEach(svg => svg.style.color = '#12211a');
+}
+paintCuts();
+
+// wind is altijd lijnwerk, ook in de vlakke variant
+['#w-wind', '#b-bike'].forEach(id => {
+  document.querySelectorAll(`.ic use[href="${id}"]`).forEach(u => {
+    u.parentElement.style.color = 'var(--ink)';
+  });
+});
+
+// ── tabs ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('#bar button[data-v]').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#bar button[data-v]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+    document.getElementById('page-' + b.dataset.v).classList.add('on');
+    window.scrollTo({ top: 0 });
+  };
+});
+document.getElementById('revealBtn').onclick = () => document.body.classList.toggle('reveal');
+</script>
+</body>
+</html>

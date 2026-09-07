@@ -35,6 +35,8 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | # | Naam | Design Question | Winnaar | Tags |
 |---|------|-----------------|---------|------|
 | 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | **B — Papier en inkt** | home, hierarchie, typografie, weerbalken, fase-23 |
+| 002 | [iconografie](002-iconografie/) | Waar komt het kledingadvies vandaan als het geen systeememoji meer is — twee losse kledingstukken, één tenue, of een gekleed figuur? | *afgewezen — verkeerde vraag* | iconografie, kleding, fase-24 |
+| 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | *open* | iconografie, kleding, weerbalken, fase-24 |
 
 ## Beslissingen die doorwerken
 
@@ -46,3 +48,14 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 - **Weerbalken krijgen een leesbaar bereik plus een woord.** De absolute schaal blijft eerlijk maar
   wordt ingezoomd (regen 0–3 mm i.p.v. 0–10 mm), en er komt een oordeel naast de waarde. Dat is de
   ingreep die "versiering" naar "informatie" tilt.
+
+- **002 → afgewezen (2026-09-07).** Eigen kledingpictogrammen zijn de verkeerde oplossing voor het
+  goede probleem. Dat de emoji op elk platform anders wordt getekend klopt, maar het antwoord is niet
+  "teken ze zelf" — het advies gaat over hoe koud het aanvoelt, en dat is informatie, geen
+  illustratie. Dezelfde afweging als bij de weerbalken in fase 23: een plaatje dat niets toevoegt is
+  versiering. Voor de zestien niet-kleding-emoji blijft de vraag wél open, en daar is het antwoord
+  waarschijnlijk Material Symbols — die zitten al in Flutter en zijn op elk platform identiek.
+- **De gevoelstemperatuur hoort in beeld.** `recommendClothing()` rekent al met
+  `temp − (wind + 15) × 0,05` maar toonde dat getal nergens, waardoor de app bij 15 °C "lange mouw"
+  adviseerde zonder reden te geven. Dat is geen stijlkeuze maar een ontbrekend stuk informatie, en
+  het geldt ongeacht welke variant uit 003 wint.

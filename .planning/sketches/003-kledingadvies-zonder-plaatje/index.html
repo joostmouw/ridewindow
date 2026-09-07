@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>RideWindow — Kledingadvies zonder plaatje (sketch 003)</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: #6d7a66;
+    color: var(--text-primary);
+    padding: 62px 24px 64px;
+  }
+
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #1d2a22; color: #e6ede0;
+    border-bottom: 1px solid #33453a;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: system-ui, sans-serif; font-size: 12px;
+  }
+  #bar .name { font-weight: 700; letter-spacing: .04em; margin-right: 8px; opacity: .75; }
+  #bar .sep { width: 1px; height: 20px; background: #3c5145; margin: 0 4px; }
+  #bar button {
+    font: inherit; color: #e6ede0; background: #2b3b31;
+    border: 1px solid #3c5145; border-radius: 999px;
+    padding: 5px 12px; cursor: pointer;
+  }
+  #bar button.on { background: var(--brand-light); color: #1d2a22; border-color: var(--brand-light); font-weight: 700; }
+  #bar .grow { flex: 1; }
+  #bar .hint { opacity: .5; }
+
+  .wrap { max-width: 1320px; margin: 0 auto; }
+
+  .lede { color: #eef3e9; margin-bottom: 24px; font-family: system-ui, sans-serif; }
+  .lede h1 { font-family: var(--font); font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+  .lede p { font-size: 13px; line-height: 1.55; opacity: .8; max-width: 82ch; margin-top: 8px; }
+  .lede code { background: rgba(0,0,0,.22); padding: 1px 5px; border-radius: 4px; }
+
+  .caserow { margin-bottom: 26px; }
+  .casehead {
+    font-family: system-ui, sans-serif; color: #e9f0e3;
+    margin-bottom: 12px;
+  }
+  .casehead b { font-size: 14px; }
+  .casehead span { font-size: 12px; opacity: .7; margin-left: 8px; }
+
+  .cols { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .col { width: 390px; }
+  .colhead {
+    font-family: system-ui, sans-serif; color: #e9f0e3;
+    margin-bottom: 10px; min-height: 62px;
+  }
+  .colhead b { display: block; font-size: 15px; }
+  .colhead .star { color: #ffd54f; }
+  .colhead span { display: block; font-size: 12px; opacity: .72; line-height: 1.45; margin-top: 3px; }
+
+  /* ── het scherm van Ride Detail ── */
+  .screen {
+    background: var(--sc-lowest);
+    border-radius: 20px;
+    padding: 14px 0;
+    box-shadow: 0 14px 34px rgba(0,0,0,.26);
+  }
+
+  /* ── de "What to wear"-kaart, exact zoals in ride_detail_screen.dart ── */
+  .card {
+    margin: 8px 16px;
+    padding: 14px;
+    border-radius: 16px;
+    background: rgba(35,73,52,.045);          /* primaryContainer alpha 30 */
+    border: 1px solid rgba(35,73,52,.16);     /* primary alpha 40 */
+  }
+  .card .title {
+    font-size: 13px; font-weight: 700; color: var(--score-perfect);
+  }
+  .items {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.4;
+  }
+
+  /* ── de balk-anatomie uit weather_indicator_bar.dart ── */
+  .metric { }
+  .metric .top { display: flex; align-items: flex-end; gap: 6px; }
+  .metric .lbl {
+    font-size: 12px; font-weight: 600; color: var(--text-secondary); flex: 1;
+  }
+  .metric .val {
+    font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+  .metric .verdict {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; margin-left: 2px;
+  }
+  .track {
+    position: relative; height: 14px; margin-top: 6px;
+    border-radius: 7px; overflow: hidden;
+    background: var(--sc-high);
+  }
+  .band { position: absolute; top: 0; bottom: 0; }
+  .marker {
+    position: absolute; top: -2px; bottom: -2px; width: 3px;
+    border-radius: 2px; background: var(--text-primary);
+    box-shadow: 0 0 0 2px var(--sc-lowest);
+  }
+  .scale {
+    display: flex; margin-top: 3px;
+    font-size: 9px; color: var(--text-hint); font-variant-numeric: tabular-nums;
+  }
+  .scale .mid { flex: 1; text-align: center; color: var(--score-perfect); font-weight: 600; }
+
+  /* ── vier stappen ── */
+  .steps { display: flex; gap: 4px; margin-top: 8px; }
+  .step {
+    flex: 1; height: 30px; border-radius: 8px;
+    border: 1px solid var(--border-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--text-hint); text-align: center; line-height: 1.15;
+    padding: 0 2px;
+  }
+  .step.on {
+    background: var(--brand-dark); border-color: var(--brand-dark);
+    color: #fff; font-weight: 700;
+  }
+  .stepcap {
+    font-size: 11px; color: var(--text-tertiary); margin-top: 6px;
+    font-family: system-ui, sans-serif;
+  }
+
+  /* ── alleen woorden ── */
+  .verdictline {
+    font-size: 19px; font-weight: 600; line-height: 1.25;
+    color: var(--text-primary); letter-spacing: -.01em;
+  }
+  .because {
+    font-size: 12px; color: var(--text-tertiary); margin-top: 4px; line-height: 1.4;
+  }
+
+  .note {
+    font-family: system-ui, sans-serif; font-size: 11px; color: #dfe8d9;
+    opacity: .78; margin-top: 10px; line-height: 1.5;
+  }
+
+  /* buurkaarten, om te zien of het in de kolom past */
+  .neighbour {
+    margin: 8px 16px; padding: 12px 14px; border-radius: 16px;
+    background: var(--sc-low); border: 1px solid var(--border-dim);
+  }
+  .neighbour .nh {
+    font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <span class="name">SKETCH 003 · KLEDINGADVIES ZONDER PLAATJE</span>
+  <button id="tNeighbour" class="on">Met buurkaart</button>
+  <span class="grow"></span>
+  <span class="hint">fase 24 · v4.0 Eigen gezicht</span>
+</div>
+
+<div class="wrap">
+  <div class="lede">
+    <h1>Het kledingadvies wordt informatie in plaats van illustratie</h1>
+    <p>Geen eigen pictogrammen en geen systeememoji: dezelfde beweging als fase 23 met de weerbalken.
+       Wat de gebruiker echt wil weten is <b>hoe koud het aanvoelt op de fiets</b> — en dat is niet
+       de gemeten temperatuur. <code>recommendClothing()</code> trekt er al 15 km/u tegenwind bij op
+       en rekent <code>gevoel = temp − (wind + 15) × 0,05</code>. Dat getal stond nergens, waardoor
+       de app bij 15° "lange mouw" adviseerde zonder ooit te zeggen waarom. Alle drie de varianten
+       hieronder zetten dat getal in beeld; ze verschillen in hoeveel grafiek eromheen mag.</p>
+  </div>
+
+  <div id="cases"></div>
+
+  <div class="lede" style="margin-top:30px">
+    <p><b>Waar dit ook op Home terugkomt.</b> De uitgeklapte ritkaart toont dezelfde combo-tekst.
+       Wat je hier kiest bepaalt dus twee schermen, niet één.</p>
+  </div>
+</div>
+
+<script>
+// ── de echte logica uit lib/features/shared/clothing_tip.dart ─────────────
+function recommend(tempC, windKmh, precipMm) {
+  const wind = (windKmh || 0) + 15;
+  const feels = tempC - wind * 0.05;
+  const raining = (precipMm || 0) > 0.5;
+  const windy = (windKmh || 0) > 25;
+  let combo;
+  if (feels >= 20) combo = 'ss';
+  else if (feels >= 14) combo = 'ls';
+  else if (feels >= 5) combo = 'll';
+  else combo = 'llx';
+  return { combo, feels, raining, windy };
+}
+
+function items(a) {
+  const out = [];
+  if (a.combo === 'ss') {
+    out.push('Short-sleeve jersey');
+    if (a.feels >= 25) out.push('Sunscreen');
+    if (a.feels >= 30) out.push('Extra water');
+  } else if (a.combo === 'ls') {
+    out.push('Long-sleeve jersey');
+    if (a.feels < 17) out.push('Arm warmers just in case');
+  } else if (a.combo === 'll') {
+    out.push('Long-sleeve jersey');
+    if (a.feels < 10) out.push('Arm warmers', 'Leg warmers');
+    else out.push('Knee warmers');
+  } else {
+    out.push('Winter jacket', 'Thermal pants', 'Gloves', 'Overshoes');
+  }
+  if (a.raining) out.push('Rain jacket');
+  if (a.windy) out.push('Wind vest');
+  return out;
+}
+
+const BANDS = [
+  { key:'llx', from:-10, to:5,  short:'Long/long +', long:'Long sleeves, long legs, extra layers', tint:'rgba(100,181,246,.42)' },
+  { key:'ll',  from:5,   to:14, short:'Long/long',   long:'Long sleeves, long legs',               tint:'rgba(100,181,246,.20)' },
+  { key:'ls',  from:14,  to:20, short:'Long/short',  long:'Long sleeves, short legs',              tint:'rgba(197,212,182,.55)' },
+  { key:'ss',  from:20,  to:35, short:'Short/short', long:'Short sleeves, short legs',             tint:'rgba(255,152,0,.28)' },
+];
+const ZMIN = -5, ZMAX = 25;
+const band = k => BANDS.find(b => b.key === k);
+const rangeLabel = b =>
+  b.from <= -10 ? `below ${b.to}°` :
+  b.to >= 35    ? `${b.from}° and up` :
+                  `${b.from}–${b.to}°`;
+const pct  = t => Math.max(0, Math.min(1, (t - ZMIN) / (ZMAX - ZMIN))) * 100;
+
+const CASES = [
+  { t:15, w:28, p:0,   title:'Zaterdag 09:00 — 15 °C, 28 km/u wind, droog',
+    note:'De interessante: gemeten 15° maar het voelt als 13°, dus lange mouw. Zonder dat getal lijkt het advies fout.' },
+  { t:2,  w:12, p:0,   title:'Zondag 08:00 — 2 °C, 12 km/u wind, droog',
+    note:'De koudste tier. Let op waar de markering staat en of de schaal dan nog iets zegt.' },
+  { t:24, w:9,  p:1.2, title:'Woensdag 18:00 — 24 °C, 9 km/u wind, 1,2 mm regen',
+    note:'Warm én nat: de regenjas komt uit een andere regel dan de temperatuurband.' },
+];
+
+// ── varianten ─────────────────────────────────────────────────────────────
+function variantA(a) {
+  const b = band(a.combo);
+  const bands = BANDS.map(x => `
+    <div class="band" style="left:${pct(x.from)}%;width:${pct(x.to)-pct(x.from)}%;background:${x.tint}"></div>`).join('');
+  return `
+    <div class="card">
+      <div class="title">What to wear</div>
+      <div style="height:8px"></div>
+      <div class="metric">
+        <div class="top">
+          <span class="lbl">Feels like on the bike</span>
+          <span class="val">${Math.round(a.feels)}°</span>
+          <span class="verdict" style="color:var(--score-perfect)">${b.short}</span>
+        </div>
+        <div class="track">
+          ${bands}
+          <div class="marker" style="left:calc(${pct(a.feels)}% - 1.5px)"></div>
+        </div>
+        <div class="scale">
+          <span>${ZMIN}°</span>
+          <span class="mid">${b.short} · ${rangeLabel(b)}</span>
+          <span>${ZMAX}°+</span>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="items">${items(a).join(' · ')}</div>
+    </div>`;
+}
+
+function variantB(a) {
+  const steps = BANDS.slice().reverse().map(x => `
+    <div class="step ${x.key === a.combo ? 'on' : ''}">${x.short}</div>`).join('');
+  return `
+    <div class="card">
+      <div class="title">What to wear</div>
+      <div class="steps">${steps}</div>
+      <div class="stepcap">Feels like <b>${Math.round(a.feels)}°</b> on the bike
+        &middot; measured ${a.measured}°</div>
+      <div style="height:10px"></div>
+      <div class="items">${items(a).join(' · ')}</div>
+    </div>`;
+}
+
+function variantC(a) {
+  const b = band(a.combo);
+  const diff = Math.round(a.measured - a.feels);
+  const why = diff >= 1
+    ? `${diff}° colder than measured — wind takes it off you.`
+    : 'Wind is barely taking anything off.';
+  return `
+    <div class="card">
+      <div class="verdictline">${b.long}</div>
+      <div class="because">Feels like ${Math.round(a.feels)}° on the bike. ${why}</div>
+      <div style="height:12px"></div>
+      <div class="title">What to wear</div>
+      <div style="height:4px"></div>
+      <div class="items">${items(a).join(' · ')}</div>
+    </div>`;
+}
+
+const NEIGHBOUR = a => `
+  <div class="neighbour">
+    <div class="nh">Weather</div>
+    <div class="metric">
+      <div class="top">
+        <span class="lbl">Rain</span><span class="val">${a.precip.toFixed(1)}mm</span>
+        <span class="verdict" style="color:${a.precip > 0.5 ? 'var(--warning)' : 'var(--score-perfect)'}">${a.precip > 0.5 ? 'SHOWERS' : 'DRY'}</span>
+      </div>
+      <div class="track">
+        <div class="band" style="left:0;width:17%;background:var(--score-green-tint)"></div>
+        <div class="marker" style="left:calc(${Math.min(100, a.precip / 3 * 100)}% - 1.5px)"></div>
+      </div>
+      <div class="scale"><span>0mm</span><span class="mid">your range ≤0.5mm</span><span>3mm</span></div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="metric">
+      <div class="top">
+        <span class="lbl">Wind</span><span class="val">${a.wind}km/h</span>
+        <span class="verdict" style="color:${a.wind > 20 ? 'var(--warning)' : 'var(--score-perfect)'}">${a.wind > 20 ? 'BREEZY' : 'CALM'}</span>
+      </div>
+      <div class="track">
+        <div class="band" style="left:0;width:50%;background:var(--score-green-tint)"></div>
+        <div class="marker" style="left:calc(${Math.min(100, a.wind / 40 * 100)}% - 1.5px)"></div>
+      </div>
+      <div class="scale"><span>0km/h</span><span class="mid">your range ≤20km/h</span><span>40km/h</span></div>
+    </div>
+  </div>`;
+
+const COLS = [
+  { id:'A', name:'A — Gevoelsbalk',
+    sub:'Precies de anatomie van de weerbalken: waarde, oordeelswoord, ingezoomde schaal met jouw band. Een vierde balk in een rij die er al staat.',
+    fn: variantA },
+  { id:'B', name:'B — Vier stappen',
+    sub:'Geen continue schaal maar vier vakjes, zoals de dagstrip vier niveaus toont. Je ziet waar je zit én dat er vier zijn.',
+    fn: variantB },
+  { id:'C', name:'C — Alleen woorden',
+    sub:'Geen grafiek. Het oordeel groot, de reden klein eronder. De les van fase 23 doorgetrokken: een balk die niets toevoegt is versiering.',
+    fn: variantC },
+];
+
+document.getElementById('cases').innerHTML = CASES.map((c, ci) => {
+  const a = recommend(c.t, c.w, c.p);
+  a.measured = c.t;
+  a.wind = c.w;
+  a.precip = c.p;
+  return `
+    <div class="caserow">
+      <div class="casehead"><b>${c.title}</b><span>${c.note}</span></div>
+      <div class="cols">
+        ${COLS.map(col => `
+          <div class="col">
+            ${ci === 0 ? `<div class="colhead"><b>${col.name}</b><span>${col.sub}</span></div>` : ''}
+            <div class="screen">
+              ${col.fn(a)}
+              <div class="nb">${NEIGHBOUR(a)}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}).join('');
+
+document.getElementById('tNeighbour').onclick = function () {
+  this.classList.toggle('on');
+  const show = this.classList.contains('on');
+  document.querySelectorAll('.nb').forEach(n => n.style.display = show ? '' : 'none');
+};
+</script>
+</body>
+</html>
