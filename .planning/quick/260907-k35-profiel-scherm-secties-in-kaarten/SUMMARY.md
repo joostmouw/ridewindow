@@ -72,6 +72,28 @@ was er meteen — dezelfde werkwijze als bij het kiezen van Outfit.
   punt 4 uit de open lijst van fase 23 en het geldt meteen overal waar een
   `Switch` staat.
 
+## Nagekomen: op het toestel bekeken (en wat dat opleverde)
+
+De onderkant van Profiel is alsnog op de Oppo bekeken. Eén echte fout: het label
+"System" in de themakiezer brak af tot "Syste / m". De 32px die een sectiekaart
+kost is niet de oorzaak — Material 3 schrijft 16dp schermmarge voor en een
+list-item houdt daarbinnen zijn eigen 16dp, dus die inspringing klopt. Het
+vinkje van het geselecteerde segment was de oorzaak, en dat is bij een
+enkelvoudige keuze dubbelop. `showSelectedIcon: false` op taal én thema; de
+periodefilter op Home houdt zijn vinkje, want die is meervoudig.
+
+De MD3-skill is hier voor het eerst in deze epic geraadpleegd (Joost vroeg
+ernaar, terecht). Twee dingen die hij bevestigde: elevatie hoort uit tonale
+oppervlaktekleur te komen en niet uit schaduw — wat achteraf de keuze over de
+beste kaart onderbouwt — en `outline` is de juiste rol voor de omtrek van een
+uitgeschakelde schakelaar, terwijl dividers `outlineVariant` horen te gebruiken
+(dat stond al goed).
+
+**Nog niet opgepakt:** de radii in de app vormen geen systeem — 24 op ritkaarten,
+18 op de detail- en sectiekaarten, 16 op de PLANNED-regels, 12 en 3 elders.
+MD3's vormtokens kennen 12 (medium), 16 (large) en 20 (large-increased); 18 en
+24 zijn geen token. Dat is een aparte opruimactie, geen onderdeel van deze taak.
+
 ## Nog open in fase 23
 
 - Stap 3 — de typografische schaal echt gebruiken.
