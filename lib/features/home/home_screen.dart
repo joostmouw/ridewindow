@@ -1179,14 +1179,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            // De typografische stap uit schets
+                                            // 001: 24 op de beste kaart, 16 op
+                                            // de rest. Stond allebei op 16, en
+                                            // dat is de helft van de vlakheid
+                                            // die deze epic moet wegnemen.
                                             Text(
                                               _formatDayName(slot.start),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
+                                              style: (isBest
+                                                      ? Theme.of(context)
+                                                          .textTheme
+                                                          .headlineSmall
+                                                      : Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium)
                                                   ?.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                             Text(
                                               '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
@@ -1207,6 +1216,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 ScoreDisplay(
                                   score: slot.overallScore,
                                   tier: slot.tier,
+                                  emphasis: isBest
+                                      ? ScoreEmphasis.hero
+                                      : ScoreEmphasis.normal,
                                 ),
                               ],
                             ),

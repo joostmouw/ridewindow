@@ -24,15 +24,35 @@ import 'package:ridewindow/theme/app_theme.dart';
 /// [ScoreBadge] blijft bestaan voor de compacte plekken waar een hele regel
 /// hoogte niet past -- de geplande-rit-regels op Home, de agenda-cellen en de
 /// bottom sheets.
+/// Twee maten voor hetzelfde getal, en dat is het punt.
+///
+/// Tot fase 23 stond elke score op `displaySmall`, hoe goed of slecht de rit
+/// ook was. Dat is de helft van de vlakheid die deze epic moet wegnemen: als
+/// alles even groot is, wijst niets iets aan. Sinds de beste kaart geen schaduw
+/// en geen accentstaaf meer draagt (Joost, 2026-09-07) is dit bovendien niet
+/// langer een extra signaal maar het voornaamste — de pil zegt *dat* hij de
+/// beste is, de maat laat het zíen.
+enum ScoreEmphasis {
+  /// De beste kaart: `displayMedium` (45), oordeel op `titleMedium`.
+  hero,
+
+  /// Elke andere kaart: `headlineMedium` (28), oordeel op `titleSmall`.
+  normal,
+}
+
 class ScoreDisplay extends StatefulWidget {
   const ScoreDisplay({
     super.key,
     required this.score,
     required this.tier,
+    this.emphasis = ScoreEmphasis.normal,
   });
 
   final double score;
   final RideTier tier;
+
+  /// Hoe groot het getal mag zijn. Zie [ScoreEmphasis].
+  final ScoreEmphasis emphasis;
 
   @override
   State<ScoreDisplay> createState() => _ScoreDisplayState();
@@ -77,6 +97,14 @@ class _ScoreDisplayState extends State<ScoreDisplay>
       Poor() => (t.poorFg, s.tierPoor),
     };
 
+    // Rollen uit de schaal, geen losse getallen: `_style()` in
+    // app_typography.dart is de enige plek waar een puntgrootte hoort te staan.
+    final isHero = widget.emphasis == ScoreEmphasis.hero;
+    final numberStyle =
+        isHero ? theme.textTheme.displayMedium : theme.textTheme.headlineMedium;
+    final labelStyle =
+        isHero ? theme.textTheme.titleMedium : theme.textTheme.titleSmall;
+
     return ScaleTransition(
       scale: _scale,
       child: Semantics(
@@ -90,9 +118,12 @@ class _ScoreDisplayState extends State<ScoreDisplay>
           children: [
             Text(
               '${widget.score.round()}',
-              style: theme.textTheme.displaySmall?.copyWith(
+              style: numberStyle?.copyWith(
                 color: fg,
                 fontWeight: FontWeight.w600,
+                // Outfit is een variabele letter; zonder deze `fontVariations`
+                // pakt de web-build de statische instantie en blijft het
+                // gewicht op 500 staan.
                 fontVariations: const [FontVariation('wght', 600)],
                 height: 1.0,
               ),
@@ -100,7 +131,7 @@ class _ScoreDisplayState extends State<ScoreDisplay>
             const SizedBox(height: 2),
             Text(
               label,
-              style: theme.textTheme.titleSmall?.copyWith(color: fg),
+              style: labelStyle?.copyWith(color: fg),
             ),
           ],
         ),

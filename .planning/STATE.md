@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23: 1,2,4,6 + Profiel-kaarten klaar — open: 3, 5"
+status: "Fase 23 bijna rond — alleen stap 5 nog open"
 last_updated: "2026-09-07T17:20:00.000Z"
 last_activity: 2026-09-07
 progress:
@@ -23,6 +23,7 @@ progress:
 | 2026-09-07 | [weerbalken](quick/20260907-weerbalken/) | Stap 4: ingezoomd bereik plus een uitgeschreven oordeel (Dry/Calm/Ideal). Alleen de beste kaart houdt balken. |
 | 2026-09-07 | [sweep](quick/20260907-sweep/) | Stap 6: Agenda, Profiel-banner en Ride Detail naar papier. **Deels** — Profiel-kaarten per sectie staan nog open. |
 | 2026-09-07 | [profiel-secties-in-kaarten](quick/260907-k35-profiel-scherm-secties-in-kaarten/) | Profiel-kaarten per sectie (het laatste scherm zonder papier-behandeling), plus Joost's twee punten over Home. |
+| 2026-09-07 | [stap-3-typografie](quick/260907-kqr-fase-23-stap-3-typografische-schaal-echt/) | Stap 3: de beste kaart op 24/45, de rest op 16/28. Zonder schaduw of staaf wijst maat de kaart nu aan. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -30,11 +31,12 @@ progress:
 **https://my-project-joost.web.app** (Firebase Hosting; `main.dart.js` heeft `no-cache`, dus daar
 volstaat een gewone herlaad). De Play-build loopt bewust achter op 1.0.23+24.
 
-**Open in fase 23, in volgorde van mijn voorkeur:**
+**Open in fase 23:**
 
-1. **Stap 3** — de typografische schaal echt gebruiken.
-2. **Stap 5** — dagstrip en periodefilter rustiger.
-3. Kleiner: Peloton-kaarten missen hun haarlijn.
+1. **Stap 5** — dagstrip en periodefilter rustiger: de dagchips verliezen hun
+   gekleurde achtergrond en de kwaliteit van een dag wordt een 3px onderstreping
+   in de tierkleur; het `SegmentedButton` wordt een tekstrij met onderstreping.
+2. Kleiner: Peloton-kaarten missen hun haarlijn.
 
 **Afgerond op 2026-09-07, tweede sessie** (zie
 `quick/260907-k35-profiel-scherm-secties-in-kaarten/SUMMARY.md`):
