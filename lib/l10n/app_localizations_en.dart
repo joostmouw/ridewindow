@@ -854,6 +854,38 @@ class SEn extends S {
   String get clothingTitle => 'What to wear';
 
   @override
+  String get clothingOnTheBike => 'On the bike';
+
+  @override
+  String clothingBandBelow(int to) {
+    return 'below $to°';
+  }
+
+  @override
+  String clothingBandAbove(int from) {
+    return '$from° and up';
+  }
+
+  @override
+  String clothingBandBetween(int from, int to) {
+    return '$from–$to°';
+  }
+
+  @override
+  String get clothingFeelsLikeInfo =>
+      'The “feels like” in the weather list assumes you are standing still. On a bike you make about 15 km/h of headwind yourself, on top of the wind that is already forecast. RideWindow subtracts that chill before picking your clothing, so this number sits below the one in the list — and this is the number the advice is based on. The coloured bands show which advice belongs to which temperature.';
+
+  @override
+  String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill) {
+    return 'The forecast says $airTemp°. Riding brings it down to $bikeTemp° — the wind takes $chill° off.';
+  }
+
+  @override
+  String clothingFeelsLikeNoDrop(int airTemp) {
+    return 'The forecast says $airTemp°, and at this wind speed riding barely takes anything off.';
+  }
+
+  @override
   String get clothingWinterJacket => 'Winter jacket';
 
   @override

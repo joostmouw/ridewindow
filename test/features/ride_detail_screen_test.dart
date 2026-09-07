@@ -290,8 +290,13 @@ void main() {
       ));
       await tester.pump();
 
-      // "i" button should be findable
-      expect(find.byIcon(Icons.info_outline), findsOneWidget);
+      // Zoek de knop in de banner, niet zomaar het icoon: sinds fase 24 heeft
+      // ook de gevoelsbalk in de kledingkaart een info-icoon, en dan matcht
+      // `find.byIcon` er twee. De banner-knop is de enige IconButton ermee.
+      expect(
+        find.widgetWithIcon(IconButton, Icons.info_outline),
+        findsOneWidget,
+      );
     });
 
     testWidgets('"i"-knop opent InsightsSheet via showModalBottomSheet',
@@ -306,7 +311,7 @@ void main() {
       ));
       await tester.pump();
 
-      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.tap(find.widgetWithIcon(IconButton, Icons.info_outline));
       await tester.pumpAndSettle();
 
       // Bottom sheet should have appeared — InsightsSheet stub or content

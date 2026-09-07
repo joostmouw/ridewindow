@@ -377,6 +377,43 @@
   },
 
   "clothingTitle": "Wat trek je aan",
+
+  "clothingOnTheBike": "Op de fiets",
+  "clothingBandBelow": "onder {to}\u00B0",
+  "@clothingBandBelow": {
+    "placeholders": {
+      "to": {"type": "int"}
+    }
+  },
+  "clothingBandAbove": "vanaf {from}\u00B0",
+  "@clothingBandAbove": {
+    "placeholders": {
+      "from": {"type": "int"}
+    }
+  },
+  "clothingBandBetween": "{from}\u2013{to}\u00B0",
+  "@clothingBandBetween": {
+    "placeholders": {
+      "from": {"type": "int"},
+      "to": {"type": "int"}
+    }
+  },
+  "clothingFeelsLikeInfo": "De \u201Cvoelt als\u201D in de weerlijst gaat uit van stilstaan. Op de fiets maak je zelf zo\u2019n 15 km/u tegenwind, boven op de wind die al voorspeld is. RideWindow trekt die kou eraf voordat hij je kleding kiest, dus dit getal ligt lager dan dat in de lijst \u2014 en d\u00EDt is het getal waar het advies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.",
+  "clothingFeelsLikeDrop": "De voorspelling zegt {airTemp}\u00B0. Fietsen brengt het naar {bikeTemp}\u00B0 \u2014 de wind haalt er {chill}\u00B0 af.",
+  "@clothingFeelsLikeDrop": {
+    "description": "De namen staan alfabetisch en dat is opzet: gen-l10n sorteert argumenten alfabetisch, niet op leesvolgorde -- zie b3ee1c1.",
+    "placeholders": {
+      "airTemp": {"type": "int"},
+      "bikeTemp": {"type": "int"},
+      "chill": {"type": "int"}
+    }
+  },
+  "clothingFeelsLikeNoDrop": "De voorspelling zegt {airTemp}\u00B0, en bij deze wind haalt het fietsen er nauwelijks iets af.",
+  "@clothingFeelsLikeNoDrop": {
+    "placeholders": {
+      "airTemp": {"type": "int"}
+    }
+  },
   "clothingWinterJacket": "Winterjas",
   "clothingThermalPants": "Thermobroek",
   "clothingGloves": "Handschoenen",

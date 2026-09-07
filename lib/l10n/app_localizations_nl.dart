@@ -854,6 +854,38 @@ class SNl extends S {
   String get clothingTitle => 'Wat trek je aan';
 
   @override
+  String get clothingOnTheBike => 'Op de fiets';
+
+  @override
+  String clothingBandBelow(int to) {
+    return 'onder $to°';
+  }
+
+  @override
+  String clothingBandAbove(int from) {
+    return 'vanaf $from°';
+  }
+
+  @override
+  String clothingBandBetween(int from, int to) {
+    return '$from–$to°';
+  }
+
+  @override
+  String get clothingFeelsLikeInfo =>
+      'De “voelt als” in de weerlijst gaat uit van stilstaan. Op de fiets maak je zelf zo’n 15 km/u tegenwind, boven op de wind die al voorspeld is. RideWindow trekt die kou eraf voordat hij je kleding kiest, dus dit getal ligt lager dan dat in de lijst — en dít is het getal waar het advies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.';
+
+  @override
+  String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill) {
+    return 'De voorspelling zegt $airTemp°. Fietsen brengt het naar $bikeTemp° — de wind haalt er $chill° af.';
+  }
+
+  @override
+  String clothingFeelsLikeNoDrop(int airTemp) {
+    return 'De voorspelling zegt $airTemp°, en bij deze wind haalt het fietsen er nauwelijks iets af.';
+  }
+
+  @override
   String get clothingWinterJacket => 'Winterjas';
 
   @override

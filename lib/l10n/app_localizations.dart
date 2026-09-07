@@ -1609,6 +1609,48 @@ abstract class S {
   /// **'Wat trek je aan'**
   String get clothingTitle;
 
+  /// No description provided for @clothingOnTheBike.
+  ///
+  /// In nl, this message translates to:
+  /// **'Op de fiets'**
+  String get clothingOnTheBike;
+
+  /// No description provided for @clothingBandBelow.
+  ///
+  /// In nl, this message translates to:
+  /// **'onder {to}°'**
+  String clothingBandBelow(int to);
+
+  /// No description provided for @clothingBandAbove.
+  ///
+  /// In nl, this message translates to:
+  /// **'vanaf {from}°'**
+  String clothingBandAbove(int from);
+
+  /// No description provided for @clothingBandBetween.
+  ///
+  /// In nl, this message translates to:
+  /// **'{from}–{to}°'**
+  String clothingBandBetween(int from, int to);
+
+  /// No description provided for @clothingFeelsLikeInfo.
+  ///
+  /// In nl, this message translates to:
+  /// **'De “voelt als” in de weerlijst gaat uit van stilstaan. Op de fiets maak je zelf zo’n 15 km/u tegenwind, boven op de wind die al voorspeld is. RideWindow trekt die kou eraf voordat hij je kleding kiest, dus dit getal ligt lager dan dat in de lijst — en dít is het getal waar het advies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.'**
+  String get clothingFeelsLikeInfo;
+
+  /// De namen staan alfabetisch en dat is opzet: gen-l10n sorteert argumenten alfabetisch, niet op leesvolgorde -- zie b3ee1c1.
+  ///
+  /// In nl, this message translates to:
+  /// **'De voorspelling zegt {airTemp}°. Fietsen brengt het naar {bikeTemp}° — de wind haalt er {chill}° af.'**
+  String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill);
+
+  /// No description provided for @clothingFeelsLikeNoDrop.
+  ///
+  /// In nl, this message translates to:
+  /// **'De voorspelling zegt {airTemp}°, en bij deze wind haalt het fietsen er nauwelijks iets af.'**
+  String clothingFeelsLikeNoDrop(int airTemp);
+
   /// No description provided for @clothingWinterJacket.
   ///
   /// In nl, this message translates to:

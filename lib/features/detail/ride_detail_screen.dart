@@ -17,6 +17,7 @@ import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
+import 'package:ridewindow/features/shared/feels_like_bar.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
@@ -424,38 +425,34 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    s.clothingTitle,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: rw.scorePerfect,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    items.join(' \u00B7 '),
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: rw.textSecondary,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
+            Text(
+              s.clothingTitle,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: rw.scorePerfect,
               ),
             ),
-            const SizedBox(width: 12),
-            ClothingTip(
-              avgTempC: avgTemp,
-              avgWindKmh: windAvg,
-              totalPrecipMm: totalPrecip,
+            const SizedBox(height: 8),
+            // De balk staat bóven de lijst en niet ernaast: hij draagt de
+            // reden ("het voelt als 13 graden") en de lijst het gevolg. Naast
+            // elkaar zouden ze om dezelfde breedte vechten op een telefoon.
+            FeelsLikeBar(
+              feelsLikeC: advice.feelsLike,
+              measuredC: avgTemp,
+              combo: advice.combo,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              items.join(' \u00B7 '),
+              style: TextStyle(
+                fontSize: 13,
+                color: rw.textSecondary,
+                height: 1.4,
+              ),
             ),
           ],
         ),

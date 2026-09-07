@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "1.0.24+25 live op internal testing — wacht op feedback"
-last_updated: "2026-09-07T18:40:00.000Z"
+status: "Fase 24: gevoelsbalk staat; iconen-keuze open"
+last_updated: "2026-09-07T21:55:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -27,6 +27,7 @@ progress:
 | 2026-09-07 | [stap-5-dagstrip-en-filter](quick/260907-s5x-fase-23-stap-5-dagstrip-en-periodefilter/) | Stap 5: kwaliteit werd een onderstreping, selectie een tonale vulling; filter werd een tekstrij. Plus: kleine ritkaarten zijn uitklapbaar. |
 | 2026-09-07 | Peloton-kaarten (`41217d9`, `63770c2`) | Peloton kreeg `SectionCard` (verhuisd uit Profiel); `cardTheme` bleek een tweede kaartsoort te hebben en is gelijkgetrokken. Elke ritkaart kan nu open én dicht. |
 | 2026-09-07 | [home-verfijning](quick/260907-hzt-home-verfijning-na-fase-23/) | Zes rondes na fase 23: dagstrip op vier niveaus, lijstplafonds, compactere kaarten, en uitleg waarom een score die score is. **Lees de drie vondsten daar** — icon-tree-shaking, gen-l10n-volgorde, en de verouderde bundel. |
+| 2026-09-07 | [gevoelsbalk](quick/260907-wgz-fase-24-kledingadvies-gevoelsbalk/) | Fase 24: het kledingadvies is geen plaatje meer maar een balk met de gevoelstemperatuur. **Lees de vondst daar** — de app toonde twee verschillende "feels like" naast elkaar. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -47,6 +48,22 @@ agenda-omschrijving). Open blijft **backlog #63** — de iPhone-tester die niet
 terugkomt uit het beschikbaarheidsscherm. Dat is niet op te lossen zonder
 iPhone; de knop bestáát in alle drie de takken, dus het is een
 safe-area-kwestie op iOS-standalone.
+
+**Fase 24 is begonnen en gedraaid van koers.** De fase heette "iconografie" en
+zou eigen pictogrammen voor het kledingadvies opleveren (schets 002). Joost wees
+die af: het advies gaat niet over textiel maar over hoe koud het aanvoelt, dus
+het hoort informatie te zijn. Schets 003 variant A staat nu in de app — een balk
+met de gevoelstemperatuur en de vier kledingbanden als schaal. Daarbij kwam een
+tegenspraak boven water die de emoji-pil verborg: de weerlijst toont Open-Meteo's
+`apparentTemperatureC` als "feels like 16°C" terwijl het kledingadvies met een
+eigen berekening op 14° uitkomt. Voorlopig opgelost met een eigen label ("Op de
+fiets") plus uitleg. **Openstaande vraag:** moet `recommendClothing()` van de
+gevoelstemperatuur uitgaan in plaats van de kale meting? Dat verandert wat de app
+adviseert, dus dat is Joost's keuze.
+
+**De zestien andere emoji staan nog open.** Joost wil ze persoonlijk maken, niet
+Material. Aanpak: een karaktervolle open familie (Lucide, Phosphor) naast elkaar
+in de échte schermen, kiezen zoals Outfit gekozen is. Dat wordt schets 004.
 
 **1.0.24+25 staat op Play, internal testing** (uitgerold 2026-09-07 door Joost).
 Dat is de eerste Play-build met v4.0 én Peloton: de testers gingen in één sprong

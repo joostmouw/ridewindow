@@ -1,6 +1,10 @@
 // lib/features/shared/clothing_tip.dart
 // Clothing recommendation for cyclists based on feels-like temperature.
 //
+// Sinds fase 24 staat hier alleen nog de regel, geen weergave. Het advies wordt
+// getoond door `FeelsLikeBar` (feels_like_bar.dart); de emoji-pil die hier
+// stond is vervallen omdat elk platform die anders tekende.
+//
 // Cycling logic:
 // - Legs are the engine → stay warm from pedaling → shorts until ~14°C
 // - Upper body catches wind → needs protection sooner
@@ -12,20 +16,56 @@
 //   5-14°C  lang/lang  — lange mouw + lange broek
 //   <5°C    lang/lang+  — volledige bescherming + extra lagen
 
-import 'package:flutter/material.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
-// Shared recommendation logic — used by both the emoji widget and the
-// detailed clothing list on the detail screen.
+// De regel zelf. Pure Dart: geen BuildContext, geen widgets — alleen
+// `clothingItems` heeft de vertalingen nodig.
 // ---------------------------------------------------------------------------
 
+/// De vier kledingadviezen, elk met de gevoelstemperatuur waarbij hij geldt.
+///
+/// **Waarom de grenzen op de enum staan en niet in [recommendClothing].** Sinds
+/// fase 24 tekent `FeelsLikeBar` deze banden als schaal onder het advies. Zou
+/// de balk zijn eigen getallen aanhouden, dan kan de markering in de ene band
+/// staan terwijl de tekst een andere noemt — en dan liegt het scherm over zijn
+/// eigen redenering. Eén bron, twee lezers.
 enum ClothingCombo {
-  shortShort,
-  longShort,
-  longLong,
-  longLongExtra,
+  shortShort(minFeelsC: 20),
+  longShort(minFeelsC: 14, maxFeelsC: 20),
+  longLong(minFeelsC: 5, maxFeelsC: 14),
+  longLongExtra(maxFeelsC: 5);
+
+  const ClothingCombo({this.minFeelsC, this.maxFeelsC});
+
+  /// Ondergrens, inclusief. `null` voor de koudste band: die heeft er geen.
+  final double? minFeelsC;
+
+  /// Bovengrens, exclusief. `null` voor de warmste band.
+  final double? maxFeelsC;
+
+  /// De band waar deze gevoelstemperatuur in valt.
+  ///
+  /// De volgorde is van warm naar koud en de vergelijking is `>=`, precies
+  /// zoals de oorspronkelijke if-keten. 20,0 is dus kort/kort en 19,9 is
+  /// lang/kort.
+  static ClothingCombo forFeelsLike(double feelsLikeC) {
+    for (final combo in values) {
+      if (combo.minFeelsC == null || feelsLikeC >= combo.minFeelsC!) {
+        return combo;
+      }
+    }
+    return longLongExtra;
+  }
 }
+
+/// Het getekende bereik van de gevoelsbalk.
+///
+/// Niet het meetbereik maar het bereik dat je op de fiets tegenkomt — zelfde
+/// afweging als `zoomMin`/`zoomMax` op `WeatherMetric`. Buiten dit bereik klapt
+/// de markering tegen de rand; het getal in de tekst blijft de echte waarde.
+const double feelsLikeZoomMinC = -5;
+const double feelsLikeZoomMaxC = 25;
 
 class ClothingAdvice {
   final ClothingCombo combo;
@@ -52,19 +92,8 @@ ClothingAdvice recommendClothing({
   final raining = (totalPrecipMm ?? 0) > 0.5;
   final windy = (avgWindKmh ?? 0) > 25;
 
-  final ClothingCombo combo;
-  if (feelsLike >= 20) {
-    combo = ClothingCombo.shortShort;
-  } else if (feelsLike >= 14) {
-    combo = ClothingCombo.longShort;
-  } else if (feelsLike >= 5) {
-    combo = ClothingCombo.longLong;
-  } else {
-    combo = ClothingCombo.longLongExtra;
-  }
-
   return ClothingAdvice(
-    combo: combo,
+    combo: ClothingCombo.forFeelsLike(feelsLike),
     feelsLike: feelsLike,
     raining: raining,
     windy: windy,
@@ -109,69 +138,4 @@ List<String> clothingItems(ClothingAdvice advice, S s) {
   if (advice.windy) items.add(s.clothingWindVest);
 
   return items;
-}
-
-// ---------------------------------------------------------------------------
-// Emoji widget — compact visual summary
-// ---------------------------------------------------------------------------
-
-class ClothingTip extends StatelessWidget {
-  final double? avgTempC;
-  final double? avgWindKmh;
-  final double? totalPrecipMm;
-
-  const ClothingTip({
-    super.key,
-    this.avgTempC,
-    this.avgWindKmh,
-    this.totalPrecipMm,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final advice = recommendClothing(
-      avgTempC: avgTempC,
-      avgWindKmh: avgWindKmh,
-      totalPrecipMm: totalPrecipMm,
-    );
-    final cs = Theme.of(context).colorScheme;
-
-    final String emoji;
-    final String label;
-    switch (advice.combo) {
-      case ClothingCombo.shortShort:
-        emoji = '\u{1F455}\u{1FA73}'; // t-shirt + shorts
-        label = S.of(context).comboShortShort;
-      case ClothingCombo.longShort:
-        emoji = '\u{1F9E5}\u{1FA73}'; // long sleeve + shorts
-        label = S.of(context).comboLongShort;
-      case ClothingCombo.longLong:
-        emoji = '\u{1F9E5}\u{1F456}'; // long sleeve + pants
-        label = S.of(context).comboLongLong;
-      case ClothingCombo.longLongExtra:
-        emoji = '\u{1F9E5}\u{1F9E5}'; // double layer
-        label = S.of(context).comboLongLongExtra;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
 }

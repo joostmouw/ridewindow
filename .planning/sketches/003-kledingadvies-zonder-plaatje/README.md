@@ -2,11 +2,19 @@
 sketch: 003
 name: kledingadvies-zonder-plaatje
 question: "Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél?"
-winner: null
+winner: "A — Gevoelsbalk"
 tags: [iconografie, kleding, weerbalken, fase-24]
 ---
 
 # Sketch 003: Kledingadvies zonder plaatje
+
+> **Gewonnen: variant A — Gevoelsbalk.** Gekozen door Joost op 2026-09-07 en
+> diezelfde dag uitgevoerd, zie
+> [`.planning/quick/260907-wgz-fase-24-kledingadvies-gevoelsbalk/`](../../quick/260907-wgz-fase-24-kledingadvies-gevoelsbalk/).
+> Het uitvoeren bracht iets aan het licht dat in de schets niet zichtbaar was:
+> de weerlijst op ditzelfde scherm toont Open-Meteo's `apparentTemperatureC` al
+> als "feels like 16°C", terwijl deze balk op 14° uitkomt. Twee getallen onder
+> dezelfde woorden. Het label heet daarom "On the bike" / "Op de fiets".
 
 ## Design Question
 

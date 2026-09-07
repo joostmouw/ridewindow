@@ -36,7 +36,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 |---|------|-----------------|---------|------|
 | 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | **B — Papier en inkt** | home, hierarchie, typografie, weerbalken, fase-23 |
 | 002 | [iconografie](002-iconografie/) | Waar komt het kledingadvies vandaan als het geen systeememoji meer is — twee losse kledingstukken, één tenue, of een gekleed figuur? | *afgewezen — verkeerde vraag* | iconografie, kleding, fase-24 |
-| 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | *open* | iconografie, kleding, weerbalken, fase-24 |
+| 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | **A — Gevoelsbalk** | iconografie, kleding, weerbalken, fase-24 |
 
 ## Beslissingen die doorwerken
 
@@ -59,3 +59,11 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
   `temp − (wind + 15) × 0,05` maar toonde dat getal nergens, waardoor de app bij 15 °C "lange mouw"
   adviseerde zonder reden te geven. Dat is geen stijlkeuze maar een ontbrekend stuk informatie, en
   het geldt ongeacht welke variant uit 003 wint.
+- **003 → A (2026-09-07), en meteen gebouwd.** Het kledingadvies is een balk in
+  de familie van de weerbalken geworden. Eén ding kwam pas boven water toen het
+  in de app stond: RideWindow had al een "feels like" — die van Open-Meteo, in
+  de weerlijst — en die staat vier centimeter van de balk vandaan een ander
+  getal te tonen. Twee berekeningen onder dezelfde woorden. Voorlopig gescheiden
+  met een eigen label, maar de echte vraag is of het kledingadvies niet gewoon
+  van de gevoelstemperatuur moet uitgaan. Dat verandert wat de app adviseert en
+  is daarom een beslissing, geen opruimwerk.
