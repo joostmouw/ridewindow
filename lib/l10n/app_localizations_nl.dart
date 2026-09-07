@@ -69,6 +69,40 @@ class SNl extends S {
   String get plannedRidesLabel => 'GEPLAND';
 
   @override
+  String scoreSectionTitle(Object score) {
+    return 'Dit venster: $score van de 100';
+  }
+
+  @override
+  String scoreInsideIdeal(Object value) {
+    return '$value valt binnen het bereik dat je hebt ingesteld, dus dit scoort de volle 100.';
+  }
+
+  @override
+  String scoreOutsideIdeal(Object value) {
+    return '$value valt buiten het bereik dat je hebt ingesteld, en dát kost de punten.';
+  }
+
+  @override
+  String scaleTemp(Object ex1, Object ex2, Object score1, Object score2) {
+    return 'Buiten je bereik zakt de score met 5 punten per graad. $ex1 zou dus $score1 scoren, en $ex2 zou $score2 scoren.';
+  }
+
+  @override
+  String scaleRain(Object ex1, Object ex2, Object score1, Object score2) {
+    return 'Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: $ex1 scoort $score1, $ex2 scoort $score2. De kans op regen telt ook mee — de slechtste van die twee wordt de score.';
+  }
+
+  @override
+  String scaleWind(Object ex1, Object ex2, Object score1, Object score2) {
+    return 'Boven je grens zakt het eerst rustig en daarna steil, want harde wind is een veiligheidskwestie: $ex1 scoort $score1, $ex2 scoort $score2.';
+  }
+
+  @override
+  String get scoreCombines =>
+      'De zwakste van temperatuur, regen en wind weegt het zwaarst: de ritscore is 60% van de laagste plus 40% van het gemiddelde van alle drie.';
+
+  @override
   String showAllWindows(Object count) {
     return 'Toon alle $count vensters';
   }

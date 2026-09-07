@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -1185,6 +1186,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final avgWind =
         winds.isEmpty ? null : winds.reduce((a, b) => a + b) / winds.length;
 
+    // De echte deelscores uit de motor, gemiddeld over de uren van dit venster
+    // — niet nagerekend uit de gemiddelde waarde hierboven. Dat scheelt: de
+    // regenscore is de laagste van hoeveelheid én kans, en die kans zit niet in
+    // `totalPrecip`. Zou de uitleg zelf gaan rekenen, dan noemt hij een ander
+    // getal dan de score die ernaast staat.
+    double? avgOf(double Function(HourlyScore) pick) {
+      if (slot.hours.isEmpty) return null;
+      return slot.hours.map(pick).reduce((a, b) => a + b) / slot.hours.length;
+    }
+
+    final tempScore = avgOf((h) => h.temperatureScore);
+    final rainScore = avgOf((h) => h.rainScore);
+    final windScore = avgOf((h) => h.windScore);
+
     // Alle kaarten dezelfde volle radius, ook de beste.
     //
     // Dat was even anders: de beste kaart had links 8px, zodat de accentrand
@@ -1470,6 +1485,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   avgTemp: avgTemp,
                                   totalPrecip: totalPrecip,
                                   avgWind: avgWind,
+                                  tempScore: tempScore,
+                                  rainScore: rainScore,
+                                  windScore: windScore,
                                 ),
                                 // Dicht deelt de chevron zijn regel met de
                                 // weersamenvatting — die is kort
@@ -1534,6 +1552,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     double? avgTemp,
     double? totalPrecip,
     double? avgWind,
+    double? tempScore,
+    double? rainScore,
+    double? windScore,
   }) {
     final s = S.of(context);
     final profile = ref.watch(profileProvider).value;
@@ -1555,6 +1576,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             idealMin: tempMin,
             idealMax: tempMax,
             infoText: s.infoTemp,
+            score: tempScore,
           ),
         if (totalPrecip != null)
           WeatherIndicatorBar(
@@ -1565,6 +1587,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             unit: ' mm',
             idealMax: rainMax,
             infoText: s.infoRain,
+            score: rainScore,
           ),
         if (avgWind != null)
           WeatherIndicatorBar(
@@ -1575,6 +1598,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             unit: ' km/h',
             idealMax: windMax,
             infoText: s.infoWind,
+            score: windScore,
           ),
       ],
     );

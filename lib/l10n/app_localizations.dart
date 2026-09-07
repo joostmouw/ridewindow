@@ -193,6 +193,48 @@ abstract class S {
   /// **'GEPLAND'**
   String get plannedRidesLabel;
 
+  /// No description provided for @scoreSectionTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit venster: {score} van de 100'**
+  String scoreSectionTitle(Object score);
+
+  /// No description provided for @scoreInsideIdeal.
+  ///
+  /// In nl, this message translates to:
+  /// **'{value} valt binnen het bereik dat je hebt ingesteld, dus dit scoort de volle 100.'**
+  String scoreInsideIdeal(Object value);
+
+  /// No description provided for @scoreOutsideIdeal.
+  ///
+  /// In nl, this message translates to:
+  /// **'{value} valt buiten het bereik dat je hebt ingesteld, en dát kost de punten.'**
+  String scoreOutsideIdeal(Object value);
+
+  /// No description provided for @scaleTemp.
+  ///
+  /// In nl, this message translates to:
+  /// **'Buiten je bereik zakt de score met 5 punten per graad. {ex1} zou dus {score1} scoren, en {ex2} zou {score2} scoren.'**
+  String scaleTemp(Object ex1, Object ex2, Object score1, Object score2);
+
+  /// No description provided for @scaleRain.
+  ///
+  /// In nl, this message translates to:
+  /// **'Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: {ex1} scoort {score1}, {ex2} scoort {score2}. De kans op regen telt ook mee — de slechtste van die twee wordt de score.'**
+  String scaleRain(Object ex1, Object ex2, Object score1, Object score2);
+
+  /// No description provided for @scaleWind.
+  ///
+  /// In nl, this message translates to:
+  /// **'Boven je grens zakt het eerst rustig en daarna steil, want harde wind is een veiligheidskwestie: {ex1} scoort {score1}, {ex2} scoort {score2}.'**
+  String scaleWind(Object ex1, Object ex2, Object score1, Object score2);
+
+  /// No description provided for @scoreCombines.
+  ///
+  /// In nl, this message translates to:
+  /// **'De zwakste van temperatuur, regen en wind weegt het zwaarst: de ritscore is 60% van de laagste plus 40% van het gemiddelde van alle drie.'**
+  String get scoreCombines;
+
   /// No description provided for @showAllWindows.
   ///
   /// In nl, this message translates to:

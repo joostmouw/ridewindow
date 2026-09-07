@@ -69,6 +69,40 @@ class SEn extends S {
   String get plannedRidesLabel => 'PLANNED';
 
   @override
+  String scoreSectionTitle(Object score) {
+    return 'This window: $score out of 100';
+  }
+
+  @override
+  String scoreInsideIdeal(Object value) {
+    return '$value is within the range you set, so this scores the full 100.';
+  }
+
+  @override
+  String scoreOutsideIdeal(Object value) {
+    return '$value falls outside the range you set, which is what costs the points.';
+  }
+
+  @override
+  String scaleTemp(Object ex1, Object ex2, Object score1, Object score2) {
+    return 'Outside your range the score drops by 5 points per degree. So $ex1 would score $score1, and $ex2 would score $score2.';
+  }
+
+  @override
+  String scaleRain(Object ex1, Object ex2, Object score1, Object score2) {
+    return 'Above your limit the first drops cost the most and it flattens out after that: $ex1 scores $score1, $ex2 scores $score2. The chance of rain counts as well — whichever of the two is worse becomes the score.';
+  }
+
+  @override
+  String scaleWind(Object ex1, Object ex2, Object score1, Object score2) {
+    return 'Above your limit it drops gently at first and then steeply, because hard wind is a safety issue: $ex1 scores $score1, $ex2 scores $score2.';
+  }
+
+  @override
+  String get scoreCombines =>
+      'The weakest of temperature, rain and wind weighs heaviest: the ride score is 60% of the lowest plus 40% of the average of all three.';
+
+  @override
   String showAllWindows(Object count) {
     return 'Show all $count windows';
   }

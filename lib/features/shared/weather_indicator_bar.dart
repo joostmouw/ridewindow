@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/weather_verdict.dart';
+import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -33,6 +34,7 @@ class WeatherIndicatorBar extends StatelessWidget {
     required this.idealMax,
     this.idealMin,
     this.infoText,
+    this.score,
   });
 
   final WeatherMetric metric;
@@ -49,6 +51,14 @@ class WeatherIndicatorBar extends StatelessWidget {
   final double? idealMin;
 
   final String? infoText;
+
+  /// De deelscore die deze meting in dit venster kreeg, 0–100.
+  ///
+  /// Komt uit de motor (gemiddeld over de uren van het venster) en wordt hier
+  /// niet nagerekend: de regenscore is de laagste van hoeveelheid én kans, en
+  /// die kans zit niet in [value]. Zou deze widget zelf gaan rekenen, dan noemt
+  /// het infovenster een ander getal dan de score op de kaart.
+  final double? score;
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +222,8 @@ class WeatherIndicatorBar extends StatelessWidget {
   /// want de standaardgrens is 0,5 mm.
   String _formatValue() => switch (metric) {
         WeatherMetric.rain => _trim(value),
-        WeatherMetric.temperature || WeatherMetric.wind =>
+        WeatherMetric.temperature ||
+        WeatherMetric.wind =>
           value.round().toString(),
       };
 
@@ -275,11 +286,105 @@ class WeatherIndicatorBar extends StatelessWidget {
                   height: 1.5,
                 ),
               ),
+              if (score != null) ..._scoreExplanation(ctx, rw),
             ],
           ),
         ),
       ),
     );
+  }
+
+  /// Het tweede blok in het infovenster: niet wát deze meting is, maar waaróm
+  /// hij híér deze score kreeg.
+  ///
+  /// Joost's verzoek (2026-09-07): *"per weer-item geeft ie een uitleg van wat
+  /// het is in het algemeen, maar eronder wil ik ook een uitleg over deze
+  /// score — gericht op het item dat erin staat, met een uitleg over de schaal
+  /// en waarom die score de score is."*
+  ///
+  /// De voorbeeldwaarden worden hier berekend met [MetricScores], dezelfde
+  /// functies die de motor gebruikt. Dat is geen netheid maar noodzaak: zodra
+  /// iemand een curve verschuift moet deze tekst meebewegen, anders vertelt de
+  /// app iets anders dan hij doet — en het uitleggen van de score raakt de
+  /// kernwaarde van dit product.
+  List<Widget> _scoreExplanation(BuildContext context, RideWindowTheme rw) {
+    final s = S.of(context);
+    final cs = Theme.of(context).colorScheme;
+    // `_formatValue()` en niet `_trim()`: de balk rondt temperatuur en wind af
+    // op hele eenheden, en de uitleg moet hetzelfde getal noemen als wat de
+    // gebruiker ziet staan. Anders staat er "15°" op de balk en "15,4°" in de
+    // uitleg eronder, en dan lijkt de app twee metingen te hebben.
+    final valueLabel = _formatValue();
+    final inRange =
+        (idealMin == null || this.value >= idealMin!) && this.value <= idealMax;
+
+    // Twee concrete voorbeelden nét buiten de grens, zodat de schaal een maat
+    // krijgt in plaats van een belofte. De stappen verschillen per meting omdat
+    // de eenheden dat ook doen.
+    final (double ex1, double ex2) = switch (metric) {
+      WeatherMetric.temperature => (idealMax + 6, idealMax + 14),
+      WeatherMetric.rain => (idealMax + 1, idealMax + 3),
+      WeatherMetric.wind => (idealMax + 10, idealMax + 25),
+    };
+    final double sc1;
+    final double sc2;
+    switch (metric) {
+      case WeatherMetric.temperature:
+        sc1 = MetricScores.linear(
+            ex1, idealMin ?? 0, idealMax, MetricScores.tempFadeRangeC);
+        sc2 = MetricScores.linear(
+            ex2, idealMin ?? 0, idealMax, MetricScores.tempFadeRangeC);
+      case WeatherMetric.rain:
+        sc1 = MetricScores.rainAmount(ex1, idealMax);
+        sc2 = MetricScores.rainAmount(ex2, idealMax);
+      case WeatherMetric.wind:
+        sc1 = MetricScores.wind(ex1, idealMax);
+        sc2 = MetricScores.wind(ex2, idealMax);
+    }
+
+    // LET OP de volgorde. `gen-l10n` sorteert placeholders **alfabetisch**
+    // (`ex1, ex2, score1, score2`) en niet op hun volgorde in de zin. Geef je
+    // ze in leesvolgorde door, dan compileert alles en staat er onzin op het
+    // scherm: "32 graden zou 40 graden scoren, en 70 zou 30 scoren".
+    // Waargenomen 2026-09-07, en alleen te zien door de zin echt te lezen --
+    // de analyzer merkt niets, want alle parameters zijn `Object`.
+    final e1 = '${_trim(ex1)}$unit';
+    final e2 = '${_trim(ex2)}$unit';
+    final s1 = sc1.round();
+    final s2 = sc2.round();
+
+    final scaleText = switch (metric) {
+      WeatherMetric.temperature => s.scaleTemp(e1, e2, s1, s2),
+      WeatherMetric.rain => s.scaleRain(e1, e2, s1, s2),
+      WeatherMetric.wind => s.scaleWind(e1, e2, s1, s2),
+    };
+
+    final body = TextStyle(fontSize: 14, color: rw.textSecondary, height: 1.5);
+
+    return [
+      const SizedBox(height: 20),
+      Divider(height: 1, color: cs.outlineVariant),
+      const SizedBox(height: 16),
+      Text(
+        s.scoreSectionTitle(score!.round()),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: rw.scorePerfect,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        inRange
+            ? s.scoreInsideIdeal('$value$unit')
+            : s.scoreOutsideIdeal('$value$unit'),
+        style: body,
+      ),
+      const SizedBox(height: 8),
+      Text(scaleText, style: body),
+      const SizedBox(height: 8),
+      Text(s.scoreCombines, style: body),
+    ];
   }
 }
 
@@ -314,8 +419,7 @@ class _BarPainter extends CustomPainter {
     if (w <= 0 || size.height <= 0) return;
     final top = (size.height - _trackHeight) / 2;
     final radius = const Radius.circular(_trackHeight / 2);
-    final track =
-        RRect.fromLTRBR(0, top, w, top + _trackHeight, radius);
+    final track = RRect.fromLTRBR(0, top, w, top + _trackHeight, radius);
 
     canvas.drawRRect(track, Paint()..color = trackColor);
 
