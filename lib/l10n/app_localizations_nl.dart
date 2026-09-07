@@ -69,6 +69,19 @@ class SNl extends S {
   String get plannedRidesLabel => 'GEPLAND';
 
   @override
+  String showAllWindows(Object count) {
+    return 'Toon alle $count vensters';
+  }
+
+  @override
+  String get showFewerWindows => 'Toon minder';
+
+  @override
+  String morePlannedRides(Object count) {
+    return 'nog $count';
+  }
+
+  @override
   String get filterMorning => 'Ochtend';
 
   @override

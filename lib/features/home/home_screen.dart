@@ -84,6 +84,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// dan die je hebt aangetikt.
   final Map<DateTime, bool> _cardExpanded = {};
 
+  /// Toont RIDE TIMES de volledige lijst in plaats van alleen de beste
+  /// [_kVisibleSlotCount]?
+  ///
+  /// Home rendert zonder plafond élk gevonden tijdvak — bij Joost waren dat er
+  /// 64, ruim 11.000 pixels scrollen (waargenomen 2026-09-07). Dat botst met
+  /// waar dit scherm voor is: *at a glance* de béste momenten van je week. Bij
+  /// 64 kaarten is er geen glance meer, en juist het woord "beste" verdwijnt in
+  /// de massa.
+  ///
+  /// Bewust ter plekke uitklappen en niet een eigen scherm: de dagstrip en het
+  /// periodefilter blijven dan gewoon staan, er komt geen derde plek bij waar
+  /// een ritkaart getekend wordt, en wie alles wil zien heeft dat op dat moment
+  /// zelf gevraagd.
+  bool _showAllSlots = false;
+
+  /// Hoeveel tijdvakken RIDE TIMES standaard toont. De lijst is gesorteerd op
+  /// tier met de beste vooraan, dus dit zijn ook echt de vijf beste — en bij een
+  /// actief filter de vijf beste bínnen die selectie.
+  static const _kVisibleSlotCount = 5;
+
+  /// Hoeveel geplande ritten PLANNED standaard toont. Lager dan bij de
+  /// tijdvakken omdat dit geen keuzelijst is maar een geheugensteun: wat komt
+  /// er nu aan. De rest staat compleet op het tabblad Rides.
+  static const _kVisiblePlannedCount = 3;
+
   /// Dagdeel filter: ochtend (6-12), middag (12-17), avond (17-22).
   /// Standaard: alle drie actief (geen filtering).
   final Set<_DayPeriod> _activePeriods = {
@@ -744,8 +769,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
             ),
             const SizedBox(height: 8),
-            ...entries.map(_buildPlannedRideCard),
+            // Afgetopt op de eerstvolgende drie. PLANNED is geen keuzelijst
+            // maar een geheugensteun -- wat komt er nu aan -- en twintig
+            // geplande ritten zouden de tijdvakken waar dit scherm voor bestaat
+            // van het scherm duwen.
+            ...entries.take(_kVisiblePlannedCount).map(_buildPlannedRideCard),
+            if (entries.length > _kVisiblePlannedCount)
+              _buildMorePlannedRow(entries.length - _kVisiblePlannedCount),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// De rij onder PLANNED die naar de rest verwijst.
+  ///
+  /// Navigeert bewust naar het tabblad Rides in plaats van hier uit te klappen:
+  /// dat tabblad ís al de volledige lijst met geplande ritten. Een tweede
+  /// volledige lijst bouwen op Home zou hetzelfde scherm twee keer maken --
+  /// en de app hoort geen huiswerk achter te laten, dus je gaat naar de plek
+  /// die er al voor is.
+  Widget _buildMorePlannedRow(int hidden) {
+    final s = S.of(context);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          context.go('/rides');
+        },
+        icon: const Icon(Icons.arrow_forward, size: 18),
+        label: Text(s.morePlannedRides(hidden)),
+        style: TextButton.styleFrom(
+          foregroundColor: context.rw.plannedRide,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
       ),
     );
@@ -1000,9 +1058,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         slots.insert(0, slots.removeAt(bestIndex));
       }
 
+      // Afgetopt op de beste vijf, met een rij eronder die de rest erbij haalt.
+      // Zie [_showAllSlots] voor waarom.
+      final total = slots.length;
+      final hidden = total - _kVisibleSlotCount;
+      final visible = _showAllSlots || hidden <= 0 ? total : _kVisibleSlotCount;
+
       return SliverList.builder(
-        itemCount: slots.length,
+        // +1 voor de "toon alles"-rij, maar alleen als er iets te tonen valt.
+        itemCount: hidden > 0 ? visible + 1 : visible,
         itemBuilder: (context, index) {
+          if (index == visible) return _buildShowAllSlotsRow(total);
           final isBest = index == 0 &&
               (slots.first.tier is Perfect || slots.first.tier is Great);
           final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
@@ -1470,6 +1536,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// af zit, en dat is een vraag die je alleen stelt over de rit die je
   /// overweegt. Voor de rest volstaat het oordeel \u2014 dat is precies het woord
   /// dat de balk hierboven ook al draagt.
+  /// De rij onder RIDE TIMES die de rest van de tijdvakken erbij haalt, of ze
+  /// weer wegvouwt. Draagt het totaal in de tekst, zodat je wéét hoeveel je
+  /// opvraagt in plaats van in het duister te tikken.
+  Widget _buildShowAllSlotsRow(int total) {
+    final cs = Theme.of(context).colorScheme;
+    final s = S.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+      child: Center(
+        child: TextButton.icon(
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            setState(() => _showAllSlots = !_showAllSlots);
+          },
+          icon: AnimatedRotation(
+            turns: _showAllSlots ? 0.5 : 0.0,
+            duration: AppMotion.emphasizedDuration,
+            curve: AppMotion.emphasizedCurve,
+            child: const Icon(Icons.expand_more, size: 20),
+          ),
+          label: Text(
+            _showAllSlots ? s.showFewerWindows : s.showAllWindows(total),
+          ),
+          style: TextButton.styleFrom(foregroundColor: cs.primary),
+        ),
+      ),
+    );
+  }
+
   /// De open-/dichtklapknop van een ritkaart. Staat onder de weerinhoud en is
   /// op élke kaart hetzelfde — ook op de beste.
   ///

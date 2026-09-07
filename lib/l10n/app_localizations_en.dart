@@ -69,6 +69,19 @@ class SEn extends S {
   String get plannedRidesLabel => 'PLANNED';
 
   @override
+  String showAllWindows(Object count) {
+    return 'Show all $count windows';
+  }
+
+  @override
+  String get showFewerWindows => 'Show fewer';
+
+  @override
+  String morePlannedRides(Object count) {
+    return '$count more';
+  }
+
+  @override
   String get filterMorning => 'Morning';
 
   @override

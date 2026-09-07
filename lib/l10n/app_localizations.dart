@@ -193,6 +193,24 @@ abstract class S {
   /// **'GEPLAND'**
   String get plannedRidesLabel;
 
+  /// No description provided for @showAllWindows.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toon alle {count} vensters'**
+  String showAllWindows(Object count);
+
+  /// No description provided for @showFewerWindows.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toon minder'**
+  String get showFewerWindows;
+
+  /// No description provided for @morePlannedRides.
+  ///
+  /// In nl, this message translates to:
+  /// **'nog {count}'**
+  String morePlannedRides(Object count);
+
   /// No description provided for @filterMorning.
   ///
   /// In nl, this message translates to:
