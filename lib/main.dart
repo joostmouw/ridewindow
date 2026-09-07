@@ -29,6 +29,7 @@ import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_typography.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -118,6 +119,16 @@ ThemeData _buildTheme(Brightness brightness) {
   return ThemeData(
     colorScheme: colorScheme,
     extensions: [isLight ? RideWindowTheme.light : RideWindowTheme.dark],
+
+    // ── Huisletter (epic #64) ──
+    // `fontFamily` dekt alles wat geen expliciete stijl uit `textTheme` pakt
+    // (denk aan losse `TextStyle`s in schermen die nog niet zijn omgezet), zodat
+    // er nergens Roboto doorheen lekt zolang die opruiming loopt.
+    fontFamily: AppTypography.family,
+    textTheme: AppTypography.textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+    ),
 
     // ── Scaffold ──
     scaffoldBackgroundColor: colorScheme.surface,

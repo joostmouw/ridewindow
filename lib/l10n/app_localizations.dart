@@ -2563,6 +2563,12 @@ abstract class S {
   /// **'Ritten waar je aan meedoet'**
   String get pelotonJoinedRides;
 
+  /// No description provided for @scoreSemanticLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Score {score} van 100 — {tier}'**
+  String scoreSemanticLabel(int score, String tier);
+
   /// No description provided for @pelotonWithOwner.
   ///
   /// In nl, this message translates to:

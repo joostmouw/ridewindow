@@ -14,6 +14,7 @@ import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/features/shared/score_display.dart';
 import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
 import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
@@ -1114,7 +1115,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             ),
                           ),
                           const SizedBox(width: 12),
-                          ScoreBadge(tier: slot.tier),
+                          ScoreDisplay(
+                            score: slot.overallScore,
+                            tier: slot.tier,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 14),

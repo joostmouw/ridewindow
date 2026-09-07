@@ -106,3 +106,20 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+  fonts:
+    # Outfit als variabele font: één bestand van 111 kB draagt alle gewichten
+    # van Thin tot Black. Bewust variabel en niet vijf losse statische
+    # gewichten -- die wegen samen een veelvoud. Gewichtselectie loopt via
+    # `fontVariations` in `lib/theme/app_typography.dart`; `fontWeight` alleen
+    # stuurt een variabele as niet aan.
+    #
+    # SIL Open Font License 1.1 (assets/fonts/OFL.txt). Die licentie eist dat de
+    # tekst wordt meegeleverd; vandaar dat het bestand in de assets staat en
+    # niet alleen in de repo.
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit.ttf
+
+  assets:
+    - assets/fonts/OFL.txt

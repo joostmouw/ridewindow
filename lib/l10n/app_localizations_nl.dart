@@ -1390,6 +1390,11 @@ class SNl extends S {
   String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
 
   @override
+  String scoreSemanticLabel(int score, String tier) {
+    return 'Score $score van 100 — $tier';
+  }
+
+  @override
   String pelotonWithOwner(String name) {
     return 'Met $name';
   }

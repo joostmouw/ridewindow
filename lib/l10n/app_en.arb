@@ -484,6 +484,8 @@
   "pelotonDecline": "Can't make it",
   "pelotonOwnedRides": "Rides you organise",
   "pelotonJoinedRides": "Rides you're joining",
+  "scoreSemanticLabel": "Score {score} of 100 — {tier}",
+  "@scoreSemanticLabel": {"placeholders": {"score": {"type": "int"}, "tier": {"type": "String"}}},
   "pelotonWithOwner": "With {name}",
   "pelotonFriendAdded": "{name} is now your buddy",
   "pelotonCodeInvalid": "That code doesn't work — it may have expired.",

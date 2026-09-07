@@ -1387,6 +1387,11 @@ class SEn extends S {
   String get pelotonJoinedRides => 'Rides you\'re joining';
 
   @override
+  String scoreSemanticLabel(int score, String tier) {
+    return 'Score $score of 100 — $tier';
+  }
+
+  @override
   String pelotonWithOwner(String name) {
     return 'With $name';
   }
