@@ -1449,33 +1449,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 crossFadeState: isExpanded
                                     ? CrossFadeState.showFirst
                                     : CrossFadeState.showSecond,
-                                // De chevron zit ín de twee kinderen en niet als
-                                // losse regel eronder. Dicht deelt hij zijn
-                                // regel met de weersamenvatting -- die is kort
-                                // (`20° · Dry · 16 km/h`), dus daar was ruimte
-                                // en een eigen regel van 28px voor één icoon
-                                // was pure hoogte. Open staat hij gecentreerd
-                                // onder de balken, want daar vult de inhoud de
-                                // regel wél.
+                                // De dichtklap-chevron staat búiten deze
+                                // `AnimatedCrossFade`, de uitklap-chevron erín.
+                                // Dat is geen symmetrie maar ervaring: toen
+                                // béide in de kinderen zaten, tekende de
+                                // chevron van `firstChild` niets meer — de
+                                // ruimte werd gereserveerd, het icoon bleef
+                                // weg, en de kaart was daarmee niet meer dicht
+                                // te klikken (Joost, 2026-09-07).
                                 //
-                                // Bijkomend voordeel: zo hoeft er tijdens de
-                                // overgang niets te verschijnen of verdwijnen
-                                // in de `Column`. Zou de chevron erbuiten
-                                // staan, dan sprong de kaart 28px op het moment
-                                // dat de kruisvervaging begint -- precies de
-                                // schok die deze animatie moest wegnemen.
-                                firstChild: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    _buildWeatherBars(
-                                      avgTemp: avgTemp,
-                                      totalPrecip: totalPrecip,
-                                      avgWind: avgWind,
-                                    ),
-                                    _buildExpandToggle(slot, expanded: true),
-                                  ],
+                                // Het lag níét aan `--tree-shake-icons`; beide
+                                // glyphs zitten aantoonbaar in de gesubsette
+                                // `MaterialIcons-Regular.otf` (0xe245 en
+                                // 0xe246, nagemeten in de cmap van de build).
+                                // De cross-fade zelf is de oorzaak. Verplaats
+                                // de open-chevron dus niet terug naar binnen
+                                // zonder op een toestel te controleren dat hij
+                                // nog tekent.
+                                firstChild: _buildWeatherBars(
+                                  avgTemp: avgTemp,
+                                  totalPrecip: totalPrecip,
+                                  avgWind: avgWind,
                                 ),
+                                // Dicht deelt de chevron zijn regel met de
+                                // weersamenvatting — die is kort
+                                // (`20° · Dry · 16 km/h`), dus daar was ruimte,
+                                // en een eigen regel van 28px voor één icoon
+                                // was pure hoogte.
                                 secondChild: Row(
                                   children: [
                                     Expanded(
@@ -1489,6 +1489,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ],
                                 ),
                               ),
+                              if (isExpanded)
+                                _buildExpandToggle(slot, expanded: true),
                             ],
                             SizedBox(height: isExpanded ? 14 : 6),
                             // Footer: Plan het knop
@@ -1631,10 +1633,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
 
-    final icon = Icon(
-      expanded ? Icons.expand_less : Icons.expand_more,
-      size: 20,
-      color: cs.onSurfaceVariant,
+    // Eén glyph, gedraaid — nooit twee verschillende iconen.
+    //
+    // Dit stond op `expanded ? Icons.expand_less : Icons.expand_more` en toen
+    // was de kaart niet meer dicht te klikken: de knop werkte, de ruimte werd
+    // gereserveerd, maar er tekende niets (Joost, 2026-09-07).
+    //
+    // `Icons.expand_more` staat elders in dit bestand in een `const Icon` en
+    // wordt daarom door `--tree-shake-icons` in de gesubsette
+    // `MaterialIcons-Regular.otf` gehouden. `Icons.expand_less` stond alleen
+    // in de ternaire hierboven — geen constante instantie, dus de shaker zag
+    // hem niet en sneed de glyph eruit. Je merkt dat pas in een release-build
+    // op een toestel: in debug is het lettertype compleet en lijkt alles goed.
+    //
+    // Vandaar één glyph die 180° draait. Wil je hier tóch een tweede icoon,
+    // zet het dan ergens als `const Icon(...)` neer én controleer het in een
+    // release-build.
+    final icon = Transform.rotate(
+      angle: expanded ? math.pi : 0,
+      child: Icon(
+        Icons.expand_more,
+        size: 20,
+        color: cs.onSurfaceVariant,
+      ),
     );
 
     return Semantics(
