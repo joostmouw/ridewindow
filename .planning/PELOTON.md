@@ -111,7 +111,10 @@ organisator en hebben geen prullenbak — je gooit de rit van een ander niet weg
 bewust persoonlijk**; de Peloton-tab ernaast draagt het gedeelde deel.
 
 Vijf providertests leggen de afbakening vast (`test/providers/peloton_providers_test.dart`).
-**Nog niet op een toestel bevestigd** — de code is gedeployd, de visuele controle staat open.
+**Op het toestel bevestigd 2026-09-07 09:49**: Home toont de gedeelde rit onder PLANNED met "With
+Joost", groeps-icoon en zonder prullenbak, boven de eigen zaterdagrit die zijn prullenbak wél heeft;
+de Peloton-tab toont "RIDES YOU'RE JOINING". Daarmee is de belofte van de epic — "de rit verschijnt
+bij de ander" — waargemaakt.
 
 ### 2. Maatjes zijn eenzijdig zichtbaar: B ziet A, A ziet B niet — oorzaak nog ONBEKEND
 
