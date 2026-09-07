@@ -727,6 +727,12 @@ class SEn extends S {
   }
 
   @override
+  String get showWeatherDetails => 'Show the weather bars';
+
+  @override
+  String get hideWeatherDetails => 'Hide the weather bars';
+
+  @override
   String get verdictDry => 'Dry';
 
   @override

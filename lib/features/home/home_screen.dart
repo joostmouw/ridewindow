@@ -65,6 +65,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// null = toon alle slots; non-null = filter op dag.
   DateTime? _selectedDay;
 
+  /// Welke niet-beste ritkaarten hun volle weerbalken tonen, op begintijd.
+  ///
+  /// De beste kaart staat altijd open; die staat hier nooit in. Joost's
+  /// verzoek (2026-09-07): *"ik wil dat je alle kleinere tijdvakken ook kan
+  /// openklikken zodat ze ook zo groot worden als het ideaal voorgestelde
+  /// tijdvak."* De compacte regel blijft de rusttoestand — drie volle balken op
+  /// élke kaart is precies waarom de lijst als één massa las — maar wie de
+  /// cijfers achter een kaart wil zien hoeft daarvoor niet meer naar het
+  /// detailscherm.
+  ///
+  /// `slot.start` is de sleutel omdat een `RideSlot` geen id heeft en de lijst
+  /// bij elke weerverversing opnieuw wordt opgebouwd; de begintijd overleeft
+  /// dat en een index niet.
+  final Set<DateTime> _expandedSlots = {};
+
   /// Dagdeel filter: ochtend (6-12), middag (12-17), avond (17-22).
   /// Standaard: alle drie actief (geen filtering).
   final Set<_DayPeriod> _activePeriods = {
@@ -403,46 +418,101 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // Period filter — SegmentedButton
   // ---------------------------------------------------------------------------
 
+  /// Was een `SegmentedButton` met drie omrande vakken en een icoon per vak.
+  /// Dat is een zware vorm voor een licht filter: het stond als een volledige
+  /// knoppenbalk pal boven de ritkaarten en trok evenveel aandacht als het
+  /// antwoord eronder. Nu drie woorden met een onderstreping -- dezelfde
+  /// gedachte als de dagstrip hierboven, waar de kwaliteit ook een streepje
+  /// werd in plaats van een vlak.
+  ///
+  /// De iconen (zon, wolk, maan) zijn met de vakken meegegaan. Ze waren
+  /// decoratie: "Morning" zegt al wat er staat, en drie iconen op een rij die
+  /// niets toevoegen is precies het soort ruis dat deze stap moet wegnemen.
   Widget _buildPeriodFilter() {
     final s = S.of(context);
+    // Alle drie actief betekent "geen filter", en dan hoort er niets
+    // onderstreept te zijn -- anders leest een ongefilterde lijst als een
+    // gefilterde. Dit is dezelfde afspraak als de `selected: allActive ? {}`
+    // die de `SegmentedButton` hier had.
     final allActive = _activePeriods.length == 3;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
-      child: SegmentedButton<_DayPeriod>(
-        segments: [
-          ButtonSegment(
-              value: _DayPeriod.morning,
-              label: Text(s.filterMorning),
-              icon: const Icon(Icons.wb_sunny_outlined, size: 16)),
-          ButtonSegment(
-              value: _DayPeriod.afternoon,
-              label: Text(s.filterAfternoon),
-              icon: const Icon(Icons.wb_cloudy_outlined, size: 16)),
-          ButtonSegment(
-              value: _DayPeriod.evening,
-              label: Text(s.filterEvening),
-              icon: const Icon(Icons.nights_stay_outlined, size: 16)),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+      child: Row(
+        children: [
+          _buildPeriodItem(_DayPeriod.morning, s.filterMorning, allActive),
+          _buildPeriodItem(_DayPeriod.afternoon, s.filterAfternoon, allActive),
+          _buildPeriodItem(_DayPeriod.evening, s.filterEvening, allActive),
         ],
-        selected: allActive ? {} : _activePeriods,
-        onSelectionChanged: (selected) {
-          HapticFeedback.lightImpact();
-          setState(() {
-            _activePeriods
-              ..clear()
-              ..addAll(selected);
-            if (_activePeriods.isEmpty) {
-              _activePeriods.addAll(_DayPeriod.values);
-            }
-          });
-        },
-        multiSelectionEnabled: true,
-        emptySelectionAllowed: true,
-        showSelectedIcon: false,
-        style: ButtonStyle(
-          visualDensity: VisualDensity.compact,
-          textStyle: WidgetStatePropertyAll(
-            Theme.of(context).textTheme.labelSmall,
+      ),
+    );
+  }
+
+  Widget _buildPeriodItem(_DayPeriod period, String label, bool allActive) {
+    final cs = Theme.of(context).colorScheme;
+    final isOn = !allActive && _activePeriods.contains(period);
+
+    return Expanded(
+      child: Semantics(
+        selected: isOn,
+        button: true,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            setState(() {
+              // Vanuit "alles aan" is een tik een keuze vóór dat dagdeel, niet
+              // het uitzetten ervan -- anders moet je twee keer tikken om te
+              // krijgen wat je bedoelde. De `SegmentedButton` deed dit vanzelf
+              // omdat hij in die staat niets geselecteerd toonde.
+              if (allActive) {
+                _activePeriods
+                  ..clear()
+                  ..add(period);
+              } else if (_activePeriods.contains(period)) {
+                _activePeriods.remove(period);
+                // Alles uit betekent niets te zien. Terug naar alles aan, wat
+                // ook was wat `emptySelectionAllowed` hier opving.
+                if (_activePeriods.isEmpty) {
+                  _activePeriods.addAll(_DayPeriod.values);
+                }
+              } else {
+                _activePeriods.add(period);
+              }
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: isOn ? cs.primary : cs.onSurfaceVariant,
+                        fontWeight: isOn ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: 5),
+                // Uit is een haarlijn, niet niets. Met alle drie de dagdelen
+                // aan — de standaard, en dus wat je het vaakst ziet — was er
+                // anders geen enkele onderstreping, en dan leest deze rij als
+                // een bijschrift in plaats van als een filter dat je kunt
+                // bedienen. Drie streepjes op een rij zeggen "hier valt te
+                // kiezen"; welke aan staat zegt de dikte en de kleur.
+                AnimatedContainer(
+                  duration: AppMotion.effectsDuration,
+                  curve: AppMotion.effectsCurve,
+                  height: isOn ? 3 : 1,
+                  width: 28,
+                  decoration: BoxDecoration(
+                    color: isOn ? cs.primary : cs.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -502,20 +572,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       dotClass = _DayClass.bad;
     }
 
-    // Kleuren
-    final Color chipBg;
-    final Color chipFg;
-    switch (dotClass) {
-      case _DayClass.good:
-        chipBg = isSelected ? cs.primaryContainer : rw.tiers.perfectBg;
-        chipFg = isSelected ? cs.onPrimaryContainer : rw.scorePerfect;
-      case _DayClass.ok:
-        chipBg = isSelected ? cs.tertiaryContainer : rw.tiers.acceptableBg;
-        chipFg = isSelected ? cs.onTertiaryContainer : rw.tiers.acceptableFg;
-      case _DayClass.bad:
-        chipBg = isSelected ? cs.surfaceContainerLowest : rw.tiers.poorBg;
-        chipFg = isSelected ? cs.onSurface : rw.tiers.poorFg;
-    }
+    // Twee dingen, twee kanalen -- en dat was precies het probleem.
+    //
+    // Tot fase 23 droeg de achtergrondkleur van een dagchip zowel de kwaliteit
+    // van die dag (groen/oranje/grijs) als of hij geselecteerd was
+    // (primaryContainer/tertiaryContainer/wit). Twee betekenissen op één eigen-
+    // schap, en het resultaat was een rij van zeven gekleurde blokjes die met de
+    // ritkaarten eronder concurreerde in plaats van ze te dienen.
+    //
+    // Nu: **kwaliteit is de onderstreping**, **selectie is de vulling**. De
+    // vulling is bewust een neutrale tonale trap en geen tierkleur, zodat je de
+    // twee nooit meer met elkaar kunt verwarren.
+    final Color qualityColor = switch (dotClass) {
+      _DayClass.good => rw.scorePerfect,
+      _DayClass.ok => rw.tiers.acceptableFg,
+      _DayClass.bad => rw.tiers.poorFg,
+    };
 
     return Semantics(
       selected: isSelected,
@@ -527,46 +599,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             _selectedDay = isSelected ? null : day;
           });
         },
-        child: AnimatedScale(
-          scale: isSelected ? 1.08 : 1.0,
-          duration: AppMotion.spatialDuration,
-          curve: AppMotion.spatialCurve,
-          child: AnimatedContainer(
-            duration: AppMotion.effectsDuration,
-            curve: AppMotion.effectsCurve,
-            margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: chipBg,
-              borderRadius: BorderRadius.circular(16),
-              border: isSelected
-                  ? Border.all(color: chipFg, width: 2)
-                  : isToday
-                      ? Border.all(color: cs.outline, width: 1)
-                      : null,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: isSelected ? chipFg : cs.onSurfaceVariant,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                      ),
+        // De `AnimatedScale` van 1.08 is vervallen. Een chip die opspringt trekt
+        // aandacht naar het filter terwijl het antwoord eronder staat -- en
+        // "rustiger" is de hele opdracht van deze stap. De haptische tik blijft,
+        // dus de bevestiging bij het aanraken is niet weg.
+        child: AnimatedContainer(
+          duration: AppMotion.effectsDuration,
+          curve: AppMotion.effectsCurve,
+          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          padding: const EdgeInsets.fromLTRB(0, 8, 0, 6),
+          decoration: BoxDecoration(
+            color: isSelected ? cs.surfaceContainer : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                // Vandaag was een randje van 1px om de chip. Zonder vulling
+                // heeft zo'n randje niets meer om omheen te liggen, en het
+                // botste bovendien met de rand die selectie aangaf. Nu draagt
+                // het weekdaglabel het: vandaag in de merkkleur, de rest grijs.
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: isToday ? cs.primary : cs.onSurfaceVariant,
+                      fontWeight: isToday || isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${day.day}',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: cs.onSurface,
+                      fontWeight:
+                          isSelected ? FontWeight.w800 : FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 5),
+              // De kwaliteit van de dag: 3px, in de tierkleur, en verder niets.
+              // Genoeg om een goede dag te vinden zonder dat zeven vlakken het
+              // scherm overnemen.
+              AnimatedContainer(
+                duration: AppMotion.effectsDuration,
+                curve: AppMotion.effectsCurve,
+                height: 3,
+                width: 18,
+                decoration: BoxDecoration(
+                  color: qualityColor,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${day.day}',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: chipFg,
-                        fontWeight:
-                            isSelected ? FontWeight.w800 : FontWeight.w600,
-                      ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -1223,26 +1308,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ],
                             ),
                             const SizedBox(height: 14),
-                            // Alleen de beste kaart krijgt de volle balken. Drie
-                            // balken op élke kaart is de reden dat de lijst als
-                            // één massa leest — dat was op de schets meteen te
-                            // zien. De rest krijgt één regel, zodat het verschil
-                            // tussen eerste en tweede plek ook overeind blijft
-                            // als je scrollt.
+                            // De beste kaart staat altijd open met de volle
+                            // balken; de rest staat dicht op één compacte regel.
+                            // Drie balken op élke kaart is de reden dat de lijst
+                            // als één massa las — dat was op de schets meteen te
+                            // zien — dus dat blijft de rusttoestand.
+                            //
+                            // Maar dicht is nu geen eindstation meer: tik op de
+                            // regel en de kaart klapt open tot dezelfde balken
+                            // als de beste. De tik op de kaart zelf gaat nog
+                            // steeds naar het detailscherm; de binnenste
+                            // `InkWell` wint de hit-test, dus die twee bijten
+                            // elkaar niet.
                             if (avgTemp != null ||
                                 totalPrecip != null ||
                                 avgWind != null)
-                              isBest
-                                  ? _buildWeatherBars(
-                                      avgTemp: avgTemp,
-                                      totalPrecip: totalPrecip,
-                                      avgWind: avgWind,
-                                    )
-                                  : _buildWeatherSummary(
-                                      avgTemp: avgTemp,
-                                      totalPrecip: totalPrecip,
-                                      avgWind: avgWind,
-                                    ),
+                              AnimatedSize(
+                                duration: AppMotion.spatialDuration,
+                                curve: AppMotion.spatialCurve,
+                                alignment: Alignment.topCenter,
+                                child: (isBest ||
+                                        _expandedSlots.contains(slot.start))
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          _buildWeatherBars(
+                                            avgTemp: avgTemp,
+                                            totalPrecip: totalPrecip,
+                                            avgWind: avgWind,
+                                          ),
+                                          if (!isBest)
+                                            _buildExpandToggle(
+                                              slot,
+                                              expanded: true,
+                                            ),
+                                        ],
+                                      )
+                                    : _buildExpandToggle(
+                                        slot,
+                                        expanded: false,
+                                        summary: _buildWeatherSummary(
+                                          avgTemp: avgTemp,
+                                          totalPrecip: totalPrecip,
+                                          avgWind: avgWind,
+                                        ),
+                                      ),
+                              ),
                             const SizedBox(height: 14),
                             // Footer: Plan het knop
                             Align(
@@ -1324,6 +1436,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// af zit, en dat is een vraag die je alleen stelt over de rit die je
   /// overweegt. Voor de rest volstaat het oordeel \u2014 dat is precies het woord
   /// dat de balk hierboven ook al draagt.
+  /// Het open-/dichtklapvlak van een niet-beste ritkaart.
+  ///
+  /// Dicht is het de compacte weerregel mét een chevron erachter, zodat de
+  /// regel zélf de knop is — een losse knop naast een regel die al de hele
+  /// breedte vult, zou er een tweede ding bij zetten waar er één nodig is.
+  /// Open is het alleen de chevron, gecentreerd onder de balken, want daar is
+  /// de inhoud eboven al het antwoord.
+  Widget _buildExpandToggle(
+    RideSlot slot, {
+    required bool expanded,
+    Widget? summary,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    final s = S.of(context);
+
+    return Semantics(
+      button: true,
+      expanded: expanded,
+      label: expanded ? s.hideWeatherDetails : s.showWeatherDetails,
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          setState(() {
+            if (expanded) {
+              _expandedSlots.remove(slot.start);
+            } else {
+              _expandedSlots.add(slot.start);
+            }
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              if (summary != null) Expanded(child: summary) else const Spacer(),
+              Icon(
+                expanded ? Icons.expand_less : Icons.expand_more,
+                size: 20,
+                color: cs.onSurfaceVariant,
+              ),
+              if (summary == null) const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildWeatherSummary({
     double? avgTemp,
     double? totalPrecip,

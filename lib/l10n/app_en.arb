@@ -274,6 +274,8 @@
     "description": "Label under a weather bar marking the user's own ideal range, e.g. 'your range 12-26°'.",
     "placeholders": { "range": { "type": "String" } }
   },
+  "showWeatherDetails": "Show the weather bars",
+  "hideWeatherDetails": "Hide the weather bars",
   "verdictDry": "Dry",
   "verdictLight": "Light",
   "verdictShowers": "Showers",

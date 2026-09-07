@@ -727,6 +727,12 @@ class SNl extends S {
   }
 
   @override
+  String get showWeatherDetails => 'Toon de weerbalken';
+
+  @override
+  String get hideWeatherDetails => 'Verberg de weerbalken';
+
+  @override
   String get verdictDry => 'Droog';
 
   @override

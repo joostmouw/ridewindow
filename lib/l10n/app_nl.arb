@@ -320,6 +320,8 @@
     "description": "Label onder een weerbalk met het eigen ideaalbereik, bijv. 'jouw bereik 12-26°'.",
     "placeholders": { "range": { "type": "String" } }
   },
+  "showWeatherDetails": "Toon de weerbalken",
+  "hideWeatherDetails": "Verberg de weerbalken",
   "verdictDry": "Droog",
   "verdictLight": "Motregen",
   "verdictShowers": "Buien",

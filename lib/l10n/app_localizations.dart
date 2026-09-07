@@ -1405,6 +1405,18 @@ abstract class S {
   /// **'jouw bereik {range}'**
   String weatherYourRange(String range);
 
+  /// No description provided for @showWeatherDetails.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toon de weerbalken'**
+  String get showWeatherDetails;
+
+  /// No description provided for @hideWeatherDetails.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verberg de weerbalken'**
+  String get hideWeatherDetails;
+
   /// No description provided for @verdictDry.
   ///
   /// In nl, this message translates to:

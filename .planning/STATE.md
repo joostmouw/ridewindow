@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23 bijna rond — alleen stap 5 nog open"
+status: "Fase 23: alle 6 stappen klaar — rest: Peloton-haarlijn"
 last_updated: "2026-09-07T17:20:00.000Z"
 last_activity: 2026-09-07
 progress:
@@ -24,6 +24,7 @@ progress:
 | 2026-09-07 | [sweep](quick/20260907-sweep/) | Stap 6: Agenda, Profiel-banner en Ride Detail naar papier. **Deels** — Profiel-kaarten per sectie staan nog open. |
 | 2026-09-07 | [profiel-secties-in-kaarten](quick/260907-k35-profiel-scherm-secties-in-kaarten/) | Profiel-kaarten per sectie (het laatste scherm zonder papier-behandeling), plus Joost's twee punten over Home. |
 | 2026-09-07 | [stap-3-typografie](quick/260907-kqr-fase-23-stap-3-typografische-schaal-echt/) | Stap 3: de beste kaart op 24/45, de rest op 16/28. Zonder schaduw of staaf wijst maat de kaart nu aan. |
+| 2026-09-07 | [stap-5-dagstrip-en-filter](quick/260907-s5x-fase-23-stap-5-dagstrip-en-periodefilter/) | Stap 5: kwaliteit werd een onderstreping, selectie een tonale vulling; filter werd een tekstrij. Plus: kleine ritkaarten zijn uitklapbaar. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -31,12 +32,13 @@ progress:
 **https://my-project-joost.web.app** (Firebase Hosting; `main.dart.js` heeft `no-cache`, dus daar
 volstaat een gewone herlaad). De Play-build loopt bewust achter op 1.0.23+24.
 
-**Open in fase 23:**
+**Fase 23 is af — alle zes de stappen uit schets 001 staan.** Wat nog rest is
+één klein punt uit de sweep: **Peloton-kaarten missen hun haarlijn.**
 
-1. **Stap 5** — dagstrip en periodefilter rustiger: de dagchips verliezen hun
-   gekleurde achtergrond en de kwaliteit van een dag wordt een 3px onderstreping
-   in de tierkleur; het `SegmentedButton` wordt een tekstrij met onderstreping.
-2. Kleiner: Peloton-kaarten missen hun haarlijn.
+Daarna is de vraag welke fase van v4.0 aan de beurt is — fase 24 (iconografie:
+het kledingadvies tekent nu losse Unicode-emoji, die op elk platform anders
+worden getekend) of fase 25 (de wrijving die op 2026-09-07 is waargenomen,
+uitgeschreven in `EIGEN-GEZICHT.md`).
 
 **Afgerond op 2026-09-07, tweede sessie** (zie
 `quick/260907-k35-profiel-scherm-secties-in-kaarten/SUMMARY.md`):
