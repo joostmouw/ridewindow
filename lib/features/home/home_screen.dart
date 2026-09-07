@@ -30,6 +30,7 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -576,7 +577,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildPlannedRidesSliver() {
-    final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
+    final plannedRides =
+        ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
     // Gedeelde ritten van een maatje waar je ja op hebt gezegd horen hier
     // net zo goed te staan als je eigen ritten -- dat is het hele punt van
     // accepteren. Ze krijgen geen rij in `planned_rides` (die blijft strikt
@@ -668,11 +670,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     children: [
                       Text(
                         _formatDayName(ride.start),
-                        style:
-                            Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: rw.plannedRide,
-                                ),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: rw.plannedRide,
+                            ),
                       ),
                       Text(
                         '${_formatTime(ride.start)} – ${_formatTime(ride.end)} · ${ride.durationHours}u',
@@ -822,7 +823,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
 
       // Filter out already-planned rides
-      final planned = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
+      final planned =
+          ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
       var slots = slotsState.slots.where((s) {
         return !planned.any((r) => r.start == s.start && r.end == s.end);
       }).toList();
@@ -971,177 +973,235 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final avgWind =
         winds.isEmpty ? null : winds.reduce((a, b) => a + b) / winds.length;
 
+    // De beste kaart krijgt een bijna rechte linkerkant, zodat de 5px rand
+    // hieronder als een streep leest en niet als een sikkel. Rechts blijft de
+    // volle radius, dus de kaart houdt zijn vorm.
+    final radius = isBest
+        ? const BorderRadius.horizontal(
+            left: Radius.circular(8),
+            right: Radius.circular(_rideCardRadius),
+          )
+        : BorderRadius.circular(_rideCardRadius);
+
+    // Extra ruimte onder de beste kaart: zonder dat valt zijn slagschaduw over
+    // de kaart eronder heen en lijkt die vies in plaats van vlak.
+    final margin =
+        isBest ? const EdgeInsets.fromLTRB(20, 6, 20, 18) : _rideCardMargin;
+
     // Zelfde constructie als op Rides: de hele Dismissible in een afgeronde clip,
     // met de marge erbuiten. Alleen de achtergrond afronden volstaat niet — dan
     // schuift de kaart nog steeds als rechthoek weg.
+    //
+    // De `DecoratedBox` eromheen bestaat om één reden: een `ClipRRect` snijdt
+    // alles weg wat buiten zijn rechthoek valt, en een slagschaduw valt daar per
+    // definitie buiten. Zet je de schaduw op de `Card` binnen de clip, dan is
+    // hij onzichtbaar — dat is waarom deze kaart tot v4.0 op `elevation: 0`
+    // stond. Hier tekent de ouder de schaduw, buiten de clip om, terwijl de
+    // clip zelf blijft doen waar hij voor zit: de swipe naar "Schedule".
     return SpringPressEffect(
       child: Padding(
-        padding: _rideCardMargin,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(_rideCardRadius),
-          child: Dismissible(
-            key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),
-            direction: DismissDirection.startToEnd,
-            confirmDismiss: (_) async {
-              HapticFeedback.mediumImpact();
-              _planRide(slot);
-              return false;
-            },
-            background: ColoredBox(
-              color: cs.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 24),
-                child: Row(
-                  children: [
-                    Icon(Icons.event_available,
-                        color: cs.onPrimaryContainer, size: 22),
-                    const SizedBox(width: 8),
-                    Text(
-                      S.of(context).schedule,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: cs.onPrimaryContainer,
-                          ),
+        padding: margin,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            boxShadow: isBest
+                ? const [
+                    BoxShadow(
+                      color: Color(0x4D1B2A20),
+                      blurRadius: 30,
+                      spreadRadius: -8,
+                      offset: Offset(0, 14),
                     ),
-                  ],
+                    BoxShadow(
+                      color: Color(0x1A1B2A20),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: ClipRRect(
+            borderRadius: radius,
+            child: Dismissible(
+              key: ValueKey('slot_${slot.start.millisecondsSinceEpoch}'),
+              direction: DismissDirection.startToEnd,
+              confirmDismiss: (_) async {
+                HapticFeedback.mediumImpact();
+                _planRide(slot);
+                return false;
+              },
+              background: ColoredBox(
+                color: cs.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 24),
+                  child: Row(
+                    children: [
+                      Icon(Icons.event_available,
+                          color: cs.onPrimaryContainer, size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        S.of(context).schedule,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: cs.onPrimaryContainer,
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // Gehighlight = lichter, niet donkerder. De best-choice kaart krijgt het
-            // lichtste oppervlak en komt daarmee naar voren; de overige kaarten zakken
-            // een trap terug in de getinte achtergrond. Eerder was dit omgekeerd: een
-            // vrijwel doorzichtige primaryContainer liet juist de groene achtergrond
-            // doorschijnen, waardoor de beste optie donkerder oogde dan de rest.
-            child: Card(
-              // Geen elevation: de ClipRRect zou de slagschaduw toch afsnijden. De
-              // best-choice kaart onderscheidt zich via het lichtste oppervlak plus
-              // de rand.
-              elevation: 0,
-              margin: EdgeInsets.zero,
-              color:
-                  isBest ? cs.surfaceContainerLowest : cs.surfaceContainerHigh,
-              shape: isBest
-                  ? RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(_rideCardRadius),
-                      side: BorderSide(
-                          color: cs.primary.withAlpha(120), width: 1.5),
-                    )
-                  : null,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(_rideCardRadius),
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  context.push(
-                    '/detail',
-                    extra: DetailArgs(
-                      slot: slot,
-                      forecasts: slotForecasts,
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // "Beste keuze" label
-                      if (isBest)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: cs.primaryContainer,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(20)),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star_rounded,
-                                    size: 14, color: cs.onPrimaryContainer),
-                                const SizedBox(width: 4),
-                                Text(
-                                  S.of(context).bestChoice,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: cs.onPrimaryContainer,
-                                      ),
-                                ),
-                              ],
+              // Beide kaarten zijn hetzelfde wit. Dat is opzet: het onderscheid
+              // komt niet meer uit kleur maar uit licht en rand — de beste kaart
+              // heeft de schaduw hierboven plus de 5px linkerrand hieronder, de
+              // rest is vlak met een haarlijn. Kleur werkte hier nooit, want de
+              // trappen in de oppervlakkenladder liggen te dicht op elkaar om een
+              // eerste en tweede plek mee te maken.
+              child: Card(
+                // De schaduw zit bewust op de `DecoratedBox` buiten de clip, niet
+                // hier — zie de noot daar. `elevation` binnen een `ClipRRect` is
+                // weggegooid werk.
+                elevation: 0,
+                margin: EdgeInsets.zero,
+                color: cs.surfaceContainerLowest,
+                shape: RoundedRectangleBorder(
+                  borderRadius: radius,
+                  side: isBest
+                      ? BorderSide.none
+                      : BorderSide(color: cs.surfaceContainerHigh),
+                ),
+                child: Container(
+                  // De accentrand van de beste kaart. Een `Container` met een
+                  // enkelzijdige `Border` schuift zijn kind netjes 5px op; dat
+                  // kan alleen zonder `borderRadius` (Flutter staat een
+                  // niet-uniforme rand met radius niet toe), en dat hoeft ook
+                  // niet — de `ClipRRect` eromheen rondt hem al af.
+                  decoration: isBest
+                      ? const BoxDecoration(
+                          border: Border(
+                            left: BorderSide(
+                              color: AppColors.brandDark,
+                              width: 5,
                             ),
                           ),
+                        )
+                      : null,
+                  child: InkWell(
+                    borderRadius: radius,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      context.push(
+                        '/detail',
+                        extra: DetailArgs(
+                          slot: slot,
+                          forecasts: slotForecasts,
                         ),
-                      // Card top: dag + badge
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                WeatherIcon(tier: slot.tier, size: 24),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _formatDayName(slot.start),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      Text(
-                                        '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.copyWith(
-                                              color: cs.onSurfaceVariant,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
+                          // "Beste keuze" label
+                          if (isBest)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: cs.primaryContainer,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20)),
                                 ),
-                              ],
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.star_rounded,
+                                        size: 14, color: cs.onPrimaryContainer),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      S.of(context).bestChoice,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: cs.onPrimaryContainer,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
+                          // Card top: dag + badge
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    WeatherIcon(tier: slot.tier, size: 24),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _formatDayName(slot.start),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          Text(
+                                            '${_formatTime(slot.start)} – ${_formatTime(slot.end)} · ${_durationHours(slot)}u',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  color: cs.onSurfaceVariant,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              ScoreDisplay(
+                                score: slot.overallScore,
+                                tier: slot.tier,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          ScoreDisplay(
-                            score: slot.overallScore,
-                            tier: slot.tier,
+                          const SizedBox(height: 14),
+                          // Weather indicator bars
+                          if (avgTemp != null ||
+                              totalPrecip != null ||
+                              avgWind != null)
+                            _buildWeatherBars(
+                              avgTemp: avgTemp,
+                              totalPrecip: totalPrecip,
+                              avgWind: avgWind,
+                            ),
+                          const SizedBox(height: 14),
+                          // Footer: Plan het knop
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: FilledButton.tonalIcon(
+                              onPressed: () => _planRide(slot),
+                              icon: const Icon(Icons.event_available, size: 16),
+                              label: Text(S.of(context).schedule),
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
-                      // Weather indicator bars
-                      if (avgTemp != null ||
-                          totalPrecip != null ||
-                          avgWind != null)
-                        _buildWeatherBars(
-                          avgTemp: avgTemp,
-                          totalPrecip: totalPrecip,
-                          avgWind: avgWind,
-                        ),
-                      const SizedBox(height: 14),
-                      // Footer: Plan het knop
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: FilledButton.tonalIcon(
-                          onPressed: () => _planRide(slot),
-                          icon: const Icon(Icons.event_available, size: 16),
-                          label: Text(S.of(context).schedule),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -1215,9 +1275,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   void _planRide(RideSlot slot) {
     final notifier = ref.read(plannedRidesProvider.notifier);
-    final already = (ref.read(plannedRidesProvider).value ?? const <PlannedRide>[]).any(
-          (r) => r.start == slot.start && r.end == slot.end,
-        );
+    final already =
+        (ref.read(plannedRidesProvider).value ?? const <PlannedRide>[]).any(
+      (r) => r.start == slot.start && r.end == slot.end,
+    );
     if (already) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(S.of(context).ridePlanned)),
