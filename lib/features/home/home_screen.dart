@@ -1314,8 +1314,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                         );
                       },
+                      // Een dichte kaart krijgt minder lucht dan een open.
+                      //
+                      // Ingeklapt draagt een kaart drie regels informatie maar
+                      // besloeg hij ~230px: 20px rondom, twee tussenruimtes van
+                      // 14, een eigen regel voor de chevron en nog een voor de
+                      // Schedule-knop. Dat is de maat van een open kaart voor
+                      // de inhoud van een dichte, en met vijf kaarten onder
+                      // elkaar telt dat op tot een scherm vol lucht.
+                      //
+                      // Open blijft ruim: daar staan drie weerbalken met assen
+                      // en die hebben die lucht nodig om leesbaar te zijn.
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(isExpanded ? 20 : 14),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1410,7 +1421,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: isExpanded ? 14 : 8),
                             // Open toont de volle balken, dicht één compacte
                             // regel. De beste kaart begint open en de rest
                             // dicht, maar dat is een startwaarde en geen wet:
@@ -1438,24 +1449,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 crossFadeState: isExpanded
                                     ? CrossFadeState.showFirst
                                     : CrossFadeState.showSecond,
-                                firstChild: _buildWeatherBars(
-                                  avgTemp: avgTemp,
-                                  totalPrecip: totalPrecip,
-                                  avgWind: avgWind,
+                                // De chevron zit ín de twee kinderen en niet als
+                                // losse regel eronder. Dicht deelt hij zijn
+                                // regel met de weersamenvatting -- die is kort
+                                // (`20° · Dry · 16 km/h`), dus daar was ruimte
+                                // en een eigen regel van 28px voor één icoon
+                                // was pure hoogte. Open staat hij gecentreerd
+                                // onder de balken, want daar vult de inhoud de
+                                // regel wél.
+                                //
+                                // Bijkomend voordeel: zo hoeft er tijdens de
+                                // overgang niets te verschijnen of verdwijnen
+                                // in de `Column`. Zou de chevron erbuiten
+                                // staan, dan sprong de kaart 28px op het moment
+                                // dat de kruisvervaging begint -- precies de
+                                // schok die deze animatie moest wegnemen.
+                                firstChild: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    _buildWeatherBars(
+                                      avgTemp: avgTemp,
+                                      totalPrecip: totalPrecip,
+                                      avgWind: avgWind,
+                                    ),
+                                    _buildExpandToggle(slot, expanded: true),
+                                  ],
                                 ),
-                                secondChild: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: _buildWeatherSummary(
-                                    avgTemp: avgTemp,
-                                    totalPrecip: totalPrecip,
-                                    avgWind: avgWind,
-                                  ),
+                                secondChild: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildWeatherSummary(
+                                        avgTemp: avgTemp,
+                                        totalPrecip: totalPrecip,
+                                        avgWind: avgWind,
+                                      ),
+                                    ),
+                                    _buildExpandToggle(slot, expanded: false),
+                                  ],
                                 ),
                               ),
-                              _buildExpandToggle(slot, expanded: isExpanded),
                             ],
-                            const SizedBox(height: 14),
+                            SizedBox(height: isExpanded ? 14 : 6),
                             // Footer: Plan het knop
                             Align(
                               alignment: Alignment.centerRight,
@@ -1464,6 +1499,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 icon:
                                     const Icon(Icons.event_available, size: 16),
                                 label: Text(S.of(context).schedule),
+                                // Dicht een slag dichter op elkaar. Dezelfde
+                                // knop met dezelfde tekst, alleen minder lucht
+                                // eromheen -- de kaart is hier een regel in een
+                                // lijst en geen scherm op zichzelf.
+                                style: isExpanded
+                                    ? null
+                                    : FilledButton.styleFrom(
+                                        visualDensity: VisualDensity.compact,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                      ),
                               ),
                             ),
                           ],
@@ -1566,17 +1614,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  /// De open-/dichtklapknop van een ritkaart. Staat onder de weerinhoud en is
-  /// op élke kaart hetzelfde — ook op de beste.
+  /// De open-/dichtklapknop van een ritkaart, op élke kaart hetzelfde — ook op
+  /// de beste.
   ///
-  /// Eén chevron die draait in plaats van twee iconen die elkaar vervangen:
-  /// bij een wissel springt het beeld, bij een draai zie je waar de beweging
-  /// heen gaat. Dat is dezelfde gedachte als de kruisvervaging van de inhoud
-  /// erboven, en het is wat Material bedoelt met een overgang die begint en
-  /// eindigt op het scherm.
+  /// Twee vormen, want hij leeft in twee verschillende regels. Dicht is hij een
+  /// smal vlakje aan het eind van de weersamenvatting; open een volle regel met
+  /// de chevron in het midden, onder de balken.
+  ///
+  /// Hier stond een `AnimatedRotation` die de chevron omdraaide in plaats van
+  /// twee iconen te wisselen. Die is vervallen toen de knop ín de twee
+  /// kruisvervagende kinderen werd gezet: elk kind heeft nu zijn eigen vaste
+  /// stand, dus er valt niets meer te draaien. De vervaging draagt de overgang,
+  /// en de kaart is er ~28px korter door — dat was de afweging, en compactheid
+  /// won.
   Widget _buildExpandToggle(RideSlot slot, {required bool expanded}) {
     final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
+
+    final icon = Icon(
+      expanded ? Icons.expand_less : Icons.expand_more,
+      size: 20,
+      color: cs.onSurfaceVariant,
+    );
 
     return Semantics(
       button: true,
@@ -1589,21 +1648,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           HapticFeedback.selectionClick();
           setState(() => _cardExpanded[slot.start] = !expanded);
         },
-        child: SizedBox(
-          height: 28,
-          child: Center(
-            child: AnimatedRotation(
-              turns: expanded ? 0.5 : 0.0,
-              duration: AppMotion.emphasizedDuration,
-              curve: AppMotion.emphasizedCurve,
-              child: Icon(
-                Icons.expand_more,
-                size: 20,
-                color: cs.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ),
+        child: expanded
+            ? SizedBox(height: 28, child: Center(child: icon))
+            // Dicht: 40×32 is klein op het scherm maar blijft met de
+            // omliggende regelhoogte ruim boven de 48dp die Material voor een
+            // raakdoel vraagt -- de rij eromheen telt mee.
+            : SizedBox(width: 40, height: 32, child: Center(child: icon)),
       ),
     );
   }
