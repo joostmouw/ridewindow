@@ -3,9 +3,9 @@
 > Bijgewerkt 2026-09-07. Epic staat als **#62** in `BACKLOG.md`. Dit bestand is de werkstand;
 > begin hier als je de draad oppakt.
 >
-> **Stand in één zin:** de hele lus is op een toestel bewezen — vriendschap, uitnodigen, accepteren
-> — maar een geaccepteerde rit is bij de genodigde nergens zichtbaar, en dat is de eerstvolgende
-> slice. Begin bij "De lus is rond" hieronder.
+> **Stand in één zin:** de hele lus werkt en een geaccepteerde rit is nu ook zichtbaar bij de
+> genodigde (`3ff18ed`, gedeployd, nog niet visueel gecontroleerd op een toestel). Open: de
+> eenzijdige maatjeslijst — zie punt 2 hieronder, één query beslist het.
 
 ## Wat Joost heeft gekozen (2026-09-03, niet opnieuw ter discussie stellen)
 
@@ -98,18 +98,20 @@ kan hem accepteren. Dat is het bewijs dat de epic zocht.
 
 Drie dingen werken daarna níét, en twee ervan zijn nieuw gevonden.
 
-### 1. Een geaccepteerde rit is bij de genodigde nergens te zien — dit is het gat dat telt
+### 1. ~~Een geaccepteerde rit is bij de genodigde nergens te zien~~ — OPGELOST (`3ff18ed`)
 
-Na "Join" verdwijnt de uitnodiging uit "Invitations for you" en komt hij **nergens** terug: niet in
-"My rides", niet op Home onder PLANNED, niet elders op de Peloton-tab. Dat is geen renderfout maar
-een ontbrekend stuk: `peloton_tab.dart` toont drie dingen — openstaande uitnodigingen
-(`pendingRideInvites`, dus status `invited`), maatjes, en ritten die jíj organiseert
-(`ownedGroupRides`). Een geaccepteerde rit van iemand anders valt in geen van drieën. En accepteren
-maakt géén rij in `planned_rides`, want dat blijft strikt persoonlijk (keuze 2).
+Na "Join" verdween de uitnodiging uit "Invitations for you" en kwam hij nergens terug. Geen
+renderfout maar een ontbrekende categorie: niet meer `invited` (dus weg uit `pendingRideInvites`),
+niet van jou (dus niet in `ownedGroupRides`), en accepteren maakt met opzet geen `planned_rides`-rij.
 
-De belofte van de epic is "de rit verschijnt bij de ander". Dat is dus nog niet waar. Dit is de
-eerstvolgende slice: een geaccepteerde gedeelde rit moet net zo goed op Home en in "My rides"
-verschijnen als een eigen geplande rit, met zichtbaar wie er meerijdt.
+**De fix.** `joinedGroupRides` (accepted, niet-eigenaar) als derde categorie, plus twee plekken waar
+hij landt: een sectie "Ritten waar je aan meedoet" op de Peloton-tab, en Home onder PLANNED, daar
+samengevoegd met je eigen ritten en gesorteerd op begintijd. Gedeelde ritten dragen de naam van de
+organisator en hebben geen prullenbak — je gooit de rit van een ander niet weg. **"My rides" blijft
+bewust persoonlijk**; de Peloton-tab ernaast draagt het gedeelde deel.
+
+Vijf providertests leggen de afbakening vast (`test/providers/peloton_providers_test.dart`).
+**Nog niet op een toestel bevestigd** — de code is gedeployd, de visuele controle staat open.
 
 ### 2. Maatjes zijn eenzijdig zichtbaar: B ziet A, A ziet B niet — oorzaak nog ONBEKEND
 
