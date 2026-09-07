@@ -253,9 +253,9 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 16. PWA Installability & iOS Polish | v2.0 | 4/4 | Complete   | 2026-07-17 |
 | 17. Deployment Hardening & Firebase Hosting | v2.0 | 1/1 | Complete   | 2026-07-17 |
 | 18. Preconditions | v3.0 | 4/4 | Complete    | 2026-07-26 |
-| 19. Auth | v3.0 | 6/7 | In Progress|  |
+| 19. Auth | v3.0 | 7/7 | Complete   | 2026-09-07 |
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
-| 21. Sync + migration | v3.0 | 10/12 | In Progress|  |
+| 21. Sync + migration | v3.0 | 14/14 | Complete   | 2026-09-02 |
 | 22. Account-backed feedback | v3.0 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
