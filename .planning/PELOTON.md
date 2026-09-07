@@ -111,22 +111,50 @@ De belofte van de epic is "de rit verschijnt bij de ander". Dat is dus nog niet 
 eerstvolgende slice: een geaccepteerde gedeelde rit moet net zo goed op Home en in "My rides"
 verschijnen als een eigen geplande rit, met zichtbaar wie er meerijdt.
 
-### 2. Maatjes zijn eenzijdig zichtbaar: B ziet A, A ziet B niet
+### 2. Maatjes zijn eenzijdig zichtbaar: B ziet A, A ziet B niet — oorzaak nog ONBEKEND
 
-Na de wederzijdse vriendschap toont A's Peloton-tab "No buddies yet" — ook na pull-to-refresh —
-terwijl B A gewoon in zijn lijst heeft staan. De vriendschapsrij is symmetrisch en
-`friend_profiles()` behandelt beide volgordes correct, dus daar zit het niet.
+Na de wederzijdse vriendschap toont A's Peloton-tab "No buddies yet", ook na pull-to-refresh,
+terwijl B A gewoon in zijn lijst heeft staan.
 
-**Waarschijnlijke oorzaak:** `friend_profiles()` doet `from public.profiles p where p.user_id in
-(...)`. Je bent voor je maatje dus alleen zichtbaar als je een rij in `profiles` hebt. B is een vers
-account dat inlogde met "Keep data" en daarna niets wijzigde — en `ProfileRepository.save()`
-enqueuet alleen bij een échte wijziging. Er is dus nooit een profielrij voor B weggeschreven.
+**Wat is uitgesloten** (en dus niet opnieuw onderzoeken):
 
-Dat maakt dit geen randgeval maar het normale pad: **iedereen die via een invite-code binnenkomt en
-niets aanpast, blijft onzichtbaar in de maatjeslijst van degene die hem uitnodigde.** Te bevestigen
-met `select user_id, user_name from public.profiles;` — staat B daar niet bij, dan is het dit. De
-fix hoort bij het inloggen te liggen (bij een nieuw account altijd een profielrij aanleggen), niet
-in een `left join` in de functie, want een maatje zonder naam moet je nog steeds kunnen uitnodigen.
+- De vriendschapsrij zelf. `redeem_friend_invite()` schrijft één rij in canonieke volgorde
+  (`least`/`greatest`) met `on conflict do nothing` — er is geen richting.
+- `friend_profiles()`. Die doet `case when f.user_a = auth.uid() then f.user_b else f.user_a end`
+  en `where auth.uid() in (f.user_a, f.user_b)`; beide volgordes werken.
+- Een gecachete provider. `_invalidateAll()` invalideert `friendsProvider` echt, en de
+  pull-to-refresh riep hem aan.
+
+**Wat overblijft.** `friend_profiles()` joint op `public.profiles`, dus je bent pas zichtbaar voor
+je maatje als je daar een rij hebt. Mijn eerste conclusie was dat B die rij nooit kreeg — maar dat
+klopt niet zonder meer: `resolveAccountSync` geeft bij een account zonder cloudrij
+`pushLocalToCloud`, en dat enqueuet `profileRepo.enqueueCurrentState()`. B hóórt dus een rij te
+hebben.
+
+Twee kandidaten die daar overheen kunnen lopen, allebei nog te bewijzen:
+
+1. **De upsert is wel geënqueued maar nooit geland.** `SyncOutboxService` laat een rij na
+   `kMaxSendAttempts` mislukte pogingen vallen. De teller staat daarna óók op nul, dus het
+   accountscherm zegt gewoon "Synced" — een geslaagde en een opgegeven push zien er identiek uit.
+   Dat is op zichzelf al een gat in de waarneembaarheid.
+2. **De rij is met het verkeerde `user_id` weggeschreven.** `AvailabilityRepository` en
+   `ProfileRepository` krijgen hun `userId` uit `currentUserIdProvider`. Vlak na een accountwissel
+   is de volgorde waarin die provider herbouwt ten opzichte van `_runAccountSync` niet vastgelegd
+   door een test.
+
+**De query die dit in één keer beslist**, in de Supabase SQL-editor:
+
+```sql
+select user_id, user_name, created_at, updated_at from public.profiles order by created_at;
+```
+
+Twee rijen → B heeft een profiel en de oorzaak ligt elders (dan is de volgende stap de outbox-log
+van B's sessie). Eén rij → de push is nooit geland, en kandidaat 1 of 2 is aan de beurt.
+
+**Waarom dit hoe dan ook een blocker is voor de volgende epic:** wie via een code binnenkomt en
+onzichtbaar blijft in de maatjeslijst, is ook onvindbaar via een gebruikersnaam of via
+contacten-matching. Zichtbaarheid van een profiel is de fundering onder alles wat "vrienden
+toevoegen" heet, niet een detail ernaast.
 
 ### 3. "Start fresh" wiste een echt weekrooster — opgelost (`89d0c7a`)
 
