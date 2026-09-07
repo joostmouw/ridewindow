@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 23: schets 001 → variant B gekozen, nu in Dart"
-last_updated: "2026-09-07T14:30:00.000Z"
+status: "Fase 23 stap 1+2 draait — papier + beste kaart"
+last_updated: "2026-09-07T16:05:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -14,6 +14,12 @@ progress:
 ---
 
 # Project State
+
+## Quick Tasks Completed
+
+| Datum | Taak | Resultaat |
+|---|---|---|
+| 2026-09-07 | [home-papier-en-inkt](quick/20260907-home-papier-en-inkt/) | Fase 23 stap 1+2: achtergrond wordt papier, beste ritkaart licht op met een schaduw buiten de `ClipRRect`. Suite 479/479, analyze onveranderd. Openstaande vraag voor Joost in de SUMMARY: "Best choice" staat op de vroegste `Perfect`, niet op de hoogste score. |
 
 ## Deferred Items
 
