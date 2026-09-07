@@ -1052,31 +1052,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 _planRide(slot);
                 return false;
               },
-              // Het onthulvlak is een eigen afgerond blok, geen vulling die
-              // toevallig door de buitenste clip links wordt afgerond. Zonder
-              // die eigen ronding hield het aan de kant van de kaart vierkante
-              // hoeken over — op een scherm waar alles radius 24 heeft viel dat
-              // meteen op (Joost, 2026-09-07, tweede opname).
-              background: Container(
-                decoration: BoxDecoration(
-                  color: cs.primaryContainer,
-                  borderRadius: radius,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 24),
-                  child: Row(
-                    children: [
-                      Icon(Icons.event_available,
-                          color: cs.onPrimaryContainer, size: 22),
-                      const SizedBox(width: 8),
-                      Text(
-                        S.of(context).schedule,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: cs.onPrimaryContainer,
-                            ),
-                      ),
-                    ],
-                  ),
+              // Geen gekleurd vlak achter de kaart, alleen een icoon en een
+              // woord op de gewone achtergrond.
+              //
+              // Er heeft hier een groen blok gezeten, en dat was niet rond te
+              // krijgen. `Dismissible` knipt zijn achtergrond zélf af tot het
+              // onthulde stuk, en die knip loopt kaarsrecht langs de rand van
+              // de kaart. Een `borderRadius` op dat blok deed daar niets tegen:
+              // links werd hij netjes rond, rechts hield hij een hoek van 90°,
+              // met een wig achtergrond ertussen omdat de kaart daar juist wél
+              // rond is. Op een echt toestel met een echte vinger was dat het
+              // eerste wat opviel (Joost, 2026-09-07, na drie rondes waarin ik
+              // steeds naar de kaart keek in plaats van naar het vlak erachter).
+              //
+              // Wat niet bestaat kan ook niet vierkant afgeknipt worden. De
+              // knip valt nu op de achtergrond zelf en is daarmee onzichtbaar.
+              background: Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: Row(
+                  children: [
+                    // Groen op papier in plaats van op een groen vlak, dus de
+                    // kleur moet nu zelf het contrast dragen.
+                    Icon(Icons.event_available, color: cs.primary, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      S.of(context).schedule,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: cs.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
                 ),
               ),
               // Deze `ClipRRect` maakt van de meeschuivende kaart een écht
