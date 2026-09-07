@@ -2563,6 +2563,30 @@ abstract class S {
   /// **'Ritten waar je aan meedoet'**
   String get pelotonJoinedRides;
 
+  /// No description provided for @pelotonCopyCode.
+  ///
+  /// In nl, this message translates to:
+  /// **'Code kopiëren'**
+  String get pelotonCopyCode;
+
+  /// No description provided for @pelotonCodeCopied.
+  ///
+  /// In nl, this message translates to:
+  /// **'Code gekopieerd'**
+  String get pelotonCodeCopied;
+
+  /// No description provided for @pelotonSignInAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen'**
+  String get pelotonSignInAction;
+
+  /// No description provided for @pelotonAutoJoined.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent nu maatjes met {name}'**
+  String pelotonAutoJoined(String name);
+
   /// No description provided for @feedbackThanks.
   ///
   /// In nl, this message translates to:

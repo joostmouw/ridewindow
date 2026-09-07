@@ -22,6 +22,8 @@ import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/services/pending_invite_store.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/account_sync_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
@@ -248,6 +250,43 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     // captured BEFORE either `prefs.setString` call above -- AccountSyncService
     // needs that pre-write snapshot, never the already-overwritten value).
     await _runAccountSync(signedInUid, lastSyncedUid);
+
+    // Kwam deze gebruiker binnen via een gedeelde uitnodigingslink, dan ligt
+    // zijn code klaar. Hem nu verzilveren is het verschil tussen een link die
+    // werkt en een link die huiswerk oplevert: zonder dit moest hij zelf naar
+    // Rides → Peloton en de code overtypen die de app allang kende. Zie
+    // PendingInviteStore.
+    await _redeemPendingInvite();
+  }
+
+  /// Verzilvert een code die vóór het inloggen is klaargelegd.
+  ///
+  /// Faalt stil op alles behalve de melding aan de gebruiker: een verlopen of
+  /// al gebruikte code mag het inloggen niet alsnog laten mislukken -- dat is
+  /// twee dingen door elkaar halen. De code wordt hoe dan ook gewist, ook na
+  /// een fout: hem bewaren zou betekenen dat elke volgende login dezelfde
+  /// foutmelding opnieuw laat zien.
+  Future<void> _redeemPendingInvite() async {
+    final code = await PendingInviteStore.read();
+    if (code == null) return;
+    await PendingInviteStore.clear();
+
+    try {
+      final friend =
+          await ref.read(pelotonGatewayProvider).redeemFriendInvite(code);
+      ref.invalidate(friendsProvider);
+      if (!mounted) return;
+      final s = S.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            s.pelotonAutoJoined(friend.label(s.pelotonUnnamedFriend)),
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Peloton: klaargelegde code verzilveren mislukt: $error');
+    }
   }
 
   /// Wires plan 21-06's `AccountSyncService` into the sign-in flow (MIG-01/

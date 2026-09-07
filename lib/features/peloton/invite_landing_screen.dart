@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,6 +7,7 @@ import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/services/pending_invite_store.dart';
 
 /// Waar een gedeelde uitnodigingslink op uitkomt: `/invite/:code` (epic #62).
 ///
@@ -45,9 +47,15 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
   @override
   void initState() {
     super.initState();
-    // Uitgelogd kan er niets verzilverd worden -- de RPC eist auth.uid(). Dan
-    // toont dit scherm de code zodat hij niet verloren gaat.
-    if (ref.read(currentUserIdProvider) != null) _start();
+    if (ref.read(currentUserIdProvider) != null) {
+      _start();
+    } else {
+      // Uitgelogd kan er niets verzilverd worden -- de RPC eist auth.uid().
+      // De code wordt bewaard zodat hij het inloggen overleeft en daarna
+      // vanzelf verzilverd wordt. Zie PendingInviteStore voor waarom dit geen
+      // luxe is maar het verschil tussen een werkende en een doodlopende link.
+      PendingInviteStore.save(widget.code);
+    }
   }
 
   void _start() {
@@ -68,17 +76,58 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
     final theme = Theme.of(context);
     final signedIn = ref.watch(currentUserIdProvider) != null;
 
+    // Logt iemand in terwijl dit scherm openstaat, dan moet de code meteen
+    // verzilverd worden. `initState` keek maar één keer; zonder deze listener
+    // bleef de gebruiker naar "log eerst in" kijken terwijl hij dat net gedaan
+    // had.
+    ref.listen(currentUserIdProvider, (previous, next) {
+      if (previous == null && next != null && _redeem == null) {
+        PendingInviteStore.clear();
+        _start();
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(title: Text(s.pelotonJoinTitle)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: !signedIn
-              ? _Message(
-                  icon: Icons.lock_outline,
-                  title: s.pelotonSignInToJoin,
-                  detail: s.pelotonYourCode(widget.code),
-                  theme: theme,
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Message(
+                      icon: Icons.lock_outline,
+                      title: s.pelotonSignInToJoin,
+                      detail: s.pelotonYourCode(widget.code),
+                      theme: theme,
+                    ),
+                    const SizedBox(height: 8),
+                    // Jacco's verzoek, en het vangnet voor het geval de
+                    // automatische verzilvering ergens strandt: de code moet
+                    // te kopiëren zijn zonder overtypen.
+                    TextButton.icon(
+                      icon: const Icon(Icons.copy_all_outlined),
+                      label: Text(s.pelotonCopyCode),
+                      onPressed: () async {
+                        await Clipboard.setData(
+                          ClipboardData(text: widget.code),
+                        );
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(s.pelotonCodeCopied)),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // Hier liep het vast: het scherm zei "log eerst in" en bood
+                    // vervolgens geen enkele manier om dat te doen. De
+                    // gebruiker moest zelf Profiel zien te vinden.
+                    FilledButton(
+                      onPressed: () => context.go('/profile'),
+                      child: Text(s.pelotonSignInAction),
+                    ),
+                  ],
                 )
               : FutureBuilder<Friend>(
                   future: _redeem,

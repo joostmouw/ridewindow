@@ -1387,6 +1387,20 @@ class SEn extends S {
   String get pelotonJoinedRides => 'Rides you\'re joining';
 
   @override
+  String get pelotonCopyCode => 'Copy code';
+
+  @override
+  String get pelotonCodeCopied => 'Code copied';
+
+  @override
+  String get pelotonSignInAction => 'Sign in';
+
+  @override
+  String pelotonAutoJoined(String name) {
+    return 'You\'re now buddies with $name';
+  }
+
+  @override
   String get feedbackThanks => 'Thanks — your feedback is on its way.';
 
   @override

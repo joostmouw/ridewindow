@@ -1390,6 +1390,20 @@ class SNl extends S {
   String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
 
   @override
+  String get pelotonCopyCode => 'Code kopiëren';
+
+  @override
+  String get pelotonCodeCopied => 'Code gekopieerd';
+
+  @override
+  String get pelotonSignInAction => 'Inloggen';
+
+  @override
+  String pelotonAutoJoined(String name) {
+    return 'Je bent nu maatjes met $name';
+  }
+
+  @override
   String get feedbackThanks => 'Dank je — je feedback is onderweg.';
 
   @override
