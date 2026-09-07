@@ -600,6 +600,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: SegmentedButton<String>(
+                  // Zie de noot bij de themakiezer hieronder: geen vinkje op een
+                  // enkelvoudige keuze. Hier past het label ook mét vinkje, maar
+                  // twee keuzeknoppen recht onder elkaar waarvan er één een
+                  // vinkje draagt en de ander niet, oogt als een fout.
+                  showSelectedIcon: false,
                   segments: const [
                     ButtonSegment(value: 'nl', label: Text('Nederlands')),
                     ButtonSegment(value: 'en', label: Text('English')),
@@ -621,6 +626,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 // D-06-09: SegmentedButton, PROF-04
                 child: SegmentedButton<String>(
+                  // Geen vinkje. In een sectiekaart is de knop 32px smaller —
+                  // dat is spec-conform (16dp schermmarge plus 16dp
+                  // list-item-inspringing), maar met drie segmenten brak
+                  // "System" daardoor af tot "Syste / m" op de Oppo. Het vinkje
+                  // is hier bovendien dubbelop: dit is een enkelvoudige keuze en
+                  // het gevulde `secondaryContainer` zégt al welke aan staat.
+                  //
+                  // Niet overnemen op de periodefilter van Home: die is
+                  // meervoudig, en daar draagt het vinkje wél informatie —
+                  // welke van de drie aan staan is niet af te lezen aan één
+                  // gevuld vlak.
+                  showSelectedIcon: false,
                   segments: [
                     ButtonSegment(value: 'system', label: Text(s.themeSystem)),
                     ButtonSegment(value: 'light', label: Text(s.themeLight)),
