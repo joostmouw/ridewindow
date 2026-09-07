@@ -116,50 +116,35 @@ Joost", groeps-icoon en zonder prullenbak, boven de eigen zaterdagrit die zijn p
 de Peloton-tab toont "RIDES YOU'RE JOINING". Daarmee is de belofte van de epic — "de rit verschijnt
 bij de ander" — waargemaakt.
 
-### 2. Maatjes zijn eenzijdig zichtbaar: B ziet A, A ziet B niet — oorzaak nog ONBEKEND
+### 2. Maatjes zijn eenzijdig zichtbaar — SYMPTOOM OPGELOST (`ef391bf`), oorzaak deels open
 
-Na de wederzijdse vriendschap toont A's Peloton-tab "No buddies yet", ook na pull-to-refresh,
-terwijl B A gewoon in zijn lijst heeft staan.
+**Wat de database zei** (query gedraaid 2026-09-07): vijf rijen in `public.profiles`, en
+**joost.oppo staat er niet bij** — er is niets van 6 september, terwijl hij toen inlogde en het
+scherm "Synced" toonde. Jacco (echte tester, ingelogd 07:59 diezelfde ochtend) staat er wél, mét
+`user_name: 'Jacco'`.
 
-**Wat is uitgesloten** (en dus niet opnieuw onderzoeken):
+**Dat verschil is de sleutel.** Jacco's rij ontstond doordat de app bij zijn eerste login zijn naam
+wegschreef, en díé schrijving duwde de rij omhoog. Bij joost.oppo koos ik "Keep data", dus de lokale
+naam stond al ingevuld, de naam-schrijfactie werd overgeslagen, en de rij ontstond nooit. **De
+profielrij hing aan een toevallige bijwerking**, niet aan een pad dat ervoor bedoeld is.
 
-- De vriendschapsrij zelf. `redeem_friend_invite()` schrijft één rij in canonieke volgorde
-  (`least`/`greatest`) met `on conflict do nothing` — er is geen richting.
-- `friend_profiles()`. Die doet `case when f.user_a = auth.uid() then f.user_b else f.user_a end`
-  en `where auth.uid() in (f.user_a, f.user_b)`; beide volgordes werken.
-- Een gecachete provider. `_invalidateAll()` invalideert `friendsProvider` echt, en de
-  pull-to-refresh riep hem aan.
+**Uitgesloten:** de RPC. `migrate_account_data` is los getoetst tegen de live database met alle
+veertien parameters en komt netjes tot zijn eigen `not authenticated`-controle (P0001) — de functie
+bestaat, de handtekening klopt, en hij schrijft de profielrij onvoorwaardelijk. Ergens vóór dat punt
+viel `onSignIn` uit, en `_runAccountSync` slikte dat in met alleen een `debugPrint`.
 
-**Wat overblijft.** `friend_profiles()` joint op `public.profiles`, dus je bent pas zichtbaar voor
-je maatje als je daar een rij hebt. Mijn eerste conclusie was dat B die rij nooit kreeg — maar dat
-klopt niet zonder meer: `resolveAccountSync` geeft bij een account zonder cloudrij
-`pushLocalToCloud`, en dat enqueuet `profileRepo.enqueueCurrentState()`. B hóórt dus een rij te
-hebben.
+**Wat er nu staat.** `_ensureCloudProfileRow()` draait na elke sign-in: een blinde, idempotente
+enqueue van de huidige profielstaat plus een drain. Dat repareert het symptoom ongeacht welke stap
+faalde, en herstelt bestaande accounts bij hun eerstvolgende login — joost.oppo hoeft dus alleen
+opnieuw in te loggen. Daarnaast toont de catch in `_runAccountSync` nu een melding, zodat een stille
+mislukking niet meer als "Synced" wegkomt.
 
-Twee kandidaten die daar overheen kunnen lopen, allebei nog te bewijzen:
+**Wat nog open is:** wélke stap in `onSignIn` faalde. Dat is nu wél waarneembaar geworden — bij een
+volgende mislukking verschijnt er een melding in plaats van niets. Repareer de oorzaak pas als hij
+zich laat zien; het vangnet maakt het niet urgent meer.
 
-1. **De upsert is wel geënqueued maar nooit geland.** `SyncOutboxService` laat een rij na
-   `kMaxSendAttempts` mislukte pogingen vallen. De teller staat daarna óók op nul, dus het
-   accountscherm zegt gewoon "Synced" — een geslaagde en een opgegeven push zien er identiek uit.
-   Dat is op zichzelf al een gat in de waarneembaarheid.
-2. **De rij is met het verkeerde `user_id` weggeschreven.** `AvailabilityRepository` en
-   `ProfileRepository` krijgen hun `userId` uit `currentUserIdProvider`. Vlak na een accountwissel
-   is de volgorde waarin die provider herbouwt ten opzichte van `_runAccountSync` niet vastgelegd
-   door een test.
-
-**De query die dit in één keer beslist**, in de Supabase SQL-editor:
-
-```sql
-select user_id, user_name, created_at, updated_at from public.profiles order by created_at;
-```
-
-Twee rijen → B heeft een profiel en de oorzaak ligt elders (dan is de volgende stap de outbox-log
-van B's sessie). Eén rij → de push is nooit geland, en kandidaat 1 of 2 is aan de beurt.
-
-**Waarom dit hoe dan ook een blocker is voor de volgende epic:** wie via een code binnenkomt en
-onzichtbaar blijft in de maatjeslijst, is ook onvindbaar via een gebruikersnaam of via
-contacten-matching. Zichtbaarheid van een profiel is de fundering onder alles wat "vrienden
-toevoegen" heet, niet een detail ernaast.
+**Te bevestigen:** log opnieuw in als joost.oppo en controleer of hij daarna in Joosts maatjeslijst
+verschijnt.
 
 ### 3. "Start fresh" wiste een echt weekrooster — opgelost (`89d0c7a`)
 
