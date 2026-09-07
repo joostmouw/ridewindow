@@ -556,24 +556,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         _selectedDay?.year == day.year;
 
     // Bepaal dot klasse.
-    _DayClass dotClass;
+    // De béste rit van die dag bepaalt de kleur — dat is de vraag die je aan
+    // een weekstrip stelt ("valt er die dag iets te rijden"), niet het
+    // gemiddelde. `null` betekent: die dag heeft geen enkel venster.
+    RideTier? bestTier;
     if (slotsState is SlotsLoaded && slotsState.slots.isNotEmpty) {
       final daySlots = slotsState.slots.where((s) {
         return s.start.year == day.year &&
             s.start.month == day.month &&
             s.start.day == day.day;
       }).toList();
-
-      if (daySlots.isEmpty) {
-        dotClass = _DayClass.bad;
-      } else {
-        final bestTier = _bestTier(daySlots);
-        dotClass = (bestTier is Perfect || bestTier is Great)
-            ? _DayClass.good
-            : _DayClass.ok;
-      }
-    } else {
-      dotClass = _DayClass.bad;
+      if (daySlots.isNotEmpty) bestTier = _bestTier(daySlots);
     }
 
     // Twee dingen, twee kanalen -- en dat was precies het probleem.
@@ -587,10 +580,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // Nu: **kwaliteit is de onderstreping**, **selectie is de vulling**. De
     // vulling is bewust een neutrale tonale trap en geen tierkleur, zodat je de
     // twee nooit meer met elkaar kunt verwarren.
-    final Color qualityColor = switch (dotClass) {
-      _DayClass.good => rw.scorePerfect,
-      _DayClass.ok => rw.tiers.acceptableFg,
-      _DayClass.bad => rw.tiers.poorFg,
+    // Alle vier de niveaus, in exact de kleuren die de score op de ritkaart
+    // eronder ook gebruikt (`ScoreDisplay` leest uit dezelfde `tiers`).
+    //
+    // Dit stond tot 2026-09-07 op drie niveaus, waarbij Perfect en Great samen
+    // "goed" waren. Daardoor zag een dag met 99 er hetzelfde uit als een dag
+    // met 71 -- en groen dekte de hele band van 70 tot 100, dus in een
+    // redelijke week was de héle strip groen en zei hij niets. Precies het
+    // onderscheid dat de kaarten eronder wél maken, gooide de strip weg.
+    // Joost zag dat meteen ("deze zijn nu allemaal groen").
+    //
+    // `Poor` is in de praktijk onbereikbaar: `removeHiddenPoor` (SLOT-04)
+    // haalt alles onder de 50 eruit vóórdat deze strip het ziet. Hij staat er
+    // toch, want een `switch` op een sealed class hoort compleet te zijn en
+    // niet te leunen op een filter twee lagen verderop.
+    final Color qualityColor = switch (bestTier) {
+      Perfect() => rw.tiers.perfectFg,
+      Great() => rw.tiers.greatFg,
+      Acceptable() => rw.tiers.acceptableFg,
+      Poor() => rw.tiers.poorFg,
+      null => rw.tiers.poorFg,
     };
 
     return Semantics(
@@ -1644,7 +1653,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 // Internal enums
 // ---------------------------------------------------------------------------
 
-enum _DayClass { good, ok, bad }
+// `_DayClass { good, ok, bad }` stond hier tot 2026-09-07. De dagstrip gebruikt
+// nu `RideTier` zelf, zodat hij dezelfde vier niveaus en dezelfde kleuren toont
+// als de ritkaarten eronder — zie de noot bij `qualityColor` in `_buildDayChip`.
 
 enum _DayPeriod {
   morning, // 6:00 – 11:59
