@@ -48,6 +48,23 @@ terugkomt uit het beschikbaarheidsscherm. Dat is niet op te lossen zonder
 iPhone; de knop bestáát in alle drie de takken, dus het is een
 safe-area-kwestie op iOS-standalone.
 
+**Play-release: ik kan hem bouwen, niet uploaden.** Vastgesteld 2026-09-07.
+`flutter build appbundle --release` levert een ondertekende AAB (`key.properties`
+staat goed) op `build/app/outputs/bundle/release/app-release.aab`, ~67 MB. Het
+uploaden lukt niet vanaf hier:
+
+- **Browser-automatisering valt af.** Het uploadgereedschap accepteert maximaal
+  10 MB en alleen bestanden die met de sessie gedeeld zijn. 67 MB uit `build/`
+  voldoet aan geen van beide.
+- **De Play Developer API is niet ingericht.** Geen service-account-JSON in het
+  project, geen `gcloud`, geen fastlane.
+
+Wil je dit wél geautomatiseerd, dan is dat een eenmalige inrichting: service
+account in GCP-project `my-project-joost`, die uitnodigen in Play Console onder
+Users & permissions met release-rechten, sleutel opslaan buiten de repo. Daarna
+is elke release één commando. Tot die tijd is uploaden handwerk in de Play
+Console.
+
 **De Play-build loopt inmiddels ver achter.** Op het toestel staat 1.0.23+24,
 zónder Peloton en zónder iets van v4.0. Alle testers zien dus nog de app waar
 de klacht "hij ziet er hetzelfde uit" over ging. `PELOTON.md` zegt: batch een
