@@ -17,6 +17,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/domain/services/account_switch_resolver.dart';
+import 'package:ridewindow/features/profile/settings_section.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -114,8 +115,8 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     // window"). Android's exacte twee-staps-volgorde blijft ongewijzigd.
     String? accessToken;
     try {
-      var authorization = await account.authorizationClient
-          .authorizationForScopes(['email']);
+      var authorization =
+          await account.authorizationClient.authorizationForScopes(['email']);
       if (authorization == null && _supportsNativeAuthenticate) {
         authorization =
             await account.authorizationClient.authorizeScopes(['email']);
@@ -234,7 +235,9 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
           );
           try {
             await ref.read(profileProvider.notifier).resetToDefaults();
-            await ref.read(availabilityProvider.notifier).resetForAccountSwitch();
+            await ref
+                .read(availabilityProvider.notifier)
+                .resetForAccountSwitch();
             await ref.read(plannedRidesProvider.notifier).clearAll();
           } finally {
             availabilitySub.close();
@@ -369,7 +372,8 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
             ],
           ),
         );
-        await service.resolvePrompt(prompt, userId, keepLocal: keepLocal ?? true);
+        await service.resolvePrompt(prompt, userId,
+            keepLocal: keepLocal ?? true);
       }
 
       if (prompts.isNotEmpty) {
@@ -434,7 +438,8 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     } on GoogleSignInException catch (e) {
       // D-07: annuleren is een keuze, geen fout -- niets tonen.
       if (e.code != GoogleSignInExceptionCode.canceled) {
-        debugPrint('AccountSection: GoogleSignInException: ${e.code} ${e.description}');
+        debugPrint(
+            'AccountSection: GoogleSignInException: ${e.code} ${e.description}');
         _showSignInError();
       }
     } catch (e) {
@@ -546,10 +551,9 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     });
     final authAsync = ref.watch(authStateProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return SettingsSection(
+      title: s.sectionAccount,
       children: [
-        _AccountSectionHeader(s.sectionAccount),
         authAsync.when(
           loading: () => ListTile(
             leading: const SizedBox(
@@ -560,8 +564,9 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
             title: Text(s.accountLoading),
           ),
           error: (_, __) => _buildSignedOutRow(context, s),
-          data: (user) =>
-              user == null ? _buildSignedOutRow(context, s) : _buildSignedInRow(context, s, user),
+          data: (user) => user == null
+              ? _buildSignedOutRow(context, s)
+              : _buildSignedInRow(context, s, user),
         ),
       ],
     );
@@ -625,7 +630,9 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
               if (user.email != null) Text(user.email!),
               pendingCountAsync.when(
                 data: (count) => Text(
-                  count == 0 ? s.accountSyncStatusSynced : s.accountSyncStatusPending,
+                  count == 0
+                      ? s.accountSyncStatusSynced
+                      : s.accountSyncStatusPending,
                 ),
                 loading: () => const SizedBox.shrink(),
                 error: (_, __) => const SizedBox.shrink(),
@@ -682,23 +689,7 @@ class _AccountAvatarState extends State<_AccountAvatar> {
   }
 }
 
-/// Sectie-koptekst, dupliceert profile_screen.dart's private _SectionHeader
-/// stijl (Dart-privacy is per-bestand -- zie de interfaces-sectie in het plan).
-class _AccountSectionHeader extends StatelessWidget {
-  const _AccountSectionHeader(this.title);
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-    );
-  }
-}
+// `_AccountSectionHeader` was een letterlijk duplicaat van profile_screen.dart's
+// `_SectionHeader`, want Dart-privacy is per bestand en er was geen gedeelde
+// plek. Die is er nu wel: `SettingsSection` is publiek, dus het duplicaat kon
+// weg en beide schermen gebruiken dezelfde kop én hetzelfde vlak.
