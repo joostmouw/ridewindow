@@ -1,10 +1,7 @@
-Elk pictogram is nu in dezelfde stijl en lijndikte getekend — dezelfde lijn als
-het RideWindow-logo. Geen systeememoji meer die er op elke telefoon anders
-uitzien.
+De intro speelt sneller — dezelfde animatie, minder wachten.
 
-Het welkomscherm beweegt: het monogram tekent zichzelf en wordt een fiets.
+De uitleg in de app is opnieuw gebouwd. Je kunt terug om iets nog eens te
+lezen, je ziet hoe ver je bent, en een tik ernaast slaat niets meer over.
 
-Het kledingadvies is een schaal geworden, geen plaatje. Het toont hoe koud de
-rit echt aanvoelt bij 15 km/u.
-
-Onder elke dag op Home volgt het streepje de beste score van die dag.
+In Peloton kun je nu afzeggen voor een rit waar je al ja op had gezegd. Per
+ongeluk geklikt? Het ongedaan maken staat meteen in de melding.

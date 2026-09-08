@@ -1,10 +1,8 @@
-Every icon is now drawn in one style and one line weight — the same line the
-RideWindow logo is drawn in. No more system emoji that looked different on
-every phone.
+The intro plays quicker now — same animation, less waiting.
 
-The welcome screen animates: the monogram draws itself and becomes a bike.
+The in-app tips have been rebuilt. You can step back to re-read one, you can
+see how far along you are, and a stray tap no longer skips ahead. The first-run
+tour is finally in English too, instead of Dutch.
 
-Clothing advice is a scale now, not a picture. It shows what the ride will
-actually feel like at 15 km/h.
-
-Under each day on Home, the bar follows that day's best score.
+In Peloton you can now drop out of a ride you already joined. Changed your mind
+by accident? The undo is right there in the message.
