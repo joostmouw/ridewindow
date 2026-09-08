@@ -60,9 +60,10 @@ commit;
 -- ---------------------------------------------------------------------------
 -- Staat dit ook op de andere tabellen?
 -- ---------------------------------------------------------------------------
--- Waarschijnlijk wel -- de standaardrechten gelden schemabreed, niet per tabel.
--- Deze query laat het in één keer zien; draai hem vóór je besluit of er een
--- 0006 nodig is:
+-- Ja. Joost draaide de query op 2026-09-08 en het patroon stond op elke tabel.
+-- Daar gaat `0006_tighten_grants_schema_wide.sql` over; die pakt ook de
+-- oorzaak aan, zodat een nieuwe tabel ze niet opnieuw erft. Deze migratie is
+-- uitgevoerd en blijft staan zoals hij was.
 --
 --   select table_name, grantee, string_agg(privilege_type, ', ' order by
 --          privilege_type) as rechten
