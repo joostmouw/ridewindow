@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Uitleg, intro en Peloton bij; 1.0.26 nog niet gebouwd"
-last_updated: "2026-09-08T15:20:00.000Z"
+status: "1.0.26+27 gebouwd en klaar om te uploaden"
+last_updated: "2026-09-08T15:55:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -77,12 +77,22 @@ opgehoogd voor Play).
 - **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
   alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
 
-**Wat als eerste aandacht vraagt:** er staat sinds 1.0.25+26 alweer een sessie
-werk klaar dat niet op Play staat — de intro op 1,75×, de uitleg als rich
-tooltip, en afzeggen in Peloton. Dat vraagt een **1.0.26+27**: `pubspec.yaml`
-én `lib/core/app_version.dart` ophogen, bouwen, uploaden. Zie het blok
-"Play-release" hieronder; het uploadscript staat klaar en wacht op de
-service-account-sleutel.
+**Wat als eerste aandacht vraagt: `1.0.26+27` staat klaar om geüpload te
+worden.** Gebouwd en gecontroleerd — manifest zegt `versionCode=27` /
+`versionName=1.0.26`, ondertekend met `META-INF/UPLOAD.RSA`, 66 MB, en de drie
+vangrails van `tool/play_upload.dart` komen alle drie schoon door. Hij bevat
+de intro op 1,75×, de uitleg als Material 3 rich tooltip, en afzeggen in
+Peloton. Release-notes staan in `release-notes/` in beide talen.
+
+Uploaden gaat met de hand in de console (Testing → Internal testing → Create
+new release → dit bestand erin slepen):
+
+```
+build/app/outputs/bundle/release/app-release.aab
+```
+
+Of in één commando zodra de service-account-sleutel er is — zie het blok
+"Play-release" hieronder.
 
 Let op bij een volgende bump: `pubspec.yaml` is niet de enige plek. De in-app
 versie staat hard in `lib/core/app_version.dart` en liep hier stilzwijgend
