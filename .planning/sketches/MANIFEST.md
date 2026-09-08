@@ -37,6 +37,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | **B — Papier en inkt** | home, hierarchie, typografie, weerbalken, fase-23 |
 | 002 | [iconografie](002-iconografie/) | Waar komt het kledingadvies vandaan als het geen systeememoji meer is — twee losse kledingstukken, één tenue, of een gekleed figuur? | *afgewezen — verkeerde vraag* | iconografie, kleding, fase-24 |
 | 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | **A — Gevoelsbalk** | iconografie, kleding, weerbalken, fase-24 |
+| 004 | [iconenfamilie](004-iconenfamilie/) | Welke hand tekent de zestien plekken waar RideWindow nu een systeememoji zet? | *open* | iconografie, fase-24, rider-types |
 
 ## Beslissingen die doorwerken
 

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>RideWindow — Iconenfamilie (sketch 004)</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: #6d7a66;
+    color: var(--text-primary);
+    padding: 62px 24px 64px;
+  }
+
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #1d2a22; color: #e6ede0;
+    border-bottom: 1px solid #33453a;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: system-ui, sans-serif; font-size: 12px;
+  }
+  #bar .name { font-weight: 700; letter-spacing: .04em; margin-right: 8px; opacity: .75; }
+  #bar button {
+    font: inherit; color: #e6ede0; background: #2b3b31;
+    border: 1px solid #3c5145; border-radius: 999px;
+    padding: 5px 12px; cursor: pointer;
+  }
+  #bar button.on { background: var(--brand-light); color: #1d2a22; border-color: var(--brand-light); font-weight: 700; }
+  #bar .grow { flex: 1; }
+  #bar .hint { opacity: .5; }
+
+  .wrap { max-width: 1400px; margin: 0 auto; }
+
+  .lede { color: #eef3e9; margin-bottom: 26px; font-family: system-ui, sans-serif; }
+  .lede h1 { font-family: var(--font); font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+  .lede p { font-size: 13px; line-height: 1.55; opacity: .8; max-width: 84ch; margin-top: 8px; }
+  .lede code { background: rgba(0,0,0,.22); padding: 1px 5px; border-radius: 4px; }
+
+  h2 {
+    font-family: system-ui, sans-serif;
+    color: #e9f0e3; font-size: 14px; font-weight: 600;
+    margin: 30px 0 4px;
+  }
+  h2 + p {
+    font-family: system-ui, sans-serif;
+    color: #dfe8d9; opacity: .7; font-size: 12px; line-height: 1.5;
+    max-width: 84ch; margin-bottom: 12px;
+  }
+
+  .fams { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .fam { width: 292px; }
+  .famhead {
+    font-family: system-ui, sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: .07em; text-transform: uppercase;
+    color: #e9f0e3; opacity: .8; margin-bottom: 8px;
+  }
+  .panel {
+    background: var(--sc-lowest);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.2);
+  }
+  .panel.brand { background: var(--brand-light); }
+  .panel.dark  { background: #101a14; }
+
+  /* ── weerbalk, zoals weather_indicator_bar.dart ── */
+  .metric + .metric { margin-top: 10px; }
+  .metric .top { display: flex; align-items: flex-end; gap: 6px; }
+  .metric .lbl { font-size: 12px; font-weight: 600; color: var(--text-secondary); flex: 1; }
+  .metric .val { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .metric .verdict {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--score-perfect);
+  }
+  .track {
+    position: relative; height: 14px; margin-top: 6px;
+    border-radius: 7px; background: var(--sc-high); overflow: hidden;
+  }
+  .track .zone { position: absolute; top: 0; bottom: 0; background: rgba(46,125,50,.18); }
+  .track .mark {
+    position: absolute; top: -2px; bottom: -2px; width: 3px;
+    border-radius: 2px; background: var(--text-primary);
+  }
+  .scale {
+    display: flex; margin-top: 3px; font-size: 9px;
+    color: var(--text-hint); font-variant-numeric: tabular-nums;
+  }
+  .scale .mid { flex: 1; text-align: center; color: var(--score-perfect); font-weight: 600; }
+
+  /* ── rider-type kaart, availability_screen.dart ── */
+  .rider {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 16px;
+    background: var(--sc-low); border: 1px solid var(--border-dim);
+  }
+  .rider + .rider { margin-top: 8px; }
+  .rider .t { font-size: 14px; font-weight: 700; }
+  .rider .d { font-size: 12px; color: var(--text-tertiary); line-height: 1.35; }
+
+  /* ── welcome ── */
+  .welcome { text-align: center; padding: 26px 14px 20px; }
+  .welcome .t {
+    font-size: 24px; font-weight: 600; margin-top: 16px;
+    color: var(--brand-dark); letter-spacing: -.01em;
+  }
+  .welcome .s { font-size: 13px; color: #3a4a40; margin-top: 6px; }
+
+  /* ── specimen ── */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .grid figure {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 10px 2px 6px; border-radius: 12px; background: var(--sc-low);
+  }
+  .grid figcaption {
+    font-family: system-ui, sans-serif; font-size: 9px; color: var(--text-hint);
+    text-align: center; line-height: 1.2;
+  }
+
+  .ic { display: block; flex: 0 0 auto; }
+  .row { display: flex; align-items: center; gap: 8px; }
+
+  .note {
+    font-family: system-ui, sans-serif; font-size: 11px;
+    color: var(--text-hint); margin-top: 10px; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <span class="name">SKETCH 004 · ICONENFAMILIE</span>
+  <button id="tStroke" class="on">Lijndikte 2</button>
+  <span class="grow"></span>
+  <span class="hint">fase 24 · v4.0 Eigen gezicht</span>
+</div>
+
+<div class="wrap">
+  <div class="lede">
+    <h1>Welke hand tekent de rest van de app?</h1>
+    <p>Zestien plekken tekenen nu een systeememoji, en elk platform tekent die anders — op deze pagina
+       zie je macOS-emoji, op de Oppo krijg je Google's versie en op het web soms een leeg blokje.
+       De vraag is niet óf ze weg moeten maar wélke hand ze vervangt. <b>Material Symbols staat er
+       bewust niet bij:</b> dat is de Google-huisstijl en leest als "standaard app". Deze vier zijn
+       MIT-gelicenseerd, professioneel getekend, en hebben elk een eigen karakter. Ze staan hier in
+       de échte schermen op de échte maten — 13 px in de weerbalken, 24 px op de rider-kaarten,
+       80 px op Welcome.</p>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="lede" style="margin-top:34px">
+    <p><b>Let bij het kiezen hierop:</b> de lijndikte bij 13 px (blijft de thermometer leesbaar of
+       wordt hij grijze soep?), of de fietser als fietser leest op 24 px, en of het geheel bij Outfit
+       past — dat lettertype heeft <em>vlakke</em> uiteinden, dus een iconenset met ronde uiteinden
+       zet er contrast tegenover en een set met vlakke uiteinden versterkt het.</p>
+  </div>
+</div>
+
+<script src="icons.js"></script>
+<script>
+const FAMS = [
+  { id:'lucide',   name:'Lucide',            note:'monoline, ronde uiteinden, lijn 2 — de taal van het RW-monogram' },
+  { id:'phosphor', name:'Phosphor · regular',note:'gevuld noch lijn: dunne lijn op een 256-raster, zes gewichten beschikbaar' },
+  { id:'phosduo',  name:'Phosphor · duotone',note:'zelfde tekening met een tweede vlak op 20% — kleur zonder een tweede kleur' },
+  { id:'tabler',   name:'Tabler',            note:'monoline, iets hoekiger, ruim 5000 iconen' },
+];
+
+function ic(concept, fam, size, cls) {
+  const d = ICONS[concept] && ICONS[concept][fam];
+  if (!d) return `<span style="width:${size}px;height:${size}px;display:block"></span>`;
+  const paint = d.mode === 'stroke'
+    ? `fill="none" stroke="currentColor" stroke-width="${window.SW || 2}" stroke-linecap="round" stroke-linejoin="round"`
+    : 'fill="currentColor"';
+  return `<svg class="ic ${cls || ''}" viewBox="${d.vb}" width="${size}" height="${size}" ${paint} aria-hidden="true">${d.inner}</svg>`;
+}
+
+const SECTIONS = [
+  {
+    title: '1 · De weerbalken — 13 px, het kleinste formaat in de app',
+    lead: 'Ride Detail en de uitgeklapte ritkaart. Hier staan 🌡 🌧 💨 vandaag. Dit is de scherpste toets: bij 13 px valt een te fijne tekening uit elkaar.',
+    render: fam => `
+      <div class="panel">
+        ${[['thermo','Temperature','15°','IDEAL','32','52'],
+           ['rain','Rain','0.2mm','DRY','0','17'],
+           ['wind','Wind','28km/h','BREEZY','0','50']].map(([c,l,v,vd,zs,ze]) => `
+          <div class="metric">
+            <div class="top">
+              ${ic(c, fam, 13)}
+              <span class="lbl">${l}</span>
+              <span class="val">${v}</span>
+              <span class="verdict">${vd}</span>
+            </div>
+            <div class="track">
+              <div class="zone" style="left:${zs}%;width:${ze - zs}%"></div>
+              <div class="mark" style="left:calc(${c === 'wind' ? 70 : c === 'rain' ? 7 : 44}% - 1.5px)"></div>
+            </div>
+            <div class="scale"><span>0</span><span class="mid">your range</span><span>max</span></div>
+          </div>`).join('')}
+      </div>`,
+  },
+  {
+    title: '2 · De rider-types — 24 px, acht stuks op één scherm',
+    lead: 'Profiel → Beschikbaarheid. Hier staan nu 😮 🚴 🏔 🌅 🌇 ☀️ 💪 🚲. Acht iconen onder elkaar laten meteen zien of een familie samenhang heeft of los zand is.',
+    render: fam => `
+      <div class="panel">
+        ${[['mountain','Weekend warrior','De meeste vrije uren vallen in het weekend'],
+           ['sunrise','Early bird','Je rijdt het liefst voor negenen'],
+           ['sunset','After-work rider','Na het werk, als het licht laag staat'],
+           ['strength','Busy but making it work','Weinig ruimte, en toch elke week een rit']].map(([c,t,d]) => `
+          <div class="rider">
+            ${ic(c, fam, 24)}
+            <div><div class="t">${t}</div><div class="d">${d}</div></div>
+          </div>`).join('')}
+      </div>`,
+  },
+  {
+    title: '3 · Welcome — 80 px, het eerste dat iemand van de app ziet',
+    lead: 'Nu een 🚴 die op elk toestel anders is. Op dit formaat wordt lijndikte een stijlkeuze in plaats van een leesbaarheidskwestie.',
+    render: fam => `
+      <div class="panel brand welcome" style="color:var(--brand-dark)">
+        ${ic('cyclist', fam, 80).replace('class="ic ', 'class="ic " style="margin:0 auto" data-x="')}
+        <div class="t">Your perfect ride moment</div>
+        <div class="s">Combine the weather forecast with your calendar</div>
+      </div>`,
+  },
+  {
+    title: '4 · De hele set, en op donker',
+    lead: 'Twaalf begrippen op 28 px. De app heeft een donker thema — dat is geen bijzaak, want een gevulde familie gedraagt zich daar anders dan een lijnfamilie.',
+    render: fam => `
+      <div class="panel">
+        <div class="grid">
+          ${Object.keys(ICONS).map(c => `
+            <figure>${ic(c, fam, 28)}<figcaption>${(ICONS[c][fam] || {}).name || '—'}</figcaption></figure>`).join('')}
+        </div>
+      </div>
+      <div class="panel dark" style="margin-top:10px;color:#e6ede0">
+        <div class="grid">
+          ${Object.keys(ICONS).map(c => `
+            <figure style="background:rgba(255,255,255,.05)">${ic(c, fam, 28)}<figcaption style="color:#93a58c">&nbsp;</figcaption></figure>`).join('')}
+        </div>
+      </div>`,
+  },
+];
+
+function draw() {
+  document.getElementById('sections').innerHTML = SECTIONS.map(s => `
+    <h2>${s.title}</h2>
+    <p>${s.lead}</p>
+    <div class="fams">
+      ${FAMS.map(f => `
+        <div class="fam">
+          <div class="famhead">${f.name}</div>
+          ${s.render(f.id)}
+          <div class="note" style="color:#dfe8d9;opacity:.62">${f.note}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+window.SW = 2;
+draw();
+
+document.getElementById('tStroke').onclick = function () {
+  window.SW = window.SW === 2 ? 1.5 : window.SW === 1.5 ? 2.5 : 2;
+  this.textContent = 'Lijndikte ' + window.SW;
+  draw();
+};
+</script>
+</body>
+</html>
