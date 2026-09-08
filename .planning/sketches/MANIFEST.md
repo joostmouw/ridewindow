@@ -89,3 +89,10 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
   beoordeel je op alles wat de app tekent, en **een dekkingsgetal zegt evenveel over je zoekwoorden
   als over de set** — Phosphor leek 77/83 tot ik zijn eigen taal gebruikte (`prohibit`,
   `arrows-clockwise`, `link-break`), en toen was het 83/83.
+
+## 007 — Uitleg in stappen
+
+`007-uitleg-stappen/` — De twee uitleg-overlays (`screen_hint_overlay.dart`,
+`app_tour_overlay.dart`) kunnen alleen vooruit en staan op glas in plaats van papier. Vier
+varianten voor een voet met teller en `‹ ›`, live klikbaar op een nagebouwd Home-scherm.
+Aanleiding: Joost, 2026-09-08, met driver.js als referentie. **Nog te kiezen.**

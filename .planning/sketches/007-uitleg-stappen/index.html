@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uitleg in stappen — schets 007</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('Outfit.ttf') format('truetype'); font-weight:100 900; }
+  @font-face { font-family:'Phosphor'; src:url('Phosphor.ttf') format('truetype'); }
+
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --great-fg:#006457; --great-bg:#E0F2F1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 24px 72px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:32px;line-height:1.25;font-weight:500;margin:0 0 8px}
+  .lede{font-size:16px;line-height:1.5;color:var(--ink-2);max-width:64ch;margin:0}
+  .lede b{font-weight:500;color:var(--ink)}
+  .ph{font-family:'Phosphor';font-style:normal;line-height:1}
+
+  .switcher{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 8px}
+  .switcher button{font-family:inherit;font-size:14px;font-weight:500;padding:9px 18px;
+      border-radius:999px;cursor:pointer;border:1px solid var(--outline);
+      background:transparent;color:var(--ink-2)}
+  .switcher button[aria-pressed="true"]{background:var(--brand-dark);color:var(--paper);border-color:var(--brand-dark)}
+  .variant-note{font-size:14px;line-height:1.5;color:var(--ink-3);margin:0 0 22px;max-width:64ch;min-height:42px}
+
+  .stage-row{display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+
+  /* ── telefoon ── */
+  .phone{width:360px;max-width:100%;margin:0 auto;border-radius:32px;overflow:hidden;
+         border:1px solid var(--outline);background:var(--paper);position:relative;
+         box-shadow:0 12px 32px rgba(35,73,52,.10)}
+  .screen{position:relative;height:640px;background:var(--paper);overflow:hidden}
+  .scrim{position:absolute;inset:0;background:rgba(27,42,32,.62);z-index:5;pointer-events:none}
+
+  /* nagebouwd Home-scherm */
+  .appbar{padding:18px 20px 8px}
+  .appbar .hi{font-size:12px;letter-spacing:.5px;color:var(--ink-3);font-weight:500;text-transform:uppercase}
+  .appbar h2{margin:2px 0 0;font-size:24px;font-weight:500;line-height:1.33}
+  .strip{display:flex;gap:6px;padding:14px 20px 4px}
+  .day{flex:1;text-align:center;padding:8px 0 10px;border-radius:12px}
+  .day.sel{background:var(--paper-high)}
+  .day .d{font-size:11px;color:var(--ink-3);font-weight:500}
+  .day .n{font-size:15px;font-weight:500;margin-top:1px}
+  .day .bar{height:3px;border-radius:2px;margin:7px 6px 0;background:var(--outline)}
+  .day.a .bar{background:#E4A33A}.day.b .bar{background:#2FA090}.day.c .bar{background:var(--great-fg)}
+  .filters{display:flex;gap:8px;padding:12px 20px 6px;font-size:13px;color:var(--ink-2)}
+  .filters span{padding:5px 12px;border-radius:999px;border:1px solid var(--outline)}
+  .filters span.on{background:var(--brand-dark);color:var(--paper);border-color:var(--brand-dark)}
+  .cards{padding:10px 20px}
+  .rcard{background:var(--paper);border:1px solid var(--outline);border-radius:20px;padding:16px;margin-bottom:10px}
+  .rcard.best{border-color:var(--outline-strong)}
+  .rcard .when{font-size:13px;color:var(--ink-3);font-weight:500}
+  .rcard .score{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+  .rcard .score .n{font-size:45px;font-weight:500;line-height:1.05;letter-spacing:-.5px}
+  .rcard .score .w{font-size:16px;font-weight:500;color:var(--great-fg)}
+  .rcard.small .score .n{font-size:24px}
+  .rcard .meta{font-size:13px;color:var(--ink-2);margin-top:6px}
+
+  /* ── spotlight ── */
+  .spot{position:absolute;z-index:6;border-radius:14px;box-shadow:0 0 0 9999px rgba(27,42,32,.62);
+        outline:2px solid rgba(252,253,248,.55);outline-offset:0;transition:all .28s cubic-bezier(.2,0,0,1)}
+
+  /* ── de popover ── */
+  .pop{position:absolute;z-index:7;left:16px;right:16px;background:var(--paper);
+       border-radius:20px;padding:16px;border:1px solid var(--outline);
+       box-shadow:0 10px 28px rgba(27,42,32,.28);transition:top .28s cubic-bezier(.2,0,0,1)}
+  .pop .beak{position:absolute;width:16px;height:9px;background:var(--paper);
+       clip-path:polygon(50% 0,100% 100%,0 100%);top:-8px}
+  .pop .beak.down{top:auto;bottom:-8px;clip-path:polygon(0 0,100% 0,50% 100%)}
+  .pop-head{display:flex;align-items:center;gap:10px}
+  .pop-head .gi{width:34px;height:34px;border-radius:10px;background:var(--brand-light);
+       display:grid;place-items:center;color:var(--brand-dark);font-size:19px;flex:none}
+  .pop-head h3{margin:0;font-size:16px;font-weight:500;line-height:1.5;letter-spacing:.15px}
+  .pop p{margin:8px 0 0;font-size:14px;line-height:1.43;letter-spacing:.25px;color:var(--ink-2)}
+  .pop-foot{display:flex;align-items:center;gap:10px;margin-top:14px}
+  .count{font-size:12px;font-weight:500;letter-spacing:.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .skip{font-family:inherit;font-size:13px;font-weight:500;color:var(--ink-3);background:none;
+        border:0;cursor:pointer;padding:6px 2px}
+  .grow{flex:1}
+  .nav{display:flex;align-items:center;gap:6px}
+  .iconbtn{width:38px;height:38px;border-radius:999px;border:1px solid var(--outline);
+        background:transparent;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;
+        font-size:17px;padding:0;transition:background .12s,opacity .12s}
+  .iconbtn:hover:not(:disabled){background:var(--paper-mid)}
+  .iconbtn:disabled{opacity:.32;cursor:default}
+  .pill{font-family:inherit;font-size:14px;font-weight:500;letter-spacing:.1px;height:38px;
+        padding:0 20px;border-radius:999px;border:0;background:var(--brand-dark);color:var(--paper);
+        cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+
+  /* variant B — pijlen om de teller heen */
+  .pop.vb .pop-foot{justify-content:center;gap:4px}
+  .pop.vb .skip{position:absolute;left:16px;bottom:16px}
+  .pop.vb .count{min-width:52px;text-align:center;font-size:13px;color:var(--ink-2)}
+
+  /* variant C — balk onderin de kaart */
+  .pop.vc{padding:16px 16px 0}
+  .pop.vc .pop-foot{margin:14px -16px 0;padding:10px 12px;border-top:1px solid var(--outline);
+        background:var(--paper-low);border-radius:0 0 19px 19px}
+
+  /* voortgangsstreepjes ipv teller (variant D) */
+  .ticks{display:flex;gap:5px;align-items:center}
+  .ticks i{display:block;width:18px;height:3px;border-radius:2px;background:var(--outline)}
+  .ticks i.on{background:var(--brand-dark)}
+
+  .side h3{font-size:16px;font-weight:500;margin:0 0 8px}
+  .side p{font-size:14px;line-height:1.6;color:var(--ink-2);margin:0 0 14px;max-width:56ch}
+  .side code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--paper-mid);
+        padding:1px 5px;border-radius:4px}
+  .side ul{margin:0 0 14px;padding-left:18px;font-size:14px;line-height:1.6;color:var(--ink-2)}
+  .side li{margin-bottom:5px}
+  .kbd{display:inline-block;border:1px solid var(--outline);border-radius:5px;padding:0 6px;
+       font-size:12px;background:var(--paper);color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Uitleg in stappen</h1>
+  <p class="lede">De uitleg-overlays kunnen nu alleen vooruit, en de kaart is een doorzichtig wit
+  vlak dat nergens anders in de app voorkomt. Hieronder staat dezelfde uitleg op papier, met
+  <b>‹ ›</b> zodat je terug kunt, en een teller zodat je weet hoe lang het nog duurt. Klik de
+  pijlen — ze werken.</p>
+
+  <div class="switcher" id="sw"></div>
+  <p class="variant-note" id="note"></p>
+
+  <div class="stage-row">
+    <div class="phone">
+      <div class="screen" id="screen">
+        <div class="appbar">
+          <div class="hi">Dinsdag 8 september</div>
+          <h2>Deze week</h2>
+        </div>
+        <div class="strip" id="strip">
+          <div class="day a"><div class="d">ma</div><div class="n">7</div><div class="bar"></div></div>
+          <div class="day b"><div class="d">di</div><div class="n">8</div><div class="bar"></div></div>
+          <div class="day sel c"><div class="d">wo</div><div class="n">9</div><div class="bar"></div></div>
+          <div class="day a"><div class="d">do</div><div class="n">10</div><div class="bar"></div></div>
+          <div class="day b"><div class="d">vr</div><div class="n">11</div><div class="bar"></div></div>
+          <div class="day a"><div class="d">za</div><div class="n">12</div><div class="bar"></div></div>
+          <div class="day c"><div class="d">zo</div><div class="n">13</div><div class="bar"></div></div>
+        </div>
+        <div class="filters" id="filters">
+          <span class="on">Hele dag</span><span>Ochtend</span><span>Middag</span><span>Avond</span>
+        </div>
+        <div class="cards">
+          <div class="rcard best" id="card1">
+            <div class="when">Woensdag 09:00 – 13:00 · 4 u</div>
+            <div class="score"><span class="n">92</span><span class="w">Perfect</span></div>
+            <div class="meta">14° gevoel · droog · 9 km/u zuidwest</div>
+          </div>
+          <div class="rcard small">
+            <div class="when">Zaterdag 10:00 – 12:00 · 2 u</div>
+            <div class="score"><span class="n">78</span><span class="w" style="color:var(--ink-2)">Prima</span></div>
+          </div>
+        </div>
+
+        <div class="spot" id="spot"></div>
+        <div class="pop" id="pop"></div>
+      </div>
+    </div>
+
+    <div class="side">
+      <h3>Wat er verandert ten opzichte van nu</h3>
+      <ul>
+        <li><b>Terug kunnen.</b> Nu is elke tik "volgende" en is een gemiste zin weg. Met <span class="kbd">‹</span>
+            haal je hem terug.</li>
+        <li><b>Papier in plaats van glas.</b> De kaart was <code>Colors.white.withAlpha(30)</code> —
+            een doorzichtig vlak dat nergens anders in de app bestaat. Nu dezelfde papieren kaart als
+            op Home, met dezelfde radius&nbsp;20 en dezelfde randkleur.</li>
+        <li><b>Niet meer overal tikken.</b> Een tik op het scherm sprong vooruit, ook als je alleen
+            wilde lezen. Alleen de knoppen doen nu iets.</li>
+        <li><b>De teller staat er altijd.</b> Ook in de eerste tour, die had alleen bolletjes.</li>
+      </ul>
+
+      <h3>Wat hetzelfde blijft</h3>
+      <p>De spotlight-uitsnede met het lichte randje eromheen, en de plaatsing boven of onder het
+      doel afhankelijk van waar het op het scherm staat. Dat werkte; alleen de kaart eraan was
+      niet in stijl.</p>
+
+      <h3>Nog te kiezen</h3>
+      <p>Hierboven staan vier manieren om dezelfde besturing neer te zetten. Ze verschillen alleen
+      in de voet van de kaart. Kies er één, dan bouw ik hem — en dan krijgen de vier schermen van
+      de eerste tour dezelfde voet, zodat het één ding is in plaats van twee.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  { target:'strip',   icon:'', title:'Filter op dag',
+    body:'Tik op een dag bovenaan om alleen de ritten van die dag te zien. Het streepje eronder volgt de beste score van die dag.' },
+  { target:'card1',   icon:'', title:'Tik op een rijvenster',
+    body:'Bekijk weerdetails, plan de rit in of voeg hem toe aan Google Agenda.' },
+  { target:'filters', icon:'', title:'Filter op dagdeel',
+    body:'Kies ochtend, middag of avond om alleen ritten in dat dagdeel te tonen.' },
+];
+
+const variants = {
+  A:{ name:'A — teller links, pijlen rechts',
+      note:'De rustigste. De teller leest als bijschrift, de besturing zit rechts waar je duim al is. Dit is het dichtst bij wat er nu staat, alleen met een terugknop erbij.' },
+  B:{ name:'B — pijlen om de teller',
+      note:'Het meest als driver.js: ‹ 2/3 › als één geheel, gecentreerd. Je ziet in één blik waar je bent en waar je heen kunt. Overslaan schuift naar links onderin.' },
+  C:{ name:'C — balk onder de kaart',
+      note:'De besturing krijgt een eigen vlak op paper-low, gescheiden van de tekst door een lijn. Dat maakt duidelijk dat de kaart uit lezen en bedienen bestaat, maar het kost hoogte.' },
+  D:{ name:'D — streepjes in plaats van cijfers',
+      note:'Dezelfde opzet als A, maar de voortgang is een rij streepjes zoals de dagstreepjes op Home. Rijmt met de rest van de app; je moet wel tellen als je wilt weten hoeveel er nog komen.' },
+};
+
+let variant = 'A', step = 0;
+
+const sw = document.getElementById('sw');
+sw.innerHTML = Object.entries(variants).map(([k,v]) =>
+  `<button data-v="${k}" aria-pressed="${k===variant}">${v.name}</button>`).join('');
+sw.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  variant = b.dataset.v;
+  [...sw.children].forEach(c => c.setAttribute('aria-pressed', c.dataset.v===variant));
+  render();
+});
+
+function render(){
+  document.getElementById('note').textContent = variants[variant].note;
+
+  const s = steps[step];
+  const screen = document.getElementById('screen');
+  const t = document.getElementById(s.target);
+  const sr = screen.getBoundingClientRect(), tr = t.getBoundingClientRect();
+  const pad = 6;
+  const top = tr.top - sr.top - pad, left = tr.left - sr.left - pad;
+  const h = tr.height + pad*2, w = tr.width + pad*2;
+
+  const spot = document.getElementById('spot');
+  Object.assign(spot.style, {top:top+'px', left:left+'px', width:w+'px', height:h+'px'});
+
+  const below = (top + h/2) < 300;
+  const pop = document.getElementById('pop');
+  pop.className = 'pop v' + variant.toLowerCase();
+
+  const first = step === 0, last = step === steps.length - 1;
+  const counter = variant === 'D'
+    ? `<span class="ticks">${steps.map((_,i)=>`<i class="${i<=step?'on':''}"></i>`).join('')}</span>`
+    : `<span class="count">${step+1} / ${steps.length}</span>`;
+
+  const back  = `<button class="iconbtn" ${first?'disabled':''} onclick="go(-1)" aria-label="Vorige"><i class="ph"></i></button>`;
+  const fwd   = last
+    ? `<button class="pill" onclick="done()">Klaar</button>`
+    : `<button class="iconbtn" onclick="go(1)" aria-label="Volgende"><i class="ph"></i></button>`;
+  const skip  = `<button class="skip" onclick="done()">Overslaan</button>`;
+
+  let foot;
+  if (variant === 'B') {
+    foot = `${skip}<div class="nav">${back}${counter}${fwd}</div>`;
+  } else {
+    foot = `${counter}${skip}<span class="grow"></span><div class="nav">${back}${fwd}</div>`;
+  }
+
+  pop.innerHTML = `
+    <div class="beak ${below?'':'down'}" style="left:${Math.min(Math.max(tr.left-sr.left+tr.width/2-24,12),260)}px"></div>
+    <div class="pop-head"><div class="gi"><i class="ph">${s.icon}</i></div><h3>${s.title}</h3></div>
+    <p>${s.body}</p>
+    <div class="pop-foot">${foot}</div>`;
+
+  pop.style.top = below ? (top + h + 12) + 'px' : '';
+  pop.style.bottom = below ? '' : (640 - top + 12) + 'px';
+}
+
+function go(d){ step = Math.min(Math.max(step + d, 0), steps.length - 1); render(); }
+function done(){ step = 0; render(); }
+render();
+</script>
+</body>
+</html>
