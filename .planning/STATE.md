@@ -213,6 +213,32 @@ De eerste verklaring die voor de hand ligt — sideload met de upload-sleutel
 tegenover Play App Signing — was hier níét de oorzaak. Kijk dus eerst naar
 `installed=` per gebruiker voordat je over handtekeningen begint.
 
+**Migratiestand op de gehoste database.** Bijgewerkt 2026-09-08. De repo zegt
+niets over wat er drááit, dus dit is de enige plek waar het staat:
+
+| Migratie | Toegepast |
+|---|---|
+| 0001 t/m 0004 | ja |
+| 0005 tighten_table_grants | ja, 2026-09-08 |
+| 0006 tighten_grants_schema_wide | ja, 2026-09-08 |
+
+Na 0006 geverifieerd met de controlequery: **`anon` heeft nog exact één recht
+in het hele schema** — INSERT op `feedback`. Geen SELECT op feedback voor wie
+dan ook (FB-05 staat), `friendships` op DELETE + SELECT zonder INSERT precies
+zoals 0002 het grant, en TRUNCATE/REFERENCES/TRIGGER zijn overal weg.
+
+Die drie kwamen uit Supabase's standaardrechten op `public` en werden bij elke
+tabel meegeërfd. **TRUNCATE negeert RLS volledig** — policies gelden alleen
+voor SELECT/INSERT/UPDATE/DELETE — dus elke policy in 0001 en 0002 stond naast
+een recht dat er dwars doorheen ging. Niet bereikbaar via PostgREST, dat kent
+geen TRUNCATE, maar wel klaarliggend. 0006 pakt ook de bron aan met
+`alter default privileges`, zodat een nieuwe tabel ze niet opnieuw erft.
+
+**Nog open:** `"Test table"` staat in `public` maar in geen enkele migratie —
+vermoedelijk uit de dashboard-editor. Nu inert (geen enkel clientrecht meer).
+Weggooien is Joost's beslissing; de query's om te zien of hij leeg is staan
+onderaan `0006`.
+
 **Deploy-hygiëne:** gebruik bij elke deploy waarvan je het resultaat gaat
 beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op
 2026-09-07 meermaals een oudere bundel ondanks de `no-cache`-headers.
