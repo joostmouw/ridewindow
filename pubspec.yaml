@@ -100,6 +100,11 @@ dev_dependencies:
   # Phase 3 — Riverpod code-gen (4.x required for riverpod_annotation 4.0.2 / Riverpod 3.x)
   riverpod_generator: ^4.0.4-dev.1
 
+  # v4.0 — tool/play_upload.dart praat met de Play Developer API. googleapis
+  # zit al bij de gewone dependencies; googleapis_auth kwam tot nu toe alleen
+  # transitief mee en wordt hier expliciet gemaakt.
+  googleapis_auth: ^2.0.0
+
 flutter:
   uses-material-design: true
   generate: true

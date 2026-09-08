@@ -1,0 +1,10 @@
+Elk pictogram is nu in dezelfde stijl en lijndikte getekend — dezelfde lijn als
+het RideWindow-logo. Geen systeememoji meer die er op elke telefoon anders
+uitzien.
+
+Het welkomscherm beweegt: het monogram tekent zichzelf en wordt een fiets.
+
+Het kledingadvies is een schaal geworden, geen plaatje. Het toont hoe koud de
+rit echt aanvoelt bij 15 km/u.
+
+Onder elke dag op Home volgt het streepje de beste score van die dag.

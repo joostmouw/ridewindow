@@ -1,0 +1,10 @@
+Every icon is now drawn in one style and one line weight — the same line the
+RideWindow logo is drawn in. No more system emoji that looked different on
+every phone.
+
+The welcome screen animates: the monogram draws itself and becomes a bike.
+
+Clothing advice is a scale now, not a picture. It shows what the ride will
+actually feel like at 15 km/h.
+
+Under each day on Home, the bar follows that day's best score.

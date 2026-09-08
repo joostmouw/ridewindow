@@ -88,3 +88,7 @@ skills-lock.json
 # Bronvideo's voor marketing/animatie — te groot voor een publieke repo,
 # niet nodig om de app te bouwen. Bewaar ze buiten git.
 photos/*.mp4
+
+# De Play-service-account-sleutel hoort in ~/.config/ridewindow/ te staan, niet
+# hier. Dit is de vangnetregel voor als hij toch een keer in de repo belandt.
+play-service-account*.json
