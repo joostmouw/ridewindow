@@ -1536,6 +1536,18 @@ class SNl extends S {
   String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
 
   @override
+  String get pelotonWithdraw => 'Toch niet';
+
+  @override
+  String get pelotonWithdrawn => 'Je doet niet meer mee aan deze rit';
+
+  @override
+  String get pelotonRejoined => 'Je doet weer mee';
+
+  @override
+  String get pelotonUndo => 'Ongedaan maken';
+
+  @override
   String get accountSyncFailed =>
       'Synchroniseren lukte nu even niet. De app probeert het vanzelf opnieuw.';
 

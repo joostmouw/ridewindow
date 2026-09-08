@@ -2791,6 +2791,30 @@ abstract class S {
   /// **'Ritten waar je aan meedoet'**
   String get pelotonJoinedRides;
 
+  /// No description provided for @pelotonWithdraw.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toch niet'**
+  String get pelotonWithdraw;
+
+  /// No description provided for @pelotonWithdrawn.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je doet niet meer mee aan deze rit'**
+  String get pelotonWithdrawn;
+
+  /// No description provided for @pelotonRejoined.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je doet weer mee'**
+  String get pelotonRejoined;
+
+  /// No description provided for @pelotonUndo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ongedaan maken'**
+  String get pelotonUndo;
+
   /// No description provided for @accountSyncFailed.
   ///
   /// In nl, this message translates to:

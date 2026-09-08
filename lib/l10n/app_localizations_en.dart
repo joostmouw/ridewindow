@@ -1533,6 +1533,18 @@ class SEn extends S {
   String get pelotonJoinedRides => 'Rides you\'re joining';
 
   @override
+  String get pelotonWithdraw => 'Drop out';
+
+  @override
+  String get pelotonWithdrawn => 'You\'ve dropped out of this ride';
+
+  @override
+  String get pelotonRejoined => 'You\'re back on this ride';
+
+  @override
+  String get pelotonUndo => 'Undo';
+
+  @override
   String get accountSyncFailed =>
       'Couldn\'t sync your account just now. It will retry automatically.';
 

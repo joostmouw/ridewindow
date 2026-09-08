@@ -103,6 +103,43 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
         _invalidateAll();
       });
 
+  /// Terugkomen op een "ik ga mee".
+  ///
+  /// **Waarom hier een ongedaan-maken zit en bij [_respond] niet.** Afzeggen is
+  /// een deur die maar één kant op gaat: een rit met status `declined` valt uit
+  /// [pendingRideInvitesProvider] (die filtert op `invited`), uit
+  /// [joinedGroupRidesProvider] (die filtert op `accepted`) en uit
+  /// [ownedGroupRidesProvider] (hij is niet van jou). Hij is daarna nergens
+  /// meer aan te wijzen, terwijl de rij in de database gewoon bestaat en het
+  /// RLS-beleid `group_ride_participants_update_own` een terugweg toestaat.
+  /// Een misklik zou dus onherstelbaar zijn zonder dat daar een technische
+  /// reden voor is.
+  ///
+  /// De snackbar overbrugt precies dat gat. Wat hij níét oplost: morgen alsnog
+  /// van gedachten veranderen. Daarvoor zou een afgezegde rit zichtbaar moeten
+  /// blijven, en dat is een aparte keuze — zie BACKLOG.md.
+  Future<void> _withdraw(GroupRide ride) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    await _respond(ride, accepted: false);
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(s.pelotonWithdrawn),
+        action: SnackBarAction(
+          label: s.pelotonUndo,
+          onPressed: () async {
+            await _respond(ride, accepted: true);
+            if (!mounted) return;
+            messenger.showSnackBar(
+              SnackBar(content: Text(s.pelotonRejoined)),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
@@ -150,7 +187,12 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
               title: s.pelotonJoinedRides,
               children: [
                 for (final ride in joined.value!)
-                  _JoinedRideRow(ride: ride, s: s),
+                  _JoinedRideRow(
+                    ride: ride,
+                    s: s,
+                    busy: _busy,
+                    onWithdraw: () => _withdraw(ride),
+                  ),
               ],
             ),
           if (owned.value?.isNotEmpty ?? false)
@@ -392,10 +434,17 @@ class _InviteRow extends StatelessWidget {
 /// deelnemersteller: bij een rit die niet van jou is, is "van wie is dit" de
 /// eerste vraag, niet "hoeveel man gaat er mee".
 class _JoinedRideRow extends StatelessWidget {
-  const _JoinedRideRow({required this.ride, required this.s});
+  const _JoinedRideRow({
+    required this.ride,
+    required this.s,
+    required this.busy,
+    required this.onWithdraw,
+  });
 
   final GroupRide ride;
   final S s;
+  final bool busy;
+  final VoidCallback onWithdraw;
 
   @override
   Widget build(BuildContext context) {
@@ -407,6 +456,13 @@ class _JoinedRideRow extends StatelessWidget {
         s.pelotonWithOwner(
           owner == null || owner.isEmpty ? s.pelotonUnnamedFriend : owner,
         ),
+      ),
+      // Een tekstknop en geen kruisje. Een kruisje naast andermans rit leest
+      // als "verwijder deze rit", en dat is precies wat hier níét gebeurt --
+      // de rit blijft bestaan, jij gaat alleen niet mee.
+      trailing: TextButton(
+        onPressed: busy ? null : onWithdraw,
+        child: Text(s.pelotonWithdraw),
       ),
     );
   }
