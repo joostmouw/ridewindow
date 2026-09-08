@@ -9,3 +9,7 @@ lijst, en een rit die jij organiseert kun je nu ook afzeggen.
 
 Opgelost: de tekst op het openingsscherm was onleesbaar als je telefoon op de
 donkere modus staat.
+
+De Nederlandse teksten zijn nagelopen: één woord voor hetzelfde ding, geen
+Engels meer waar het niet hoort, en het kledingadvies noemt geen kniewarmers
+meer.

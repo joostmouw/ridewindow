@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "1.0.29+30 klaar voor Play; PWA staat live"
-last_updated: "2026-09-08T22:20:00.000Z"
+status: "NL-teksten opgeschoond; 1.0.29+30 klaar voor Play"
+last_updated: "2026-09-08T22:40:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -895,3 +895,15 @@ build.
 **1.0.29+30 staat klaar maar is niet geüpload.** `build/app/outputs/bundle/release/app-release.aab`
 (69,0 MB), release-notities in beide talen bijgewerkt, en de vier rol-iconen zijn in de bundel
 gecontroleerd op tree-shaking. Uploaden wacht op Joost's akkoord na de PWA-ronde.
+
+**De Nederlandse teksten (schets 009).** Joost: "ik vind de Nederlandse vertalingen ook niet zo
+goed", plus het punt dat kniewarmers geen kledingstuk zijn dat mensen aanhebben. Alle 505 strings
+nagelezen. De app gebruikte **vijf** woorden voor zijn eigen kernbegrip — rijvenster, rijmoment,
+rijtijd, venster en slot — en dat is nu overal **fietsmoment**. Achttien echte fouten eruit, waarvan
+vier die iets anders zeiden dan bedoeld; de scherpste was `hourlyFeelsLike`, dat de
+gevoelstemperatuur afdrukte als "v.a. 12°C". Joost hield blok 2 bewust klein (alleen de
+kniewarmers) en wees blok 4 (toon) af — *Nachtuil*, *Weekendstrijder*, *TOLERANTIES* en *RIJLENGTE*
+blijven staan. Wil je daar ooit op terugkomen: het staat uitgeschreven in schets 009.
+
+**De bundel is opnieuw gebouwd** nadat de teksten wijzigden; `1.0.29+30` is nog steeds niet
+geüpload, dus het versienummer bleef staan. Release-notities in beide talen bijgewerkt.

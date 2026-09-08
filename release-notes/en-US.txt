@@ -9,3 +9,6 @@ ride you organise can now be cancelled.
 
 Fixed: the text on the opening screen was unreadable when your phone is set to
 dark mode.
+
+The Dutch texts have been cleaned up, and the clothing advice no longer
+suggests knee warmers.
