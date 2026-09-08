@@ -1,8 +1,8 @@
-Opgelost: als je een ster aantikt in het feedbackformulier wordt die ster nu
-echt gevuld, en alle sterren ervoor ook. Eerst veranderde alleen de kleur.
+Opgelost: feedback versturen doet dat nu ook echt. Hij werd op je telefoon
+bewaard en vertrok pas als de app toevallig opnieuw opstartte.
 
-De uitleg scrolt naar waar hij naar wijst, zodat je ziet waar het over gaat in
-plaats van te moeten zoeken.
+Opgelost: als je een ster aantikt wordt die gevuld, en alle sterren ervoor ook.
+Eerst veranderde alleen de kleur.
 
-En je kunt de uitleg terughalen: een i-knopje op Home, Agenda en Ritten, en de
-rondleiding staat onder Profiel → Over.
+De uitleg scrolt naar waar hij naar wijst, en je kunt hem terughalen: een
+i-knopje op Home, Agenda en Ritten, en de rondleiding onder Profiel → Over.
