@@ -727,7 +727,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   height: 4,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: _barColor(bestScore, rw.tiers),
+                    color: _barColor(bestScore, rw),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1849,40 +1849,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// wordt lineair gemengd. Een 86 en een 100 zijn allebei Perfect op de kaart,
   /// maar krijgen hier zichtbaar verschillend groen; dat was precies de klacht.
   ///
-  /// **De prijs, bewust betaald.** Tussen de ankers is de tint een mengsel, dus
-  /// een score van 86 leest groener-met-een-vleug-teal in plaats van exact de
-  /// `perfectFg` die de kaart eronder toont. De strip beantwoordt daarmee een
-  /// andere vraag dan de kaart: de kaart zegt wélke klasse, de strip hoe goed.
-  /// Op de drempels vallen ze weer samen.
-  static Color _barColor(double? score, TierColors tiers) {
+  /// **De prijs, bewust betaald.** Tussen de ankers is de kleur een mengsel, dus
+  /// een 86 leest als teal-groen in plaats van exact het groen dat de kaart
+  /// eronder toont. De strip beantwoordt een andere vraag dan de kaart: de kaart
+  /// zegt wélke klasse, de strip hoe goed. Op de ankers vallen ze weer samen.
+  ///
+  /// **Waarom kanaalsgewijs mengen en niet over de tint draaien.** Draaien lijkt
+  /// netter — het vermijdt grijze tussenkleuren — maar op het traject oranje naar
+  /// teal gaat de korte weg over geel, en dan piekt de helderheid halverwege naar
+  /// 0,78 tegen 0,49 aan het begin. Een dag met 55 zou het félste streepje van de
+  /// week krijgen, feller dan een dag met 100. Kanaalsgewijs blijft de helderheid
+  /// netjes dalen (0,49 → 0,30) en klopt de rangorde. Gemeten, 2026-09-08.
+  static Color _barColor(double? score, RideWindowTheme rw) {
     // Geen venster die dag: grijs, en geen plek in het verloop.
-    if (score == null) return tiers.poorFg;
+    if (score == null) return rw.scorePoor;
 
-    // Uit het thema en niet hard genoemd, zodat het donkere thema
-    // zijn eigen tierkleuren houdt.
+    // **De scorekleuren, niet de tierkleuren.** De `tiers.*Fg` zijn gemaakt om
+    // tekst mee te zetten en zijn daarom allemaal donker -- #006457 en #1B5E20
+    // liggen zo dicht bij elkaar dat een 80 en een 99 er hetzelfde uitzagen.
+    // De scorekleuren die `ScoreDisplay` gebruikt hebben wél bereik: teal 400
+    // naar groen. Op een balk van 4 px is dat geen leesbaarheidsprobleem, en
+    // het zijn dezelfde kleuren die de app elders al toont.
     final stops = <(double, Color)>[
-      (0, tiers.poorFg),
-      (50, tiers.acceptableFg),
-      (70, tiers.greatFg),
-      (100, tiers.perfectFg),
+      (0, rw.scorePoor),
+      (50, rw.scoreAcceptable),
+      (70, rw.scoreGreat),
+      (100, rw.scorePerfect),
     ];
     final v = score.clamp(0.0, 100.0);
     for (var i = 0; i < stops.length - 1; i++) {
       final (lo, loColor) = stops[i];
       final (hi, hiColor) = stops[i + 1];
       if (v <= hi) {
-        // **In HSL en niet in RGB.** Kanaalsgewijs mengen loopt van het
-        // roodbruin (#A42E0A) naar het teal (#006457) dwars door een modderig
-        // olijf rond score 60 -- de kleuren zitten aan weerszijden van het
-        // grijspunt, dus de rechte lijn ertussen gaat er doorheen. Draaien over
-        // de tint gaat de korte weg via oranje en geel, en dat leest als een
-        // stoplicht in plaats van als vuil.
-        return HSLColor.lerp(
-          HSLColor.fromColor(loColor),
-          HSLColor.fromColor(hiColor),
-          (v - lo) / (hi - lo),
-        )!
-            .toColor();
+        return Color.lerp(loColor, hiColor, (v - lo) / (hi - lo))!;
       }
     }
     return stops.last.$2;
