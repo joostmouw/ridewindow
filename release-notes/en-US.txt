@@ -1,8 +1,8 @@
-Fixed: sending feedback now actually sends it. It was being saved on your phone
-and only left when the app happened to restart.
+Fixed: sending feedback now actually sends it. It was saved on your phone and
+only left when the app happened to restart.
 
-Fixed: tapping a star in the feedback form fills that star and the ones before
-it. It only changed colour before.
+Fixed: the text on the opening screen is readable straight away instead of
+half-faded for a second. And tapping a star now really fills it.
 
-Tips now scroll to what they point at, and you can bring them back: an info
-button on Home, Agenda and Rides, and the welcome tour under Profile → About.
+Tips scroll to what they point at, and you can bring them back: an info button
+on Home, Agenda and Rides, and the welcome tour under Profile → About.

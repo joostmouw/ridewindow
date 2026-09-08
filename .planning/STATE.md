@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "1.0.27+28 klaar; telefoon is vrij voor Play"
-last_updated: "2026-09-08T18:40:00.000Z"
+status: "1.0.28+29 klaar; 28 was al gebruikt op Play"
+last_updated: "2026-09-08T19:30:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -80,25 +80,26 @@ opgehoogd voor Play).
 - **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
   alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
 
-**Wat als eerste aandacht vraagt: `1.0.27+28` staat klaar om geüpload te
-worden.** Gebouwd en gecontroleerd — manifest zegt `versionCode=28` /
-`versionName=1.0.27`, ondertekend met `META-INF/UPLOAD.RSA`, 66 MB, en de drie
-vangrails van `tool/play_upload.dart` komen alle drie schoon door.
+**Wat als eerste aandacht vraagt: `1.0.28+29` staat klaar om geüpload te
+worden.** Gebouwd en gecontroleerd — manifest zegt `versionCode=29` /
+`versionName=1.0.28`, ondertekend, 66 MB, alle drie de vangrails schoon, 524
+tests groen.
 
-Hij bevat alles van 1.0.26 (intro op 1,75×, uitleg als Material 3 rich
-tooltip, afzeggen in Peloton) plus de vier punten van Joost daarna: de sterren
-in het feedbackvenster gaan weer aan, de uitleg scrolt naar zijn doel, het
-`i`-knopje staat nu op Home, Agenda én Mijn ritten met de rondleiding onder
-Profiel → Over, en **feedback versturen start nu ook echt een verzending**.
+**Waarom 28 wordt overgeslagen:** Play weigerde `1.0.27+28` met "version code
+28 has already been used". Er is dus ergens op 2026-09-08 een 1.0.27 geüpload;
+wélke build dat was is niet vastgelegd, en dat is precies waarom het loont om
+na elke upload één regel hier te zetten. Sindsdien zijn er twee dingen bij
+gekomen die in 28 mogelijk ontbraken: de feedback-fix en de leesbaarheid van
+de welkomtekst.
 
-**1.0.26+27 is nooit geüpload en wordt overgeslagen.** De bundel is op
-2026-09-08 18:40 voor het laatst herbouwd — daar zit nu ook de leesbaarheid van
-de welkomtekst in. `versionCode` 28 is nog vrij op Play, dus de versie is
-bewust níét opgehoogd bij elke herbouw.
+De bundel bevat: de intro op 1,75×, de uitleg als Material 3 rich tooltip met
+terugknop en in beide talen, afzeggen in Peloton met ongedaan maken, de
+gevulde sterren, de meescrollende uitleg, het `i`-knopje op alle drie de
+schermen met uitleg, feedback die daadwerkelijk verstuurt, en de welkomtekst
+die meteen voluit staat.
 
-Release-notes staan in `release-notes/` in beide talen. Uploaden met de hand
-in de console (Testing → Internal testing → Create new release → dit bestand
-erin slepen):
+Uploaden met de hand in de console (Testing → Internal testing → Create new
+release → dit bestand erin slepen):
 
 ```
 build/app/outputs/bundle/release/app-release.aab
@@ -248,7 +249,7 @@ onderaan `0006`.
 | GitHub `main` | alles gepusht |
 | Supabase | migraties 0001 t/m 0006 toegepast en geverifieerd |
 | **Web** — https://my-project-joost.web.app | **actueel**, gedeployd met `scripts/deploy_web.sh` en hash-geverifieerd (`ce0137b8…`) |
-| Play, internal testing | **1.0.25+26** — loopt achter; `1.0.27+28` ligt klaar maar is niet geüpload |
+| Play, internal testing | loopt achter; **`1.0.28+29` ligt klaar**. Let op: `versionCode` 28 is al gebruikt, dus er is ergens vandaag een 1.0.27 geüpload — welke build dat precies was is niet vastgelegd |
 
 **Deploy-hygiëne:** gebruik bij elke deploy waarvan je het resultaat gaat
 beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op

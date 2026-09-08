@@ -1,8 +1,8 @@
 Opgelost: feedback versturen doet dat nu ook echt. Hij werd op je telefoon
 bewaard en vertrok pas als de app toevallig opnieuw opstartte.
 
-Opgelost: als je een ster aantikt wordt die gevuld, en alle sterren ervoor ook.
-Eerst veranderde alleen de kleur.
+Opgelost: de tekst op het openingsscherm staat meteen voluit in plaats van een
+seconde lang halfzichtbaar. En een aangetikte ster wordt nu echt gevuld.
 
 De uitleg scrolt naar waar hij naar wijst, en je kunt hem terughalen: een
 i-knopje op Home, Agenda en Ritten, en de rondleiding onder Profiel → Over.
