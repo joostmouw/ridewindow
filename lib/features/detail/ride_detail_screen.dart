@@ -400,9 +400,21 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final windAvg =
         winds.isEmpty ? 0.0 : winds.reduce((a, b) => a + b) / winds.length;
 
+    // De gevoelstemperatuur die de weerlijst hierboven ook toont. Hetzelfde
+    // getal als startpunt nemen is precies waarom de twee elkaar niet meer
+    // tegenspreken.
+    final apparents = widget.forecasts
+        .where((f) => f.apparentTemperatureC != null)
+        .map((f) => f.apparentTemperatureC!)
+        .toList();
+    final avgApparent = apparents.isEmpty
+        ? null
+        : apparents.reduce((a, b) => a + b) / apparents.length;
+
     final s = S.of(context);
     final advice = recommendClothing(
       avgTempC: avgTemp,
+      avgApparentC: avgApparent,
       avgWindKmh: windAvg,
       totalPrecipMm: totalPrecip,
     );
@@ -436,7 +448,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             // elkaar zouden ze om dezelfde breedte vechten op een telefoon.
             FeelsLikeBar(
               feelsLikeC: advice.feelsLike,
-              measuredC: avgTemp,
+              measuredC: avgApparent ?? avgTemp,
               combo: advice.combo,
             ),
             const SizedBox(height: 8),

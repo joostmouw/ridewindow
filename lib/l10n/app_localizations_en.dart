@@ -876,16 +876,16 @@ class SEn extends S {
 
   @override
   String get clothingFeelsLikeInfo =>
-      'The “feels like” in the weather list assumes you are standing still. On a bike you make about 15 km/h of headwind yourself, on top of the wind that is already forecast. RideWindow subtracts that chill before picking your clothing, so this number sits below the one in the list — and this is the number the advice is based on. The coloured bands show which advice belongs to which temperature.';
+      'The “feels like” in the weather list accounts for sun, humidity and the wind that is blowing, but assumes you are standing still. On a bike you make about 15 km/h of headwind yourself, and only that part comes off here. This number is what your clothing advice is based on. The coloured bands show which advice belongs to which temperature.';
 
   @override
   String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill) {
-    return 'The forecast says $airTemp°. Riding brings it down to $bikeTemp° — the wind takes $chill° off.';
+    return 'The list says it feels like $airTemp°. On the bike that becomes $bikeTemp° — your own headwind takes $chill° off.';
   }
 
   @override
   String clothingFeelsLikeNoDrop(int airTemp) {
-    return 'The forecast says $airTemp°, and at this wind speed riding barely takes anything off.';
+    return 'The list says it feels like $airTemp°, and riding barely takes anything off that.';
   }
 
   @override

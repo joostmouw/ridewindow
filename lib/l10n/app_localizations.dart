@@ -1642,19 +1642,19 @@ abstract class S {
   /// No description provided for @clothingFeelsLikeInfo.
   ///
   /// In nl, this message translates to:
-  /// **'De “voelt als” in de weerlijst gaat uit van stilstaan. Op de fiets maak je zelf zo’n 15 km/u tegenwind, boven op de wind die al voorspeld is. RideWindow trekt die kou eraf voordat hij je kleding kiest, dus dit getal ligt lager dan dat in de lijst — en dít is het getal waar het advies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.'**
+  /// **'De “voelt als” in de weerlijst verrekent zon, vocht en de wind die er staat, maar gaat uit van stilstaan. Op de fiets maak je zelf zo’n 15 km/u tegenwind, en alleen dat stukje gaat er hier nog af. Dit getal is waar je kledingadvies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.'**
   String get clothingFeelsLikeInfo;
 
   /// De namen staan alfabetisch en dat is opzet: gen-l10n sorteert argumenten alfabetisch, niet op leesvolgorde -- zie b3ee1c1.
   ///
   /// In nl, this message translates to:
-  /// **'De voorspelling zegt {airTemp}°. Fietsen brengt het naar {bikeTemp}° — de wind haalt er {chill}° af.'**
+  /// **'In de weerlijst voelt het als {airTemp}°. Op de fiets wordt dat {bikeTemp}° — je eigen tegenwind haalt er {chill}° af.'**
   String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill);
 
   /// No description provided for @clothingFeelsLikeNoDrop.
   ///
   /// In nl, this message translates to:
-  /// **'De voorspelling zegt {airTemp}°, en bij deze wind haalt het fietsen er nauwelijks iets af.'**
+  /// **'In de weerlijst voelt het als {airTemp}°, en het fietsen haalt daar nauwelijks iets af.'**
   String clothingFeelsLikeNoDrop(int airTemp);
 
   /// No description provided for @clothingWinterJacket.

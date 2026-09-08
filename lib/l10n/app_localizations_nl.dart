@@ -876,16 +876,16 @@ class SNl extends S {
 
   @override
   String get clothingFeelsLikeInfo =>
-      'De “voelt als” in de weerlijst gaat uit van stilstaan. Op de fiets maak je zelf zo’n 15 km/u tegenwind, boven op de wind die al voorspeld is. RideWindow trekt die kou eraf voordat hij je kleding kiest, dus dit getal ligt lager dan dat in de lijst — en dít is het getal waar het advies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.';
+      'De “voelt als” in de weerlijst verrekent zon, vocht en de wind die er staat, maar gaat uit van stilstaan. Op de fiets maak je zelf zo’n 15 km/u tegenwind, en alleen dat stukje gaat er hier nog af. Dit getal is waar je kledingadvies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.';
 
   @override
   String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill) {
-    return 'De voorspelling zegt $airTemp°. Fietsen brengt het naar $bikeTemp° — de wind haalt er $chill° af.';
+    return 'In de weerlijst voelt het als $airTemp°. Op de fiets wordt dat $bikeTemp° — je eigen tegenwind haalt er $chill° af.';
   }
 
   @override
   String clothingFeelsLikeNoDrop(int airTemp) {
-    return 'De voorspelling zegt $airTemp°, en bij deze wind haalt het fietsen er nauwelijks iets af.';
+    return 'In de weerlijst voelt het als $airTemp°, en het fietsen haalt daar nauwelijks iets af.';
   }
 
   @override

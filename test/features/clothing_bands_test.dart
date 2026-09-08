@@ -79,6 +79,40 @@ void main() {
       expect(advice.windy, isFalse);
     });
 
+    test('rekent vanaf de gevoelstemperatuur als die er is', () {
+      // 12 gemeten maar 16 gevoeld -- zon en vocht zitten in dat tweede getal.
+      // Er gaat alleen de wind af die je zelf maakt: 15 x 0,05 = 0,75.
+      final advice = recommendClothing(
+        avgTempC: 12,
+        avgApparentC: 16,
+        avgWindKmh: 20,
+      );
+      expect(advice.feelsLike, closeTo(15.25, 0.001));
+      expect(advice.combo, ClothingCombo.longShort);
+    });
+
+    test('telt de omgevingswind niet dubbel', () {
+      // Dezelfde gevoelstemperatuur, heel andere omgevingswind: het advies mag
+      // niet verschillen, want die wind zit al in de gevoelstemperatuur. Zou
+      // hier nog (wind + 15) van afgaan, dan telde hij twee keer mee.
+      final luw = recommendClothing(avgTempC: 12, avgApparentC: 16, avgWindKmh: 2);
+      final stormachtig =
+          recommendClothing(avgTempC: 12, avgApparentC: 16, avgWindKmh: 35);
+      expect(luw.feelsLike, stormachtig.feelsLike);
+      expect(luw.combo, stormachtig.combo);
+      // De windvlag hangt wél aan de echte wind, want een windvest is een
+      // andere vraag dan hoe koud het voelt.
+      expect(luw.windy, isFalse);
+      expect(stormachtig.windy, isTrue);
+    });
+
+    test('valt terug op de oude som zonder gevoelstemperatuur', () {
+      // Ontbrekende data mag nooit betekenen: geen advies.
+      final advice = recommendClothing(avgTempC: 15, avgWindKmh: 28);
+      expect(advice.feelsLike, closeTo(12.85, 0.001));
+      expect(advice.combo, ClothingCombo.longLong);
+    });
+
     test('regen telt vanaf een halve millimeter', () {
       expect(recommendClothing(avgTempC: 18, totalPrecipMm: 0.5).raining,
           isFalse);

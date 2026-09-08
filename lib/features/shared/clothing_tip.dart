@@ -81,14 +81,37 @@ class ClothingAdvice {
   });
 }
 
+/// De snelheid die je zelf maakt, in km/u. Dat is de enige wind die nog van de
+/// gevoelstemperatuur af moet, want de omgevingswind zit daar al in.
+const double _ownSpeedKmh = 15;
+
+/// Graden koeling per km/u schijnbare wind. Een grove maat, maar het is de maat
+/// die dit product altijd al gebruikte; hem hier veranderen zou twee dingen
+/// tegelijk verschuiven.
+const double _chillPerKmh = 0.05;
+
 ClothingAdvice recommendClothing({
   required double? avgTempC,
+  double? avgApparentC,
   double? avgWindKmh,
   double? totalPrecipMm,
 }) {
-  // Cycling adds ~15 km/h effective headwind.
-  final wind = (avgWindKmh ?? 0) + 15;
-  final feelsLike = (avgTempC ?? 15) - (wind * 0.05);
+  // **Waarom de gevoelstemperatuur het startpunt is.** [avgTempC] is de kale
+  // meting: die weet niets van zon en vocht. Op een zonnige dag van 12 graden
+  // adviseerde deze functie daarom voor 12 terwijl het als 16 voelt. Open-Meteo
+  // rekent zon, vocht én de omgevingswind al mee in `apparentTemperatureC`, en
+  // dat getal staat elders op ditzelfde scherm ook al.
+  //
+  // Daarvan hoeft dus alleen de wind af die je zélf maakt. Zou hier
+  // `(wind + 15)` blijven staan, dan telt de omgevingswind dubbel: één keer in
+  // de gevoelstemperatuur en nog een keer hier.
+  //
+  // Zonder gevoelstemperatuur (die kan ontbreken in de data) valt hij terug op
+  // de oude som vanaf de kale meting. Dat is de vorige versie van deze regel,
+  // ongewijzigd, zodat de app nooit zonder advies zit.
+  final double feelsLike = avgApparentC != null
+      ? avgApparentC - _ownSpeedKmh * _chillPerKmh
+      : (avgTempC ?? 15) - ((avgWindKmh ?? 0) + _ownSpeedKmh) * _chillPerKmh;
   final raining = (totalPrecipMm ?? 0) > 0.5;
   final windy = (avgWindKmh ?? 0) > 25;
 

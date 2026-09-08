@@ -1871,7 +1871,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       final (lo, loColor) = stops[i];
       final (hi, hiColor) = stops[i + 1];
       if (v <= hi) {
-        return Color.lerp(loColor, hiColor, (v - lo) / (hi - lo))!;
+        // **In HSL en niet in RGB.** Kanaalsgewijs mengen loopt van het
+        // roodbruin (#A42E0A) naar het teal (#006457) dwars door een modderig
+        // olijf rond score 60 -- de kleuren zitten aan weerszijden van het
+        // grijspunt, dus de rechte lijn ertussen gaat er doorheen. Draaien over
+        // de tint gaat de korte weg via oranje en geel, en dat leest als een
+        // stoplicht in plaats van als vuil.
+        return HSLColor.lerp(
+          HSLColor.fromColor(loColor),
+          HSLColor.fromColor(hiColor),
+          (v - lo) / (hi - lo),
+        )!
+            .toColor();
       }
     }
     return stops.last.$2;
