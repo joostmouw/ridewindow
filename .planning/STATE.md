@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 24 af: Phosphor overal, welkom-animatie staat"
-last_updated: "2026-09-08T10:35:00.000Z"
+status: "v4.0 fase 23-25 af; Play-upload is de volgende stap"
+last_updated: "2026-09-08T11:05:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -49,6 +49,33 @@ agenda-omschrijving). Open blijft **backlog #63** — de iPhone-tester die niet
 terugkomt uit het beschikbaarheidsscherm. Dat is niet op te lossen zonder
 iPhone; de knop bestáát in alle drie de takken, dus het is een
 safe-area-kwestie op iOS-standalone.
+
+**Stand na 2026-09-08 — lees dit eerst.**
+
+Fase 24 is af en er kwam een hoop naast te staan. Alles zit in een
+release-APK die op de Oppo draait (versie 1.0.24 in de pubspec, nog niet
+opgehoogd voor Play).
+
+- **Iconen: Phosphor Regular, overal.** 71 Material-iconen en alle 12
+  emoji-plekken. Geen enkele systeememoji meer in `lib/` of de ARB's.
+  Waarom Phosphor: schets 006. Waarom het pub-pakket níét: het breekt op
+  Flutter's `final class IconData`, dus we dragen het font zelf in
+  `assets/fonts/` met de codepunten in `lib/theme/app_icons.dart`.
+- **Welkomscherm is een animatie.** Het RW-monogram tekent zichzelf en
+  wordt een fiets; daarna schuift hij omhoog en komt de tekst eronder.
+  Geanimeerde WebP, 1:1 met Joost's bron, geen `video_player`. De bron
+  staat in `~/Downloads/Ik_wil_alleen_het_logo_en_de_f.mp4`; het
+  bewerkingsrecept staat in de dartdoc van `welcome_screen.dart`.
+- **"Ik heb al een account"** onder Get started, brengt je naar Profiel.
+- **Dagstreepjes op Home** volgen de score van de beste rit, doorlopend
+  van oranje via teal naar groen. Let op de meting in `_barColor`: over de
+  tint draaien lijkt netter maar draait de rangorde om.
+- **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
+  alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
+
+**Wat als eerste aandacht vraagt:** dit alles staat nog niet op Play. De
+laatste Play-build is 1.0.24+25 en die kent hiervan niets. Zie hieronder
+waarom uploaden handwerk blijft.
 
 **Fase 24 is begonnen en gedraaid van koers.** De fase heette "iconografie" en
 zou eigen pictogrammen voor het kledingadvies opleveren (schets 002). Joost wees
