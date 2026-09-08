@@ -241,6 +241,15 @@ vermoedelijk uit de dashboard-editor. Nu inert (geen enkel clientrecht meer).
 Weggooien is Joost's beslissing; de query's om te zien of hij leeg is staan
 onderaan `0006`.
 
+**Wat er waar live staat, 2026-09-08 19:10.**
+
+| Waar | Stand |
+|---|---|
+| GitHub `main` | alles gepusht |
+| Supabase | migraties 0001 t/m 0006 toegepast en geverifieerd |
+| **Web** — https://my-project-joost.web.app | **actueel**, gedeployd met `scripts/deploy_web.sh` en hash-geverifieerd (`ce0137b8…`) |
+| Play, internal testing | **1.0.25+26** — loopt achter; `1.0.27+28` ligt klaar maar is niet geüpload |
+
 **Deploy-hygiëne:** gebruik bij elke deploy waarvan je het resultaat gaat
 beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op
 2026-09-07 meermaals een oudere bundel ondanks de `no-cache`-headers.
