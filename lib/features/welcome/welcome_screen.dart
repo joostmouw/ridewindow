@@ -24,6 +24,17 @@ import 'package:ridewindow/theme/app_motion.dart';
 /// luminantietabel gehaald die papier op `brandLight` zet en inkt op
 /// `brandDark`. Het beeld valt nu weg in de achtergrond van dit scherm.
 ///
+/// **Waarom het bestand 1:1 met de bron is.** 756×512 is precies de uitsnede
+/// uit het origineel van 1280×720; er wordt niets verkleind, want elke
+/// verkleining kost scherpte die je in het monogram als eerste ziet. Scherper
+/// dan dit kan niet — het zit niet in de bron.
+///
+/// **Hoe de tekst is weggehaald.** De fiets loopt tijdens de morph door tot
+/// y 579 in de bron, dus wegsnijden onder de tekst kost je de wielen. Maar de
+/// tekst verschijnt pas na 6,7 s, en dán is de fiets al opgetrokken tot y 461.
+/// Vanaf dat frame ligt er een vlak in `brandLight` over alles onder y 508 —
+/// de tekst verdwijnt zonder dat de fiets ooit wordt aangeraakt.
+///
 /// **Waarom de twee bewegingen overlappen.** Wachten tot de animatie klaar is
 /// en dán pas verschuiven leest als twee losse gebeurtenissen. De verschuiving
 /// begint daarom terwijl de laatste seconde nog speelt, en tekst en knop komen
@@ -43,8 +54,8 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 8,65 s (206
-  /// frames van 42 ms), dus dit valt er ruim binnen: de laatste anderhalve
-  /// seconde van de rit beweegt mee in plaats van dat de app erop wacht.
+  /// frames van 42 ms) en het verschuiven zelf 1,8 s, dus ze eindigen samen:
+  /// de rit rijdt zijn laatste seconde uit terwijl hij al omhoog gaat.
   static const _settleAt = Duration(milliseconds: 6800);
 
   late final AnimationController _settle;
@@ -55,7 +66,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     _settle = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      // Rustig. Op 900 ms schoot de renner het scherm in; over deze afstand
+      // leest alles onder de anderhalve seconde als een sprong.
+      duration: const Duration(milliseconds: 1800),
     );
     _timer = Timer(_settleAt, _startSettle);
   }
@@ -94,9 +107,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     // De rit krimpt van bijna schermbreed naar iets meer dan de helft, en
     // schuift van het midden naar boven. Eén curve voor allebei, anders lopen
     // ze uit de pas en ziet het er hakkelig uit.
+    // Bewust géén SpringCurve hier. De veren in `app_motion.dart` schieten
+    // door en veren terug; op een verplaatsing van een half scherm leest dat
+    // als een schok in plaats van als een beweging. Een symmetrische cubic
+    // vertrekt traag en komt traag aan, en dat is precies wat dit moment wil.
     final curve = CurvedAnimation(
       parent: _settle,
-      curve: AppMotion.spatialEmphasizedCurve,
+      curve: Curves.easeInOutCubic,
     );
     final scale = Tween(begin: 1.0, end: 0.62).animate(curve);
     final align = AlignmentTween(
