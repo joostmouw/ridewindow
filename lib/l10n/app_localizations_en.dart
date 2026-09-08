@@ -1537,7 +1537,7 @@ class SEn extends S {
 
   @override
   String get pelotonSignedOutHint =>
-      'Peloton needs an account, so your buddies can find you. Everything else in the app keeps working without one.';
+      'Riding together needs an account, so your buddies can find you. Everything else in the app keeps working without one.';
 
   @override
   String get pelotonFriends => 'Buddies';
@@ -1660,7 +1660,7 @@ class SEn extends S {
 
   @override
   String get pelotonNeedFriendsFirst =>
-      'Add a buddy first — Rides, tab Peloton.';
+      'Add a buddy first — Rides, tab Buddies.';
 
   @override
   String get pelotonInviteAction => 'Invite';
@@ -1673,13 +1673,107 @@ class SEn extends S {
 
   @override
   String get pelotonSignInToJoin =>
-      'Sign in first, then enter this code under Rides, tab Peloton.';
+      'Sign in first, then enter this code under Rides, tab Buddies.';
 
   @override
-  String get pelotonGoToPeloton => 'Go to Peloton';
+  String get pelotonGoToPeloton => 'Go to Buddies';
 
   @override
   String pelotonInviteShareLink(String link, String code) {
-    return 'Ride with me on RideWindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Peloton.';
+    return 'Ride with me on RideWindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Buddies.';
   }
+
+  @override
+  String get ridesTabRides => 'Rides';
+
+  @override
+  String get ridesTabBuddies => 'Buddies';
+
+  @override
+  String get ridesFilterAll => 'All';
+
+  @override
+  String get ridesFilterOrganising => 'I\'m organising';
+
+  @override
+  String get ridesFilterJoined => 'I\'m joining';
+
+  @override
+  String get ridesFilterSolo => 'Just me';
+
+  @override
+  String get ridesFilterPending => 'Waiting on you';
+
+  @override
+  String get ridesFilterEmpty => 'No rides in this filter';
+
+  @override
+  String get ridesFilterEmptyHint => 'Tap “All” to see your whole week.';
+
+  @override
+  String get roleOrganiser => 'You\'re organising';
+
+  @override
+  String roleJoinedWith(String name) {
+    return 'You\'re joining $name';
+  }
+
+  @override
+  String get roleSolo => 'Just you';
+
+  @override
+  String rolePendingFrom(String name) {
+    return '$name is asking you along';
+  }
+
+  @override
+  String ridePelotonGoing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count are coming',
+      one: '1 is coming',
+      zero: 'Nobody has answered yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ridePelotonWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count still to answer',
+      one: '1 still to answer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pelotonStatusGoing => 'coming along';
+
+  @override
+  String get pelotonStatusWaiting => 'no answer yet';
+
+  @override
+  String get pelotonStatusDeclined => 'can\'t make it';
+
+  @override
+  String get pelotonCancelRide => 'Cancel ride';
+
+  @override
+  String get pelotonCancelRideTitle => 'Cancel this ride?';
+
+  @override
+  String get pelotonCancelRideBody =>
+      'Everyone you invited will see the ride disappear. Your own plan for this window goes with it.';
+
+  @override
+  String get pelotonRideCancelled => 'Ride cancelled';
+
+  @override
+  String get pelotonCancelFailed => 'Cancelling failed. Please try again.';
+
+  @override
+  String get pelotonNobodyInvitedYet => 'Nobody invited yet';
 }

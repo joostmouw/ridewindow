@@ -129,6 +129,12 @@ abstract final class AppColors {
 
   static const lightPlannedRide = Color(0xFF1565C0);
   static const lightPlannedRideLight = Color(0xFF64B5F6);
+
+  /// Rollen in een rit (schets 008). `plannedRide` draagt al "je gaat mee";
+  /// deze twee zetten "jij organiseert" en "wacht op jou" ernaast zonder ze
+  /// met het blauw van een geplande rit te laten samenvallen.
+  static const lightRideOrganiser = Color(0xFF7B4B12);
+  static const lightRidePending = Color(0xFFA42E0A);
   static const lightCalendarBusy = Color(0xFF64B5F6);
 
   static const lightWarning = Color(0xFFFF9800);
@@ -175,6 +181,11 @@ abstract final class AppColors {
 
   static const darkPlannedRide = Color(0xFF42A5F5);
   static const darkPlannedRideLight = Color(0xFF90CAF9);
+
+  /// Zie [lightRideOrganiser]. Opgelicht voor donkere achtergronden, zoals
+  /// elke andere kleur in dit blok.
+  static const darkRideOrganiser = Color(0xFFD9A264);
+  static const darkRidePending = Color(0xFFF0865C);
   static const darkCalendarBusy = Color(0xFF90CAF9);
 
   static const darkWarning = Color(0xFFFFB74D);

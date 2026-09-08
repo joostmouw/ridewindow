@@ -12,12 +12,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
-import 'package:ridewindow/features/peloton/peloton_tab.dart';
+import 'package:ridewindow/domain/models/planned_ride.dart';
+import 'package:ridewindow/features/planned/planned_rides_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/peloton_gateway.dart';
+import 'package:ridewindow/theme/app_theme.dart';
+
+/// Geen SharedPreferences en geen Drift: dit is een test over één knop, niet
+/// over de opslaglaag.
+class _FakePlannedRides extends PlannedRidesNotifier {
+  @override
+  Future<List<PlannedRide>> build() async => const [];
+}
+
+class _FakeWeather extends WeatherNotifier {
+  @override
+  Future<List<HourlyForecast>> build() async => const [];
+}
 
 const _me = 'uid-me';
 const _owner = 'uid-owner';
@@ -72,31 +91,40 @@ class _RecordingGateway implements PelotonGateway {
       throw UnimplementedError('${invocation.memberName} niet nodig');
 }
 
-GroupRide _acceptedRide() => GroupRide(
+/// Bewust relatief aan nu: de rittenlijst snijdt alles weg wat voorbij is
+/// (`rideEntriesProvider`), dus een vaste datum zou deze test op een dag
+/// stilletjes leeg maken.
+GroupRide _acceptedRide() {
+  final day = DateTime.now().add(const Duration(days: 3));
+  return GroupRide(
       id: 'ride-1',
       ownerId: _owner,
-      start: DateTime(2026, 9, 12, 9),
-      end: DateTime(2026, 9, 12, 13),
+      start: DateTime(day.year, day.month, day.day, 9),
+      end: DateTime(day.year, day.month, day.day, 13),
       plannedScore: 91,
       ownerName: 'Maatje',
       participants: const [
         RideParticipant(userId: _me, status: ParticipantStatus.accepted),
-      ],
-    );
+      ]);
+}
 
 Future<_RecordingGateway> _pumpTab(WidgetTester tester) async {
+  SharedPreferences.setMockInitialValues({});
   final gateway = _RecordingGateway([_acceptedRide()]);
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         pelotonGatewayProvider.overrideWithValue(gateway),
         currentUserIdProvider.overrideWithValue(_me),
+        plannedRidesProvider.overrideWith(_FakePlannedRides.new),
+        weatherProvider.overrideWith(_FakeWeather.new),
       ],
       child: MaterialApp(
         locale: const Locale('nl'),
         localizationsDelegates: S.localizationsDelegates,
         supportedLocales: S.supportedLocales,
-        home: const Scaffold(body: PelotonTab()),
+        theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        home: const Scaffold(body: RidesTab()),
       ),
     ),
   );

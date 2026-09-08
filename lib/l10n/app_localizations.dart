@@ -2134,7 +2134,7 @@ abstract class S {
   /// No description provided for @ridesEmptySharedHint.
   ///
   /// In nl, this message translates to:
-  /// **'Je hebt zelf nog niets gepland, maar je doet mee aan {count} gedeelde rit. Die staan op het tabblad Peloton.'**
+  /// **'Je hebt zelf nog niets gepland, maar je doet mee aan {count} gedeelde rit. Die staan op het tabblad Maatjes.'**
   String ridesEmptySharedHint(Object count);
 
   /// No description provided for @ridesEmptyGoToPeloton.
@@ -2800,7 +2800,7 @@ abstract class S {
   /// No description provided for @pelotonSignedOutHint.
   ///
   /// In nl, this message translates to:
-  /// **'Peloton heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.'**
+  /// **'Samen fietsen heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.'**
   String get pelotonSignedOutHint;
 
   /// No description provided for @pelotonFriends.
@@ -3010,7 +3010,7 @@ abstract class S {
   /// No description provided for @pelotonNeedFriendsFirst.
   ///
   /// In nl, this message translates to:
-  /// **'Voeg eerst een maatje toe — Rides, tab Peloton.'**
+  /// **'Voeg eerst een maatje toe — Ritten, tab Maatjes.'**
   String get pelotonNeedFriendsFirst;
 
   /// No description provided for @pelotonInviteAction.
@@ -3034,20 +3034,164 @@ abstract class S {
   /// No description provided for @pelotonSignInToJoin.
   ///
   /// In nl, this message translates to:
-  /// **'Log eerst in en vul deze code daarna in onder Rides, tab Peloton.'**
+  /// **'Log eerst in en vul deze code daarna in onder Ritten, tab Maatjes.'**
   String get pelotonSignInToJoin;
 
   /// No description provided for @pelotonGoToPeloton.
   ///
   /// In nl, this message translates to:
-  /// **'Naar Peloton'**
+  /// **'Naar Maatjes'**
   String get pelotonGoToPeloton;
 
   /// No description provided for @pelotonInviteShareLink.
   ///
   /// In nl, this message translates to:
-  /// **'Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Rides, tab Peloton.'**
+  /// **'Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Maatjes.'**
   String pelotonInviteShareLink(String link, String code);
+
+  /// No description provided for @ridesTabRides.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ritten'**
+  String get ridesTabRides;
+
+  /// No description provided for @ridesTabBuddies.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maatjes'**
+  String get ridesTabBuddies;
+
+  /// No description provided for @ridesFilterAll.
+  ///
+  /// In nl, this message translates to:
+  /// **'Alles'**
+  String get ridesFilterAll;
+
+  /// No description provided for @ridesFilterOrganising.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ik organiseer'**
+  String get ridesFilterOrganising;
+
+  /// No description provided for @ridesFilterJoined.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ik ga mee'**
+  String get ridesFilterJoined;
+
+  /// No description provided for @ridesFilterSolo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Alleen ik'**
+  String get ridesFilterSolo;
+
+  /// No description provided for @ridesFilterPending.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wacht op jou'**
+  String get ridesFilterPending;
+
+  /// No description provided for @ridesFilterEmpty.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geen ritten in dit filter'**
+  String get ridesFilterEmpty;
+
+  /// No description provided for @ridesFilterEmptyHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Tik op “Alles” om je hele week te zien.'**
+  String get ridesFilterEmptyHint;
+
+  /// No description provided for @roleOrganiser.
+  ///
+  /// In nl, this message translates to:
+  /// **'Jij organiseert'**
+  String get roleOrganiser;
+
+  /// No description provided for @roleJoinedWith.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je gaat mee met {name}'**
+  String roleJoinedWith(String name);
+
+  /// No description provided for @roleSolo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Alleen jij'**
+  String get roleSolo;
+
+  /// No description provided for @rolePendingFrom.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} vraagt of je meegaat'**
+  String rolePendingFrom(String name);
+
+  /// No description provided for @ridePelotonGoing.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =0{Nog niemand geantwoord} =1{1 gaat mee} other{{count} gaan mee}}'**
+  String ridePelotonGoing(int count);
+
+  /// No description provided for @ridePelotonWaiting.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 wacht nog} other{{count} wachten nog}}'**
+  String ridePelotonWaiting(int count);
+
+  /// No description provided for @pelotonStatusGoing.
+  ///
+  /// In nl, this message translates to:
+  /// **'gaat mee'**
+  String get pelotonStatusGoing;
+
+  /// No description provided for @pelotonStatusWaiting.
+  ///
+  /// In nl, this message translates to:
+  /// **'nog geen antwoord'**
+  String get pelotonStatusWaiting;
+
+  /// No description provided for @pelotonStatusDeclined.
+  ///
+  /// In nl, this message translates to:
+  /// **'kan niet'**
+  String get pelotonStatusDeclined;
+
+  /// No description provided for @pelotonCancelRide.
+  ///
+  /// In nl, this message translates to:
+  /// **'Rit afzeggen'**
+  String get pelotonCancelRide;
+
+  /// No description provided for @pelotonCancelRideTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deze rit afzeggen?'**
+  String get pelotonCancelRideTitle;
+
+  /// No description provided for @pelotonCancelRideBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Iedereen die je hebt uitgenodigd ziet de rit verdwijnen. Je eigen planning voor dit tijdvak gaat er ook af.'**
+  String get pelotonCancelRideBody;
+
+  /// No description provided for @pelotonRideCancelled.
+  ///
+  /// In nl, this message translates to:
+  /// **'Rit afgezegd'**
+  String get pelotonRideCancelled;
+
+  /// No description provided for @pelotonCancelFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Afzeggen is niet gelukt. Probeer het opnieuw.'**
+  String get pelotonCancelFailed;
+
+  /// No description provided for @pelotonNobodyInvitedYet.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nog niemand uitgenodigd'**
+  String get pelotonNobodyInvitedYet;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

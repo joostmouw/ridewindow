@@ -1158,7 +1158,7 @@ class SNl extends S {
 
   @override
   String ridesEmptySharedHint(Object count) {
-    return 'Je hebt zelf nog niets gepland, maar je doet mee aan $count gedeelde rit. Die staan op het tabblad Peloton.';
+    return 'Je hebt zelf nog niets gepland, maar je doet mee aan $count gedeelde rit. Die staan op het tabblad Maatjes.';
   }
 
   @override
@@ -1540,7 +1540,7 @@ class SNl extends S {
 
   @override
   String get pelotonSignedOutHint =>
-      'Peloton heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.';
+      'Samen fietsen heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.';
 
   @override
   String get pelotonFriends => 'Maatjes';
@@ -1665,7 +1665,7 @@ class SNl extends S {
 
   @override
   String get pelotonNeedFriendsFirst =>
-      'Voeg eerst een maatje toe — Rides, tab Peloton.';
+      'Voeg eerst een maatje toe — Ritten, tab Maatjes.';
 
   @override
   String get pelotonInviteAction => 'Uitnodigen';
@@ -1678,13 +1678,108 @@ class SNl extends S {
 
   @override
   String get pelotonSignInToJoin =>
-      'Log eerst in en vul deze code daarna in onder Rides, tab Peloton.';
+      'Log eerst in en vul deze code daarna in onder Ritten, tab Maatjes.';
 
   @override
-  String get pelotonGoToPeloton => 'Naar Peloton';
+  String get pelotonGoToPeloton => 'Naar Maatjes';
 
   @override
   String pelotonInviteShareLink(String link, String code) {
-    return 'Fiets met me mee in RideWindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Rides, tab Peloton.';
+    return 'Fiets met me mee in RideWindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Ritten, tab Maatjes.';
   }
+
+  @override
+  String get ridesTabRides => 'Ritten';
+
+  @override
+  String get ridesTabBuddies => 'Maatjes';
+
+  @override
+  String get ridesFilterAll => 'Alles';
+
+  @override
+  String get ridesFilterOrganising => 'Ik organiseer';
+
+  @override
+  String get ridesFilterJoined => 'Ik ga mee';
+
+  @override
+  String get ridesFilterSolo => 'Alleen ik';
+
+  @override
+  String get ridesFilterPending => 'Wacht op jou';
+
+  @override
+  String get ridesFilterEmpty => 'Geen ritten in dit filter';
+
+  @override
+  String get ridesFilterEmptyHint => 'Tik op “Alles” om je hele week te zien.';
+
+  @override
+  String get roleOrganiser => 'Jij organiseert';
+
+  @override
+  String roleJoinedWith(String name) {
+    return 'Je gaat mee met $name';
+  }
+
+  @override
+  String get roleSolo => 'Alleen jij';
+
+  @override
+  String rolePendingFrom(String name) {
+    return '$name vraagt of je meegaat';
+  }
+
+  @override
+  String ridePelotonGoing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gaan mee',
+      one: '1 gaat mee',
+      zero: 'Nog niemand geantwoord',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ridePelotonWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count wachten nog',
+      one: '1 wacht nog',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pelotonStatusGoing => 'gaat mee';
+
+  @override
+  String get pelotonStatusWaiting => 'nog geen antwoord';
+
+  @override
+  String get pelotonStatusDeclined => 'kan niet';
+
+  @override
+  String get pelotonCancelRide => 'Rit afzeggen';
+
+  @override
+  String get pelotonCancelRideTitle => 'Deze rit afzeggen?';
+
+  @override
+  String get pelotonCancelRideBody =>
+      'Iedereen die je hebt uitgenodigd ziet de rit verdwijnen. Je eigen planning voor dit tijdvak gaat er ook af.';
+
+  @override
+  String get pelotonRideCancelled => 'Rit afgezegd';
+
+  @override
+  String get pelotonCancelFailed =>
+      'Afzeggen is niet gelukt. Probeer het opnieuw.';
+
+  @override
+  String get pelotonNobodyInvitedYet => 'Nog niemand uitgenodigd';
 }

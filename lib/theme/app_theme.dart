@@ -23,6 +23,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     required this.scoreAcceptable,
     required this.scorePoor,
     required this.plannedRide,
+    required this.rideOrganiser,
+    required this.ridePending,
     required this.plannedRideLight,
     required this.calendarBusy,
     required this.warning,
@@ -75,6 +77,10 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
   final Color scoreAcceptable;
   final Color scorePoor;
   final Color plannedRide;
+
+  /// De kleur van "jij organiseert" en van "wacht op jou" (schets 008).
+  final Color rideOrganiser;
+  final Color ridePending;
   final Color plannedRideLight;
   final Color calendarBusy;
   final Color warning;
@@ -113,6 +119,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     scoreAcceptable: AppColors.lightScoreAcceptable,
     scorePoor: AppColors.lightScorePoor,
     plannedRide: AppColors.lightPlannedRide,
+    rideOrganiser: AppColors.lightRideOrganiser,
+    ridePending: AppColors.lightRidePending,
     plannedRideLight: AppColors.lightPlannedRideLight,
     calendarBusy: AppColors.lightCalendarBusy,
     warning: AppColors.lightWarning,
@@ -152,6 +160,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     scoreAcceptable: AppColors.darkScoreAcceptable,
     scorePoor: AppColors.darkScorePoor,
     plannedRide: AppColors.darkPlannedRide,
+    rideOrganiser: AppColors.darkRideOrganiser,
+    ridePending: AppColors.darkRidePending,
     plannedRideLight: AppColors.darkPlannedRideLight,
     calendarBusy: AppColors.darkCalendarBusy,
     warning: AppColors.darkWarning,
@@ -192,6 +202,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
     Color? scoreAcceptable,
     Color? scorePoor,
     Color? plannedRide,
+    Color? rideOrganiser,
+    Color? ridePending,
     Color? plannedRideLight,
     Color? calendarBusy,
     Color? warning,
@@ -230,6 +242,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       scoreAcceptable: scoreAcceptable ?? this.scoreAcceptable,
       scorePoor: scorePoor ?? this.scorePoor,
       plannedRide: plannedRide ?? this.plannedRide,
+      rideOrganiser: rideOrganiser ?? this.rideOrganiser,
+      ridePending: ridePending ?? this.ridePending,
       plannedRideLight: plannedRideLight ?? this.plannedRideLight,
       calendarBusy: calendarBusy ?? this.calendarBusy,
       warning: warning ?? this.warning,
@@ -273,6 +287,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       scoreAcceptable: Color.lerp(scoreAcceptable, other.scoreAcceptable, t)!,
       scorePoor: Color.lerp(scorePoor, other.scorePoor, t)!,
       plannedRide: Color.lerp(plannedRide, other.plannedRide, t)!,
+      rideOrganiser: Color.lerp(rideOrganiser, other.rideOrganiser, t)!,
+      ridePending: Color.lerp(ridePending, other.ridePending, t)!,
       plannedRideLight: Color.lerp(plannedRideLight, other.plannedRideLight, t)!,
       calendarBusy: Color.lerp(calendarBusy, other.calendarBusy, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
