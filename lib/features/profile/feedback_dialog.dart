@@ -3,6 +3,8 @@
 // weggeschreven naar `public.feedback` via de outbox in plaats van naar een
 // mailto:.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +16,7 @@ import 'package:ridewindow/domain/services/feedback_payload.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
@@ -87,6 +90,9 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
     final s = S.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    // Vóór de `await` gelezen, net als `messenger` en `navigator`: dit scherm
+    // sluit zichzelf hieronder, en `ref.read` op een afgebroken widget gooit.
+    final reconciler = ref.read(cloudSyncReconcilerProvider);
 
     try {
       final service = FeedbackService(
@@ -100,6 +106,18 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
         comment: _controller.text,
         context: _buildContext(),
       );
+      // Meteen proberen te bezorgen. Zonder dit bleef de rij in de outbox
+      // staan tot de app toevallig een voorgrondovergang maakte -- de app zei
+      // "bedankt" terwijl er niets was verstuurd, en in Supabase bleef het
+      // leeg (Joost, 2026-09-08).
+      //
+      // Bewust niet afgewacht: de outbox is er juist om verzending los te
+      // koppelen van het versturen. Mislukt de drain, dan blijft de rij staan
+      // en gaat hij mee met de volgende. Dit maakt het alleen normaal dat hij
+      // meteen aankomt in plaats van bij toeval. `drainOutbox` heeft een eigen
+      // try/catch en een re-entrancy-guard, dus dit kan geen scherm raken.
+      unawaited(reconciler.drainOutbox());
+
       navigator.pop();
       messenger.showSnackBar(SnackBar(content: Text(s.feedbackThanks)));
     } catch (error) {

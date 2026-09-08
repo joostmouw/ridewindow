@@ -6,14 +6,20 @@
 //                rij met `user_id: null` op in plaats van een fout.
 //   Test 4:      de dialoog toont titel en vijf sterren.
 //   Test 5:      Verzenden blijft uit tot er een ster gekozen is.
-//
-// De verzendknop wordt in deze suite nooit ingedrukt: dat zou een Drift-database
-// en een Supabase-client vergen. Wat er ná die tik gebeurt is gedekt door de
-// pure functies hierboven en door de outbox-tests van fase 21.
+//   Test 6:      de gekozen ster en alles ervoor worden gevuld.
+//   Test 7:      verzenden zet niet alleen een rij in de outbox maar start ook
+//                meteen een drain.
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:ridewindow/data/database/app_database.dart';
+import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
+import 'package:ridewindow/services/sync_outbox_service.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -64,6 +70,28 @@ Future<void> _pumpDialogTrigger(WidgetTester tester) async {
   );
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
+}
+
+/// Legt vast of [drain] werkelijk is aangeroepen, zonder echt werk te doen.
+/// Zelfde vorm als `_RecordingSyncOutboxService` in
+/// `test/providers/outbox_drain_wiring_test.dart`; de superconstructor wil een
+/// echte dao maar raakt hem nooit aan.
+class _RecordingSyncOutboxService extends SyncOutboxService {
+  _RecordingSyncOutboxService(super.dao);
+
+  var drainCalled = false;
+
+  @override
+  Future<void> drain({
+    required Future<void> Function(
+      String entity,
+      String entityKey,
+      Map<String, dynamic> payload,
+    ) upsertFn,
+    required Future<void> Function(String entity, String entityKey) deleteFn,
+  }) async {
+    drainCalled = true;
+  }
 }
 
 void main() {
@@ -206,5 +234,58 @@ void main() {
     for (var n = 4; n <= 5; n++) {
       expect(glyphOf(n), AppIcons.star, reason: 'ster $n hoort leeg');
     }
+  });
+
+  testWidgets(
+      'Test 7 — verzenden zet een rij in de outbox én start meteen een drain',
+      (tester) async {
+    // De bug. `_submit` schreef alleen naar de outbox en toonde "bedankt";
+    // de rij vertrok pas als de app toevallig een voorgrondovergang maakte.
+    // De app zei dus dat het gelukt was terwijl er in Supabase niets stond
+    // (Joost, 2026-09-08).
+    //
+    // De outbox blijft de vangnetlaag -- mislukt de drain, dan blijft de rij
+    // staan voor de volgende. Wat hier bewaakt wordt is dat de poging
+    // überhaupt gedaan wordt.
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    final outbox = _RecordingSyncOutboxService(db.syncOutboxDao);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWith((ref) => db),
+          syncOutboxServiceProvider.overrideWith((ref) => outbox),
+          currentUserIdProvider.overrideWithValue(null),
+        ],
+        child: MaterialApp(
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+          locale: const Locale('en'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () => showFeedbackDialog(context),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    final s = S.of(tester.element(find.text('open')));
+    await tester.tap(find.byKey(const ValueKey('feedback_star_4')));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(TextButton, s.feedbackSendButton));
+    await tester.pumpAndSettle();
+
+    expect((await db.syncOutboxDao.pendingRows()).length, 1,
+        reason: 'de rij hoort in de outbox te staan');
+    expect(outbox.drainCalled, isTrue,
+        reason: 'verzenden moet meteen een drain starten');
   });
 }
