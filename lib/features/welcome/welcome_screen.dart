@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
@@ -97,6 +98,29 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _timer?.cancel();
     _settle.dispose();
     super.dispose();
+  }
+
+  /// "Ik heb al een account": sla de onboarding over en land op Profiel, waar
+  /// inloggen zit.
+  ///
+  /// **Waarom hier geen eigen inlogknop staat.** De Google-stroom in
+  /// `account_section.dart` regelt initialisatie, de nonce, het uitwisselen van
+  /// het id-token bij Supabase en alle foutpaden — en die stroom heeft in dit
+  /// project al twee keer een subtiele bug gehad (zie `260726-o3m`). Een tweede
+  /// exemplaar op dit scherm zou die geschiedenis verdubbelen. De link brengt
+  /// je naar de plek waar het werkt.
+  ///
+  /// **Waarom de onboarding-vlag hier al omgaat.** Wie een account heeft, heeft
+  /// die stap ooit gedaan; zijn beschikbaarheid en voorkeuren komen bij het
+  /// inloggen uit Supabase terug. Hem opnieuw door de onboarding sturen is
+  /// precies het huiswerk dat deze epic wil afschaffen. Haakt hij af zonder in
+  /// te loggen, dan staat hij in de app met de standaardinstellingen — dezelfde
+  /// staat als een nieuwe gebruiker ná onboarding, en vanuit Profiel alsnog aan
+  /// te passen.
+  Future<void> _goToSignIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_complete', true);
+    if (mounted) context.go('/profile');
   }
 
   @override
@@ -200,6 +224,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             FilledButton(
                               onPressed: () => context.push('/onboard'),
                               child: Text(s.welcomeButton),
+                            ),
+                            const SizedBox(height: 4),
+                            TextButton(
+                              onPressed: _goToSignIn,
+                              child: Text(s.welcomeHaveAccount),
                             ),
                           ],
                         ),

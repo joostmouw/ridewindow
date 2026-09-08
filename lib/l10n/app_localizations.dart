@@ -661,6 +661,12 @@ abstract class S {
   /// **'Aan de slag →'**
   String get welcomeButton;
 
+  /// No description provided for @welcomeHaveAccount.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ik heb al een account'**
+  String get welcomeHaveAccount;
+
   /// No description provided for @onboardingTitle.
   ///
   /// In nl, this message translates to:

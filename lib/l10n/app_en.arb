@@ -116,6 +116,7 @@
   "welcomeTitle": "Your perfect ride moment",
   "welcomeSubtitle": "Combine the weather forecast with your calendar and discover the best windows to ride.",
   "welcomeButton": "Get started \u2192",
+  "welcomeHaveAccount": "I already have an account",
 
   "onboardingTitle": "When do you prefer to ride?",
   "onboardingSubtitle": "Pick a schedule to start. You can always change this later.",

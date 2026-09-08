@@ -338,6 +338,9 @@ class SNl extends S {
   String get welcomeButton => 'Aan de slag →';
 
   @override
+  String get welcomeHaveAccount => 'Ik heb al een account';
+
+  @override
   String get onboardingTitle => 'Wanneer rijd jij het liefst?';
 
   @override

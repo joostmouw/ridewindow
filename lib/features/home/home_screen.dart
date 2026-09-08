@@ -587,13 +587,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // een weekstrip stelt ("valt er die dag iets te rijden"), niet het
     // gemiddelde. `null` betekent: die dag heeft geen enkel venster.
     RideTier? bestTier;
+    double? bestScore;
     if (slotsState is SlotsLoaded && slotsState.slots.isNotEmpty) {
       final daySlots = slotsState.slots.where((s) {
         return s.start.year == day.year &&
             s.start.month == day.month &&
             s.start.day == day.day;
       }).toList();
-      if (daySlots.isNotEmpty) bestTier = _bestTier(daySlots);
+      if (daySlots.isNotEmpty) {
+        bestTier = _bestTier(daySlots);
+        // Niet alleen wélke tier, ook hoe hoog erbinnen. `_bestTier` gooide de
+        // score weg, en daardoor zag een dag met 100 er exact hetzelfde uit als
+        // een dag met 86 -- allebei Perfect, allebei dezelfde groene balk.
+        bestScore = daySlots
+            .map((s) => s.overallScore)
+            .reduce((a, b) => a > b ? a : b);
+      }
     }
 
     // Twee dingen, twee kanalen -- en dat was precies het probleem.
@@ -698,6 +707,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               // steeds geen gevuld blok — de reden dat de gekleurde chips
               // moesten verdwijnen blijft staan — maar wel genoeg om groen van
               // teal te onderscheiden zonder erop te turen.
+              //
+              // **De balk verloopt binnen zijn tier.** Vier vaste kleuren
+              // betekende dat een dag met 100 en een dag met 86 er identiek
+              // uitzagen -- allebei Perfect. De balk mengt daarom van de
+              // tierkleur op 55% aan de ondergrens van de band naar vol aan de
+              // bovengrens, zodat zaterdag met 100 zichtbaar sterker is dan
+              // vrijdag met 86. De hue blijft die van de tier, dus de strip kan
+              // de kaart eronder nooit tegenspreken: groen blijft groen.
+              //
+              // Het dagnummer houdt bewust de vólle tierkleur. Meemengen zou
+              // het op de zwakke kant van een band tot ongeveer 2,6:1 contrast
+              // terugbrengen, en dat is tekst die je moet kunnen lezen.
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: AnimatedContainer(
@@ -706,7 +727,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   height: 4,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: qualityColor,
+                    color: _barColor(bestScore, rw.tiers),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1818,6 +1839,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       s.daySunFull,
     ];
     return names[dt.weekday - 1];
+  }
+
+  /// De kleur van het streepje onder een dag: één doorlopend verloop over de
+  /// hele scoreschaal, zodat elke score zijn eigen tint heeft.
+  ///
+  /// De ankers zijn de bestaande tierkleuren op hun eigen drempels uit
+  /// [rideTierFromScore] — 50 acceptable, 70 great, 100 perfect — en daartussen
+  /// wordt lineair gemengd. Een 86 en een 100 zijn allebei Perfect op de kaart,
+  /// maar krijgen hier zichtbaar verschillend groen; dat was precies de klacht.
+  ///
+  /// **De prijs, bewust betaald.** Tussen de ankers is de tint een mengsel, dus
+  /// een score van 86 leest groener-met-een-vleug-teal in plaats van exact de
+  /// `perfectFg` die de kaart eronder toont. De strip beantwoordt daarmee een
+  /// andere vraag dan de kaart: de kaart zegt wélke klasse, de strip hoe goed.
+  /// Op de drempels vallen ze weer samen.
+  static Color _barColor(double? score, TierColors tiers) {
+    // Geen venster die dag: grijs, en geen plek in het verloop.
+    if (score == null) return tiers.poorFg;
+
+    // Uit het thema en niet hard genoemd, zodat het donkere thema
+    // zijn eigen tierkleuren houdt.
+    final stops = <(double, Color)>[
+      (0, tiers.poorFg),
+      (50, tiers.acceptableFg),
+      (70, tiers.greatFg),
+      (100, tiers.perfectFg),
+    ];
+    final v = score.clamp(0.0, 100.0);
+    for (var i = 0; i < stops.length - 1; i++) {
+      final (lo, loColor) = stops[i];
+      final (hi, hiColor) = stops[i + 1];
+      if (v <= hi) {
+        return Color.lerp(loColor, hiColor, (v - lo) / (hi - lo))!;
+      }
+    }
+    return stops.last.$2;
   }
 
   RideTier _bestTier(List<RideSlot> slots) {

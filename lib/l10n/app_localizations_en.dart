@@ -337,6 +337,9 @@ class SEn extends S {
   String get welcomeButton => 'Get started →';
 
   @override
+  String get welcomeHaveAccount => 'I already have an account';
+
+  @override
   String get onboardingTitle => 'When do you prefer to ride?';
 
   @override
