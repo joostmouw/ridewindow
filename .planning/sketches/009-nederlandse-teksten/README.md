@@ -2,7 +2,7 @@
 sketch: 009
 name: nederlandse-teksten
 question: "Welk Nederlands spreekt deze app — en welk woord gebruikt hij voor zijn eigen kernbegrip?"
-winner: null
+winner: "A + beperkt 2 + heel 3"
 tags: [l10n, nederlands, toon, kleding, jargon]
 ---
 
@@ -48,3 +48,15 @@ open http://localhost:8765/.planning/sketches/009-nederlandse-teksten/index.html
 - **Blok 2:** de rechterkolom is wat iemand met een gewone kledingkast in huis heeft. Klopt dat, of
   gaat er iets nuttigs verloren?
 - **Blok 4:** streep door wat je wilt houden.
+
+## Wat Joost koos (2026-09-08)
+
+| Blok | Keuze |
+|---|---|
+| 1 — kernwoord | **A, "fietsmoment"**. 22 strings omgezet; *rijvenster*, *rijmoment*, *rijtijd*, *venster* en *slot* zijn allemaal weg uit de Nederlandse interface. |
+| 2 — kleding | **Alleen de kniewarmers.** Tussen 10 en 14 graden staat er nu niets extra, en `clothingLegWarmers` heet "Lange broek" in plaats van "Beenwarmers" (ook in het Engels: *Long trousers* — anders adviseren de twee talen andere kleding). De rest van de wielrennerstaal blijft. |
+| 3 — fouten | **Alle achttien**, plus twee dode sleutels die erbij bleken te liggen (`clothingKneeWarmers` en `clothingLightShirt`). |
+| 4 — toon | **Niets.** Nachtuil, Weekendstrijder, TOLERANTIES en RIJLENGTE blijven staan. |
+
+Zes tests wezen op de oude teksten en zijn meegegaan: `Annuleer`, `Begrijpen`, `NOTIFICATIES`,
+`rijvensters`, `Rijvenster toegevoegd` en `perfecte rijmoment`.

@@ -331,7 +331,7 @@ void main() {
   );
 
   testWidgets(
-    'Test 7 (Rule 8): Plan rit commits via the notifier and clears selection; Annuleer clears without committing',
+    'Test 7 (Rule 8): Plan rit commits via the notifier and clears selection; Annuleren clears without committing',
     (tester) async {
       final fakeNotifier = FakePlannedRidesNotifier();
       await pumpAgendaApp(tester, plannedRidesNotifier: fakeNotifier);
@@ -351,7 +351,7 @@ void main() {
       await tester.pump();
       expect(find.text('1 uur geselecteerd'), findsOneWidget);
 
-      await tester.tap(find.text('Annuleer'));
+      await tester.tap(find.text('Annuleren'));
       await tester.pump();
 
       expect(fakeNotifier.added.length, 1);

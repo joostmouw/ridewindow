@@ -58,14 +58,14 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
-  // Test 2: Titel 'perfecte rijmoment' zichtbaar
+  // Test 2: Titel 'perfecte fietsmoment' zichtbaar
   // ---------------------------------------------------------------------------
-  testWidgets('WelcomeScreen toont titel met "perfecte rijmoment"',
+  testWidgets('WelcomeScreen toont titel met "perfecte fietsmoment"',
       (tester) async {
     await tester.pumpWidget(_buildTestApp());
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('perfecte rijmoment'), findsOneWidget);
+    expect(find.textContaining('perfecte fietsmoment'), findsOneWidget);
   });
 
   // ---------------------------------------------------------------------------
@@ -95,7 +95,7 @@ void main() {
     final fade = tester.widget<FadeTransition>(
       find
           .ancestor(
-            of: find.textContaining('perfecte rijmoment'),
+            of: find.textContaining('perfecte fietsmoment'),
             matching: find.byType(FadeTransition),
           )
           .first,

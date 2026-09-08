@@ -160,7 +160,7 @@ abstract class S {
   /// No description provided for @rideWindowCount.
   ///
   /// In nl, this message translates to:
-  /// **'{count} {count, plural, =1{rijvenster} other{rijvensters}} deze week'**
+  /// **'{count} {count, plural, =1{fietsmoment} other{fietsmomenten}} deze week'**
   String rideWindowCount(int count);
 
   /// No description provided for @updatedAt.
@@ -184,7 +184,7 @@ abstract class S {
   /// No description provided for @rideTimes.
   ///
   /// In nl, this message translates to:
-  /// **'RIJTIJDEN'**
+  /// **'FIETSMOMENTEN'**
   String get rideTimes;
 
   /// No description provided for @plannedRidesLabel.
@@ -238,7 +238,7 @@ abstract class S {
   /// No description provided for @showAllWindows.
   ///
   /// In nl, this message translates to:
-  /// **'Toon alle {count} vensters'**
+  /// **'Toon alle {count} momenten'**
   String showAllWindows(Object count);
 
   /// No description provided for @showFewerWindows.
@@ -328,7 +328,7 @@ abstract class S {
   /// No description provided for @infoTemp.
   ///
   /// In nl, this message translates to:
-  /// **'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.'**
+  /// **'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit fietsmoment. Pas je bereik aan in Profiel.'**
   String get infoTemp;
 
   /// No description provided for @infoRain.
@@ -508,7 +508,7 @@ abstract class S {
   /// No description provided for @tierGreatAgenda.
   ///
   /// In nl, this message translates to:
-  /// **'Geweldig'**
+  /// **'Goed'**
   String get tierGreatAgenda;
 
   /// No description provided for @tierAcceptableAgenda.
@@ -550,7 +550,7 @@ abstract class S {
   /// No description provided for @addedToGoogleCalendar.
   ///
   /// In nl, this message translates to:
-  /// **'Rijvenster toegevoegd aan Google Agenda!'**
+  /// **'Fietsmoment toegevoegd aan Google Agenda'**
   String get addedToGoogleCalendar;
 
   /// No description provided for @couldNotAdd.
@@ -562,13 +562,13 @@ abstract class S {
   /// No description provided for @weatherLoadError.
   ///
   /// In nl, this message translates to:
-  /// **'Weersdata kon niet worden geladen.'**
+  /// **'Het weerbericht kon niet worden geladen.'**
   String get weatherLoadError;
 
   /// No description provided for @emptyBadWeather.
   ///
   /// In nl, this message translates to:
-  /// **'Geen goede rijmomenten deze week. Slecht weer verwacht.'**
+  /// **'Geen goede fietsmomenten deze week. Slecht weer verwacht.'**
   String get emptyBadWeather;
 
   /// No description provided for @emptyAllBlocked.
@@ -580,25 +580,25 @@ abstract class S {
   /// No description provided for @emptyNoSlots.
   ///
   /// In nl, this message translates to:
-  /// **'Geen rijmomenten gevonden.'**
+  /// **'Geen fietsmomenten gevonden.'**
   String get emptyNoSlots;
 
   /// No description provided for @emptyNoSlotsDay.
   ///
   /// In nl, this message translates to:
-  /// **'Geen rijmomenten op deze dag.'**
+  /// **'Geen fietsmomenten op deze dag.'**
   String get emptyNoSlotsDay;
 
   /// No description provided for @staleDataBannerWithTime.
   ///
   /// In nl, this message translates to:
-  /// **'Offline — toont rijvensters van {time}'**
+  /// **'Offline — toont fietsmomenten van {time}'**
   String staleDataBannerWithTime(String time);
 
   /// No description provided for @staleDataBannerNoTime.
   ///
   /// In nl, this message translates to:
-  /// **'Offline — toont laatst bekende rijvensters'**
+  /// **'Offline — toont laatst bekende fietsmomenten'**
   String get staleDataBannerNoTime;
 
   /// No description provided for @unitKmh.
@@ -646,13 +646,13 @@ abstract class S {
   /// No description provided for @welcomeTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Jouw perfecte rijmoment'**
+  /// **'Jouw perfecte fietsmoment'**
   String get welcomeTitle;
 
   /// No description provided for @welcomeSubtitle.
   ///
   /// In nl, this message translates to:
-  /// **'Combineer het weerbericht met jouw agenda en ontdek de beste windows om te fietsen.'**
+  /// **'Combineer het weerbericht met jouw agenda en ontdek de beste momenten om te fietsen.'**
   String get welcomeSubtitle;
 
   /// No description provided for @welcomeButton.
@@ -748,7 +748,7 @@ abstract class S {
   /// No description provided for @sectionNotifications.
   ///
   /// In nl, this message translates to:
-  /// **'NOTIFICATIES'**
+  /// **'MELDINGEN'**
   String get sectionNotifications;
 
   /// No description provided for @sectionTheme.
@@ -814,7 +814,7 @@ abstract class S {
   /// No description provided for @clearLocationOverride.
   ///
   /// In nl, this message translates to:
-  /// **'Locatie-override wissen'**
+  /// **'Terug naar mijn GPS-locatie'**
   String get clearLocationOverride;
 
   /// No description provided for @grantPermission.
@@ -862,7 +862,7 @@ abstract class S {
   /// No description provided for @notifEveningBeforeSub.
   ///
   /// In nl, this message translates to:
-  /// **'19:00 de vorige dag als er een top-slot is'**
+  /// **'19:00 de avond ervoor, als er een mooi moment aankomt'**
   String get notifEveningBeforeSub;
 
   /// No description provided for @notifMorningOf.
@@ -874,7 +874,7 @@ abstract class S {
   /// No description provided for @notifMorningOfSub.
   ///
   /// In nl, this message translates to:
-  /// **'2 uur voor het slot begint'**
+  /// **'2 uur voordat het begint'**
   String get notifMorningOfSub;
 
   /// No description provided for @notifWeeklyDigest.
@@ -946,7 +946,7 @@ abstract class S {
   /// No description provided for @toleranceTempInfo.
   ///
   /// In nl, this message translates to:
-  /// **'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer rijvensters; een smaller bereik toont alleen je ideale omstandigheden.'**
+  /// **'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.'**
   String get toleranceTempInfo;
 
   /// No description provided for @toleranceRainInfoTitle.
@@ -970,7 +970,7 @@ abstract class S {
   /// No description provided for @toleranceWindInfo.
   ///
   /// In nl, this message translates to:
-  /// **'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer rijvensters, maar verwacht zwaarder fietsen.'**
+  /// **'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.'**
   String get toleranceWindInfo;
 
   /// No description provided for @tempDescAllWeather.
@@ -1006,7 +1006,7 @@ abstract class S {
   /// No description provided for @rainDescDrizzleOk.
   ///
   /// In nl, this message translates to:
-  /// **'Een beetje motregen is ok'**
+  /// **'Een beetje motregen is prima'**
   String get rainDescDrizzleOk;
 
   /// No description provided for @rainDescLightRainOk.
@@ -1078,7 +1078,7 @@ abstract class S {
   /// No description provided for @cancel.
   ///
   /// In nl, this message translates to:
-  /// **'Annuleer'**
+  /// **'Annuleren'**
   String get cancel;
 
   /// No description provided for @save.
@@ -1132,7 +1132,7 @@ abstract class S {
   /// No description provided for @calendarStatusChecking.
   ///
   /// In nl, this message translates to:
-  /// **'Controleren...'**
+  /// **'Controleren…'**
   String get calendarStatusChecking;
 
   /// No description provided for @calendarStatusConnected.
@@ -1282,7 +1282,7 @@ abstract class S {
   /// No description provided for @accountSyncStatusPending.
   ///
   /// In nl, this message translates to:
-  /// **'Wordt gesynchroniseerd...'**
+  /// **'Wordt gesynchroniseerd…'**
   String get accountSyncStatusPending;
 
   /// No description provided for @accountDeleteAction.
@@ -1696,14 +1696,8 @@ abstract class S {
   /// No description provided for @clothingLegWarmers.
   ///
   /// In nl, this message translates to:
-  /// **'Beenwarmers'**
+  /// **'Lange broek'**
   String get clothingLegWarmers;
-
-  /// No description provided for @clothingKneeWarmers.
-  ///
-  /// In nl, this message translates to:
-  /// **'Kniewarmers'**
-  String get clothingKneeWarmers;
 
   /// No description provided for @clothingShortSleeveJersey.
   ///
@@ -1716,12 +1710,6 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Armwarmers voor de zekerheid'**
   String get clothingArmWarmersJustInCase;
-
-  /// No description provided for @clothingLightShirt.
-  ///
-  /// In nl, this message translates to:
-  /// **'Licht shirt'**
-  String get clothingLightShirt;
 
   /// No description provided for @clothingSunscreen.
   ///
@@ -1786,7 +1774,7 @@ abstract class S {
   /// No description provided for @shareRideWindow.
   ///
   /// In nl, this message translates to:
-  /// **'Deel dit rijvenster'**
+  /// **'Deel dit fietsmoment'**
   String get shareRideWindow;
 
   /// No description provided for @shareText.
@@ -1918,7 +1906,7 @@ abstract class S {
   /// No description provided for @understood.
   ///
   /// In nl, this message translates to:
-  /// **'Begrijpen'**
+  /// **'Duidelijk'**
   String get understood;
 
   /// No description provided for @showScoreDetails.
@@ -1960,7 +1948,7 @@ abstract class S {
   /// No description provided for @riderNoTimeDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Maak wat uren vrij om je perfecte rijmomenten te vinden.'**
+  /// **'Maak wat uren vrij om je perfecte fietsmomenten te vinden.'**
   String get riderNoTimeDesc;
 
   /// No description provided for @riderFulltime.
@@ -1984,7 +1972,7 @@ abstract class S {
   /// No description provided for @riderWeekendDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Het weekend is jouw speeltuin. We vinden de beste zaterdag- en zondagvensters.'**
+  /// **'Het weekend is jouw speeltuin. We vinden de beste zaterdag- en zondagmomenten.'**
   String get riderWeekendDesc;
 
   /// No description provided for @riderEarlyBird.
@@ -1996,7 +1984,7 @@ abstract class S {
   /// No description provided for @riderEarlyBirdDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Je fietst voordat de wereld wakker wordt. Ochtendslots zijn jouw sweet spot.'**
+  /// **'Je fietst voordat de wereld wakker wordt. De vroege uren zijn van jou.'**
   String get riderEarlyBirdDesc;
 
   /// No description provided for @riderAfterWork.
@@ -2008,7 +1996,7 @@ abstract class S {
   /// No description provided for @riderAfterWorkDesc.
   ///
   /// In nl, this message translates to:
-  /// **'De avond is jouw ontsnapping. We zoeken de beste avondvensters met het mooiste weer.'**
+  /// **'De avond is jouw ontsnapping. We zoeken de beste avondmomenten met het mooiste weer.'**
   String get riderAfterWorkDesc;
 
   /// No description provided for @riderAfternoon.
@@ -2020,7 +2008,7 @@ abstract class S {
   /// No description provided for @riderAfternoonDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Je pakt de beste uren van de dag. Middagslots worden jouw ideale momenten.'**
+  /// **'Je pakt de beste uren van de dag. De middaguren worden jouw beste ritten.'**
   String get riderAfternoonDesc;
 
   /// No description provided for @riderBusy.
@@ -2056,7 +2044,7 @@ abstract class S {
   /// No description provided for @agendaCancel.
   ///
   /// In nl, this message translates to:
-  /// **'Annuleer'**
+  /// **'Annuleren'**
   String get agendaCancel;
 
   /// No description provided for @agendaBusy.
@@ -2170,7 +2158,7 @@ abstract class S {
   /// No description provided for @unplanConfirmTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Rit uitplannen?'**
+  /// **'Deze rit verwijderen?'**
   String get unplanConfirmTitle;
 
   /// No description provided for @unplanConfirmMessage.
@@ -2182,7 +2170,7 @@ abstract class S {
   /// No description provided for @unplanConfirmAction.
   ///
   /// In nl, this message translates to:
-  /// **'Uitplannen'**
+  /// **'Verwijderen'**
   String get unplanConfirmAction;
 
   /// No description provided for @ridesWindFrom.
@@ -2290,7 +2278,7 @@ abstract class S {
   /// No description provided for @hintTapRideWindow.
   ///
   /// In nl, this message translates to:
-  /// **'Tik op een rijvenster'**
+  /// **'Tik op een fietsmoment'**
   String get hintTapRideWindow;
 
   /// No description provided for @hintTapRideWindowDesc.
@@ -2362,7 +2350,7 @@ abstract class S {
   /// No description provided for @hintSwipeDelete.
   ///
   /// In nl, this message translates to:
-  /// **'Swipe om te verwijderen'**
+  /// **'Veeg om te verwijderen'**
   String get hintSwipeDelete;
 
   /// No description provided for @hintSwipeDeleteDesc.
@@ -2416,7 +2404,7 @@ abstract class S {
   /// No description provided for @tourHomeTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Rijvensters'**
+  /// **'Fietsmomenten'**
   String get tourHomeTitle;
 
   /// No description provided for @tourHomeBody.
@@ -2494,13 +2482,13 @@ abstract class S {
   /// No description provided for @calendarSignInCanceled.
   ///
   /// In nl, this message translates to:
-  /// **'Aanmelden geannuleerd'**
+  /// **'Inloggen geannuleerd'**
   String get calendarSignInCanceled;
 
   /// No description provided for @notifEveningTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Top rijmoment morgen!'**
+  /// **'Mooi fietsmoment morgen!'**
   String get notifEveningTitle;
 
   /// No description provided for @notifEveningBody.
@@ -2512,7 +2500,7 @@ abstract class S {
   /// No description provided for @notifMorningTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Over 2 uur een top rijmoment!'**
+  /// **'Over 2 uur een mooi fietsmoment!'**
   String get notifMorningTitle;
 
   /// No description provided for @notifMorningBody.
@@ -2548,7 +2536,7 @@ abstract class S {
   /// No description provided for @notifChannelWeeklyDigestDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Zondagavond overzicht van de beste rijmomenten'**
+  /// **'Zondagavond overzicht van de beste fietsmomenten'**
   String get notifChannelWeeklyDigestDesc;
 
   /// No description provided for @widgetTierPerfect.
@@ -2560,7 +2548,7 @@ abstract class S {
   /// No description provided for @widgetTierGreat.
   ///
   /// In nl, this message translates to:
-  /// **'Geweldig'**
+  /// **'Goed'**
   String get widgetTierGreat;
 
   /// No description provided for @widgetTierAcceptable.
@@ -2590,7 +2578,7 @@ abstract class S {
   /// No description provided for @hourlyFeelsLike.
   ///
   /// In nl, this message translates to:
-  /// **'v.a. {temp}°C'**
+  /// **'voelt als {temp}°'**
   String hourlyFeelsLike(String temp);
 
   /// No description provided for @dayShortMon.
@@ -2650,7 +2638,7 @@ abstract class S {
   /// No description provided for @calendarImportSuccess.
   ///
   /// In nl, this message translates to:
-  /// **'Agenda-afspraken geimporteerd!'**
+  /// **'Agenda-afspraken geïmporteerd'**
   String get calendarImportSuccess;
 
   /// No description provided for @calendarImportError.

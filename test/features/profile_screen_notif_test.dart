@@ -1,5 +1,5 @@
 // test/features/profile_screen_notif_test.dart
-// Widget-tests voor ProfileScreen NOTIFICATIES sectie.
+// Widget-tests voor ProfileScreen MELDINGEN sectie.
 // Dekt Phase 8 Plan 05 success criteria (NOTIF-01, NOTIF-02, NOTIF-03).
 
 import 'package:flutter/material.dart';
@@ -102,15 +102,15 @@ void main() {
   });
 
   testWidgets(
-    'Test 1: Toont NOTIFICATIES sectie met 3 SwitchListTile widgets',
+    'Test 1: Toont MELDINGEN sectie met 3 SwitchListTile widgets',
     (tester) async {
       final notifier = FakeProfileNotifier(testProfile);
       await tester.pumpWidget(await _buildProfileScreen(notifier));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // NOTIFICATIES sectie-koptekst zichtbaar
-      expect(find.text('NOTIFICATIES', skipOffstage: false), findsOneWidget);
+      // MELDINGEN sectie-koptekst zichtbaar
+      expect(find.text('MELDINGEN', skipOffstage: false), findsOneWidget);
 
       // Drie SwitchListTile widgets aanwezig
       expect(

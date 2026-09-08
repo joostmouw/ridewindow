@@ -40,6 +40,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | *ingehaald door 006* | iconografie, fase-24, merk, rider-types |
 | 006 | [hele-set-per-familie](006-hele-set-per-familie/) | Hoe ziet de volledige icooninventaris eruit in elke kandidaat-familie? | **Phosphor** (gewicht open) | iconografie, fase-24, mapping, keuze |
 | 008 | [ritten-rollen](008-ritten-rollen/) | Hoe lees je aan een rit af welke rol jij erin hebt — en hoe kom je vanaf een gedeelde rit in één tik bij het detail? | **A — Eén lijst met filterrij** | ritten, peloton, rollen, navigatie, lijst |
+| 009 | [nederlandse-teksten](009-nederlandse-teksten/) | Welk Nederlands spreekt deze app — en welk woord gebruikt hij voor zijn eigen kernbegrip? | **A — "fietsmoment"** (blok 2 beperkt, blok 4 afgewezen) | l10n, nederlands, toon, kleding, jargon |
 
 ## Beslissingen die doorwerken
 
@@ -105,3 +106,10 @@ staan verdeeld over twee tabbladen, dragen hetzelfde icoon, missen hun datum en 
 tikken. Drie manieren om de rol áán de rit te hangen — filterrij, secties, of een rolstrook — plus
 één keer waar de tik op uitkomt. Aanleiding: Joost, 2026-09-08. **Gekozen: A** — chronologie blijft
 leidend, de filterrij met telling beantwoordt "wat organiseer ik" al vóór je tikt.
+
+## 009 — De Nederlandse teksten
+
+`009-nederlandse-teksten/` — Alle 505 strings nagelezen na Joost's "ik vind de Nederlandse
+vertalingen ook niet zo goed". Vier blokken: het kernwoord (de app had er vijf voor hetzelfde
+ding), het kledingadvies, achttien echte fouten en acht plekken toon. **Gekozen: A** plus alle
+fouten; de kleding beperkt tot de kniewarmers, de toon ongemoeid.

@@ -7,7 +7,7 @@
 //   - Score-labels worden getoond per factor (bijv. "95 · Ideaal")
 //   - Eén-regel uitleg per factor aanwezig
 //   - Totale score rij onderaan zichtbaar
-//   - "Begrijpen" knop sluit de sheet
+//   - "Duidelijk" knop sluit de sheet
 //   - Lege hours-lijst vallt terug op score 50.0 (geen crash)
 
 import 'package:flutter/material.dart';
@@ -180,12 +180,12 @@ void main() {
       expect(find.textContaining('Totaalscore'), findsOneWidget);
     });
 
-    testWidgets('"Begrijpen" knop is zichtbaar', (tester) async {
+    testWidgets('"Duidelijk" knop is zichtbaar', (tester) async {
       final slot = makeSlot();
       await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: slot)));
       await tester.pump();
 
-      expect(find.textContaining('Begrijpen'), findsOneWidget);
+      expect(find.textContaining('Duidelijk'), findsOneWidget);
     });
 
     testWidgets('Lege hours-lijst veroorzaakt geen crash (fallback score 50)',

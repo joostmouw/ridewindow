@@ -45,8 +45,8 @@ class SNl extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'rijvensters',
-      one: 'rijvenster',
+      other: 'fietsmomenten',
+      one: 'fietsmoment',
     );
     return '$count $_temp0 deze week';
   }
@@ -63,7 +63,7 @@ class SNl extends S {
   String get thisWeek => 'KOMENDE DAGEN';
 
   @override
-  String get rideTimes => 'RIJTIJDEN';
+  String get rideTimes => 'FIETSMOMENTEN';
 
   @override
   String get plannedRidesLabel => 'GEPLAND';
@@ -104,7 +104,7 @@ class SNl extends S {
 
   @override
   String showAllWindows(Object count) {
-    return 'Toon alle $count vensters';
+    return 'Toon alle $count momenten';
   }
 
   @override
@@ -157,7 +157,7 @@ class SNl extends S {
 
   @override
   String get infoTemp =>
-      'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit rijvenster. Pas je bereik aan in Profiel.';
+      'De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit fietsmoment. Pas je bereik aan in Profiel.';
 
   @override
   String get infoRain =>
@@ -249,7 +249,7 @@ class SNl extends S {
   String get tierPerfectAgenda => 'Perfect';
 
   @override
-  String get tierGreatAgenda => 'Geweldig';
+  String get tierGreatAgenda => 'Goed';
 
   @override
   String get tierAcceptableAgenda => 'Oké';
@@ -271,7 +271,7 @@ class SNl extends S {
 
   @override
   String get addedToGoogleCalendar =>
-      'Rijvenster toegevoegd aan Google Agenda!';
+      'Fietsmoment toegevoegd aan Google Agenda';
 
   @override
   String couldNotAdd(String error) {
@@ -279,30 +279,30 @@ class SNl extends S {
   }
 
   @override
-  String get weatherLoadError => 'Weersdata kon niet worden geladen.';
+  String get weatherLoadError => 'Het weerbericht kon niet worden geladen.';
 
   @override
   String get emptyBadWeather =>
-      'Geen goede rijmomenten deze week. Slecht weer verwacht.';
+      'Geen goede fietsmomenten deze week. Slecht weer verwacht.';
 
   @override
   String get emptyAllBlocked =>
       'Alle goede momenten zijn geblokkeerd. Pas je schema aan.';
 
   @override
-  String get emptyNoSlots => 'Geen rijmomenten gevonden.';
+  String get emptyNoSlots => 'Geen fietsmomenten gevonden.';
 
   @override
-  String get emptyNoSlotsDay => 'Geen rijmomenten op deze dag.';
+  String get emptyNoSlotsDay => 'Geen fietsmomenten op deze dag.';
 
   @override
   String staleDataBannerWithTime(String time) {
-    return 'Offline — toont rijvensters van $time';
+    return 'Offline — toont fietsmomenten van $time';
   }
 
   @override
   String get staleDataBannerNoTime =>
-      'Offline — toont laatst bekende rijvensters';
+      'Offline — toont laatst bekende fietsmomenten';
 
   @override
   String get unitKmh => 'km/u';
@@ -328,11 +328,11 @@ class SNl extends S {
   }
 
   @override
-  String get welcomeTitle => 'Jouw perfecte rijmoment';
+  String get welcomeTitle => 'Jouw perfecte fietsmoment';
 
   @override
   String get welcomeSubtitle =>
-      'Combineer het weerbericht met jouw agenda en ontdek de beste windows om te fietsen.';
+      'Combineer het weerbericht met jouw agenda en ontdek de beste momenten om te fietsen.';
 
   @override
   String get welcomeButton => 'Aan de slag →';
@@ -382,7 +382,7 @@ class SNl extends S {
   String get sectionLocation => 'LOCATIE';
 
   @override
-  String get sectionNotifications => 'NOTIFICATIES';
+  String get sectionNotifications => 'MELDINGEN';
 
   @override
   String get sectionTheme => 'THEMA';
@@ -416,7 +416,7 @@ class SNl extends S {
   String get useGpsLocation => 'GPS-locatie gebruiken';
 
   @override
-  String get clearLocationOverride => 'Locatie-override wissen';
+  String get clearLocationOverride => 'Terug naar mijn GPS-locatie';
 
   @override
   String get grantPermission => 'Toestemming geven';
@@ -443,13 +443,13 @@ class SNl extends S {
 
   @override
   String get notifEveningBeforeSub =>
-      '19:00 de vorige dag als er een top-slot is';
+      '19:00 de avond ervoor, als er een mooi moment aankomt';
 
   @override
   String get notifMorningOf => 'Ochtend van de dag';
 
   @override
-  String get notifMorningOfSub => '2 uur voor het slot begint';
+  String get notifMorningOfSub => '2 uur voordat het begint';
 
   @override
   String get notifWeeklyDigest => 'Wekelijks overzicht';
@@ -488,7 +488,7 @@ class SNl extends S {
 
   @override
   String get toleranceTempInfo =>
-      'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer rijvensters; een smaller bereik toont alleen je ideale omstandigheden.';
+      'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.';
 
   @override
   String get toleranceRainInfoTitle => 'Regentolerantie';
@@ -502,7 +502,7 @@ class SNl extends S {
 
   @override
   String get toleranceWindInfo =>
-      'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer rijvensters, maar verwacht zwaarder fietsen.';
+      'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.';
 
   @override
   String get tempDescAllWeather => 'Je fietst in bijna elk weer';
@@ -520,7 +520,7 @@ class SNl extends S {
   String get rainDescDryOnly => 'Alleen bij droog weer';
 
   @override
-  String get rainDescDrizzleOk => 'Een beetje motregen is ok';
+  String get rainDescDrizzleOk => 'Een beetje motregen is prima';
 
   @override
   String get rainDescLightRainOk => 'Lichte regen geen probleem';
@@ -557,7 +557,7 @@ class SNl extends S {
   String get enterYourName => 'Voer je naam in';
 
   @override
-  String get cancel => 'Annuleer';
+  String get cancel => 'Annuleren';
 
   @override
   String get save => 'Opslaan';
@@ -592,7 +592,7 @@ class SNl extends S {
   String get googleCalendarLabel => 'Google Agenda';
 
   @override
-  String get calendarStatusChecking => 'Controleren...';
+  String get calendarStatusChecking => 'Controleren…';
 
   @override
   String get calendarStatusConnected => 'Verbonden';
@@ -672,7 +672,7 @@ class SNl extends S {
   String get accountSyncStatusSynced => 'Gesynchroniseerd';
 
   @override
-  String get accountSyncStatusPending => 'Wordt gesynchroniseerd...';
+  String get accountSyncStatusPending => 'Wordt gesynchroniseerd…';
 
   @override
   String get accountDeleteAction => 'Account verwijderen';
@@ -907,19 +907,13 @@ class SNl extends S {
   String get clothingArmWarmers => 'Armwarmers';
 
   @override
-  String get clothingLegWarmers => 'Beenwarmers';
-
-  @override
-  String get clothingKneeWarmers => 'Kniewarmers';
+  String get clothingLegWarmers => 'Lange broek';
 
   @override
   String get clothingShortSleeveJersey => 'Korte mouw jersey';
 
   @override
   String get clothingArmWarmersJustInCase => 'Armwarmers voor de zekerheid';
-
-  @override
-  String get clothingLightShirt => 'Licht shirt';
 
   @override
   String get clothingSunscreen => 'Zonnebrand';
@@ -952,7 +946,7 @@ class SNl extends S {
   String get reminderPlanned => 'Herinnering gepland voor de avond ervoor!';
 
   @override
-  String get shareRideWindow => 'Deel dit rijvenster';
+  String get shareRideWindow => 'Deel dit fietsmoment';
 
   @override
   String shareText(String day, String timeRange, String tier, String summary) {
@@ -1026,7 +1020,7 @@ class SNl extends S {
   String get totalScore => 'Totaalscore';
 
   @override
-  String get understood => 'Begrijpen';
+  String get understood => 'Duidelijk';
 
   @override
   String get showScoreDetails => 'Waarom deze score';
@@ -1048,7 +1042,7 @@ class SNl extends S {
 
   @override
   String get riderNoTimeDesc =>
-      'Maak wat uren vrij om je perfecte rijmomenten te vinden.';
+      'Maak wat uren vrij om je perfecte fietsmomenten te vinden.';
 
   @override
   String get riderFulltime => 'Fulltime fietser';
@@ -1062,28 +1056,28 @@ class SNl extends S {
 
   @override
   String get riderWeekendDesc =>
-      'Het weekend is jouw speeltuin. We vinden de beste zaterdag- en zondagvensters.';
+      'Het weekend is jouw speeltuin. We vinden de beste zaterdag- en zondagmomenten.';
 
   @override
   String get riderEarlyBird => 'Vroege vogel';
 
   @override
   String get riderEarlyBirdDesc =>
-      'Je fietst voordat de wereld wakker wordt. Ochtendslots zijn jouw sweet spot.';
+      'Je fietst voordat de wereld wakker wordt. De vroege uren zijn van jou.';
 
   @override
   String get riderAfterWork => 'Na-werk fietser';
 
   @override
   String get riderAfterWorkDesc =>
-      'De avond is jouw ontsnapping. We zoeken de beste avondvensters met het mooiste weer.';
+      'De avond is jouw ontsnapping. We zoeken de beste avondmomenten met het mooiste weer.';
 
   @override
   String get riderAfternoon => 'Middagfietser';
 
   @override
   String get riderAfternoonDesc =>
-      'Je pakt de beste uren van de dag. Middagslots worden jouw ideale momenten.';
+      'Je pakt de beste uren van de dag. De middaguren worden jouw beste ritten.';
 
   @override
   String get riderBusy => 'Druk maar doorzetter';
@@ -1103,7 +1097,7 @@ class SNl extends S {
   String get agendaTitle => 'Agenda';
 
   @override
-  String get agendaCancel => 'Annuleer';
+  String get agendaCancel => 'Annuleren';
 
   @override
   String get agendaBusy => 'Bezet';
@@ -1177,14 +1171,14 @@ class SNl extends S {
   String get removePlannedRideTooltip => 'Verwijder geplande rit';
 
   @override
-  String get unplanConfirmTitle => 'Rit uitplannen?';
+  String get unplanConfirmTitle => 'Deze rit verwijderen?';
 
   @override
   String get unplanConfirmMessage =>
       'Dit verwijdert de rit uit je geplande ritten. Je kunt hem altijd opnieuw plannen.';
 
   @override
-  String get unplanConfirmAction => 'Uitplannen';
+  String get unplanConfirmAction => 'Verwijderen';
 
   @override
   String ridesWindFrom(String direction, String advice) {
@@ -1240,7 +1234,7 @@ class SNl extends S {
   String get compassNW => 'NW';
 
   @override
-  String get hintTapRideWindow => 'Tik op een rijvenster';
+  String get hintTapRideWindow => 'Tik op een fietsmoment';
 
   @override
   String get hintTapRideWindowDesc =>
@@ -1282,7 +1276,7 @@ class SNl extends S {
       'Tik op een rit voor een uitgebreid weeroverzicht per uur, score-opbouw en windadvies.';
 
   @override
-  String get hintSwipeDelete => 'Swipe om te verwijderen';
+  String get hintSwipeDelete => 'Veeg om te verwijderen';
 
   @override
   String get hintSwipeDeleteDesc =>
@@ -1312,7 +1306,7 @@ class SNl extends S {
   }
 
   @override
-  String get tourHomeTitle => 'Rijvensters';
+  String get tourHomeTitle => 'Fietsmomenten';
 
   @override
   String get tourHomeBody =>
@@ -1359,10 +1353,10 @@ class SNl extends S {
   }
 
   @override
-  String get calendarSignInCanceled => 'Aanmelden geannuleerd';
+  String get calendarSignInCanceled => 'Inloggen geannuleerd';
 
   @override
-  String get notifEveningTitle => 'Top rijmoment morgen!';
+  String get notifEveningTitle => 'Mooi fietsmoment morgen!';
 
   @override
   String notifEveningBody(String slot) {
@@ -1370,7 +1364,7 @@ class SNl extends S {
   }
 
   @override
-  String get notifMorningTitle => 'Over 2 uur een top rijmoment!';
+  String get notifMorningTitle => 'Over 2 uur een mooi fietsmoment!';
 
   @override
   String notifMorningBody(String slot) {
@@ -1392,13 +1386,13 @@ class SNl extends S {
 
   @override
   String get notifChannelWeeklyDigestDesc =>
-      'Zondagavond overzicht van de beste rijmomenten';
+      'Zondagavond overzicht van de beste fietsmomenten';
 
   @override
   String get widgetTierPerfect => 'Perfect';
 
   @override
-  String get widgetTierGreat => 'Geweldig';
+  String get widgetTierGreat => 'Goed';
 
   @override
   String get widgetTierAcceptable => 'Acceptabel';
@@ -1414,7 +1408,7 @@ class SNl extends S {
 
   @override
   String hourlyFeelsLike(String temp) {
-    return 'v.a. $temp°C';
+    return 'voelt als $temp°';
   }
 
   @override
@@ -1445,7 +1439,7 @@ class SNl extends S {
   String get legendCalendar => 'Agenda';
 
   @override
-  String get calendarImportSuccess => 'Agenda-afspraken geimporteerd!';
+  String get calendarImportSuccess => 'Agenda-afspraken geïmporteerd';
 
   @override
   String get calendarImportError => 'Kon agenda-afspraken niet importeren';

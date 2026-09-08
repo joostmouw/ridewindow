@@ -91,7 +91,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final title = find.textContaining('perfecte rijmoment');
+      final title = find.textContaining('perfecte fietsmoment');
       expect(title, findsOneWidget);
 
       final ratio = contrast(

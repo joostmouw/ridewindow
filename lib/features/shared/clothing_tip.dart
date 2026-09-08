@@ -143,10 +143,13 @@ List<String> clothingItems(ClothingAdvice advice, S s) {
       }
     case ClothingCombo.longLong:
       items.add(s.clothingLongSleeveJersey);
+      // Tussen 10 en 14 graden stond hier "kniewarmers". Weg (Joost,
+      // 2026-09-08): dat is geen kledingstuk dat mensen aanhebben -- korte of
+      // lange broek is genoeg, en die staat al in de bandnaam (lang/lang).
+      // Er is dus bewust géén vervanger; een advies dat niets toevoegt hoort
+      // er niet te staan.
       if (advice.feelsLike < 10) {
         items.addAll([s.clothingArmWarmers, s.clothingLegWarmers]);
-      } else {
-        items.add(s.clothingKneeWarmers);
       }
     case ClothingCombo.longLongExtra:
       items.addAll([

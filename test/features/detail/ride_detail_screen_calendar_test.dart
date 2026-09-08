@@ -6,7 +6,7 @@
 //
 // Tests:
 //   Test 1 — laadstatus: CircularProgressIndicator zichtbaar terwijl Future loopt
-//   Test 2 — succesmelding: SnackBar met "Rijvenster toegevoegd"
+//   Test 2 — succesmelding: SnackBar met "Fietsmoment toegevoegd"
 //   Test 3 — foutmelding: SnackBar met foutboodschap
 //   Test 4 — PERS-04 privacy: addRideSlotToCalendar NIET aangeroepen zonder knoptik
 
@@ -233,10 +233,10 @@ void main() {
     });
 
     // -------------------------------------------------------------------------
-    // Test 2: succesmelding — SnackBar met "Rijvenster toegevoegd" na succes.
+    // Test 2: succesmelding — SnackBar met "Fietsmoment toegevoegd" na succes.
     // -------------------------------------------------------------------------
     testWidgets(
-        'Test 2 — succesmelding: SnackBar met "Rijvenster toegevoegd" verschijnt',
+        'Test 2 — succesmelding: SnackBar met "Fietsmoment toegevoegd" verschijnt',
         (tester) async {
       final service = SuccessFakeCalendarService();
       final slot = makeSlot();
@@ -260,7 +260,7 @@ void main() {
       await tester.tap(find.text('Toevoegen aan Google Agenda'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Rijvenster toegevoegd'), findsOneWidget);
+      expect(find.textContaining('Fietsmoment toegevoegd'), findsOneWidget);
     });
 
     // -------------------------------------------------------------------------

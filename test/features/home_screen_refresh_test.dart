@@ -343,7 +343,7 @@ void main() {
 
       // (a) stale/offline banner is present with the known timestamp.
       expect(
-        find.text('Offline — toont rijvensters van 14:30'),
+        find.text('Offline — toont fietsmomenten van 14:30'),
         findsOneWidget,
       );
       // (b) the blank full-screen error is NOT shown when previous data

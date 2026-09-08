@@ -907,19 +907,13 @@ class SEn extends S {
   String get clothingArmWarmers => 'Arm warmers';
 
   @override
-  String get clothingLegWarmers => 'Leg warmers';
-
-  @override
-  String get clothingKneeWarmers => 'Knee warmers';
+  String get clothingLegWarmers => 'Long trousers';
 
   @override
   String get clothingShortSleeveJersey => 'Short sleeve jersey';
 
   @override
   String get clothingArmWarmersJustInCase => 'Arm warmers just in case';
-
-  @override
-  String get clothingLightShirt => 'Light shirt';
 
   @override
   String get clothingSunscreen => 'Sunscreen';
