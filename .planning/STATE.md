@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "v4.0 fase 23-25 af; Play-upload is de volgende stap"
-last_updated: "2026-09-08T11:05:00.000Z"
+status: "1.0.25+26 gebouwd; Play-sleutel vraagt Joosts hand"
+last_updated: "2026-09-08T13:30:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -29,6 +29,7 @@ progress:
 | 2026-09-07 | [home-verfijning](quick/260907-hzt-home-verfijning-na-fase-23/) | Zes rondes na fase 23: dagstrip op vier niveaus, lijstplafonds, compactere kaarten, en uitleg waarom een score die score is. **Lees de drie vondsten daar** — icon-tree-shaking, gen-l10n-volgorde, en de verouderde bundel. |
 | 2026-09-07 | [gevoelsbalk](quick/260907-wgz-fase-24-kledingadvies-gevoelsbalk/) | Fase 24: het kledingadvies is geen plaatje meer maar een balk met de gevoelstemperatuur. **Lees de vondst daar** — de app toonde twee verschillende "feels like" naast elkaar. |
 | 2026-09-08 | [phosphor](quick/260908-d9k-fase-24-iconen-naar-phosphor-regular/) | Fase 24 af: 71 Material-iconen en 12 emoji naar Phosphor Regular. **Het pub-pakket viel af** — het breekt op Flutter's `final class IconData`; we dragen het font nu zelf. |
+| 2026-09-08 | [play-release](quick/260908-i4m-play-release-v4-0-klaarzetten-en-uploads/) | `1.0.25+26` gebouwd plus `tool/play_upload.dart`. **De testsuite ving de val**: `lib/core/app_version.dart` bumpt niet mee met `pubspec.yaml`. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -73,9 +74,15 @@ opgehoogd voor Play).
 - **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
   alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
 
-**Wat als eerste aandacht vraagt:** dit alles staat nog niet op Play. De
-laatste Play-build is 1.0.24+25 en die kent hiervan niets. Zie hieronder
-waarom uploaden handwerk blijft.
+**Wat als eerste aandacht vraagt:** dit alles staat nog niet op Play — de
+laatste Play-build is 1.0.24+25 en kent hiervan niets. `1.0.25+26` ligt klaar
+en het uploadscript is geschreven; wat ontbreekt is de service-account-sleutel.
+Zie het blok "Play-release" hieronder voor de twee stappen.
+
+Let op bij een volgende bump: `pubspec.yaml` is niet de enige plek. De in-app
+versie staat hard in `lib/core/app_version.dart` en liep hier stilzwijgend
+achter — `test/core/app_version_test.dart` ving het, en `tool/play_upload.dart`
+weigert nu ook te uploaden als die twee uiteenlopen.
 
 **Fase 24 is begonnen en gedraaid van koers.** De fase heette "iconografie" en
 zou eigen pictogrammen voor het kledingadvies opleveren (schets 002). Joost wees
@@ -102,27 +109,36 @@ iemand anders dan Joost het nieuwe uiterlijk ziet.
 Er zijn 3 van de 12 testers die Google wil zien voor productietoegang, en een
 closed test moet 14 dagen lopen.
 
-**Play-release: ik kan hem bouwen, niet uploaden.** Vastgesteld 2026-09-07.
-`flutter build appbundle --release` levert een ondertekende AAB (`key.properties`
-staat goed) op `build/app/outputs/bundle/release/app-release.aab`, ~67 MB. Het
-uploaden lukt niet vanaf hier:
+**Play-release: het script staat, de sleutel niet.** Bijgewerkt 2026-09-08.
 
-- **Browser-automatisering valt af.** Het uploadgereedschap accepteert maximaal
-  10 MB en alleen bestanden die met de sessie gedeeld zijn. 67 MB uit `build/`
-  voldoet aan geen van beide.
-- **De Play Developer API is niet ingericht.** Geen service-account-JSON in het
-  project, geen `gcloud`, geen fastlane.
+`1.0.25+26` is gebouwd en ondertekend (`META-INF/UPLOAD.RSA`, manifest zegt
+`versionCode=26` / `versionName=1.0.25`), 66 MB. Uploaden is nu:
 
-De poging is echt gedaan, niet beredeneerd: `file_upload` antwoordde
-letterlijk `total upload size would exceed 10 MB` op een bestand van 67,3 MB.
-Splitsen kan niet, een AAB is één bestand.
+```bash
+dart run tool/play_upload.dart --track internal --status draft \
+  --notes en-US:release-notes/en-US.txt --notes nl-NL:release-notes/nl-NL.txt
+```
 
-**Openstaand aanbod:** de Play Developer API kent die grens niet. Eenmalige
-inrichting — service account in GCP-project `my-project-joost`, uitnodigen in
-Play Console onder *Users and permissions* met release-rechten, sleutel buiten
-de repo. Stap 2 en 3 zijn rechtenwijzigingen op Joosts account en dus zijn hand;
-het script is mijn deel en is nog niet geschreven. Daarna is elke release één
-commando.
+**Wat jouw hand vraagt, eenmalig — daarna is elke release dat ene commando.**
+Beide stappen staan uitgeschreven in `tool/README-play-release.md`:
+
+1. Play Console → *Setup → API access* → service-account aanmaken in
+   `my-project-joost`, JSON-sleutel downloaden naar
+   `~/.config/ridewindow/play-service-account.json` (buiten de repo, bewust).
+2. Play Console → *Users and permissions* → dat service-account uitnodigen,
+   beperkt tot RideWindow, met *Release to testing tracks*.
+
+Rechten hebben tot 24 uur nodig om door te werken; een 401 vlak na het
+uitnodigen is geen fout in het script.
+
+**Wat wél en niet bewezen is.** Argumenten, de twee vangrails, het inlezen van
+release-notes en `dart analyze` zijn gedraaid. De vier API-aanroepen zelf niet —
+daarvoor is die sleutel nodig. Draai de eerste keer met `--status draft`.
+
+**Waarom browser-automatisering afvalt (2026-09-07, niet beredeneerd maar
+geprobeerd):** `file_upload` antwoordde letterlijk `total upload size would
+exceed 10 MB` op een bestand van 67,3 MB. Splitsen kan niet, een AAB is één
+bestand. De Developer API kent die grens niet — hij uploadt resumable.
 
 **De Play-build loopt inmiddels ver achter.** Op het toestel staat 1.0.23+24,
 zónder Peloton en zónder iets van v4.0. Alle testers zien dus nog de app waar
