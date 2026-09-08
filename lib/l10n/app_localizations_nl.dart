@@ -1157,14 +1157,6 @@ class SNl extends S {
       'Plan een rit vanuit Home of selecteer uren in de Agenda.';
 
   @override
-  String ridesEmptySharedHint(Object count) {
-    return 'Je hebt zelf nog niets gepland, maar je doet mee aan $count gedeelde rit. Die staan op het tabblad Maatjes.';
-  }
-
-  @override
-  String get ridesEmptyGoToPeloton => 'Naar Peloton';
-
-  @override
   String get rideRemoved => 'Rit verwijderd';
 
   @override
@@ -1492,12 +1484,6 @@ class SNl extends S {
       'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.';
 
   @override
-  String get ridesTabMine => 'Mijn ritten';
-
-  @override
-  String get ridesTabPeloton => 'Peloton';
-
-  @override
   String get pelotonEmptyTitle => 'Samen fietsen';
 
   @override
@@ -1515,25 +1501,6 @@ class SNl extends S {
 
   @override
   String get pelotonJoin => 'Meedoen';
-
-  @override
-  String get pelotonNobodyYet => 'Nog niemand aangemeld';
-
-  @override
-  String pelotonJoinedCount(num count) {
-    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
-      locale: localeName,
-    );
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString fietsers doen mee',
-      one: '1 fietser doet mee',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get pelotonSignedOut => 'Log in om samen te fietsen';
@@ -1569,19 +1536,10 @@ class SNl extends S {
   String get pelotonRemoveFriend => 'Maatje verwijderen';
 
   @override
-  String get pelotonPendingInvites => 'Uitnodigingen voor jou';
-
-  @override
   String get pelotonAccept => 'Ik ga mee';
 
   @override
   String get pelotonDecline => 'Kan niet';
-
-  @override
-  String get pelotonOwnedRides => 'Ritten die jij organiseert';
-
-  @override
-  String get pelotonJoinedRides => 'Ritten waar je aan meedoet';
 
   @override
   String get pelotonWithdraw => 'Toch niet';
@@ -1626,11 +1584,6 @@ class SNl extends S {
   }
 
   @override
-  String pelotonWithOwner(String name) {
-    return 'Met $name';
-  }
-
-  @override
   String pelotonFriendAdded(String name) {
     return '$name is nu je maatje';
   }
@@ -1641,11 +1594,6 @@ class SNl extends S {
 
   @override
   String get pelotonUnnamedFriend => 'Fietser';
-
-  @override
-  String pelotonInvitedBy(String name) {
-    return 'Van $name';
-  }
 
   @override
   String get pelotonRetry => 'Opnieuw proberen';

@@ -2131,18 +2131,6 @@ abstract class S {
   /// **'Plan een rit vanuit Home of selecteer uren in de Agenda.'**
   String get ridesEmptyHint;
 
-  /// No description provided for @ridesEmptySharedHint.
-  ///
-  /// In nl, this message translates to:
-  /// **'Je hebt zelf nog niets gepland, maar je doet mee aan {count} gedeelde rit. Die staan op het tabblad Maatjes.'**
-  String ridesEmptySharedHint(Object count);
-
-  /// No description provided for @ridesEmptyGoToPeloton.
-  ///
-  /// In nl, this message translates to:
-  /// **'Naar Peloton'**
-  String get ridesEmptyGoToPeloton;
-
   /// No description provided for @rideRemoved.
   ///
   /// In nl, this message translates to:
@@ -2731,18 +2719,6 @@ abstract class S {
   /// **'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.'**
   String get addToHomeScreenHint;
 
-  /// No description provided for @ridesTabMine.
-  ///
-  /// In nl, this message translates to:
-  /// **'Mijn ritten'**
-  String get ridesTabMine;
-
-  /// No description provided for @ridesTabPeloton.
-  ///
-  /// In nl, this message translates to:
-  /// **'Peloton'**
-  String get ridesTabPeloton;
-
   /// No description provided for @pelotonEmptyTitle.
   ///
   /// In nl, this message translates to:
@@ -2778,18 +2754,6 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Meedoen'**
   String get pelotonJoin;
-
-  /// No description provided for @pelotonNobodyYet.
-  ///
-  /// In nl, this message translates to:
-  /// **'Nog niemand aangemeld'**
-  String get pelotonNobodyYet;
-
-  /// No description provided for @pelotonJoinedCount.
-  ///
-  /// In nl, this message translates to:
-  /// **'{count, plural, =1{1 fietser doet mee} other{{count} fietsers doen mee}}'**
-  String pelotonJoinedCount(num count);
 
   /// No description provided for @pelotonSignedOut.
   ///
@@ -2845,12 +2809,6 @@ abstract class S {
   /// **'Maatje verwijderen'**
   String get pelotonRemoveFriend;
 
-  /// No description provided for @pelotonPendingInvites.
-  ///
-  /// In nl, this message translates to:
-  /// **'Uitnodigingen voor jou'**
-  String get pelotonPendingInvites;
-
   /// No description provided for @pelotonAccept.
   ///
   /// In nl, this message translates to:
@@ -2862,18 +2820,6 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Kan niet'**
   String get pelotonDecline;
-
-  /// No description provided for @pelotonOwnedRides.
-  ///
-  /// In nl, this message translates to:
-  /// **'Ritten die jij organiseert'**
-  String get pelotonOwnedRides;
-
-  /// No description provided for @pelotonJoinedRides.
-  ///
-  /// In nl, this message translates to:
-  /// **'Ritten waar je aan meedoet'**
-  String get pelotonJoinedRides;
 
   /// No description provided for @pelotonWithdraw.
   ///
@@ -2947,12 +2893,6 @@ abstract class S {
   /// **'Score {score} van 100 — {tier}'**
   String scoreSemanticLabel(int score, String tier);
 
-  /// No description provided for @pelotonWithOwner.
-  ///
-  /// In nl, this message translates to:
-  /// **'Met {name}'**
-  String pelotonWithOwner(String name);
-
   /// No description provided for @pelotonFriendAdded.
   ///
   /// In nl, this message translates to:
@@ -2970,12 +2910,6 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Fietser'**
   String get pelotonUnnamedFriend;
-
-  /// No description provided for @pelotonInvitedBy.
-  ///
-  /// In nl, this message translates to:
-  /// **'Van {name}'**
-  String pelotonInvitedBy(String name);
 
   /// No description provided for @pelotonRetry.
   ///

@@ -1156,14 +1156,6 @@ class SEn extends S {
       'Plan a ride from Home or select hours in the Agenda.';
 
   @override
-  String ridesEmptySharedHint(Object count) {
-    return 'You have no rides of your own yet, but you are joined on $count shared. Those live on the Peloton tab.';
-  }
-
-  @override
-  String get ridesEmptyGoToPeloton => 'Open Peloton';
-
-  @override
   String get rideRemoved => 'Ride removed';
 
   @override
@@ -1489,12 +1481,6 @@ class SEn extends S {
       'Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.';
 
   @override
-  String get ridesTabMine => 'My rides';
-
-  @override
-  String get ridesTabPeloton => 'Peloton';
-
-  @override
   String get pelotonEmptyTitle => 'Ride together';
 
   @override
@@ -1512,25 +1498,6 @@ class SEn extends S {
 
   @override
   String get pelotonJoin => 'Join';
-
-  @override
-  String get pelotonNobodyYet => 'Nobody has joined yet';
-
-  @override
-  String pelotonJoinedCount(num count) {
-    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
-      locale: localeName,
-    );
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString riders joined',
-      one: '1 rider joined',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get pelotonSignedOut => 'Sign in to ride together';
@@ -1566,19 +1533,10 @@ class SEn extends S {
   String get pelotonRemoveFriend => 'Remove buddy';
 
   @override
-  String get pelotonPendingInvites => 'Invitations for you';
-
-  @override
   String get pelotonAccept => 'Join';
 
   @override
   String get pelotonDecline => 'Can\'t make it';
-
-  @override
-  String get pelotonOwnedRides => 'Rides you organise';
-
-  @override
-  String get pelotonJoinedRides => 'Rides you\'re joining';
 
   @override
   String get pelotonWithdraw => 'Drop out';
@@ -1622,11 +1580,6 @@ class SEn extends S {
   }
 
   @override
-  String pelotonWithOwner(String name) {
-    return 'With $name';
-  }
-
-  @override
   String pelotonFriendAdded(String name) {
     return '$name is now your buddy';
   }
@@ -1637,11 +1590,6 @@ class SEn extends S {
 
   @override
   String get pelotonUnnamedFriend => 'Rider';
-
-  @override
-  String pelotonInvitedBy(String name) {
-    return 'From $name';
-  }
 
   @override
   String get pelotonRetry => 'Try again';
