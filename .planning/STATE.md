@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "v4.0 afgesloten; 1.0.28+29 staat op Play"
-last_updated: "2026-09-08T20:00:00.000Z"
+status: "Ritten: vier rollen in een lijst -- nog niet op Play"
+last_updated: "2026-09-08T22:10:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -36,6 +36,7 @@ progress:
 | 2026-09-08 | [sterren-en-uitleg](quick/260908-m8v-sterren-en-uitleg-terughalen/) | Sterren gingen niet aan (**beide takken hetzelfde icoon** na de Phosphor-migratie), de hint scrolt nu naar zijn doel, en het `i`-knopje staat op alle drie de schermen met uitleg. |
 | 2026-09-08 | [feedback-vertrok-niet](quick/260908-n3r-feedback-vertrok-niet/) | Feedback zei "bedankt" maar startte geen verzending — de rij bleef in de lokale outbox. **Twee dingen die Joost zelf moet nakijken staan in die SUMMARY.** |
 | 2026-09-08 | [welkomtekst-leesbaar](quick/260908-p6w-welkomtekst-leesbaar/) | Tester meldde "font lastig te lezen met kleuren". **Het was de kleur niet** — 9,63:1 en 5,54:1 op brandLight — maar 1170 ms halfzichtbare tekst. |
+| 2026-09-08 | [ritten-rollen](sketches/008-ritten-rollen/) | Schets 008 + bouw: vier rolsoorten (wacht op jou / jij organiseert / je gaat mee / alleen jij) in één chronologische lijst met filterrij; élke rit klikt door naar het detail. **Vijf gebreken, niet één** -- zie de README van de schets. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -859,3 +860,21 @@ Vorige sessie: 2026-08-07 - Fase 21 webkant afgerond: SYNC-11 en SYNC-04 afgetek
 
 - Review the v3.0 roadmap draft (`.planning/ROADMAP.md`, Phases 18–22) and confirm scope/phase split before planning begins.
 - Once approved: `/gsd:plan-phase 18`
+
+## Stand na 2026-09-08 avond -- ritten en rollen
+
+Joost kon niet zien welke ritten hij organiseert, waar hij ja op heeft gezegd en wat hij zelf
+plande, en gedeelde ritten waren niet aan te tikken. Dat bleken **vijf** losse gebreken, waarvan er
+drie los van de vraag stonden: gedeelde ritten toonden geen datum, `joined` en `owned` droegen
+hetzelfde icoon, en `deleteGroupRide` stond sinds epic #62 ongebruikt in de poort -- als organisator
+kwam je nooit meer van je eigen rit af.
+
+Schets 008, variant A (gekozen binnen een minuut, zoals elke keer dat er eerst geschetst is).
+`RideEntry` + `buildRideEntries` zijn nu de enige plek waar "welke rol heb ik in deze rit" wordt
+beslist; Home, de rittenlijst en het detailscherm lezen alle drie diezelfde provider. Tab 2 heet
+**Maatjes** en gaat alleen nog over relaties.
+
+**Wat nog niet is nagelopen op echte data:** de vier rolregels zijn in widget-tests vastgelegd
+(`rides_roles_test.dart`), maar met twee échte accounts is er niets gezien -- daar is een tweede
+inlog voor nodig. De webbuild staat klaar in `build/web`; hij is nog niet naar Firebase Hosting
+gedeployed en niet op de Oppo gedraaid (geen toestel aangesloten tijdens deze sessie).
