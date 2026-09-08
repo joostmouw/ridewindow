@@ -20,6 +20,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 class SafeBackButton extends StatelessWidget {
   const SafeBackButton({super.key, this.fallbackRoute = '/home'});
@@ -46,7 +47,7 @@ class SafeBackButton extends StatelessWidget {
         : (localizedS?.navHome ?? 'Home');
 
     return IconButton(
-      icon: Icon(canPop ? Icons.arrow_back : Icons.home_outlined),
+      icon: Icon(canPop ? AppIcons.arrowLeft : AppIcons.house),
       tooltip: tooltip,
       onPressed: () {
         final router = GoRouter.maybeOf(context);

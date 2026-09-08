@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// De gevoelstemperatuur op de fiets, met de vier kledingbanden als schaal.
 ///
@@ -81,7 +82,7 @@ class FeelsLikeBar extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Icon(Icons.thermostat, size: 13, color: rw.textTertiary),
+              Icon(AppIcons.thermometerSimple, size: 13, color: rw.textTertiary),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -120,7 +121,7 @@ class FeelsLikeBar extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Icon(
-                        Icons.info_outline,
+                        AppIcons.info,
                         size: 14,
                         color: rw.textHint,
                       ),
@@ -235,7 +236,7 @@ class FeelsLikeBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.thermostat, size: 20, color: rw.scorePerfect),
+                  Icon(AppIcons.thermometerSimple, size: 20, color: rw.scorePerfect),
                   const SizedBox(width: 8),
                   Text(
                     s.clothingOnTheBike,

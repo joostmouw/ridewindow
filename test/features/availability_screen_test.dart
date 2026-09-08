@@ -27,6 +27,7 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers
@@ -493,7 +494,7 @@ void main() {
       await tester.pump();
 
       expect(find.textContaining('geselecteerd'), findsNothing);
-      expect(find.byIcon(Icons.touch_app), findsNothing);
+      expect(find.byIcon(AppIcons.handPointing), findsNothing);
     });
   });
 

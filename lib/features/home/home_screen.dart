@@ -35,6 +35,7 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// Vorm van een ride-kaart. De Dismissible-clip, de kaartrand en de
 /// InkWell-ripple gebruiken dezelfde waarden, zodat je precies het blokje
@@ -241,7 +242,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                       Row(
                         children: [
-                          Icon(Icons.location_on_outlined,
+                          Icon(AppIcons.mapPin,
                               size: 14, color: cs.onSurfaceVariant),
                           const SizedBox(width: 4),
                           Text(
@@ -260,7 +261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   actions: [
                     if (weatherState.hasError)
                       IconButton(
-                        icon: Icon(Icons.refresh, color: cs.primary),
+                        icon: Icon(AppIcons.arrowsClockwise, color: cs.primary),
                         tooltip: S.of(context).retryButton,
                         onPressed: () => ref.invalidate(weatherProvider),
                       ),
@@ -371,20 +372,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return [
       HintItem(
         targetKey: _weekStripKey,
-        gestureIcon: Icons.touch_app,
+        gestureIcon: AppIcons.handPointing,
         title: s.hintFilterDay,
         description: s.hintFilterDayDesc,
       ),
       HintItem(
         targetKey: _firstCardKey,
-        gestureIcon: Icons.touch_app,
+        gestureIcon: AppIcons.handPointing,
         title: s.hintTapRideWindow,
         description: s.hintTapRideWindowDesc,
         spotlightPadding: 4,
       ),
       HintItem(
         targetKey: _periodFilterKey,
-        gestureIcon: Icons.swipe,
+        gestureIcon: AppIcons.handSwipeRight,
         title: s.hintFilterPeriod,
         description: s.hintFilterPeriodDesc,
       ),
@@ -800,7 +801,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           HapticFeedback.selectionClick();
           context.go('/rides');
         },
-        icon: const Icon(Icons.arrow_forward, size: 18),
+        icon: const Icon(AppIcons.arrowRight, size: 18),
         label: Text(s.morePlannedRides(hidden)),
         style: TextButton.styleFrom(
           foregroundColor: context.rw.plannedRide,
@@ -853,7 +854,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(isShared ? Icons.groups : Icons.event_available,
+                Icon(isShared ? AppIcons.usersThree : AppIcons.calendarCheck,
                     size: 20, color: rw.plannedRide),
                 const SizedBox(width: 12),
                 Expanded(
@@ -893,7 +894,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (!isShared) ...[
                   const SizedBox(width: 4),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline),
+                    icon: const Icon(AppIcons.trash),
                     tooltip: s.removePlannedRideTooltip,
                     color: cs.error,
                     onPressed: () async {
@@ -987,10 +988,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         hasScrollBody: false,
         child: _buildEmptyState(
           S.of(context).weatherLoadError,
-          icon: Icons.error_outline,
+          icon: AppIcons.warningCircle,
           action: FilledButton.icon(
             onPressed: () => ref.invalidate(weatherProvider),
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(AppIcons.arrowsClockwise),
             label: Text(S.of(context).retryButton),
           ),
         ),
@@ -1110,7 +1111,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
       child: Row(
         children: [
-          Icon(Icons.cloud_off, color: cs.onErrorContainer, size: 20),
+          Icon(AppIcons.cloudSlash, color: cs.onErrorContainer, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -1126,7 +1127,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildEmptyState(String message,
-      {IconData icon = Icons.cloud_off_outlined, Widget? action}) {
+      {IconData icon = AppIcons.cloudSlash, Widget? action}) {
     final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
@@ -1264,7 +1265,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 children: [
                   // Groen op papier in plaats van op een groen vlak, dus de
                   // kleur moet nu zelf het contrast dragen.
-                  Icon(Icons.event_available, color: cs.primary, size: 22),
+                  Icon(AppIcons.calendarCheck, color: cs.primary, size: 22),
                   const SizedBox(width: 8),
                   Text(
                     S.of(context).schedule,
@@ -1360,7 +1361,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.star_rounded,
+                                      Icon(AppIcons.star,
                                           size: 14,
                                           color: cs.onPrimaryContainer),
                                       const SizedBox(width: 4),
@@ -1517,7 +1518,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               child: FilledButton.tonalIcon(
                                 onPressed: () => _planRide(slot),
                                 icon:
-                                    const Icon(Icons.event_available, size: 16),
+                                    const Icon(AppIcons.calendarCheck, size: 16),
                                 label: Text(S.of(context).schedule),
                                 // Dicht een slag dichter op elkaar. Dezelfde
                                 // knop met dezelfde tekst, alleen minder lucht
@@ -1569,7 +1570,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         if (avgTemp != null)
           WeatherIndicatorBar(
             metric: WeatherMetric.temperature,
-            icon: Icons.thermostat,
+            icon: AppIcons.thermometerSimple,
             label: s.weatherTemperature,
             value: avgTemp,
             unit: '\u00B0',
@@ -1581,7 +1582,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         if (totalPrecip != null)
           WeatherIndicatorBar(
             metric: WeatherMetric.rain,
-            icon: Icons.water_drop,
+            icon: AppIcons.drop,
             label: s.weatherRain,
             value: totalPrecip,
             unit: ' mm',
@@ -1592,7 +1593,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         if (avgWind != null)
           WeatherIndicatorBar(
             metric: WeatherMetric.wind,
-            icon: Icons.air,
+            icon: AppIcons.wind,
             label: s.weatherWind,
             value: avgWind,
             unit: ' ${s.unitKmh}',
@@ -1629,7 +1630,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             turns: _showAllSlots ? 0.5 : 0.0,
             duration: AppMotion.emphasizedDuration,
             curve: AppMotion.emphasizedCurve,
-            child: const Icon(Icons.expand_more, size: 20),
+            child: const Icon(AppIcons.caretDown, size: 20),
           ),
           label: Text(
             _showAllSlots ? s.showFewerWindows : s.showAllWindows(total),
@@ -1659,13 +1660,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     // Eén glyph, gedraaid — nooit twee verschillende iconen.
     //
-    // Dit stond op `expanded ? Icons.expand_less : Icons.expand_more` en toen
+    // Dit stond op `expanded ? AppIcons.caretUp : AppIcons.caretDown` en toen
     // was de kaart niet meer dicht te klikken: de knop werkte, de ruimte werd
     // gereserveerd, maar er tekende niets (Joost, 2026-09-07).
     //
-    // `Icons.expand_more` staat elders in dit bestand in een `const Icon` en
+    // `AppIcons.caretDown` staat elders in dit bestand in een `const Icon` en
     // wordt daarom door `--tree-shake-icons` in de gesubsette
-    // `MaterialIcons-Regular.otf` gehouden. `Icons.expand_less` stond alleen
+    // `MaterialIcons-Regular.otf` gehouden. `AppIcons.caretUp` stond alleen
     // in de ternaire hierboven — geen constante instantie, dus de shaker zag
     // hem niet en sneed de glyph eruit. Je merkt dat pas in een release-build
     // op een toestel: in debug is het lettertype compleet en lijkt alles goed.
@@ -1676,7 +1677,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final icon = Transform.rotate(
       angle: expanded ? math.pi : 0,
       child: Icon(
-        Icons.expand_more,
+        AppIcons.caretDown,
         size: 20,
         color: cs.onSurfaceVariant,
       ),
@@ -1734,12 +1735,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Row(
       children: [
         if (avgTemp != null) ...[
-          item(Icons.thermostat, '${avgTemp.round()}\u00B0'),
+          item(AppIcons.thermometerSimple, '${avgTemp.round()}\u00B0'),
           const SizedBox(width: 16),
         ],
         if (totalPrecip != null) ...[
           item(
-            Icons.water_drop,
+            AppIcons.drop,
             _verdictText(
               s,
               weatherVerdictFor(
@@ -1751,7 +1752,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
           const SizedBox(width: 16),
         ],
-        if (avgWind != null) item(Icons.air, '${avgWind.round()} km/h'),
+        if (avgWind != null) item(AppIcons.wind, '${avgWind.round()} km/h'),
       ],
     );
   }

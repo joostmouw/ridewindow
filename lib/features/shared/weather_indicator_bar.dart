@@ -3,6 +3,7 @@ import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// Eén weermeting: waarde, oordeel, en hoe ver het van je ideaal af zit.
 ///
@@ -153,7 +154,7 @@ class WeatherIndicatorBar extends StatelessWidget {
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: Icon(
-                            Icons.info_outline,
+                            AppIcons.info,
                             size: 14,
                             color: rw.textHint,
                           ),

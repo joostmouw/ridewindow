@@ -41,6 +41,7 @@ import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers (zelfde patroon als profile_screen_location_test.dart)
@@ -197,7 +198,7 @@ void main() {
     // _checkCalendarMismatch() wordt nooit aangeroepen -- de waarschuwing mag
     // dan ook nooit verschijnen, ongeacht de authStateProvider-staat.
     expect(
-      find.byIcon(Icons.warning_amber_rounded),
+      find.byIcon(AppIcons.warning),
       findsNothing,
     );
     expect(
@@ -222,7 +223,7 @@ void main() {
     final context = tester.element(find.byType(ProfileScreen));
     final s = S.of(context);
 
-    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+    expect(find.byIcon(AppIcons.warning), findsNothing);
     expect(
       find.text(
         s.calendarMismatchWarning(_fakeSignedInUser.email!),

@@ -19,6 +19,7 @@ import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers
@@ -176,7 +177,7 @@ void main() {
 
   bool cellHasCheckmark(WidgetTester tester, int dayIndex, int hour) =>
       find
-          .descendant(of: cellFinder(dayIndex, hour), matching: find.byIcon(Icons.check))
+          .descendant(of: cellFinder(dayIndex, hour), matching: find.byIcon(AppIcons.check))
           .evaluate()
           .isNotEmpty;
 

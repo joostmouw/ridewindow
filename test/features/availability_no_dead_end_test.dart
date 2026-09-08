@@ -18,6 +18,7 @@ import 'package:ridewindow/features/availability/availability_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// Empty availability map -- no blocked hours, matching a fresh onboarding
 /// arrival before the user has made any selections.
@@ -74,10 +75,10 @@ void main() {
 
       // canPop is false (no prior push, context.go() replaced history) ->
       // SafeBackButton must show the home fallback, not a back arrow.
-      expect(find.byIcon(Icons.home_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back), findsNothing);
+      expect(find.byIcon(AppIcons.house), findsOneWidget);
+      expect(find.byIcon(AppIcons.arrowLeft), findsNothing);
 
-      await tester.tap(find.byIcon(Icons.home_outlined));
+      await tester.tap(find.byIcon(AppIcons.house));
       await tester.pumpAndSettle();
 
       expect(find.text('HomeScreen'), findsOneWidget);

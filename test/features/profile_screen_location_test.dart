@@ -28,6 +28,7 @@ import 'package:ridewindow/providers/gps_permission_notifier.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 // ---------------------------------------------------------------------------
 // Fake Notifiers
@@ -153,15 +154,15 @@ void main() {
   });
 
   testWidgets(
-      'Test 3 — toont wis-knop (Icons.clear) als override actief',
+      'Test 3 — toont wis-knop (AppIcons.x) als override actief',
       (tester) async {
     await _pumpProfileScreen(
       tester,
       profile: baseProfile(locationOverride: 'Groningen'),
     );
 
-    // IconButton met Icons.clear aanwezig als locationOverride != null
-    expect(find.byIcon(Icons.clear, skipOffstage: false), findsOneWidget);
+    // IconButton met AppIcons.x aanwezig als locationOverride != null
+    expect(find.byIcon(AppIcons.x, skipOffstage: false), findsOneWidget);
   });
 
   testWidgets(
@@ -172,8 +173,8 @@ void main() {
       profile: baseProfile(locationOverride: null),
     );
 
-    // Geen IconButton met Icons.clear als locationOverride == null
-    expect(find.byIcon(Icons.clear, skipOffstage: false), findsNothing);
+    // Geen IconButton met AppIcons.x als locationOverride == null
+    expect(find.byIcon(AppIcons.x, skipOffstage: false), findsNothing);
   });
 
   testWidgets(

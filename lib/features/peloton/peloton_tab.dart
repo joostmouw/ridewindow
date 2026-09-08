@@ -9,6 +9,7 @@ import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// De Peloton-tab onder "Rides" (epic #62).
 ///
@@ -202,7 +203,7 @@ class _PelotonTabState extends ConsumerState<PelotonTab> {
                   width: double.infinity,
                   child: FilledButton.tonalIcon(
                     onPressed: _busy ? null : _shareInvite,
-                    icon: const Icon(Icons.person_add_alt),
+                    icon: const Icon(AppIcons.userPlus),
                     label: Text(s.pelotonInviteFriend),
                   ),
                 ),
@@ -255,7 +256,7 @@ class _SignedOutState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.groups_outlined,
+              AppIcons.usersThree,
               size: 48,
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -324,7 +325,7 @@ class _FriendRow extends StatelessWidget {
       leading: CircleAvatar(child: Text(name.characters.first.toUpperCase())),
       title: Text(name),
       trailing: IconButton(
-        icon: const Icon(Icons.person_remove_outlined),
+        icon: const Icon(AppIcons.userMinus),
         tooltip: S.of(context).pelotonRemoveFriend,
         onPressed: onRemove,
       ),
@@ -400,7 +401,7 @@ class _JoinedRideRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final owner = ride.ownerName?.trim();
     return ListTile(
-      leading: const Icon(Icons.groups),
+      leading: const Icon(AppIcons.usersThree),
       title: Text(_formatRide(ride)),
       subtitle: Text(
         s.pelotonWithOwner(
@@ -421,7 +422,7 @@ class _OwnedRideRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final joined = ride.accepted.length;
     return ListTile(
-      leading: const Icon(Icons.groups),
+      leading: const Icon(AppIcons.usersThree),
       title: Text(_formatRide(ride)),
       subtitle: Text(
         joined == 0 ? s.pelotonNobodyYet : s.pelotonJoinedCount(joined),
@@ -442,7 +443,7 @@ class _ErrorRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off_outlined),
+          const Icon(AppIcons.cloudSlash),
           const SizedBox(width: 12),
           TextButton(onPressed: onRetry, child: Text(label)),
         ],

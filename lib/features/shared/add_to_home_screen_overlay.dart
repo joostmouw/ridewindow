@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 class AddToHomeScreenOverlay extends StatelessWidget {
   const AddToHomeScreenOverlay({super.key});
@@ -41,7 +42,7 @@ class AddToHomeScreenOverlay extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.ios_share,
+                  AppIcons.export,
                   color: colorScheme.onInverseSurface,
                   size: 20,
                 ),

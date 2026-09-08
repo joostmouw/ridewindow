@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 const _kTourSeenKey = 'app_tour_seen';
 
@@ -40,28 +41,28 @@ class _AppTourOverlayState extends State<_AppTourOverlay> {
 
   static const _pages = [
     _TourPage(
-      icon: Icons.home,
+      icon: AppIcons.house,
       title: 'Rijvensters',
       body: 'Op het Home scherm zie je de beste momenten om te fietsen deze week. '
           'Elke kaart toont de score, het tijdstip en het weer. '
           'Tik op een kaart voor meer details.',
     ),
     _TourPage(
-      icon: Icons.calendar_view_week,
+      icon: AppIcons.calendarDots,
       title: 'Agenda',
       body: 'De Agenda toont 7 dagen met uurvakken — groen is goed, rood is slecht. '
           'Tik op een vak voor weerdetails. '
           'Houd ingedrukt en sleep verticaal om meerdere uren te selecteren voor een rit.',
     ),
     _TourPage(
-      icon: Icons.directions_bike,
+      icon: AppIcons.bicycle,
       title: 'Mijn Ritten',
       body: 'Plan een rit vanuit Home of de Agenda. '
           'In Mijn Ritten volg je of het weer nog steeds goed is. '
           'De windrichting-tip helpt je de route te kiezen: eerst tegenwind, dan meewind terug.',
     ),
     _TourPage(
-      icon: Icons.person,
+      icon: AppIcons.user,
       title: 'Profiel',
       body: 'Stel je locatie in, kies je weertoleranties (temperatuur, regen, wind) '
           'en beheer je beschikbaarheid. '

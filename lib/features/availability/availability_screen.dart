@@ -20,6 +20,7 @@ import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 class AvailabilityScreen extends ConsumerStatefulWidget {
   const AvailabilityScreen({super.key, this.fromOnboarding = false});
@@ -112,7 +113,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                   ),
                 )
               : IconButton(
-                  icon: const Icon(Icons.event),
+                  icon: const Icon(AppIcons.calendarBlank),
                   tooltip: S.of(context).importFromCalendar,
                   onPressed: () => _importFromCalendar(weekStart),
                 ),
@@ -298,7 +299,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.touch_app,
+                    AppIcons.handPointing,
                     size: 14,
                     color: Theme.of(context).colorScheme.primary,
                   ),

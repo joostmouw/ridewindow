@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 class WeatherIcon extends StatefulWidget {
   final RideTier tier;
@@ -70,7 +71,7 @@ class _WeatherIconState extends State<WeatherIcon>
         );
       },
       child: Icon(
-        Icons.wb_sunny_rounded,
+        AppIcons.sun,
         size: widget.size,
         color: rw.scoreAcceptable, // warm sun orange
       ),
@@ -89,7 +90,7 @@ class _WeatherIconState extends State<WeatherIcon>
         );
       },
       child: Icon(
-        Icons.cloud,
+        AppIcons.cloud,
         size: widget.size,
         color: rw.scoreGreat,
       ),
@@ -108,7 +109,7 @@ class _WeatherIconState extends State<WeatherIcon>
         );
       },
       child: Icon(
-        Icons.cloud_queue,
+        AppIcons.cloud,
         size: widget.size,
         color: rw.scoreAcceptable,
       ),
@@ -127,7 +128,7 @@ class _WeatherIconState extends State<WeatherIcon>
         );
       },
       child: Icon(
-        Icons.grain,
+        AppIcons.cloudRain,
         size: widget.size,
         color: rw.scorePoor,
       ),

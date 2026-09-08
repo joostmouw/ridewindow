@@ -25,6 +25,7 @@ import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// NotificationService stub — avoids the real flutter_local_notifications
 /// platform channel, which is not available in a plain widget test
@@ -294,7 +295,7 @@ void main() {
       // ook de gevoelsbalk in de kledingkaart een info-icoon, en dan matcht
       // `find.byIcon` er twee. De banner-knop is de enige IconButton ermee.
       expect(
-        find.widgetWithIcon(IconButton, Icons.info_outline),
+        find.widgetWithIcon(IconButton, AppIcons.info),
         findsOneWidget,
       );
     });
@@ -311,7 +312,7 @@ void main() {
       ));
       await tester.pump();
 
-      await tester.tap(find.widgetWithIcon(IconButton, Icons.info_outline));
+      await tester.tap(find.widgetWithIcon(IconButton, AppIcons.info));
       await tester.pumpAndSettle();
 
       // Bottom sheet should have appeared — InsightsSheet stub or content

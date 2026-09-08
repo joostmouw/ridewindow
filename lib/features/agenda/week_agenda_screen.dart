@@ -18,6 +18,7 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 const int _kDayCount = 7;
 const _kHours = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
@@ -247,7 +248,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
             ],
           ),
           IconButton(
-            icon: const Icon(Icons.info_outline, size: 20),
+            icon: const Icon(AppIcons.info, size: 20),
             tooltip: S.of(context).hintDragSelect,
             onPressed: () => setState(() => _showHints = true),
           ),
@@ -271,7 +272,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                   const SizedBox(width: 8),
                   _Dot(color: context.rw.plannedRide, label: S.of(context).legendPlanned),
                 ] else ...[
-                  Icon(Icons.touch_app, size: 14, color: theme.colorScheme.primary),
+                  Icon(AppIcons.handPointing, size: 14, color: theme.colorScheme.primary),
                   const SizedBox(width: 4),
                   Text(
                     S.of(context).agendaHoursSelected(_selection!.count),
@@ -302,7 +303,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
                   width: double.infinity,
                   child: FilledButton.icon(
                     onPressed: () => _planSelection(days, allScores),
-                    icon: const Icon(Icons.directions_bike),
+                    icon: const Icon(AppIcons.bicycle),
                     label: Text(S.of(context).agendaPlanRide(_selection!.count)),
                   ),
                 ),
@@ -328,14 +329,14 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
     return [
       HintItem(
         targetKey: _gridKey,
-        gestureIcon: Icons.touch_app,
+        gestureIcon: AppIcons.handPointing,
         title: s.hintTapWeatherDetail,
         description: s.hintTapWeatherDetailDesc,
         spotlightPadding: 0,
       ),
       HintItem(
         targetKey: _gridKey,
-        gestureIcon: Icons.touch_app,
+        gestureIcon: AppIcons.handPointing,
         title: s.hintDragSelect,
         description: s.hintDragSelectDesc,
         spotlightPadding: 0,
@@ -563,14 +564,14 @@ class _CellWidget extends ConsumerWidget {
               // Het slotje mag nu op volle sterkte: op de oude olijfvulling was
               // 120 alpha nodig om het niet te laten schreeuwen, op een
               // neutrale vulling verdween het daardoor bijna.
-              ? Center(child: Icon(Icons.block, size: 10, color: rw.textHint))
+              ? Center(child: Icon(AppIcons.prohibit, size: 10, color: rw.textHint))
               : isSelected
                   ? Center(
-                      child: Icon(Icons.check, size: 12, color: rw.tiers.perfectFg),
+                      child: Icon(AppIcons.check, size: 12, color: rw.tiers.perfectFg),
                     )
                   : isPlanned
                       ? Center(
-                          child: Icon(Icons.directions_bike, size: 10, color: rw.plannedRide),
+                          child: Icon(AppIcons.bicycle, size: 10, color: rw.plannedRide),
                         )
                       : null,
         ),
@@ -629,13 +630,13 @@ class _CellWidget extends ConsumerWidget {
             ],
             const SizedBox(height: 16),
             if (forecast != null) ...[
-              _DetailRow(icon: Icons.thermostat, label: S.of(context).weatherTemperature,
+              _DetailRow(icon: AppIcons.thermometerSimple, label: S.of(context).weatherTemperature,
                 value: '${forecast.temperatureC?.round() ?? '?'}°C (voelt als ${forecast.apparentTemperatureC?.round() ?? '?'}°C)'),
               const SizedBox(height: 8),
-              _DetailRow(icon: Icons.water_drop, label: S.of(context).weatherRain,
+              _DetailRow(icon: AppIcons.drop, label: S.of(context).weatherRain,
                 value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm — ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
               const SizedBox(height: 8),
-              _DetailRow(icon: Icons.air, label: S.of(context).weatherWind,
+              _DetailRow(icon: AppIcons.wind, label: S.of(context).weatherWind,
                 value: forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
                     ? S.of(context).windCalm
                     : forecast.windspeedKmh != null && forecast.windspeedKmh! >= 15 && forecast.winddirectionDeg != null
@@ -667,7 +668,7 @@ class _CellWidget extends ConsumerWidget {
                       SnackBar(content: Text(S.of(context).ridePlanned)),
                     );
                   },
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(AppIcons.plus),
                   label: Text(S.of(context).schedule),
                 ),
               ),
@@ -689,7 +690,7 @@ class _CellWidget extends ConsumerWidget {
                       );
                       context.push('/detail', extra: DetailArgs(slot: slot, forecasts: [forecast]));
                     },
-                    icon: const Icon(Icons.open_in_new, size: 18),
+                    icon: const Icon(AppIcons.arrowSquareOut, size: 18),
                     label: Text(S.of(context).agendaViewDetails),
                   ),
                 ),

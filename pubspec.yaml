@@ -81,9 +81,6 @@ dependencies:
 
   # Phase 19 — Supabase Auth
   supabase_flutter: ^2.16.0
-
-  # fl_chart arriveert in een latere fase
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -120,6 +117,12 @@ flutter:
     - family: Outfit
       fonts:
         - asset: assets/fonts/Outfit.ttf
+    - family: Phosphor
+      fonts:
+        - asset: assets/fonts/Phosphor.ttf
+    - family: PhosphorFill
+      fonts:
+        - asset: assets/fonts/Phosphor-Fill.ttf
 
   assets:
     - assets/fonts/OFL.txt

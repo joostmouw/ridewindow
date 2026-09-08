@@ -7,6 +7,7 @@ import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// Interne data-structuur voor een onboarding preset-optie.
 class _PresetOption {
@@ -105,7 +106,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
+                  icon: const Icon(AppIcons.caretLeft),
                   tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                   onPressed: () => context.go('/welcome'),
                 ),
@@ -223,7 +224,7 @@ class _PresetTile extends StatelessWidget {
             ),
             child: isSelected
                 ? Icon(
-                    Icons.check,
+                    AppIcons.check,
                     size: 13,
                     color: Theme.of(context).colorScheme.onPrimary,
                   )

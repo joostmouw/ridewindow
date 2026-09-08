@@ -29,6 +29,7 @@ import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 const _pi = math.pi;
 final _sin = math.sin;
@@ -318,7 +319,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       elevation: 0,
       actions: [
         IconButton(
-          icon: const Icon(Icons.info_outline),
+          icon: const Icon(AppIcons.info),
           tooltip: s.showScoreDetails,
           onPressed: () {
             showModalBottomSheet<void>(
@@ -622,7 +623,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, size: 16, color: rw.warning),
+          Icon(AppIcons.warning, size: 16, color: rw.warning),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -692,7 +693,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     style: TextStyle(fontSize: 12, color: rw.textTertiary)),
               ),
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline, size: 20),
+                icon: const Icon(AppIcons.minusCircle, size: 20),
                 tooltip: s.decreaseStartTime,
                 color: rw.scorePerfect,
                 onPressed: canExpandStart
@@ -706,7 +707,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               IconButton(
-                icon: const Icon(Icons.add_circle_outline, size: 20),
+                icon: const Icon(AppIcons.plusCircle, size: 20),
                 tooltip: s.increaseStartTime,
                 color: rw.scorePerfect,
                 onPressed: canShrinkStart
@@ -725,7 +726,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     style: TextStyle(fontSize: 12, color: rw.textTertiary)),
               ),
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline, size: 20),
+                icon: const Icon(AppIcons.minusCircle, size: 20),
                 tooltip: s.decreaseEndTime,
                 color: rw.scorePerfect,
                 onPressed: canShrinkEnd
@@ -739,7 +740,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               IconButton(
-                icon: const Icon(Icons.add_circle_outline, size: 20),
+                icon: const Icon(AppIcons.plusCircle, size: 20),
                 tooltip: s.increaseEndTime,
                 color: rw.scorePerfect,
                 onPressed: canExpandEnd
@@ -842,7 +843,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                   );
                 }
               },
-              icon: const Icon(Icons.check_circle_outline),
+              icon: const Icon(AppIcons.checkCircle),
               label: Text(S.of(context).plannedButtonLabel),
             )
           : FilledButton.icon(
@@ -858,7 +859,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                   SnackBar(content: Text(S.of(context).ridePlanned)),
                 );
               },
-              icon: const Icon(Icons.directions_bike),
+              icon: const Icon(AppIcons.bicycle),
               label: Text(S.of(context).planRide),
             ),
     );
@@ -878,7 +879,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.calendar_month, size: 18),
+                : const Icon(AppIcons.calendarBlank, size: 18),
             label: Text(S.of(context).addToGoogleCalendar),
           ),
           const SizedBox(height: 10),
@@ -896,7 +897,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         end: widget.slot.end,
                         plannedScore: widget.slot.overallScore,
                       ),
-              icon: const Icon(Icons.group_add_outlined, size: 18),
+              icon: const Icon(AppIcons.userPlus, size: 18),
               label: Text(S.of(context).pelotonInviteToRide),
             ),
             const SizedBox(height: 10),
@@ -920,13 +921,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 );
               }
             },
-            icon: const Icon(Icons.notifications_outlined, size: 18),
+            icon: const Icon(AppIcons.bell, size: 18),
             label: Text(S.of(context).remindEveningBefore),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: _shareSlot,
-            icon: const Icon(Icons.share, size: 18),
+            icon: const Icon(AppIcons.shareNetwork, size: 18),
             label: Text(S.of(context).shareRideWindow),
           ),
         ],

@@ -8,6 +8,7 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/services/pending_invite_store.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// Waar een gedeelde uitnodigingslink op uitkomt: `/invite/:code` (epic #62).
 ///
@@ -97,7 +98,7 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _Message(
-                      icon: Icons.lock_outline,
+                      icon: AppIcons.lock,
                       title: s.pelotonSignInToJoin,
                       detail: s.pelotonYourCode(widget.code),
                       theme: theme,
@@ -107,7 +108,7 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
                     // automatische verzilvering ergens strandt: de code moet
                     // te kopiëren zijn zonder overtypen.
                     TextButton.icon(
-                      icon: const Icon(Icons.copy_all_outlined),
+                      icon: const Icon(AppIcons.copy),
                       label: Text(s.pelotonCopyCode),
                       onPressed: () async {
                         await Clipboard.setData(
@@ -134,7 +135,7 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return _Message(
-                        icon: Icons.hourglass_empty,
+                        icon: AppIcons.hourglass,
                         title: s.pelotonJoining,
                         theme: theme,
                       );
@@ -144,7 +145,7 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _Message(
-                            icon: Icons.link_off,
+                            icon: AppIcons.linkBreak,
                             title: s.pelotonCodeInvalid,
                             theme: theme,
                           ),
@@ -161,7 +162,7 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _Message(
-                          icon: Icons.groups,
+                          icon: AppIcons.usersThree,
                           title: s.pelotonFriendAdded(
                             friend?.label(s.pelotonUnnamedFriend) ??
                                 s.pelotonUnnamedFriend,

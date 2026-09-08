@@ -28,6 +28,7 @@ import 'package:ridewindow/services/pending_invite_store.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/account_sync_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 // package:google_sign_in/web_only.dart does not exist in google_sign_in
 // 7.2.0 -- renderButton() lives in the federated google_sign_in_web package,
@@ -575,7 +576,7 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
   Widget _buildSignedOutRow(BuildContext context, S s) {
     if (_supportsNativeAuthenticate) {
       return ListTile(
-        leading: const Icon(Icons.login),
+        leading: const Icon(AppIcons.signIn),
         title: Text(s.signInWithGoogle),
         subtitle: Text(s.accountSyncPromise),
         onTap: _busy ? null : _handleAndroidSignIn,
@@ -678,7 +679,7 @@ class _AccountAvatarState extends State<_AccountAvatar> {
   @override
   Widget build(BuildContext context) {
     if (widget.avatarUrl == null || _loadFailed) {
-      return const CircleAvatar(child: Icon(Icons.account_circle));
+      return const CircleAvatar(child: Icon(AppIcons.userCircle));
     }
     return CircleAvatar(
       backgroundImage: NetworkImage(widget.avatarUrl!),

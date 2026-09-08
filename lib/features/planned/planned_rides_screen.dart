@@ -21,6 +21,7 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 ({Color bg, Color fg}) _scoreTonal(double score, RideWindowTheme rw) {
   final t = rw.tiers;
@@ -124,14 +125,14 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
     return [
       HintItem(
         targetKey: _firstRideKey,
-        gestureIcon: Icons.touch_app,
+        gestureIcon: AppIcons.handPointing,
         title: s.hintTapSummary,
         description: s.hintTapSummaryDesc,
         spotlightPadding: 4,
       ),
       HintItem(
         targetKey: _firstRideKey,
-        gestureIcon: Icons.swipe,
+        gestureIcon: AppIcons.handSwipeRight,
         title: s.hintSwipeDelete,
         description: s.hintSwipeDeleteDesc,
         spotlightPadding: 4,
@@ -221,7 +222,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.directions_bike,
+                  Icon(AppIcons.bicycle,
                       size: 48, color: theme.colorScheme.onSurfaceVariant),
                   const SizedBox(height: 16),
                   Text(S.of(context).ridesEmpty,
@@ -240,7 +241,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
                     const SizedBox(height: 16),
                     FilledButton.tonalIcon(
                       onPressed: () => _tabController.animateTo(1),
-                      icon: const Icon(Icons.groups, size: 18),
+                      icon: const Icon(AppIcons.usersThree, size: 18),
                       label: Text(S.of(context).ridesEmptyGoToPeloton),
                     ),
                   ],
@@ -385,7 +386,7 @@ class _RideCard extends ConsumerWidget {
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(right: 24),
-              child: Icon(Icons.delete, color: theme.colorScheme.error),
+              child: Icon(AppIcons.trash, color: theme.colorScheme.error),
             ),
           ),
           onDismissed: (_) {
@@ -479,8 +480,8 @@ class _RideCard extends ConsumerWidget {
                                   children: [
                                     Icon(
                                       delta > 0
-                                          ? Icons.trending_up
-                                          : Icons.trending_down,
+                                          ? AppIcons.trendUp
+                                          : AppIcons.trendDown,
                                       size: 14,
                                       color: delta > 0
                                           ? rw.scorePerfect
@@ -510,20 +511,20 @@ class _RideCard extends ConsumerWidget {
                         Row(
                           children: [
                             _WeatherChip(
-                                icon: Icons.thermostat,
+                                icon: AppIcons.thermometerSimple,
                                 value: avgApparent != null &&
                                         (avgApparent - avgTemp!).abs() >= 2
                                     ? '${avgTemp.round()}° (${avgApparent.round()}°)'
                                     : '${avgTemp.round()}°C'),
                             const SizedBox(width: 12),
                             _WeatherChip(
-                                icon: Icons.water_drop,
+                                icon: AppIcons.drop,
                                 value: avgRainProb != null && avgRainProb > 0
                                     ? '${avgRain!.toStringAsFixed(1)}mm (${avgRainProb.round()}%)'
                                     : '${avgRain!.toStringAsFixed(1)}mm'),
                             const SizedBox(width: 12),
                             _WeatherChip(
-                                icon: Icons.air,
+                                icon: AppIcons.wind,
                                 value: avgWind! < 5
                                     ? S.of(context).windCalm
                                     : avgWindDir != null
@@ -540,7 +541,7 @@ class _RideCard extends ConsumerWidget {
                             children: [
                               Transform.rotate(
                                 angle: (avgWindDir ?? 0) * math.pi / 180,
-                                child: Icon(Icons.navigation,
+                                child: Icon(AppIcons.navigationArrow,
                                     size: 14, color: theme.colorScheme.primary),
                               ),
                               const SizedBox(width: 4),

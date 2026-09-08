@@ -29,6 +29,7 @@ import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -239,7 +240,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.restart_alt),
+                leading: const Icon(AppIcons.arrowCounterClockwise),
                 title: Text(s.debugResetOnboarding),
                 onTap: () async {
                   final prefs = await SharedPreferences.getInstance();
@@ -253,7 +254,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete_sweep),
+                leading: const Icon(AppIcons.trashSimple),
                 title: Text(s.debugClearWeather),
                 onTap: () {
                   ref.invalidate(weatherProvider);
@@ -264,7 +265,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.calendar_today_outlined),
+                leading: const Icon(AppIcons.calendarBlank),
                 title: Text(s.debugResetAvailability),
                 onTap: () async {
                   await ref.read(availabilityProvider.notifier).clearAll();
@@ -277,7 +278,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.refresh),
+                leading: const Icon(AppIcons.arrowsClockwise),
                 title: Text(s.debugRefreshWeather),
                 onTap: () {
                   ref.invalidate(weatherProvider);
@@ -288,7 +289,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.outbox),
+                leading: const Icon(AppIcons.paperPlaneTilt),
                 title: Text(s.debugOutbox),
                 onTap: () {
                   Navigator.of(ctx).pop();
@@ -371,7 +372,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 if (rows != null && rows.isNotEmpty)
                   ListTile(
-                    leading: const Icon(Icons.delete_sweep),
+                    leading: const Icon(AppIcons.trashSimple),
                     title: Text(s.debugOutboxClear),
                     onTap: () async {
                       final cleared = await dao.clearAll();
@@ -478,7 +479,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       const SizedBox(height: 8),
                       FilledButton.icon(
                         onPressed: () => _openCityPicker(context),
-                        icon: const Icon(Icons.location_city),
+                        icon: const Icon(AppIcons.buildings),
                         label: Text(s.tapToChooseCity),
                       ),
                     ],
@@ -519,7 +520,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               // ELEMENT 2 — GPS toestemming vragen (denied, niet deniedForever)
               if (permission == LocationPermission.denied)
                 ListTile(
-                  leading: const Icon(Icons.location_searching),
+                  leading: const Icon(AppIcons.crosshair),
                   title: Text(s.useGpsLocation),
                   trailing: TextButton(
                     onPressed: () => ref
@@ -531,12 +532,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
               // ELEMENT 3 — Actieve locatie + stad-picker
               ListTile(
-                leading: const Icon(Icons.location_city),
+                leading: const Icon(AppIcons.buildings),
                 title: Text(profile.locationOverride ?? s.gpsAutomatic),
                 subtitle: Text(s.tapToChooseCity),
                 trailing: profile.locationOverride != null
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const Icon(AppIcons.x),
                         tooltip: s.clearLocationOverride,
                         onPressed: () => ref
                             .read(profileProvider.notifier)
@@ -886,7 +887,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               // Beschikbaarheidskalender navigatie (D-06-08)
               ListTile(
                 title: Text(s.editMySchedule),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: const Icon(AppIcons.caretRight),
                 onTap: () => context.push('/availability'),
               ),
             ],
@@ -897,7 +898,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: s.sectionName,
             children: [
               ListTile(
-                leading: const Icon(Icons.person_outline),
+                leading: const Icon(AppIcons.user),
                 title: Text(profile.userName ?? s.setYourName),
                 subtitle: profile.userName == null ? Text(s.nameHint) : null,
                 onTap: () => _showNameDialog(context, profile.userName),
@@ -910,13 +911,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: s.sectionAbout,
             children: [
               ListTile(
-                leading: const Icon(Icons.feedback_outlined),
+                leading: const Icon(AppIcons.chatCircleDots),
                 title: Text(s.sendFeedback),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: const Icon(AppIcons.caretRight),
                 onTap: () => showFeedbackDialog(context),
               ),
               ListTile(
-                leading: const Icon(Icons.calendar_month),
+                leading: const Icon(AppIcons.calendarBlank),
                 title: Text(s.googleCalendarLabel),
                 subtitle: _calendarMismatchEmail != null
                     ? Column(
@@ -928,7 +929,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.warning_amber_rounded,
+                                AppIcons.warning,
                                 size: 16,
                                 color: Theme.of(context).colorScheme.error,
                               ),
@@ -960,12 +961,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               ListTile(
                 title: Text(s.privacyPolicy),
-                trailing: const Icon(Icons.open_in_new),
+                trailing: const Icon(AppIcons.arrowSquareOut),
                 onTap: _launchPrivacyPolicy,
               ),
               ListTile(
                 title: Text(s.weatherDataAttribution),
-                trailing: const Icon(Icons.open_in_new),
+                trailing: const Icon(AppIcons.arrowSquareOut),
                 onTap: () => launchUrl(Uri.parse('https://open-meteo.com/')),
               ),
               ListTile(
@@ -994,7 +995,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 Widget _infoButton(BuildContext context, String title, String explanation,
     String currentDesc) {
   return IconButton(
-    icon: Icon(Icons.info_outline,
+    icon: Icon(AppIcons.info,
         size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
     padding: EdgeInsets.zero,
     constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
@@ -1020,7 +1021,7 @@ Widget _infoButton(BuildContext context, String title, String explanation,
               ),
               child: Row(
                 children: [
-                  Icon(Icons.tune,
+                  Icon(AppIcons.slidersHorizontal,
                       size: 16, color: Theme.of(context).colorScheme.primary),
                   const SizedBox(width: 8),
                   Expanded(

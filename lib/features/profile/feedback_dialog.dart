@@ -20,6 +20,7 @@ import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/feedback_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 /// Opent de feedbackdialoog.
 Future<void> showFeedbackDialog(BuildContext context) {
@@ -131,7 +132,7 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
                 button: true,
                 child: IconButton(
                   key: ValueKey('feedback_star_$n'),
-                  icon: Icon(selected ? Icons.star : Icons.star_border),
+                  icon: Icon(selected ? AppIcons.star : AppIcons.star),
                   tooltip: s.feedbackStarRating(n),
                   color: selected
                       ? context.rw.scorePerfect

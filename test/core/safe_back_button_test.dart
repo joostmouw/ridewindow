@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 void main() {
   group('SafeBackButton', () {
@@ -32,10 +33,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-        expect(find.byIcon(Icons.home_outlined), findsNothing);
+        expect(find.byIcon(AppIcons.arrowLeft), findsOneWidget);
+        expect(find.byIcon(AppIcons.house), findsNothing);
 
-        await tester.tap(find.byIcon(Icons.arrow_back));
+        await tester.tap(find.byIcon(AppIcons.arrowLeft));
         await tester.pumpAndSettle();
 
         expect(find.text('Home'), findsOneWidget);
@@ -67,10 +68,10 @@ void main() {
         await tester.pumpWidget(MaterialApp.router(routerConfig: router));
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.home_outlined), findsOneWidget);
-        expect(find.byIcon(Icons.arrow_back), findsNothing);
+        expect(find.byIcon(AppIcons.house), findsOneWidget);
+        expect(find.byIcon(AppIcons.arrowLeft), findsNothing);
 
-        await tester.tap(find.byIcon(Icons.home_outlined));
+        await tester.tap(find.byIcon(AppIcons.house));
         await tester.pumpAndSettle();
 
         expect(find.text('HomeScreen'), findsOneWidget);
@@ -84,11 +85,11 @@ void main() {
         await tester.pumpWidget(const MaterialApp(home: SafeBackButton()));
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.home_outlined), findsOneWidget);
+        expect(find.byIcon(AppIcons.house), findsOneWidget);
 
         // Tapping must be a no-op, not a crash -- there is nothing sensible
         // to do without a GoRouter present.
-        await tester.tap(find.byIcon(Icons.home_outlined));
+        await tester.tap(find.byIcon(AppIcons.house));
         await tester.pumpAndSettle();
 
         expect(tester.takeException(), isNull);
