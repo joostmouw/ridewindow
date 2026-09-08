@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: Eigen gezicht
 status: "1.0.25+26 gebouwd; Play-sleutel vraagt Joosts hand"
 last_updated: "2026-09-08T13:30:00.000Z"
-last_activity: 2026-09-07
+last_activity: 2026-09-08
 progress:
   total_phases: 3
   completed_phases: 0
