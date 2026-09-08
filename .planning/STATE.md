@@ -175,6 +175,33 @@ de klacht "hij ziet er hetzelfde uit" over ging. `PELOTON.md` zegt: batch een
 Play-release pas als de epic een testbare mijlpaal heeft — en die is er nu.
 Doen ná fase 25, zodat de wrijvingspunten niet meegaan naar de testers.
 
+**Als Play weigert te installeren: kijk eerst in het kloonprofiel.** Vastgesteld
+2026-09-08 op de Oppo. Joost kon 1.0.26 niet uit Play halen. `dumpsys package`
+liet zien waarom, en het was niet wat het leek:
+
+```
+User 0 (Joost):         installed=false     ← eigen profiel: niets
+User 10 (system_clone): installed=true      ← hier zat hij
+pm path ...             (leeg)              ← en de APK was al weg
+```
+
+Een **spookrecord in Oppo's App Clone-profiel**: het pakket stond geregistreerd
+zonder dat er nog code bij hoorde. Dat houdt de pakketnaam bezet en Play kan er
+niet overheen. Symptomen die erbij horen: `pm path` geeft niets,
+`resolve-activity` zegt "No activity found", en `am start` faalt met
+"Activity class does not exist" — terwijl `pm list packages` hem wél noemt.
+
+`adb uninstall` lost dit **niet** op; die faalt met
+`DELETE_FAILED_INTERNAL_ERROR`. Wat wel werkt:
+
+```bash
+adb shell pm uninstall --user 10 ridewindow.joost.amsterdam
+```
+
+De eerste verklaring die voor de hand ligt — sideload met de upload-sleutel
+tegenover Play App Signing — was hier níét de oorzaak. Kijk dus eerst naar
+`installed=` per gebruiker voordat je over handtekeningen begint.
+
 **Deploy-hygiëne:** gebruik bij elke deploy waarvan je het resultaat gaat
 beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op
 2026-09-07 meermaals een oudere bundel ondanks de `no-cache`-headers.
