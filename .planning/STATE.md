@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
 status: "1.0.27+28 klaar; telefoon is vrij voor Play"
-last_updated: "2026-09-08T17:20:00.000Z"
+last_updated: "2026-09-08T17:45:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -34,6 +34,7 @@ progress:
 | 2026-09-08 | [peloton-afzeggen](quick/260908-j2q-peloton-afzeggen/) | Een geaccepteerde rit is af te zeggen. **Alles behalve de knop bestond al**; geen migratie. Met ongedaan-maken, want afzeggen was een deur die één kant op ging. |
 | 2026-09-08 | [uitleg-in-stappen](quick/260908-k4t-uitleg-in-stappen/) | De twee uitleg-overlays zijn één Material 3 rich tooltip geworden, met terugknop en in beide talen. **Lees de vondst daar** — het weghalen van tik-om-verder sloot je op bij een niet-gemeten doel. |
 | 2026-09-08 | [sterren-en-uitleg](quick/260908-m8v-sterren-en-uitleg-terughalen/) | Sterren gingen niet aan (**beide takken hetzelfde icoon** na de Phosphor-migratie), de hint scrolt nu naar zijn doel, en het `i`-knopje staat op alle drie de schermen met uitleg. |
+| 2026-09-08 | [feedback-vertrok-niet](quick/260908-n3r-feedback-vertrok-niet/) | Feedback zei "bedankt" maar startte geen verzending — de rij bleef in de lokale outbox. **Twee dingen die Joost zelf moet nakijken staan in die SUMMARY.** |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -84,10 +85,14 @@ worden.** Gebouwd en gecontroleerd — manifest zegt `versionCode=28` /
 vangrails van `tool/play_upload.dart` komen alle drie schoon door.
 
 Hij bevat alles van 1.0.26 (intro op 1,75×, uitleg als Material 3 rich
-tooltip, afzeggen in Peloton) plus de drie punten van Joost daarna: de sterren
-in het feedbackvenster gaan weer aan, de uitleg scrolt naar zijn doel, en het
+tooltip, afzeggen in Peloton) plus de vier punten van Joost daarna: de sterren
+in het feedbackvenster gaan weer aan, de uitleg scrolt naar zijn doel, het
 `i`-knopje staat nu op Home, Agenda én Mijn ritten met de rondleiding onder
-Profiel → Over. **1.0.26+27 is nooit geüpload en wordt overgeslagen.**
+Profiel → Over, en **feedback versturen start nu ook echt een verzending**.
+
+**1.0.26+27 is nooit geüpload en wordt overgeslagen.** De bundel is op
+2026-09-08 17:45 opnieuw gebouwd met de feedback-fix erin; `versionCode` 28 is
+nog vrij op Play, dus de versie is bewust níét opgehoogd.
 
 Release-notes staan in `release-notes/` in beide talen. Uploaden met de hand
 in de console (Testing → Internal testing → Create new release → dit bestand
