@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "1.0.28+29 klaar; 28 was al gebruikt op Play"
-last_updated: "2026-09-08T19:30:00.000Z"
+status: "v4.0 afgesloten; 1.0.28+29 staat op Play"
+last_updated: "2026-09-08T20:00:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -80,33 +80,36 @@ opgehoogd voor Play).
 - **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
   alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
 
-**Wat als eerste aandacht vraagt: `1.0.28+29` staat klaar om geüpload te
-worden.** Gebouwd en gecontroleerd — manifest zegt `versionCode=29` /
-`versionName=1.0.28`, ondertekend, 66 MB, alle drie de vangrails schoon, 524
-tests groen.
+**v4.0 "Eigen gezicht" is afgesloten op 2026-09-08.** Alle vijf de fases zitten
+in `1.0.28+29`, en die staat op Play internal testing. Web, `main` en Play zijn
+voor het eerst gelijk.
 
-**Waarom 28 wordt overgeslagen:** Play weigerde `1.0.27+28` met "version code
-28 has already been used". Er is dus ergens op 2026-09-08 een 1.0.27 geüpload;
-wélke build dat was is niet vastgelegd, en dat is precies waarom het loont om
-na elke upload één regel hier te zetten. Sindsdien zijn er twee dingen bij
-gekomen die in 28 mogelijk ontbraken: de feedback-fix en de leesbaarheid van
-de welkomtekst.
+**Begin een volgende sessie hier**, en lees dan `EIGEN-GEZICHT.md` — daar staat
+onderaan wat de epic heeft opgeleverd, wat er open bleef, en de drie lessen die
+het meest hebben gescheeld.
 
-De bundel bevat: de intro op 1,75×, de uitleg als Material 3 rich tooltip met
-terugknop en in beide talen, afzeggen in Peloton met ongedaan maken, de
-gevulde sterren, de meescrollende uitleg, het `i`-knopje op alle drie de
-schermen met uitleg, feedback die daadwerkelijk verstuurt, en de welkomtekst
-die meteen voluit staat.
+**Wat als eerste aandacht vraagt: vraag je testers om hun reactie.** Dit is de
+eerste build waarin de feedbackknop werkelijk verstuurt (dat deed hij niet — hij
+zei "bedankt" en schreef alleen lokaal), én de eerste die ze zien ná de klacht
+die deze hele epic startte. Bouwen zonder dat antwoord is gokken.
 
-Uploaden met de hand in de console (Testing → Internal testing → Create new
-release → dit bestand erin slepen):
+Twee dingen die daarbij helpen: één van hen meldde vandaag "font is lastig te
+lezen met kleuren" en dat is opgelost — laat weten dát het is opgelost én dat
+het geen kleur- maar een animatieprobleem was, dat nodigt uit tot meer van dat
+soort waarnemingen. En noteer voortaan **hier, in één regel, welke build je
+uploadt**: dat `versionCode` 28 al bezet bleek betekende vandaag dat niemand
+meer wist wat de testers precies hadden.
 
-```
-build/app/outputs/bundle/release/app-release.aab
-```
+**Losse einden, geen van alle blokkerend:** de radii vormen geen systeem
+(18 en 24 zijn geen MD3-token), `ScoreBadge` staat naast `ScoreDisplay` met
+twee vormtalen, en backlog #63 (iPhone), #66 (afgezegde ritten onbereikbaar)
+en #67 (notificaties hardgecodeerd Nederlands) staan open. Zie
+`EIGEN-GEZICHT.md`, onderaan.
 
-Of in één commando zodra de service-account-sleutel er is — zie het blok
-"Play-release" hieronder.
+**Het aanbod dat blijft staan:** de Play Developer API inrichten maakt van
+uploaden één commando. `tool/play_upload.dart` is geschreven en getest tot aan
+de authenticatie; wat ontbreekt zijn twee rechtenwijzigingen op Joosts account.
+Zie het blok "Play-release" hieronder.
 
 Let op bij een volgende bump: `pubspec.yaml` is niet de enige plek. De in-app
 versie staat hard in `lib/core/app_version.dart` en liep hier stilzwijgend
@@ -249,7 +252,7 @@ onderaan `0006`.
 | GitHub `main` | alles gepusht |
 | Supabase | migraties 0001 t/m 0006 toegepast en geverifieerd |
 | **Web** — https://my-project-joost.web.app | **actueel**, gedeployd met `scripts/deploy_web.sh` en hash-geverifieerd (`ce0137b8…`) |
-| Play, internal testing | loopt achter; **`1.0.28+29` ligt klaar**. Let op: `versionCode` 28 is al gebruikt, dus er is ergens vandaag een 1.0.27 geüpload — welke build dat precies was is niet vastgelegd |
+| Play, internal testing | **`1.0.28+29`**, geüpload 2026-09-08 door Joost. Gelijk aan web en `main` |
 
 **Deploy-hygiëne:** gebruik bij elke deploy waarvan je het resultaat gaat
 beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op

@@ -4,11 +4,20 @@
 > Backlog-epic: **#64** in `BACKLOG.md`. Voorganger: v3.0, afgesloten — zie
 > `.planning/milestones/v3.0-CLOSEOUT.md`.
 >
-> **Stand in één zin (2026-09-07, eind van de dag):** variant B is uitgevoerd — de achtergrond is
-> papier, de beste kaart domineert, de weerbalken zijn leesbaar en de sweep is gedaan; wat rest is
-> stap 3 (typografie), stap 5 (dagstrip/filter) en de kaarten per sectie in Profiel.
-> **Begin bij het blok "Stand na 2026-09-07" in `STATE.md`** — daar staat ook wat een halve dag
-> kostte aan vierkante sleephoeken, zodat je die valkuilen niet opnieuw inloopt.
+> ## AFGESLOTEN op 2026-09-08 — `1.0.28+29` staat op Play
+>
+> **Stand in één zin:** alle vijf de fases zijn af en zitten in de build die de testers hebben.
+> De app heeft een eigen gezicht: papier en inkt, Outfit, Phosphor voor alle 83 iconen, een
+> bewegend welkomscherm, het kledingadvies als gevoelstemperatuur-schaal, en uitleg die je terug
+> kunt halen.
+>
+> **De epic is gesloten "voor nu", niet gearchiveerd** — er staan nog vier losse punten open, zie
+> "Wat er open bleef" onderaan dit bestand. Ze zijn geen van alle blokkerend en geen van alle
+> onderdeel van de oorspronkelijke belofte.
+>
+> **Begin bij het blok "Wat er waar live staat" in `STATE.md`.** Daar staat ook wat een halve dag
+> kostte aan vierkante sleephoeken en wat een spookrecord in Oppo's kloonprofiel deed, zodat je
+> die valkuilen niet opnieuw inloopt.
 >
 > Live: **https://my-project-joost.web.app**
 
@@ -162,3 +171,42 @@ voer deze code in" te zien zónder inlogknop, en vroeg "En nu?" — terwijl de a
 want hij stond in de URL. Loop bij elke wijziging het pad van de gebruiker één keer helemaal af en
 vraag per scherm: weet de app dit al (vraag het dan niet), en kan de gebruiker vanaf hier verder
 (zet die stap dan als knop neer). Dit is geen stijlkwestie maar de reden dat deze epic bestaat.
+
+---
+
+# Wat er open bleef
+
+Toegevoegd bij de afsluiting op 2026-09-08. Geen van deze vier is blokkerend, en geen van deze
+vier hoorde bij de belofte van de epic — ze zijn onderweg opgemerkt.
+
+| | Waar | Waarom het bleef liggen |
+|---|---|---|
+| **De radii vormen geen systeem** | 24 op ritkaarten, 18 op detail- en sectiekaarten, 16 op PLANNED-regels, 12 en 3 elders | Material 3 kent 12, 16 en 20; **18 en 24 zijn geen token**. Een aparte opruimronde waard, maar het valt niemand op zolang het consistent oogt |
+| **`ScoreBadge` naast `ScoreDisplay`** | `lib/features/shared/` | Twee vormtalen naast elkaar, bewust (zie de klassennoot), maar nooit tegen het papier-uiterlijk gehouden |
+| **#63 — iPhone-tester komt niet terug uit beschikbaarheid** | `BACKLOG.md` | Niet op te lossen zonder iPhone. De knop bestáát in alle drie de takken, dus het is een safe-area-kwestie op iOS-standalone |
+| **#66 / #67** | `BACKLOG.md` | Afgezegde ritten blijven onbereikbaar, en notificaties zijn hardgecodeerd Nederlands. Allebei opgemerkt tijdens deze epic, allebei buiten zijn scope |
+
+## Wat deze epic heeft opgeleverd
+
+| Fase | Wat |
+|---|---|
+| 23 | Papier en inkt: de achtergrond werd papier, de beste kaart kreeg gewicht, de weerbalken werden leesbaar |
+| 24 | Iconografie: 71 Material-iconen en 12 emoji werden Phosphor Regular; het kledingadvies werd een gevoelstemperatuur-schaal |
+| 25 | De wrijvingspunten: Peloton-volgorde, lege staten, één route naar een rit, en al het Nederlands uit de Engelse interface |
+| — | Het welkomscherm werd een animatie, op 1,75× |
+| — | De uitleg werd een Material 3 rich tooltip met terugknop, in beide talen, op alle drie de schermen terug te halen |
+
+## De lessen die het meest hebben opgeleverd
+
+1. **Laten zien is sneller dan beschrijven.** Outfit, variant B, de iconenfamilie, het introtempo en
+   de uitlegvoet zijn allemaal gekozen binnen een minuut nadat ze als HTML naast elkaar stonden met
+   de échte kleuren en de échte inhoud. Elke keer dat er eerst geschetst is, was de keuze meteen
+   raak.
+2. **Een klacht is een waarneming, geen diagnose.** "De app ziet er hetzelfde uit" bleek gebrek aan
+   contrast, niet gebrek aan tokens. "Font is lastig te lezen met kleuren" bleek een animatie die
+   1170 ms over zichzelf deed, niet een kleur. Twee keer zou de letterlijke lezing het verkeerde
+   hebben gerepareerd.
+3. **Test wat aan een screenshot niet te zien is.** De sterrenbug was tweemaal hetzelfde icoon met
+   alleen een kleurverschil; de feedbackbug was een knop die "bedankt" zei zonder iets te versturen.
+   Beide overleefden maanden. De tests die er nu op staan vergelijken `fontFamily` en of een drain
+   werkelijk is aangeroepen — en zijn allebei op fálen gecontroleerd.
