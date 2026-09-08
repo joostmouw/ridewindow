@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "1.0.25+26 gebouwd; Play-sleutel vraagt Joosts hand"
-last_updated: "2026-09-08T13:30:00.000Z"
+status: "1.0.25+26 op internal testing; wacht op testers"
+last_updated: "2026-09-08T14:05:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -100,11 +100,25 @@ adviseert, dus dat is Joost's keuze.
 Material. Aanpak: een karaktervolle open familie (Lucide, Phosphor) naast elkaar
 in de échte schermen, kiezen zoals Outfit gekozen is. Dat wordt schets 004.
 
-**1.0.24+25 staat op Play, internal testing** (uitgerold 2026-09-07 door Joost).
-Dat is de eerste Play-build met v4.0 én Peloton: de testers gingen in één sprong
-van 1.0.23 naar fase 21 t/m 25. **Vraag als eerste om hun reactie** — de hele
-epic begon met "de app ziet er hetzelfde uit" en dit is de eerste keer dat
-iemand anders dan Joost het nieuwe uiterlijk ziet.
+**1.0.25+26 staat op Play, internal testing** (geüpload 2026-09-08 door Joost,
+met de hand in de console). Daarmee zien de testers nu álles van v4.0: Phosphor
+voor alle 83 iconen, het bewegende welkomscherm, het kledingadvies als
+gevoelstemperatuur-schaal, en de dagstreepjes met bereik.
+
+De build ervóór was 1.0.24+25 (2026-09-07), de eerste met v4.0 én Peloton — de
+testers gingen in één sprong van 1.0.23 naar fase 21 t/m 25.
+
+**Vraag als eerste om hun reactie** — de hele epic begon met "de app ziet er
+hetzelfde uit", en dit is de eerste keer dat iemand anders dan Joost het nieuwe
+uiterlijk compleet ziet. Twee dingen zijn het waard specifiek naar te vragen,
+omdat ze onderweg een keuze waren en geen vanzelfsprekendheid: of het
+kledingadvies als schaal begrepen wordt (het was eerst een plaatje), en of het
+welkomscherm niet te lang duurt.
+
+Nog niet ingericht: de Play Developer API. `tool/play_upload.dart` staat klaar
+maar heeft de service-account-sleutel nog niet — zie het blok "Play-release"
+hieronder. Zolang die er niet is blijft uploaden handwerk in de console, wat
+prima werkt maar de tweede stap van elke release is.
 
 Er zijn 3 van de 12 testers die Google wil zien voor productietoegang, en een
 closed test moet 14 dagen lopen.
