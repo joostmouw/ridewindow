@@ -451,6 +451,8 @@
   "hintDismiss": "Done",
   "hintNext": "Next",
   "hintBack": "Back",
+  "showTips": "Show tips",
+  "showWelcomeTour": "Replay the welcome tour",
   "hintSkip": "Skip",
   "hintStepOf": "Step {current} of {total}",
   "tourHomeTitle": "Ride windows",

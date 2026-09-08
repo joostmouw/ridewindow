@@ -1306,6 +1306,12 @@ class SNl extends S {
   String get hintBack => 'Vorige';
 
   @override
+  String get showTips => 'Uitleg tonen';
+
+  @override
+  String get showWelcomeTour => 'Rondleiding opnieuw bekijken';
+
+  @override
   String get hintSkip => 'Overslaan';
 
   @override

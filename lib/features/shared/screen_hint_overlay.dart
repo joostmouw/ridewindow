@@ -76,9 +76,7 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
     // overlay in dezelfde frame gebouwd als zijn doel -- wat in tests gebeurt
     // en op een traag toestel kan -- dan meet de eerste `build` niets. Eén
     // rebuild na die frame lost dat op.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() {});
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _revealTarget());
   }
 
   @override
@@ -102,12 +100,48 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
   /// Uit- en weer infaden tussen twee stappen. Zonder die tussenstap springt
   /// de uitsnede van het ene element naar het andere en verlies je het spoor.
   void _goTo(int step) {
-    _animController.reverse().then((_) {
-      if (mounted) {
-        setState(() => _currentStep = step);
-        _animController.forward();
-      }
+    _animController.reverse().then((_) async {
+      if (!mounted) return;
+      setState(() => _currentStep = step);
+      await _revealTarget();
+      if (mounted) _animController.forward();
     });
+  }
+
+  /// Scrollt het doel in beeld voordat de spotlight erop valt, en meet daarna
+  /// opnieuw.
+  ///
+  /// **Waarom dit nodig is.** De uitleg over de rijvensters op Home wees naar
+  /// een kaart die onder de vouw hing: de uitsnede viel half buiten beeld en
+  /// de kaart met de tekst kwam er bovenop te liggen. Je las dan uitleg over
+  /// iets wat je niet zag (Joost, 2026-09-08). Alleen de tekst verplaatsen
+  /// lost dat niet op -- het dóél moet in beeld.
+  ///
+  /// `alignment: 0.25` zet het doel in de bovenste kwart van het scherm. Daar
+  /// is eronder ruimte voor de kaart, wat de rustigste plaatsing is: de
+  /// uitleg staat dan altijd op dezelfde plek in plaats van te wisselen
+  /// tussen boven en onder het doel.
+  ///
+  /// **Grens.** Dit werkt alleen als het doel al gebouwd is. Hangt het in een
+  /// lui opgebouwde lijst zó ver naar beneden dat Flutter het nog niet heeft
+  /// aangemaakt, dan is `currentContext` null en valt er niets aan te wijzen —
+  /// dan gebeurt er niets in plaats van iets verkeerds. Voor de hints die de
+  /// app vandaag heeft is dat geen beperking; die staan alle zes in het eerste
+  /// of tweede schermbeeld. Wijst een nieuwe hint ooit naar iets diep in een
+  /// lijst, dan is index-gebaseerd scrollen nodig en niet dit.
+  Future<void> _revealTarget() async {
+    final context = widget.hints[_currentStep].targetKey.currentContext;
+    if (context != null && Scrollable.maybeOf(context) != null) {
+      await Scrollable.ensureVisible(
+        context,
+        alignment: 0.25,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+    // Ook zonder scrollen opnieuw meten: het doel kan pas ná deze frame
+    // gelegd zijn.
+    if (mounted) setState(() {});
   }
 
   /// Get the bounding rect of the target widget in global coordinates.

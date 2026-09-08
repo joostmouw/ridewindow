@@ -179,4 +179,68 @@ void main() {
     await tester.pumpAndSettle();
     expect(dismissed, 1);
   });
+
+  testWidgets('een doel onder de vouw wordt eerst in beeld gescrold',
+      (tester) async {
+    // De uitleg over de rijvensters op Home wees naar een kaart die onder de
+    // vouw hing: de uitsnede viel half buiten beeld en de tekstkaart kwam er
+    // bovenop. Je las uitleg over iets wat je niet zag (Joost, 2026-09-08).
+    final farDown = GlobalKey();
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('nl'),
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        home: Scaffold(
+          body: Stack(
+            children: [
+              // Bewust `SingleChildScrollView` en geen `ListView`: die bouwt
+              // alles op, dus het doel bestáát wel maar valt buiten beeld --
+              // precies de situatie op Home. Een luie lijst zou het doel nog
+              // niet hebben aangemaakt, en dan valt er ook niets aan te
+              // wijzen; zie de noot bij `_revealTarget`.
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 2000),
+                    Container(key: farDown, height: 60, color: Colors.grey),
+                    const SizedBox(height: 2000),
+                  ],
+                ),
+              ),
+              ScreenHintOverlay(
+                onDismiss: () {},
+                hints: [
+                  HintItem(
+                    targetKey: farDown,
+                    gestureIcon: AppIcons.handPointing,
+                    title: 'Ver naar beneden',
+                    description: 'Dit doel begint buiten beeld.',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Vóór het scrollen ligt het doel ruim onder de vouw.
+    double topOfTarget() =>
+        (farDown.currentContext!.findRenderObject()! as RenderBox)
+            .localToGlobal(Offset.zero)
+            .dy;
+    final screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(topOfTarget(), greaterThan(screenHeight));
+
+    await tester.pumpAndSettle();
+
+    // De overlay heeft de lijst verschoven, dus het doel ligt nu in beeld --
+    // en boven de helft, want `alignment: 0.25` laat er ruimte onder voor de
+    // uitlegkaart.
+    expect(topOfTarget(), greaterThanOrEqualTo(0));
+    expect(topOfTarget(), lessThan(screenHeight / 2));
+    expect(find.text('Ver naar beneden'), findsOneWidget);
+  });
 }

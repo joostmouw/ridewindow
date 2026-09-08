@@ -19,6 +19,7 @@ import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
+import 'package:ridewindow/features/shared/app_tour_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
@@ -910,6 +911,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           SectionCard(
             title: s.sectionAbout,
             children: [
+              // De rondleiding van vier schermen hoort hier en niet achter een
+              // i'tje in een appbalk: hij gaat niet over één scherm maar over
+              // waar alles zit. De schermgebonden uitleg zit wél op het scherm
+              // zelf -- daar wijst hij naar dingen, en dat werkt alleen daar.
+              ListTile(
+                leading: const Icon(AppIcons.info),
+                title: Text(s.showWelcomeTour),
+                trailing: const Icon(AppIcons.caretRight),
+                onTap: () => showAppTour(context),
+              ),
               ListTile(
                 leading: const Icon(AppIcons.chatCircleDots),
                 title: Text(s.sendFeedback),

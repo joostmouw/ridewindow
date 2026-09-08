@@ -158,8 +158,13 @@ abstract final class AppIcons {
       IconData(0xe4f6, fontFamily: 'Phosphor');
 }
 
-/// Phosphor Fill. Alleen voor de geselecteerde tab in de navigatiebalk:
-/// Material deed dat met omlijnd-versus-gevuld, Phosphor met een gewicht.
+/// Phosphor Fill. Voor het verschil tussen aan en uit, waar kleur alleen niet
+/// genoeg is: de geselecteerde tab in de navigatiebalk, en de sterren in het
+/// feedbackvenster.
+///
+/// Material deed dat verschil met omlijnd-versus-gevuld, Phosphor met een
+/// gewicht. De codepunten zijn in beide fonts gelijk — alleen de familienaam
+/// verschilt.
 abstract final class AppIconsFill {
   static const IconData bicycle =
       IconData(0xe0d6, fontFamily: 'PhosphorFill');
@@ -167,6 +172,8 @@ abstract final class AppIconsFill {
       IconData(0xe7b4, fontFamily: 'PhosphorFill');
   static const IconData house =
       IconData(0xe2c2, fontFamily: 'PhosphorFill');
+  static const IconData star =
+      IconData(0xe46a, fontFamily: 'PhosphorFill');
   static const IconData user =
       IconData(0xe4c2, fontFamily: 'PhosphorFill');
 }

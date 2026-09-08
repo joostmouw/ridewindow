@@ -265,6 +265,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         tooltip: S.of(context).retryButton,
                         onPressed: () => ref.invalidate(weatherProvider),
                       ),
+                    // De uitleg is terug te halen, net als op de Agenda. Zonder
+                    // dit zag je hem één keer en daarna nooit meer -- terwijl
+                    // hij juist gaat over dingen die je pas na een week gebruik
+                    // nodig hebt (Joost, 2026-09-08).
+                    IconButton(
+                      icon: const Icon(AppIcons.info, size: 20),
+                      tooltip: S.of(context).showTips,
+                      onPressed: () => setState(() => _showHints = true),
+                    ),
                   ],
                 ),
 

@@ -23,6 +23,7 @@ import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/domain/services/feedback_payload.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 const _profile = UserProfile(
@@ -168,5 +169,42 @@ void main() {
     await tester.pump();
 
     expect(sendButton().onPressed, isNotNull);
+  });
+
+  testWidgets(
+      'Test 6 — de gekozen ster en alles ervoor worden gevuld, de rest niet',
+      (tester) async {
+    // Regressie. Hier stond `selected ? AppIcons.star : AppIcons.star`: bij de
+    // Phosphor-migratie zijn Icons.star en Icons.star_border allebei op
+    // hetzelfde icoon uitgekomen, waardoor een aangeklikte ster alleen nog van
+    // kleur veranderde. Joost las dat niet als "aan" (2026-09-08).
+    //
+    // De twee families delen hun codepunten, dus alleen `fontFamily`
+    // onderscheidt gevuld van omlijnd -- een verschil dat geen enkele
+    // screenshot-vergelijking op kleur zou opmerken.
+    await _pumpDialogTrigger(tester);
+
+    IconData glyphOf(int n) => tester
+        .widget<Icon>(
+          find.descendant(
+            of: find.byKey(ValueKey('feedback_star_$n')),
+            matching: find.byType(Icon),
+          ),
+        )
+        .icon!;
+
+    for (var n = 1; n <= 5; n++) {
+      expect(glyphOf(n), AppIcons.star, reason: 'ster $n staat nog uit');
+    }
+
+    await tester.tap(find.byKey(const ValueKey('feedback_star_3')));
+    await tester.pump();
+
+    for (var n = 1; n <= 3; n++) {
+      expect(glyphOf(n), AppIconsFill.star, reason: 'ster $n hoort gevuld');
+    }
+    for (var n = 4; n <= 5; n++) {
+      expect(glyphOf(n), AppIcons.star, reason: 'ster $n hoort leeg');
+    }
   });
 }

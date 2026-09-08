@@ -249,7 +249,7 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
           ),
           IconButton(
             icon: const Icon(AppIcons.info, size: 20),
-            tooltip: S.of(context).hintDragSelect,
+            tooltip: S.of(context).showTips,
             onPressed: () => setState(() => _showHints = true),
           ),
         ],

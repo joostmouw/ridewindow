@@ -132,7 +132,13 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
                 button: true,
                 child: IconButton(
                   key: ValueKey('feedback_star_$n'),
-                  icon: Icon(selected ? AppIcons.star : AppIcons.star),
+                  // Gevuld versus omlijnd, niet alleen een kleurverschil.
+                  // Hier stond tweemaal `AppIcons.star`: bij de
+                  // Phosphor-migratie zijn `Icons.star` en `Icons.star_border`
+                  // allebei op datzelfde icoon uitgekomen, waardoor een
+                  // aangeklikte ster alleen nog van kleur veranderde. Dat leest
+                  // niet als "aan" -- Joost, 2026-09-08.
+                  icon: Icon(selected ? AppIconsFill.star : AppIcons.star),
                   tooltip: s.feedbackStarRating(n),
                   color: selected
                       ? context.rw.scorePerfect

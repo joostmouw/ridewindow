@@ -158,6 +158,13 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
         Scaffold(
           appBar: AppBar(
             title: Text(S.of(context).ridesTitle),
+            actions: [
+              IconButton(
+                icon: const Icon(AppIcons.info, size: 20),
+                tooltip: S.of(context).showTips,
+                onPressed: () => setState(() => _showHints = true),
+              ),
+            ],
             bottom: TabBar(
               controller: _tabController,
               tabs: [

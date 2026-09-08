@@ -2401,6 +2401,18 @@ abstract class S {
   /// **'Vorige'**
   String get hintBack;
 
+  /// No description provided for @showTips.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitleg tonen'**
+  String get showTips;
+
+  /// No description provided for @showWelcomeTour.
+  ///
+  /// In nl, this message translates to:
+  /// **'Rondleiding opnieuw bekijken'**
+  String get showWelcomeTour;
+
   /// No description provided for @hintSkip.
   ///
   /// In nl, this message translates to:

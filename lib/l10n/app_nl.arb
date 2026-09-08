@@ -593,6 +593,8 @@
   "hintDismiss": "Klaar",
   "hintNext": "Volgende",
   "hintBack": "Vorige",
+  "showTips": "Uitleg tonen",
+  "showWelcomeTour": "Rondleiding opnieuw bekijken",
   "hintSkip": "Overslaan",
   "hintStepOf": "Stap {current} van {total}",
   "tourHomeTitle": "Rijvensters",

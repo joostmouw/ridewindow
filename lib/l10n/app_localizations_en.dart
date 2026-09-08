@@ -1303,6 +1303,12 @@ class SEn extends S {
   String get hintBack => 'Back';
 
   @override
+  String get showTips => 'Show tips';
+
+  @override
+  String get showWelcomeTour => 'Replay the welcome tour';
+
+  @override
   String get hintSkip => 'Skip';
 
   @override
