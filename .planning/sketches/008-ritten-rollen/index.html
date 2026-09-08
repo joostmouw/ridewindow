@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ritten en rollen — schets 008</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('Outfit.ttf') format('truetype'); font-weight:100 900; }
+  @font-face { font-family:'Phosphor'; src:url('Phosphor.ttf') format('truetype'); }
+
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+    --great-fg:#006457;  --great-bg:#E0F2F1;
+    --accept-fg:#A42E0A; --accept-bg:#FFF3E0;
+    --planned:#1565C0;
+    --organiser:#7B4B12;   /* jij organiseert  */
+    --joined:#1565C0;      /* je gaat mee      */
+    --solo:#4C5C52;        /* alleen jij       */
+    --pending:#A42E0A;     /* nog beantwoorden */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 24px 80px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1300px;margin:0 auto}
+  h1{font-size:32px;line-height:1.25;font-weight:500;margin:0 0 10px}
+  .lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:74ch;margin:0}
+  .lede b{font-weight:600;color:var(--ink)}
+  .ph{font-family:'Phosphor';font-style:normal;line-height:1;display:inline-block}
+
+  .switcher{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0 10px}
+  .switcher button{font-family:inherit;font-size:14px;font-weight:500;padding:9px 18px;
+      border-radius:999px;cursor:pointer;border:1px solid var(--outline);
+      background:transparent;color:var(--ink-2)}
+  .switcher button[aria-pressed="true"]{background:var(--brand-dark);color:var(--paper);border-color:var(--brand-dark)}
+  .variant-note{font-size:14.5px;line-height:1.55;color:var(--ink-3);margin:0 0 24px;max-width:78ch;min-height:46px}
+  .variant-note b{color:var(--ink-2);font-weight:600}
+
+  .stage{display:none}
+  .stage.on{display:block}
+  .stage-row{display:flex;gap:34px;flex-wrap:wrap;align-items:flex-start}
+
+  /* ── telefoon ── */
+  .phone{width:372px;flex:none;border-radius:34px;overflow:hidden;
+         border:1px solid var(--outline);background:var(--paper);
+         box-shadow:0 14px 36px rgba(35,73,52,.12)}
+  .screen{height:718px;background:var(--paper-low);overflow-y:auto;position:relative}
+  .screen::-webkit-scrollbar{width:0}
+  .caption{font-size:13px;color:var(--ink-3);margin:10px 2px 0;max-width:372px;line-height:1.5}
+  .caption b{color:var(--ink-2);font-weight:600}
+
+  /* ── appbar ── */
+  .appbar{background:var(--brand-light);padding:16px 20px 0;position:sticky;top:0;z-index:3}
+  .appbar h2{margin:0;font-size:22px;font-weight:500;color:var(--brand-dark);letter-spacing:.1px}
+  .appbar .row{display:flex;align-items:center;justify-content:space-between}
+  .appbar .info{font-family:'Phosphor';font-size:20px;color:var(--brand-dark);opacity:.7}
+  .tabs{display:flex;gap:0;margin-top:14px}
+  .tabs div{flex:1;text-align:center;padding:11px 0 10px;font-size:14px;font-weight:500;
+            color:rgba(35,73,52,.62);border-bottom:2px solid transparent}
+  .tabs div.on{color:var(--brand-dark);border-bottom-color:var(--brand-dark)}
+
+  /* ── filterrij (variant A) ── */
+  .filterrow{display:flex;gap:16px;padding:14px 20px 6px;font-size:13.5px;overflow-x:auto}
+  .filterrow span{white-space:nowrap;color:var(--ink-3);font-weight:500;padding-bottom:5px;
+                  border-bottom:2px solid transparent;cursor:pointer}
+  .filterrow span.on{color:var(--ink);border-bottom-color:var(--brand-dark);font-weight:600}
+  .filterrow span .n{font-variant-numeric:tabular-nums;opacity:.65;font-weight:500}
+
+  /* ── ritkaart, gedeelde basis ── */
+  .list{padding:8px 16px 28px}
+  .card{background:var(--paper);border:1px solid var(--outline);border-radius:20px;
+        margin-bottom:10px;overflow:hidden;display:flex;position:relative}
+  .card .body{flex:1;padding:13px 14px 13px 15px;min-width:0}
+  .day{font-size:15px;font-weight:600;line-height:1.3}
+  .time{font-size:13px;color:var(--ink-3);margin-top:1px;font-variant-numeric:tabular-nums}
+  .role{display:flex;align-items:center;gap:6px;margin-top:7px;font-size:12.5px;font-weight:600;letter-spacing:.1px}
+  .role .ph{font-size:15px}
+  .role.organiser{color:var(--organiser)}
+  .role.joined{color:var(--joined)}
+  .role.solo{color:var(--solo);font-weight:500}
+  .role.pending{color:var(--pending)}
+  .chev{align-self:center;padding:0 12px 0 4px;font-family:'Phosphor';font-size:19px;color:var(--ink-3);opacity:.55}
+  .badge{align-self:flex-start;margin:14px 0 0;flex:none;
+         font-size:12px;font-weight:600;padding:4px 9px;border-radius:999px;letter-spacing:.2px}
+  .b-perfect{background:var(--perfect-bg);color:var(--perfect-fg)}
+  .b-great{background:var(--great-bg);color:var(--great-fg)}
+  .b-accept{background:var(--accept-bg);color:var(--accept-fg)}
+  .cardtop{display:flex;align-items:flex-start;gap:10px}
+  .cardtop .grow{flex:1;min-width:0}
+
+  /* deelnemers */
+  .avs{display:flex;align-items:center;gap:-6px;margin-top:9px}
+  .av{width:24px;height:24px;border-radius:999px;background:var(--brand-light);color:var(--brand-dark);
+      font-size:11px;font-weight:600;display:grid;place-items:center;border:1.5px solid var(--paper);margin-right:-7px}
+  .av.more{background:var(--paper-high);color:var(--ink-3)}
+  .avs .lbl{margin-left:14px;font-size:12.5px;color:var(--ink-3)}
+
+  /* actieknoppen op een uitnodiging */
+  .acts{display:flex;gap:8px;margin-top:12px}
+  .acts button{font-family:inherit;font-size:13px;font-weight:600;padding:7px 15px;border-radius:999px;cursor:pointer;border:0}
+  .acts .yes{background:var(--brand-dark);color:var(--paper)}
+  .acts .no{background:transparent;color:var(--ink-3);border:1px solid var(--outline)}
+
+  /* ── variant A: rolvlag linksboven ── */
+  .A .card .body{padding-left:15px}
+
+  /* ── variant B: secties ── */
+  .sectioncard{background:var(--paper);border:1px solid var(--outline);border-radius:18px;
+               margin:0 16px 12px;overflow:hidden}
+  .sectionhead{display:flex;align-items:center;gap:9px;padding:13px 16px 9px}
+  .sectionhead .ph{font-size:17px}
+  .sectionhead h3{margin:0;font-size:13px;font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+  .sectionhead .count{margin-left:auto;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .sh-organiser{color:var(--organiser)} .sh-joined{color:var(--joined)}
+  .sh-solo{color:var(--solo)} .sh-pending{color:var(--pending)}
+  .row{display:flex;align-items:center;gap:12px;padding:11px 14px 11px 16px;border-top:1px solid var(--paper-mid)}
+  .row:first-of-type{border-top:0}
+  .row .grow{flex:1;min-width:0}
+  .row .sub{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+  .row .chev{padding:0;opacity:.5}
+
+  /* ── variant C: rolstrook ── */
+  .C .card{padding-left:0}
+  .stripe{width:6px;flex:none}
+  .st-organiser{background:var(--organiser)} .st-joined{background:var(--joined)}
+  .st-solo{background:var(--outline)} .st-pending{background:var(--pending)}
+  .C .card .body{padding-left:13px}
+  .rolechip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+            padding:3px 9px 3px 7px;border-radius:999px;letter-spacing:.2px}
+  .rc-organiser{background:#F6EADA;color:var(--organiser)}
+  .rc-joined{background:#E3EDF9;color:var(--joined)}
+  .rc-solo{background:var(--paper-mid);color:var(--ink-3)}
+  .rc-pending{background:var(--accept-bg);color:var(--pending)}
+  .rolechip .ph{font-size:13px}
+
+  .sectiontitle{font-size:11.5px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;
+                color:var(--ink-3);padding:16px 20px 6px}
+
+  /* detailkop, voor de kolom ernaast */
+  .detail .hero{background:var(--brand-light);padding:20px 20px 18px}
+  .detail .hero .when{font-size:13px;color:rgba(35,73,52,.75);font-weight:500}
+  .detail .hero .score{display:flex;align-items:baseline;gap:10px;margin-top:2px}
+  .detail .hero .score .n{font-size:45px;font-weight:500;color:var(--brand-dark);line-height:1.05}
+  .detail .hero .score .w{font-size:17px;font-weight:600;color:var(--brand-dark)}
+  .detail .peloton{margin:14px 16px;background:var(--paper);border:1px solid var(--outline);
+                   border-radius:18px;overflow:hidden}
+  .detail .peloton .hd{display:flex;align-items:center;gap:9px;padding:13px 16px 6px;color:var(--organiser)}
+  .detail .peloton .hd h3{margin:0;font-size:13px;font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+  .detail .peloton .who{display:flex;align-items:center;gap:11px;padding:9px 16px}
+  .detail .peloton .who .nm{font-size:14.5px;font-weight:500}
+  .detail .peloton .who .st{font-size:12px;color:var(--ink-3)}
+  .detail .peloton .who .tick{margin-left:auto;font-family:'Phosphor';font-size:17px}
+  .detail .peloton .foot{padding:10px 16px 14px;border-top:1px solid var(--paper-mid);margin-top:6px}
+  .detail .peloton .foot button{width:100%;font-family:inherit;font-size:14px;font-weight:600;
+      padding:11px;border-radius:999px;border:1px solid var(--outline);background:transparent;color:var(--ink-2);cursor:pointer}
+  .detail .rowsimple{display:flex;gap:12px;align-items:center;padding:12px 20px;font-size:14px;color:var(--ink-2)}
+
+  .legend{display:flex;gap:22px;flex-wrap:wrap;margin:22px 0 0;font-size:13px;color:var(--ink-3)}
+  .legend div{display:flex;align-items:center;gap:7px}
+  .legend .sw{width:11px;height:11px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Ritten en rollen — schets 008</h1>
+<p class="lede">
+Vandaag staan ritten verdeeld over twee tabbladen, dragen <b>“jij organiseert”</b> en <b>“je gaat mee”</b>
+hetzelfde icoon, hebben gedeelde ritten <b>geen datum</b> en zijn ze <b>niet aan te tikken</b>. Drie
+manieren om de rol af te lezen, alle drie met dezelfde vijf ritten, en alle drie met de hele regel
+tikbaar naar het detailscherm. Rechts staat één keer waar je dan uitkomt.
+</p>
+
+<div class="switcher" role="tablist">
+  <button aria-pressed="true"  onclick="pick('A',this)">A — Eén lijst met filterrij</button>
+  <button aria-pressed="false" onclick="pick('B',this)">B — Vier secties onder elkaar</button>
+  <button aria-pressed="false" onclick="pick('C',this)">C — Rolstrook op de kaart</button>
+</div>
+<p class="variant-note" id="note"></p>
+
+<!-- ══════════════════════════ VARIANT A ══════════════════════════ -->
+<div class="stage on A" id="stage-A">
+<div class="stage-row">
+
+  <div>
+  <div class="phone"><div class="screen">
+    <div class="appbar">
+      <div class="row"><h2>Ritten</h2><i class="info ph">&#xe2ce;</i></div>
+      <div class="tabs"><div class="on">Ritten</div><div>Maatjes</div></div>
+    </div>
+
+    <div class="filterrow">
+      <span class="on">Alles <span class="n">5</span></span>
+      <span>Ik organiseer <span class="n">2</span></span>
+      <span>Ik ga mee <span class="n">1</span></span>
+      <span>Alleen ik <span class="n">1</span></span>
+    </div>
+
+    <div class="list">
+      <!-- open uitnodiging -->
+      <div class="card">
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <div class="day">zaterdag 13 september</div>
+              <div class="time">09:00 – 13:00 · 4u</div>
+              <div class="role pending"><i class="ph">&#xe2b2;</i> Peter vraagt of je meegaat</div>
+            </div>
+            <div class="badge b-perfect">88</div>
+          </div>
+          <div class="acts"><button class="yes">Ik ga mee</button><button class="no">Kan niet</button></div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <!-- jij organiseert -->
+      <div class="card">
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <div class="day">zondag 14 september</div>
+              <div class="time">10:00 – 12:00 · 2u</div>
+              <div class="role organiser"><i class="ph">&#xe244;</i> Jij organiseert</div>
+              <div class="avs"><div class="av">S</div><div class="av">M</div><div class="av more">+1</div>
+                <span class="lbl">2 gaan mee, 1 wacht nog</span></div>
+            </div>
+            <div class="badge b-great">74</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <!-- je gaat mee -->
+      <div class="card">
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <div class="day">dinsdag 16 september</div>
+              <div class="time">18:00 – 20:00 · 2u</div>
+              <div class="role joined"><i class="ph">&#xe68e;</i> Je gaat mee met Sanne</div>
+            </div>
+            <div class="badge b-great">71</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <!-- alleen jij -->
+      <div class="card">
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <div class="day">donderdag 18 september</div>
+              <div class="time">07:00 – 09:00 · 2u</div>
+              <div class="role solo"><i class="ph">&#xe734;</i> Alleen jij</div>
+            </div>
+            <div class="badge b-accept">61</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <!-- jij organiseert, nog niemand -->
+      <div class="card">
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <div class="day">zaterdag 20 september</div>
+              <div class="time">09:00 – 13:00 · 4u</div>
+              <div class="role organiser"><i class="ph">&#xe244;</i> Jij organiseert</div>
+              <div class="avs"><span class="lbl" style="margin-left:0">Nog niemand geantwoord</span></div>
+            </div>
+            <div class="badge b-perfect">86</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+  </div></div>
+  <p class="caption"><b>A</b> — één chronologische lijst, rol als gekleurde regel onder de tijd.
+     De filterrij is dezelfde tekstrij als het periodefilter op Home, mét telling.</p>
+  </div>
+
+  <div id="detail-col-A"></div>
+</div>
+</div>
+
+<!-- ══════════════════════════ VARIANT B ══════════════════════════ -->
+<div class="stage B" id="stage-B">
+<div class="stage-row">
+
+  <div>
+  <div class="phone"><div class="screen">
+    <div class="appbar">
+      <div class="row"><h2>Ritten</h2><i class="info ph">&#xe2ce;</i></div>
+      <div class="tabs"><div class="on">Ritten</div><div>Maatjes</div></div>
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div class="sectioncard">
+      <div class="sectionhead sh-pending"><i class="ph">&#xe2b2;</i><h3>Wacht op jou</h3><span class="count">1</span></div>
+      <div class="row">
+        <div class="grow">
+          <div class="day">zaterdag 13 september</div>
+          <div class="sub">09:00 – 13:00 · van Peter</div>
+          <div class="acts"><button class="yes">Ik ga mee</button><button class="no">Kan niet</button></div>
+        </div>
+        <div class="badge b-perfect" style="margin:0">88</div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+
+    <div class="sectioncard">
+      <div class="sectionhead sh-organiser"><i class="ph">&#xe244;</i><h3>Jij organiseert</h3><span class="count">2</span></div>
+      <div class="row">
+        <div class="grow">
+          <div class="day">zondag 14 september</div>
+          <div class="sub">10:00 – 12:00 · 2 gaan mee, 1 wacht nog</div>
+        </div>
+        <div class="badge b-great" style="margin:0">74</div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+      <div class="row">
+        <div class="grow">
+          <div class="day">zaterdag 20 september</div>
+          <div class="sub">09:00 – 13:00 · nog niemand geantwoord</div>
+        </div>
+        <div class="badge b-perfect" style="margin:0">86</div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+
+    <div class="sectioncard">
+      <div class="sectionhead sh-joined"><i class="ph">&#xe68e;</i><h3>Je gaat mee</h3><span class="count">1</span></div>
+      <div class="row">
+        <div class="grow">
+          <div class="day">dinsdag 16 september</div>
+          <div class="sub">18:00 – 20:00 · met Sanne</div>
+        </div>
+        <div class="badge b-great" style="margin:0">71</div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+
+    <div class="sectioncard">
+      <div class="sectionhead sh-solo"><i class="ph">&#xe734;</i><h3>Alleen jij</h3><span class="count">1</span></div>
+      <div class="row">
+        <div class="grow">
+          <div class="day">donderdag 18 september</div>
+          <div class="sub">07:00 – 09:00 · 2u</div>
+        </div>
+        <div class="badge b-accept" style="margin:0">61</div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+    <div style="height:24px"></div>
+  </div></div>
+  <p class="caption"><b>B</b> — vier <code>SectionCard</code>s, de component die Peloton en Profiel al
+     gebruiken. Kleinste ingreep: koppen bestaan, regels worden alleen tikbaar en krijgen hun datum.</p>
+  </div>
+
+  <div id="detail-col-B"></div>
+</div>
+</div>
+
+<!-- ══════════════════════════ VARIANT C ══════════════════════════ -->
+<div class="stage C" id="stage-C">
+<div class="stage-row">
+
+  <div>
+  <div class="phone"><div class="screen">
+    <div class="appbar">
+      <div class="row"><h2>Ritten</h2><i class="info ph">&#xe2ce;</i></div>
+      <div class="tabs"><div class="on">Ritten</div><div>Maatjes</div></div>
+    </div>
+
+    <div class="sectiontitle">Deze week</div>
+    <div class="list">
+      <div class="card">
+        <div class="stripe st-pending"></div>
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <span class="rolechip rc-pending"><i class="ph">&#xe2b2;</i> Wacht op jou</span>
+              <div class="day" style="margin-top:7px">zaterdag 13 september</div>
+              <div class="time">09:00 – 13:00 · van Peter</div>
+            </div>
+            <div class="badge b-perfect">88</div>
+          </div>
+          <div class="acts"><button class="yes">Ik ga mee</button><button class="no">Kan niet</button></div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <div class="card">
+        <div class="stripe st-organiser"></div>
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <span class="rolechip rc-organiser"><i class="ph">&#xe244;</i> Jij organiseert</span>
+              <div class="day" style="margin-top:7px">zondag 14 september</div>
+              <div class="time">10:00 – 12:00 · 2u</div>
+              <div class="avs"><div class="av">S</div><div class="av">M</div><div class="av more">+1</div>
+                <span class="lbl">2 gaan mee, 1 wacht nog</span></div>
+            </div>
+            <div class="badge b-great">74</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <div class="card">
+        <div class="stripe st-joined"></div>
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <span class="rolechip rc-joined"><i class="ph">&#xe68e;</i> Je gaat mee</span>
+              <div class="day" style="margin-top:7px">dinsdag 16 september</div>
+              <div class="time">18:00 – 20:00 · met Sanne</div>
+            </div>
+            <div class="badge b-great">71</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+
+      <div class="card">
+        <div class="stripe st-solo"></div>
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <span class="rolechip rc-solo"><i class="ph">&#xe734;</i> Alleen jij</span>
+              <div class="day" style="margin-top:7px">donderdag 18 september</div>
+              <div class="time">07:00 – 09:00 · 2u</div>
+            </div>
+            <div class="badge b-accept">61</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+
+    <div class="sectiontitle">Volgende week</div>
+    <div class="list">
+      <div class="card">
+        <div class="stripe st-organiser"></div>
+        <div class="body">
+          <div class="cardtop">
+            <div class="grow">
+              <span class="rolechip rc-organiser"><i class="ph">&#xe244;</i> Jij organiseert</span>
+              <div class="day" style="margin-top:7px">zaterdag 20 september</div>
+              <div class="time">09:00 – 13:00 · 4u</div>
+              <div class="avs"><span class="lbl" style="margin-left:0">Nog niemand geantwoord</span></div>
+            </div>
+            <div class="badge b-perfect">86</div>
+          </div>
+        </div>
+        <i class="chev ph">&#xe13a;</i>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div></div>
+  <p class="caption"><b>C</b> — chronologisch met weekkoppen; de rol staat als gekleurde strook én
+     als chip bovenaan de kaart. Rol is af te lezen zonder te lezen.</p>
+  </div>
+
+  <div id="detail-col-C"></div>
+</div>
+</div>
+
+<div class="legend">
+  <div><span class="sw" style="background:var(--pending)"></span> Wacht op jou</div>
+  <div><span class="sw" style="background:var(--organiser)"></span> Jij organiseert &nbsp;<i class="ph">&#xe244;</i></div>
+  <div><span class="sw" style="background:var(--joined)"></span> Je gaat mee &nbsp;<i class="ph">&#xe68e;</i></div>
+  <div><span class="sw" style="background:var(--outline)"></span> Alleen jij &nbsp;<i class="ph">&#xe734;</i></div>
+</div>
+
+</div>
+
+<template id="detail-tpl">
+  <div>
+  <div class="phone"><div class="screen detail">
+    <div class="hero">
+      <div class="when">zondag 14 september · 10:00 – 12:00</div>
+      <div class="score"><span class="n">74</span><span class="w">Prima</span></div>
+    </div>
+
+    <div class="peloton">
+      <div class="hd" style="color:var(--organiser)"><i class="ph">&#xe244;</i><h3>Jij organiseert</h3></div>
+      <div class="who"><div class="av" style="margin:0">S</div>
+        <div><div class="nm">Sanne</div><div class="st">gaat mee</div></div>
+        <i class="tick ph" style="color:var(--perfect-fg)">&#xe184;</i></div>
+      <div class="who"><div class="av" style="margin:0">M</div>
+        <div><div class="nm">Mark</div><div class="st">gaat mee</div></div>
+        <i class="tick ph" style="color:var(--perfect-fg)">&#xe184;</i></div>
+      <div class="who"><div class="av more" style="margin:0">P</div>
+        <div><div class="nm">Peter</div><div class="st">nog geen antwoord</div></div>
+        <i class="tick ph" style="color:var(--ink-3);opacity:.6">&#xe2b2;</i></div>
+      <div class="foot"><button><i class="ph" style="font-size:15px">&#xe4d0;</i>&nbsp; Nog iemand uitnodigen</button></div>
+    </div>
+
+    <div class="rowsimple"><i class="ph" style="font-size:18px;color:var(--ink-3)">&#xe5cc;</i> 14° · voelt als 12°</div>
+    <div class="rowsimple"><i class="ph" style="font-size:18px;color:var(--ink-3)">&#xe5d2;</i> 11 km/u uit het zuidwesten</div>
+    <div class="rowsimple"><i class="ph" style="font-size:18px;color:var(--ink-3)">&#xe210;</i> Droog · 5% kans</div>
+    <div class="rowsimple"><i class="ph" style="font-size:18px;color:var(--ink-3)">&#xe10a;</i> Zet in Google Agenda</div>
+  </div></div>
+  <p class="caption"><b>Waar je uitkomt</b> — hetzelfde detailscherm dat een eigen rit al opent, met
+     er één blok bij: wie er meegaat en wie nog moet antwoorden. Bij een rit van een ander staat daar
+     <i>Van Peter</i> met een knop <i>Toch niet</i>.</p>
+  </div>
+</template>
+
+<script>
+  const notes = {
+    A: '<b>Eén lijst, filterrij bovenaan.</b> Alle ritten chronologisch door elkaar, precies zoals je week loopt. ' +
+       'De filterrij beantwoordt jouw vraag rechtstreeks: tik “Ik organiseer” en je ziet er twee. ' +
+       'De telling per filter zegt het antwoord al vóór je tikt. Kost het meest werk: nieuwe filterstaat, en de ' +
+       'Peloton-tab wordt “Maatjes” (alleen nog relaties).',
+    B: '<b>Vier secties onder elkaar.</b> Elke rol een eigen kop met telling — je hoeft niets te filteren, ' +
+       'de vraag “wat organiseer ik” is een kopje. Gebruikt <code>SectionCard</code> die er al is, en ' +
+       'de bestaande rijen worden alleen tikbaar. Nadeel: je week loopt niet meer op volgorde — ' +
+       'de rit van zaterdag staat boven die van dinsdag omdat de rol de sortering bepaalt.',
+    C: '<b>Rolstrook op de kaart.</b> Chronologisch mét weekkoppen, en de rol zit ín de kaart: een gekleurde ' +
+       'strook links plus een chip bovenaan. Je herkent de soort aan kleur en vorm, zonder te lezen. ' +
+       'Geen filter, geen sectiekoppen — de langste lijst, maar de rustigste structuur.'
+  };
+  function pick(v, btn){
+    document.querySelectorAll('.switcher button').forEach(b=>b.setAttribute('aria-pressed', b===btn));
+    document.querySelectorAll('.stage').forEach(s=>s.classList.toggle('on', s.id==='stage-'+v));
+    document.getElementById('note').innerHTML = notes[v];
+  }
+  // het detailscherm staat in alle drie de kolommen — één bron, drie plekken
+  const tpl = document.getElementById('detail-tpl').content;
+  ['A','B','C'].forEach(v => document.getElementById('detail-col-'+v).appendChild(tpl.cloneNode(true)));
+  document.getElementById('note').innerHTML = notes.A;
+</script>
+</body>
+</html>
