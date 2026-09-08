@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "1.0.25+26 op internal testing; wacht op testers"
-last_updated: "2026-09-08T14:05:00.000Z"
+status: "Uitleg, intro en Peloton bij; 1.0.26 nog niet gebouwd"
+last_updated: "2026-09-08T15:20:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -30,6 +30,9 @@ progress:
 | 2026-09-07 | [gevoelsbalk](quick/260907-wgz-fase-24-kledingadvies-gevoelsbalk/) | Fase 24: het kledingadvies is geen plaatje meer maar een balk met de gevoelstemperatuur. **Lees de vondst daar** — de app toonde twee verschillende "feels like" naast elkaar. |
 | 2026-09-08 | [phosphor](quick/260908-d9k-fase-24-iconen-naar-phosphor-regular/) | Fase 24 af: 71 Material-iconen en 12 emoji naar Phosphor Regular. **Het pub-pakket viel af** — het breekt op Flutter's `final class IconData`; we dragen het font nu zelf. |
 | 2026-09-08 | [play-release](quick/260908-i4m-play-release-v4-0-klaarzetten-en-uploads/) | `1.0.25+26` gebouwd plus `tool/play_upload.dart`. **De testsuite ving de val**: `lib/core/app_version.dart` bumpt niet mee met `pubspec.yaml`. |
+| 2026-09-08 | [intro-1.75×](quick/260908-i7p-intro-op-1-75/) | De intro speelt 1,75× zo snel. Framelengtes gepatcht, **bestand exact even groot** — niets hercodeerd. `_settleAt` schuift mee. |
+| 2026-09-08 | [peloton-afzeggen](quick/260908-j2q-peloton-afzeggen/) | Een geaccepteerde rit is af te zeggen. **Alles behalve de knop bestond al**; geen migratie. Met ongedaan-maken, want afzeggen was een deur die één kant op ging. |
+| 2026-09-08 | [uitleg-in-stappen](quick/260908-k4t-uitleg-in-stappen/) | De twee uitleg-overlays zijn één Material 3 rich tooltip geworden, met terugknop en in beide talen. **Lees de vondst daar** — het weghalen van tik-om-verder sloot je op bij een niet-gemeten doel. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -74,10 +77,12 @@ opgehoogd voor Play).
 - **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
   alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
 
-**Wat als eerste aandacht vraagt:** dit alles staat nog niet op Play — de
-laatste Play-build is 1.0.24+25 en kent hiervan niets. `1.0.25+26` ligt klaar
-en het uploadscript is geschreven; wat ontbreekt is de service-account-sleutel.
-Zie het blok "Play-release" hieronder voor de twee stappen.
+**Wat als eerste aandacht vraagt:** er staat sinds 1.0.25+26 alweer een sessie
+werk klaar dat niet op Play staat — de intro op 1,75×, de uitleg als rich
+tooltip, en afzeggen in Peloton. Dat vraagt een **1.0.26+27**: `pubspec.yaml`
+én `lib/core/app_version.dart` ophogen, bouwen, uploaden. Zie het blok
+"Play-release" hieronder; het uploadscript staat klaar en wacht op de
+service-account-sleutel.
 
 Let op bij een volgende bump: `pubspec.yaml` is niet de enige plek. De in-app
 versie staat hard in `lib/core/app_version.dart` en liep hier stilzwijgend
