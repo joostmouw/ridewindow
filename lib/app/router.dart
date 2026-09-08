@@ -14,6 +14,7 @@ import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
+import 'package:ridewindow/features/shared/brand_canvas.dart';
 import 'package:ridewindow/features/availability/availability_screen.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
@@ -99,12 +100,12 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/welcome',
         pageBuilder: (context, state) =>
-            _fadeTransition(state, const WelcomeScreen()),
+            _fadeTransition(state, const BrandCanvas(child: WelcomeScreen())),
       ),
       GoRoute(
         path: '/onboard',
-        pageBuilder: (context, state) =>
-            _fadeTransition(state, const OnboardingScreen()),
+        pageBuilder: (context, state) => _fadeTransition(
+            state, const BrandCanvas(child: OnboardingScreen())),
       ),
 
       // Home + Profile als tabs met gedeelde NavigationBar.
@@ -165,7 +166,8 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/availability',
         pageBuilder: (context, state) {
-          final fromOnboarding = state.uri.queryParameters['from'] == 'onboarding';
+          final fromOnboarding =
+              state.uri.queryParameters['from'] == 'onboarding';
           return _slideUpTransition(
             state,
             AvailabilityScreen(fromOnboarding: fromOnboarding),

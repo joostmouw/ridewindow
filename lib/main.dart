@@ -27,9 +27,7 @@ import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
-import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
-import 'package:ridewindow/theme/app_typography.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,170 +88,6 @@ Future<void> main() async {
   }
 }
 
-ThemeData _buildTheme(Brightness brightness) {
-  final seeded = ColorScheme.fromSeed(
-    seedColor: AppColors.seed,
-    brightness: brightness,
-  );
-  final isLight = brightness == Brightness.light;
-
-  // In light mode houden de oppervlakken een lichte groenzweem in plaats van
-  // MD3's neutrale grijs, zodat het scherm papier is en geen steriel wit --
-  // maar de achtergrond is sinds v4.0 wél licht (`lightSurface`), niet
-  // brandLight. Zie de noot bij `AppColors.brandLight`: op een middentoon leest
-  // een slagschaduw niet, en zonder schaduw is er geen manier om de beste rit
-  // vóór de rest te zetten. Dark mode volgt het afgeleide schema van de seed.
-  final colorScheme = isLight
-      ? seeded.copyWith(
-          surface: AppColors.lightSurface,
-          surfaceContainerLowest: AppColors.lightSurfaceContainerLowest,
-          surfaceContainerLow: AppColors.lightSurfaceContainerLow,
-          surfaceContainer: AppColors.lightSurfaceContainer,
-          surfaceContainerHigh: AppColors.lightSurfaceContainerHigh,
-          surfaceContainerHighest: AppColors.lightSurfaceContainerHighest,
-          onSurface: AppColors.lightOnSurface,
-          onSurfaceVariant: AppColors.lightOnSurfaceVariant,
-          outline: AppColors.lightOutline,
-          outlineVariant: AppColors.lightOutlineVariant,
-        )
-      : seeded;
-
-  return ThemeData(
-    colorScheme: colorScheme,
-    extensions: [isLight ? RideWindowTheme.light : RideWindowTheme.dark],
-
-    // ── Huisletter (epic #64) ──
-    // `fontFamily` dekt alles wat geen expliciete stijl uit `textTheme` pakt
-    // (denk aan losse `TextStyle`s in schermen die nog niet zijn omgezet), zodat
-    // er nergens Roboto doorheen lekt zolang die opruiming loopt.
-    fontFamily: AppTypography.family,
-    textTheme: AppTypography.textTheme.apply(
-      bodyColor: colorScheme.onSurface,
-      displayColor: colorScheme.onSurface,
-    ),
-
-    // ── Scaffold ──
-    scaffoldBackgroundColor: colorScheme.surface,
-
-    // ── AppBar ──
-    appBarTheme: AppBarTheme(
-      centerTitle: false,
-      elevation: 0,
-      scrolledUnderElevation: 2,
-      backgroundColor: colorScheme.surface,
-      foregroundColor: colorScheme.onSurface,
-      surfaceTintColor: colorScheme.surfaceTint,
-    ),
-
-    // ── Cards (M3 Expressive: larger radii) ──
-    //
-    // Sinds v4.0 fase 23 hebben Home en Ride Detail hun kaarten lokaal op
-    // papier-wit gezet: `surfaceContainerLowest` met een haarlijn in
-    // `surfaceContainerHigh`. Dit thema bleef ondertussen op
-    // `surfaceContainerLow` staan met een rand van `outlineVariant` op 120
-    // alpha, en dus had de app twee soorten kaarten — welke je kreeg hing
-    // ervan af of dat scherm in de sweep was meegenomen. Op "My rides" was dat
-    // meteen te zien: groenige kaarten naast Home's witte.
-    //
-    // Nu is het thema de papierbehandeling en zijn de lokale overschrijvingen
-    // op Home en Ride Detail de uitzondering die ze horen te zijn (die staan
-    // er om andere redenen — een `ClipRRect` die geen `elevation` doorlaat, en
-    // een `Container` die ook een `BoxShadow` droeg).
-    cardTheme: CardThemeData(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: colorScheme.surfaceContainerHigh),
-      ),
-      color: colorScheme.surfaceContainerLowest,
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-    ),
-
-    // ── Buttons (M3 Expressive: fully rounded) ──
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        shape: const StadiumBorder(),
-      ),
-    ),
-
-    // ── Chips (M3 Expressive) ──
-    chipTheme: ChipThemeData(
-      shape: const StadiumBorder(),
-      showCheckmark: false,
-    ),
-
-    // ── Bottom Sheet (M3 Expressive: 28dp corners) ──
-    bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: colorScheme.surfaceContainerLow,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      showDragHandle: true,
-    ),
-
-    // ── Divider ──
-    dividerTheme: DividerThemeData(
-      color: colorScheme.outlineVariant,
-      thickness: 1,
-      space: 1,
-    ),
-
-    // ── SnackBar ──
-    snackBarTheme: SnackBarThemeData(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-
-    // ── NavigationBar ──
-    navigationBarTheme: NavigationBarThemeData(
-      elevation: 0,
-      backgroundColor: colorScheme.surfaceContainer,
-      indicatorColor: colorScheme.secondaryContainer,
-    ),
-
-    // ── Switch ──
-    switchTheme: SwitchThemeData(
-      thumbColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return colorScheme.onPrimary;
-        }
-        return colorScheme.outline;
-      }),
-      trackColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return colorScheme.primary;
-        }
-        return colorScheme.surfaceContainerHighest;
-      }),
-      // Zonder deze rand is een uitgeschakelde schakelaar een randloze olijf-
-      // vlek: op de papieren achtergrond van v4.0 leest hij dan niet als "uit"
-      // maar als "kapot". Material 3 schrijft de omtrek voor en die ontbrak --
-      // vandaar dat de notificatie-toggles in Profiel dood ogen. Aan verdwijnt
-      // hij, want daar draagt de gevulde track de staat al.
-      trackOutlineColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return Colors.transparent;
-        }
-        return colorScheme.outline;
-      }),
-    ),
-  );
-}
-
 class RideWindowApp extends ConsumerWidget {
   const RideWindowApp({super.key});
 
@@ -283,8 +117,8 @@ class RideWindowApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: _buildTheme(Brightness.light),
-      darkTheme: _buildTheme(Brightness.dark),
+      theme: buildAppTheme(Brightness.light),
+      darkTheme: buildAppTheme(Brightness.dark),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: router,
       // Renders the iOS "Add to Home Screen" instructional banner above

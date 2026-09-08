@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'app_typography.dart';
 
 /// Custom [ThemeExtension] that exposes semantic colour tokens and tier colours.
 ///
@@ -289,7 +290,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       plannedRide: Color.lerp(plannedRide, other.plannedRide, t)!,
       rideOrganiser: Color.lerp(rideOrganiser, other.rideOrganiser, t)!,
       ridePending: Color.lerp(ridePending, other.ridePending, t)!,
-      plannedRideLight: Color.lerp(plannedRideLight, other.plannedRideLight, t)!,
+      plannedRideLight:
+          Color.lerp(plannedRideLight, other.plannedRideLight, t)!,
       calendarBusy: Color.lerp(calendarBusy, other.calendarBusy, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       error: Color.lerp(error, other.error, t)!,
@@ -297,7 +299,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       availWork: Color.lerp(availWork, other.availWork, t)!,
       availCustom: Color.lerp(availCustom, other.availCustom, t)!,
       availCalendar: Color.lerp(availCalendar, other.availCalendar, t)!,
-      availCustomLight: Color.lerp(availCustomLight, other.availCustomLight, t)!,
+      availCustomLight:
+          Color.lerp(availCustomLight, other.availCustomLight, t)!,
       availWorkLight: Color.lerp(availWorkLight, other.availWorkLight, t)!,
       rowGreenTint: Color.lerp(rowGreenTint, other.rowGreenTint, t)!,
       rowOrangeTint: Color.lerp(rowOrangeTint, other.rowOrangeTint, t)!,
@@ -308,7 +311,8 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
       scoreGreenTint: Color.lerp(scoreGreenTint, other.scoreGreenTint, t)!,
       greenBg: Color.lerp(greenBg, other.greenBg, t)!,
       greenBorder: Color.lerp(greenBorder, other.greenBorder, t)!,
-      greenGradientStart: Color.lerp(greenGradientStart, other.greenGradientStart, t)!,
+      greenGradientStart:
+          Color.lerp(greenGradientStart, other.greenGradientStart, t)!,
     );
   }
 }
@@ -317,4 +321,186 @@ class RideWindowTheme extends ThemeExtension<RideWindowTheme> {
 /// `Theme.of(context).extension<RideWindowTheme>()!`.
 extension RideWindowThemeX on BuildContext {
   RideWindowTheme get rw => Theme.of(this).extension<RideWindowTheme>()!;
+}
+
+/// Het lichte thema als één gedeelde instantie.
+///
+/// Voor de schermen die hun achtergrond hard vastzetten en dus ook hun
+/// voorgrond moeten vastzetten -- zie `BrandCanvas`. Een top-level `final`
+/// wordt in Dart lui en precies één keer geïnitialiseerd, en dat is hier het
+/// punt: `ColorScheme.fromSeed` is geen goedkope aanroep om per frame te doen.
+final ThemeData brandCanvasTheme = buildAppTheme(Brightness.light);
+
+/// Het app-brede thema, per helderheid.
+///
+/// **Stond tot 2026-09-08 in `main.dart` en was daardoor onbereikbaar voor de
+/// twee schermen die hem het hardst nodig hadden.** Welkom en Onboarding zetten
+/// hun achtergrond bewust hard op [AppColors.brandLight] -- een merkmoment in
+/// plaats van behang -- maar haalden hun tekstkleur uit het actieve schema. In
+/// donkere modus is dat lichte tekst op een licht groen vlak: 1,21:1 voor de
+/// titel en 1,09:1 voor de ondertitel, tegen 9,63:1 en 5,54:1 in lichte modus.
+/// Een scherm dat zijn achtergrond vastzet, moet zijn voorgrond ook vastzetten,
+/// en daarvoor moet dit thema van buiten main.dart te bouwen zijn.
+ThemeData buildAppTheme(Brightness brightness) {
+  final seeded = ColorScheme.fromSeed(
+    seedColor: AppColors.seed,
+    brightness: brightness,
+  );
+  final isLight = brightness == Brightness.light;
+
+  // In light mode houden de oppervlakken een lichte groenzweem in plaats van
+  // MD3's neutrale grijs, zodat het scherm papier is en geen steriel wit --
+  // maar de achtergrond is sinds v4.0 wél licht (`lightSurface`), niet
+  // brandLight. Zie de noot bij `AppColors.brandLight`: op een middentoon leest
+  // een slagschaduw niet, en zonder schaduw is er geen manier om de beste rit
+  // vóór de rest te zetten. Dark mode volgt het afgeleide schema van de seed.
+  final colorScheme = isLight
+      ? seeded.copyWith(
+          surface: AppColors.lightSurface,
+          surfaceContainerLowest: AppColors.lightSurfaceContainerLowest,
+          surfaceContainerLow: AppColors.lightSurfaceContainerLow,
+          surfaceContainer: AppColors.lightSurfaceContainer,
+          surfaceContainerHigh: AppColors.lightSurfaceContainerHigh,
+          surfaceContainerHighest: AppColors.lightSurfaceContainerHighest,
+          onSurface: AppColors.lightOnSurface,
+          onSurfaceVariant: AppColors.lightOnSurfaceVariant,
+          outline: AppColors.lightOutline,
+          outlineVariant: AppColors.lightOutlineVariant,
+        )
+      : seeded;
+
+  return ThemeData(
+    colorScheme: colorScheme,
+    extensions: [isLight ? RideWindowTheme.light : RideWindowTheme.dark],
+
+    // ── Huisletter (epic #64) ──
+    // `fontFamily` dekt alles wat geen expliciete stijl uit `textTheme` pakt
+    // (denk aan losse `TextStyle`s in schermen die nog niet zijn omgezet), zodat
+    // er nergens Roboto doorheen lekt zolang die opruiming loopt.
+    fontFamily: AppTypography.family,
+    textTheme: AppTypography.textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+    ),
+
+    // ── Scaffold ──
+    scaffoldBackgroundColor: colorScheme.surface,
+
+    // ── AppBar ──
+    appBarTheme: AppBarTheme(
+      centerTitle: false,
+      elevation: 0,
+      scrolledUnderElevation: 2,
+      backgroundColor: colorScheme.surface,
+      foregroundColor: colorScheme.onSurface,
+      surfaceTintColor: colorScheme.surfaceTint,
+    ),
+
+    // ── Cards (M3 Expressive: larger radii) ──
+    //
+    // Sinds v4.0 fase 23 hebben Home en Ride Detail hun kaarten lokaal op
+    // papier-wit gezet: `surfaceContainerLowest` met een haarlijn in
+    // `surfaceContainerHigh`. Dit thema bleef ondertussen op
+    // `surfaceContainerLow` staan met een rand van `outlineVariant` op 120
+    // alpha, en dus had de app twee soorten kaarten — welke je kreeg hing
+    // ervan af of dat scherm in de sweep was meegenomen. Op "My rides" was dat
+    // meteen te zien: groenige kaarten naast Home's witte.
+    //
+    // Nu is het thema de papierbehandeling en zijn de lokale overschrijvingen
+    // op Home en Ride Detail de uitzondering die ze horen te zijn (die staan
+    // er om andere redenen — een `ClipRRect` die geen `elevation` doorlaat, en
+    // een `Container` die ook een `BoxShadow` droeg).
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: colorScheme.surfaceContainerHigh),
+      ),
+      color: colorScheme.surfaceContainerLowest,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+    ),
+
+    // ── Buttons (M3 Expressive: fully rounded) ──
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        shape: const StadiumBorder(),
+      ),
+    ),
+
+    // ── Chips (M3 Expressive) ──
+    chipTheme: const ChipThemeData(
+      shape: StadiumBorder(),
+      showCheckmark: false,
+    ),
+
+    // ── Bottom Sheet (M3 Expressive: 28dp corners) ──
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: colorScheme.surfaceContainerLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      showDragHandle: true,
+    ),
+
+    // ── Divider ──
+    dividerTheme: DividerThemeData(
+      color: colorScheme.outlineVariant,
+      thickness: 1,
+      space: 1,
+    ),
+
+    // ── SnackBar ──
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+
+    // ── NavigationBar ──
+    navigationBarTheme: NavigationBarThemeData(
+      elevation: 0,
+      backgroundColor: colorScheme.surfaceContainer,
+      indicatorColor: colorScheme.secondaryContainer,
+    ),
+
+    // ── Switch ──
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return colorScheme.onPrimary;
+        }
+        return colorScheme.outline;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return colorScheme.primary;
+        }
+        return colorScheme.surfaceContainerHighest;
+      }),
+      // Zonder deze rand is een uitgeschakelde schakelaar een randloze olijf-
+      // vlek: op de papieren achtergrond van v4.0 leest hij dan niet als "uit"
+      // maar als "kapot". Material 3 schrijft de omtrek voor en die ontbrak --
+      // vandaar dat de notificatie-toggles in Profiel dood ogen. Aan verdwijnt
+      // hij, want daar draagt de gevulde track de staat al.
+      trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return Colors.transparent;
+        }
+        return colorScheme.outline;
+      }),
+    ),
+  );
 }
