@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nederlandse teksten — schets 009</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('Outfit.ttf') format('truetype'); font-weight:100 900; }
+  @font-face { font-family:'Phosphor'; src:url('Phosphor.ttf') format('truetype'); }
+
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+    --great-fg:#006457;  --great-bg:#E0F2F1;
+    --accept-fg:#A42E0A; --accept-bg:#FFF3E0;
+    --bad:#A42E0A; --good:#1B5E20;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 26px 90px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:32px;line-height:1.25;font-weight:500;margin:0 0 10px}
+  h2{font-size:22px;font-weight:500;margin:44px 0 6px;padding-top:22px;border-top:1px solid var(--outline)}
+  h2 .n{color:var(--ink-3);font-weight:500;margin-right:10px}
+  .lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:76ch;margin:0}
+  .lede b{font-weight:600;color:var(--ink)}
+  .sub{font-size:14.5px;line-height:1.6;color:var(--ink-3);max-width:80ch;margin:8px 0 20px}
+  .sub b{color:var(--ink-2);font-weight:600}
+  .ph{font-family:'Phosphor';font-style:normal;line-height:1;display:inline-block}
+
+  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:14px 0 0}
+  th{text-align:left;font-weight:600;font-size:12px;letter-spacing:.6px;text-transform:uppercase;
+     color:var(--ink-3);padding:0 12px 8px;border-bottom:1px solid var(--outline)}
+  td{padding:10px 12px;border-bottom:1px solid var(--paper-high);vertical-align:top;line-height:1.45}
+  td.key{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--ink-3);white-space:nowrap}
+  td.old{color:var(--bad)}
+  td.new{color:var(--good);font-weight:500}
+  td.why{color:var(--ink-3);font-size:13.5px}
+  tr:hover td{background:var(--paper)}
+
+  .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:18px}
+  .opt{background:var(--paper);border:1px solid var(--outline);border-radius:20px;padding:18px 18px 16px}
+  .opt.pick{border-color:var(--brand-dark);border-width:2px;padding:17px 17px 15px}
+  .opt h3{margin:0 0 3px;font-size:17px;font-weight:600}
+  .opt .tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+            background:var(--brand-dark);color:var(--paper);border-radius:999px;padding:3px 9px;margin-bottom:8px}
+  .opt .note{font-size:13.5px;line-height:1.5;color:var(--ink-3);margin:8px 0 0}
+  .opt ul{margin:10px 0 0;padding-left:0;list-style:none}
+  .opt li{font-size:14px;line-height:1.7;color:var(--ink-2)}
+  .opt li b{color:var(--ink);font-weight:600}
+
+  .phonebits{display:grid;gap:10px;margin-top:12px}
+  .bit{background:var(--paper-mid);border-radius:14px;padding:11px 14px;font-size:14px;line-height:1.5}
+  .bit .lbl{display:block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:3px}
+
+  .band{display:grid;grid-template-columns:132px 1fr 1fr;gap:0;align-items:stretch;
+        border:1px solid var(--outline);border-radius:16px;overflow:hidden;margin-bottom:10px;background:var(--paper)}
+  .band .t{padding:14px 16px;background:var(--paper-mid);font-weight:600;font-size:14.5px;
+           display:flex;flex-direction:column;justify-content:center;line-height:1.35}
+  .band .t small{display:block;font-weight:500;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+  .band .c{padding:14px 16px;font-size:14.5px;line-height:1.6}
+  .band .c.oldc{color:var(--bad);border-right:1px solid var(--paper-high)}
+  .band .c.newc{color:var(--good);font-weight:500}
+  .band .c .h{display:block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+              color:var(--ink-3);font-weight:600;margin-bottom:5px}
+
+  .foot{margin-top:44px;padding-top:22px;border-top:1px solid var(--outline);font-size:14.5px;
+        line-height:1.6;color:var(--ink-2);max-width:80ch}
+  .foot b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>De Nederlandse teksten — schets 009</h1>
+<p class="lede">
+Alle <b>505</b> Nederlandse strings doorgelezen. Er zitten drie soorten problemen in, en maar
+<b>twee</b> daarvan zijn een keuze. De rest is gewoon fout en gaat er hoe dan ook uit.
+</p>
+
+<!-- ═══════════════════ 1. HET KERNWOORD ═══════════════════ -->
+<h2><span class="n">1</span>Het kernwoord — nu vijf woorden voor één ding</h2>
+<p class="sub">
+De app noemt hetzelfde ding <b>rijvenster</b>, <b>rijmoment</b>, <b>rijtijd</b>, <b>venster</b> én
+<b>slot</b>, soms twee ervan op één scherm. “Rijvenster” is bovendien een letterlijke vertaling van
+<i>ride window</i> — geen Nederlander zegt dat. Eén woord, overal.
+</p>
+
+<div class="cards">
+  <div class="opt pick">
+    <span class="tag">mijn voorkeur</span>
+    <h3>A — “fietsmoment”</h3>
+    <p class="note">Gewoon Nederlands, en het sluit aan bij wat de app zelf al zegt: “de beste
+      momenten van de week”. In lopende tekst kort je het af tot <i>moment</i>.</p>
+    <div class="phonebits">
+      <div class="bit"><span class="lbl">Home, onder de begroeting</span>29 fietsmomenten deze week</div>
+      <div class="bit"><span class="lbl">Melding, avond ervoor</span>Mooi fietsmoment morgen!</div>
+      <div class="bit"><span class="lbl">Uitleg</span>Tik op een fietsmoment</div>
+      <div class="bit"><span class="lbl">Delen</span>Deel dit fietsmoment</div>
+    </div>
+  </div>
+  <div class="opt">
+    <h3>B — “rijvenster” houden</h3>
+    <p class="note">Merkgetrouw: de app heet RideWindow, dus het venster is het product. Maar het
+      blijft een woord dat buiten deze app niet bestaat, en de doelgroep is de gewone fietser.</p>
+    <div class="phonebits">
+      <div class="bit"><span class="lbl">Home, onder de begroeting</span>29 rijvensters deze week</div>
+      <div class="bit"><span class="lbl">Melding, avond ervoor</span>Top rijvenster morgen!</div>
+      <div class="bit"><span class="lbl">Uitleg</span>Tik op een rijvenster</div>
+      <div class="bit"><span class="lbl">Delen</span>Deel dit rijvenster</div>
+    </div>
+  </div>
+  <div class="opt">
+    <h3>C — “moment”, kaal</h3>
+    <p class="note">Het kortste, en op een klein scherm scheelt dat. Nadeel: los van context zegt
+      “29 momenten deze week” niet waarvoor.</p>
+    <div class="phonebits">
+      <div class="bit"><span class="lbl">Home, onder de begroeting</span>29 momenten om te fietsen</div>
+      <div class="bit"><span class="lbl">Melding, avond ervoor</span>Mooi moment om te fietsen morgen!</div>
+      <div class="bit"><span class="lbl">Uitleg</span>Tik op een moment</div>
+      <div class="bit"><span class="lbl">Delen</span>Deel dit moment</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 2. HET KLEDINGADVIES ═══════════════════ -->
+<h2><span class="n">2</span>Het kledingadvies — wielrennerstaal voor gewone fietsers</h2>
+<p class="sub">
+Je punt over de kniewarmers geldt voor de hele lijst: <b>jersey, armwarmers, beenwarmers,
+kniewarmers, overschoenen, thermobroek, windvest</b> zijn allemaal spullen uit de wielrenkast.
+CLAUDE.md zegt dat de app voor de <b>gewone fietser</b> is. Rechts staat wat iemand met een gewone
+kast wél in huis heeft — en zoals je zei: korte of lange broek is genoeg.
+</p>
+
+<div class="band">
+  <div class="t">Vanaf 20°<small>kort/kort</small></div>
+  <div class="c oldc"><span class="h">nu</span>Korte mouw jersey<br>Zonnebrand <i>(vanaf 25°)</i><br>Extra water <i>(vanaf 30°)</i></div>
+  <div class="c newc"><span class="h">voorstel</span>T-shirt en korte broek<br>Zonnebrand <i>(vanaf 25°)</i><br>Extra water mee <i>(vanaf 30°)</i></div>
+</div>
+<div class="band">
+  <div class="t">14° – 20°<small>lang/kort</small></div>
+  <div class="c oldc"><span class="h">nu</span>Lange mouw jersey<br>Armwarmers voor de zekerheid <i>(onder 17°)</i></div>
+  <div class="c newc"><span class="h">voorstel</span>Shirt met lange mouwen en korte broek<br>Windjack voor de zekerheid <i>(onder 17°)</i></div>
+</div>
+<div class="band">
+  <div class="t">5° – 14°<small>lang/lang</small></div>
+  <div class="c oldc"><span class="h">nu</span>Lange mouw jersey<br>Armwarmers + beenwarmers <i>(onder 10°)</i><br><b>Kniewarmers</b> <i>(10–14°)</i></div>
+  <div class="c newc"><span class="h">voorstel</span>Shirt met lange mouwen en lange broek<br>Windjack en handschoenen <i>(onder 10°)</i><br><i>(niets extra tussen 10 en 14°)</i></div>
+</div>
+<div class="band">
+  <div class="t">Onder 5°<small>lang/lang +</small></div>
+  <div class="c oldc"><span class="h">nu</span>Winterjas<br>Thermobroek<br>Handschoenen<br>Overschoenen</div>
+  <div class="c newc"><span class="h">voorstel</span>Winterjas<br>Warme lange broek<br>Handschoenen en muts<br>Dikke sokken</div>
+</div>
+<p class="sub" style="margin-top:14px">
+Regen voegt <b>Regenjas</b> toe en harde wind <b>Windjack</b> (was “windvest” — een vest heeft geen
+mouwen en dat is nu net niet wat je bij harde wind wilt). De vier bandlabels
+<b>Kort/kort · Lang/kort · Lang/lang · Lang/lang +</b> onder de gevoelsbalk blijven zoals ze zijn:
+die staan naast de balk en zijn dáár juist kort en leesbaar.
+</p>
+
+<!-- ═══════════════════ 3. GEWOON FOUT ═══════════════════ -->
+<h2><span class="n">3</span>Gewoon fout — geen keuze, dit gaat eruit</h2>
+<p class="sub">Achttien plekken. Vier daarvan zeggen iets anders dan bedoeld.</p>
+
+<table>
+  <thead><tr><th>waar</th><th>nu</th><th>wordt</th><th>waarom</th></tr></thead>
+  <tbody>
+    <tr><td class="key">hourlyFeelsLike</td><td class="old">v.a. 12°C</td><td class="new">voelt als 12°</td><td class="why"><b>Zegt iets anders.</b> “v.a.” leest als “vanaf”; het ís de gevoelstemperatuur.</td></tr>
+    <tr><td class="key">welcomeSubtitle</td><td class="old">…de beste <b>windows</b> om te fietsen</td><td class="new">…de beste momenten om te fietsen</td><td class="why">Engels woord blijven staan, op het eerste scherm dat iemand ziet.</td></tr>
+    <tr><td class="key">notifEveningBeforeSub</td><td class="old">19:00 de vorige dag als er een top-<b>slot</b> is</td><td class="new">19:00 de avond ervoor, als er een mooi moment aankomt</td><td class="why">Engels, en “de vorige dag” om 19:00 is de avond ervoor.</td></tr>
+    <tr><td class="key">notifMorningOfSub</td><td class="old">2 uur voor het <b>slot</b> begint</td><td class="new">2 uur voordat het begint</td><td class="why">Engels.</td></tr>
+    <tr><td class="key">riderEarlyBirdDesc</td><td class="old">Ochtend<b>slots</b> zijn jouw <b>sweet spot</b></td><td class="new">De vroege uren zijn van jou</td><td class="why">Twee anglicismen in één zin.</td></tr>
+    <tr><td class="key">riderAfternoonDesc</td><td class="old">Middag<b>slots</b> worden jouw ideale momenten</td><td class="new">De middaguren worden jouw beste ritten</td><td class="why">Engels.</td></tr>
+    <tr><td class="key">clearLocationOverride</td><td class="old">Locatie-<b>override</b> wissen</td><td class="new">Terug naar mijn GPS-locatie</td><td class="why">Jargon uit de code, geen taal voor een instelling.</td></tr>
+    <tr><td class="key">hintSwipeDelete</td><td class="old"><b>Swipe</b> om te verwijderen</td><td class="new">Veeg om te verwijderen</td><td class="why">Engels — en de zin eronder zegt zelf al “veeg”.</td></tr>
+    <tr><td class="key">sectionNotifications</td><td class="old">NOTIFICATIES</td><td class="new">MELDINGEN</td><td class="why">Android Nederlands zegt “meldingen”; daar komt de gebruiker vandaan.</td></tr>
+    <tr><td class="key">calendarImportSuccess</td><td class="old">Agenda-afspraken ge<b>i</b>mporteerd!</td><td class="new">Agenda-afspraken geïmporteerd</td><td class="why"><b>Spelfout</b> — trema ontbreekt.</td></tr>
+    <tr><td class="key">understood</td><td class="old">Begrijpen</td><td class="new">Duidelijk</td><td class="why"><b>Verkeerde vorm.</b> Het is een knop waarmee je iets wegklikt, geen opdracht.</td></tr>
+    <tr><td class="key">cancel · agendaCancel</td><td class="old">Annuleer</td><td class="new">Annuleren</td><td class="why">Nederlandse knoppen staan in de infinitief — “Opslaan” staat er twee knoppen naast.</td></tr>
+    <tr><td class="key">calendarSignInCanceled</td><td class="old"><b>Aanmelden</b> geannuleerd</td><td class="new">Inloggen geannuleerd</td><td class="why">De rest van de app zegt consequent “inloggen”.</td></tr>
+    <tr><td class="key">rainDescDrizzleOk</td><td class="old">Een beetje motregen is <b>ok</b></td><td class="new">Een beetje motregen is prima</td><td class="why">“ok” is Engels; de windregel ernaast zegt al “is prima”.</td></tr>
+    <tr><td class="key">tierGreat</td><td class="old">Goed <i>(Home)</i> vs Geweldig <i>(agenda, widget)</i></td><td class="new">Goed, overal</td><td class="why">Eén niveau, twee woorden. En “Geweldig” hoort niet ónder “Perfect” te staan.</td></tr>
+    <tr><td class="key">unplanConfirm*</td><td class="old">Rit <b>uitplannen</b>?</td><td class="new">Deze rit verwijderen?</td><td class="why">“Uitplannen” is geen Nederlands woord.</td></tr>
+    <tr><td class="key">weatherLoadError</td><td class="old"><b>Weersdata</b> kon niet worden geladen.</td><td class="new">Het weerbericht kon niet worden geladen.</td><td class="why">Elders heet het “weerdata”; en een gebruiker kent “weerbericht”.</td></tr>
+    <tr><td class="key">calendarStatusChecking · accountSyncStatusPending</td><td class="old">Controleren<b>...</b></td><td class="new">Controleren…</td><td class="why">Drie losse punten waar de rest van de app een echt beletselteken gebruikt.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════ 4. TOON ═══════════════════ -->
+<h2><span class="n">4</span>Toon — smaak, dus zeg maar wat je ervan vindt</h2>
+<p class="sub">
+Deze zijn niet fout, ze klinken alleen niet als iemand die Nederlands praat. Ik laat ze staan als
+je ze leuk vindt.
+</p>
+
+<table>
+  <thead><tr><th>waar</th><th>nu</th><th>voorstel</th><th>waarom</th></tr></thead>
+  <tbody>
+    <tr><td class="key">greetingNightOwl</td><td class="old">Nachtuil</td><td class="new">Nog wakker?</td><td class="why">“Nachtuil” is een etiket, geen begroeting — de andere drie zijn dat wel.</td></tr>
+    <tr><td class="key">riderBusy</td><td class="old">Druk maar doorzetter</td><td class="new">Druk, maar volhouden</td><td class="why">Er ontbreekt een komma, en “doorzetter” als bijnaam wringt.</td></tr>
+    <tr><td class="key">riderWeekend</td><td class="old">Weekendstrijder</td><td class="new">Weekendfietser</td><td class="why">“Strijder” is vertaald uit <i>warrior</i>; de rest van de types heet gewoon “fietser”.</td></tr>
+    <tr><td class="key">insightsWindNoteStrong</td><td class="old">Sterke wind — plan de route <b>strategisch</b></td><td class="new">Sterke wind — ga eerst tegen de wind in, dan heb je hem mee terug</td><td class="why">“Strategisch” zegt niet wát je moet doen. De app kent het antwoord al.</td></tr>
+    <tr><td class="key">sectionTolerances</td><td class="old">TOLERANTIES</td><td class="new">JOUW GRENZEN</td><td class="why">“Toleranties” komt uit de techniek.</td></tr>
+    <tr><td class="key">sectionRideLength</td><td class="old">RIJLENGTE</td><td class="new">RITDUUR</td><td class="why">Een rit heeft een duur, geen lengte — en “rijlengte” is vertaald uit <i>ride length</i>.</td></tr>
+    <tr><td class="key">notifChannelRideAlertsDesc</td><td class="old">Avond-van-tevoren en ochtend-van-de-dag rijmeldingen</td><td class="new">Meldingen de avond ervoor en op de ochtend zelf</td><td class="why">Vier koppeltekens in één zin.</td></tr>
+    <tr><td class="key">riderFulltimeDesc</td><td class="old">Je schema staat wagenwijd open.</td><td class="new"><i>ongewijzigd — deze is goed</i></td><td class="why">Ter vergelijking: zo klinkt de rest wél.</td></tr>
+  </tbody>
+</table>
+
+<div class="foot">
+<b>Wat ik nodig heb:</b> je keuze bij <b>1</b> (A, B of C), akkoord op <b>2</b>, en een streep door
+wat je bij <b>4</b> wilt houden. Blok <b>3</b> voer ik hoe dan ook door, tenzij je er iets uithaalt.
+<br><br>
+Het Engels laat ik met rust — daar ging je opmerking niet over, en die teksten hebben dezelfde
+problemen niet. Wel loopt <b>1</b> door naar het Engels: <i>ride window</i> blijft daar gewoon
+kloppen, dus daar verandert alleen de consistentie (nu ook <i>slot</i> en <i>window</i> door elkaar).
+</div>
+
+</div>
+</body>
+</html>
