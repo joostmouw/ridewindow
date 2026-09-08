@@ -15,6 +15,11 @@ import 'package:ridewindow/domain/services/slot_generator.dart'
     show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
+import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/ride_entry.dart';
+import 'package:ridewindow/features/shared/ride_role_style.dart';
+import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/feels_like_bar.dart';
@@ -347,6 +352,187 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             ),
           ),
           ...rows,
+        ],
+      ),
+    );
+  }
+
+  /// Wie er meegaat -- het blok dat een gedeelde rit tot een gedeelde rit maakt.
+  ///
+  /// **Waarom dit scherm het zelf opzoekt en niet meekrijgt via [DetailArgs].**
+  /// Er lopen drie routes hierheen (Home, de rittenlijst, en een tik op een
+  /// tijdvak) plus de deel-link. Zou de rit-rol als argument moeten meereizen,
+  /// dan zou elk van die routes hem apart moeten meegeven en zou de vierde die
+  /// vergeet stilzwijgend een leeg scherm opleveren. Opzoeken op tijdvak
+  /// betekent bovendien dat het blok meteen klopt na accepteren of afzeggen,
+  /// zonder dat er iets doorgegeven hoeft te worden.
+  RideEntry? get _pelotonEntry {
+    final slot = _effectiveSlot;
+    for (final entry in ref.watch(rideEntriesProvider)) {
+      if (entry.isShared &&
+          entry.start.isAtSameMomentAs(slot.start) &&
+          entry.end.isAtSameMomentAs(slot.end)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _respondToRide(RideEntry entry, {required bool accepted}) async {
+    final group = entry.group;
+    if (group == null || _isLoading) return;
+    setState(() => _isLoading = true);
+    try {
+      await ref
+          .read(pelotonGatewayProvider)
+          .respondToRide(rideId: group.id, accepted: accepted);
+      ref.invalidate(groupRidesProvider);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  /// Afzeggen met een terugweg, net als in de rittenlijst -- `declined` valt
+  /// uit alle providers en zou zonder deze snackbar onherstelbaar zijn.
+  Future<void> _withdrawFromRide(RideEntry entry) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    await _respondToRide(entry, accepted: false);
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(s.pelotonWithdrawn),
+        action: SnackBarAction(
+          label: s.pelotonUndo,
+          onPressed: () => _respondToRide(entry, accepted: true),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPelotonCard(BuildContext context) {
+    final entry = _pelotonEntry;
+    if (entry == null) return const SizedBox.shrink();
+
+    final s = S.of(context);
+    final rw = context.rw;
+    final style = rideRoleStyle(context, entry);
+    final participants = entry.group?.participants ?? const <RideParticipant>[];
+
+    String statusLabel(ParticipantStatus status) => switch (status) {
+          ParticipantStatus.accepted => s.pelotonStatusGoing,
+          ParticipantStatus.declined => s.pelotonStatusDeclined,
+          ParticipantStatus.invited => s.pelotonStatusWaiting,
+        };
+
+    return Card.outlined(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            child: Row(
+              children: [
+                Icon(style.icon, size: 16, color: style.color),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    style.label.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: style.color,
+                          letterSpacing: 0.8,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (participants.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 2, 16, 14),
+              child: Text(
+                s.pelotonNobodyInvitedYet,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: rw.textTertiary),
+              ),
+            )
+          else
+            for (final p in participants)
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: rw.borderDim)),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 14,
+                      child: Text(
+                        (p.displayName?.trim().isNotEmpty ?? false)
+                            ? p.displayName!.trim()[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        p.displayName?.trim().isNotEmpty ?? false
+                            ? p.displayName!
+                            : s.pelotonUnnamedFriend,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    Text(
+                      statusLabel(p.status),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: rw.textTertiary),
+                    ),
+                  ],
+                ),
+              ),
+          // De handeling die bij jouw rol hoort staat op de kaart zelf, want
+          // hier is waar je hem zoekt zodra je de rit openslaat.
+          if (entry.role == RideRole.pending)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () => _respondToRide(entry, accepted: false),
+                    child: Text(s.pelotonDecline),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () => _respondToRide(entry, accepted: true),
+                    child: Text(s.pelotonAccept),
+                  ),
+                ],
+              ),
+            ),
+          if (entry.role == RideRole.joined)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+                child: TextButton(
+                  onPressed: _isLoading ? null : () => _withdrawFromRide(entry),
+                  child: Text(s.pelotonWithdraw),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -964,6 +1150,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 child: Column(
                   children: [
                     _buildTimeAdjuster(),
+                    // Vlak onder de tijd: bij een gedeelde rit is "wie gaat er
+                    // mee" de vraag die je hier komt beantwoorden, nog voor het
+                    // weer. Bij een solo-rit tekent dit blok niets.
+                    _buildPelotonCard(context),
                     _buildInfoCard(
                       title: S.of(context).weatherSection,
                       rows: [
