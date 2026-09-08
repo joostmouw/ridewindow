@@ -30,6 +30,15 @@ import 'package:ridewindow/theme/app_motion.dart';
 /// verkleining kost scherpte die je in het monogram als eerste ziet. Scherper
 /// dan dit kan niet — het zit niet in de bron.
 ///
+/// **Waarom hij op 1,75× staat en niet op de snelheid van de bron.** Joost,
+/// 2026-09-08, na de vier tempo's naast elkaar te hebben gezien: op ware
+/// snelheid duurt de intro 8,65 s en dat is lang voor iets dat je één keer
+/// ziet en daarna nooit meer. De frames zijn dezelfde gebleven — alleen de
+/// framelengte in de ANMF-chunks is van 42 ms naar 24 ms gepatcht met
+/// `tool/webp_speed.py`, dus er is niets hercodeerd en het bestand is nog
+/// exact even groot. Wil je een ander tempo, draai dan dat script opnieuw op
+/// de bron en pas `_settleAt` hieronder aan.
+///
 /// **Hoe de tekst is weggehaald.** De fiets loopt tijdens de morph door tot
 /// y 579 in de bron, dus wegsnijden onder de tekst kost je de wielen. Maar de
 /// tekst verschijnt pas na 6,7 s, en dán is de fiets al opgetrokken tot y 461.
@@ -54,10 +63,15 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
-  /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 8,65 s (206
-  /// frames van 42 ms) en het verschuiven zelf 1,8 s, dus ze eindigen samen:
+  /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 4,94 s (206
+  /// frames van 24 ms) en het verschuiven zelf 1,8 s, dus ze eindigen samen:
   /// de rit rijdt zijn laatste seconde uit terwijl hij al omhoog gaat.
-  static const _settleAt = Duration(milliseconds: 6800);
+  ///
+  /// **Dit getal is afgeleid, niet gekozen.** Het is de duur van de animatie
+  /// min de 1,8 s hieronder. Verandert het tempo van de WebP, dan verandert
+  /// dit mee — anders staat het scherm stil terwijl de rit al klaar is, of
+  /// schuift hij weg terwijl de renner nog fietst.
+  static const _settleAt = Duration(milliseconds: 3144);
 
   late final AnimationController _settle;
   Timer? _timer;
