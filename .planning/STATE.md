@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fase 24: gevoelsbalk staat; iconen-keuze open"
-last_updated: "2026-09-07T21:55:00.000Z"
+status: "Fase 24 af: Phosphor overal, welkom-animatie staat"
+last_updated: "2026-09-08T10:35:00.000Z"
 last_activity: 2026-09-07
 progress:
   total_phases: 3
@@ -28,6 +28,7 @@ progress:
 | 2026-09-07 | Peloton-kaarten (`41217d9`, `63770c2`) | Peloton kreeg `SectionCard` (verhuisd uit Profiel); `cardTheme` bleek een tweede kaartsoort te hebben en is gelijkgetrokken. Elke ritkaart kan nu open én dicht. |
 | 2026-09-07 | [home-verfijning](quick/260907-hzt-home-verfijning-na-fase-23/) | Zes rondes na fase 23: dagstrip op vier niveaus, lijstplafonds, compactere kaarten, en uitleg waarom een score die score is. **Lees de drie vondsten daar** — icon-tree-shaking, gen-l10n-volgorde, en de verouderde bundel. |
 | 2026-09-07 | [gevoelsbalk](quick/260907-wgz-fase-24-kledingadvies-gevoelsbalk/) | Fase 24: het kledingadvies is geen plaatje meer maar een balk met de gevoelstemperatuur. **Lees de vondst daar** — de app toonde twee verschillende "feels like" naast elkaar. |
+| 2026-09-08 | [phosphor](quick/260908-d9k-fase-24-iconen-naar-phosphor-regular/) | Fase 24 af: 71 Material-iconen en 12 emoji naar Phosphor Regular. **Het pub-pakket viel af** — het breekt op Flutter's `final class IconData`; we dragen het font nu zelf. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
