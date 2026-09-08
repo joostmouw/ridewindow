@@ -2,7 +2,7 @@
 sketch: 008
 name: ritten-rollen
 question: "Hoe lees je aan een rit af welke rol jij erin hebt, en hoe kom je vanaf een gedeelde rit in één tik bij het detailscherm?"
-winner: null
+winner: "A"
 tags: [ritten, peloton, rollen, navigatie, lijst]
 ---
 

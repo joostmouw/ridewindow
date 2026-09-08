@@ -39,7 +39,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | **A — Gevoelsbalk** | iconografie, kleding, weerbalken, fase-24 |
 | 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | *ingehaald door 006* | iconografie, fase-24, merk, rider-types |
 | 006 | [hele-set-per-familie](006-hele-set-per-familie/) | Hoe ziet de volledige icooninventaris eruit in elke kandidaat-familie? | **Phosphor** (gewicht open) | iconografie, fase-24, mapping, keuze |
-| 008 | [ritten-rollen](008-ritten-rollen/) | Hoe lees je aan een rit af welke rol jij erin hebt — en hoe kom je vanaf een gedeelde rit in één tik bij het detail? | *nog te kiezen* | ritten, peloton, rollen, navigatie, lijst |
+| 008 | [ritten-rollen](008-ritten-rollen/) | Hoe lees je aan een rit af welke rol jij erin hebt — en hoe kom je vanaf een gedeelde rit in één tik bij het detail? | **A — Eén lijst met filterrij** | ritten, peloton, rollen, navigatie, lijst |
 
 ## Beslissingen die doorwerken
 
@@ -103,4 +103,5 @@ Aanleiding: Joost, 2026-09-08, met driver.js als referentie. **Nog te kiezen.**
 `008-ritten-rollen/` — Vier ritsoorten (wacht op jou / jij organiseert / je gaat mee / alleen jij)
 staan verdeeld over twee tabbladen, dragen hetzelfde icoon, missen hun datum en zijn niet aan te
 tikken. Drie manieren om de rol áán de rit te hangen — filterrij, secties, of een rolstrook — plus
-één keer waar de tik op uitkomt. Aanleiding: Joost, 2026-09-08. **Nog te kiezen.**
+één keer waar de tik op uitkomt. Aanleiding: Joost, 2026-09-08. **Gekozen: A** — chronologie blijft
+leidend, de filterrij met telling beantwoordt "wat organiseer ik" al vóór je tikt.
