@@ -37,8 +37,8 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | **B — Papier en inkt** | home, hierarchie, typografie, weerbalken, fase-23 |
 | 002 | [iconografie](002-iconografie/) | Waar komt het kledingadvies vandaan als het geen systeememoji meer is — twee losse kledingstukken, één tenue, of een gekleed figuur? | *afgewezen — verkeerde vraag* | iconografie, kleding, fase-24 |
 | 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | **A — Gevoelsbalk** | iconografie, kleding, weerbalken, fase-24 |
-| 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | **Hugeicons** | iconografie, fase-24, merk, rider-types |
-| 005 | [hugeicons-volledig](005-hugeicons-volledig/) | Hoe ziet élk icoon in RideWindow eruit in Hugeicons, en zijn er gaten? | *werktekening* | iconografie, fase-24, mapping |
+| 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | *ingehaald door 006* | iconografie, fase-24, merk, rider-types |
+| 006 | [hele-set-per-familie](006-hele-set-per-familie/) | Hoe ziet de volledige icooninventaris eruit in elke kandidaat-familie? | *open* | iconografie, fase-24, mapping, keuze |
 
 ## Beslissingen die doorwerken
 
@@ -69,7 +69,11 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
   met een eigen label, maar de echte vraag is of het kledingadvies niet gewoon
   van de gevoelstemperatuur moet uitgaan. Dat verandert wat de app adviseert en
   is daarom een beslissing, geen opruimwerk.
-- **004 → Hugeicons (2026-09-08).** De maatstaf was niet "welke set is mooi" maar welke set de hand
+- **004 → Hugeicons, en daarna teruggedraaid (2026-09-08).** Op vier signatuur-iconen viel de keuze
+  op Hugeicons; zodra de volledige set van 83 er lag, viel hij tegen. De les zit in de opzet, niet in
+  de familie: **een iconenfamilie beoordeel je op de hele set, niet op een handvol.** Karaktervol per
+  stuk kan ongelijk als groep zijn, en dat zie je alleen bij elkaar. Schets 006 doet het daarom
+  opnieuw met alle 83 en een familieknop. Wat blijft staan uit 004: De maatstaf was niet "welke set is mooi" maar welke set de hand
   van het app-icoon deelt: ronde uiteinden, gulle bochten, gelijke lijndikte, cirkelvormige
   geometrie. Hugeicons komt daar het dichtst bij en dekt als enige alle begrippen. Twee routes zijn
   onderweg afgevallen en staan vastgelegd in die README: een kant-en-klaar handgetekend pakket

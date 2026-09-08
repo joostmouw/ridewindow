@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>RideWindow — De hele set, per familie (sketch 006)</title>
+<link rel="stylesheet" href="../themes/default.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font); background: #6d7a66;
+    color: var(--text-primary); padding: 96px 24px 64px;
+  }
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #1d2a22; color: #e6ede0; border-bottom: 1px solid #33453a;
+    padding: 8px 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    font-family: system-ui, sans-serif; font-size: 12px;
+  }
+  #bar .name { font-weight: 700; letter-spacing: .04em; margin-right: 6px; opacity: .75; }
+  #bar .sep { width: 1px; height: 20px; background: #3c5145; margin: 0 6px; }
+  #bar button {
+    font: inherit; color: #e6ede0; background: #2b3b31;
+    border: 1px solid #3c5145; border-radius: 999px; padding: 5px 11px; cursor: pointer;
+  }
+  #bar button.on { background: var(--brand-light); color: #1d2a22; border-color: var(--brand-light); font-weight: 700; }
+  #bar .grow { flex: 1; }
+  #bar .cov { opacity: .6; font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 1500px; margin: 0 auto; }
+  .lede { color: #eef3e9; margin-bottom: 20px; font-family: system-ui, sans-serif; }
+  .lede h1 { font-family: var(--font); font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+  .lede p { font-size: 13px; line-height: 1.55; opacity: .82; max-width: 88ch; margin-top: 8px; }
+  .lede code { background: rgba(0,0,0,.22); padding: 1px 5px; border-radius: 4px; }
+
+  h2 { font-family: system-ui, sans-serif; color: #e9f0e3; font-size: 14px; font-weight: 600; margin: 26px 0 4px; }
+  h2 + p {
+    font-family: system-ui, sans-serif; color: #dfe8d9; opacity: .7;
+    font-size: 12px; line-height: 1.5; max-width: 88ch; margin-bottom: 10px;
+  }
+
+  .sheet { background: var(--sc-lowest); border-radius: 20px; padding: 16px; box-shadow: 0 12px 28px rgba(0,0,0,.22); }
+  body.dark .sheet { background: #101a14; color: #e6ede0; }
+  body.dark .cell { border-color: #2a3a30; }
+  body.dark .cell .nm, body.dark .cell .whr { color: #93a58c; }
+  body.dark .old { color: #6f8168; }
+
+  .cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(174px, 1fr)); gap: 8px; }
+  .cell {
+    border: 1px solid var(--border-dim); border-radius: 14px;
+    padding: 10px 10px 8px; display: flex; gap: 9px; align-items: flex-start;
+  }
+  .cell .pair { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+  .old { color: var(--text-hint); opacity: .75; display: inline-flex; align-items: center; justify-content: center; }
+  .arrow { color: var(--border); font-size: 11px; }
+  .txt { min-width: 0; }
+  .cell .nm {
+    font-family: ui-monospace, monospace; font-size: 9.5px;
+    color: var(--text-secondary); word-break: break-all; line-height: 1.3;
+  }
+  .cell .whr {
+    font-family: system-ui, sans-serif; font-size: 9px; color: var(--text-hint);
+    line-height: 1.35; margin-top: 3px;
+  }
+  .cell.gap { border-color: var(--error); background: rgba(229,57,53,.05); }
+  .emojicell .big { font-size: 22px; line-height: 1; }
+  .miss { color: var(--error); font-family: system-ui, sans-serif; font-size: 10px; }
+
+  .ic { display: block; flex: 0 0 auto; color: var(--text-primary); }
+  body.dark .ic { color: #e6ede0; }
+  .legend {
+    font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--text-tertiary);
+    margin-bottom: 12px; line-height: 1.5;
+  }
+  body.dark .legend { color: #93a58c; }
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <span class="name">SKETCH 006 · DE HELE SET, PER FAMILIE</span>
+  <span id="fambtns"></span>
+  <span class="sep"></span>
+  <button id="tSize">Maat 24</button>
+  <button id="tStroke">Lijndikte 2</button>
+  <button id="tDark">Donker</button>
+  <span class="grow"></span>
+  <span class="cov" id="cov"></span>
+</div>
+
+<div class="wrap">
+  <div class="lede">
+    <h1>Dezelfde 83 iconen, in zeven handen</h1>
+    <p>In schets 004 koos je op vier signatuur-iconen, en bij de volledige set viel Hugeicons tegen.
+       Terecht — vier iconen zeggen te weinig over een familie. Daarom hier de <b>hele inventaris van
+       de app</b> (12 emoji-plekken plus 71 Material-iconen) in elke kandidaat, met één knop ertussen.
+       Wat je zoekt is samenhang: 83 iconen die eruitzien alsof dezelfde persoon ze tekende, in de
+       hand van het RW-monogram — ronde uiteinden, gulle bochten, gelijke lijndikte.</p>
+  </div>
+
+  <h2>1 · De emoji — waar het besturingssysteem nu tekent</h2>
+  <p>Links wat jouw Mac ervan maakt; op de Oppo en op het web ziet dezelfde tekst er anders uit.</p>
+  <div class="sheet">
+    <div class="legend" id="leg1"></div>
+    <div class="cells" id="emoji"></div>
+  </div>
+
+  <h2>2 · De Material-iconen — alles wat de app verder tekent</h2>
+  <p>Consistent over platforms, maar met de Google-hand. Een rood vak betekent: deze familie kent het
+     begrip niet en het moet bijgetekend worden.</p>
+  <div class="sheet">
+    <div class="legend" id="leg2"></div>
+    <div class="cells" id="material"></div>
+  </div>
+
+  <div class="lede" style="margin-top:28px">
+    <p><b>Waar je op let bij het wisselen.</b> Springt er één icoon uit de rij qua gewicht of detail?
+       Zien de acht rider-types (berg, zonsopgang, zonsondergang, zon, kracht, fiets, geen tijd,
+       renner) eruit als één serie? En hoe gedraagt de set zich op <b>13 px</b> — dat is de maat in de
+       weerbalken en de harde ondergrens.</p>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const LABEL = {
+  lucide: 'Lucide', tabler: 'Tabler', hugeicons: 'Hugeicons', mynaui: 'Mynaui',
+  ph: 'Phosphor', solar: 'Solar', iconoir: 'Iconoir',
+};
+
+function ic(name, size) {
+  const b = DATA.bodies[window.FAM] && DATA.bodies[window.FAM][name];
+  if (!b) return `<span class="miss" style="width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center">—</span>`;
+  // De sets leveren hun eigen gewicht en uiteinden mee. Die halen we eruit,
+  // zodat de knoppen alle families op dezelfde dikte zetten -- anders vergelijk
+  // je gewichten in plaats van handschriften.
+  const inner = b.inner
+    .replace(/stroke-width="[^"]*"/g, '')
+    .replace(/stroke-linecap="[^"]*"/g, '')
+    .replace(/stroke-linejoin="[^"]*"/g, '');
+  // Phosphor tekent zijn omlijningen als gevulde vormen; die strijken levert
+  // een lijn om een lijn op. Solar mengt beide: alleen de -linear- en
+  // -outline-varianten zijn echt lijnwerk. Vandaar per familie vastgelegd in
+  // plaats van geraden uit de body.
+  const filled = window.FAM === 'ph'
+    || (window.FAM === 'solar' && !/-(linear|outline|broken)$/.test(name || ''));
+  const paint = filled
+    ? 'fill="currentColor"'
+    : `fill="none" stroke="currentColor" stroke-width="${window.SW}" stroke-linecap="round" stroke-linejoin="round"`;
+  return `<svg class="ic" viewBox="${b.vb}" width="${size}" height="${size}" ${paint} aria-hidden="true">${inner}</svg>`;
+}
+
+function material(dartName, size) {
+  const outlined = /_outlined$/.test(dartName);
+  const base = dartName.replace(/_(outlined|rounded|alt|ios)$/, '');
+  const fam = outlined ? 'material-icons-outlined' : 'material-icons';
+  return `<span class="old" style="font-size:${size}px;width:${size}px;height:${size}px">
+    <span class="${fam}">${base}</span></span>`;
+}
+
+function draw() {
+  const S = window.SZ, R = DATA.resolved[window.FAM];
+  const total = Object.keys(R).length;
+  const hit = Object.values(R).filter(Boolean).length;
+  document.getElementById('cov').textContent = `${LABEL[window.FAM]} · ${hit}/${total} gedekt`;
+  document.getElementById('leg1').textContent = 'links de emoji van dit toestel · rechts ' + LABEL[window.FAM];
+  document.getElementById('leg2').textContent = 'links Material · rechts ' + LABEL[window.FAM] + ' · daaronder de bestanden waar het icoon staat';
+
+  document.getElementById('emoji').innerHTML = Object.entries(DATA.emoji).map(([key, [glyph, where]]) => {
+    const name = R[key];
+    return `<div class="cell emojicell ${name ? '' : 'gap'}">
+      <div class="pair"><span class="big">${glyph}</span><span class="arrow">→</span>${ic(name, S)}</div>
+      <div class="txt"><div class="nm">${name || 'ontbreekt'}</div><div class="whr">${where}</div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('material').innerHTML = Object.keys(DATA.usage).sort().map(dart => {
+    const name = R[dart];
+    return `<div class="cell ${name ? '' : 'gap'}">
+      <div class="pair">${material(dart, S)}<span class="arrow">→</span>${ic(name, S)}</div>
+      <div class="txt">
+        <div class="nm">${dart}<br>→ ${name || 'ontbreekt'}</div>
+        <div class="whr">${(DATA.usage[dart] || []).join(' · ')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('fambtns').innerHTML = DATA.fams.map(f =>
+  `<button data-f="${f}">${LABEL[f]}</button>`).join('');
+
+window.FAM = 'lucide';
+window.SZ = 24;
+window.SW = 2;
+
+function setFam(f) {
+  window.FAM = f;
+  document.querySelectorAll('#fambtns button').forEach(b => b.classList.toggle('on', b.dataset.f === f));
+  draw();
+}
+document.querySelectorAll('#fambtns button').forEach(b => b.onclick = () => setFam(b.dataset.f));
+setFam('lucide');
+
+document.getElementById('tSize').onclick = function () {
+  window.SZ = window.SZ === 24 ? 13 : window.SZ === 13 ? 20 : 24;
+  this.textContent = 'Maat ' + window.SZ; draw();
+};
+document.getElementById('tStroke').onclick = function () {
+  window.SW = window.SW === 2 ? 2.5 : window.SW === 2.5 ? 1.5 : 2;
+  this.textContent = 'Lijndikte ' + window.SW; draw();
+};
+document.getElementById('tDark').onclick = function () {
+  document.body.classList.toggle('dark'); this.classList.toggle('on');
+};
+</script>
+</body>
+</html>
