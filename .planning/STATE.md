@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Ritten: vier rollen in een lijst -- nog niet op Play"
-last_updated: "2026-09-08T22:10:00.000Z"
+status: "1.0.29+30 klaar voor Play; PWA staat live"
+last_updated: "2026-09-08T22:20:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -876,5 +876,22 @@ beslist; Home, de rittenlijst en het detailscherm lezen alle drie diezelfde prov
 
 **Wat nog niet is nagelopen op echte data:** de vier rolregels zijn in widget-tests vastgelegd
 (`rides_roles_test.dart`), maar met twee échte accounts is er niets gezien -- daar is een tweede
-inlog voor nodig. De webbuild staat klaar in `build/web`; hij is nog niet naar Firebase Hosting
-gedeployed en niet op de Oppo gedraaid (geen toestel aangesloten tijdens deze sessie).
+inlog voor nodig. Staat live op https://my-project-joost.web.app. Niet op de Oppo gedraaid; geen
+toestel aangesloten tijdens deze sessie.
+
+**Tweede gebrek op het welkomscherm, en het was niet hetzelfde als 's middags.** Joost
+fotografeerde opnieuw bleke tekst. Vanmiddag was het de dekking (1170 ms halfzichtbaar), nu wél de
+kleur: Welkom en Onboarding zetten hun achtergrond hard op `brandLight` maar erfden hun tekstkleur
+uit het actieve schema, en in donkere modus is dat 1,21:1 in plaats van 9,63:1. `BrandCanvas` zet
+die twee routes nu op het lichte palet; `_buildTheme` verhuisde daarvoor naar `app_theme.dart` als
+`buildAppTheme`. **De les:** de drie bestaande welkomtests maten alleen in lichte modus, en een
+contrastmeting in één helderheid bewijst niets over de andere.
+
+**Let op bij het bekijken van de PWA:** de eerste herlaad na een deploy gaf hier de óude bundel
+terug, inclusief het gebrek dat net gerepareerd was. Een cache-buster in de URL (`?x=1`) of ⌘⇧R
+haalt hem eraf. De serverkant klopte -- `main.dart.js` op de server was byte-identiek aan de lokale
+build.
+
+**1.0.29+30 staat klaar maar is niet geüpload.** `build/app/outputs/bundle/release/app-release.aab`
+(69,0 MB), release-notities in beide talen bijgewerkt, en de vier rol-iconen zijn in de bundel
+gecontroleerd op tree-shaking. Uploaden wacht op Joost's akkoord na de PWA-ronde.

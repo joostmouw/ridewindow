@@ -16,8 +16,8 @@
 // "welke build draait hier eigenlijk?" — één keer omdat Play een oudere track
 // serveerde, één keer omdat een lokale build niet ververst was. Een versienaam
 // zonder buildnummer beantwoordt die vraag niet.
-const kAppVersionName = '1.0.28';
-const kAppBuildNumber = '29';
+const kAppVersionName = '1.0.29';
+const kAppBuildNumber = '30';
 
 /// Wat het profielscherm toont, in de vorm `<versienaam> (<buildnummer>)`.
 /// Bewust zonder concreet voorbeeld: dat zou bij elke bump verouderen.

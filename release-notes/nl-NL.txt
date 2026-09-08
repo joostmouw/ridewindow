@@ -1,8 +1,11 @@
-Opgelost: feedback versturen doet dat nu ook echt. Hij werd op je telefoon
-bewaard en vertrok pas als de app toevallig opnieuw opstartte.
+Je ritten staan nu in één lijst, op volgorde van je week, en je ziet aan elke
+rit wat je rol erin is: je organiseert hem, je gaat mee met een maatje, je
+rijdt alleen, of er wacht nog een uitnodiging op antwoord. Filter er bovenaan
+op, met de aantallen erbij.
 
-Opgelost: de tekst op het openingsscherm staat meteen voluit in plaats van een
-seconde lang halfzichtbaar. En een aangetikte ster wordt nu echt gevuld.
+Elke gedeelde rit klikt nu door naar zijn detailscherm, waar staat wie er
+meegaat en wie nog moet antwoorden. Uitnodigingen beantwoord je direct in de
+lijst, en een rit die jij organiseert kun je nu ook afzeggen.
 
-De uitleg scrolt naar waar hij naar wijst, en je kunt hem terughalen: een
-i-knopje op Home, Agenda en Ritten, en de rondleiding onder Profiel → Over.
+Opgelost: de tekst op het openingsscherm was onleesbaar als je telefoon op de
+donkere modus staat.

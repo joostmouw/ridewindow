@@ -1,8 +1,11 @@
-Fixed: sending feedback now actually sends it. It was saved on your phone and
-only left when the app happened to restart.
+Your rides now sit in one list, in the order your week runs, and every ride
+shows your part in it: you are organising it, you are joining a buddy, you are
+riding alone, or an invitation is still waiting on your answer. Filter on that
+at the top, counts included.
 
-Fixed: the text on the opening screen is readable straight away instead of
-half-faded for a second. And tapping a star now really fills it.
+Every shared ride now opens its detail screen, showing who is coming and who
+has yet to answer. Invitations can be answered straight from the list, and a
+ride you organise can now be cancelled.
 
-Tips scroll to what they point at, and you can bring them back: an info button
-on Home, Agenda and Rides, and the welcome tour under Profile → About.
+Fixed: the text on the opening screen was unreadable when your phone is set to
+dark mode.
