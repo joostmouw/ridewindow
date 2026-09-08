@@ -37,7 +37,8 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 001 | [home-hierarchie](001-home-hierarchie/) | Waar komt de hiërarchie op Home vandaan — uit een dominante held, uit een neutraal papier, of uit het weer zelf? | **B — Papier en inkt** | home, hierarchie, typografie, weerbalken, fase-23 |
 | 002 | [iconografie](002-iconografie/) | Waar komt het kledingadvies vandaan als het geen systeememoji meer is — twee losse kledingstukken, één tenue, of een gekleed figuur? | *afgewezen — verkeerde vraag* | iconografie, kleding, fase-24 |
 | 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | **A — Gevoelsbalk** | iconografie, kleding, weerbalken, fase-24 |
-| 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | *open* | iconografie, fase-24, merk, rider-types |
+| 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | **Hugeicons** | iconografie, fase-24, merk, rider-types |
+| 005 | [hugeicons-volledig](005-hugeicons-volledig/) | Hoe ziet élk icoon in RideWindow eruit in Hugeicons, en zijn er gaten? | *werktekening* | iconografie, fase-24, mapping |
 
 ## Beslissingen die doorwerken
 
@@ -68,3 +69,14 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
   met een eigen label, maar de echte vraag is of het kledingadvies niet gewoon
   van de gevoelstemperatuur moet uitgaan. Dat verandert wat de app adviseert en
   is daarom een beslissing, geen opruimwerk.
+- **004 → Hugeicons (2026-09-08).** De maatstaf was niet "welke set is mooi" maar welke set de hand
+  van het app-icoon deelt: ronde uiteinden, gulle bochten, gelijke lijndikte, cirkelvormige
+  geometrie. Hugeicons komt daar het dichtst bij en dekt als enige alle begrippen. Twee routes zijn
+  onderweg afgevallen en staan vastgelegd in die README: een kant-en-klaar handgetekend pakket
+  bestaat niet voor dit domein, en een schone familie door een schetsfilter halen levert het
+  verkeerde soort handgemaakt op — het logo is zelfverzekerd handschrift, geen krassige schets.
+- **De overstap raakt 83 plekken, niet 16.** Naast de emoji tekent de app 71 Material-iconen. Die
+  half laten staan levert twee handen op één scherm. Volledige mapping in schets 005; alle 63
+  benodigde vormen bestaan. Eén echt ontwerpgat: Material gebruikt gevuld-versus-omlijnd om de
+  geselecteerde tab aan te wijzen, en die tweedeling heeft Hugeicons niet — de navigatiebalk moet
+  selectie dus anders tonen.

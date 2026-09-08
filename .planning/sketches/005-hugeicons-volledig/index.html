@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>RideWindow — De hele set in Hugeicons (sketch 005)</title>
+<link rel="stylesheet" href="../themes/default.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font); background: #6d7a66;
+    color: var(--text-primary); padding: 62px 24px 64px;
+  }
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+    background: #1d2a22; color: #e6ede0; border-bottom: 1px solid #33453a;
+    padding: 8px 16px; display: flex; align-items: center; gap: 8px;
+    font-family: system-ui, sans-serif; font-size: 12px;
+  }
+  #bar .name { font-weight: 700; letter-spacing: .04em; margin-right: 8px; opacity: .75; }
+  #bar button {
+    font: inherit; color: #e6ede0; background: #2b3b31;
+    border: 1px solid #3c5145; border-radius: 999px; padding: 5px 12px; cursor: pointer;
+  }
+  #bar button.on { background: var(--brand-light); color: #1d2a22; border-color: var(--brand-light); font-weight: 700; }
+  #bar .grow { flex: 1; }
+  #bar .hint { opacity: .5; }
+
+  .wrap { max-width: 1500px; margin: 0 auto; }
+  .lede { color: #eef3e9; margin-bottom: 22px; font-family: system-ui, sans-serif; }
+  .lede h1 { font-family: var(--font); font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+  .lede p { font-size: 13px; line-height: 1.55; opacity: .82; max-width: 88ch; margin-top: 8px; }
+  .lede code { background: rgba(0,0,0,.22); padding: 1px 5px; border-radius: 4px; }
+
+  h2 { font-family: system-ui, sans-serif; color: #e9f0e3; font-size: 14px; font-weight: 600; margin: 30px 0 4px; }
+  h2 + p {
+    font-family: system-ui, sans-serif; color: #dfe8d9; opacity: .7;
+    font-size: 12px; line-height: 1.5; max-width: 88ch; margin-bottom: 12px;
+  }
+
+  .sheet {
+    background: var(--sc-lowest); border-radius: 20px; padding: 16px;
+    box-shadow: 0 12px 28px rgba(0,0,0,.22);
+  }
+  body.dark .sheet { background: #101a14; color: #e6ede0; }
+  body.dark .cell { border-color: #2a3a30; }
+  body.dark .cell .nm, body.dark .cell .whr { color: #93a58c; }
+  body.dark .old { color: #6f8168; }
+
+  .cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 8px; }
+  .cell {
+    border: 1px solid var(--border-dim); border-radius: 14px;
+    padding: 10px 10px 8px; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .cell .pair { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+  .old {
+    color: var(--text-hint); opacity: .8;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .old .material-icons, .old .material-icons-outlined { font-size: inherit; }
+  .arrow { color: var(--border); font-size: 11px; }
+  .txt { min-width: 0; }
+  .cell .nm {
+    font-family: ui-monospace, monospace; font-size: 10px;
+    color: var(--text-secondary); word-break: break-all; line-height: 1.3;
+  }
+  .cell .whr {
+    font-family: system-ui, sans-serif; font-size: 9.5px; color: var(--text-hint);
+    line-height: 1.35; margin-top: 3px;
+  }
+  .emojicell .big { font-size: 22px; line-height: 1; }
+
+  .ic { display: block; flex: 0 0 auto; color: var(--text-primary); }
+  body.dark .ic { color: #e6ede0; }
+
+  .legend {
+    font-family: system-ui, sans-serif; font-size: 11.5px; color: var(--text-tertiary);
+    margin-bottom: 12px; line-height: 1.5;
+  }
+  body.dark .legend { color: #93a58c; }
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <span class="name">SKETCH 005 · DE HELE SET IN HUGEICONS</span>
+  <button id="tSize">Maat 24</button>
+  <button id="tStroke">Lijndikte 2</button>
+  <button id="tDark">Donker</button>
+  <span class="grow"></span>
+  <span class="hint">fase 24 · v4.0 Eigen gezicht</span>
+</div>
+
+<div class="wrap">
+  <div class="lede">
+    <h1>De hele set: elk icoon dat RideWindow tekent</h1>
+    <p>Niet alleen de zestien emoji. Als alleen die vervangen worden houd je een app die half
+       Hugeicons en half Material is, en dat zie je — twee handen op één scherm leest onrustiger dan
+       één vreemde hand. Dit is daarom de <b>volledige inventaris</b>: 12 emoji-plekken en
+       <b>71 Material-iconen</b>, elk met zijn vervanger en de plek waar hij staat. Alle 64 unieke
+       vervangers bestaan in Hugeicons; er is geen enkel gat.</p>
+  </div>
+
+  <h2>1 · De emoji — de plekken waar het besturingssysteem nu tekent</h2>
+  <p>Dit is waar fase 24 om begon. Links wat jouw Mac ervan maakt; op de Oppo, op een iPhone en op
+     het web ziet dezelfde tekst er anders uit.</p>
+  <div class="sheet">
+    <div class="legend">links de emoji van dit toestel · rechts de Hugeicons-vervanger</div>
+    <div class="cells" id="emoji"></div>
+  </div>
+
+  <h2>2 · De Material-iconen — alles wat de app verder al tekent</h2>
+  <p>Deze zijn vandaag consistent (Material tekent op elk platform hetzelfde), maar ze dragen wel de
+     Google-hand. Links het huidige icoon, rechts de vervanger, daaronder waar hij staat.</p>
+  <div class="sheet">
+    <div class="legend">links Material · rechts Hugeicons · daaronder de bestanden waar het icoon voorkomt</div>
+    <div class="cells" id="material"></div>
+  </div>
+
+  <div class="lede" style="margin-top:30px">
+    <p><b>Wat dit kost om te bouwen.</b> Met het pub-pakket blijft de aanroep hetzelfde vorm houden —
+       <code>Icon(HugeIcons.strokeRoundedBicycle01, size: 24)</code> in plaats van
+       <code>Icon(Icons.directions_bike, size: 24)</code> — dus het is 87 regels vervangen, geen
+       herbouw. De emoji-plekken zijn meer werk: daar staat nu een <code>Text</code> met een string,
+       en die moet een <code>Icon</code> worden, inclusief kleur en uitlijning.</p>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+function ic(name, size) {
+  const b = DATA.bodies[name];
+  if (!b) return `<span style="width:${size}px;height:${size}px;display:block"></span>`;
+  const inner = b.inner
+    .replace(/stroke-width="[^"]*"/g, '')
+    .replace(/stroke-linecap="[^"]*"/g, '')
+    .replace(/stroke-linejoin="[^"]*"/g, '');
+  return `<svg class="ic" viewBox="${b.vb}" width="${size}" height="${size}"
+    fill="none" stroke="currentColor" stroke-width="${window.SW}"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+}
+
+// Material-iconen met een _outlined- of _rounded-achtervoegsel bestaan in de
+// webfont onder de basisnaam in een andere familie. Zo blijft de vergelijking
+// eerlijk in plaats van een leeg vierkant te tonen.
+function material(dartName, size) {
+  const outlined = /_outlined$/.test(dartName);
+  const base = dartName.replace(/_(outlined|rounded|alt|ios)$/, '');
+  const fam = outlined ? 'material-icons-outlined' : 'material-icons';
+  return `<span class="old" style="font-size:${size}px;width:${size}px;height:${size}px">
+    <span class="${fam}">${base}</span></span>`;
+}
+
+function draw() {
+  const S = window.SZ;
+
+  document.getElementById('emoji').innerHTML =
+    Object.entries(DATA.emoji).map(([label, name]) => {
+      const emoji = label.split(' ')[0].replace(/\\u\{([0-9A-F]+)\}/i,
+        (_, h) => String.fromCodePoint(parseInt(h, 16)));
+      const rest = label.split(' ').slice(1).join(' ');
+      return `<div class="cell emojicell">
+        <div class="pair">
+          <span class="big">${emoji}</span>
+          <span class="arrow">→</span>
+          ${ic(name, S)}
+        </div>
+        <div class="txt">
+          <div class="nm">${name}</div>
+          <div class="whr">${rest}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+  document.getElementById('material').innerHTML =
+    Object.entries(DATA.map).sort((a, b) => a[0].localeCompare(b[0])).map(([dart, name]) => `
+      <div class="cell">
+        <div class="pair">
+          ${material(dart, S)}
+          <span class="arrow">→</span>
+          ${ic(name, S)}
+        </div>
+        <div class="txt">
+          <div class="nm">${dart}<br>→ ${name}</div>
+          <div class="whr">${(DATA.usage[dart] || []).join(' · ') || '—'}</div>
+        </div>
+      </div>`).join('');
+}
+
+window.SZ = 24;
+window.SW = 2;
+draw();
+
+document.getElementById('tSize').onclick = function () {
+  window.SZ = window.SZ === 24 ? 13 : window.SZ === 13 ? 20 : 24;
+  this.textContent = 'Maat ' + window.SZ;
+  draw();
+};
+document.getElementById('tStroke').onclick = function () {
+  window.SW = window.SW === 2 ? 2.5 : window.SW === 2.5 ? 1.5 : 2;
+  this.textContent = 'Lijndikte ' + window.SW;
+  draw();
+};
+document.getElementById('tDark').onclick = function () {
+  document.body.classList.toggle('dark');
+  this.classList.toggle('on');
+};
+</script>
+</body>
+</html>
