@@ -1,7 +1,8 @@
-De intro speelt sneller — dezelfde animatie, minder wachten.
+Opgelost: als je een ster aantikt in het feedbackformulier wordt die ster nu
+echt gevuld, en alle sterren ervoor ook. Eerst veranderde alleen de kleur.
 
-De uitleg in de app is opnieuw gebouwd. Je kunt terug om iets nog eens te
-lezen, je ziet hoe ver je bent, en een tik ernaast slaat niets meer over.
+De uitleg scrolt naar waar hij naar wijst, zodat je ziet waar het over gaat in
+plaats van te moeten zoeken.
 
-In Peloton kun je nu afzeggen voor een rit waar je al ja op had gezegd. Per
-ongeluk geklikt? Het ongedaan maken staat meteen in de melding.
+En je kunt de uitleg terughalen: een i-knopje op Home, Agenda en Ritten, en de
+rondleiding staat onder Profiel → Over.

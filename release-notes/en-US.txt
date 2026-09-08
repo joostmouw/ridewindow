@@ -1,8 +1,8 @@
-The intro plays quicker now — same animation, less waiting.
+Fixed: tapping a star in the feedback form now actually fills that star and the
+ones before it. It only changed colour before.
 
-The in-app tips have been rebuilt. You can step back to re-read one, you can
-see how far along you are, and a stray tap no longer skips ahead. The first-run
-tour is finally in English too, instead of Dutch.
+The in-app tips scroll to what they're pointing at, so you can see the thing
+being explained instead of guessing.
 
-In Peloton you can now drop out of a ride you already joined. Changed your mind
-by accident? The undo is right there in the message.
+And you can bring the tips back. There's an info button on Home, Agenda and
+Rides, and the welcome tour is under Profile → About.
