@@ -1297,10 +1297,52 @@ class SNl extends S {
       'Veeg een rit naar links om hem te verwijderen.';
 
   @override
-  String get hintDismiss => 'Tik om te sluiten';
+  String get hintDismiss => 'Klaar';
 
   @override
-  String get hintNext => 'Tik voor volgende';
+  String get hintNext => 'Volgende';
+
+  @override
+  String get hintBack => 'Vorige';
+
+  @override
+  String get hintSkip => 'Overslaan';
+
+  @override
+  String hintStepOf(int current, int total) {
+    return 'Stap $current van $total';
+  }
+
+  @override
+  String get tourHomeTitle => 'Rijvensters';
+
+  @override
+  String get tourHomeBody =>
+      'Home toont de beste momenten om deze week te fietsen. Elke kaart draagt de score, het tijdstip en het weer. Tik op een kaart voor details.';
+
+  @override
+  String get tourAgendaTitle => 'Agenda';
+
+  @override
+  String get tourAgendaBody =>
+      'Zeven dagen met uurvakken — groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.';
+
+  @override
+  String get tourRidesTitle => 'Mijn ritten';
+
+  @override
+  String get tourRidesBody =>
+      'Plan een rit vanuit Home of de Agenda en volg hier of het weer nog meezit. De windtip helpt je een route kiezen: eerst tegenwind, dan mee terug.';
+
+  @override
+  String get tourProfileTitle => 'Profiel';
+
+  @override
+  String get tourProfileBody =>
+      'Stel je locatie in, je grenzen voor temperatuur, regen en wind, en je beschikbaarheid. Daar worden je scores mee berekend.';
+
+  @override
+  String get tourDone => 'Aan de slag';
 
   @override
   String calendarEventTitle(String timeRange) {

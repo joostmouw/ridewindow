@@ -1294,10 +1294,52 @@ class SEn extends S {
   String get hintSwipeDeleteDesc => 'Swipe a ride to the left to delete it.';
 
   @override
-  String get hintDismiss => 'Tap to close';
+  String get hintDismiss => 'Done';
 
   @override
-  String get hintNext => 'Tap for next';
+  String get hintNext => 'Next';
+
+  @override
+  String get hintBack => 'Back';
+
+  @override
+  String get hintSkip => 'Skip';
+
+  @override
+  String hintStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get tourHomeTitle => 'Ride windows';
+
+  @override
+  String get tourHomeBody =>
+      'Home shows the best moments to ride this week. Each card carries the score, the time and the weather. Tap a card for details.';
+
+  @override
+  String get tourAgendaTitle => 'Agenda';
+
+  @override
+  String get tourAgendaBody =>
+      'Seven days of hour cells — green is good, orange is not. Tap a cell for the weather. Tap twice to select a range and plan a ride.';
+
+  @override
+  String get tourRidesTitle => 'My rides';
+
+  @override
+  String get tourRidesBody =>
+      'Plan a ride from Home or the Agenda, then follow here whether the weather still holds. The wind tip helps you pick a route: headwind out, tailwind home.';
+
+  @override
+  String get tourProfileTitle => 'Profile';
+
+  @override
+  String get tourProfileBody =>
+      'Set your location, your tolerances for temperature, rain and wind, and your availability. Your scores are calculated from those.';
+
+  @override
+  String get tourDone => 'Get started';
 
   @override
   String calendarEventTitle(String timeRange) {

@@ -1,7 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:ridewindow/features/shared/step_controls.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Per-screen spotlight coach marks.
@@ -71,6 +71,14 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
       curve: Curves.easeOut,
     );
     _animController.forward();
+
+    // De doelmaten zijn pas te lezen als de laag eronder gelegd is. Wordt deze
+    // overlay in dezelfde frame gebouwd als zijn doel -- wat in tests gebeurt
+    // en op een traag toestel kan -- dan meet de eerste `build` niets. Eén
+    // rebuild na die frame lost dat op.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -81,15 +89,25 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
 
   void _next() {
     if (_currentStep < widget.hints.length - 1) {
-      _animController.reverse().then((_) {
-        if (mounted) {
-          setState(() => _currentStep++);
-          _animController.forward();
-        }
-      });
+      _goTo(_currentStep + 1);
     } else {
       widget.onDismiss();
     }
+  }
+
+  void _back() {
+    if (_currentStep > 0) _goTo(_currentStep - 1);
+  }
+
+  /// Uit- en weer infaden tussen twee stappen. Zonder die tussenstap springt
+  /// de uitsnede van het ene element naar het andere en verlies je het spoor.
+  void _goTo(int step) {
+    _animController.reverse().then((_) {
+      if (mounted) {
+        setState(() => _currentStep = step);
+        _animController.forward();
+      }
+    });
   }
 
   /// Get the bounding rect of the target widget in global coordinates.
@@ -113,8 +131,11 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
     final s = S.of(context);
     final targetRect = _getTargetRect(hint);
 
+    // Was `onTap: _next`. Elke tik op het scherm sprong daarmee vooruit, ook
+    // een tik waarmee je alleen wilde lezen -- en een gemiste zin was weg,
+    // want terug kon niet. Nu vangt dit gebaar de tik alleen nog af zodat de
+    // app eronder niet reageert; vooruit en terug gaan via de knoppen.
     return GestureDetector(
-      onTap: _next,
       behavior: HitTestBehavior.opaque,
       child: FadeTransition(
         opacity: _fadeAnimation,
@@ -130,9 +151,12 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
                 ),
               ),
             ),
-            // Tooltip card positioned near the target
-            if (targetRect != null)
-              _buildTooltip(context, hint, targetRect, isLast, s),
+            // De kaart hoort bij het doel, maar hij verschijnt óók als dat
+            // doel niet te meten is. Dat was vroeger niet nodig: toen sprong
+            // elke tik op het scherm vooruit, dus een lege overlay was altijd
+            // weg te tikken. Sinds alleen de knoppen nog iets doen (2026-09-08)
+            // zou een niet-gemeten doel je opsluiten in een donker scherm.
+            _buildTooltip(context, hint, targetRect, isLast, s),
           ],
         ),
       ),
@@ -142,11 +166,16 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
   Widget _buildTooltip(
     BuildContext context,
     HintItem hint,
-    Rect targetRect,
+    Rect? rect,
     bool isLast,
     S s,
   ) {
     final screenSize = MediaQuery.of(context).size;
+    // Geen doel: zet de kaart in het midden en teken geen pijltje. Alles
+    // hieronder rekent met een rechthoek, dus dat wordt het scherm zelf --
+    // waarmee `targetCoversScreen` vanzelf waar is en de kaart centreert.
+    final targetRect = rect ?? Offset.zero & screenSize;
+    final hasTarget = rect != null;
     final safeTop = MediaQuery.of(context).padding.top;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     final targetCenter = targetRect.center;
@@ -184,7 +213,7 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Arrow pointing to target (hide for large targets)
-          if (showBelow && !targetCoversScreen)
+          if (hasTarget && showBelow && !targetCoversScreen)
             Padding(
               padding: EdgeInsets.only(
                 left: (targetCenter.dx - 20).clamp(16, screenSize.width - 56),
@@ -192,82 +221,75 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
               child: CustomPaint(
                 size: const Size(16, 8),
                 painter: _ArrowPainter(
-                  color: Colors.white.withAlpha(30),
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   pointUp: true,
                 ),
               ),
             ),
-          // Card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(30),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withAlpha(50)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withAlpha(60),
-                        borderRadius: BorderRadius.circular(10),
+          // De kaart is een Material 3 *rich tooltip*: MD3 kent geen
+          // rondleiding-component, maar wel deze -- een oppervlak met titel,
+          // uitleg en tekstknoppen. Joost koos hem op 2026-09-08 boven een
+          // eigen papieren kaart met streepjes.
+          //
+          // Vandaar deze maten en niet die van een ritkaart: `surfaceContainer`
+          // in plaats van papier, hoek 12 (`radiusMd`) in plaats van 20, en
+          // schaduwniveau 2. Was `Colors.white.withAlpha(30)` -- een doorzichtig
+          // glasvlak dat nergens anders in de app voorkwam en dat als enige
+          // scherm nooit door de papier-en-inkt-ronde van fase 23 is gegaan.
+          Material(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            elevation: 2,
+            borderRadius: AppShapes.roundedMd,
+            child: Padding(
+              padding: const EdgeInsets.all(AppShapes.paddingLg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  StepProgress(
+                    step: _currentStep,
+                    total: widget.hints.length,
+                  ),
+                  const SizedBox(height: AppShapes.paddingLg),
+                  Row(
+                    children: [
+                      Icon(
+                        hint.gestureIcon,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
-                      child: Icon(hint.gestureIcon,
-                          color: Colors.white, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        hint.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      const SizedBox(width: AppShapes.paddingMd),
+                      Expanded(
+                        child: Text(
+                          hint.title,
+                          // Title Small, wat MD3 voor de kop van een rich
+                          // tooltip voorschrijft -- niet titleMedium.
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  hint.description,
-                  style: TextStyle(
-                    color: Colors.white.withAlpha(210),
-                    fontSize: 14,
-                    height: 1.4,
+                    ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${_currentStep + 1}/${widget.hints.length}',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 12,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: _next,
-                      style: TextButton.styleFrom(foregroundColor: Colors.white),
-                      child: Text(isLast ? s.hintDismiss : s.hintNext),
-                    ),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: AppShapes.paddingSm),
+                  Text(
+                    hint.description,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const SizedBox(height: AppShapes.paddingLg),
+                  StepControls(
+                    step: _currentStep,
+                    total: widget.hints.length,
+                    onBack: _back,
+                    onNext: _next,
+                    onSkip: widget.onDismiss,
+                  ),
+                ],
+              ),
             ),
           ),
           // Arrow pointing up (when tooltip is above target)
-          if (!showBelow)
+          if (hasTarget && !showBelow)
             Padding(
               padding: EdgeInsets.only(
                 left: (targetCenter.dx - 20).clamp(16, screenSize.width - 56),
@@ -275,7 +297,7 @@ class _ScreenHintOverlayState extends State<ScreenHintOverlay>
               child: CustomPaint(
                 size: const Size(16, 8),
                 painter: _ArrowPainter(
-                  color: Colors.white.withAlpha(30),
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   pointUp: false,
                 ),
               ),

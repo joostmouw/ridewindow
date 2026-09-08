@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:ridewindow/features/shared/step_controls.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_icons.dart';
+import 'package:ridewindow/theme/app_shapes.dart';
 
 const _kTourSeenKey = 'app_tour_seen';
 
@@ -28,6 +32,19 @@ void showAppTour(BuildContext context) {
   );
 }
 
+/// De rondleiding bij de eerste start: vier schermen die zeggen waar wat zit.
+///
+/// **Waarom dit een kaart is en geen vol scherm met witte tekst.** Het stond
+/// er als tekst rechtstreeks op de schermvuller, in `Colors.white` — een van de
+/// laatste twee plekken met hardgecodeerde kleuren, en het enige scherm dat
+/// nooit door de papier-en-inkt-ronde van fase 23 is gegaan. Het is nu
+/// dezelfde Material 3 *rich tooltip* als de spotlight-uitleg per scherm, met
+/// dezelfde [StepControls] eronder. Wat je hier leert werkt daar dus ook.
+///
+/// **Waarom de teksten uit de ARB komen.** Ze stonden hardgecodeerd in het
+/// Nederlands, dus een Engelse gebruiker kreeg bij zijn allereerste start vier
+/// schermen Nederlands te zien. Dat is precies het verkeerde eerste moment om
+/// dat te doen.
 class _AppTourOverlay extends StatefulWidget {
   const _AppTourOverlay();
 
@@ -39,43 +56,30 @@ class _AppTourOverlayState extends State<_AppTourOverlay> {
   final _controller = PageController();
   int _page = 0;
 
-  static const _pages = [
-    _TourPage(
-      icon: AppIcons.house,
-      title: 'Rijvensters',
-      body: 'Op het Home scherm zie je de beste momenten om te fietsen deze week. '
-          'Elke kaart toont de score, het tijdstip en het weer. '
-          'Tik op een kaart voor meer details.',
-    ),
-    _TourPage(
-      icon: AppIcons.calendarDots,
-      title: 'Agenda',
-      body: 'De Agenda toont 7 dagen met uurvakken — groen is goed, rood is slecht. '
-          'Tik op een vak voor weerdetails. '
-          'Houd ingedrukt en sleep verticaal om meerdere uren te selecteren voor een rit.',
-    ),
-    _TourPage(
-      icon: AppIcons.bicycle,
-      title: 'Mijn Ritten',
-      body: 'Plan een rit vanuit Home of de Agenda. '
-          'In Mijn Ritten volg je of het weer nog steeds goed is. '
-          'De windrichting-tip helpt je de route te kiezen: eerst tegenwind, dan meewind terug.',
-    ),
-    _TourPage(
-      icon: AppIcons.user,
-      title: 'Profiel',
-      body: 'Stel je locatie in, kies je weertoleranties (temperatuur, regen, wind) '
-          'en beheer je beschikbaarheid. '
-          'De app berekent je scores op basis van jouw voorkeuren.',
-    ),
+  static const _icons = [
+    AppIcons.house,
+    AppIcons.calendarDots,
+    AppIcons.bicycle,
+    AppIcons.user,
   ];
 
-  void _next() {
-    if (_page < _pages.length - 1) {
-      _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    } else {
-      _close();
-    }
+  List<({IconData icon, String title, String body})> _pages(S s) => [
+        (icon: _icons[0], title: s.tourHomeTitle, body: s.tourHomeBody),
+        (icon: _icons[1], title: s.tourAgendaTitle, body: s.tourAgendaBody),
+        (icon: _icons[2], title: s.tourRidesTitle, body: s.tourRidesBody),
+        (icon: _icons[3], title: s.tourProfileTitle, body: s.tourProfileBody),
+      ];
+
+  void _goTo(int page) => _controller.animateToPage(
+        page,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+
+  void _next(int total) => _page < total - 1 ? _goTo(_page + 1) : _close();
+
+  void _back() {
+    if (_page > 0) _goTo(_page - 1);
   }
 
   void _close() {
@@ -91,54 +95,59 @@ class _AppTourOverlayState extends State<_AppTourOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final theme = Theme.of(context);
+    final pages = _pages(s);
 
     return Material(
-      color: Theme.of(context).colorScheme.scrim.withAlpha(200),
+      color: theme.colorScheme.scrim.withAlpha(200),
       child: SafeArea(
-        child: Column(
-          children: [
-            // Skip button
-            Align(
-              alignment: Alignment.topRight,
-              child: TextButton(
-                onPressed: _close,
-                child: Text('Overslaan', style: TextStyle(color: Colors.white.withAlpha(180))),
-              ),
-            ),
-            // Pages
-            Expanded(
-              child: PageView(
-                controller: _controller,
-                onPageChanged: (i) => setState(() => _page = i),
-                children: _pages,
-              ),
-            ),
-            // Dots + next button
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: Row(
-                children: [
-                  // Page dots
-                  for (var i = 0; i < _pages.length; i++)
-                    Container(
-                      width: 8,
-                      height: 8,
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: i == _page ? theme.colorScheme.primary : Colors.white.withAlpha(100),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppShapes.paddingXl),
+            child: Material(
+              color: theme.colorScheme.surfaceContainer,
+              elevation: 2,
+              borderRadius: AppShapes.roundedMd,
+              child: Padding(
+                padding: const EdgeInsets.all(AppShapes.paddingXl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    StepProgress(step: _page, total: pages.length),
+                    const SizedBox(height: AppShapes.paddingXl),
+                    // Een vaste hoogte, anders springt de kaart bij elke stap
+                    // omdat de ene tekst langer is dan de andere -- en dan
+                    // verschuift "Volgende" onder je duim vandaan.
+                    SizedBox(
+                      height: 260,
+                      child: PageView(
+                        controller: _controller,
+                        onPageChanged: (i) => setState(() => _page = i),
+                        children: [
+                          for (final page in pages)
+                            _TourPage(
+                              icon: page.icon,
+                              title: page.title,
+                              body: page.body,
+                            ),
+                        ],
                       ),
                     ),
-                  const Spacer(),
-                  FilledButton(
-                    onPressed: _next,
-                    child: Text(_page < _pages.length - 1 ? 'Volgende' : 'Aan de slag'),
-                  ),
-                ],
+                    const SizedBox(height: AppShapes.paddingLg),
+                    StepControls(
+                      step: _page,
+                      total: pages.length,
+                      onBack: _back,
+                      onNext: () => _next(pages.length),
+                      onSkip: _close,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -147,6 +156,7 @@ class _AppTourOverlayState extends State<_AppTourOverlay> {
 
 class _TourPage extends StatelessWidget {
   const _TourPage({required this.icon, required this.title, required this.body});
+
   final IconData icon;
   final String title;
   final String body;
@@ -154,39 +164,33 @@ class _TourPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withAlpha(40),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 40, color: theme.colorScheme.primary),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer,
+            shape: BoxShape.circle,
           ),
-          const SizedBox(height: 24),
-          Text(
-            title,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Icon(
+            icon,
+            size: 34,
+            color: theme.colorScheme.onPrimaryContainer,
           ),
-          const SizedBox(height: 16),
-          Text(
-            body,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: Colors.white.withAlpha(220),
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppShapes.paddingLg),
+        Text(title, style: theme.textTheme.titleLarge),
+        const SizedBox(height: AppShapes.paddingSm),
+        Text(
+          body,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
-        ],
-      ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

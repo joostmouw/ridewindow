@@ -2386,14 +2386,86 @@ abstract class S {
   /// No description provided for @hintDismiss.
   ///
   /// In nl, this message translates to:
-  /// **'Tik om te sluiten'**
+  /// **'Klaar'**
   String get hintDismiss;
 
   /// No description provided for @hintNext.
   ///
   /// In nl, this message translates to:
-  /// **'Tik voor volgende'**
+  /// **'Volgende'**
   String get hintNext;
+
+  /// No description provided for @hintBack.
+  ///
+  /// In nl, this message translates to:
+  /// **'Vorige'**
+  String get hintBack;
+
+  /// No description provided for @hintSkip.
+  ///
+  /// In nl, this message translates to:
+  /// **'Overslaan'**
+  String get hintSkip;
+
+  /// No description provided for @hintStepOf.
+  ///
+  /// In nl, this message translates to:
+  /// **'Stap {current} van {total}'**
+  String hintStepOf(int current, int total);
+
+  /// No description provided for @tourHomeTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Rijvensters'**
+  String get tourHomeTitle;
+
+  /// No description provided for @tourHomeBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Home toont de beste momenten om deze week te fietsen. Elke kaart draagt de score, het tijdstip en het weer. Tik op een kaart voor details.'**
+  String get tourHomeBody;
+
+  /// No description provided for @tourAgendaTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Agenda'**
+  String get tourAgendaTitle;
+
+  /// No description provided for @tourAgendaBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zeven dagen met uurvakken — groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.'**
+  String get tourAgendaBody;
+
+  /// No description provided for @tourRidesTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Mijn ritten'**
+  String get tourRidesTitle;
+
+  /// No description provided for @tourRidesBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Plan een rit vanuit Home of de Agenda en volg hier of het weer nog meezit. De windtip helpt je een route kiezen: eerst tegenwind, dan mee terug.'**
+  String get tourRidesBody;
+
+  /// No description provided for @tourProfileTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Profiel'**
+  String get tourProfileTitle;
+
+  /// No description provided for @tourProfileBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Stel je locatie in, je grenzen voor temperatuur, regen en wind, en je beschikbaarheid. Daar worden je scores mee berekend.'**
+  String get tourProfileBody;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aan de slag'**
+  String get tourDone;
 
   /// No description provided for @calendarEventTitle.
   ///
