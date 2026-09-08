@@ -38,7 +38,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 002 | [iconografie](002-iconografie/) | Waar komt het kledingadvies vandaan als het geen systeememoji meer is — twee losse kledingstukken, één tenue, of een gekleed figuur? | *afgewezen — verkeerde vraag* | iconografie, kleding, fase-24 |
 | 003 | [kledingadvies-zonder-plaatje](003-kledingadvies-zonder-plaatje/) | Als het kledingadvies geen plaatje meer is — hoeveel grafiek verdient het dan wél? | **A — Gevoelsbalk** | iconografie, kleding, weerbalken, fase-24 |
 | 004 | [iconenfamilie](004-iconenfamilie/) | Welke iconenfamilie deelt de hand van het RW-logo en van Outfit? | *ingehaald door 006* | iconografie, fase-24, merk, rider-types |
-| 006 | [hele-set-per-familie](006-hele-set-per-familie/) | Hoe ziet de volledige icooninventaris eruit in elke kandidaat-familie? | *open* | iconografie, fase-24, mapping, keuze |
+| 006 | [hele-set-per-familie](006-hele-set-per-familie/) | Hoe ziet de volledige icooninventaris eruit in elke kandidaat-familie? | **Phosphor** (gewicht open) | iconografie, fase-24, mapping, keuze |
 
 ## Beslissingen die doorwerken
 
@@ -84,3 +84,8 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
   benodigde vormen bestaan. Eén echt ontwerpgat: Material gebruikt gevuld-versus-omlijnd om de
   geselecteerde tab aan te wijzen, en die tweedeling heeft Hugeicons niet — de navigatiebalk moet
   selectie dus anders tonen.
+- **006 → Phosphor (2026-09-08).** Gekozen op de volledige set van 83, niet op een handvol. Het
+  gewicht — regular, bold of duotone — staat nog open. Twee dingen om te onthouden: een familie
+  beoordeel je op alles wat de app tekent, en **een dekkingsgetal zegt evenveel over je zoekwoorden
+  als over de set** — Phosphor leek 77/83 tot ik zijn eigen taal gebruikte (`prohibit`,
+  `arrows-clockwise`, `link-break`), en toen was het 83/83.

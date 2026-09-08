@@ -91,11 +91,16 @@
 <div class="wrap">
   <div class="lede">
     <h1>Dezelfde 83 iconen, in zeven handen</h1>
-    <p>In schets 004 koos je op vier signatuur-iconen, en bij de volledige set viel Hugeicons tegen.
-       Terecht — vier iconen zeggen te weinig over een familie. Daarom hier de <b>hele inventaris van
-       de app</b> (12 emoji-plekken plus 71 Material-iconen) in elke kandidaat, met één knop ertussen.
-       Wat je zoekt is samenhang: 83 iconen die eruitzien alsof dezelfde persoon ze tekende, in de
-       hand van het RW-monogram — ronde uiteinden, gulle bochten, gelijke lijndikte.</p>
+    <p>De <b>hele inventaris van de app</b> — 12 emoji-plekken plus 71 Material-iconen — in elke
+       kandidaat, met één knop ertussen. Wat je zoekt is samenhang: 83 iconen die eruitzien alsof
+       dezelfde persoon ze tekende, in de hand van het RW-monogram.</p>
+    <p><b>Phosphor staat vooraan, in drie gewichten.</b> Joost koos hem op 2026-09-08. De eerste
+       telling gaf 77/83, maar dat was mijn woordenlijst: Phosphor noemt dingen in eigen taal —
+       <code>prohibit</code> in plaats van block, <code>arrows-clockwise</code> in plaats van refresh,
+       <code>link-break</code> in plaats van link-off. Met die namen dekt hij <b>83/83</b>. Het
+       gewicht is nu de vraag: het RW-monogram is een dikke stiftlijn, en <b>regular</b> is dunner dan
+       dat. Vergelijk regular, bold en duotone — vooral op 13 px, waar bold kan dichtslibben en
+       regular kan verdwijnen.</p>
   </div>
 
   <h2>1 · De emoji — waar het besturingssysteem nu tekent</h2>
@@ -124,8 +129,9 @@
 <script src="data.js"></script>
 <script>
 const LABEL = {
+  'ph': 'Phosphor', 'ph-bold': 'Phosphor bold', 'ph-duotone': 'Phosphor duotone',
   lucide: 'Lucide', tabler: 'Tabler', hugeicons: 'Hugeicons', mynaui: 'Mynaui',
-  ph: 'Phosphor', solar: 'Solar', iconoir: 'Iconoir',
+  solar: 'Solar', iconoir: 'Iconoir',
 };
 
 function ic(name, size) {
@@ -142,7 +148,7 @@ function ic(name, size) {
   // een lijn om een lijn op. Solar mengt beide: alleen de -linear- en
   // -outline-varianten zijn echt lijnwerk. Vandaar per familie vastgelegd in
   // plaats van geraden uit de body.
-  const filled = window.FAM === 'ph'
+  const filled = window.FAM.startsWith('ph')
     || (window.FAM === 'solar' && !/-(linear|outline|broken)$/.test(name || ''));
   const paint = filled
     ? 'fill="currentColor"'
@@ -189,7 +195,7 @@ function draw() {
 document.getElementById('fambtns').innerHTML = DATA.fams.map(f =>
   `<button data-f="${f}">${LABEL[f]}</button>`).join('');
 
-window.FAM = 'lucide';
+window.FAM = 'ph';
 window.SZ = 24;
 window.SW = 2;
 
@@ -199,7 +205,7 @@ function setFam(f) {
   draw();
 }
 document.querySelectorAll('#fambtns button').forEach(b => b.onclick = () => setFam(b.dataset.f));
-setFam('lucide');
+setFam('ph');
 
 document.getElementById('tSize').onclick = function () {
   window.SZ = window.SZ === 24 ? 13 : window.SZ === 13 ? 20 : 24;

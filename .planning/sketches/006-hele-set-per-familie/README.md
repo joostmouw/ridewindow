@@ -2,11 +2,15 @@
 sketch: 006
 name: hele-set-per-familie
 question: "Hoe ziet de volledige icooninventaris van RideWindow eruit in elke kandidaat-familie?"
-winner: null
+winner: "Phosphor — gewicht nog te kiezen"
 tags: [iconografie, fase-24, mapping, keuze]
 ---
 
 # Sketch 006: De hele set, in zeven handen
+
+> **Gekozen: Phosphor** (Joost, 2026-09-08). Het gewicht staat nog open — regular, bold of duotone
+> staan als drie aparte knoppen vooraan. Zie *De correctie op Phosphor* hieronder: de eerste telling
+> van 77/83 was mijn fout, niet die van de set.
 
 ## Waarom deze schets bestaat
 
@@ -24,11 +28,11 @@ Alle 83 plekken, per familie machinaal opgezocht in de officiële naamlijsten:
 
 | Familie | Gedekt | Mist |
 |---|---|---|
+| **Phosphor** (3 gewichten) | **83/83** | — |
 | **Tabler** | **83/83** | — |
 | **Hugeicons** | **83/83** | — |
 | **Lucide** | 82/83 | swipe |
 | Mynaui | 78/83 | tune, hourglass, touch, swipe, kracht |
-| Phosphor | 77/83 | refresh, open-in-new, link-off, error, block |
 | Solar | 75/83 | fiets, berg, agenda-kruis, swipe |
 | Iconoir | 73/83 | cloud-off, groups, berg, zonsopgang |
 
@@ -46,6 +50,37 @@ open http://localhost:8765/.planning/sketches/006-hele-set-per-familie/index.htm
 Zeven familieknoppen bovenin, plus **maat** (24 / 13 / 20 px), **lijndikte** (2 / 2,5 / 1,5) en
 **donker**. De lijndikte en de uiteinden worden voor álle families gelijkgetrokken — anders vergelijk
 je gewichten in plaats van handschriften.
+
+## De correctie op Phosphor
+
+De eerste telling gaf Phosphor 77/83 en dat was **onjuist**. De vertaaltabel werkte met algemene
+synoniemen, en Phosphor gebruikt eigen taal:
+
+| Begrip | Wat ik zocht | Hoe Phosphor het noemt |
+|---|---|---|
+| block | ban, block, forbid | `prohibit` |
+| refresh | refresh, reload, rotate | `arrows-clockwise` |
+| restart | restart | `arrow-counter-clockwise` |
+| open in new | external-link | `arrow-square-out` |
+| link off | unlink, link-off | `link-break` |
+| error | alert-circle | `warning-circle` |
+
+Met een mapping in zijn eigen vocabulaire dekt Phosphor **alle 83**. Dit is een les over de methode:
+een dekkingsgetal zegt evenveel over de zoekwoorden als over de set. Bij de andere families kan
+hetzelfde spelen — hun gaten zijn niet met dezelfde zorg nagelopen, dus lees die cijfers als
+ondergrens.
+
+## Het gewicht is nu de vraag
+
+Phosphor heeft zes gewichten; drie staan hier als knop. Het RW-monogram is een **dikke stiftlijn**,
+en Phosphor *regular* is dunner dan dat.
+
+- **Regular** — elegant, maar op 13 px in de weerbalken kan hij wegvallen naast de tekst ernaast.
+- **Bold** — dichter bij het monogram; let op of hij op 13 px niet dichtslibt.
+- **Duotone** — zelfde tekening met een tweede vlak op 20% dekking. Geeft diepte zonder tweede kleur,
+  maar voegt wel een nieuwe visuele laag toe aan een app die net rust heeft gekregen in fase 23.
+
+Vergelijk ze vooral op **13 px** en **op donker** — daar wijken ze het meest af.
 
 ## What to Look For
 
