@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
 status: "1.0.27+28 klaar; telefoon is vrij voor Play"
-last_updated: "2026-09-08T17:45:00.000Z"
+last_updated: "2026-09-08T18:40:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -35,6 +35,7 @@ progress:
 | 2026-09-08 | [uitleg-in-stappen](quick/260908-k4t-uitleg-in-stappen/) | De twee uitleg-overlays zijn één Material 3 rich tooltip geworden, met terugknop en in beide talen. **Lees de vondst daar** — het weghalen van tik-om-verder sloot je op bij een niet-gemeten doel. |
 | 2026-09-08 | [sterren-en-uitleg](quick/260908-m8v-sterren-en-uitleg-terughalen/) | Sterren gingen niet aan (**beide takken hetzelfde icoon** na de Phosphor-migratie), de hint scrolt nu naar zijn doel, en het `i`-knopje staat op alle drie de schermen met uitleg. |
 | 2026-09-08 | [feedback-vertrok-niet](quick/260908-n3r-feedback-vertrok-niet/) | Feedback zei "bedankt" maar startte geen verzending — de rij bleef in de lokale outbox. **Twee dingen die Joost zelf moet nakijken staan in die SUMMARY.** |
+| 2026-09-08 | [welkomtekst-leesbaar](quick/260908-p6w-welkomtekst-leesbaar/) | Tester meldde "font lastig te lezen met kleuren". **Het was de kleur niet** — 9,63:1 en 5,54:1 op brandLight — maar 1170 ms halfzichtbare tekst. |
 
 ## Stand na 2026-09-07 — lees dit eerst voor v4.0
 
@@ -91,8 +92,9 @@ in het feedbackvenster gaan weer aan, de uitleg scrolt naar zijn doel, het
 Profiel → Over, en **feedback versturen start nu ook echt een verzending**.
 
 **1.0.26+27 is nooit geüpload en wordt overgeslagen.** De bundel is op
-2026-09-08 17:45 opnieuw gebouwd met de feedback-fix erin; `versionCode` 28 is
-nog vrij op Play, dus de versie is bewust níét opgehoogd.
+2026-09-08 18:40 voor het laatst herbouwd — daar zit nu ook de leesbaarheid van
+de welkomtekst in. `versionCode` 28 is nog vrij op Play, dus de versie is
+bewust níét opgehoogd bij elke herbouw.
 
 Release-notes staan in `release-notes/` in beide talen. Uploaden met de hand
 in de console (Testing → Internal testing → Create new release → dit bestand

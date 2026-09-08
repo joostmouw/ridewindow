@@ -158,16 +158,38 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       begin: Alignment.center,
       end: const Alignment(0, -0.58),
     ).animate(curve);
-    final fadeIn = CurvedAnimation(
+    // De tekst komt pas los als de rit al onderweg is; tegelijk starten maakt
+    // het scherm druk. De verplaatsing loopt daarna door tot het eind.
+    final appear = CurvedAnimation(
       parent: _settle,
-      // De tekst komt pas los als de rit al onderweg is; tegelijk starten
-      // maakt het scherm druk.
       curve: const Interval(0.35, 1.0, curve: AppMotion.effectsCurve),
     );
     final slideIn = Tween(
       begin: const Offset(0, 0.28),
       end: Offset.zero,
-    ).animate(fadeIn);
+    ).animate(appear);
+
+    // **De dekking loopt bewust niet mee met de verplaatsing.** Dat deed hij
+    // wel, en dan stond het tekstblok 1170 ms lang halfzichtbaar op zijn plek
+    // te wachten. Een tester fotografeerde precies dat moment en meldde "font
+    // is lastig te lezen met kleuren" (2026-09-08) -- terwijl de kleuren goed
+    // zijn: de titel haalt 9,63:1 op `brandLight` en de subtitel 5,54:1,
+    // allebei ruim boven de AA-drempel van 4,5. Het was geen kleurprobleem
+    // maar een moment waarin je oog begint te lezen en faalt.
+    //
+    // Tekst hoort er niet te zijn, of leesbaar te zijn -- nooit iets
+    // ertussenin. Vandaar 0.35 tot 0.46: ruwweg 200 ms van de 1800 ms, en
+    // daarna trekt alleen de bewéging nog het oog. Joost koos dit op een
+    // specimen met de drie varianten naast elkaar.
+    //
+    // `Curves.easeOut` en niet de veer hierboven: die is onderdempt
+    // (dempingsverhouding 0,71) en schiet dus door voorbij 1,0. Voor een
+    // verplaatsing is dat precies de bedoeling, voor een dekking is het een
+    // waarde die niet bestaat.
+    final fadeIn = CurvedAnimation(
+      parent: _settle,
+      curve: const Interval(0.35, 0.46, curve: Curves.easeOut),
+    );
 
     return Scaffold(
       // Expliciet brandLight, niet `colorScheme.surface`. Sinds v4.0 is surface
