@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoeveel fiets zit er in de taal — schets 010</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('Outfit.ttf') format('truetype'); font-weight:100 900; }
+  @font-face { font-family:'Phosphor'; src:url('Phosphor.ttf') format('truetype'); }
+
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+    --great-fg:#006457;  --great-bg:#E0F2F1;
+    --accept-fg:#A42E0A; --accept-bg:#FFF3E0;
+    --planned:#1565C0; --organiser:#7B4B12;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 26px 90px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1320px;margin:0 auto}
+  h1{font-size:32px;line-height:1.25;font-weight:500;margin:0 0 10px}
+  h2{font-size:21px;font-weight:500;margin:46px 0 8px;padding-top:22px;border-top:1px solid var(--outline)}
+  .lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:82ch;margin:0}
+  .lede b{font-weight:600;color:var(--ink)}
+  .sub{font-size:14.5px;line-height:1.6;color:var(--ink-3);max-width:84ch;margin:8px 0 0}
+  .ph{font-family:'Phosphor';font-style:normal;line-height:1;display:inline-block}
+
+  /* ── de knop ── */
+  .dial{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:26px}
+  .col{min-width:0}
+  .colhead{margin-bottom:12px}
+  .colhead .pos{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.7px;
+      text-transform:uppercase;color:var(--paper);background:var(--outline-strong);
+      border-radius:999px;padding:4px 11px;margin-bottom:7px}
+  .col.pick .colhead .pos{background:var(--brand-dark)}
+  .colhead h3{margin:0 0 4px;font-size:18px;font-weight:600}
+  .colhead p{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink-3)}
+  .col.pick .colhead h3::after{content:' ★';color:var(--brand-dark);font-size:15px}
+
+  /* ── telefoon ── */
+  .phone{border-radius:28px;overflow:hidden;border:1px solid var(--outline);background:var(--paper);
+         box-shadow:0 12px 30px rgba(35,73,52,.10);margin-top:14px}
+  .screen{background:var(--paper-low)}
+  .hdr{background:var(--brand-light);padding:15px 16px 13px}
+  .hdr .hi{font-size:19px;font-weight:600;color:var(--brand-dark);line-height:1.25}
+  .hdr .meta{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:12.5px;color:rgba(35,73,52,.82)}
+  .hdr .meta .ph{font-size:14px}
+  .hdr .meta .type{font-weight:600}
+  .hdr .meta .dot{opacity:.5}
+
+  .strip{display:flex;gap:5px;padding:11px 14px 3px;background:var(--paper-low)}
+  .day{flex:1;text-align:center;padding:5px 0 7px;border-radius:9px}
+  .day.sel{background:var(--paper-high)}
+  .day .d{font-size:9.5px;color:var(--ink-3);font-weight:600}
+  .day .n{font-size:13px;font-weight:500;margin-top:1px}
+  .day .bar{height:3px;border-radius:2px;margin:5px 5px 0;background:var(--outline)}
+  .day.a .bar{background:#E4A33A}.day.b .bar{background:#2FA090}.day.c .bar{background:var(--perfect-fg)}
+
+  .seclabel{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--ink-3);padding:11px 16px 6px}
+  .rcard{margin:0 12px 10px;background:var(--paper);border:1px solid var(--outline);
+         border-radius:18px;padding:13px 14px}
+  .rcard .when{font-size:12px;color:var(--ink-3);font-weight:500}
+  .rcard .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:2px}
+  .rcard .n{font-size:34px;font-weight:500;line-height:1.05;letter-spacing:-.5px}
+  .rcard .verdict{font-size:14px;font-weight:600;color:var(--perfect-fg)}
+  .rcard .meta{font-size:12px;color:var(--ink-2);margin-top:5px}
+
+  .nav{display:flex;background:var(--paper);border-top:1px solid var(--paper-high);padding:7px 0 9px}
+  .nav div{flex:1;text-align:center;font-size:10.5px;color:var(--ink-3);font-weight:500}
+  .nav div .ph{display:block;font-size:19px;margin-bottom:3px}
+  .nav div.on{color:var(--brand-dark);font-weight:600}
+  .nav div.on .ph{color:var(--brand-dark)}
+
+  /* ── losse fragmenten ── */
+  .frag{margin-top:12px;background:var(--paper);border:1px solid var(--outline);border-radius:16px;overflow:hidden}
+  .frag .lbl{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--ink-3);
+             padding:9px 14px 0}
+  .frag .body{padding:8px 14px 13px}
+  .tabs{display:flex;border-bottom:1px solid var(--paper-high);margin-top:6px}
+  .tabs span{flex:1;text-align:center;padding:9px 0 8px;font-size:13px;font-weight:500;color:var(--ink-3);
+             border-bottom:2px solid transparent}
+  .tabs span.on{color:var(--ink);font-weight:600;border-bottom-color:var(--brand-dark)}
+  .empty{padding:16px 14px 18px;text-align:center}
+  .empty .ph{font-size:26px;color:var(--ink-3);opacity:.7}
+  .empty h4{margin:9px 0 4px;font-size:14.5px;font-weight:600}
+  .empty p{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink-3)}
+  .notif{display:flex;gap:10px;padding:11px 13px;background:var(--paper-mid);border-radius:12px;margin:8px 14px 13px}
+  .notif .ic{width:26px;height:26px;border-radius:7px;background:var(--brand-dark);color:var(--paper);
+             display:grid;place-items:center;font-size:14px;flex:none}
+  .notif .t{font-size:12.5px;font-weight:600;line-height:1.35}
+  .notif .b{font-size:12px;color:var(--ink-3);margin-top:1px;line-height:1.4}
+
+  .tierrow{display:flex;flex-wrap:wrap;gap:6px;padding:2px 14px 13px}
+  .tier{font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:999px}
+  .t1{background:var(--perfect-bg);color:var(--perfect-fg)}
+  .t2{background:var(--great-bg);color:var(--great-fg)}
+  .t3{background:var(--accept-bg);color:var(--accept-fg)}
+  .t4{background:#F0F0F0;color:#585858}
+
+  /* ── het inzicht ── */
+  .insight{margin-top:26px;background:var(--paper);border:2px solid var(--brand-dark);
+           border-radius:22px;padding:22px 24px}
+  .insight h3{margin:0 0 8px;font-size:19px;font-weight:600}
+  .insight p{margin:0 0 12px;font-size:14.5px;line-height:1.6;color:var(--ink-2);max-width:78ch}
+  .insight p:last-child{margin-bottom:0}
+  .insight b{font-weight:600;color:var(--ink)}
+  .demo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0 0}
+  .demo .box{border:1px solid var(--outline);border-radius:16px;overflow:hidden;background:var(--paper-low)}
+  .demo .box .cap{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+                  color:var(--ink-3);padding:10px 14px 0}
+  .demo .box.bad .cap{color:#A42E0A}
+  .demo .box.good .cap{color:var(--perfect-fg)}
+
+  .foot{margin-top:44px;padding-top:22px;border-top:1px solid var(--outline);font-size:14.5px;
+        line-height:1.65;color:var(--ink-2);max-width:84ch}
+  .foot b{color:var(--ink);font-weight:600}
+  .foot ul{margin:10px 0 0;padding-left:20px}
+  .foot li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Hoeveel fiets zit er in de taal? — schets 010</h1>
+<p class="lede">
+Je wilt fietstermen, maar Peloton kwam uit het niets. Dat zijn <b>twee verschillende dingen</b>, en
+het onderscheid bepaalt wat je moet repareren. Hieronder eerst dat onderscheid, dan drie standen
+van dezelfde knop op de échte schermen.
+</p>
+
+<!-- ═══════════════ HET INZICHT ═══════════════ -->
+<div class="insight">
+  <h3>Het woord was niet het probleem — het ontbreken van een introductie was dat</h3>
+  <p>
+    “Peloton” stond op een tabblad, en een tabblad is een <b>wegwijzer</b>: iets wat je moet kunnen
+    volgen zonder het geleerd te hebben. Er stond nergens wat het betekende, dus je moest het raden.
+    Dát is wat “uit het niets” voelde — niet dat het woord fout is.
+  </p>
+  <p>
+    Een term die de app <b>één keer uitlegt</b> is daarna geen jargon meer maar van jou. Precies zoals
+    een fietsclub een naam heeft: de eerste avond hoor je wat hij betekent, daarna zeg je hem zelf.
+    Zeven woorden op de lege staat doen dat werk.
+  </p>
+  <div class="demo">
+    <div class="box bad">
+      <span class="cap">✗ zoals het was</span>
+      <div class="tabs" style="margin:8px 0 0"><span>Ritten</span><span class="on">Peloton</span></div>
+      <div class="empty">
+        <i class="ph">&#xe68e;</i>
+        <h4>Nog geen maatjes</h4>
+        <p>Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.</p>
+      </div>
+    </div>
+    <div class="box good">
+      <span class="cap">✓ met introductie</span>
+      <div class="tabs" style="margin:8px 0 0"><span>Ritten</span><span class="on">Peloton</span></div>
+      <div class="empty">
+        <i class="ph">&#xe68e;</i>
+        <h4>Je peloton is nog leeg</h4>
+        <p><b>Een peloton is de groep waarmee je rijdt.</b> Nodig een maatje uit en jullie zien
+           elkaars ritten.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DE KNOP ═══════════════ -->
+<h2>Drie standen, dezelfde schermen</h2>
+<p class="sub">
+De knop loopt van links naar rechts: <b>alleen toon</b> → <b>ook de oordelen</b> → <b>ook de
+wegwijzers</b>. Alle drie hebben het fietserstype op Home, want dat is de goedkoopste winst en hij
+zit al in de app — alleen op het verkeerde scherm.
+</p>
+
+<div class="dial">
+
+  <!-- ───────── STAND 1 ───────── -->
+  <div class="col pick">
+    <div class="colhead">
+      <span class="pos">stand 1 · knipoog</span>
+      <h3>Fiets in de toon</h3>
+      <p>Wegwijzers en oordelen in gewone taal. Het fietsen zit in je type, je meldingen en je lege
+         staten — dingen die je mag missen zonder te verdwalen.</p>
+    </div>
+
+    <div class="phone"><div class="screen">
+      <div class="hdr">
+        <div class="hi">Goedenavond, Joost</div>
+        <div class="meta"><i class="ph">&#xe5b6;</i><span class="type">Vroege vogel</span>
+          <span class="dot">·</span><span>29 fietsmomenten deze week</span></div>
+      </div>
+      <div class="strip">
+        <div class="day a"><div class="d">DI</div><div class="n">8</div><div class="bar"></div></div>
+        <div class="day b"><div class="d">WO</div><div class="n">9</div><div class="bar"></div></div>
+        <div class="day c sel"><div class="d">DO</div><div class="n">10</div><div class="bar"></div></div>
+        <div class="day b"><div class="d">VR</div><div class="n">11</div><div class="bar"></div></div>
+        <div class="day c"><div class="d">ZA</div><div class="n">12</div><div class="bar"></div></div>
+      </div>
+      <div class="seclabel">FIETSMOMENTEN</div>
+      <div class="rcard">
+        <div class="when">donderdag · 20:00 – 22:00</div>
+        <div class="row"><span class="n">99</span><span class="verdict">Perfect</span></div>
+        <div class="meta">15° · droog · 10 km/u</div>
+      </div>
+      <div class="nav">
+        <div class="on"><i class="ph">&#xe2c2;</i>Home</div>
+        <div><i class="ph">&#xe10a;</i>Agenda</div>
+        <div><i class="ph">&#xe0d6;</i>Ritten</div>
+        <div><i class="ph">&#xe4c2;</i>Profiel</div>
+      </div>
+    </div></div>
+
+    <div class="frag">
+      <span class="lbl">Tweede tabblad onder Ritten</span>
+      <div class="tabs"><span class="on">Ritten</span><span>Maatjes</span></div>
+    </div>
+    <div class="frag">
+      <span class="lbl">De vier oordelen</span>
+      <div class="tierrow" style="padding-top:9px">
+        <span class="tier t1">Perfect</span><span class="tier t2">Goed</span>
+        <span class="tier t3">Acceptabel</span><span class="tier t4">Slecht</span>
+      </div>
+    </div>
+    <div class="frag">
+      <span class="lbl">Melding, avond ervoor</span>
+      <div class="notif"><div class="ic"><i class="ph">&#xe0d6;</i></div>
+        <div><div class="t">Mooi fietsmoment morgen!</div>
+             <div class="b">09:00 – 13:00 — perfecte omstandigheden</div></div></div>
+    </div>
+  </div>
+
+  <!-- ───────── STAND 2 ───────── -->
+  <div class="col">
+    <div class="colhead">
+      <span class="pos">stand 2 · karakter</span>
+      <h3>Fiets ook in de oordelen</h3>
+      <p>De wegwijzers blijven gewoon, maar de dingen waar de app een mening over heeft krijgen een
+         fietsnaam. Je ziet ze elke dag op elke kaart.</p>
+    </div>
+
+    <div class="phone"><div class="screen">
+      <div class="hdr">
+        <div class="hi">Goedenavond, Joost</div>
+        <div class="meta"><i class="ph">&#xe5b6;</i><span class="type">Vroege vogel</span>
+          <span class="dot">·</span><span>29 fietsmomenten deze week</span></div>
+      </div>
+      <div class="strip">
+        <div class="day a"><div class="d">DI</div><div class="n">8</div><div class="bar"></div></div>
+        <div class="day b"><div class="d">WO</div><div class="n">9</div><div class="bar"></div></div>
+        <div class="day c sel"><div class="d">DO</div><div class="n">10</div><div class="bar"></div></div>
+        <div class="day b"><div class="d">VR</div><div class="n">11</div><div class="bar"></div></div>
+        <div class="day c"><div class="d">ZA</div><div class="n">12</div><div class="bar"></div></div>
+      </div>
+      <div class="seclabel">FIETSMOMENTEN</div>
+      <div class="rcard">
+        <div class="when">donderdag · 20:00 – 22:00</div>
+        <div class="row"><span class="n">99</span><span class="verdict">Toprit</span></div>
+        <div class="meta">15° · droog · 10 km/u</div>
+      </div>
+      <div class="nav">
+        <div class="on"><i class="ph">&#xe2c2;</i>Home</div>
+        <div><i class="ph">&#xe10a;</i>Agenda</div>
+        <div><i class="ph">&#xe0d6;</i>Ritten</div>
+        <div><i class="ph">&#xe4c2;</i>Profiel</div>
+      </div>
+    </div></div>
+
+    <div class="frag">
+      <span class="lbl">Tweede tabblad onder Ritten</span>
+      <div class="tabs"><span class="on">Ritten</span><span>Maatjes</span></div>
+    </div>
+    <div class="frag">
+      <span class="lbl">De vier oordelen</span>
+      <div class="tierrow" style="padding-top:9px">
+        <span class="tier t1">Toprit</span><span class="tier t2">Fijne rit</span>
+        <span class="tier t3">Te doen</span><span class="tier t4">Binnenblijver</span>
+      </div>
+    </div>
+    <div class="frag">
+      <span class="lbl">Melding, avond ervoor</span>
+      <div class="notif"><div class="ic"><i class="ph">&#xe0d6;</i></div>
+        <div><div class="t">Morgen ligt er een toprit klaar</div>
+             <div class="b">09:00 – 13:00 — perfecte omstandigheden</div></div></div>
+    </div>
+  </div>
+
+  <!-- ───────── STAND 3 ───────── -->
+  <div class="col">
+    <div class="colhead">
+      <span class="pos">stand 3 · peloton terug</span>
+      <h3>Fiets ook in de wegwijzers</h3>
+      <p>Stand 2, plus het sociale tabblad heet weer <b>Peloton</b> — maar nu mét de introductie uit
+         het kader hierboven, dus het komt niet meer koud binnen.</p>
+    </div>
+
+    <div class="phone"><div class="screen">
+      <div class="hdr">
+        <div class="hi">Goedenavond, Joost</div>
+        <div class="meta"><i class="ph">&#xe5b6;</i><span class="type">Vroege vogel</span>
+          <span class="dot">·</span><span>29 fietsmomenten deze week</span></div>
+      </div>
+      <div class="strip">
+        <div class="day a"><div class="d">DI</div><div class="n">8</div><div class="bar"></div></div>
+        <div class="day b"><div class="d">WO</div><div class="n">9</div><div class="bar"></div></div>
+        <div class="day c sel"><div class="d">DO</div><div class="n">10</div><div class="bar"></div></div>
+        <div class="day b"><div class="d">VR</div><div class="n">11</div><div class="bar"></div></div>
+        <div class="day c"><div class="d">ZA</div><div class="n">12</div><div class="bar"></div></div>
+      </div>
+      <div class="seclabel">FIETSMOMENTEN</div>
+      <div class="rcard">
+        <div class="when">donderdag · 20:00 – 22:00</div>
+        <div class="row"><span class="n">99</span><span class="verdict">Toprit</span></div>
+        <div class="meta">15° · droog · 10 km/u</div>
+      </div>
+      <div class="nav">
+        <div class="on"><i class="ph">&#xe2c2;</i>Home</div>
+        <div><i class="ph">&#xe10a;</i>Agenda</div>
+        <div><i class="ph">&#xe0d6;</i>Ritten</div>
+        <div><i class="ph">&#xe4c2;</i>Profiel</div>
+      </div>
+    </div></div>
+
+    <div class="frag">
+      <span class="lbl">Tweede tabblad onder Ritten</span>
+      <div class="tabs"><span class="on">Ritten</span><span>Peloton</span></div>
+      <div class="empty" style="padding-top:12px">
+        <i class="ph">&#xe68e;</i>
+        <h4>Je peloton is nog leeg</h4>
+        <p><b>Een peloton is de groep waarmee je rijdt.</b> Nodig een maatje uit en jullie zien
+           elkaars ritten.</p>
+      </div>
+    </div>
+    <div class="frag">
+      <span class="lbl">De vier oordelen</span>
+      <div class="tierrow" style="padding-top:9px">
+        <span class="tier t1">Toprit</span><span class="tier t2">Fijne rit</span>
+        <span class="tier t3">Te doen</span><span class="tier t4">Binnenblijver</span>
+      </div>
+    </div>
+    <div class="frag">
+      <span class="lbl">Melding, avond ervoor</span>
+      <div class="notif"><div class="ic"><i class="ph">&#xe0d6;</i></div>
+        <div><div class="t">Morgen ligt er een toprit klaar</div>
+             <div class="b">Je peloton rijdt om 09:00 — ga je mee?</div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="foot">
+<b>Wat ik zou doen, en waarom.</b>
+<ul>
+  <li><b>Het fietserstype op Home hoort er hoe dan ook.</b> Hij zit al in de app, hij is berekend
+    uit jouw rooster, en hij staat nu op het scherm dat je één keer bezoekt. Dat is de goedkoopste
+    persoonlijkheid die je kunt krijgen, in alle drie de standen.</li>
+  <li><b>Stand 2 is waar de meeste winst zit.</b> De vier oordelen staan op élke kaart, elke dag —
+    dat is de plek waar één woord het vaakst gezien wordt. “Binnenblijver” zegt bovendien méér dan
+    “Slecht”: het vertelt je wat je moet doen.</li>
+  <li><b>Stand 3 kan, mits de introductie erbij zit.</b> Zonder dat kader gaat het weer voelen zoals
+    het voelde. Mét dat kader is “Peloton” juist sterker dan “Maatjes”, want het is een naam en geen
+    omschrijving — en het is de enige plek in de app waar een groep bestaat.</li>
+  <li><b>Wat ik níét zou doen:</b> de onderste navigatiebalk aanraken. Home, Agenda, Ritten en
+    Profiel moeten in één blik te snappen zijn, ook door iemand die de app voor het eerst opent.
+    Daar is niets te winnen en veel te verliezen.</li>
+</ul>
+</div>
+
+</div>
+</body>
+</html>

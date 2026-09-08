@@ -41,6 +41,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 006 | [hele-set-per-familie](006-hele-set-per-familie/) | Hoe ziet de volledige icooninventaris eruit in elke kandidaat-familie? | **Phosphor** (gewicht open) | iconografie, fase-24, mapping, keuze |
 | 008 | [ritten-rollen](008-ritten-rollen/) | Hoe lees je aan een rit af welke rol jij erin hebt — en hoe kom je vanaf een gedeelde rit in één tik bij het detail? | **A — Eén lijst met filterrij** | ritten, peloton, rollen, navigatie, lijst |
 | 009 | [nederlandse-teksten](009-nederlandse-teksten/) | Welk Nederlands spreekt deze app — en welk woord gebruikt hij voor zijn eigen kernbegrip? | **A — "fietsmoment"** (blok 2 beperkt, blok 4 afgewezen) | l10n, nederlands, toon, kleding, jargon |
+| 010 | [hoeveel-fiets](010-hoeveel-fiets/) | Hoeveel fietstaal verdraagt de app, en op welke plekken? | *nog te kiezen* | merk, toon, naamgeving, peloton, l10n |
 
 ## Beslissingen die doorwerken
 
@@ -113,3 +114,10 @@ leidend, de filterrij met telling beantwoordt "wat organiseer ik" al vóór je t
 vertalingen ook niet zo goed". Vier blokken: het kernwoord (de app had er vijf voor hetzelfde
 ding), het kledingadvies, achttien echte fouten en acht plekken toon. **Gekozen: A** plus alle
 fouten; de kleding beperkt tot de kniewarmers, de toon ongemoeid.
+
+## 010 — Hoeveel fiets zit er in de taal?
+
+`010-hoeveel-fiets/` — Joost wil fietstermen maar vond "Peloton" uit het niets komen. De schets
+scheidt die twee: *uit het niets* is geen verkeerd woord maar een ontbrekende introductie, en dat
+is een andere reparatie. Eén knop met drie standen — toon, oordelen, wegwijzers — op dezelfde vier
+oppervlakken. **Nog te kiezen.**
