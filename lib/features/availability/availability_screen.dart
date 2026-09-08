@@ -403,9 +403,10 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       ),
       child: Row(
         children: [
-          Text(
+          Icon(
             profile.icon,
-            style: const TextStyle(fontSize: 24),
+            size: 24,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -437,7 +438,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
   // --- Rider profile analyse ---
 
-  ({String icon, String title, String description}) _analyzeRiderProfile(
+  ({IconData icon, String title, String description}) _analyzeRiderProfile(
     BuildContext context,
     Map<DateTime, BlockType> blockedHours,
     DateTime weekStart,
@@ -470,7 +471,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     if (totalFree == 0) {
       return (
-        icon: '\u{1F62E}',
+        icon: AppIcons.calendarX,
         title: s.riderNoTime,
         description: s.riderNoTimeDesc,
       );
@@ -478,7 +479,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     if (totalFree >= 140) {
       return (
-        icon: '\u{1F6B4}',
+        icon: AppIcons.personSimpleBike,
         title: s.riderFulltime,
         description: s.riderFulltimeDesc,
       );
@@ -487,7 +488,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     // Weekend warrior: meeste vrije uren in het weekend
     if (weekendFreeHours > weekdayFreeHours && weekendFreeHours >= 16) {
       return (
-        icon: '\u{1F3D4}\u{FE0F}',
+        icon: AppIcons.mountains,
         title: s.riderWeekend,
         description: s.riderWeekendDesc,
       );
@@ -496,7 +497,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     // Early bird: meeste vrije uren in de ochtend
     if (morningFree > afternoonFree && morningFree > eveningFree) {
       return (
-        icon: '\u{1F305}',
+        icon: AppIcons.sunHorizon,
         title: s.riderEarlyBird,
         description: s.riderEarlyBirdDesc,
       );
@@ -505,7 +506,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     // After-work rider
     if (eveningFree > morningFree && eveningFree > afternoonFree) {
       return (
-        icon: '\u{1F307}',
+        icon: AppIcons.moonStars,
         title: s.riderAfterWork,
         description: s.riderAfterWorkDesc,
       );
@@ -514,7 +515,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     // Lunch rider
     if (afternoonFree > morningFree && afternoonFree > eveningFree) {
       return (
-        icon: '\u{2600}\u{FE0F}',
+        icon: AppIcons.sun,
         title: s.riderAfternoon,
         description: s.riderAfternoonDesc,
       );
@@ -523,14 +524,14 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     // Busy but making it work
     if (totalFree < 40) {
       return (
-        icon: '\u{1F4AA}',
+        icon: AppIcons.barbell,
         title: s.riderBusy,
         description: s.riderBusyDesc,
       );
     }
 
     return (
-      icon: '\u{1F6B2}',
+      icon: AppIcons.bicycle,
       title: s.riderFlexible,
       description: s.riderFlexibleDesc,
     );

@@ -8,6 +8,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 
 class InsightsSheet extends StatelessWidget {
   final RideSlot slot;
@@ -125,7 +126,7 @@ class InsightsSheet extends StatelessWidget {
 
   Widget _buildFactorRow({
     required BuildContext context,
-    required String emoji,
+    required IconData icon,
     required String label,
     required double score,
     required String scoreLabel,
@@ -140,7 +141,7 @@ class InsightsSheet extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 16)),
+            Icon(icon, size: 16, color: rw.textSecondary),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -252,7 +253,7 @@ class InsightsSheet extends StatelessWidget {
           // Temperatuur
           _buildFactorRow(
             context: context,
-            emoji: '\u{1F321}',
+            icon: AppIcons.thermometerSimple,
             label: s.weatherTemperature,
             score: avgTemp,
             scoreLabel: _tempLabel(context, avgTemp),
@@ -263,7 +264,7 @@ class InsightsSheet extends StatelessWidget {
           // Neerslag
           _buildFactorRow(
             context: context,
-            emoji: '\u{1F327}',
+            icon: AppIcons.cloudRain,
             label: s.weatherRain,
             score: avgRain,
             scoreLabel: _rainLabel(context, avgRain),
@@ -274,7 +275,7 @@ class InsightsSheet extends StatelessWidget {
           // Wind
           _buildFactorRow(
             context: context,
-            emoji: '\u{1F4A8}',
+            icon: AppIcons.wind,
             label: s.weatherWind,
             score: avgWind,
             scoreLabel: _windLabel(context, avgWind),

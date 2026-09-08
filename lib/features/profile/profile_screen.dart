@@ -1213,9 +1213,10 @@ class _AnimatedWindFlagState extends State<_AnimatedWindFlag>
             Transform.rotate(
               angle: angle,
               alignment: Alignment.bottomCenter,
-              child: Text(
-                '🚩',
-                style: TextStyle(fontSize: 20 + widget.intensity * 8),
+              child: Icon(
+                AppIcons.flag,
+                size: 20 + widget.intensity * 8,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 8),
