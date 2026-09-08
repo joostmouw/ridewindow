@@ -42,8 +42,8 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
-  /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 8,55 s (103
-  /// frames van 83 ms), dus dit valt er ruim binnen: het laatste anderhalve
+  /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 8,65 s (206
+  /// frames van 42 ms), dus dit valt er ruim binnen: de laatste anderhalve
   /// seconde van de rit beweegt mee in plaats van dat de app erop wacht.
   static const _settleAt = Duration(milliseconds: 6800);
 
@@ -65,6 +65,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     if (mounted && !_settle.isAnimating && _settle.value == 0) {
       _settle.forward();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Het decoderen niet laten concurreren met de eerste opbouw van het
+    // scherm: dat is bij een animatie van 206 frames het verschil tussen
+    // vloeiend beginnen en de eerste halve seconde overslaan.
+    precacheImage(
+      const AssetImage('assets/animations/welcome_ride.webp'),
+      context,
+    );
   }
 
   @override
@@ -123,16 +135,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     alignment: align.value,
                     child: Transform.scale(
                       scale: scale.value,
-                      child: Image.asset(
-                        'assets/animations/welcome_ride.webp',
-                        width: math.min(
-                          MediaQuery.sizeOf(context).width * 0.92,
-                          460,
+                      child: RepaintBoundary(
+                        child: Image.asset(
+                          'assets/animations/welcome_ride.webp',
+                          width: math.min(
+                            MediaQuery.sizeOf(context).width * 0.92,
+                            460,
+                          ),
+                          fit: BoxFit.contain,
+                          // De laatste frame blijft staan; zonder dit knippert
+                          // hij bij een herbouw even naar leeg.
+                          gaplessPlayback: true,
                         ),
-                        fit: BoxFit.contain,
-                        // De laatste frame blijft staan; zonder dit knippert
-                        // hij bij een herbouw even naar leeg.
-                        gaplessPlayback: true,
                       ),
                     ),
                   ),
