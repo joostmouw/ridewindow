@@ -125,4 +125,5 @@ flutter:
         - asset: assets/fonts/Phosphor-Fill.ttf
 
   assets:
+    - assets/animations/
     - assets/fonts/OFL.txt

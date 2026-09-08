@@ -140,13 +140,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     };
   }
 
-  String _tierEmoji(RideTier tier) => switch (tier) {
-        Perfect() => '\u{1F7E2}',
-        Great() => '\u{1F7E2}',
-        Acceptable() => '\u{1F7E1}',
-        Poor() => '\u26AA',
-      };
-
   String _tierDescription(BuildContext context, RideTier tier) {
     final s = S.of(context);
     return switch (tier) {
@@ -471,33 +464,33 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final apparent = row.apparentTemperatureC != null
         ? s.hourlyFeelsLike(row.apparentTemperatureC!.round().toString())
         : '';
-    final String precipIcon = row.precipitationMm == 0.0 &&
+    final IconData precipIcon = row.precipitationMm == 0.0 &&
             (row.precipitationProbability == null ||
                 row.precipitationProbability == 0)
-        ? '\u2600\ufe0f'
+        ? AppIcons.sun
         : row.precipitationMm == 0.0 &&
                 row.precipitationProbability != null &&
                 row.precipitationProbability! >= 1 &&
                 row.precipitationProbability! <= 30
-            ? '\u26c5'
-            : '\u{1F327}';
+            ? AppIcons.cloudSun
+            : AppIcons.cloudRain;
     final precip = row.precipitationMm != null
         ? (row.precipitationMm! == 0.0 &&
                 (row.precipitationProbability == null ||
                     row.precipitationProbability == 0)
-            ? '$precipIcon ${s.hourlyDry}'
+            ? s.hourlyDry
             : row.precipitationProbability != null &&
                     row.precipitationProbability! > 0
-                ? '$precipIcon ${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
-                : '$precipIcon ${row.precipitationMm!.toStringAsFixed(1)}mm')
-        : '\u{1F327} \u2014';
+                ? '${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
+                : '${row.precipitationMm!.toStringAsFixed(1)}mm')
+        : '\u2014';
     final wind = row.windspeedKmh != null
         ? row.windspeedKmh! < 5
-            ? '\u{1F4A8} ${s.hourlyWindstil}'
+            ? s.hourlyWindstil
             : row.windspeedKmh! < 15 || row.winddirectionDeg == null
-                ? '\u{1F4A8} ${row.windspeedKmh!.round()}${s.unitKmh}'
-                : '\u{1F4A8} ${row.windspeedKmh!.round()}${s.unitKmh} ${_compassDirection(context, row.winddirectionDeg!)}'
-        : '\u{1F4A8} \u2014';
+                ? '${row.windspeedKmh!.round()}${s.unitKmh}'
+                : '${row.windspeedKmh!.round()}${s.unitKmh} ${_compassDirection(context, row.winddirectionDeg!)}'
+        : '\u2014';
 
     // Subtiele achtergrondkleur op basis van uur-score
     final Color rowBg;
@@ -541,11 +534,15 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               style: TextStyle(fontSize: 13, color: rw.textTertiary),
             ),
           ),
+          Icon(precipIcon, size: 12, color: rw.textTertiary),
+          const SizedBox(width: 4),
           Text(
             precip,
             style: TextStyle(fontSize: 12, color: rw.textTertiary),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
+          Icon(AppIcons.wind, size: 12, color: rw.textTertiary),
+          const SizedBox(width: 4),
           Text(
             wind,
             style: TextStyle(fontSize: 12, color: rw.textTertiary),

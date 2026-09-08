@@ -70,6 +70,8 @@ abstract final class AppIcons {
       IconData(0xe1b4, fontFamily: 'Phosphor');
   static const IconData cloudSlash =
       IconData(0xe1b6, fontFamily: 'Phosphor');
+  static const IconData cloudSun =
+      IconData(0xe540, fontFamily: 'Phosphor');
   static const IconData copy =
       IconData(0xe1ca, fontFamily: 'Phosphor');
   static const IconData crosshair =
