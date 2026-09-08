@@ -105,6 +105,26 @@
   .pop.vc .pop-foot{margin:14px -16px 0;padding:10px 12px;border-top:1px solid var(--outline);
         background:var(--paper-low);border-radius:0 0 19px 19px}
 
+
+  /* ── variant E: Material 3 rich tooltip ── */
+  .pop.ve{background:var(--paper-mid);border:0;border-radius:12px;padding:14px 16px 8px;
+      box-shadow:0 3px 8px rgba(27,42,32,.16),0 1px 3px rgba(27,42,32,.10)}
+  .pop.ve .beak{background:var(--paper-mid)}
+  .pop.ve h3{font-size:14px;font-weight:500;line-height:1.43;letter-spacing:.1px}
+  .pop.ve p{font-size:14px;line-height:1.43;letter-spacing:.25px;color:var(--ink-2);margin-top:6px}
+  .pop.ve .pop-foot{margin-top:8px;gap:0}
+  .txtbtn{font-family:inherit;font-size:14px;font-weight:500;letter-spacing:.1px;
+      background:none;border:0;color:var(--ink-2);cursor:pointer;padding:10px 12px;border-radius:999px}
+  .txtbtn:hover:not(:disabled){background:rgba(35,73,52,.07)}
+  .txtbtn.strong{color:var(--brand-dark)}
+  .txtbtn:disabled{opacity:.32;cursor:default}
+  /* De MD3-voortgangsbalk: afgeronde vulling, een gat, en een stip aan het eind. */
+  .mdbar{position:relative;height:4px;border-radius:2px;background:#CBD8BC;margin:2px 0 12px}
+  .mdbar .fill{position:absolute;left:0;top:0;height:4px;border-radius:2px;
+      background:var(--brand-dark);transition:width .28s cubic-bezier(.2,0,0,1)}
+  .mdbar .stop{position:absolute;right:0;top:0;width:4px;height:4px;border-radius:50%;
+      background:var(--brand-dark)}
+
   /* voortgangsstreepjes ipv teller (variant D) */
   .ticks{display:flex;gap:5px;align-items:center}
   .ticks i{display:block;width:18px;height:3px;border-radius:2px;background:var(--outline)}
@@ -204,17 +224,13 @@ const steps = [
 ];
 
 const variants = {
-  A:{ name:'A — teller links, pijlen rechts',
-      note:'De rustigste. De teller leest als bijschrift, de besturing zit rechts waar je duim al is. Dit is het dichtst bij wat er nu staat, alleen met een terugknop erbij.' },
-  B:{ name:'B — pijlen om de teller',
-      note:'Het meest als driver.js: ‹ 2/3 › als één geheel, gecentreerd. Je ziet in één blik waar je bent en waar je heen kunt. Overslaan schuift naar links onderin.' },
-  C:{ name:'C — balk onder de kaart',
-      note:'De besturing krijgt een eigen vlak op paper-low, gescheiden van de tekst door een lijn. Dat maakt duidelijk dat de kaart uit lezen en bedienen bestaat, maar het kost hoogte.' },
-  D:{ name:'D — streepjes in plaats van cijfers',
-      note:'Dezelfde opzet als A, maar de voortgang is een rij streepjes zoals de dagstreepjes op Home. Rijmt met de rest van de app; je moet wel tellen als je wilt weten hoeveel er nog komen.' },
+  D:{ name:'D — streepjes op papier', cls:'vd',
+      note:'Jouw keuze: de voortgang is een rij streepjes, zoals de dagstreepjes op Home. De kaart is de papieren kaart uit fase 23 — radius 20, dezelfde randkleur als een ritkaart. Rijmt met de app, maar het is een eigen vondst: MD3 kent geen stappenteller.' },
+  E:{ name:'E — Material 3 rich tooltip', cls:'ve',
+      note:'Wat MD3 er zélf voor heeft. Een rondleiding staat niet in de spec, maar de rich tooltip wel: titel, uitleg, knoppen. Dat legt andere maten op — surfaceContainer in plaats van papier, hoek 12 in plaats van 20, schaduwniveau 2. De voortgang is een determinate LinearProgressIndicator: een échte MD3-component, die Flutter 3.44 met trackGap en stopIndicator tekent.' },
 };
 
-let variant = 'A', step = 0;
+let variant = 'D', step = 0;
 
 const sw = document.getElementById('sw');
 sw.innerHTML = Object.entries(variants).map(([k,v]) =>
@@ -245,26 +261,33 @@ function render(){
   pop.className = 'pop v' + variant.toLowerCase();
 
   const first = step === 0, last = step === steps.length - 1;
-  const counter = variant === 'D'
-    ? `<span class="ticks">${steps.map((_,i)=>`<i class="${i<=step?'on':''}"></i>`).join('')}</span>`
-    : `<span class="count">${step+1} / ${steps.length}</span>`;
+  const counter = `<span class="ticks">${steps.map((_,i)=>
+      `<i class="${i<=step?'on':''}"></i>`).join('')}</span>`;
 
-  const back  = `<button class="iconbtn" ${first?'disabled':''} onclick="go(-1)" aria-label="Vorige"><i class="ph"></i></button>`;
-  const fwd   = last
-    ? `<button class="pill" onclick="done()">Klaar</button>`
-    : `<button class="iconbtn" onclick="go(1)" aria-label="Volgende"><i class="ph"></i></button>`;
+  const back = variant === 'E'
+    ? `<button class="txtbtn" ${first?'disabled':''} onclick="go(-1)">Vorige</button>`
+    : `<button class="iconbtn" ${first?'disabled':''} onclick="go(-1)" aria-label="Vorige"><i class="ph"></i></button>`;
+  const fwd = variant === 'E'
+    ? `<button class="txtbtn strong" onclick="${last?'done()':'go(1)'}">${last?'Klaar':'Volgende'}</button>`
+    : (last
+        ? `<button class="pill" onclick="done()">Klaar</button>`
+        : `<button class="iconbtn" onclick="go(1)" aria-label="Volgende"><i class="ph"></i></button>`);
   const skip  = `<button class="skip" onclick="done()">Overslaan</button>`;
 
-  let foot;
-  if (variant === 'B') {
-    foot = `${skip}<div class="nav">${back}${counter}${fwd}</div>`;
-  } else {
-    foot = `${counter}${skip}<span class="grow"></span><div class="nav">${back}${fwd}</div>`;
-  }
+  // E gebruikt de MD3-voortgangsbalk over de volle breedte in plaats van
+  // streepjes, en tekstknoppen in plaats van ronde icoonknoppen -- dat is wat
+  // een rich tooltip voorschrijft.
+  const bar = `<div class="mdbar"><div class="fill" style="width:${
+      (step)/(steps.length-1)*100}%"></div><i class="stop"></i></div>`;
+  const foot = variant === 'E'
+    ? `<div class="nav">${back}${fwd}</div><span class="grow"></span>${skip}`
+    : `${counter}${skip}<span class="grow"></span><div class="nav">${back}${fwd}</div>`;
 
   pop.innerHTML = `
     <div class="beak ${below?'':'down'}" style="left:${Math.min(Math.max(tr.left-sr.left+tr.width/2-24,12),260)}px"></div>
-    <div class="pop-head"><div class="gi"><i class="ph">${s.icon}</i></div><h3>${s.title}</h3></div>
+    ${variant === 'E' ? bar : ''}
+    <div class="pop-head">${variant === 'E' ? '' :
+        `<div class="gi"><i class="ph">${s.icon}</i></div>`}<h3>${s.title}</h3></div>
     <p>${s.body}</p>
     <div class="pop-foot">${foot}</div>`;
 
