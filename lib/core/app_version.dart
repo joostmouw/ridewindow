@@ -17,7 +17,7 @@
 // serveerde, één keer omdat een lokale build niet ververst was. Een versienaam
 // zonder buildnummer beantwoordt die vraag niet.
 const kAppVersionName = '1.0.30';
-const kAppBuildNumber = '40';
+const kAppBuildNumber = '41';
 
 /// Wat het profielscherm toont, in de vorm `<versienaam> (<buildnummer>)`.
 /// Bewust zonder concreet voorbeeld: dat zou bij elke bump verouderen.
