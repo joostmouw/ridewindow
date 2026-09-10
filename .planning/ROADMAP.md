@@ -251,7 +251,14 @@ Plans:
   3. De winkelpagina bestaat in en-GB én nl-NL met de teksten uit `docs/store-listing.md`
   4. PWA, privacybeleid en GitHub `main` tonen 1.0.31 en de naam Ridewindow
   5. `docs/testers/changelog.md` beschrijft build 41 en 42, met Ingrids daglicht-melding als eerste opgeloste feedback
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+**Wave 1**
+
+- [ ] 26-01-PLAN.md — CON-06 verification + docs/testers/changelog.md (PROOF-01)
+- [ ] 26-02-PLAN.md — CON-01: build 42 review check, Oppo Play-install wipe/verify, promote to closed testing
+- [ ] 26-03-PLAN.md — CON-02/03/04: countries, feedback address, Google Group + opt-in link
+- [ ] 26-04-PLAN.md — CON-05: nl-NL store listing translation
 
 ### Phase 27: Wervingsonderzoek
 **Goal**: Joost weet waar hij echte fietsers vandaan haalt die de app veertien dagen blijven openen, en heeft voor elk gekozen kanaal een tekst klaar om te versturen.
@@ -352,7 +359,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 23. Typografie & hiërarchie | v4.0 | quick | Complete | 2026-09-07 |
 | 24. Iconografie & eigen beeldtaal | v4.0 | quick | Complete | 2026-09-08 |
 | 25. Wrijving wegwerken | v4.0 | quick | Complete | 2026-09-08 |
-| 26. Console op orde | v4.1 | 0/TBD | Not started | - |
+| 26. Console op orde | v4.1 | 0/4 | Not started | - |
 | 27. Wervingsonderzoek | v4.1 | 0/TBD | Not started | - |
 | 28. Feedbackstroom | v4.1 | 0/TBD | Not started | - |
 | 29. Eerste minuut | v4.1 | 0/TBD | Not started | - |
