@@ -39,7 +39,7 @@
     },
     {
       "task": "Oppo terug naar een Play-installatie",
-      "description": "Op de Oppo staat een sideload 1.0.30 (31) plus een record in kloonprofiel user 10. Deïnstalleren (adb uninstall + adb shell pm uninstall --user 10 ridewindow.joost.amsterdam) wist lokale data; ingelogd komt profiel/week/ritten terug uit de cloud. Vraag Joost eerst om akkoord. Daarna 42 via de internal-link installeren en de korte intro bij de eerste start zien.",
+      "description": "Op de Oppo staat sinds 22:50 een sideload 1.0.31 (42), over 31 heen geïnstalleerd met behoud van data (Joost wilde hem eerst als APK zien), plus een record in kloonprofiel user 10. Deïnstalleren (adb uninstall + adb shell pm uninstall --user 10 ridewindow.joost.amsterdam) wist lokale data; ingelogd komt profiel/week/ritten terug uit de cloud. Vraag Joost eerst om akkoord. Daarna 42 via de internal-link installeren en de korte intro bij de eerste start zien.",
       "owner": "Claude, na akkoord"
     },
     {

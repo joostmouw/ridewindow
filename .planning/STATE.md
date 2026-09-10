@@ -28,7 +28,7 @@ punten in `HANDOFF.json`.
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt |
 | main | 1.0.31+42, **niet gepusht** (origin ~45 achter) |
 | PWA live | nog oud (RideWindow); `build/web` lokaal op 8766 is 42 |
-| Oppo | sideload 1.0.30 (31) + record in kloonprofiel user 10 |
+| Oppo | sideload **1.0.31 (42)** via `adb install -r` (data behouden) + record in kloonprofiel user 10 |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
 feedbackstroom als eigen fases · schets 013 stand A+B (zonder vertraging) in build 43.
