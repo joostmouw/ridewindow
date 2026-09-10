@@ -1,57 +1,72 @@
 {
-  "timestamp": "2026-09-10T09:45:00.000Z",
-  "reason": "Joost wist de context om als nieuwe epic met #71 (testers werven) te beginnen",
-  "phase": "v4.0 afgerond en uitgeleverd; volgende is epic #71 'Twaalf testers'",
+  "timestamp": "2026-09-10T21:15:00.000Z",
+  "reason": "Joost wist de context en gaat verder met /gsd-plan-phase 26",
+  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store' — fase 26 'Console op orde' is de eerstvolgende",
   "position": {
-    "last_commit": "6c1ea15",
-    "last_activity": "Schets 010 stand 3 gebouwd en uitgeleverd; winkelmateriaal vernieuwd; epic #71 opgezet"
+    "last_commit": "zie git log — handoff-commit volgt op 8149b35",
+    "last_activity": "Milestone v4.1 opgezet in GSD (7 fases, 26 requirements), 41 live in de gesloten test, winkelpagina gepubliceerd, schets 013 gekozen (A+B)"
   },
   "start_here": [
-    ".planning/TESTERS.md — de nieuwe epic, begin daar",
-    ".planning/OPEN.md — alles wat nog openstaat",
-    ".planning/STATE.md — waar wat live staat"
+    "/gsd-plan-phase 26 — dat is wat Joost wil als eerste commando",
+    ".planning/ROADMAP.md — fase 26 t/m 32, met succescriteria",
+    ".planning/REQUIREMENTS.md — 26 requirements (CON, WERV, FEED, EERST, WIN, PROOF)",
+    ".planning/STATE.md — blok 'Stand na 2026-09-10 avond' bovenaan"
   ],
+  "live_on_play": {
+    "closed_testing_alpha": "41 (1.0.30), live sinds 2026-09-10 22:30 — dit is de track die Google telt",
+    "internal_testing": "40 (1.0.30) — 42 moet er nog op",
+    "store_listing": "gepubliceerd 2026-09-10: naam Ridewindow, nieuwe korte + lange omschrijving (en-GB), RW-icoon, 5 screenshots op 9:16, nieuwe feature graphic 06_banner. Alleen en-GB; nl-NL ontbreekt",
+    "testers": "2 aangemeld (Google's teller), 9 adressen in lijst 'First Testers RideWindow', geen Google Group",
+    "countries": "gesloten test alleen BE, IT, NL, UK, US",
+    "feedback_address": "leeg",
+    "managed_publishing": "uit — opslaan in de listing gaat direct naar review en live"
+  },
   "completed_this_session": [
-    "Migratie 0007 door Joost gedraaid in het Supabase-dashboard; daarmee viel de blokkade van drie dagen weg",
-    "Schets 010 stand 3 gebouwd (1bf942d): de vier oordelen heten Toprit / Fijne rit / Te doen / Binnenblijver, Peloton terug als tabnaam met introductie",
-    "Consistentiesweep vond drie afgedreven woordenlijsten: tier*Agenda (opgeheven), widget_update_service (zei 'Geweldig' waar de app 'Goed' zei), notification_service (naslepers van schets 009)",
-    "Peloton-introductie bereikte uitgelogde gebruikers niet -- gerepareerd in 36b56f0, gevonden door de app vers te installeren",
-    "PWA gedeployed en Play-bundel gebouwd op 1.0.30+41",
-    "Vijf nieuwe winkel-screenshots vanaf de Oppo, en beide winkelomschrijvingen herschreven (0704c39)",
-    "Epic #71 'Twaalf testers' opgezet (6c1ea15)"
+    "Play Console uitgelezen en opgeruimd: build 41 naar de gesloten test, winkelpagina volledig vernieuwd en door de review",
+    "Naam wordt Ridewindow (Joosts keuze in de Console), overal doorgevoerd waar een gebruiker hem ziet (a28886f); klassenamen en toegepaste migraties bewust niet",
+    "Intro twee keer zo kort: 2,47 s (059e352), gezien en goedgekeurd door Joost",
+    "1.0.31+42 gebouwd (7f29940): ~/Desktop/ridewindow-1.0.31-42.aab, manifest-label Ridewindow",
+    "Milestone v4.1 in GSD: PROJECT.md, STATE.md, REQUIREMENTS.md, ROADMAP.md (2ec41e3, d084b2b, 03f6d46); v3.0-requirements gearchiveerd",
+    "Schets 013 'fietser bij verversen': Joost koos A+B (volgt de vinger, fietst na het laden weg) — gemeten zonder vertraging; gaat als EERST-04 mee in build 43 (fase 29)",
+    "Release-notes herschreven voor 42 (naam + kortere intro)"
   ],
   "blockers": [],
-  "remaining": [
+  "remaining_before_phase_26_planning": [
     {
-      "task": "Play Console-ronde",
-      "description": "Bundel ~/Desktop/ridewindow-1.0.30-41.aab uploaden. Daarnaast drie dingen in de store listing die alleen daar kunnen: het app-icoon is nog een plaatsaanduiding (kalender met potlood) terwijl het echte icoon in docs/play-store-icon-512.png staat; de vijf screenshots vervangen door die uit ~/Desktop/ridewindow-store/; en beide omschrijvingen overnemen uit docs/store-listing.md. De feature graphic (docs/feature-graphic.png) is ook nog van 21 juni.",
-      "priority": "hoog"
+      "task": "42 naar internal testing",
+      "description": "Joost sleept ~/Desktop/ridewindow-1.0.31-42.aab in Test and release → Testing → Internal testing → Create new release; release-notes staan in release-notes/. Bundel is 69 MB: via browser-automatisering kan het niet (10 MB-grens), dus altijd Joost.",
+      "owner": "Joost"
     },
     {
-      "task": "Epic #71 -- eerste open vraag beantwoorden",
-      "description": "Hoeveel mensen kan Joost realistisch persoonlijk vragen om te testen? Dat getal bepaalt hoe groot de opvulling via r/AndroidClosedTesting moet zijn. Zie .planning/TESTERS.md, spoor 1.",
-      "priority": "hoog"
+      "task": "Oppo terug naar een Play-installatie",
+      "description": "Op de Oppo staat een sideload 1.0.30 (31) plus een record in kloonprofiel user 10. Deïnstalleren (adb uninstall + adb shell pm uninstall --user 10 ridewindow.joost.amsterdam) wist lokale data; ingelogd komt profiel/week/ritten terug uit de cloud. Vraag Joost eerst om akkoord. Daarna 42 via de internal-link installeren en de korte intro bij de eerste start zien.",
+      "owner": "Claude, na akkoord"
     },
     {
-      "task": "Op de Oppo verifieren",
-      "description": "De telefoon meldt zich niet meer op USB, ook niet als 'unauthorized'. adb-daemon draait wel. Check de USB-modus (ColorOS valt terug op 'alleen opladen') en of er een foutopsporingsdialoog op het scherm staat. De release-APK (1.0.30+41) staat klaar in build/app/outputs/flutter-apk/. Let op: er stond eerder een lokaal ondertekende build op; Play kan die niet bijwerken, dus eerst deinstalleren om terug te gaan naar de Play-versie.",
-      "priority": "medium"
+      "task": "GitHub pushen",
+      "description": "origin/main loopt ~45 commits achter (tot sketch 008 van 8 sept). Joost heeft nog geen akkoord gegeven — vraag het.",
+      "owner": "Claude, na akkoord"
+    },
+    {
+      "task": "Android developer verification",
+      "description": "Console-melding: registreren vóór 30 sept 2026. Handhaving eerst alleen in Brazilië, Indonesië, Singapore, Thailand; wereldwijd 2027. Play-apps zijn meestal automatisch geregistreerd; het menu-item heeft een stipje — controleren. Relevant omdat de gesloten test voor alle landen opengaat. Hoort in fase 26.",
+      "owner": "Joost kijkt, of fase 26"
     }
   ],
-  "open_backlog": [
-    "#63 iPhone-tester komt niet terug uit beschikbaarheid",
-    "#66 afgezegde ritten onbereikbaar",
-    "#67 notificaties hardgecodeerd Nederlands",
-    "#69 groene blok in plaats van losse vensters",
-    "#70 waarom dit venster en niet dat ernaast",
-    "#71 epic Twaalf testers -- NIEUW, de volgende stap"
+  "decisions_this_session": [
+    "Merknaam Ridewindow (kleine w) — Joost",
+    "Elke build eerst via internal testing (door Play ondertekend, zelf getest), dan promoten naar closed — CON-01",
+    "Eigen kring (6) stapt direct in; kanalen met onbekenden pas na build 43 met de eerste-minuut-fixes",
+    "Wervingsonderzoek is een eigen fase (27), niet ad hoc — Joost",
+    "Feedback wordt een gestructureerde stroom met beoordelingsronde naar de backlog (fase 28) — Joost",
+    "Schets 013: stand A+B, want zonder vertraging — Joost",
+    "AI-asset-label in de Console: niet labelen — Joost"
   ],
-  "uncommitted_files": [],
   "notes": [
-    "LES DIE TWEE UPLOADS KOSTTE: de git-historie is geen betrouwbare bron voor wat er op Play staat. Commit 2293358 zei '1.0.29+30 klaargezet -- niet geupload', maar Play weigerde zowel code 30 als 31. Versiecodes zijn daar permanent bezet, ook van gearchiveerde releases. De App bundle explorer in de Console is de enige echte bron. Daarom staat de build nu op 41.",
-    "Een verse installatie start in de taal van het toestel (profile_notifier.dart:196). Dat is correct gedrag, maar het betekent dat een Nederlandse tester met een Engelstalig toestel een Engelse app krijgt. Relevant voor epic #71.",
-    "Schets 012 (logo) staat in .planning/sketches/012-logo/ maar is VRIJBLIJVEND. Er is niets mis met het bestaande logo; het probleem was dat het niet in de Play-listing stond. Twee van de vijf geschetste richtingen vielen af bij het bekijken op 48 pixels.",
-    "570 tests groen, nul analyzer-fouten op het laatste commit.",
-    "Webservers draaiden op 8765 (repo-root, schetsen) en 8766 (build/web). Herstart ze als je een schets wilt openen."
+    "Onderzoek dat al gedaan is (input voor fase 27/32): sinds april 2026 wijst Google aanvragen af op gebrek aan tester-gebruik; een afhaker die het aantal onder 12 brengt pauzeert/reset de klok; de aanvraag stelt ~9 vragen, 250+ tekens per antwoord, 2–3 updates tijdens de 14 dagen helpen. LinkedIn-vacature 'vrijwillige tester' leverde bij Rocket Form 220 aanmeldingen (indiehackers.com).",
+    "Play-screenshots moeten binnen 2:1 blijven: de Oppo-screenshots (1272×2772) zijn op 1560×2772 gezet met een brandLight-rand; die staan in ~/Desktop/ridewindow-store/upload-naar-play/.",
+    "De bundel 41 in de gesloten test heeft nog de oude naam RideWindow onder het icoon; 42 lost dat op.",
+    "Webservers: 8765 (repo-root: schetsen en .planning/testers/*.html) en 8766 (build/web, versie 1.0.31+42). Intro zien: nieuw incognitovenster op localhost:8766.",
+    "Suite: alles groen behalve de bekende klokafhankelijke notificatietest na 19:00 UTC."
   ]
 }

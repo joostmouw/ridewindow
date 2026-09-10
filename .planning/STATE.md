@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
-status: planning
+status: "v4.1: 41 live in closed, 42 klaar voor internal"
 last_updated: "2026-09-10T20:22:54.994Z"
 last_activity: 2026-09-10
 progress:
@@ -14,6 +14,24 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-09-10 avond — lees dit eerst
+
+**Milestone v4.1 "Zo snel mogelijk live in de store"** is opgezet in GSD: fases 26–32, 26 requirements
+(`REQUIREMENTS.md`, `ROADMAP.md`). Eerstvolgende commando: **`/gsd-plan-phase 26`**. Details en open
+punten in `HANDOFF.json`.
+
+| Waar | Stand |
+|---|---|
+| Play closed testing (Alpha) | **41 (1.0.30)**, live 22:30 — de track die Google telt; 2 testers aangemeld |
+| Play internal testing | 40 — **42 (1.0.31) moet er nog op** (Joost sleept, 69 MB) |
+| Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt |
+| main | 1.0.31+42, **niet gepusht** (origin ~45 achter) |
+| PWA live | nog oud (RideWindow); `build/web` lokaal op 8766 is 42 |
+| Oppo | sideload 1.0.30 (31) + record in kloonprofiel user 10 |
+
+**Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
+feedbackstroom als eigen fases · schets 013 stand A+B (zonder vertraging) in build 43.
 
 ## Quick Tasks Completed
 

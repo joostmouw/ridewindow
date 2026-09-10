@@ -1,10 +1,4 @@
-New: the score now accounts for daylight. A window that falls after sunset no
-longer scores perfect, and you decide how much darkness weighs.
+The app is now called Ridewindow, spelled the same everywhere: under the icon,
+in the store and in the app.
 
-The four verdicts have names now: Top ride, Good ride, Doable and Indoor day.
-
-Your rides sit in one list in the order your week runs, showing your part in
-each: you organise it, you join, or you ride alone. Invitations are answered
-straight from the list.
-
-Fixed: unreadable text on the opening screen in dark mode.
+The opening animation is twice as short: 2.5 seconds instead of 5.
