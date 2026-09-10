@@ -13,8 +13,8 @@
     ".planning/STATE.md — blok 'Stand na 2026-09-10 avond' bovenaan"
   ],
   "live_on_play": {
-    "closed_testing_alpha": "41 (1.0.30), live sinds 2026-09-10 22:30 — dit is de track die Google telt",
-    "internal_testing": "40 (1.0.30) — 42 moet er nog op",
+    "closed_testing_alpha": "41 (1.0.30) live; 42 (1.0.31) in review sinds ±23:15 — dit is de track die Google telt",
+    "internal_testing": "42 (1.0.31), live sinds 2026-09-10 23:09",
     "store_listing": "gepubliceerd 2026-09-10: naam Ridewindow, nieuwe korte + lange omschrijving (en-GB), RW-icoon, 5 screenshots op 9:16, nieuwe feature graphic 06_banner. Alleen en-GB; nl-NL ontbreekt",
     "testers": "2 aangemeld (Google's teller), 9 adressen in lijst 'First Testers RideWindow', geen Google Group",
     "countries": "gesloten test alleen BE, IT, NL, UK, US",
@@ -29,14 +29,15 @@
     "Milestone v4.1 in GSD: PROJECT.md, STATE.md, REQUIREMENTS.md, ROADMAP.md (2ec41e3, d084b2b, 03f6d46); v3.0-requirements gearchiveerd",
     "Schets 013 'fietser bij verversen': Joost koos A+B (volgt de vinger, fietst na het laden weg) — gemeten zonder vertraging; op de backlog als #72 (nice to have)",
     "Release-notes herschreven voor 42 (naam + kortere intro)",
-    "PWA 1.0.31+42 gedeployd en hash-geverifieerd; GitHub gepusht (c8e7e6b), Pages-privacybeleid zegt Ridewindow"
+    "PWA 1.0.31+42 gedeployd en hash-geverifieerd; GitHub gepusht (c8e7e6b), Pages-privacybeleid zegt Ridewindow",
+    "42 op internal testing live (23:09) en ingestuurd voor closed testing; het concept met de mislukte upload en de foute naam \"41 (1.0.31)\" is hersteld via Add from library"
   ],
   "blockers": [],
   "remaining_before_phase_26_planning": [
     {
-      "task": "42 op internal én closed zetten",
-      "description": "Bundel 42 staat al in de bibliotheek (geüpload 22:45, Inactive); opnieuw uploaden geeft \"Version code 42 has already been used\". In beide lege concepten (Internal testing en Closed testing - Alpha): Add from library → 42 → release-notes uit release-notes/ → Save → Start rollout (internal) / Send for review (closed).",
-      "owner": "Joost"
+      "task": "Review van 42 op closed afwachten",
+      "description": "Publishing overview toont 42 (1.0.31) in review voor Closed testing - Alpha. Na goedkeuring: controleren dat de bundel op Active staat en de gesloten test 42 serveert.",
+      "owner": "Google, dan Claude controleert"
     },
     {
       "task": "Oppo terug naar een Play-installatie",

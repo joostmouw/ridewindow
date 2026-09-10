@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
-status: "v4.1: 41 live in closed, 42 klaar voor internal"
+status: "v4.1: 42 live op internal, in review voor closed"
 last_updated: "2026-09-10T20:22:54.994Z"
 last_activity: 2026-09-10
 progress:
@@ -23,8 +23,8 @@ punten in `HANDOFF.json`.
 
 | Waar | Stand |
 |---|---|
-| Play closed testing (Alpha) | **41 (1.0.30)**, live 22:30 — de track die Google telt; 2 testers aangemeld |
-| Play internal testing | 40 — **42 (1.0.31) moet er nog op** (Joost sleept, 69 MB) |
+| Play closed testing (Alpha) | 41 live; **42 (1.0.31) in review** sinds ±23:15 — de track die Google telt; 2 testers aangemeld |
+| Play internal testing | **42 (1.0.31)**, live sinds 23:09 |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt |
 | main | 1.0.31+42, gepusht (c8e7e6b) |
 | PWA live | **1.0.31 (42)**, hash-geverifieerd 2026-09-10; privacybeleid op GitHub Pages zegt Ridewindow |
