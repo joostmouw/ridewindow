@@ -9,33 +9,35 @@
   :root{ --brand-light:#C5D4B6; --brand-dark:#234934; --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-high:#E4EAD7;
     --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60; --outline:#A9B79C; }
   *{box-sizing:border-box}
-  body{margin:0;padding:30px 24px 80px;background:var(--paper-low);color:var(--ink);font-family:'Outfit',system-ui,sans-serif}
-  .wrap{max-width:1180px;margin:0 auto}
+  body{margin:0;padding:28px 22px 80px;background:var(--paper-low);color:var(--ink);font-family:'Outfit',system-ui,sans-serif}
+  .wrap{max-width:1200px;margin:0 auto}
   .kicker{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3)}
-  h1{font-size:32px;font-weight:500;margin:4px 0 6px}
+  h1{font-size:30px;font-weight:500;margin:4px 0 6px}
   h2{font-size:20px;font-weight:500;margin:36px 0 8px;padding-top:18px;border-top:1px solid var(--outline)}
-  .lede{font-size:15.5px;line-height:1.55;color:var(--ink-2);max-width:88ch;margin:0}
+  .lede{font-size:15px;line-height:1.55;color:var(--ink-2);max-width:92ch;margin:0}
   b{font-weight:600;color:var(--ink)}
   code{font-size:.9em;background:var(--paper-high);border-radius:5px;padding:1px 5px}
-
-  .row{display:flex;gap:28px;flex-wrap:wrap;margin-top:22px;align-items:flex-start}
-  .col{width:300px}
-  .col h3{font-size:17px;margin:0 0 2px}
-  .col .how{font-size:13px;color:var(--ink-3);margin:0 0 10px;min-height:36px;line-height:1.4}
-  .phone{position:relative;width:300px;height:654px;border-radius:34px;overflow:hidden;background:var(--paper);
-         box-shadow:0 0 0 8px #1d2320, 0 18px 40px rgba(0,0,0,.25);touch-action:none;user-select:none}
+  .bar{display:flex;gap:10px;align-items:center;margin-top:16px}
+  button{font:inherit;font-size:13px;border:1px solid var(--brand-dark);background:var(--paper);color:var(--brand-dark);
+         border-radius:999px;padding:6px 14px;cursor:pointer}
+  button.primary{background:var(--brand-dark);color:var(--paper)}
+  .row{display:flex;gap:22px;flex-wrap:wrap;margin-top:18px;align-items:flex-start}
+  .col{width:262px}
+  .col h3{font-size:16px;margin:0 0 2px}
+  .col .how{font-size:12.5px;color:var(--ink-3);margin:0 0 10px;min-height:52px;line-height:1.4}
+  .col .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:999px;
+            padding:2px 8px;background:var(--paper-high);color:var(--ink-2);margin-bottom:6px}
+  .phone{position:relative;width:262px;height:571px;border-radius:30px;overflow:hidden;background:var(--paper);cursor:grab;
+         box-shadow:0 0 0 7px #1d2320, 0 16px 36px rgba(0,0,0,.25);touch-action:none;user-select:none}
+  .phone:active{cursor:grabbing}
   .content{position:absolute;inset:0;background:url('home.png') top center/100% auto no-repeat;will-change:transform}
   .gap{position:absolute;left:0;right:0;top:0;height:0;background:var(--paper)}
-  .rider{position:absolute;top:0;left:0;width:58px;height:54px;will-change:transform}
+  .rider{position:absolute;top:0;left:0;will-change:transform;pointer-events:none}
   .lines line{stroke:var(--brand-dark);stroke-linecap:round;opacity:.5}
-  .spinner{position:absolute;left:50%;top:0;width:40px;height:40px;margin-left:-20px;border-radius:50%;background:#fff;
-           box-shadow:0 2px 6px rgba(0,0,0,.25);display:grid;place-items:center;opacity:0}
-  .spinner i{width:24px;height:24px;border-radius:50%;border:3px solid var(--brand-dark);border-right-color:transparent;display:block}
-  .hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;color:#fff;
-        background:rgba(35,73,52,.85);margin:0 40px;border-radius:999px;padding:6px 10px;pointer-events:none}
-  button{font:inherit;font-size:13px;margin-top:12px;border:1px solid var(--brand-dark);background:var(--paper);color:var(--brand-dark);
-         border-radius:999px;padding:6px 14px;cursor:pointer}
-
+  .spinner{position:absolute;left:50%;top:0;width:38px;height:38px;margin-left:-19px;border-radius:50%;background:#fff;
+           box-shadow:0 2px 6px rgba(0,0,0,.25);display:grid;place-items:center;opacity:0;pointer-events:none}
+  .spinner i{width:22px;height:22px;border-radius:50%;border:3px solid var(--brand-dark);border-right-color:transparent;display:block}
+  .col button{margin-top:12px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media (max-width:900px){.grid{grid-template-columns:1fr}}
   .card{background:var(--paper);border:1px solid var(--outline);border-radius:20px;padding:16px 18px}
@@ -44,25 +46,24 @@
 </style>
 </head>
 <body><div class="wrap">
-<div class="kicker">Schets 013 · idee van Joost, 10 september</div>
+<div class="kicker">Schets 013 · idee van Joost, 10 september · gaat mee in build 43</div>
 <h1>De fietser komt terug bij het verversen</h1>
-<p class="lede">Trek je Home omlaag om het weer te verversen, dan fietst het mannetje uit de intro in volle vaart het beeld in, op de plek waar nu het laadrondje draait. Zo komt het merk vaker terug dan alleen bij de eerste start. Speel de drie naast elkaar af: <b>nu</b>, <b>A</b> (hij komt binnenfietsen) en <b>B</b> (trekken is trappen: sleep zelf).</p>
+<p class="lede">Elke telefoon kun je zelf <b>met de muis omlaag slepen</b>, zoals je Home omlaag trekt. Laat je los voorbij de drempel, dan ververst hij. Of druk op <b>Laat zien</b>. Met de knop hieronder spelen alle vier tegelijk af, zodat je ze naast elkaar ziet.</p>
+<div class="bar"><button class="primary" onclick="phones.forEach(p=>p.auto())">▶ Speel alle vier tegelijk</button><span style="font-size:13px;color:var(--ink-3)">Het verversen duurt in de demo 1,8 seconde. In het echt is dat zolang Open-Meteo erover doet.</span></div>
 
 <div class="row">
-  <div class="col">
-    <h3>Nu</h3><p class="how">Het standaard Material-rondje, zoals Home en Peloton het vandaag doen.</p>
+  <div class="col"><span class="tag">Ijkpunt</span><h3>Nu</h3><p class="how">Het standaard Material-rondje dat Home en Peloton vandaag tonen.</p>
     <div class="phone" id="p0"><div class="gap"></div><div class="content"></div><div class="spinner"><i></i></div></div>
-  </div>
-  <div class="col">
-    <h3>A · Hij komt binnenfietsen</h3><p class="how">Loslaten, dan fietst hij snel van links naar het midden. Hij trapt door zolang er geladen wordt en rijdt rechts weg als het klaar is.</p>
+    <button onclick="phones[0].auto()">Laat zien</button></div>
+  <div class="col"><span class="tag">Stand A</span><h3>Binnenfietsen</h3><p class="how">Tijdens het trekken nog niets. Na loslaten fietst hij snel van links binnen, trapt tijdens het laden, en rijdt rechts weg.</p>
     <div class="phone" id="pA"><div class="gap"></div><div class="content"></div></div>
-    <button onclick="demoA.restart()">Nog eens</button>
-  </div>
-  <div class="col">
-    <h3>B · Trekken is trappen</h3><p class="how">Hoe verder je trekt, hoe verder hij fietst en hoe harder de wielen draaien. Laat los voorbij de drempel, dan ververst hij.</p>
-    <div class="phone" id="pB"><div class="gap"></div><div class="content"></div><div class="hint">Sleep met de muis omlaag</div></div>
-    <button onclick="demoB.auto()">Laat zien</button>
-  </div>
+    <button onclick="phones[1].auto()">Laat zien</button></div>
+  <div class="col"><span class="tag">Stand B</span><h3>Trekken is trappen</h3><p class="how">Hij volgt je vinger: hoe verder je trekt, hoe verder hij fietst. Na loslaten trapt hij ter plekke en verdwijnt met de inhoud mee omhoog.</p>
+    <div class="phone" id="pB"><div class="gap"></div><div class="content"></div></div>
+    <button onclick="phones[2].auto()">Laat zien</button></div>
+  <div class="col"><span class="tag">Stand A + B</span><h3>Volgen, dan wegrijden</h3><p class="how">Tijdens het trekken volgt hij je vinger (B). Na loslaten trapt hij door en rijdt hij in volle vaart rechts weg als het klaar is (A).</p>
+    <div class="phone" id="pC"><div class="gap"></div><div class="content"></div></div>
+    <button onclick="phones[3].auto()">Laat zien</button></div>
 </div>
 
 <h2>Wat eerlijk gezegd moet worden</h2>
@@ -70,93 +71,76 @@
   <div class="card"><h3>In de bron zit geen trapbeweging</h3><ul>
     <li>De intro eindigt met een <b>stilstaande</b> fietser. Vanaf frame 167 van de 206 verandert er vrijwel niets meer (gemeten)</li>
     <li>Deze mockup doet alsof: het uitgeknipte eindbeeld, een lichte op-en-neerbeweging, en <b>getekende spaken</b> die in de wielen draaien. Zonder spaken zie je geen verschil tussen een draaiend en een stilstaand wiel (backlog #52)</li>
-    <li>Wil je trappende benen, dan is dezelfde fietser nodig als <b>tekening in lagen</b>: lijf, benen en wielen apart. Dat is route (b) uit #52. Laat je die maken (Gemini), dan kan het precies</li>
+    <li>Wil je trappende benen, dan is dezelfde fietser nodig als <b>tekening in lagen</b>: lijf, benen en wielen apart. Dat is route (b) uit #52</li>
   </ul></div>
   <div class="card"><h3>Wat het in de app vraagt</h3><ul>
     <li>Flutters <code>RefreshIndicator</code> laat zijn rondje niet vervangen. Een eigen indicator kost een scroll-luisteraar, of het pakket <code>custom_refresh_indicator</code> (een nieuwe afhankelijkheid, af te wegen)</li>
     <li>Twee plekken, en die moeten hetzelfde doen: Home (<code>home_screen.dart:218</code>) en Peloton (<code>buddies_tab.dart:113</code>)</li>
     <li>Staat "minder beweging" aan in Android, dan een stilstaande fietser en geen gerace</li>
-    <li>Past niet op het kritieke pad van v4.1, maar wel prima als zichtbare build tijdens de 14 dagen (fase 31), of als backlog-item</li>
+    <li>Gepland in fase 29, en gaat dus mee in build 43 (requirement <code>EERST-04</code>)</li>
   </ul></div>
 </div>
 </div>
 
 <script>
-const RIDER_W=58, RIDER_H=54, VB_W=354, VB_H=330;
+const W=262, RIDER_W=54, VB_W=354, VB_H=330, RIDER_H=RIDER_W*VB_H/VB_W;
 const WHEELS=[[70,260],[284,260]], SPOKE_R=46;
-function riderSVG(){
-  const ns='http://www.w3.org/2000/svg';
-  const svg=document.createElementNS(ns,'svg');
-  svg.setAttribute('viewBox',`-60 0 ${VB_W+60} ${VB_H}`); svg.setAttribute('class','rider');
-  svg.style.width=(RIDER_W*(VB_W+60)/VB_W)+'px'; svg.style.height=RIDER_H+'px';
-  const lines=document.createElementNS(ns,'g'); lines.setAttribute('class','lines');
-  [[150,-50,120],[200,-56,95],[250,-50,120]].forEach(([y,x1,len])=>{const l=document.createElementNS(ns,'line');
-    l.setAttribute('x1',x1);l.setAttribute('x2',x1+len*0.6);l.setAttribute('y1',y);l.setAttribute('y2',y);l.setAttribute('stroke-width',14);lines.appendChild(l);});
-  svg.appendChild(lines);
-  const body=document.createElementNS(ns,'g');
-  const img=document.createElementNS(ns,'image'); img.setAttribute('href','rider.png'); img.setAttribute('width',VB_W); img.setAttribute('height',VB_H);
-  body.appendChild(img);
-  const spokes=WHEELS.map(([cx,cy])=>{const g=document.createElementNS(ns,'g');
-    for(let k=0;k<4;k++){const l=document.createElementNS(ns,'line'); const a=k*Math.PI/4;
-      l.setAttribute('x1',cx-SPOKE_R*Math.cos(a));l.setAttribute('y1',cy-SPOKE_R*Math.sin(a));
-      l.setAttribute('x2',cx+SPOKE_R*Math.cos(a));l.setAttribute('y2',cy+SPOKE_R*Math.sin(a));
-      l.setAttribute('stroke','#234934');l.setAttribute('stroke-width',6);l.setAttribute('stroke-linecap','round');g.appendChild(l);}
-    body.appendChild(g); return g;});
-  svg.appendChild(body);
-  return {svg, body, spokes, lines};
+const PULL=88, TH=72, MAX=104, CENTER=(W-RIDER_W)/2, REFRESH=1.8;
+const ease=t=>1-Math.pow(1-t,3), easeIn=t=>t*t*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ns='http://www.w3.org/2000/svg';
+function el(tag,attrs){const e=document.createElementNS(ns,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function makeRider(host){
+  const svg=el('svg',{viewBox:`-70 0 ${VB_W+70} ${VB_H}`,class:'rider'});
+  svg.style.width=(RIDER_W*(VB_W+70)/VB_W)+'px'; svg.style.height=RIDER_H+'px'; svg.style.marginLeft=(-RIDER_W*70/VB_W)+'px';
+  const lines=el('g',{class:'lines'});
+  [[150,-64,84],[200,-70,70],[250,-64,84]].forEach(([y,x,len])=>lines.appendChild(el('line',{x1:x,x2:x+len,y1:y,y2:y,'stroke-width':14})));
+  const body=el('g',{}); body.appendChild(el('image',{href:'rider.png',width:VB_W,height:VB_H}));
+  const spokes=WHEELS.map(([cx,cy])=>{const g=el('g',{});for(let k=0;k<4;k++){const a=k*Math.PI/4;
+    g.appendChild(el('line',{x1:cx-SPOKE_R*Math.cos(a),y1:cy-SPOKE_R*Math.sin(a),x2:cx+SPOKE_R*Math.cos(a),y2:cy+SPOKE_R*Math.sin(a),stroke:'#234934','stroke-width':6,'stroke-linecap':'round'}));}
+    body.appendChild(g);return g;});
+  svg.append(lines,body); host.appendChild(svg);
+  return {set(x,y,ang,bob,speedLines,opacity=1){svg.style.transform=`translate(${x}px,${y}px)`;svg.style.opacity=opacity;
+    body.setAttribute('transform',`translate(0,${bob})`);
+    spokes.forEach((g,i)=>g.setAttribute('transform',`rotate(${ang} ${WHEELS[i][0]} ${WHEELS[i][1]})`));
+    lines.style.opacity=clamp(speedLines,0,1);}};
 }
-function setRider(r, x, y, angle, bob, speed){
-  r.svg.style.transform=`translate(${x}px,${y}px)`;
-  r.body.setAttribute('transform',`translate(0,${bob})`);
-  r.spokes.forEach((g,i)=>g.setAttribute('transform',`rotate(${angle} ${WHEELS[i][0]} ${WHEELS[i][1]})`));
-  r.lines.style.opacity=Math.min(1,speed);
+
+function makePhone(id, variant){
+  const p=document.getElementById(id), content=p.querySelector('.content'), gap=p.querySelector('.gap');
+  const spinner=p.querySelector('.spinner'); const rider=variant==='now'?null:makeRider(p);
+  const follow=(variant==='B'||variant==='C'), exitRide=(variant==='A'||variant==='C');
+  let pull=0, prevPull=0, dragging=false, y0=0, mode='idle', t0=0, t1=0, ang=0, last=performance.now(), x=-100, autoRun=null;
+  const startRefresh=()=>{mode='refresh';t0=performance.now();};
+  const release=()=>{if(!dragging)return;dragging=false; if(pull>=TH)startRefresh(); else {mode='back';t0=performance.now();}};
+  p.addEventListener('pointerdown',e=>{if(mode!=='idle')return;dragging=true;y0=e.clientY;p.setPointerCapture(e.pointerId);});
+  p.addEventListener('pointermove',e=>{if(dragging)pull=clamp((e.clientY-y0)*.55,0,MAX);});
+  p.addEventListener('pointerup',release); p.addEventListener('pointercancel',release);
+  function frame(now){
+    const dt=Math.min(.05,(now-last)/1000); last=now; let speed=0, y, op=1, spinOp=0;
+    if(autoRun){const k=clamp((now-autoRun)/650,0,1); pull=MAX*.85*ease(k); if(k>=1){autoRun=null;startRefresh();}}
+    const auto=!!autoRun;
+    if(mode==='idle'&&(dragging||auto)){ x=follow? -100+(CENTER+100)*clamp(pull/TH,0,1) : -100; if(follow)ang+=(pull-prevPull)*9; spinOp=clamp(pull/TH,0,1); }
+    else if(mode==='idle'){ x=-100; }
+    if(mode==='back'){const k=clamp((now-t0)/260,0,1); pull=pull*(1-ease(k)); if(follow)x=-100+(CENTER+100)*clamp(pull/TH,0,1); if(k>=1){pull=0;mode='idle';}}
+    if(mode==='refresh'){const t=(now-t0)/1000; pull+=(PULL-pull)*clamp(dt*10,0,1); spinOp=1;
+      if(!follow&&t<.5){const k=ease(t/.5); x=-100+(CENTER+100)*k; speed=1.6-k;} else {x+= (CENTER-x)*clamp(dt*12,0,1); speed=.8;}
+      if(t>REFRESH){mode='exit';t1=now;}}
+    if(mode==='exit'){const t=(now-t1)/1000;
+      if(exitRide){ if(t<.45){const k=easeIn(t/.45); x=CENTER+(W+50-CENTER)*k; speed=.8+k*1.2; pull=PULL;}
+                    else {const k=clamp((t-.45)/.35,0,1); pull=PULL*(1-ease(k)); x=W+60; if(k>=1){pull=0;mode='idle';x=-100;}} }
+      else { const k=clamp(t/.4,0,1); pull=PULL*(1-ease(k)); speed=.8; op=1-k; if(k>=1){pull=0;mode='idle';x=-100;} }
+      spinOp=1-clamp(t/.4,0,1);}
+    ang+=dt*speed*1300; prevPull=pull;
+    content.style.transform=`translateY(${pull}px)`; gap.style.height=pull+'px';
+    if(rider){ y=pull/2-RIDER_H/2+2; const moving=(mode==='refresh'||mode==='exit'||((dragging||auto)&&follow&&pull>4));
+      rider.set(x,y,ang,moving?Math.sin(now/60)*3:0,speed-1,op); }
+    if(spinner){ spinner.style.opacity=spinOp; spinner.style.transform=`translateY(${pull*.9-12}px)`; spinner.querySelector('i').style.transform=`rotate(${now/2.2%360}deg)`; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  return {auto(){ if(mode==='idle'&&!dragging&&!autoRun) autoRun=performance.now(); }};
 }
-const PULL=96, SW=300, CENTER=(SW-RIDER_W)/2, RIDER_Y=(PULL-RIDER_H)/2+4;
-const ease=t=>1-Math.pow(1-t,3), easeIn=t=>t*t*t;
-function phoneParts(id){const p=document.getElementById(id);return{p,content:p.querySelector('.content'),gap:p.querySelector('.gap')};}
-function setPull(ph,px){ph.content.style.transform=`translateY(${px}px)`; ph.gap.style.height=px+'px';}
-
-// ── Nu: het gewone rondje ─────────────────────────────
-(function(){const ph=phoneParts('p0'); const sp=ph.p.querySelector('.spinner'); let t0=performance.now();
-  function f(now){const t=((now-t0)/1000)%4.2; let pull=0,op=0,rot=(now/2.2)%360,y=0;
-    if(t<.45){pull=PULL*.6*ease(t/.45);op=t/.45;} else if(t<2.4){pull=PULL*.6;op=1;} else if(t<2.8){const k=(t-2.4)/.4;pull=PULL*.6*(1-ease(k));op=1-k;}
-    y=pull*0.9-14; setPull(ph,pull); sp.style.opacity=op; sp.style.transform=`translateY(${y}px)`; sp.querySelector('i').style.transform=`rotate(${rot}deg)`;
-    requestAnimationFrame(f);} requestAnimationFrame(f);})();
-
-// ── A: hij komt binnenfietsen ─────────────────────────
-const demoA=(function(){const ph=phoneParts('pA'); const r=riderSVG(); ph.p.appendChild(r.svg); let t0=performance.now(), ang=0, last=t0;
-  function f(now){const dt=(now-last)/1000; last=now; const t=(now-t0)/1000%4.6; let pull=0,x=-90,speed=0;
-    if(t<.35){pull=PULL*ease(t/.35);}
-    else if(t<.85){pull=PULL; const k=ease((t-.35)/.5); x=-90+(CENTER+90)*k; speed=1.4-k*.6;}
-    else if(t<2.6){pull=PULL; x=CENTER; speed=.8;}
-    else if(t<3.1){const k=easeIn((t-2.6)/.5); pull=PULL; x=CENTER+(SW+40-CENTER)*k; speed=.8+k*.8;}
-    else if(t<3.45){pull=PULL*(1-ease((t-3.1)/.35)); x=SW+60;}
-    else {x=-90;}
-    ang+=dt*speed*1400; const bob=Math.sin(now/60)*(speed>0?4:0);
-    setPull(ph,pull); setRider(r,x,RIDER_Y-(PULL-pull),ang,bob,speed>1?speed-0.6:0);
-    requestAnimationFrame(f);} requestAnimationFrame(f);
-  return{restart(){t0=performance.now();}};})();
-
-// ── B: trekken is trappen ─────────────────────────────
-const demoB=(function(){const ph=phoneParts('pB'); const r=riderSVG(); ph.p.appendChild(r.svg);
-  let pull=0, dragging=false, y0=0, mode='idle', t0=0, ang=0, last=performance.now(), prevPull=0, hint=ph.p.querySelector('.hint');
-  const TH=78, MAX=110;
-  ph.p.addEventListener('pointerdown',e=>{if(mode!=='idle')return;dragging=true;y0=e.clientY;ph.p.setPointerCapture(e.pointerId);hint.style.opacity=0;});
-  ph.p.addEventListener('pointermove',e=>{if(!dragging)return;const dy=Math.max(0,e.clientY-y0);pull=Math.min(MAX,dy*.55);});
-  const release=()=>{if(!dragging)return;dragging=false;if(pull>=TH){mode='refresh';t0=performance.now();}else{mode='back';t0=performance.now();}};
-  ph.p.addEventListener('pointerup',release); ph.p.addEventListener('pointercancel',release);
-  function f(now){const dt=(now-last)/1000; last=now; let x, speed=0, shown=pull;
-    const prog=Math.min(1,pull/TH);
-    if(mode==='idle'||dragging){ x=-90+(CENTER+90)*prog; ang+=(pull-prevPull)*9; }
-    if(mode==='back'){const k=Math.min(1,(now-t0)/260); pull=pull*(1-ease(k)); x=-90+(CENTER+90)*Math.min(1,pull/TH); if(k>=1){pull=0;mode='idle';}}
-    if(mode==='refresh'){const t=(now-t0)/1000; pull+= (PULL-pull)*Math.min(1,dt*10); x=CENTER; speed=.8; ang+=dt*1100;
-      if(t>1.8){const k=easeIn(Math.min(1,(t-1.8)/.45)); x=CENTER+(SW+40-CENTER)*k; speed=.8+k; ang+=dt*800;}
-      if(t>2.25){const k=Math.min(1,(t-2.25)/.35); pull=PULL*(1-ease(k)); x=SW+60; if(k>=1){pull=0;mode='idle';hint.style.opacity=1;}}}
-    prevPull=pull;
-    const bob=(mode==='refresh'||pull>4)?Math.sin(now/60)*3:0;
-    setPull(ph,pull); setRider(r,x,Math.min(RIDER_Y,RIDER_Y-(PULL-Math.max(pull,RIDER_H+8))), ang, bob, speed>1?speed-0.6:0);
-    requestAnimationFrame(f);} requestAnimationFrame(f);
-  return{auto(){if(mode!=='idle')return;hint.style.opacity=0;let s=performance.now();const step=now=>{const k=Math.min(1,(now-s)/650);pull=MAX*ease(k)*.85;if(k<1)requestAnimationFrame(step);else{mode='refresh';t0=performance.now();}};requestAnimationFrame(step);}};})();
+const phones=[makePhone('p0','now'),makePhone('pA','A'),makePhone('pB','B'),makePhone('pC','C')];
 </script>
 </body>
 </html>
