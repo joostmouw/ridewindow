@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "PWA live op 1.0.30+31; bundel klaar om te uploaden"
+status: "PWA live; bundel 1.0.30+40 klaar om te uploaden"
 last_updated: "2026-09-10T09:15:00.000Z"
 last_activity: 2026-09-08
 progress:
