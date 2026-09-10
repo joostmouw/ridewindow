@@ -44,7 +44,7 @@
 - [ ] **EERST-01**: Een nieuwe gebruiker die zijn week niet invult, ziet toch een bruikbaar scherm dat hem naar het invullen leidt in plaats van een lege app
 - [ ] **EERST-02**: Een nieuwe gebruiker krijgt niet meer dan één uitlegoverlay voordat hij zelf iets in de app heeft gedaan
 - [ ] **EERST-03**: Notificaties verschijnen in de taal van de app (backlog #67)
-- [ ] **EERST-04**: Bij omlaag trekken om te verversen fietst de Ridewindow-fietser in plaats van het laadrondje — op Home én Peloton gelijk — met een stilstaande variant als Android "minder beweging" aan heeft (schets 013; stand nog te kiezen)
+- [ ] **EERST-04**: Bij omlaag trekken om te verversen fietst de Ridewindow-fietser in plaats van het laadrondje — op Home én Peloton gelijk — met een stilstaande variant als Android "minder beweging" aan heeft (schets 013, stand B: hij volgt de vinger en verdwijnt met de inhoud mee — gekozen 2026-09-10)
 
 ### Vensters (WIN)
 
