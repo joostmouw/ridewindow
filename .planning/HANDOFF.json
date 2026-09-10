@@ -1,41 +1,40 @@
 {
-  "timestamp": "2026-09-10T08:45:00.000Z",
-  "reason": "Joost wist bewust de context om door te gaan (65% verbruikt)",
-  "phase": "na v4.0 — losse verbeteringen uit testfeedback",
+  "timestamp": "2026-09-10T09:45:00.000Z",
+  "reason": "Joost wist de context om als nieuwe epic met #71 (testers werven) te beginnen",
+  "phase": "v4.0 afgerond en uitgeleverd; volgende is epic #71 'Twaalf testers'",
   "position": {
-    "last_commit": "f971903",
-    "last_activity": "Daglicht (backlog #68) af en getest; niet gedeployed, niet geupload"
+    "last_commit": "6c1ea15",
+    "last_activity": "Schets 010 stand 3 gebouwd en uitgeleverd; winkelmateriaal vernieuwd; epic #71 opgezet"
   },
+  "start_here": [
+    ".planning/TESTERS.md — de nieuwe epic, begin daar",
+    ".planning/OPEN.md — alles wat nog openstaat",
+    ".planning/STATE.md — waar wat live staat"
+  ],
   "completed_this_session": [
-    "Schets 008 + bouw: vier rolsoorten in een lijst, elke rit klikt door naar detail; deleteGroupRide eindelijk aangesloten (3223dbf, ecfa3b4, 8207771)",
-    "Welkom en Onboarding leesbaar in donkere modus -- BrandCanvas, buildAppTheme uit main.dart gehaald (cf5cc35)",
-    "Schets 009 + bouw: Nederlandse teksten -- 'fietsmoment' overal, 18 fouten eruit, kniewarmers weg (0985d6a)",
-    "Schets 010: hoeveel fietstaal en waar -- DRIE STANDEN GESCHETST, NOG NIET GEKOZEN",
-    "Schets 011 + bouw: daglicht -- eigen zonstandberekening, score-aftrek, vierde weerbalk, regel op de kaart, vierde schuif in Profiel (c3bd44f, 5aff9d7)",
-    "Backlog #68, #69, #70 vastgelegd uit Ingrids testfeedback (8d5380b)"
+    "Migratie 0007 door Joost gedraaid in het Supabase-dashboard; daarmee viel de blokkade van drie dagen weg",
+    "Schets 010 stand 3 gebouwd (1bf942d): de vier oordelen heten Toprit / Fijne rit / Te doen / Binnenblijver, Peloton terug als tabnaam met introductie",
+    "Consistentiesweep vond drie afgedreven woordenlijsten: tier*Agenda (opgeheven), widget_update_service (zei 'Geweldig' waar de app 'Goed' zei), notification_service (naslepers van schets 009)",
+    "Peloton-introductie bereikte uitgelogde gebruikers niet -- gerepareerd in 36b56f0, gevonden door de app vers te installeren",
+    "PWA gedeployed en Play-bundel gebouwd op 1.0.30+41",
+    "Vijf nieuwe winkel-screenshots vanaf de Oppo, en beide winkelomschrijvingen herschreven (0704c39)",
+    "Epic #71 'Twaalf testers' opgezet (6c1ea15)"
   ],
-  "blockers": [
-    "MIGRATIE 0007 MOET WORDEN TOEGEPAST voor de volgende deploy en voor de Play-upload. supabase/migrations/0007_profile_darkness_weight.sql -- een enkele 'alter table public.profiles add column darkness_weight'. Zonder die kolom weigert Postgres elke profiel-upsert, want darkness_weight zit in UserProfile.toRow. Joost draait hem in het Supabase-dashboard; er staat geen supabase CLI op deze machine."
-  ],
+  "blockers": [],
   "remaining": [
     {
-      "task": "Migratie 0007 toepassen, dan PWA deployen en Play-bundel herbouwen",
-      "description": "De PWA is bewust niet gedeployed sinds het daglichtwerk. De bundel 1.0.29+30 in build/app/outputs/bundle/release/ dateert van VOOR het daglicht en is dus verouderd. Release-notities noemen het daglicht nog niet. Volgorde: SQL -> flutter build web -> firebase deploy --only hosting --project my-project-joost -> release-notes bijwerken -> flutter build appbundle --release. Deel de link altijd met de waarschuwing dat de eerste herlaad na een deploy de oude bundel kan geven; gebruik ?v=N of Cmd+Shift+R.",
+      "task": "Play Console-ronde",
+      "description": "Bundel ~/Desktop/ridewindow-1.0.30-41.aab uploaden. Daarnaast drie dingen in de store listing die alleen daar kunnen: het app-icoon is nog een plaatsaanduiding (kalender met potlood) terwijl het echte icoon in docs/play-store-icon-512.png staat; de vijf screenshots vervangen door die uit ~/Desktop/ridewindow-store/; en beide omschrijvingen overnemen uit docs/store-listing.md. De feature graphic (docs/feature-graphic.png) is ook nog van 21 juni.",
       "priority": "hoog"
     },
     {
-      "task": "Schets 010 afmaken -- hoeveel fietstaal, en waar",
-      "description": "Joost wil fietstermen maar vond 'Peloton' uit het niets komen. Het inzicht van de schets: dat was geen verkeerd woord maar een ONTBREKENDE INTRODUCTIE -- Peloton stond op een tabblad zonder dat de app het uitlegde. Drie standen geschetst in .planning/sketches/010-hoeveel-fiets/: (1) fiets in de toon, (2) ook in de oordelen (Toprit/Fijne rit/Te doen/Binnenblijver), (3) ook in de wegwijzers (Peloton terug MET introductie). Mijn aanbeveling was stand 3. Joost heeft nog niet gekozen -- hij ging verder met Ingrids feedback. Vraag het opnieuw voor je bouwt.",
+      "task": "Epic #71 -- eerste open vraag beantwoorden",
+      "description": "Hoeveel mensen kan Joost realistisch persoonlijk vragen om te testen? Dat getal bepaalt hoe groot de opvulling via r/AndroidClosedTesting moet zijn. Zie .planning/TESTERS.md, spoor 1.",
       "priority": "hoog"
     },
     {
-      "task": "Backlog #69 en #70 -- het groene blok in plaats van losse vensters",
-      "description": "Beide uit Ingrids feedback en beide dezelfde onderliggende oorzaak: de app denkt in losse vensters van N uur, de gebruiker in een aaneengesloten goed blok. #69 = toon het blok per dag met het beste venster erin gemarkeerd; #70 = laat zien waarom dit venster en niet dat ernaast (het weggegooide alternatief en zijn score zijn nu onzichtbaar). Schetsmateriaal.",
-      "priority": "medium"
-    },
-    {
-      "task": "Op de Oppo draaien",
-      "description": "Er was deze hele sessie geen toestel aangesloten. Veeggedrag op de nieuwe rittenlijst, de daglichtbalk en de vierde schuif zijn alleen in Chrome gezien. Volgens Joosts eigen afspraak (memory project_phone_testing) verifieer je aanraken en scrollen via adb op de Oppo, niet in Chrome. adb staat op ~/Library/Android/sdk/platform-tools/adb.",
+      "task": "Op de Oppo verifieren",
+      "description": "De telefoon meldt zich niet meer op USB, ook niet als 'unauthorized'. adb-daemon draait wel. Check de USB-modus (ColorOS valt terug op 'alleen opladen') en of er een foutopsporingsdialoog op het scherm staat. De release-APK (1.0.30+41) staat klaar in build/app/outputs/flutter-apk/. Let op: er stond eerder een lokaal ondertekende build op; Play kan die niet bijwerken, dus eerst deinstalleren om terug te gaan naar de Play-versie.",
       "priority": "medium"
     }
   ],
@@ -43,14 +42,16 @@
     "#63 iPhone-tester komt niet terug uit beschikbaarheid",
     "#66 afgezegde ritten onbereikbaar",
     "#67 notificaties hardgecodeerd Nederlands",
-    "#69 groene blok",
-    "#70 waarom dit venster"
+    "#69 groene blok in plaats van losse vensters",
+    "#70 waarom dit venster en niet dat ernaast",
+    "#71 epic Twaalf testers -- NIEUW, de volgende stap"
   ],
   "uncommitted_files": [],
   "notes": [
-    "ALLE openstaande punten staan uitgeschreven in .planning/OPEN.md -- lees dat eerst.",
-    "653 tests groen, nul analyzer-fouten op het laatste commit.",
-    "Twee lokale webservers draaiden op poort 8765 (repo-root, voor de schetsen) en 8766 (build/web). Die overleven het wissen van de context niet noodzakelijk -- herstart ze als je een schets wilt openen.",
-    "De les die de meeste tijd kostte staat in .planning/STATE.md onderaan: ga niet terug naar de gesloten zonsopgangsvergelijking omdat hij korter is, hij is niet nauwkeurig genoeg."
+    "LES DIE TWEE UPLOADS KOSTTE: de git-historie is geen betrouwbare bron voor wat er op Play staat. Commit 2293358 zei '1.0.29+30 klaargezet -- niet geupload', maar Play weigerde zowel code 30 als 31. Versiecodes zijn daar permanent bezet, ook van gearchiveerde releases. De App bundle explorer in de Console is de enige echte bron. Daarom staat de build nu op 41.",
+    "Een verse installatie start in de taal van het toestel (profile_notifier.dart:196). Dat is correct gedrag, maar het betekent dat een Nederlandse tester met een Engelstalig toestel een Engelse app krijgt. Relevant voor epic #71.",
+    "Schets 012 (logo) staat in .planning/sketches/012-logo/ maar is VRIJBLIJVEND. Er is niets mis met het bestaande logo; het probleem was dat het niet in de Play-listing stond. Twee van de vijf geschetste richtingen vielen af bij het bekijken op 48 pixels.",
+    "570 tests groen, nul analyzer-fouten op het laatste commit.",
+    "Webservers draaiden op 8765 (repo-root, schetsen) en 8766 (build/web). Herstart ze als je een schets wilt openen."
   ]
 }

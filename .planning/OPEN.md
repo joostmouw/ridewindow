@@ -6,13 +6,22 @@ belang.
 
 ---
 
-## 1. Blokkerend — afgehandeld op 2026-09-10
+## 1. Blokkerend — allemaal weg op 2026-09-10
 
-| | Wat | Stand |
+Migratie 0007 is gedraaid, de PWA is gedeployed, en de bundel staat op `1.0.30+41`.
+Er is geen blokkade meer. Wat resteert is handwerk in de Play Console:
+
+| | Wat | Waar het ligt |
 |---|---|---|
-| **A** | Migratie 0007 (`darkness_weight`) | **Gedraaid** door Joost in het Supabase-dashboard. Profiel-upserts kunnen weer. |
-| **B** | PWA verouderd | **Gedeployed** — https://my-project-joost.web.app draait nu het daglicht én de fietstaal. Deel de link met ⌘⇧R erbij. |
-| **C** | Play-bundel verouderd | **Herbouwd** als `1.0.30+40`. Play weigerde eerst code 30, daarna 31, terwijl commit `2293358` beweerde dat 30 "niet geüpload" was. **De git-historie is geen betrouwbare bron voor wat er op Play staat** — versiecodes zijn daar permanent bezet, ook van gearchiveerde releases. De App bundle explorer in de Play Console is de enige echte bron. Vandaar de sprong naar 40; gaten kosten niets. Release-notities bijgewerkt en binnen de Play-limiet van 500 tekens gebracht — ze stonden er met 736 en 645 al overheen. **Uploaden wacht nog op je akkoord (punt E).** |
+| **A** | **Bundel 41 uploaden** | `~/Desktop/ridewindow-1.0.30-41.aab` |
+| **B** | **Het app-icoon in de listing vervangen** — daar staat nu een plaatsaanduiding, een kalender met een potlood. Het echte RW-logo zit al wél in de app | `~/Desktop/ridewindow-store/play-store-icon-512.png` |
+| **C** | **De vijf screenshots vervangen** — die in de winkel zijn van 21 juni en tonen een app die niet meer bestaat: smileys, dichtgroene kaarten, "RIJTIJDEN" | `~/Desktop/ridewindow-store/` |
+| **D** | **Beide omschrijvingen overnemen** — de oude noemden "Zaterdag 09:00–13:00 — Perfect", kenden het daglicht niet en zwegen over samen fietsen | `docs/store-listing.md` |
+| **E** | **De feature graphic** is ook nog van 21 juni | `docs/feature-graphic.png` |
+
+**Let op bij versiecodes:** Play weigerde vandaag zowel code 30 als 31, terwijl commit
+`2293358` beweerde dat 30 nooit geüpload was. De git-historie is hiervoor niet te
+vertrouwen; de App bundle explorer in de Console wel. Vandaar de sprong naar 41.
 
 ## 2. Beslissingen die op jou wachten
 
