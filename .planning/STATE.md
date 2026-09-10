@@ -1,12 +1,12 @@
 ---
 gsd_state_version: 1.0
-milestone: v4.0
-milestone_name: Eigen gezicht
-status: "Alles op 1.0.30+41; epic #71 testers staat klaar"
-last_updated: "2026-09-10T09:15:00.000Z"
-last_activity: 2026-09-08
+milestone: v4.1
+milestone_name: Zo snel mogelijk live in de store
+status: planning
+last_updated: "2026-09-10T20:22:54.994Z"
+last_activity: 2026-09-10
 progress:
-  total_phases: 3
+  total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -70,15 +70,18 @@ opgehoogd voor Play).
   Waarom Phosphor: schets 006. Waarom het pub-pakket níét: het breekt op
   Flutter's `final class IconData`, dus we dragen het font zelf in
   `assets/fonts/` met de codepunten in `lib/theme/app_icons.dart`.
+
 - **Welkomscherm is een animatie.** Het RW-monogram tekent zichzelf en
   wordt een fiets; daarna schuift hij omhoog en komt de tekst eronder.
   Geanimeerde WebP, 1:1 met Joost's bron, geen `video_player`. De bron
   staat in `~/Downloads/Ik_wil_alleen_het_logo_en_de_f.mp4`; het
   bewerkingsrecept staat in de dartdoc van `welcome_screen.dart`.
+
 - **"Ik heb al een account"** onder Get started, brengt je naar Profiel.
 - **Dagstreepjes op Home** volgen de score van de beste rit, doorlopend
   van oranje via teal naar groen. Let op de meting in `_barColor`: over de
   tint draaien lijkt netter maar draait de rangorde om.
+
 - **Kledingadvies rekent vanaf de gevoelstemperatuur** van Open-Meteo, min
   alleen je eigen 15 km/u. Joost's keuze; drie tests bewaken het.
 
@@ -173,6 +176,7 @@ Beide stappen staan uitgeschreven in `tool/README-play-release.md`:
 1. Play Console → *Setup → API access* → service-account aanmaken in
    `my-project-joost`, JSON-sleutel downloaden naar
    `~/.config/ridewindow/play-service-account.json` (buiten de repo, bewust).
+
 2. Play Console → *Users and permissions* → dat service-account uitnodigen,
    beperkt tot RideWindow, met *Release to testing tracks*.
 
@@ -266,6 +270,7 @@ beoordelen de cache-bust-truc uit `PELOTON.md`. Het toestel serveerde op
    de detail- en sectiekaarten, 16 op de PLANNED-regels, 12 en 3 elders.
    Material 3 kent 12 (medium), 16 (large) en 20 (large-increased); 18 en 24
    zijn geen token. Een aparte opruimronde waard.
+
 2. **`ScoreBadge` en `ScoreDisplay` staan naast elkaar** met verschillende
    vormtaal. Bewust — zie de klassennoot in `score_display.dart` — maar het is
    nooit tegen het nieuwe papier-uiterlijk aan gehouden.
@@ -286,9 +291,11 @@ vierkante hoeken bij het slepen. Drie oorzaken achter elkaar, en ik verifieerde 
 
 - De `Card` rondt alleen zijn rústpositie af. Zodra een `Dismissible` hem verschuift bepaalt de
   ouder de vorm → er hoort een `ClipRRect` ín de `Dismissible`, om de `Card` heen.
+
 - `Dismissible` knipt zijn eigen achtergrond kaarsrecht af tot het onthulde stuk. **Een gekleurd
   vlak achter een veegbare kaart is daarom nooit rond te krijgen**, hoeveel radius je er ook op
   zet. Beide zijn nu een icoon op de gewone achtergrond.
+
 - `Material.clipBehavior` staat standaard op `Clip.none`, dus de inkt van een `InkWell` vult de
   rechthoek en niet de afgeronde vorm. Zichtbaar zodra je indrukt.
 
@@ -326,8 +333,10 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 ## Current Position
 
-Phase: 21 (sync-migration) — UITGEVOERD, wacht op verificatie
-Actief werk: **epic "Peloton" (#62) — zie `.planning/PELOTON.md`, begin daar.**
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-09-10 — Milestone v4.1 started
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
@@ -380,28 +389,35 @@ sectie die de Play App Signing-route echt moet bewijzen — was al afgetekend. `
 aan (andere handtekening); aan het eind van de fase één Play-installatie als afsluiting.
 
 **Wat er die avond is gefixt (vier plannen, alle vier gevonden op het toestel):**
+
 - 21-11 disposed `Ref` — de drain draaide niet
 - 21-12 availability-payload was geen rij
 - 21-13 `rideId` overleefde de `timestamptz`-rondgang niet → één rit verscheen als twee
 - 21-14 push gebeurde ná pull → een verwijderde rit werd door de merge weer opgewekt
 
 **Groen op het toestel (sessie 5, 22:53-23:00):**
+
 - **MIG-02** — tweede toestel, leeg lokaal + gevulde cloud. Rooster identiek aan de opname van
   vóór de wipe, profiel en taal terug, geen conflictdialoog. Stond in de requirements en was nog
   nooit getest.
+
 - **§5b** — twee ritten op een verse installatie die alles uit de cloud trok. Sterkere vorm dan de
   checklist vroeg: er was geen lokale staat die het resultaat kon maskeren.
+
 - **§5c** — verwijderde rit blijft weg na drie cycli; de delete is zichtbaar in de drain vóór de
   pull.
 
 **Openstaand, en waarom:**
+
 - §5b's dashboardcontrole (`ride_id` op `Z`, `start_at` 10:00 UTC voor de 12:00-rit) — alleen Joost
   komt in Supabase.
+
 - §2's uitlog-ronde — **geblokkeerd door mijn eigen sideload**: de OAuth-grant van Google Calendar
   hing aan de vorige installatie en is meegegaan met de de-installatie. De koppeling staat nu op
   "Not connected", dus D-12 (uitloggen mag de agendakoppeling niet meeslepen) is niet toetsbaar
   tot de agenda opnieuw gekoppeld is. Dat had ik moeten voorzien; ik woog wel de lokale database
   af, niet de OAuth-grant.
+
 - §3 (iPhone-PWA), §4 (koude start), §5 (multi-tab), §6 (account verwijderen).
 
 **Niet als bewezen wegschrijven:** 21-13's cloud-reparatiepad (`_repairNonCanonicalRideIds`) heeft
@@ -467,15 +483,18 @@ plan 21-10 heeft dat op 2026-08-04 gedicht (in code -- toestelverificatie staat 
 
 **Auto-helften geauditeerd 2026-08-04 -- allebei groen.** Beide plannen waren taak 1 gecommit
 zonder ooit tegen hun acceptatiecriteria afgetekend te zijn; dat is nu alsnog gedaan:
+
 - 21-08 taak 1: `kDeleteOwnAccountRpc` aanwezig; RPC staat strikt vóór `signOut()` binnen
   dezelfde `try`, dus een mislukte RPC logt de gebruiker nooit uit (D-02); geen enkele
   `resetToDefaults`/`clearAll` binnen `_confirmAndDeleteAccount()` -- die matches horen bij de
   losstaande account-switch-tak (D-03 gerespecteerd); alle zes ARB-sleutels in EN+NL en in de
   drie gegenereerde bestanden; EN/NL sleutelpariteit 380/380; de "kan niet ongedaan"-tekst
   staat er letterlijk in beide talen.
+
 - 21-09 taak 1: suite 420/420, REG-05-test groen, `flutter build apk --release` exit 0,
   REGRESSION-CHECKLIST-21.md bevat alle vier vereiste secties én de verplichte `BLOCKER`-regel
   over de nooit-gemeten fase-19-basislijn.
+
 - Kanttekening: `verify.key-links` meldt 0/1 voor 21-08. Dat is een planningsartefact -- het
   `from`-veld is proza ("the delete-account confirm dialog's Delete action") in plaats van een
   bestandspad, dus de tool vindt geen bronbestand. Inhoudelijk handmatig geverifieerd, zie
@@ -536,8 +555,10 @@ mislukte send onzichtbaar, en dat is precies het patroon dat deze fase al twee k
 gebeten.
 
 Wat we wél weten:
+
 - `pendingRows()` en `watchPendingCount()` selecteren allebei ALLE rijen, zonder filter. Teller
   boven nul betekent dus letterlijk: er staan rijen die niet verzonden krijgen.
+
 - `markSent()` verwijdert de rij; blijft de rij staan, dan is de send gefaald.
 - Sterke hypothese, nog niet bewezen: dit zijn **oude, vergiftigde rijen van vanochtend**,
   aangemaakt toen de drain stuk was. Nieuwe wijzigingen syncen mogelijk prima terwijl de teller
@@ -548,11 +569,14 @@ eigen instelling -- terugzetten mag). Als `profiles.notif_evening_before` in het
 dashboard op true staat, dan werkt de nieuwe sync en zijn alleen de oude rijen stuk.
 
 Volgende stappen, in deze volgorde:
+
 1. Dashboard openen en `profiles.notif_evening_before` voor joostmouw@gmail.com controleren.
    True = nieuwe sync werkt, alleen oude rijen vastgelopen. False = de drain faalt nog volledig.
+
 2. Hoe dan ook: een plan 21-12 dat `_drainInternal`'s catch laat loggen (en overweeg `lastError`
    ergens zichtbaar te maken, al is het maar via het verborgen debugmenu). Zonder dat blijven we
    blind diagnosticeren.
+
 3. Pas daarna verder met §5a.
 
 **21-10 was NIET genoeg -- 21-11 dicht de echte bug (2026-08-04, toestelsessie 2).** Op
@@ -610,6 +634,7 @@ dashboard zijn bewijs.
 voor wat er precies gebeurd is. Sectie 3 (iPhone) is niet langer geblokkeerd.
 
 **Wat af is (waves 1-6, alles gemerged op main):**
+
 - 21-01 `resolveAccountSync()` — pure beslisfunctie, 11 tests
 - 21-02 Postgres-schema live toegepast. **Belangrijk:** tijdens de checkpoint bleek dat RLS-
   policies alléén niet volstaan — Postgres controleert tabelrechten vóór RLS, en Supabase's
@@ -617,6 +642,7 @@ voor wat er precies gebeurd is. Sectie 3 (iPhone) is niet langer geblokkeerd.
   ingelogde gebruiker zelfs zijn eigen rijen niet lezen. Gefixt in `0001_accounts_sync.sql`
   (commit 581cd73) en live toegepast. SYNC-08 bewezen: B select/update/delete van A's rij = 0/0/0,
   A select eigen rij = 1. Zie MANUAL-VERIFICATION-21.md.
+
 - 21-03 offline outbox (Drift schemaVersion 1→2, additief)
 - 21-04 profile + availability via outbox naar cloud
 - 21-05 planned rides (per-rit outbox-sleutel, niet per gebruiker)

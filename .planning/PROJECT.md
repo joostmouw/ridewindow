@@ -1,8 +1,8 @@
-# RideWindow
+# Ridewindow
 
 ## What This Is
 
-RideWindow is an app for casual cyclists who want to know — at a glance — the best windows to ride this week. It combines an accurate cycling-specific weather score (temperature, rain, wind) with the user's personal availability calendar to produce concrete, bookable time slots like "Saturday 09:00–13:00, 4h — Perfect". Native Android (Play Store, v1.0) is live; a Flutter Web/PWA build reaching iOS users (v2.0) is now also live at https://my-project-joost.web.app, with zero domain/UI code changes from the Android codebase.
+Ridewindow is an app for casual cyclists who want to know — at a glance — the best windows to ride this week. It combines an accurate cycling-specific weather score (temperature, rain, wind) with the user's personal availability calendar to produce concrete, bookable time slots like "Saturday 09:00–13:00, 4h — Perfect". Native Android is on Google Play's closed testing track — production is not yet open (that is milestone v4.1); a Flutter Web/PWA build reaching iOS users (v2.0) is now also live at https://my-project-joost.web.app, with zero domain/UI code changes from the Android codebase.
 
 ## Core Value
 
@@ -10,12 +10,12 @@ RideWindow is an app for casual cyclists who want to know — at a glance — th
 
 ## Current State (post-v2.0)
 
-**v2.0 iOS Web App (PWA) shipped 2026-07-17.** RideWindow now runs on two platforms from one Dart codebase: native Android (Play Store, v1.0) and Flutter Web/PWA for iOS (v2.0, Firebase Hosting). Both are live and confirmed unaffected by each other's platform-specific additions.
+**v2.0 iOS Web App (PWA) shipped 2026-07-17.** Ridewindow now runs on two platforms from one Dart codebase: native Android (Play Store, v1.0) and Flutter Web/PWA for iOS (v2.0, Firebase Hosting). Both are live and confirmed unaffected by each other's platform-specific additions.
 
 <details>
 <summary>v2.0 milestone goal (archived)</summary>
 
-**Goal:** Reach iOS users cheaply via a Flutter Web/PWA build of RideWindow, without an Apple Developer account.
+**Goal:** Reach iOS users cheaply via a Flutter Web/PWA build of Ridewindow, without an Apple Developer account.
 
 **Target features:**
 - Flutter Web build reusing existing Dart code (scoring, providers, UI) — core scoring, slot generation, availability calendar
@@ -26,9 +26,27 @@ RideWindow is an app for casual cyclists who want to know — at a glance — th
 
 </details>
 
-## Current Milestone: v3.0 Accounts & Sociaal
+## Current Milestone: v4.1 Zo snel mogelijk live in de store
 
-**Goal:** Turn RideWindow's two separate data silos (Android SharedPreferences, browser localStorage) into one account-backed profile — Google Sign-In plus Supabase/Postgres sync of profile and availability — and route user feedback through that account instead of a `mailto:` link.
+**Goal:** Ridewindow staat in productie op Google Play, via een gesloten test met testers die de app werkelijk gebruiken — niet alleen installeren, want sinds april 2026 wijst Google aanvragen af op gebrek aan gebruik.
+
+**Target features:**
+- Console op orde — elke build eerst via internal testing (door Play ondertekend, zelf getest op de Oppo), dan promoten naar de gesloten test; alle landen open, feedback-adres, Google Group, Nederlandse winkelpagina; PWA, privacybeleid en GitHub gelijk aan de Play-build
+- Wervingsonderzoek — uitzoeken welke kanalen (LinkedIn-post, LinkedIn-vacature, Strava-clubs, NTFU-toerclubs, fiets-Facebookgroepen, collega's, r/AndroidClosedTesting) testers opleveren die veertien dagen blijven; keuze voor 2–3 kanalen met teksten klaar
+- Werving tot minstens 15 aanmeldingen — zes uit eigen kring, de rest via de gekozen kanalen, met een lijst die afhakers vroeg laat zien
+- De eerste minuut van een tester — lege staat, de drie uitlegoverlays, notificaties in de taal van de app (#67)
+- Feedback als gestructureerde stroom — één ingang voor alle bronnen (app, Play, WhatsApp/mail) met vaste velden, feedback vragen op een natuurlijk moment in de app, een vaste beoordelingsronde die elke melding omzet in backlog-item / duplicaat / bewust niet, en terugkoppeling aan de tester in welke versie het is opgelost
+- Ingrids punten tijdens de veertien dagen — het groene blok (#69) en "waarom dit venster" (#70); regelmatig uitbrengen is zelf het bewijs
+- Bewijs en aanvraag — changelog per build vanaf 41, en na dag veertien de productie-aanvraag onderbouwd vanuit die changelog
+
+**Key context:** Het kritieke pad is de klok: die start pas als er twaalf testers aangemeld staan, en pauzeert of reset als het aantal daaronder zakt. Alles wat de werving vervroegt gaat vóór. De eigen kring stapt direct in (zij verdragen een lege eerste minuut); de kanalen met onbekenden pas ná de build met de eerste-minuut-fixes. Neemt epic #71 "Twaalf testers" (`.planning/TESTERS.md`) op. Realistisch vroegste productiemoment: begin tot half oktober 2026.
+
+<details>
+<summary>v3.0 Accounts & Sociaal (archived — shipped 2026-09-07) en v4.0 Eigen gezicht (afgerond 2026-09-08)</summary>
+
+**v4.0 Eigen gezicht** liep als epic buiten deze roadmap-structuur (fases 23–25, zie `.planning/EIGEN-GEZICHT.md`): typografie en hiërarchie, Phosphor-iconen, het bewegende welkomscherm, en de wrijving uit het gebruik weggewerkt.
+
+**v3.0 Goal:** Turn Ridewindow's two separate data silos (Android SharedPreferences, browser localStorage) into one account-backed profile — Google Sign-In plus Supabase/Postgres sync of profile and availability — and route user feedback through that account instead of a `mailto:` link.
 
 **Target features:**
 - Accounts via Google Sign-In (Supabase Auth, `signInWithIdToken`), reusing the `google_sign_in` 7.2.0 dependency — and its existing memoized init gate — already present for Calendar
@@ -42,6 +60,8 @@ RideWindow is an app for casual cyclists who want to know — at a glance — th
 Three constraints below ("No backend", "Budget", "Privacy") are broken by this milestone by design and must be consciously revised in `CLAUDE.md` and here before the first line of code. The privacy policy rewrite is legal work, not a text edit, and is a hard release blocker. The Google Cloud project carries a 100-user lifetime cap while the `calendar.events` scope stays unverified — verify at setup time.
 
 **Open design question for the plan phase:** a second login on another device that already holds local data. "Local wins" must not blindly overwrite the cloud there — that needs an explicit conflict decision, not an implicit consequence.
+
+</details>
 
 ## Requirements
 
@@ -87,12 +107,13 @@ Three constraints below ("No backend", "Budget", "Privacy") are broken by this m
 
 <!-- Current scope. Building toward these. -->
 
-**v3.0 — Accounts & Sociaal (phases 1–2 only).** Full requirement list with REQ-IDs lives in `.planning/REQUIREMENTS.md`. Scope areas:
-- Preconditions — constraint revision, privacy policy rewrite, Google Cloud OAuth verification
-- Auth — Google Sign-In via Supabase Auth, sign-out, account state across app restart
-- Sync — profile and availability to Postgres, both platforms, offline-tolerant (needs an outbox; Supabase queues no writes of its own)
-- Migration — first-login local-wins migration, plus a defined answer for second-device conflicts
-- Feedback — account-backed feedback with settings/forecast context
+**v4.1 — Zo snel mogelijk live in de store.** Full requirement list with REQ-IDs lives in `.planning/REQUIREMENTS.md` (v3.0's list is archived in `.planning/milestones/v3.0-REQUIREMENTS.md`). Scope areas:
+- Console (CON) — release-route via internal, landen, feedback-adres, Group, nl-NL, alles gelijk aan de Play-build
+- Werving (WERV) — kanaalonderzoek, uitnodigingen, minstens 15 aanmeldingen, afhakers volgen
+- Eerste minuut (EERST) — lege staat, uitlegoverlays, notificatietaal
+- Feedback (FEED) — gestructureerde intake, feedbackmoment in de app, beoordelingsronde naar de backlog, terugkoppeling
+- Vensters (WIN) — Ingrids #69 en #70
+- Bewijs (PROOF) — changelog, builds tijdens de veertien dagen, aanvraag, productie
 
 ### Out of Scope
 
@@ -111,7 +132,7 @@ Three constraints below ("No backend", "Budget", "Privacy") are broken by this m
 
 ## Context
 
-**Solo dev, evenings & weekends.** Joost works Mon–Fri 09:00–17:00 at Fanalists. RideWindow is a side project to validate a real personal need (concrete ride slots that respect work hours).
+**Solo dev, evenings & weekends.** Joost works Mon–Fri 09:00–17:00 at Fanalists. Ridewindow is a side project to validate a real personal need (concrete ride slots that respect work hours).
 
 **Mockup exists.** A complete interactive HTML mockup lives at `/Users/joostmouw/ridewindow/mockup.html` and covers all 6 screens (Welcome, Onboarding, Home, Ride Detail, Profile, Availability). It serves as the visual contract for the UI phase — `/gsd-ui-phase` should consume it directly.
 
@@ -178,4 +199,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-25 — v3.0 (Accounts & Sociaal) milestone started*
+*Last updated: 2026-09-10 — v4.1 (Zo snel mogelijk live in de store) milestone started; merknaam wordt Ridewindow*
