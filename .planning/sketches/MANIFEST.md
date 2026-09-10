@@ -42,6 +42,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 008 | [ritten-rollen](008-ritten-rollen/) | Hoe lees je aan een rit af welke rol jij erin hebt — en hoe kom je vanaf een gedeelde rit in één tik bij het detail? | **A — Eén lijst met filterrij** | ritten, peloton, rollen, navigatie, lijst |
 | 009 | [nederlandse-teksten](009-nederlandse-teksten/) | Welk Nederlands spreekt deze app — en welk woord gebruikt hij voor zijn eigen kernbegrip? | **A — "fietsmoment"** (blok 2 beperkt, blok 4 afgewezen) | l10n, nederlands, toon, kleding, jargon |
 | 010 | [hoeveel-fiets](010-hoeveel-fiets/) | Hoeveel fietstaal verdraagt de app, en op welke plekken? | *nog te kiezen* | merk, toon, naamgeving, peloton, l10n |
+| 011 | [daglicht](011-daglicht/) | Hoe laat de app zien dat een venster in het donker valt, in zijn eigen vormtaal? | *nog te kiezen* | daglicht, weerbalken, scoring, profiel, fase-26 |
 
 ## Beslissingen die doorwerken
 
@@ -121,3 +122,9 @@ fouten; de kleding beperkt tot de kniewarmers, de toon ongemoeid.
 scheidt die twee: *uit het niets* is geen verkeerd woord maar een ontbrekende introductie, en dat
 is een andere reparatie. Eén knop met drie standen — toon, oordelen, wegwijzers — op dezelfde vier
 oppervlakken. **Nog te kiezen.**
+
+## 011 — Daglicht
+
+`011-daglicht/` — Backlog #68 is aan de rekenkant klaar; dit gaat over hoe je het ziet. Twee
+plekken voor de daglichtbalk (vierde weerbalk op het detailscherm, of een strook op elke ritkaart),
+plus de regel op de kaart en de vierde schuif in Profiel. **Nog te kiezen.**

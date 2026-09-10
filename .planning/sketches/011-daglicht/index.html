@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daglicht — schets 011</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('Outfit.ttf') format('truetype'); font-weight:100 900; }
+  @font-face { font-family:'Phosphor'; src:url('Phosphor.ttf') format('truetype'); }
+
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+    --great-fg:#006457;  --great-bg:#E0F2F1;
+    --accept-fg:#A42E0A; --accept-bg:#FFF3E0;
+    --planned:#1565C0;
+    /* daglicht: één nieuw paar, in dezelfde familie als de tier-tinten */
+    --light:#E8C86A; --light-dim:#F2E3B8; --dark:#3A4A5C; --dark-dim:#C6CEDA;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 26px 90px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1260px;margin:0 auto}
+  h1{font-size:32px;line-height:1.25;font-weight:500;margin:0 0 10px}
+  h2{font-size:21px;font-weight:500;margin:44px 0 6px;padding-top:22px;border-top:1px solid var(--outline)}
+  .lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:82ch;margin:0}
+  .lede b{font-weight:600;color:var(--ink)}
+  .sub{font-size:14.5px;line-height:1.6;color:var(--ink-3);max-width:84ch;margin:8px 0 0}
+  .sub b{color:var(--ink-2);font-weight:600}
+  .ph{font-family:'Phosphor';font-style:normal;line-height:1;display:inline-block}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:22px}
+  .card{background:var(--paper);border:1px solid var(--outline);border-radius:22px;padding:20px}
+  .card.pick{border:2px solid var(--brand-dark);padding:19px}
+  .card h3{margin:0 0 3px;font-size:18px;font-weight:600}
+  .card .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+             background:var(--brand-dark);color:var(--paper);border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  .card .note{margin:6px 0 0;font-size:13.5px;line-height:1.55;color:var(--ink-3)}
+
+  /* ── de weerbalk zoals hij nu in de app staat ── */
+  .metric{margin-top:16px}
+  .metric .top{display:flex;align-items:center;gap:8px;font-size:14px}
+  .metric .top .name{color:var(--ink-2)}
+  .metric .top .grow{flex:1}
+  .metric .top .val{font-size:17px;font-weight:600}
+  .metric .top .verdict{font-size:11.5px;font-weight:700;letter-spacing:.5px;color:var(--perfect-fg)}
+  .metric .top .verdict.dark{color:var(--ink-3)}
+  .metric .top .i{color:var(--ink-3);opacity:.65;font-size:14px}
+  .track{position:relative;height:6px;border-radius:3px;background:var(--paper-high);margin:9px 0 0}
+  .zone{position:absolute;top:0;bottom:0;border-radius:3px;background:#BFE0C4}
+  .zone.lightzone{background:linear-gradient(90deg,var(--light-dim),var(--light),var(--light-dim))}
+  .mark{position:absolute;top:-4px;width:3px;height:14px;border-radius:2px;background:var(--perfect-fg)}
+  .band{position:absolute;top:-3px;height:12px;border-radius:4px;background:rgba(21,101,192,.75);
+        border:1.5px solid var(--planned)}
+  .band.dark{background:rgba(58,74,92,.75);border-color:var(--dark)}
+  .scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-top:6px}
+  .scale .mid{color:var(--ink-2);font-weight:600}
+
+  /* ── ritkaart ── */
+  .rcard{background:var(--paper);border:1px solid var(--outline);border-radius:20px;padding:15px 16px}
+  .rcard .when{font-size:12.5px;color:var(--ink-3);font-weight:500}
+  .rcard .head{display:flex;align-items:baseline;justify-content:space-between}
+  .rcard .n{font-size:38px;font-weight:500;line-height:1.05;letter-spacing:-.5px}
+  .rcard .verd{font-size:15px;font-weight:600;color:var(--great-fg)}
+  .rcard .meta{font-size:12.5px;color:var(--ink-2);margin-top:4px}
+  .rcard .sunline{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:12.5px;
+                  color:#7B4B12;font-weight:600}
+  .rcard .sunline .ph{font-size:15px}
+
+  /* ── strook op de kaart (variant B) ── */
+  .daystrip{position:relative;height:10px;border-radius:5px;margin:11px 0 5px;overflow:hidden;
+            background:linear-gradient(90deg, var(--dark-dim) 0%, var(--dark-dim) 29%,
+                        var(--light-dim) 30%, var(--light) 50%, var(--light-dim) 83%,
+                        var(--dark-dim) 84%, var(--dark-dim) 100%)}
+  .daystrip .win{position:absolute;top:0;bottom:0;border:2px solid var(--planned);border-radius:5px;
+                 background:rgba(21,101,192,.18)}
+  .daylabels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3)}
+
+  /* ── profielschuif ── */
+  .setting{margin-top:16px}
+  .setting .lbl{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:500}
+  .setting .lbl .grow{flex:1}
+  .setting .lbl .v{font-size:13px;color:var(--ink-3);font-weight:600}
+  .slider{position:relative;height:6px;border-radius:3px;background:var(--paper-high);margin:14px 0 0}
+  .slider .fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--brand-dark)}
+  .slider .knob{position:absolute;top:-7px;width:20px;height:20px;border-radius:999px;
+                background:var(--brand-dark);border:3px solid var(--paper);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .setting .desc{font-size:13px;color:var(--ink-3);margin-top:12px;line-height:1.5}
+  .ends{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:7px}
+
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:14px}
+  th{text-align:left;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-3);
+     font-weight:700;padding:0 10px 7px;border-bottom:1px solid var(--outline)}
+  td{padding:9px 10px;border-bottom:1px solid var(--paper-high);line-height:1.45}
+  td.num{font-variant-numeric:tabular-nums;font-weight:600}
+
+  .foot{margin-top:40px;padding-top:20px;border-top:1px solid var(--outline);font-size:14.5px;
+        line-height:1.65;color:var(--ink-2);max-width:84ch}
+  .foot b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Daglicht — schets 011</h1>
+<p class="lede">
+De rekenkant is af en geijkt: de zonstand wordt lokaal berekend en klopt binnen een minuut met
+Open-Meteo, van Tromsø tot Sydney. Wat hier gekozen moet worden is <b>hoe je het ziet</b>. Je
+referentie was een aparte paarse tegel; RideWindow heeft al een eigen taal voor precies dit soort
+informatie — de weerbalken met een groene zone en een markering. Daar sluit ik op aan.
+</p>
+
+<!-- ═══════════════ DE BALK ═══════════════ -->
+<h2>Waar de daglichtbalk komt te staan</h2>
+<p class="sub">
+Beide varianten gebruiken dezelfde nieuwe kleuren: <b>zonlicht</b> als warme goudtint en
+<b>donker</b> als koel blauwgrijs. Je rit staat er als blauw blok in — hetzelfde blauw dat een
+geplande rit in de agenda al heeft.
+</p>
+
+<div class="row2">
+
+  <!-- VARIANT A -->
+  <div class="card pick">
+    <span class="tag">mijn voorkeur</span>
+    <h3>A — Vierde balk op het detailscherm</h3>
+    <p class="note">Naast temperatuur, neerslag en wind, in exact dezelfde vorm. Wie de andere drie
+      snapt, snapt deze meteen — en het zegt vanzelf dat daglicht net zo goed meetelt in je score.</p>
+
+    <div class="metric">
+      <div class="top"><i class="ph" style="color:var(--ink-3)">&#xe5cc;</i>
+        <span class="name">Temperatuur</span><span class="grow"></span>
+        <span class="val">16°</span><span class="verdict">IDEAAL</span><i class="ph i">&#xe2ce;</i></div>
+      <div class="track"><div class="zone" style="left:34%;right:26%"></div>
+        <div class="mark" style="left:45%"></div></div>
+      <div class="scale"><span>0°</span><span class="mid">jouw bereik 12–26°</span><span>35°</span></div>
+    </div>
+
+    <div class="metric">
+      <div class="top"><i class="ph" style="color:var(--ink-3)">&#xe5d2;</i>
+        <span class="name">Wind</span><span class="grow"></span>
+        <span class="val">10 km/u</span><span class="verdict">WINDSTIL</span><i class="ph i">&#xe2ce;</i></div>
+      <div class="track"><div class="zone" style="left:0;right:50%"></div>
+        <div class="mark" style="left:25%"></div></div>
+      <div class="scale"><span>0km/u</span><span class="mid">jouw bereik ≤20km/u</span><span>40km/u</span></div>
+    </div>
+
+    <div class="metric" style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--outline)">
+      <div class="top"><i class="ph" style="color:#7B4B12">&#xe5b6;</i>
+        <span class="name">Daglicht</span><span class="grow"></span>
+        <span class="val">7 min</span><span class="verdict dark">GROTENDEELS DONKER</span>
+        <i class="ph i">&#xe2ce;</i></div>
+      <div class="track"><div class="zone lightzone" style="left:29%;right:16%"></div>
+        <div class="band dark" style="left:83%;right:8%"></div></div>
+      <div class="scale"><span>00:00</span><span class="mid">licht van 07:06 tot 20:07</span><span>24:00</span></div>
+    </div>
+
+    <p class="note" style="margin-top:16px">Van de twee uur die je rijdt valt er <b>7 minuten</b> in
+      het licht. Dat getal is wat de score-aftrek bepaalt, en het staat er dus ook.</p>
+  </div>
+
+  <!-- VARIANT B -->
+  <div class="card">
+    <h3>B — Strook op de ritkaart zelf</h3>
+    <p class="note">Al op Home te zien, zonder doorklikken: een dunne strook onder de tijd waarin je
+      de hele dag ziet, met je rit erin. Compact, maar er past geen uitleg bij.</p>
+
+    <div class="rcard" style="margin-top:16px">
+      <div class="when">donderdag · 20:00 – 22:00 · 2u</div>
+      <div class="head"><span class="n">81</span><span class="verd">Goed</span></div>
+      <div class="daystrip"><div class="win" style="left:83%;right:8%"></div></div>
+      <div class="daylabels"><span>00:00</span><span>07:06 ☀ 20:07</span><span>24:00</span></div>
+      <div class="meta" style="margin-top:8px">15° · droog · 10 km/u</div>
+    </div>
+
+    <p class="note" style="margin-top:16px">En dezelfde kaart bij een rit die wél in het licht valt —
+      dan is er niets bijzonders te melden en valt de strook nauwelijks op:</p>
+
+    <div class="rcard" style="margin-top:10px">
+      <div class="when">zaterdag · 09:00 – 11:00 · 2u</div>
+      <div class="head"><span class="n">100</span><span class="verd" style="color:var(--perfect-fg)">Perfect</span></div>
+      <div class="daystrip"><div class="win" style="left:37.5%;right:54%"></div></div>
+      <div class="daylabels"><span>00:00</span><span>07:06 ☀ 20:07</span><span>24:00</span></div>
+      <div class="meta" style="margin-top:8px">14° · droog · 8 km/u</div>
+    </div>
+  </div>
+</div>
+
+<h2>Op de ritkaart: één regel, alleen als het ertoe doet</h2>
+<p class="sub">
+Onafhankelijk van A of B. Een rit die helemaal in het licht valt zegt niets; een rit die de
+zonsondergang raakt zegt wanneer het donker wordt. Dezelfde regel als de rolregel die er sinds
+schets 008 al staat — één icoon, één kleur, één zin.
+</p>
+
+<div class="row2" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="rcard">
+    <div class="when">donderdag · 20:00 – 22:00 · 2u</div>
+    <div class="head"><span class="n">81</span><span class="verd">Goed</span></div>
+    <div class="sunline"><i class="ph">&#xe58e;</i> Zon onder om 20:07 — grotendeels in het donker</div>
+    <div class="meta">15° · droog · 10 km/u</div>
+  </div>
+  <div class="rcard">
+    <div class="when">vrijdag · 18:30 – 20:30 · 2u</div>
+    <div class="head"><span class="n">92</span><span class="verd" style="color:var(--perfect-fg)">Perfect</span></div>
+    <div class="sunline" style="color:#8A6A1E"><i class="ph">&#xe5b6;</i> Zon onder om 20:05 — laatste half uur schemer</div>
+    <div class="meta">17° · droog · 12 km/u</div>
+  </div>
+  <div class="rcard">
+    <div class="when">zaterdag · 09:00 – 11:00 · 2u</div>
+    <div class="head"><span class="n">100</span><span class="verd" style="color:var(--perfect-fg)">Perfect</span></div>
+    <div class="meta" style="margin-top:9px">14° · droog · 8 km/u</div>
+    <div class="note" style="margin-top:8px;font-style:italic">geen regel — volledig bij daglicht</div>
+  </div>
+</div>
+
+<!-- ═══════════════ DE SCHUIF ═══════════════ -->
+<h2>In Profiel: een vierde schuif naast temperatuur, regen en wind</h2>
+<p class="sub">
+De drie bestaande schuiven zeggen <i>waar ligt jouw grens</i>. Deze zegt <i>hoe zwaar telt donker
+voor jou</i> — dus geen grens maar een gewicht, en daarom een woordschaal in plaats van een getal
+met een eenheid.
+</p>
+
+<div class="row2">
+  <div class="card">
+    <div class="setting">
+      <div class="lbl"><i class="ph" style="color:#7B4B12">&#xe5b6;</i><span>Daglicht</span>
+        <span class="grow"></span><span class="v">Telt half mee</span></div>
+      <div class="slider"><div class="fill" style="width:50%"></div><div class="knob" style="left:calc(50% - 10px)"></div></div>
+      <div class="ends"><span>Maakt me niet uit</span><span>Alleen bij daglicht</span></div>
+      <div class="desc">Een rit die helemaal in het donker valt verliest <b>20</b> van de 100 punten.
+        Je ziet zulke ritten nog wel, maar ze staan achter de vensters bij daglicht.</div>
+    </div>
+  </div>
+  <div class="card">
+    <p class="note" style="margin:0 0 12px">Wat de standen doen met de rit van donderdag 20:00–22:00,
+      die zonder deze wijziging <b>100</b> scoorde:</p>
+    <table>
+      <thead><tr><th>Stand</th><th>Aftrek</th><th>Score</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Maakt me niet uit</td><td class="num">0</td><td class="num">100</td><td>Perfect</td></tr>
+        <tr><td>Telt licht mee</td><td class="num">−9</td><td class="num">91</td><td>Perfect</td></tr>
+        <tr><td><b>Telt half mee</b> (standaard)</td><td class="num">−19</td><td class="num">81</td><td>Goed</td></tr>
+        <tr><td>Telt zwaar mee</td><td class="num">−28</td><td class="num">72</td><td>Goed</td></tr>
+        <tr><td>Alleen bij daglicht</td><td class="num">−38</td><td class="num">62</td><td>Acceptabel</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:12px">Ook helemaal rechts verdwijnt de rit dus niet. Dat is met
+      opzet: in december is het in Nederland licht van 08:45 tot 16:30, en een harde uitsluiting zou
+      een avondfietser die maand niets laten zien.</p>
+  </div>
+</div>
+
+<div class="foot">
+<b>Wat ik zou doen:</b> variant <b>A</b> plus de regel op de kaart, plus de schuif. De balk hoort op
+het detailscherm omdat daar de uitleg bij past en omdat hij daar naast zijn drie broers staat; de
+kaart op Home krijgt alleen die ene regel, en alleen wanneer er iets te melden valt. Variant B is
+mooi maar zet een strook op élke kaart, ook op de negen van de tien waar niets aan de hand is — en
+Home is sinds fase 23 juist opgeruimd.
+<br><br>
+<b>Nog te kiezen als je A neemt:</b> of de balk de hele etmaal-as (00:00–24:00) houdt, zoals hier,
+of inzoomt op de uren die je werkelijk rijdt. De andere drie balken zoomen in op een fietsbereik
+(zie <code>zoomMin</code>/<code>zoomMax</code>), dus consequent zou inzoomen zijn — maar bij daglicht
+is juist de hele dag de betekenisvolle context.
+</div>
+
+</div>
+</body>
+</html>
