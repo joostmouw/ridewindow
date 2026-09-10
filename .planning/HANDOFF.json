@@ -28,23 +28,19 @@
     "1.0.31+42 gebouwd (7f29940): ~/Desktop/ridewindow-1.0.31-42.aab, manifest-label Ridewindow",
     "Milestone v4.1 in GSD: PROJECT.md, STATE.md, REQUIREMENTS.md, ROADMAP.md (2ec41e3, d084b2b, 03f6d46); v3.0-requirements gearchiveerd",
     "Schets 013 'fietser bij verversen': Joost koos A+B (volgt de vinger, fietst na het laden weg) — gemeten zonder vertraging; gaat als EERST-04 mee in build 43 (fase 29)",
-    "Release-notes herschreven voor 42 (naam + kortere intro)"
+    "Release-notes herschreven voor 42 (naam + kortere intro)",
+    "PWA 1.0.31+42 gedeployd en hash-geverifieerd; GitHub gepusht (c8e7e6b), Pages-privacybeleid zegt Ridewindow"
   ],
   "blockers": [],
   "remaining_before_phase_26_planning": [
     {
-      "task": "42 naar internal testing",
-      "description": "Joost sleept ~/Desktop/ridewindow-1.0.31-42.aab in Test and release → Testing → Internal testing → Create new release; release-notes staan in release-notes/. Bundel is 69 MB: via browser-automatisering kan het niet (10 MB-grens), dus altijd Joost.",
+      "task": "42 op internal én closed zetten",
+      "description": "Bundel 42 staat al in de bibliotheek (geüpload 22:45, Inactive); opnieuw uploaden geeft \"Version code 42 has already been used\". In beide lege concepten (Internal testing en Closed testing - Alpha): Add from library → 42 → release-notes uit release-notes/ → Save → Start rollout (internal) / Send for review (closed).",
       "owner": "Joost"
     },
     {
       "task": "Oppo terug naar een Play-installatie",
       "description": "Op de Oppo staat sinds 22:50 een sideload 1.0.31 (42), over 31 heen geïnstalleerd met behoud van data (Joost wilde hem eerst als APK zien), plus een record in kloonprofiel user 10. Deïnstalleren (adb uninstall + adb shell pm uninstall --user 10 ridewindow.joost.amsterdam) wist lokale data; ingelogd komt profiel/week/ritten terug uit de cloud. Vraag Joost eerst om akkoord. Daarna 42 via de internal-link installeren en de korte intro bij de eerste start zien.",
-      "owner": "Claude, na akkoord"
-    },
-    {
-      "task": "GitHub pushen",
-      "description": "origin/main loopt ~45 commits achter (tot sketch 008 van 8 sept). Joost heeft nog geen akkoord gegeven — vraag het.",
       "owner": "Claude, na akkoord"
     },
     {

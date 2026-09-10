@@ -26,8 +26,8 @@ punten in `HANDOFF.json`.
 | Play closed testing (Alpha) | **41 (1.0.30)**, live 22:30 — de track die Google telt; 2 testers aangemeld |
 | Play internal testing | 40 — **42 (1.0.31) moet er nog op** (Joost sleept, 69 MB) |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt |
-| main | 1.0.31+42, **niet gepusht** (origin ~45 achter) |
-| PWA live | nog oud (RideWindow); `build/web` lokaal op 8766 is 42 |
+| main | 1.0.31+42, gepusht (c8e7e6b) |
+| PWA live | **1.0.31 (42)**, hash-geverifieerd 2026-09-10; privacybeleid op GitHub Pages zegt Ridewindow |
 | Oppo | sideload **1.0.31 (42)** via `adb install -r` (data behouden) + record in kloonprofiel user 10 |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
