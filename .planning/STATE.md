@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Daglicht af -- migratie 0007 moet nog toegepast"
-last_updated: "2026-09-10T08:30:00.000Z"
+status: "Fietstaal door; migratie 0007 blokkeert nog deploy"
+last_updated: "2026-09-10T09:15:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -19,6 +19,7 @@ progress:
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-10 | [schets-010-stand-3](quick/260910-bu9-schets-010-stand-3-fietstaal-in-oordelen/) | De vier oordelen worden Toprit / Fijne rit / Te doen / Binnenblijver; Peloton terug als tabnaam mét introductie. Sweep ruimde drie afgedreven woordenlijsten op. |
 | 2026-09-07 | [home-papier-en-inkt](quick/20260907-home-papier-en-inkt/) | Fase 23 stap 1+2: achtergrond wordt papier, beste ritkaart licht op met een schaduw buiten de `ClipRRect`. |
 | 2026-09-07 | [weerbalken](quick/20260907-weerbalken/) | Stap 4: ingezoomd bereik plus een uitgeschreven oordeel (Dry/Calm/Ideal). Alleen de beste kaart houdt balken. |
 | 2026-09-07 | [sweep](quick/20260907-sweep/) | Stap 6: Agenda, Profiel-banner en Ride Detail naar papier. **Deels** — Profiel-kaarten per sectie staan nog open. |
