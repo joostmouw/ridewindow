@@ -134,4 +134,4 @@ plus de regel op de kaart en de vierde schuif in Profiel. **Gekozen: A**, met de
 `013-fietser-verversen/` — Joosts idee: het mannetje uit de intro komt terug bij pull-to-refresh
 en vervangt het laadrondje. Drie standen: nu (rondje), A (hij fietst binnen na loslaten), B
 (trekken is trappen). **Gemeten:** de intro bevat geen trapbeweging — de mockup tekent spaken
-over een stilstaand eindbeeld. **Gekozen: A+B** (Joost, 2026-09-10; eerst B, daarna A+B zodra bleek dat die even snel is) — geen vertraging; na de aanpassing zijn alle standen gemeten even snel terug als Nu (2,80 s in de demo).
+over een stilstaand eindbeeld. **Gekozen: A+B** (Joost, 2026-09-10; eerst B, daarna A+B zodra bleek dat die even snel is) — geen vertraging; na de aanpassing zijn alle standen gemeten even snel terug als Nu (2,80 s in de demo). Op de backlog als #72 (nice to have).
