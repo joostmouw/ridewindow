@@ -1486,7 +1486,7 @@ class SEn extends S {
 
   @override
   String get pelotonSignedOutHint =>
-      'Riding together needs an account, so your buddies can find you. Everything else in the app keeps working without one.';
+      'A peloton is the group you ride with. Signing in lets your buddies find you — everything else in the app keeps working without an account.';
 
   @override
   String get pelotonFriends => 'Buddies';

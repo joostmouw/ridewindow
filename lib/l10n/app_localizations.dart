@@ -2728,7 +2728,7 @@ abstract class S {
   /// No description provided for @pelotonSignedOutHint.
   ///
   /// In nl, this message translates to:
-  /// **'Samen fietsen heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.'**
+  /// **'Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden — de rest van de app werkt gewoon zonder.'**
   String get pelotonSignedOutHint;
 
   /// No description provided for @pelotonFriends.

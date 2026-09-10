@@ -43,6 +43,22 @@ Verder:
   voor Perfect" toetste in werkelijkheid het tier-woord. Toetst nu
   `detailTierPerfectDesc`.
 
+## Nagekomen: de introductie bereikte niet wie hem nodig had
+
+Op het toestel bleek de introductie achter het inloggen te zitten. Uitgelogd
+toont het Peloton-tabblad `pelotonSignedOut` / `pelotonSignedOutHint`, en die
+legden uit *waarom een account nodig is* — niet *wat een peloton is*. Precies
+andersom: wie nog niet is ingelogd, is juist degene die het woord voor het eerst
+ziet.
+
+De definitie staat nu vooraan in de uitgelogde tekst:
+
+> Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes
+> je kunnen vinden — de rest van de app werkt gewoon zonder.
+
+Dit is precies het soort gat dat je alleen ziet door de app te openen. In de
+tests stond niets fout; het scherm was gewoon nooit uitgelogd bekeken.
+
 ## Nog dood, bewust niet aangeraakt
 
 `pelotonEmptyTitle` / `pelotonEmptyHint` — nul verwijzingen. Ze spreken de

@@ -1,0 +1,310 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Schets 012 — het icoon</title>
+<style>
+:root { --ink:#1A2A20; --ink2:#3A4A40; --ink3:#5C6B60; --line:#D7DECB; --paper:#FCFDF8; }
+* { box-sizing:border-box }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; padding:40px 28px 80px }
+.wrap { max-width:1000px; margin:0 auto }
+h1 { font-size:30px; margin:0 0 6px; letter-spacing:-.4px }
+.lead { color:var(--ink2); max-width:70ch; margin:0 0 30px }
+.note { background:#F4F7EC; border:1px solid var(--line); border-left:4px solid #E8912A;
+  padding:14px 18px; border-radius:8px; margin:0 0 34px; max-width:80ch; font-size:15px }
+.note b { color:var(--ink) }
+.variant { border-top:1px solid var(--line); padding:26px 0 }
+.vhead h3 { margin:2px 0 2px; font-size:20px }
+.vhead p { margin:0 0 16px; color:var(--ink3); font-size:14.5px }
+.key { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.10em;
+  color:#234934; background:#C5D4B6; padding:3px 9px; border-radius:20px }
+.grids { display:flex; gap:18px; flex-wrap:wrap }
+.grid { flex:1 1 380px; border:1px solid var(--line); border-radius:12px; padding:14px 16px 10px }
+.grid.dark { background:#16301F; border-color:#2C4A38 }
+.glabel { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); margin-bottom:12px }
+.grid.dark .glabel { color:#9FB3A4 }
+.cells { display:flex; align-items:flex-end; gap:20px; flex-wrap:wrap }
+.cell { display:flex; flex-direction:column; align-items:center; gap:7px }
+.cell span { font-size:11px; color:var(--ink3) }
+.grid.dark .cell span { color:#9FB3A4 }
+.ico svg { display:block }
+.foot { margin-top:40px; padding-top:22px; border-top:1px solid var(--line);
+  font-size:14.5px; color:var(--ink2); max-width:82ch }
+.foot b { color:var(--ink) }
+.foot li { margin-bottom:7px }
+@media (prefers-color-scheme: dark) {
+  :root { --ink:#E4EAD7; --ink2:#B9C7B0; --ink3:#94A492; --line:#33463A; --paper:#131C16 }
+  .note { background:#1B2A20 }
+  .grid.light { background:#F4F7EC }
+  .grid.light .glabel, .grid.light .cell span { color:#5C6B60 }
+}
+</style></head><body><div class="wrap">
+<h1>Schets 012 — het icoon</h1>
+<p class="lead">Vijf richtingen, elk op 128, 64 en 48 pixels, in beide helderheden,
+en met het ronde masker dat Android eroverheen legt.</p>
+
+<div class="note"><b>Kijk alleen naar de kolom van 48.</b> Dat is de maat op een
+beginscherm en in de resultatenlijst van de Play Store. Wat daar niet overleeft valt af,
+hoe goed het op 128 ook oogt. Het huidige RW-monogram sneuvelt precies daar:
+de R en de W delen hun rondingen, dus het wordt een vlek.</div>
+
+
+    <section class="variant">
+      <div class="vhead"><span class="key">A</span><h3>Het venster</h3><p>Letterlijk de naam: een kozijn met licht erin.</p></div>
+      <div class="grids">
+        <div class="grid light"><div class="glabel">licht</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#234934" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#234934" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#234934" stroke-width="7"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#234934" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#234934" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#234934" stroke-width="7"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#234934" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#234934" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#234934" stroke-width="7"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367011120"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367011120)"><rect width="108" height="108" fill="#C5D4B6"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#234934" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#234934" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#234934" stroke-width="7"/>
+    </g></svg></div><span>masker</span></div></div></div>
+        <div class="grid dark"><div class="glabel">donker</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#C5D4B6" stroke-width="7"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#C5D4B6" stroke-width="7"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#C5D4B6" stroke-width="7"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367011120"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367011120)"><rect width="108" height="108" fill="#16301F"/>
+      <rect x="30" y="28" width="48" height="52" rx="7" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M54 28 V80" stroke="#C5D4B6" stroke-width="7"/>
+      <path d="M30 54 H78" stroke="#C5D4B6" stroke-width="7"/>
+    </g></svg></div><span>masker</span></div></div></div>
+      </div>
+    </section>
+    <section class="variant">
+      <div class="vhead"><span class="key">B</span><h3>Zon boven de horizon</h3><p>Het daglicht als merk — sinds #68 een rekenfactor.</p></div>
+      <div class="grids">
+        <div class="grid light"><div class="glabel">licht</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#234934" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#234934" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#234934" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367011696"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367011696)"><rect width="108" height="108" fill="#C5D4B6"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#234934" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </g></svg></div><span>masker</span></div></div></div>
+        <div class="grid dark"><div class="glabel">donker</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#C5D4B6" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#C5D4B6" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#C5D4B6" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367011696"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367011696)"><rect width="108" height="108" fill="#16301F"/>
+      <circle cx="54" cy="48" r="15" fill="#E8912A"/>
+      <path d="M26 74 H82" stroke="#C5D4B6" stroke-width="8" stroke-linecap="round"/>
+      <path d="M54 20 V12 M74 28 L80 22 M34 28 L28 22 M84 48 H92 M16 48 H24"
+            stroke="#E8912A" stroke-width="6" stroke-linecap="round"/>
+    </g></svg></div><span>masker</span></div></div></div>
+      </div>
+    </section>
+    <section class="variant">
+      <div class="vhead"><span class="key">C</span><h3>Het wiel</h3><p>Onmiskenbaar fietsen, maar zegt niets over weer of tijd.</p></div>
+      <div class="grids">
+        <div class="grid light"><div class="glabel">licht</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#234934" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#234934"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#234934" stroke-width="3.5" opacity="0.55"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#234934" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#234934"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#234934" stroke-width="3.5" opacity="0.55"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#234934" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#234934"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#234934" stroke-width="3.5" opacity="0.55"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367196224"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367196224)"><rect width="108" height="108" fill="#C5D4B6"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#234934" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#234934"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#234934" stroke-width="3.5" opacity="0.55"/>
+    </g></svg></div><span>masker</span></div></div></div>
+        <div class="grid dark"><div class="glabel">donker</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#C5D4B6" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#C5D4B6"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#C5D4B6" stroke-width="3.5" opacity="0.55"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#C5D4B6" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#C5D4B6"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#C5D4B6" stroke-width="3.5" opacity="0.55"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#C5D4B6" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#C5D4B6"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#C5D4B6" stroke-width="3.5" opacity="0.55"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367196224"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367196224)"><rect width="108" height="108" fill="#16301F"/>
+      <circle cx="54" cy="54" r="26" fill="none" stroke="#C5D4B6" stroke-width="8"/>
+      <circle cx="54" cy="54" r="6" fill="#C5D4B6"/>
+      <path d="M54 28 V80 M28 54 H80 M36 36 L72 72 M72 36 L36 72"
+            stroke="#C5D4B6" stroke-width="3.5" opacity="0.55"/>
+    </g></svg></div><span>masker</span></div></div></div>
+      </div>
+    </section>
+    <section class="variant">
+      <div class="vhead"><span class="key">D</span><h3>Venster mét zon</h3><p>A en B samen: een tijdvak waar de zon in staat.</p></div>
+      <div class="grids">
+        <div class="grid light"><div class="glabel">licht</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#234934" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#234934" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#234934" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#234934" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#234934" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#234934" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367196368"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367196368)"><rect width="108" height="108" fill="#C5D4B6"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#234934" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#234934" stroke-width="6" stroke-linecap="round"/>
+    </g></svg></div><span>masker</span></div></div></div>
+        <div class="grid dark"><div class="glabel">donker</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#C5D4B6" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#C5D4B6" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#C5D4B6" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367196368"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367196368)"><rect width="108" height="108" fill="#16301F"/>
+      <rect x="28" y="28" width="52" height="52" rx="8" fill="none" stroke="#C5D4B6" stroke-width="7"/>
+      <circle cx="54" cy="49" r="11" fill="#E8912A"/>
+      <path d="M36 68 H72" stroke="#C5D4B6" stroke-width="6" stroke-linecap="round"/>
+    </g></svg></div><span>masker</span></div></div></div>
+      </div>
+    </section>
+    <section class="variant">
+      <div class="vhead"><span class="key">E</span><h3>Monogram opgeschoond</h3><p>Als je aan RW vasthoudt: dikkere lijn, echte letters.</p></div>
+      <div class="grids">
+        <div class="grid light"><div class="glabel">licht</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#234934" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#234934" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#C5D4B6"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#234934" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367196512"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367196512)"><rect width="108" height="108" fill="#C5D4B6"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#234934" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </g></svg></div><span>masker</span></div></div></div>
+        <div class="grid dark"><div class="glabel">donker</div><div class="cells"><div class="cell"><div class="ico"><svg width="128" height="128" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#C5D4B6" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div><span>128</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#C5D4B6" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div><span>64</span></div><div class="cell"><div class="ico"><svg width="48" height="48" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><rect width="108" height="108" rx="24" fill="#16301F"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#C5D4B6" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg></div><span>48</span></div><div class="cell"><div class="ico"><svg width="64" height="64" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="m4367196512"><circle cx="54" cy="54" r="36"/></clipPath></defs><g clip-path="url(#m4367196512)"><rect width="108" height="108" fill="#16301F"/>
+      <path d="M32 76 V36 h13 a11 11 0 0 1 0 22 h-13 M45 58 l18 18"
+            fill="none" stroke="#C5D4B6" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 40 l7 30 l8 -20 l8 20 l7 -30"
+            fill="none" stroke="#E8912A" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </g></svg></div><span>masker</span></div></div></div>
+      </div>
+    </section>
+
+<div class="foot">
+<b>Wat er werkelijk staat, na kijken op 48 pixels</b>
+<ul>
+<li><b>A — het venster valt af.</b> Een kozijn met een kruis erin leest niet als raam maar als
+<i>tabel</i>. Precies het icoon dat spreadsheets gebruiken. Het idee klopt, de vorm niet.</li>
+<li><b>D valt ook af, en dat was mijn eigen aanbeveling vooraf.</b> Een kader met een oranje stip
+erin is het universele <i>afbeelding-ontbreekt</i>-symbool. Op 48 pixels is het niet van een
+kapotte foto te onderscheiden.</li>
+<li><b>B overleeft het best.</b> De zon boven de horizon blijft op 48 in beide helderheden
+herkenbaar, en hij vertelt wat de app doet. Prijs: je lijkt op elke weer-app.</li>
+<li><b>C is duidelijk over de doelgroep</b>, maar de spaken lopen op 48 in donkere modus dicht.
+Dat is te repareren met minder spaken en een dikkere lijn.</li>
+<li><b>E leest eindelijk als RW.</b> De R groen, de W oranje — dat kleurverschil doet het werk dat
+de huidige doorlopende lijn níet doet. Op 48 nog steeds twee letters, geen kronkel.</li>
+</ul>
+<b>Herziene voorkeur: B of E, en de keuze is er een van strategie.</b>
+<ul>
+<li>Kies <b>E</b> als je merkcontinuïteit wilt: het blijft RW, bestaande testers herkennen het,
+en het is puur een leesbaarheidsreparatie van wat er al staat.</li>
+<li>Kies <b>B</b> als je wilt dat iemand die het icoon voor het eerst ziet iets kan raden.
+Voor een app met nog geen tien gebruikers is dat het sterkere argument — een monogram werkt pas
+als het merk al bekend is.</li>
+</ul>
+</div></div></body></html>
