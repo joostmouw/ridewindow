@@ -9,7 +9,8 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - ✅ **v1.0 Android App** - Phases 1–10 (shipped, Internal testing track live)
 - ✅ **v2.0 iOS Web App (PWA)** - Phases 11–17 (shipped 2026-07-17) — see `.planning/milestones/v2.0-ROADMAP.md`
 - ✅ **v3.0 Accounts & Sociaal** - Phases 18–22 (shipped 2026-09-07) — see `.planning/milestones/v3.0-ACCOUNTS.md`. Milestone phases 3–5 waren gepland als uitgesteld, maar de sociale laag is er tijdens deze milestone alsnog gekomen als epic #62 "Peloton" (vrienden, uitnodigen voor een gedeelde rit, accepteren) — zie `.planning/PELOTON.md`. Wat wél uitgesteld blijft: gedeelde beschikbaarheid en server-side push, nu belegd in epic #65.
-- 🚧 **v4.0 Eigen gezicht** - Phases 23–25 (in progress) — merkidentiteit en UI/UX: typografie, hiërarchie, iconografie. Startpunt: `.planning/EIGEN-GEZICHT.md`, backlog-epic #64. Eigen hoofdversie en geen punt-release: v1 was Android, v2 de PWA, v3 accounts — een eigen gezicht is een even zichtbare stap.
+- 🚧 **v4.1 Zo snel mogelijk live in de store** - Phases 26–32 (in progress, gestart 2026-09-10) — van gesloten test naar productie op Google Play, met testers die de app werkelijk gebruiken. Neemt epic #71 "Twaalf testers" op (`.planning/TESTERS.md`).
+- ✅ **v4.0 Eigen gezicht** - Phases 23–25 (afgerond 2026-09-08) — merkidentiteit en UI/UX: typografie, hiërarchie, iconografie. Startpunt: `.planning/EIGEN-GEZICHT.md`, backlog-epic #64. Eigen hoofdversie en geen punt-release: v1 was Android, v2 de PWA, v3 accounts — een eigen gezicht is een even zichtbare stap.
 
 ## Phases
 
@@ -61,6 +62,18 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 - [x] **Phase 20: Repository refactor (local-only)** - Profile/availability/planned-rides persistence extracted into shared repositories, zero user-visible change, zero cloud involvement (20-01 through 20-05 complete 2026-07-31) (completed 2026-07-31)
 - [ ] **Phase 21: Sync + migration** - Postgres sync of profile/availability/planned rides, an offline outbox, first-login and second-device conflict handling, row-level security, and account deletion
 - [x] **Phase 22: Account-backed feedback** - In-app feedback (signed-in or anonymous) carrying scoring context, replacing the `mailto:` flow
+
+### 🚧 v4.1 Zo snel mogelijk live in de store (In Progress)
+
+**Milestone Goal:** Ridewindow staat in productie op Google Play. Het kritieke pad is de klok: veertien dagen die pas starten bij twaalf aangemelde testers.
+
+- [ ] **Phase 26: Console op orde** - Release-route via internal, landen open, feedback-adres, Google Group, nl-NL-winkelpagina, alles gelijk aan de Play-build, en de changelog vanaf build 41
+- [ ] **Phase 27: Wervingsonderzoek** - Uitzoeken welke kanalen testers opleveren die veertien dagen blijven; keuze voor 2–3 kanalen met teksten klaar
+- [ ] **Phase 28: Feedbackstroom** - Eén register voor alle bronnen, gestructureerd formulier, een natuurlijk vraagmoment, een vaste beoordelingsronde naar de backlog, en terugkoppeling aan de tester
+- [ ] **Phase 29: Eerste minuut** - Lege staat, hooguit één uitlegoverlay vooraf, notificaties in de taal van de app — samen met fase 28 in build 43
+- [ ] **Phase 30: Werving** - Eigen kring direct na fase 26, de gekozen kanalen na build 43; minstens 15 aangemeld en afhakers binnen twee dagen gezien
+- [ ] **Phase 31: De veertien dagen** - Ingrids vensters (#69, #70) als echte builds op echte feedback; minstens drie builds naar de gesloten test
+- [ ] **Phase 32: Aanvraag en productie** - De aanvraag onderbouwd vanuit de changelog, en Ridewindow in productie
 
 ## Phase Details
 
@@ -228,6 +241,84 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 26: Console op orde
+**Goal**: Een nieuwe tester, waar ook ter wereld, kan zich met één link aanmelden en installeert een build die Joost zelf vanaf Play heeft getest; alles wat een tester of Google ziet zegt Ridewindow en dezelfde versie.
+**Depends on**: Nothing (build 41 in review, 42 gebouwd)
+**Requirements**: CON-01, CON-02, CON-03, CON-04, CON-05, CON-06, PROOF-01
+**Success Criteria** (what must be TRUE):
+  1. Build 42 staat op internal, is vanaf een Play-installatie op de Oppo getest (inclusief de korte intro bij een verse start), en is gepromoot naar de gesloten test
+  2. De gesloten test staat open voor alle landen, heeft een feedback-adres en een gekoppelde Google Group met één aanmeldlink
+  3. De winkelpagina bestaat in en-GB én nl-NL met de teksten uit `docs/store-listing.md`
+  4. PWA, privacybeleid en GitHub `main` tonen 1.0.31 en de naam Ridewindow
+  5. `docs/testers/changelog.md` beschrijft build 41 en 42, met Ingrids daglicht-melding als eerste opgeloste feedback
+**Plans**: TBD
+
+### Phase 27: Wervingsonderzoek
+**Goal**: Joost weet waar hij echte fietsers vandaan haalt die de app veertien dagen blijven openen, en heeft voor elk gekozen kanaal een tekst klaar om te versturen.
+**Depends on**: Nothing — kan parallel aan fase 26
+**Requirements**: WERV-01, WERV-02
+**Success Criteria** (what must be TRUE):
+  1. Een vergelijking van minstens zeven kanalen op bereik, doorlooptijd, doelgroepgehalte en inspanning, onderbouwd met bronnen
+  2. Een gemotiveerde keuze voor 2–3 kanalen, inclusief of een LinkedIn-post van Joost zelf erbij hoort
+  3. Per gekozen kanaal een verzendklare tekst, eerst als HTML aan Joost getoond
+**Plans**: TBD
+
+### Phase 28: Feedbackstroom
+**Goal**: Elke melding van een tester komt gestructureerd binnen, krijgt een uitkomst op de backlog, en de tester hoort terug wat ermee gebeurde.
+**Depends on**: Phase 26 (feedback-adres)
+**Requirements**: FEED-01, FEED-02, FEED-03, FEED-04, FEED-05
+**Success Criteria** (what must be TRUE):
+  1. Eén register (bron, tester, versie, scherm, soort, ernst, status) waarin in-app-, Play-, WhatsApp- en mailfeedback samenkomen
+  2. Het in-app formulier vraagt soort en verwachting, en stuurt versie en scherm automatisch mee
+  3. De app vraagt op een natuurlijk moment om feedback, niet in de eerste minuut en niet vaker dan de afgesproken grens
+  4. Een beoordelingsronde is beschreven én één keer gedraaid op de bestaande meldingen (Ingrids drie punten): elk heeft een uitkomst
+  5. Een opgeloste melding verschijnt in de changelog met tester en versie, en de tester is ingelicht
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 29: Eerste minuut
+**Goal**: Een nieuwe tester ziet in zijn eerste minuut iets bruikbaars en wordt niet overladen, in zijn eigen taal — ook in notificaties.
+**Depends on**: Nothing — levert samen met fase 28 build 43
+**Requirements**: EERST-01, EERST-02, EERST-03
+**Success Criteria** (what must be TRUE):
+  1. Een verse installatie zonder ingevulde week toont een scherm dat naar het invullen leidt in plaats van een lege lijst of grijze uren
+  2. Voordat de gebruiker zelf iets doet verschijnt hooguit één uitlegoverlay
+  3. Met de app op Engels komen alle zes notificatieteksten in het Engels binnen
+  4. Build 43 (fase 28 + 29) staat via internal op de gesloten test
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 30: Werving
+**Goal**: Er staan minstens vijftien testers aangemeld die de app werkelijk gebruiken, en een afhaker valt binnen twee dagen op.
+**Depends on**: Phase 26 (eigen kring), Phase 27 en Phase 29 (overige kanalen)
+**Requirements**: WERV-03, WERV-04, WERV-05
+**Success Criteria** (what must be TRUE):
+  1. Zes mensen uit de eigen kring zijn persoonlijk uitgenodigd en tellen mee in Google's teller
+  2. Google's teller toont minstens 15 aangemelde testers
+  3. De testerslijst toont per tester bron, aanmelddatum en laatste teken van gebruik
+**Plans**: TBD
+
+### Phase 31: De veertien dagen
+**Goal**: Tijdens de veertien dagen ziet Google een app die op echte feedback verbetert — met Ingrids vensterpunten als zichtbaarste voorbeeld.
+**Depends on**: Phase 30 (de klok loopt)
+**Requirements**: WIN-01, WIN-02, PROOF-02
+**Success Criteria** (what must be TRUE):
+  1. Per dag toont de lijst het aaneengesloten goede blok met het beste venster erin gemarkeerd
+  2. De gebruiker ziet waarom een venster gekozen is en de score van het alternatief ernaast
+  3. Minstens drie builds zijn tijdens de veertien dagen naar de gesloten test gegaan, elk in de changelog
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 32: Aanvraag en productie
+**Goal**: Ridewindow staat in productie op Google Play.
+**Depends on**: Phase 31 (veertien dagen voltooid met ≥12 testers)
+**Requirements**: PROOF-03, PROOF-04
+**Success Criteria** (what must be TRUE):
+  1. Alle vragen van de aanvraag zijn beantwoord met minstens 250 tekens, concrete versies en fixes uit de changelog — eerst als HTML aan Joost getoond
+  2. De aanvraag is ingediend en goedgekeurd; bij afwijzing ligt er een herstelplan op basis van Google's reden
+  3. Ridewindow is installeerbaar uit de Play Store in productie
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -258,8 +349,15 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 20. Repository refactor (local-only) | v3.0 | 5/5 | Complete   | 2026-07-31 |
 | 21. Sync + migration | v3.0 | 14/14 | Complete   | 2026-09-02 |
 | 22. Account-backed feedback | v3.0 | 1/1 | Complete   | 2026-09-07 |
-| 23. Typografie & hiërarchie | v4.0 | 0/TBD | In Progress|  |
-| 24. Iconografie & eigen beeldtaal | v4.0 | 0/TBD | Not started | - |
-| 25. Wrijving wegwerken | v4.0 | 0/TBD | Not started | - |
+| 23. Typografie & hiërarchie | v4.0 | quick | Complete | 2026-09-07 |
+| 24. Iconografie & eigen beeldtaal | v4.0 | quick | Complete | 2026-09-08 |
+| 25. Wrijving wegwerken | v4.0 | quick | Complete | 2026-09-08 |
+| 26. Console op orde | v4.1 | 0/TBD | Not started | - |
+| 27. Wervingsonderzoek | v4.1 | 0/TBD | Not started | - |
+| 28. Feedbackstroom | v4.1 | 0/TBD | Not started | - |
+| 29. Eerste minuut | v4.1 | 0/TBD | Not started | - |
+| 30. Werving | v4.1 | 0/TBD | Not started | - |
+| 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
+| 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).
