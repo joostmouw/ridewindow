@@ -34,3 +34,5 @@ als achtergrond).
 eerste versie van de mockup liet A de inhoud wachten tot de fietser weg was (+0,4 s); na de
 aanpassing rijdt hij weg terwijl de inhoud terugveert, en zijn alle vier gemeten gelijk (inhoud
 terug op 2,80 s). Eis voor de bouw: **de animatie houdt de gegevens nooit op.**
+
+**Status:** op de backlog als **#72 (nice to have)** — Joost haalde hem op 2026-09-10 uit v4.1 fase 29.

@@ -31,7 +31,7 @@ punten in `HANDOFF.json`.
 | Oppo | sideload **1.0.31 (42)** via `adb install -r` (data behouden) + record in kloonprofiel user 10 |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
-feedbackstroom als eigen fases · schets 013 stand A+B (zonder vertraging) in build 43.
+feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de backlog (#72).
 
 ## Quick Tasks Completed
 

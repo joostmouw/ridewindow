@@ -27,7 +27,7 @@
     "Intro twee keer zo kort: 2,47 s (059e352), gezien en goedgekeurd door Joost",
     "1.0.31+42 gebouwd (7f29940): ~/Desktop/ridewindow-1.0.31-42.aab, manifest-label Ridewindow",
     "Milestone v4.1 in GSD: PROJECT.md, STATE.md, REQUIREMENTS.md, ROADMAP.md (2ec41e3, d084b2b, 03f6d46); v3.0-requirements gearchiveerd",
-    "Schets 013 'fietser bij verversen': Joost koos A+B (volgt de vinger, fietst na het laden weg) — gemeten zonder vertraging; gaat als EERST-04 mee in build 43 (fase 29)",
+    "Schets 013 'fietser bij verversen': Joost koos A+B (volgt de vinger, fietst na het laden weg) — gemeten zonder vertraging; op de backlog als #72 (nice to have)",
     "Release-notes herschreven voor 42 (naam + kortere intro)",
     "PWA 1.0.31+42 gedeployd en hash-geverifieerd; GitHub gepusht (c8e7e6b), Pages-privacybeleid zegt Ridewindow"
   ],
@@ -55,7 +55,7 @@
     "Eigen kring (6) stapt direct in; kanalen met onbekenden pas na build 43 met de eerste-minuut-fixes",
     "Wervingsonderzoek is een eigen fase (27), niet ad hoc — Joost",
     "Feedback wordt een gestructureerde stroom met beoordelingsronde naar de backlog (fase 28) — Joost",
-    "Schets 013: stand A+B, want zonder vertraging — Joost",
+    "Schets 013: stand A+B, zonder vertraging — daarna door Joost als nice to have naar de backlog (#72), niet in v4.1",
     "AI-asset-label in de Console: niet labelen — Joost"
   ],
   "notes": [
