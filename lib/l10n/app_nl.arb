@@ -1,7 +1,7 @@
 {
   "@@locale": "nl",
 
-  "appTitle": "RideWindow",
+  "appTitle": "Ridewindow",
 
   "navHome": "Home",
   "navAgenda": "Agenda",
@@ -231,7 +231,7 @@
   "save": "Opslaan",
 
   "sendFeedback": "Feedback versturen",
-  "feedbackRatingLabel": "Hoe zou je RideWindow beoordelen?",
+  "feedbackRatingLabel": "Hoe zou je Ridewindow beoordelen?",
   "feedbackCommentHint": "Wil je iets delen? (optioneel)",
   "feedbackCommentLabel": "Opmerking",
   "feedbackStarRating": "{count, plural, =1{{count} ster} other{{count} sterren}}",
@@ -431,7 +431,7 @@
   "remindEveningBefore": "Herinner me de avond ervoor",
   "reminderPlanned": "Herinnering gepland voor de avond ervoor!",
   "shareRideWindow": "Deel dit fietsmoment",
-  "shareText": "Fietsrit {day} {timeRange} ({tier})\n{summary}\n\nVia RideWindow",
+  "shareText": "Fietsrit {day} {timeRange} ({tier})\n{summary}\n\nVia Ridewindow",
   "@shareText": {
     "placeholders": {
       "day": {"type": "String"},
@@ -670,7 +670,7 @@
   "cellStatusBlocked": "Geblokkeerd",
   "dayHeaderToggleHint": "Dubbeltik om alle uren voor deze dag te wisselen",
   "hourHeaderToggleHint": "Dubbeltik om dit uur voor alle dagen te wisselen",
-  "addToHomeScreenHint": "Tik op het Deel-icoon en kies 'Zet op beginscherm' om RideWindow te installeren.",
+  "addToHomeScreenHint": "Tik op het Deel-icoon en kies 'Zet op beginscherm' om Ridewindow te installeren.",
   "pelotonEmptyTitle": "Samen fietsen",
   "pelotonEmptyHint": "Deel een ridewindow met een maatje. Hij opent je link, doet mee, en de rit staat in zijn app.",
   "pelotonInvitesSent": "Uitnodigingen die jij stuurde",
@@ -683,7 +683,7 @@
   "pelotonNoFriends": "Je peloton is nog leeg",
   "pelotonNoFriendsHint": "Een peloton is de groep waarmee je rijdt. Nodig een maatje uit en jullie zien elkaars ritten.",
   "pelotonInviteFriend": "Nodig een maatje uit",
-  "pelotonInviteShare": "Fiets met me mee in RideWindow. Open de app en vul code {code} in.",
+  "pelotonInviteShare": "Fiets met me mee in Ridewindow. Open de app en vul code {code} in.",
   "pelotonYourCode": "Jouw code: {code}",
   "pelotonRemoveFriend": "Maatje verwijderen",
   "pelotonAccept": "Ik ga mee",
@@ -720,7 +720,7 @@
   "pelotonJoining": "Je wordt toegevoegd…",
   "pelotonSignInToJoin": "Log eerst in en vul deze code daarna in onder Ritten, tab Peloton.",
   "pelotonGoToPeloton": "Naar Peloton",
-  "pelotonInviteShareLink": "Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.",
+  "pelotonInviteShareLink": "Fiets met me mee in Ridewindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.",
   "@pelotonInviteShareLink": {"placeholders": {"link": {"type": "String"}, "code": {"type": "String"}}},
   "ridesTabRides": "Ritten",
   "ridesTabBuddies": "Peloton",

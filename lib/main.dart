@@ -108,7 +108,7 @@ class RideWindowApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(appLocaleProvider);
     return MaterialApp.router(
-      title: 'RideWindow',
+      title: 'Ridewindow',
       locale: locale,
       supportedLocales: S.supportedLocales,
       localizationsDelegates: const [

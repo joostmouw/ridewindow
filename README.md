@@ -1,6 +1,6 @@
 # ridewindow
 
-RideWindow — cyclist-specific weather windows
+Ridewindow — cyclist-specific weather windows
 
 ## Getting Started
 

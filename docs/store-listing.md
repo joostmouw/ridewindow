@@ -1,4 +1,4 @@
-# Play Store Listing — RideWindow
+# Play Store Listing — Ridewindow
 
 > Bijgewerkt 2026-09-10 voor 1.0.30. De vorige versie noemde nog
 > "Zaterdag 09:00–13:00 — Perfect", kende het daglicht niet en zweeg over
@@ -13,7 +13,7 @@
 
 ### Nederlands
 
-Stop met drie apps openen om te bepalen wanneer je gaat fietsen. RideWindow legt
+Stop met drie apps openen om te bepalen wanneer je gaat fietsen. Ridewindow legt
 een fiets-specifieke weerscore naast jouw beschikbaarheid en laat zien wanneer je
 deze week het best op de fiets stapt.
 
@@ -30,18 +30,18 @@ Wat het anders maakt:
 - Je hele week in één blik, per uur
 - Wat je aan moet, op basis van de gevoelstemperatuur
 - Windadvies: welke kant je heen rijdt om met de wind mee terug te komen
-- Samen fietsen kan: nodig een maatje uit voor je rit en jullie zien elkaars plannen
+- Samen fietsen kan: nodig een maatje uit voor je rit en jullie zien elkaars ritten
 - Werkt offline na de eerste keer laden
 - Werkt zonder account. Inloggen kan, en zet je instellingen dan op al je
   toestellen — maar het hoeft niet
 - Geen advertenties, geen tracking
 
-RideWindow is voor de recreatieve fietser die rijdt als het weer het toelaat.
+Ridewindow is voor de recreatieve fietser die rijdt als het weer het toelaat.
 Open de app, kies je moment, fiets.
 
 ### English
 
-Stop opening three apps to work out when to ride. RideWindow puts a
+Stop opening three apps to work out when to ride. Ridewindow puts a
 cycling-specific weather score next to your own availability and shows you the
 best time to get on the bike this week.
 
@@ -58,13 +58,13 @@ What makes it different:
 - Your whole week at a glance, hour by hour
 - What to wear, based on how cold it will actually feel
 - Wind advice: which way to head out so the wind is behind you coming home
-- Ride together: invite a buddy to your ride and you'll see each other's plans
+- Ride together: invite a buddy to your ride and you'll see each other's rides
 - Works offline after the first load
 - Works without an account. Signing in syncs your settings across devices —
   but it is optional
 - No ads, no tracking
 
-RideWindow is for the casual cyclist who rides when the weather allows. Open the
+Ridewindow is for the casual cyclist who rides when the weather allows. Open the
 app, pick your window, ride.
 
 ## Screenshots

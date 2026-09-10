@@ -44,7 +44,7 @@ Beide zijn rechtenwijzigingen op jouw Google-account. Ik kan ze niet doen.
 
 Play Console → **Users and permissions → Invite new user**. Plak het
 `client_email` uit de JSON (`...@my-project-joost.iam.gserviceaccount.com`),
-beperk tot **RideWindow**, en vink aan:
+beperk tot **Ridewindow**, en vink aan:
 
 - *Release to testing tracks* — genoeg voor internal, alpha en beta.
 - *Release to production* — alleen als je ook naar productie wilt kunnen

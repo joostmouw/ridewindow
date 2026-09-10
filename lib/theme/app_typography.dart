@@ -1,5 +1,5 @@
 // lib/theme/app_typography.dart
-// Het lettertype van RideWindow. Epic #64 ("Eigen gezicht").
+// Het lettertype van Ridewindow. Epic #64 ("Eigen gezicht").
 
 import 'package:flutter/material.dart';
 

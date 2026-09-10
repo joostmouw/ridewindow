@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
 
-  "appTitle": "RideWindow",
+  "appTitle": "Ridewindow",
 
   "navHome": "Home",
   "navAgenda": "Agenda",
@@ -195,7 +195,7 @@
   "save": "Save",
 
   "sendFeedback": "Send feedback",
-  "feedbackRatingLabel": "How would you rate RideWindow?",
+  "feedbackRatingLabel": "How would you rate Ridewindow?",
   "feedbackCommentHint": "Anything you'd like to share? (optional)",
   "feedbackCommentLabel": "Comment",
   "feedbackStarRating": "{count, plural, =1{{count} star} other{{count} stars}}",
@@ -334,7 +334,7 @@
   "remindEveningBefore": "Remind me the evening before",
   "reminderPlanned": "Reminder planned for the evening before!",
   "shareRideWindow": "Share this ride window",
-  "shareText": "Bike ride {day} {timeRange} ({tier})\n{summary}\n\nVia RideWindow",
+  "shareText": "Bike ride {day} {timeRange} ({tier})\n{summary}\n\nVia Ridewindow",
 
   "insightsTitle": "Why '{tier}' \u2014 {score}/100",
   "insightsTempIdeal": "Ideal",
@@ -503,7 +503,7 @@
   "cellStatusBlocked": "Blocked",
   "dayHeaderToggleHint": "Double tap to toggle all hours for this day",
   "hourHeaderToggleHint": "Double tap to toggle this hour across all days",
-  "addToHomeScreenHint": "Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.",
+  "addToHomeScreenHint": "Tap the Share icon, then \"Add to Home Screen\" to install Ridewindow.",
   "pelotonEmptyTitle": "Ride together",
   "pelotonEmptyHint": "Share a ride window with a friend. They open your link, join, and the ride lands in their app.",
   "pelotonInvitesSent": "Invitations you sent",
@@ -516,7 +516,7 @@
   "pelotonNoFriends": "Your peloton is empty",
   "pelotonNoFriendsHint": "A peloton is the group you ride with. Invite a buddy and you'll see each other's rides.",
   "pelotonInviteFriend": "Invite a buddy",
-  "pelotonInviteShare": "Ride with me on RideWindow. Open the app and enter code {code}.",
+  "pelotonInviteShare": "Ride with me on Ridewindow. Open the app and enter code {code}.",
   "pelotonYourCode": "Your code: {code}",
   "pelotonRemoveFriend": "Remove buddy",
   "pelotonAccept": "Join",
@@ -552,7 +552,7 @@
   "pelotonJoining": "Adding you…",
   "pelotonSignInToJoin": "Sign in first, then enter this code under Rides, tab Peloton.",
   "pelotonGoToPeloton": "Go to Peloton",
-  "pelotonInviteShareLink": "Ride with me on RideWindow: {link}\n\nNo app yet? The link works in your browser. Or enter code {code} under Rides, tab Peloton.",
+  "pelotonInviteShareLink": "Ride with me on Ridewindow: {link}\n\nNo app yet? The link works in your browser. Or enter code {code} under Rides, tab Peloton.",
   "@pelotonInviteShareLink": {"placeholders": {"link": {"type": "String"}, "code": {"type": "String"}}},
   "ridesTabRides": "Rides",
   "ridesTabBuddies": "Peloton",

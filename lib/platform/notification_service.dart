@@ -1,5 +1,5 @@
 // lib/platform/notification_service.dart
-// NotificationService: centraliseert alle notificatie-logica voor RideWindow.
+// NotificationService: centraliseert alle notificatie-logica voor Ridewindow.
 // Geen @riverpod — plain klasse, injecteerbaar voor tests.
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,7 +11,7 @@ const int kNotifIdEveningBefore = 1001;
 const int kNotifIdMorningOf = 1002;
 const int kNotifIdWeeklyDigest = 1003;
 
-/// Gecentraliseerde notification-service voor RideWindow.
+/// Gecentraliseerde notification-service voor Ridewindow.
 /// Beheert kanaal-registratie, permissies en drie notificatie-schedulers.
 class NotificationService {
   static const _channelRideAlerts = AndroidNotificationChannel(

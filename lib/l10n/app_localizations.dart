@@ -100,7 +100,7 @@ abstract class S {
   /// No description provided for @appTitle.
   ///
   /// In nl, this message translates to:
-  /// **'RideWindow'**
+  /// **'Ridewindow'**
   String get appTitle;
 
   /// No description provided for @navHome.
@@ -1072,7 +1072,7 @@ abstract class S {
   /// No description provided for @feedbackRatingLabel.
   ///
   /// In nl, this message translates to:
-  /// **'Hoe zou je RideWindow beoordelen?'**
+  /// **'Hoe zou je Ridewindow beoordelen?'**
   String get feedbackRatingLabel;
 
   /// No description provided for @feedbackCommentHint.
@@ -1756,7 +1756,7 @@ abstract class S {
   /// No description provided for @shareText.
   ///
   /// In nl, this message translates to:
-  /// **'Fietsrit {day} {timeRange} ({tier})\n{summary}\n\nVia RideWindow'**
+  /// **'Fietsrit {day} {timeRange} ({tier})\n{summary}\n\nVia Ridewindow'**
   String shareText(String day, String timeRange, String tier, String summary);
 
   /// No description provided for @insightsTitle.
@@ -2680,7 +2680,7 @@ abstract class S {
   /// No description provided for @addToHomeScreenHint.
   ///
   /// In nl, this message translates to:
-  /// **'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.'**
+  /// **'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om Ridewindow te installeren.'**
   String get addToHomeScreenHint;
 
   /// No description provided for @pelotonEmptyTitle.
@@ -2758,7 +2758,7 @@ abstract class S {
   /// No description provided for @pelotonInviteShare.
   ///
   /// In nl, this message translates to:
-  /// **'Fiets met me mee in RideWindow. Open de app en vul code {code} in.'**
+  /// **'Fiets met me mee in Ridewindow. Open de app en vul code {code} in.'**
   String pelotonInviteShare(String code);
 
   /// No description provided for @pelotonYourCode.
@@ -2944,7 +2944,7 @@ abstract class S {
   /// No description provided for @pelotonInviteShareLink.
   ///
   /// In nl, this message translates to:
-  /// **'Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.'**
+  /// **'Fiets met me mee in Ridewindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.'**
   String pelotonInviteShareLink(String link, String code);
 
   /// No description provided for @ridesTabRides.

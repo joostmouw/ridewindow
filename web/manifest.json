@@ -1,6 +1,6 @@
 {
-    "name": "RideWindow",
-    "short_name": "RideWindow",
+    "name": "Ridewindow",
+    "short_name": "Ridewindow",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#C5D4B6",

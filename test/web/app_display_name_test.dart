@@ -96,7 +96,7 @@ void main() {
         name,
         isNot('ridewindow'),
         reason: 'lowercase "ridewindow" is the Dart package id, not the '
-            'brand name — docs/store-listing.md and CLAUDE.md say RideWindow',
+            'brand name — docs/store-listing.md and CLAUDE.md say Ridewindow',
       );
       expect(name, isNot('web'));
       expect(name, isNot(contains('A new Flutter project')));

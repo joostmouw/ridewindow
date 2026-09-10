@@ -62,7 +62,7 @@ void main() {
 
       expect(
         find.text(
-          "Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.",
+          "Tap the Share icon, then \"Add to Home Screen\" to install Ridewindow.",
         ),
         findsOneWidget,
       );

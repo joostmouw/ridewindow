@@ -1,5 +1,5 @@
 // lib/theme/app_icons.dart
-// De iconen van RideWindow: Phosphor Regular, met Fill voor de geselecteerde tab.
+// De iconen van Ridewindow: Phosphor Regular, met Fill voor de geselecteerde tab.
 //
 // **Waarom de constanten hier staan en niet uit een pakket komen.** `phosphor_flutter`
 // bestaat, maar versie 2.1.0 (mei 2024) doet `class PhosphorIconData extends IconData`

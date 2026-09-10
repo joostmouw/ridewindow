@@ -9,7 +9,7 @@ class SNl extends S {
   SNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get appTitle => 'RideWindow';
+  String get appTitle => 'Ridewindow';
 
   @override
   String get navHome => 'Home';
@@ -554,7 +554,7 @@ class SNl extends S {
   String get sendFeedback => 'Feedback versturen';
 
   @override
-  String get feedbackRatingLabel => 'Hoe zou je RideWindow beoordelen?';
+  String get feedbackRatingLabel => 'Hoe zou je Ridewindow beoordelen?';
 
   @override
   String get feedbackCommentHint => 'Wil je iets delen? (optioneel)';
@@ -938,7 +938,7 @@ class SNl extends S {
 
   @override
   String shareText(String day, String timeRange, String tier, String summary) {
-    return 'Fietsrit $day $timeRange ($tier)\n$summary\n\nVia RideWindow';
+    return 'Fietsrit $day $timeRange ($tier)\n$summary\n\nVia Ridewindow';
   }
 
   @override
@@ -1463,7 +1463,7 @@ class SNl extends S {
 
   @override
   String get addToHomeScreenHint =>
-      'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om RideWindow te installeren.';
+      'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om Ridewindow te installeren.';
 
   @override
   String get pelotonEmptyTitle => 'Samen fietsen';
@@ -1506,7 +1506,7 @@ class SNl extends S {
 
   @override
   String pelotonInviteShare(String code) {
-    return 'Fiets met me mee in RideWindow. Open de app en vul code $code in.';
+    return 'Fiets met me mee in Ridewindow. Open de app en vul code $code in.';
   }
 
   @override
@@ -1615,7 +1615,7 @@ class SNl extends S {
 
   @override
   String pelotonInviteShareLink(String link, String code) {
-    return 'Fiets met me mee in RideWindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Ritten, tab Peloton.';
+    return 'Fiets met me mee in Ridewindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Ritten, tab Peloton.';
   }
 
   @override

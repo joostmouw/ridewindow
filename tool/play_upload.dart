@@ -131,7 +131,7 @@ Future<int> _run(List<String> args) async {
   final releaseNotes = _readNotes(notesArgs);
 
   final sizeMb = (aab.lengthSync() / (1024 * 1024)).toStringAsFixed(1);
-  stdout.writeln('RideWindow ${version.name} (${version.code})');
+  stdout.writeln('Ridewindow ${version.name} (${version.code})');
   stdout.writeln('  bundel  $aabPath  ($sizeMb MB)');
   stdout.writeln('  track   $track  ($status)');
   stdout.writeln('  notes   ${releaseNotes.isEmpty ? '—' : releaseNotes.map(

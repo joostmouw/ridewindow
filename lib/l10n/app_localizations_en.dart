@@ -9,7 +9,7 @@ class SEn extends S {
   SEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'RideWindow';
+  String get appTitle => 'Ridewindow';
 
   @override
   String get navHome => 'Home';
@@ -553,7 +553,7 @@ class SEn extends S {
   String get sendFeedback => 'Send feedback';
 
   @override
-  String get feedbackRatingLabel => 'How would you rate RideWindow?';
+  String get feedbackRatingLabel => 'How would you rate Ridewindow?';
 
   @override
   String get feedbackCommentHint => 'Anything you\'d like to share? (optional)';
@@ -938,7 +938,7 @@ class SEn extends S {
 
   @override
   String shareText(String day, String timeRange, String tier, String summary) {
-    return 'Bike ride $day $timeRange ($tier)\n$summary\n\nVia RideWindow';
+    return 'Bike ride $day $timeRange ($tier)\n$summary\n\nVia Ridewindow';
   }
 
   @override
@@ -1460,7 +1460,7 @@ class SEn extends S {
 
   @override
   String get addToHomeScreenHint =>
-      'Tap the Share icon, then \"Add to Home Screen\" to install RideWindow.';
+      'Tap the Share icon, then \"Add to Home Screen\" to install Ridewindow.';
 
   @override
   String get pelotonEmptyTitle => 'Ride together';
@@ -1503,7 +1503,7 @@ class SEn extends S {
 
   @override
   String pelotonInviteShare(String code) {
-    return 'Ride with me on RideWindow. Open the app and enter code $code.';
+    return 'Ride with me on Ridewindow. Open the app and enter code $code.';
   }
 
   @override
@@ -1610,7 +1610,7 @@ class SEn extends S {
 
   @override
   String pelotonInviteShareLink(String link, String code) {
-    return 'Ride with me on RideWindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Peloton.';
+    return 'Ride with me on Ridewindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Peloton.';
   }
 
   @override

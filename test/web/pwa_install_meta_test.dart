@@ -1,5 +1,5 @@
 // test/web/pwa_install_meta_test.dart
-// Verifies web/index.html and web/manifest.json carry real RideWindow PWA
+// Verifies web/index.html and web/manifest.json carry real Ridewindow PWA
 // installability metadata (PWA-01/PWA-02) instead of the default Flutter
 // template placeholders. Guards against a regression ever silently
 // reintroducing the generic Flutter icon references, brand color, or a
@@ -39,8 +39,8 @@ void main() {
   group('web/manifest.json', () {
     final contents = File('web/manifest.json').readAsStringSync();
 
-    test('advertises the real RideWindow name, not the Flutter placeholder', () {
-      expect(contents, contains('"RideWindow"'));
+    test('advertises the real Ridewindow name, not the Flutter placeholder', () {
+      expect(contents, contains('"Ridewindow"'));
       expect(contents, isNot(contains('A new Flutter project.')));
     });
 

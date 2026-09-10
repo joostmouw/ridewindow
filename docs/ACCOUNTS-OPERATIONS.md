@@ -1,6 +1,6 @@
 # Accounts Operations
 
-Operational reference for running RideWindow's accounts (Google Sign-In + Supabase). This is a doc to consult while triaging a live problem, not a design record — for the "why", see `.planning/phases/18-preconditions/18-CONTEXT.md` and `.planning/research/PITFALLS.md` (#4, #8, #9).
+Operational reference for running Ridewindow's accounts (Google Sign-In + Supabase). This is a doc to consult while triaging a live problem, not a design record — for the "why", see `.planning/phases/18-preconditions/18-CONTEXT.md` and `.planning/research/PITFALLS.md` (#4, #8, #9).
 
 ## 1. Two different Google user caps
 
@@ -19,7 +19,7 @@ There are **two separate caps** on this Google Cloud project (`my-project-joost`
 
 ## 2. Free tier: what it costs you
 
-RideWindow's Supabase project runs on the **free tier**, chosen deliberately (`Ik wil gratis en makkelijk mogelijk`). That comes with two consequences worth remembering before they matter:
+Ridewindow's Supabase project runs on the **free tier**, chosen deliberately (`Ik wil gratis en makkelijk mogelijk`). That comes with two consequences worth remembering before they matter:
 
 **No automated backups.** The dashboard states this directly: "Last backup: No backups." If the hosted Postgres database is lost, there is no restore point on Supabase's side. The blast radius is limited because the device (Android app / browser) keeps its own local copy via Drift, and local storage remains the source of truth by design — but a hosted-only loss (e.g. a second device that has never synced) is not recoverable.
 

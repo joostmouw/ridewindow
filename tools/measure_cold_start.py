@@ -1,4 +1,4 @@
-"""Meet de koude start van de RideWindow-PWA op een Android-toestel via adb.
+"""Meet de koude start van de Ridewindow-PWA op een Android-toestel via adb.
 
 REG-03 stelt dat het eerste ride slot binnen 2 seconden na de tik zichtbaar moet zijn.
 Dit script meet dat niet als één getal maar als een verdeling: per run wordt op een

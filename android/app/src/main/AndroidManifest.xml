@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
-        android:label="RideWindow"
+        android:label="Ridewindow"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -55,7 +55,7 @@
             android:name="com.dexterous.flutterlocalnotifications.default_notification_channel_id"
             android:value="ride_alerts" />
 
-        <!-- RideWindow home screen widget -->
+        <!-- Ridewindow home screen widget -->
         <receiver
             android:name="com.fanalists.ridewindow.ridewindow.RideWidgetProvider"
             android:exported="true">
