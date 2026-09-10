@@ -39,9 +39,16 @@
       "priority": "medium"
     }
   ],
-  "open_backlog": ["#63 iPhone-tester komt niet terug uit beschikbaarheid", "#66 afgezegde ritten onbereikbaar", "#67 notificaties hardgecodeerd Nederlands", "#69 groene blok", "#70 waarom dit venster"],
+  "open_backlog": [
+    "#63 iPhone-tester komt niet terug uit beschikbaarheid",
+    "#66 afgezegde ritten onbereikbaar",
+    "#67 notificaties hardgecodeerd Nederlands",
+    "#69 groene blok",
+    "#70 waarom dit venster"
+  ],
   "uncommitted_files": [],
   "notes": [
+    "ALLE openstaande punten staan uitgeschreven in .planning/OPEN.md -- lees dat eerst.",
     "653 tests groen, nul analyzer-fouten op het laatste commit.",
     "Twee lokale webservers draaiden op poort 8765 (repo-root, voor de schetsen) en 8766 (build/web). Die overleven het wissen van de context niet noodzakelijk -- herstart ze als je een schets wilt openen.",
     "De les die de meeste tijd kostte staat in .planning/STATE.md onderaan: ga niet terug naar de gesloten zonsopgangsvergelijking omdat hij korter is, hij is niet nauwkeurig genoeg."
