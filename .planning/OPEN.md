@@ -12,7 +12,7 @@ belang.
 |---|---|---|
 | **A** | Migratie 0007 (`darkness_weight`) | **Gedraaid** door Joost in het Supabase-dashboard. Profiel-upserts kunnen weer. |
 | **B** | PWA verouderd | **Gedeployed** — https://my-project-joost.web.app draait nu het daglicht én de fietstaal. Deel de link met ⌘⇧R erbij. |
-| **C** | Play-bundel verouderd | **Herbouwd** als `1.0.29+30` (die versie was klaargezet maar nooit geüpload, dus hergebruikt). Release-notities bijgewerkt en binnen de Play-limiet van 500 tekens gebracht — ze stonden er met 736 en 645 al overheen. **Uploaden wacht nog op je akkoord (punt E).** |
+| **C** | Play-bundel verouderd | **Herbouwd** als `1.0.30+31`. Let op: `1.0.29+30` was blijkens commit `2293358` "niet geüpload", maar Play weigerde hem met *"Version code 30 has already been used"* — die commitboodschap was onjuist. Vertrouw voortaan Play, niet de git-historie, voor wat er al draait. Release-notities bijgewerkt en binnen de Play-limiet van 500 tekens gebracht — ze stonden er met 736 en 645 al overheen. **Uploaden wacht nog op je akkoord (punt E).** |
 
 ## 2. Beslissingen die op jou wachten
 
