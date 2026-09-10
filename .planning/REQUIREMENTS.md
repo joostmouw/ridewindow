@@ -44,6 +44,7 @@
 - [ ] **EERST-01**: Een nieuwe gebruiker die zijn week niet invult, ziet toch een bruikbaar scherm dat hem naar het invullen leidt in plaats van een lege app
 - [ ] **EERST-02**: Een nieuwe gebruiker krijgt niet meer dan één uitlegoverlay voordat hij zelf iets in de app heeft gedaan
 - [ ] **EERST-03**: Notificaties verschijnen in de taal van de app (backlog #67)
+- [ ] **EERST-04**: Bij omlaag trekken om te verversen fietst de Ridewindow-fietser in plaats van het laadrondje — op Home én Peloton gelijk — met een stilstaande variant als Android "minder beweging" aan heeft (schets 013; stand nog te kiezen)
 
 ### Vensters (WIN)
 
@@ -95,6 +96,7 @@
 | EERST-01 | Phase 29 | Pending |
 | EERST-02 | Phase 29 | Pending |
 | EERST-03 | Phase 29 | Pending |
+| EERST-04 | Phase 29 | Pending |
 | WERV-03 | Phase 30 | Pending |
 | WERV-04 | Phase 30 | Pending |
 | WERV-05 | Phase 30 | Pending |
@@ -105,8 +107,8 @@
 | PROOF-04 | Phase 32 | Pending |
 
 **Coverage:**
-- v4.1 requirements: 25 total
-- Mapped to phases: 25
+- v4.1 requirements: 26 total
+- Mapped to phases: 26
 - Unmapped: 0
 
 ---

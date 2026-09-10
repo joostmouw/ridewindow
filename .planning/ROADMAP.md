@@ -70,7 +70,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 - [ ] **Phase 26: Console op orde** - Release-route via internal, landen open, feedback-adres, Google Group, nl-NL-winkelpagina, alles gelijk aan de Play-build, en de changelog vanaf build 41
 - [ ] **Phase 27: Wervingsonderzoek** - Uitzoeken welke kanalen testers opleveren die veertien dagen blijven; keuze voor 2–3 kanalen met teksten klaar
 - [ ] **Phase 28: Feedbackstroom** - Eén register voor alle bronnen, gestructureerd formulier, een natuurlijk vraagmoment, een vaste beoordelingsronde naar de backlog, en terugkoppeling aan de tester
-- [ ] **Phase 29: Eerste minuut** - Lege staat, hooguit één uitlegoverlay vooraf, notificaties in de taal van de app — samen met fase 28 in build 43
+- [ ] **Phase 29: Eerste minuut** - Lege staat, hooguit één uitlegoverlay vooraf, notificaties in de taal van de app, en de fietser bij het verversen — samen met fase 28 in build 43
 - [ ] **Phase 30: Werving** - Eigen kring direct na fase 26, de gekozen kanalen na build 43; minstens 15 aangemeld en afhakers binnen twee dagen gezien
 - [ ] **Phase 31: De veertien dagen** - Ingrids vensters (#69, #70) als echte builds op echte feedback; minstens drie builds naar de gesloten test
 - [ ] **Phase 32: Aanvraag en productie** - De aanvraag onderbouwd vanuit de changelog, en Ridewindow in productie
@@ -279,12 +279,13 @@ Plans:
 ### Phase 29: Eerste minuut
 **Goal**: Een nieuwe tester ziet in zijn eerste minuut iets bruikbaars en wordt niet overladen, in zijn eigen taal — ook in notificaties.
 **Depends on**: Nothing — levert samen met fase 28 build 43
-**Requirements**: EERST-01, EERST-02, EERST-03
+**Requirements**: EERST-01, EERST-02, EERST-03, EERST-04
 **Success Criteria** (what must be TRUE):
   1. Een verse installatie zonder ingevulde week toont een scherm dat naar het invullen leidt in plaats van een lege lijst of grijze uren
   2. Voordat de gebruiker zelf iets doet verschijnt hooguit één uitlegoverlay
   3. Met de app op Engels komen alle zes notificatieteksten in het Engels binnen
-  4. Build 43 (fase 28 + 29) staat via internal op de gesloten test
+  4. Omlaag trekken op Home en Peloton laat de fietser zien in plaats van het rondje, in de stand die Joost uit schets 013 koos, en stilstaand bij "minder beweging"
+  5. Build 43 (fase 28 + 29) staat via internal op de gesloten test
 **Plans**: TBD
 **UI hint**: yes
 
