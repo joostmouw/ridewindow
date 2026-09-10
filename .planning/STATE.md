@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "NL-teksten opgeschoond; 1.0.29+30 klaar voor Play"
-last_updated: "2026-09-08T22:40:00.000Z"
+status: "Daglicht af -- migratie 0007 moet nog toegepast"
+last_updated: "2026-09-10T08:30:00.000Z"
 last_activity: 2026-09-08
 progress:
   total_phases: 3
@@ -907,3 +907,32 @@ blijven staan. Wil je daar ooit op terugkomen: het staat uitgeschreven in schets
 
 **De bundel is opnieuw gebouwd** nadat de teksten wijzigden; `1.0.29+30` is nog steeds niet
 geüpload, dus het versienummer bleef staan. Release-notities in beide talen bijgewerkt.
+
+## Stand 2026-09-10 — daglicht (backlog #68)
+
+Testfeedback van Ingrid leverde drie punten op, waarvan één een echte fout: de app hield geen
+rekening met daglicht en zette donderdag 20:00–22:00 op **score 100** terwijl de zon om **20:07**
+onderging. `slots_notifier.dart` hanteerde een hardgecodeerd venster van 06:00–22:00 en het woord
+zonsondergang kwam nergens in de codebase voor. De andere twee — te veel overlappende vensters, en
+"waarom dit venster en niet dat ernaast" — staan als **#69** en **#70** in de backlog; die gaan over
+hetzelfde onderliggende verschil, dat de app in losse vensters denkt en de gebruiker in één
+aaneengesloten goed blok.
+
+**Wat er nu staat.** `daylight.dart` rekent de zonstand lokaal uit, `SlotGenerator.applyDaylight`
+past de aftrek toe, `DaylightBar` staat als vierde weerbalk op Home en detail, `DaylightNote` is de
+regel op de ritkaart, en in Profiel staat een vierde schuif. Resultaat op het toestel: de beste
+keuze verschoof van 20:00–22:00 naar 17:00–19:00.
+
+**De les die de meeste tijd kostte:** de gesloten formule uit de zonsopgangsvergelijking is niet
+nauwkeurig genoeg. Hij zat er 104 seconden naast in Amsterdam en 175 op Tromsø, en de fout groeide
+met de breedtegraad en rond de equinox — de declinatie schuift daar 0,4° per dag op. Twee iteraties
+hielpen maar half. Wat wél werkt is de zonshoogte uitrekenen en per seconde zoeken waar hij de
+horizon kruist: binnen 53 seconden, en Open-Meteo rondt zelf op hele minuten af. Ga niet terug naar
+de gesloten formule omdat hij korter is.
+
+### ⚠️ Blokkerend vóór de volgende deploy én vóór de Play-upload
+
+`supabase/migrations/0007_profile_darkness_weight.sql` **moet zijn toegepast**. `darkness_weight`
+zit in `UserProfile.toRow`; zonder die kolom weigert Postgres elke profiel-upsert en blijft het
+profiel in de sync-outbox hangen. De PWA is daarom bewust **niet** opnieuw gedeployed en de
+Play-bundel (1.0.29+30) is **niet** herbouwd na deze wijziging.
