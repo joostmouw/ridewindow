@@ -6,23 +6,19 @@ belang.
 
 ---
 
-## 1. Blokkerend — moet vóór de volgende deploy of upload
+## 1. Blokkerend — afgehandeld op 2026-09-10
 
-| | Wat | Waarom het klemt |
+| | Wat | Stand |
 |---|---|---|
-| **A** | **Migratie 0007 toepassen** — `supabase/migrations/0007_profile_darkness_weight.sql`, één `alter table public.profiles add column darkness_weight`. | `darkness_weight` zit in `UserProfile.toRow`. Zonder die kolom weigert Postgres **elke** profiel-upsert en blijft het profiel in de sync-outbox hangen. Er staat geen `supabase` CLI op deze machine, dus dit gaat via je Supabase-dashboard. |
-| **B** | **PWA is verouderd.** Bewust niet gedeployed sinds het daglichtwerk. | Wat live staat op https://my-project-joost.web.app mist het daglicht én de Nederlandse tekstronde niet — die staat er wel — maar wel alles van 10 september. Deployen kan pas na **A**. |
-| **C** | **Play-bundel is verouderd.** `build/app/outputs/bundle/release/app-release.aab` (1.0.29+30) dateert van vóór het daglicht. | Herbouwen ná **A**, en de release-notities noemen het daglicht nog niet. Niet geüpload — dat wacht op jouw akkoord. |
-
-**Volgorde:** SQL draaien → `flutter build web` → `firebase deploy --only hosting --project my-project-joost` → release-notities aanvullen → `flutter build appbundle --release` → uploaden.
-
----
+| **A** | Migratie 0007 (`darkness_weight`) | **Gedraaid** door Joost in het Supabase-dashboard. Profiel-upserts kunnen weer. |
+| **B** | PWA verouderd | **Gedeployed** — https://my-project-joost.web.app draait nu het daglicht én de fietstaal. Deel de link met ⌘⇧R erbij. |
+| **C** | Play-bundel verouderd | **Herbouwd** als `1.0.29+30` (die versie was klaargezet maar nooit geüpload, dus hergebruikt). Release-notities bijgewerkt en binnen de Play-limiet van 500 tekens gebracht — ze stonden er met 736 en 645 al overheen. **Uploaden wacht nog op je akkoord (punt E).** |
 
 ## 2. Beslissingen die op jou wachten
 
 | | Wat | Stand |
 |---|---|---|
-| **D** | **Schets 010 — hoeveel fietstaal, en waar.** Drie standen geschetst: (1) fiets in de toon, (2) ook in de oordelen (*Toprit / Fijne rit / Te doen / Binnenblijver*), (3) ook in de wegwijzers (*Peloton* terug, mét introductie). | **Niet gekozen.** Je ging verder met Ingrids feedback. Mijn aanbeveling was **stand 3**. Het inzicht van de schets: "uit het niets" was geen verkéérd woord maar een **ontbrekende introductie** — Peloton stond op een tabblad zonder dat de app het ooit uitlegde. Zeven woorden op de lege staat repareren dat. |
+| **D** | ~~Schets 010 — hoeveel fietstaal, en waar.~~ **Gekozen op 2026-09-10: stand 3**, gebouwd en gedeployed (`1bf942d`). Oorspronkelijke tekst:** Drie standen geschetst: (1) fiets in de toon, (2) ook in de oordelen (*Toprit / Fijne rit / Te doen / Binnenblijver*), (3) ook in de wegwijzers (*Peloton* terug, mét introductie). | **Afgerond.** Je ging destijds verder met Ingrids feedback. Mijn aanbeveling was **stand 3**. Het inzicht van de schets: "uit het niets" was geen verkéérd woord maar een **ontbrekende introductie** — Peloton stond op een tabblad zonder dat de app het ooit uitlegde. Zeven woorden op de lege staat repareren dat. |
 | **E** | **Play-upload zelf.** | Wacht op jouw akkoord ná de PWA-ronde. |
 | **F** | **Blok 4 van schets 009 — de toon.** *Nachtuil*, *Weekendstrijder*, *TOLERANTIES*, *RIJLENGTE*, "plan de route strategisch". | Je koos bewust **niets**. Ligt uitgeschreven klaar in schets 009 als je erop terug wilt komen. |
 

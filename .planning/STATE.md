@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: Eigen gezicht
-status: "Fietstaal door; migratie 0007 blokkeert nog deploy"
+status: "PWA live; bundel 1.0.29+30 klaar, upload wacht op akkoord"
 last_updated: "2026-09-10T09:15:00.000Z"
 last_activity: 2026-09-08
 progress:
