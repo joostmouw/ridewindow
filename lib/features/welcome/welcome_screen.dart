@@ -30,11 +30,13 @@ import 'package:ridewindow/theme/app_motion.dart';
 /// verkleining kost scherpte die je in het monogram als eerste ziet. Scherper
 /// dan dit kan niet — het zit niet in de bron.
 ///
-/// **Waarom hij op 1,75× staat en niet op de snelheid van de bron.** Joost,
+/// **Waarom hij op 3,5× staat en niet op de snelheid van de bron.** Joost,
 /// 2026-09-08, na de vier tempo's naast elkaar te hebben gezien: op ware
 /// snelheid duurt de intro 8,65 s en dat is lang voor iets dat je één keer
-/// ziet en daarna nooit meer. De frames zijn dezelfde gebleven — alleen de
-/// framelengte in de ANMF-chunks is van 42 ms naar 24 ms gepatcht met
+/// ziet en daarna nooit meer. Eerst werd dat 1,75×; op 2026-09-10 vond hij
+/// ook dat nog te lang voor een nieuwe tester, en ging het nog eens 2× sneller.
+/// De frames zijn dezelfde gebleven — alleen de
+/// framelengte in de ANMF-chunks is van 42 ms naar 12 ms gepatcht met
 /// `tool/webp_speed.py`, dus er is niets hercodeerd en het bestand is nog
 /// exact even groot. Wil je een ander tempo, draai dan dat script opnieuw op
 /// de bron en pas `_settleAt` hieronder aan.
@@ -63,15 +65,15 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
-  /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 4,94 s (206
-  /// frames van 24 ms) en het verschuiven zelf 1,8 s, dus ze eindigen samen:
+  /// Wanneer het verschuiven begint. `welcome_ride.webp` duurt 2,47 s (206
+  /// frames van 12 ms) en het verschuiven zelf 1,5 s, dus ze eindigen samen:
   /// de rit rijdt zijn laatste seconde uit terwijl hij al omhoog gaat.
   ///
   /// **Dit getal is afgeleid, niet gekozen.** Het is de duur van de animatie
-  /// min de 1,8 s hieronder. Verandert het tempo van de WebP, dan verandert
+  /// min de 1,5 s hieronder. Verandert het tempo van de WebP, dan verandert
   /// dit mee — anders staat het scherm stil terwijl de rit al klaar is, of
   /// schuift hij weg terwijl de renner nog fietst.
-  static const _settleAt = Duration(milliseconds: 3144);
+  static const _settleAt = Duration(milliseconds: 972);
 
   late final AnimationController _settle;
   Timer? _timer;
@@ -82,8 +84,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _settle = AnimationController(
       vsync: this,
       // Rustig. Op 900 ms schoot de renner het scherm in; over deze afstand
-      // leest alles onder de anderhalve seconde als een sprong.
-      duration: const Duration(milliseconds: 1800),
+      // leest alles onder de anderhalve seconde als een sprong — dus precies
+      // die, sinds de intro zelf 2,47 s duurt.
+      duration: const Duration(milliseconds: 1500),
     );
     _timer = Timer(_settleAt, _startSettle);
   }

@@ -85,11 +85,11 @@ void main() {
     await tester.pumpWidget(_buildTestApp());
 
     // In twee stappen, en dat is geen omweg: de verschuiving start via een
-    // `Timer` op 3144 ms. Eén grote pump laat die timer vuren maar geeft de
+    // `Timer` op 972 ms. Eén grote pump laat die timer vuren maar geeft de
     // controller daarna geen tijd meer, dus dan staat alles nog op nul.
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 3200)); // timer vuurt
-    await tester.pump(const Duration(milliseconds: 1200)); // 2/3 van de 1800 ms
+    await tester.pump(const Duration(milliseconds: 1000)); // timer vuurt
+    await tester.pump(const Duration(milliseconds: 1000)); // 2/3 van de 1500 ms
 
     // Precies de FadeTransition om de tekst, niet die van de router.
     final fade = tester.widget<FadeTransition>(
