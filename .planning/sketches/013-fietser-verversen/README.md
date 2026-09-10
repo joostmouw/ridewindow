@@ -30,7 +30,7 @@ als achtergrond).
 **Openen:** `python3 -m http.server 8765` vanuit de repo-root, dan
 `http://localhost:8765/.planning/sketches/013-fietser-verversen/`.
 
-**Gekozen: B — trekken is trappen** (Joost, 2026-09-10). Doorslaggevend: geen vertraging. In de
+**Gekozen: A+B — volgen, dan wegrijden** (Joost, 2026-09-10). Eerst viel de keuze op B omdat die geen vertraging had; toen A+B na de aanpassing even snel bleek, werd het A+B: tijdens het trekken volgt hij de vinger, na het laden fietst hij rechts weg terwijl de inhoud terugveert. In de
 eerste versie van de mockup liet A de inhoud wachten tot de fietser weg was (+0,4 s); na de
 aanpassing rijdt hij weg terwijl de inhoud terugveert, en zijn alle vier gemeten gelijk (inhoud
 terug op 2,80 s). Eis voor de bouw: **de animatie houdt de gegevens nooit op.**

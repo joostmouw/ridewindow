@@ -284,7 +284,7 @@ Plans:
   1. Een verse installatie zonder ingevulde week toont een scherm dat naar het invullen leidt in plaats van een lege lijst of grijze uren
   2. Voordat de gebruiker zelf iets doet verschijnt hooguit één uitlegoverlay
   3. Met de app op Engels komen alle zes notificatieteksten in het Engels binnen
-  4. Omlaag trekken op Home en Peloton laat de fietser zien in plaats van het rondje, in stand B uit schets 013 (volgt de vinger, verdwijnt met de inhoud mee), zonder vertraging ten opzichte van het rondje, en stilstaand bij "minder beweging"
+  4. Omlaag trekken op Home en Peloton laat de fietser zien in plaats van het rondje, in stand A+B uit schets 013 (volgt de vinger, fietst na het laden rechts weg terwijl de inhoud terugveert), zonder vertraging ten opzichte van het rondje, en stilstaand bij "minder beweging"
   5. Build 43 (fase 28 + 29) staat via internal op de gesloten test
 **Plans**: TBD
 **UI hint**: yes
