@@ -1,33 +1,49 @@
 {
-  "timestamp": "2026-06-05T21:48:11.647Z",
-  "reason": "context exhaustion at 81%",
-  "phase": "post-phase-10 (UX polish)",
+  "timestamp": "2026-09-10T08:45:00.000Z",
+  "reason": "Joost wist bewust de context om door te gaan (65% verbruikt)",
+  "phase": "na v4.0 — losse verbeteringen uit testfeedback",
   "position": {
-    "last_commit": "99062cb",
-    "last_activity": "UX polish round 2 — 6 of 8 improvements committed"
+    "last_commit": "f971903",
+    "last_activity": "Daglicht (backlog #68) af en getest; niet gedeployed, niet geupload"
   },
   "completed_this_session": [
-    "UX/UI polish round 1: 8 super-app improvements (ca6f0f8)",
-    "GSD quick task registration for round 1 (5cab968)",
-    "UX polish round 2: 6 improvements — button redesign, date numbers, slot count, share button, colored hourly rows, notification fix (99062cb)"
+    "Schets 008 + bouw: vier rolsoorten in een lijst, elke rit klikt door naar detail; deleteGroupRide eindelijk aangesloten (3223dbf, ecfa3b4, 8207771)",
+    "Welkom en Onboarding leesbaar in donkere modus -- BrandCanvas, buildAppTheme uit main.dart gehaald (cf5cc35)",
+    "Schets 009 + bouw: Nederlandse teksten -- 'fietsmoment' overal, 18 fouten eruit, kniewarmers weg (0985d6a)",
+    "Schets 010: hoeveel fietstaal en waar -- DRIE STANDEN GESCHETST, NOG NIET GEKOZEN",
+    "Schets 011 + bouw: daglicht -- eigen zonstandberekening, score-aftrek, vierde weerbalk, regel op de kaart, vierde schuif in Profiel (c3bd44f, 5aff9d7)",
+    "Backlog #68, #69, #70 vastgelegd uit Ingrids testfeedback (8d5380b)"
+  ],
+  "blockers": [
+    "MIGRATIE 0007 MOET WORDEN TOEGEPAST voor de volgende deploy en voor de Play-upload. supabase/migrations/0007_profile_darkness_weight.sql -- een enkele 'alter table public.profiles add column darkness_weight'. Zonder die kolom weigert Postgres elke profiel-upsert, want darkness_weight zit in UserProfile.toRow. Joost draait hem in het Supabase-dashboard; er staat geen supabase CLI op deze machine."
   ],
   "remaining": [
     {
-      "task": "Staggered card fade-in animation",
-      "description": "Ride cards animate in with cascading fade+slide when data loads on HomeScreen",
+      "task": "Migratie 0007 toepassen, dan PWA deployen en Play-bundel herbouwen",
+      "description": "De PWA is bewust niet gedeployed sinds het daglichtwerk. De bundel 1.0.29+30 in build/app/outputs/bundle/release/ dateert van VOOR het daglicht en is dus verouderd. Release-notities noemen het daglicht nog niet. Volgorde: SQL -> flutter build web -> firebase deploy --only hosting --project my-project-joost -> release-notes bijwerken -> flutter build appbundle --release. Deel de link altijd met de waarschuwing dat de eerste herlaad na een deploy de oude bundel kan geven; gebruik ?v=N of Cmd+Shift+R.",
+      "priority": "hoog"
+    },
+    {
+      "task": "Schets 010 afmaken -- hoeveel fietstaal, en waar",
+      "description": "Joost wil fietstermen maar vond 'Peloton' uit het niets komen. Het inzicht van de schets: dat was geen verkeerd woord maar een ONTBREKENDE INTRODUCTIE -- Peloton stond op een tabblad zonder dat de app het uitlegde. Drie standen geschetst in .planning/sketches/010-hoeveel-fiets/: (1) fiets in de toon, (2) ook in de oordelen (Toprit/Fijne rit/Te doen/Binnenblijver), (3) ook in de wegwijzers (Peloton terug MET introductie). Mijn aanbeveling was stand 3. Joost heeft nog niet gekozen -- hij ging verder met Ingrids feedback. Vraag het opnieuw voor je bouwt.",
+      "priority": "hoog"
+    },
+    {
+      "task": "Backlog #69 en #70 -- het groene blok in plaats van losse vensters",
+      "description": "Beide uit Ingrids feedback en beide dezelfde onderliggende oorzaak: de app denkt in losse vensters van N uur, de gebruiker in een aaneengesloten goed blok. #69 = toon het blok per dag met het beste venster erin gemarkeerd; #70 = laat zien waarom dit venster en niet dat ernaast (het weggegooide alternatief en zijn score zijn nu onzichtbaar). Schetsmateriaal.",
       "priority": "medium"
     },
     {
-      "task": "Color-track on tolerance sliders",
-      "description": "ProfileScreen sliders should have color gradient track (green=ideal, orange=acceptable, red=bad)",
+      "task": "Op de Oppo draaien",
+      "description": "Er was deze hele sessie geen toestel aangesloten. Veeggedrag op de nieuwe rittenlijst, de daglichtbalk en de vierde schuif zijn alleen in Chrome gezien. Volgens Joosts eigen afspraak (memory project_phone_testing) verifieer je aanraken en scrollen via adb op de Oppo, niet in Chrome. adb staat op ~/Library/Android/sdk/platform-tools/adb.",
       "priority": "medium"
     }
   ],
-  "blockers": [
-    "Phase 10 Plan 04 blocked on Google Play developer identity verification (submitted 2026-06-05)"
-  ],
-  "uncommitted_files": [
-    ".planning/STATE.md (modified — session continuity update)",
-    ".planning/phases/07-location-gps-manual-city-permission-state-machine/07-05-SUMMARY.md (modified)"
+  "open_backlog": ["#63 iPhone-tester komt niet terug uit beschikbaarheid", "#66 afgezegde ritten onbereikbaar", "#67 notificaties hardgecodeerd Nederlands", "#69 groene blok", "#70 waarom dit venster"],
+  "uncommitted_files": [],
+  "notes": [
+    "653 tests groen, nul analyzer-fouten op het laatste commit.",
+    "Twee lokale webservers draaiden op poort 8765 (repo-root, voor de schetsen) en 8766 (build/web). Die overleven het wissen van de context niet noodzakelijk -- herstart ze als je een schets wilt openen.",
+    "De les die de meeste tijd kostte staat in .planning/STATE.md onderaan: ga niet terug naar de gesloten zonsopgangsvergelijking omdat hij korter is, hij is niet nauwkeurig genoeg."
   ]
 }
