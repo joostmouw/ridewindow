@@ -1,15 +1,11 @@
-Je ritten staan nu in één lijst, op volgorde van je week, en je ziet aan elke
-rit wat je rol erin is: je organiseert hem, je gaat mee met een maatje, je
-rijdt alleen, of er wacht nog een uitnodiging op antwoord. Filter er bovenaan
-op, met de aantallen erbij.
+Nieuw: de score houdt rekening met daglicht. Een venster dat na zonsondergang
+valt scoort niet langer perfect. Hoe zwaar donker meetelt stel je zelf in.
 
-Elke gedeelde rit klikt nu door naar zijn detailscherm, waar staat wie er
-meegaat en wie nog moet antwoorden. Uitnodigingen beantwoord je direct in de
-lijst, en een rit die jij organiseert kun je nu ook afzeggen.
+De vier oordelen hebben namen gekregen: Toprit, Fijne rit, Te doen en
+Binnenblijver.
 
-Opgelost: de tekst op het openingsscherm was onleesbaar als je telefoon op de
-donkere modus staat.
+Je ritten staan in één lijst op volgorde van je week, met je rol per rit: je
+organiseert hem, je gaat mee, of je rijdt alleen. Uitnodigingen beantwoord je
+direct in de lijst.
 
-De Nederlandse teksten zijn nagelopen: één woord voor hetzelfde ding, geen
-Engels meer waar het niet hoort, en het kledingadvies noemt geen kniewarmers
-meer.
+Opgelost: onleesbare tekst op het openingsscherm in donkere modus.
