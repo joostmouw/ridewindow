@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twaalf testers — werving</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('../../assets/fonts/Outfit.ttf') format('truetype'); font-weight:100 900; }
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+    --accept-fg:#A42E0A; --accept-bg:#FFF3E0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 26px 90px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:32px;line-height:1.25;font-weight:500;margin:0 0 10px}
+  h2{font-size:21px;font-weight:500;margin:40px 0 6px;padding-top:22px;border-top:1px solid var(--outline)}
+  .lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:82ch;margin:0}
+  .sub{font-size:14.5px;line-height:1.6;color:var(--ink-3);max-width:84ch;margin:8px 0 0}
+  b{font-weight:600;color:var(--ink)}
+  code{font-size:.92em;background:var(--paper-high);border-radius:5px;padding:1px 5px}
+
+  .alert{margin-top:22px;background:var(--accept-bg);border:2px solid var(--accept-fg);border-radius:22px;padding:18px 22px}
+  .alert h3{margin:0 0 6px;font-size:18px;color:var(--accept-fg)}
+  .alert p{margin:6px 0 0;font-size:14.5px;line-height:1.6;color:var(--ink-2);max-width:90ch}
+
+  .sum{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;align-items:stretch}
+  .tile{background:var(--paper);border:1px solid var(--outline);border-radius:18px;padding:14px 18px;min-width:130px}
+  .tile .n{font-size:36px;font-weight:600;line-height:1}
+  .tile .l{font-size:13px;color:var(--ink-3);margin-top:6px;line-height:1.35}
+  .tile.goal{border:2px solid var(--brand-dark);background:var(--perfect-bg)}
+  .op{align-self:center;font-size:26px;color:var(--ink-3)}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:22px}
+  @media (max-width:860px){.row2{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--outline);border-radius:22px;padding:20px}
+  .card h3{margin:0 0 3px;font-size:18px;font-weight:600}
+  .card .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+             background:var(--brand-dark);color:var(--paper);border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  .card .note{margin:6px 0 12px;font-size:13.5px;line-height:1.55;color:var(--ink-3)}
+
+  /* WhatsApp-bubbel */
+  .chat{background:#E5DDD5;border-radius:16px;padding:14px}
+  .bubble{background:#DCF8C6;border-radius:10px 2px 10px 10px;padding:10px 12px;font-family:system-ui,sans-serif;
+          font-size:14px;line-height:1.5;white-space:pre-wrap;color:#111;box-shadow:0 1px 1px rgba(0,0,0,.12)}
+  /* Reddit-post */
+  .reddit{border:1px solid #ccc;border-radius:10px;background:#fff;padding:12px 14px;font-family:system-ui,sans-serif;color:#1c1c1c}
+  .reddit .sr{font-size:12px;color:#576f76}
+  .reddit .t{font-size:17px;font-weight:600;margin:6px 0 8px;line-height:1.3}
+  .reddit .b{font-size:14px;line-height:1.5;white-space:pre-wrap}
+
+  ol.steps{margin:12px 0 0;padding-left:20px;font-size:14.5px;line-height:1.65;color:var(--ink-2)}
+  ol.steps li{margin-bottom:6px}
+  .next{margin-top:18px;background:var(--paper);border:2px solid var(--brand-dark);border-radius:22px;padding:18px 22px}
+  .next h3{margin:0 0 4px;font-size:18px}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>Twaalf testers: de werving</h1>
+<p class="lede">Je kunt <b>zes mensen</b> persoonlijk vragen. Hieronder staan de rekensom, één ding dat eerst gecontroleerd moet worden, de opzet van de Google Group en twee uitnodigingen: één voor je eigen kring en één voor Reddit.</p>
+
+<h2 style="border-top:0;margin-top:26px;padding-top:0">Wat de Play Console nu zegt (uitgelezen 10 sept)</h2>
+<div class="row2" style="margin-top:12px">
+  <div class="card">
+    <h3>Builds</h3>
+    <p class="note" style="margin-bottom:0">
+      <b>Gesloten test (Alpha): 30 · 1.0.29</b>. Dit is de test die Google telt. Zonder de oordeelnamen en de Peloton-introductie.<br>
+      <b>Interne test: 40 · 1.0.30</b>, zonder de Peloton-fix.<br>
+      <b>Bundel 41</b> met alles erin staat alleen op je bureaublad.<br>
+      <b>Je Oppo</b> draait een zelf geïnstalleerde <code>1.0.30 (31)</code>, niet de Play-versie.
+    </p>
+  </div>
+  <div class="card">
+    <h3>Testers</h3>
+    <p class="note" style="margin-bottom:0">
+      <b>2 aangemeld</b> van de 12. Dat is Google's eigen teller op het dashboard.<br>
+      Eén e-maillijst, <i>First Testers RideWindow</i>, met 9 adressen. <b>Geen Google Group.</b><br>
+      <b>Feedback-adres: leeg.</b> Testers zien dus nergens waar ze feedback kwijt kunnen.<br>
+      <b>Landen: alleen BE, IT, NL, UK en de VS.</b> Veel mensen op r/AndroidClosedTesting zitten in India, Pakistan of Brazilië en kunnen de app nu niet installeren.
+    </p>
+  </div>
+</div>
+<div class="alert">
+  <h3>Winkelpagina: <i>Managed publishing</i> staat uit</h3>
+  <p>Een wijziging die je opslaat gaat dus <b>direct naar review en daarna live</b>, zonder tussenstap. De standaardtaal is <b>en-GB</b>. Daar staat nog de oude korte omschrijving (<i>"Find your best cycling windows…"</i>), het oude icoon en de vijf oude screenshots.</p>
+</div>
+
+<h2>Het plan, in deze volgorde</h2>
+<ol class="steps">
+  <li><b>Ik:</b> in de gesloten test (Alpha) <b>Create new release</b> openen. <b>Jij:</b> <code>~/Desktop/ridewindow-1.0.30-41.aab</code> erin slepen. Die is 69 MB, en via de browser kan ik alleen tot 10 MB uploaden.</li>
+  <li><b>Ik:</b> de release-notes invullen (hieronder). <b>Jij</b> drukt op <i>Send for review</i>, of ik doe het na jouw ja.</li>
+  <li><b>Ik, na je ja:</b> dezelfde bundel 41 via <i>Add from library</i> ook op de interne test zetten, zodat beide tracks gelijk lopen.</li>
+  <li><b>Ik, na je ja:</b> <b>landen</b> uitbreiden naar alle landen, en het <b>feedback-adres</b> invullen. Welk adres wil je daar? Die hoort bij RideWindow, niet bij Fanalists.</li>
+  <li><b>Ik, na je ja:</b> de <b>winkelpagina</b>: korte en lange omschrijving uit <code>docs/store-listing.md</code>, en voor nl-NL ook de Nederlandse. Het icoon en de screenshots probeer ik te uploaden. Lukt dat niet vanaf je bureaublad, dan sleep jij ze erin.</li>
+  <li><b>Jij:</b> de Google Group aanmaken. <b>Ik</b> koppel hem daarna aan de gesloten test.</li>
+  <li><b>Oppo:</b> de zelf geïnstalleerde build verwijderen, ook uit het kloonprofiel, en 41 via Play installeren. Dan zie je precies wat een tester ziet.</li>
+</ol>
+
+<div class="row2">
+  <div class="card">
+    <span class="tag">Release-notes · en-US</span>
+    <div class="reddit"><div class="b">New: the score accounts for daylight. A window after sunset no longer scores perfect, and you decide how much darkness weighs.
+
+The four verdicts have names: Top ride, Good ride, Doable and Indoor day.
+
+Your rides sit in one list in week order, showing your part in each. Invitations are answered straight from the list.
+
+Peloton is back as a tab, with a short intro on riding together.</div></div>
+  </div>
+  <div class="card">
+    <span class="tag">Release-notes · nl-NL</span>
+    <div class="reddit"><div class="b">Nieuw: de score houdt rekening met daglicht. Een venster na zonsondergang scoort niet langer perfect, en jij bepaalt hoe zwaar donker meetelt.
+
+De vier oordelen hebben namen: Toprit, Fijne rit, Te doen en Binnenblijver.
+
+Je ritten staan in één lijst op volgorde van je week, met je rol per rit. Uitnodigingen beantwoord je direct in de lijst.
+
+Peloton is terug als tabblad, met een korte uitleg over samen fietsen.</div></div>
+  </div>
+</div>
+
+<h2>De rekensom</h2>
+<p class="sub">Google wil twaalf testers die veertien dagen aaneengesloten aangemeld blijven. Als één iemand zich halverwege afmeldt, zak je onder de twaalf. Daarom een buffer.</p>
+<div class="sum">
+  <div class="tile"><div class="n">6</div><div class="l">eigen kring<br>fietsers die de app echt openen</div></div>
+  <div class="op">+</div>
+  <div class="tile"><div class="n">6</div><div class="l">test-for-test<br>om de twaalf te halen</div></div>
+  <div class="op">+</div>
+  <div class="tile"><div class="n">3</div><div class="l">buffer<br>voor wie afhaakt</div></div>
+  <div class="op">=</div>
+  <div class="tile goal"><div class="n">15</div><div class="l">doel aan aanmeldingen<br>vóór de klok start</div></div>
+</div>
+<p class="sub">Dus <b>9 via r/AndroidClosedTesting</b>. Google telt nu 2 aanmeldingen. Horen die <i>niet</i> bij je zes, dan heb je er al 8 uit eigen kring en volstaan er 7 via Reddit.</p>
+
+<h2>Google Group: één link in plaats van losse adressen</h2>
+<ol class="steps">
+  <li><a href="https://groups.google.com/my-groups">groups.google.com</a> → <b>Groep maken</b>. Naam <code>ridewindow-testers</code>. Het adres wordt dan <code>ridewindow-testers@googlegroups.com</code>.</li>
+  <li>Privacy: <b>Wie kan lid worden: iedereen kan deelnemen</b>. Anders moet je elk verzoek met de hand goedkeuren.</li>
+  <li>Play Console → <b>Gesloten tests → Testers</b> → Google Groups → <code>ridewindow-testers@googlegroups.com</code> toevoegen.</li>
+  <li>De bestaande testers blijven gewoon staan. Een e-maillijst en een groep mogen naast elkaar bestaan.</li>
+</ol>
+<p class="sub">Daarna is de aanmelding voor iedereen dezelfde twee links. Die staan al in de teksten hieronder.</p>
+
+<h2>De uitnodigingen</h2>
+<div class="row2">
+  <div class="card">
+    <span class="tag">Eigen kring · WhatsApp · NL</span>
+    <h3>Persoonlijk, voor de zes</h3>
+    <p class="note">Er staat in waarom Google dit wil en dat je vraagt de app een paar keer per week te openen. De tip onderaan vangt twee van de drie eerste-minuutproblemen op zonder code: de lege app en de taal van het toestel.</p>
+    <div class="chat"><div class="bubble">Hoi [naam]! Ik bouw al een tijdje een fiets-app, RideWindow. Hij legt het weer naast je agenda en vertelt je wanneer je deze week het best kunt fietsen: temperatuur, regen, wind en sinds deze week ook daglicht.
+
+Voordat hij echt in de Play Store mag, wil Google dat twaalf mensen hem twee weken lang testen. Wil jij een van die twaalf zijn?
+
+Wat ik vraag: open hem een paar keer per week, bijvoorbeeld als je bedenkt of je dit weekend gaat fietsen. Google kijkt of de app echt gebruikt wordt, niet alleen of hij geïnstalleerd is. En zeg het gerust als iets raar is. Een andere tester merkte vorige week op dat er tot 22:00 werd geadviseerd terwijl het dan al donker is, en dat zit er nu in.
+
+Meedoen kost twee minuten op je Android-telefoon:
+1. Word lid van de testgroep: https://groups.google.com/g/ridewindow-testers
+2. Meld je aan als tester: https://play.google.com/apps/testing/ridewindow.joost.amsterdam
+3. Installeer RideWindow via de knop die daar verschijnt
+
+Gebruik bij 1 en 2 hetzelfde Google-account als op je telefoon.
+
+Tip: vul meteen in welke uren je kunt fietsen, anders heeft de app nog niets om mee te rekenen. Staat hij in het Engels? Profiel → Taal.
+
+Dank je! 🚲</div></div>
+  </div>
+
+  <div class="card">
+    <span class="tag">Opvulling · r/AndroidClosedTesting · EN</span>
+    <h3>Test-for-test, voor de negen</h3>
+    <p class="note">Daar is ruilen de norm. Een concrete belofte (binnen 24 uur, 14 dagen laten staan) en een echte reden om de app te openen geven je testers die hem niet meteen weer weggooien.</p>
+    <div class="reddit">
+      <div class="sr">r/AndroidClosedTesting · Posted by u/…</div>
+      <div class="t">[Test for Test] RideWindow — tells you the best time to ride your bike this week</div>
+      <div class="b">Hi all! I'm a solo dev looking for testers for my closed test.
+
+RideWindow scores every free hour of your week for cycling (temperature, rain, wind and daylight) and turns it into concrete ride windows like "Saturday 10:00–12:00 — Top ride". No ads, no tracking, works without an account.
+
+How to join (2 min):
+1. Join the group: https://groups.google.com/g/ridewindow-testers
+2. Opt in: https://play.google.com/apps/testing/ridewindow.joost.amsterdam
+3. Install from the Play Store link that appears
+
+Please use the same Google account as on your phone, and open it every couple of days. It's genuinely useful if you ride a bike, and feedback is very welcome (Profile → Send feedback).
+
+I'll test yours back: comment your link and I'll join within 24 hours and keep it installed for the full 14 days.</div>
+    </div>
+  </div>
+</div>
+
+<div class="next">
+  <h3>Na je akkoord</h3>
+  <ol class="steps">
+    <li><b>Ik:</b> de twee teksten in <code>docs/testers/uitnodiging.md</code> zetten, zodat je ze kunt kopiëren. Daarnaast <code>TESTERS.md</code> bijwerken met het getal zes, de rekensom en de controle van de testtrack.</li>
+    <li><b>Ik:</b> de administratie beginnen (spoor 4) in <code>docs/testers/changelog.md</code>, met build 41 en Ingrids daglicht-melding als eerste regel.</li>
+    <li><b>Eerst</b> het plan hierboven: bundel 41 in review, de landen open, de winkelpagina bijgewerkt en de Group gekoppeld.</li>
+    <li><b>Dan pas versturen:</b> eerst de zes persoonlijk, en een dag later de Reddit-post, zodat de eerste reacties van mensen komen die echt fietsen.</li>
+  </ol>
+</div>
+
+</div></body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>v4.1 — roadmap ter goedkeuring</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('../../assets/fonts/Outfit.ttf') format('truetype'); font-weight:100 900; }
+  :root{ --brand-dark:#234934; --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60; --outline:#A9B79C; --perfect-bg:#E8F5E9; --planned:#1565C0; }
+  *{box-sizing:border-box}
+  body{margin:0;padding:30px 24px 80px;background:var(--paper-low);color:var(--ink);font-family:'Outfit',system-ui,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3)}
+  h1{font-size:32px;font-weight:500;margin:4px 0 6px}
+  .lede{font-size:15.5px;line-height:1.55;color:var(--ink-2);max-width:86ch;margin:0}
+  b{font-weight:600;color:var(--ink)}
+  code{font-size:.9em;background:var(--paper-high);border-radius:5px;padding:1px 5px}
+  .flow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:22px 0 8px}
+  .step{background:var(--paper);border:1px solid var(--outline);border-radius:16px;padding:10px 11px;font-size:12.5px;line-height:1.4;color:var(--ink-2)}
+  .step .n{font-size:22px;font-weight:600;color:var(--ink)}
+  .step .t{font-weight:600;color:var(--ink);font-size:13.5px;margin:2px 0 4px}
+  .step.crit{border:2px solid var(--brand-dark);padding:9px 10px}
+  .step.clock{background:var(--perfect-bg)}
+  .legend{font-size:12.5px;color:var(--ink-3)}
+  .phases{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  @media (max-width:900px){.phases{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}}
+  .card{background:var(--paper);border:1px solid var(--outline);border-radius:20px;padding:16px 18px}
+  .card h3{margin:0 0 2px;font-size:17px}
+  .card .dep{font-size:12.5px;color:var(--ink-3);margin-bottom:8px}
+  .req{list-style:none;margin:0;padding:0}
+  .req li{font-size:13.5px;line-height:1.5;color:var(--ink-2);padding:5px 0;border-top:1px solid var(--paper-high)}
+  .req li code{font-weight:600;background:none;padding:0;color:var(--brand-dark);margin-right:4px}
+  .card.new{border:2px solid var(--planned)}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:middle;background:var(--planned);color:#fff}
+  .out{margin-top:22px;font-size:14px;line-height:1.6;color:var(--ink-2)}
+</style>
+</head>
+<body><div class="wrap">
+<div class="kicker">Milestone v4.1 · 7 fases · 25 requirements · alles gedekt</div>
+<h1>Zo snel mogelijk live in de store — de roadmap</h1>
+<p class="lede">Dit keur je in één keer goed: de requirements (wat waar moet zijn) en de fases (in welke volgorde). De dikke rand is het kritieke pad naar de klok. <b>Feedback</b> (blauw) is op jouw verzoek een eigen fase geworden.</p>
+
+<div class="flow">
+  <div class="step crit"><div class="n">26</div><div class="t">Console op orde</div>42 via internal → closed, landen, Group, nl-NL, changelog</div>
+  <div class="step"><div class="n">27</div><div class="t">Wervings&shy;onderzoek</div>Parallel aan 26. Welke kanalen, welke teksten</div>
+  <div class="step"><div class="n">28</div><div class="t">Feedback&shy;stroom</div>Register, formulier, vraagmoment, beoordelingsronde</div>
+  <div class="step"><div class="n">29</div><div class="t">Eerste minuut</div>Lege staat, overlays, #67. Samen met 28: build 43</div>
+  <div class="step crit"><div class="n">30</div><div class="t">Werving</div>Eigen kring direct na 26, de kanalen na 43. ≥15 aangemeld</div>
+  <div class="step crit clock"><div class="n">31</div><div class="t">De 14 dagen</div>#69, #70, ≥3 builds naar closed</div>
+  <div class="step crit"><div class="n">32</div><div class="t">Aanvraag</div>Antwoorden uit de changelog, dan productie</div>
+</div>
+<div class="legend">Dikke rand = kritiek pad · groen = de klok loopt · 27, 28 en 29 lopen naast 26 en vertragen de eigen kring niet</div>
+
+<div class="phases">
+  <div class="card"><h3>26 · Console op orde</h3><div class="dep">Hangt nergens van af</div><ul class="req">
+    <li><code>CON-01</code>Elke build eerst naar internal, getest vanaf Play op de Oppo, dan pas promoten</li>
+    <li><code>CON-02</code>Gesloten test open voor alle landen</li>
+    <li><code>CON-03</code>Feedback-adres van Ridewindow zichtbaar in Play</li>
+    <li><code>CON-04</code>Eén vaste aanmeldlink via een Google Group</li>
+    <li><code>CON-05</code>Winkelpagina in het Nederlands (nl-NL)</li>
+    <li><code>CON-06</code>PWA, privacybeleid en GitHub gelijk aan de Play-build</li>
+    <li><code>PROOF-01</code>Changelog per build vanaf 41</li></ul></div>
+  <div class="card"><h3>27 · Wervingsonderzoek</h3><div class="dep">Parallel aan 26</div><ul class="req">
+    <li><code>WERV-01</code>Zeven kanalen vergeleken (o.a. je eigen LinkedIn-post, een LinkedIn-vacature, Strava, NTFU, Facebook, collega's, Reddit); keuze voor 2–3</li>
+    <li><code>WERV-02</code>Per kanaal een verzendklare tekst, eerst als HTML aan jou getoond</li></ul></div>
+  <div class="card new"><h3>28 · Feedbackstroom <span class="tag">nieuw</span></h3><div class="dep">Na 26 (feedback-adres)</div><ul class="req">
+    <li><code>FEED-01</code>Eén register voor app, Play, WhatsApp en mail: bron, tester, versie, scherm, soort, ernst, status</li>
+    <li><code>FEED-02</code>Formulier vraagt soort en verwachting; versie en scherm gaan automatisch mee</li>
+    <li><code>FEED-03</code>De app vraagt op een natuurlijk moment om feedback, niet in de eerste minuut</li>
+    <li><code>FEED-04</code>Vaste beoordelingsronde: elke melding wordt backlog-item, duplicaat, of bewust niet (met reden)</li>
+    <li><code>FEED-05</code>De tester hoort terug in welke versie het is opgelost, en dat gaat de changelog in</li></ul></div>
+  <div class="card"><h3>29 · Eerste minuut</h3><div class="dep">Samen met 28 in build 43</div><ul class="req">
+    <li><code>EERST-01</code>Geen lege app voor wie zijn week niet invult</li>
+    <li><code>EERST-02</code>Hooguit één uitlegoverlay voordat je zelf iets doet</li>
+    <li><code>EERST-03</code>Notificaties in de taal van de app (#67)</li></ul></div>
+  <div class="card"><h3>30 · Werving</h3><div class="dep">Eigen kring na 26 · de kanalen na 27 en 29</div><ul class="req">
+    <li><code>WERV-03</code>Zes uit eigen kring aangemeld</li>
+    <li><code>WERV-04</code>Google's teller toont ≥15</li>
+    <li><code>WERV-05</code>Testerslijst: een afhaker valt binnen twee dagen op en wordt vervangen</li></ul></div>
+  <div class="card"><h3>31 · De veertien dagen</h3><div class="dep">Zodra de klok loopt</div><ul class="req">
+    <li><code>WIN-01</code>Het groene blok per dag (#69)</li>
+    <li><code>WIN-02</code>Waarom dit venster en niet dat ernaast (#70)</li>
+    <li><code>PROOF-02</code>≥3 builds naar de gesloten test tijdens de 14 dagen</li></ul></div>
+  <div class="card"><h3>32 · Aanvraag en productie</h3><div class="dep">Na 14 dagen met ≥12 testers</div><ul class="req">
+    <li><code>PROOF-03</code>Aanvraag ingediend: ≥250 tekens per antwoord, met versies en fixes, eerst aan jou getoond</li>
+    <li><code>PROOF-04</code>Ridewindow in productie op Google Play</li></ul></div>
+  <div class="card"><h3>Bewust buiten v4.1</h3><div class="dep">Uitgesteld of uitgesloten</div><ul class="req">
+    <li>Betaalde testdiensten: breken de grens van €0 per maand</li>
+    <li>Ruilnetwerken als hoofdroute: aanmeldingen zonder gebruik, precies waarop Google afwijst</li>
+    <li>Analytics of tracking: "geen tracking" is een belofte aan je gebruikers</li>
+    <li>Later: Peloton v2 (#65), iPhone (#63), afgezegde ritten (#66), lanceringsmarketing</li></ul></div>
+</div>
+</div></body>
+</html>

@@ -128,3 +128,10 @@ oppervlakken. **Nog te kiezen.**
 `011-daglicht/` — Backlog #68 is aan de rekenkant klaar; dit gaat over hoe je het ziet. Twee
 plekken voor de daglichtbalk (vierde weerbalk op het detailscherm, of een strook op elke ritkaart),
 plus de regel op de kaart en de vierde schuif in Profiel. **Gekozen: A**, met de as over het hele etmaal.
+
+## 013 — De fietser bij het verversen
+
+`013-fietser-verversen/` — Joosts idee: het mannetje uit de intro komt terug bij pull-to-refresh
+en vervangt het laadrondje. Drie standen: nu (rondje), A (hij fietst binnen na loslaten), B
+(trekken is trappen). **Gemeten:** de intro bevat geen trapbeweging — de mockup tekent spaken
+over een stilstaand eindbeeld. **Nog te kiezen.**

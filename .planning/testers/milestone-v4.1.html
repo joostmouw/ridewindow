@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>v4.1 — Zo snel mogelijk live in de store</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('../../assets/fonts/Outfit.ttf') format('truetype'); font-weight:100 900; }
+  :root{
+    --brand-dark:#234934; --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#5A6B60; --outline:#A9B79C;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9; --accept-fg:#A42E0A; --accept-bg:#FFF3E0; --planned:#1565C0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 26px 80px;background:var(--paper-low);color:var(--ink);font-family:'Outfit',system-ui,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3)}
+  h1{font-size:34px;font-weight:500;margin:4px 0 8px}
+  h2{font-size:20px;font-weight:500;margin:36px 0 10px;padding-top:18px;border-top:1px solid var(--outline)}
+  .lede{font-size:16.5px;line-height:1.55;color:var(--ink-2);max-width:80ch;margin:0}
+  b{font-weight:600;color:var(--ink)}
+  code{font-size:.9em;background:var(--paper-high);border-radius:5px;padding:1px 5px}
+
+  /* tijdlijn */
+  .tl{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:14px;border-radius:18px;overflow:hidden;border:1px solid var(--outline)}
+  .tl div{padding:14px 16px;background:var(--paper);border-right:1px solid var(--outline)}
+  .tl div:last-child{border-right:0}
+  .tl .when{font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--ink-3);text-transform:uppercase}
+  .tl .what{font-size:16px;font-weight:600;margin:4px 0 4px}
+  .tl .how{font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+  .tl .clock{background:var(--perfect-bg)}
+  .note{font-size:13.5px;color:var(--ink-3);margin-top:8px;max-width:90ch;line-height:1.55}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:860px){.grid,.tl{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--outline);border-radius:20px;padding:18px 20px}
+  .card h3{margin:0 0 2px;font-size:17px}
+  .card .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:999px;padding:3px 9px;margin-bottom:8px}
+  .t-crit{background:var(--brand-dark);color:var(--paper)}
+  .t-par{background:var(--paper-high);color:var(--ink-2)}
+  .card ul{margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--ink-2)}
+  .card li{margin-bottom:3px}
+
+  .alert{margin-top:16px;background:var(--accept-bg);border:2px solid var(--accept-fg);border-radius:18px;padding:14px 18px;font-size:14.5px;line-height:1.55;color:var(--ink-2)}
+  .alert b{color:var(--accept-fg)}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="kicker">Milestone v4.1 · fases vanaf 26 · neemt epic #71 op</div>
+<h1>Zo snel mogelijk live in de store</h1>
+<p class="lede"><b>Doel:</b> Ridewindow staat in productie op Google Play. De eis van 12 testers en 14 dagen halen we met testers die de app <b>echt gebruiken</b>, niet alleen installeren, want dat is wat Google meet.</p>
+
+<h2>Het kritieke pad: de klok start pas bij 12</h2>
+<div class="tl">
+  <div><div class="when">Nu – ±14 sep</div><div class="what">Huis op orde</div><div class="how">Build 42 via internal naar closed, landen open, Group, feedback-adres, nl-NL-winkelpagina</div></div>
+  <div><div class="when">±12 – 19 sep</div><div class="what">Werving naar 15</div><div class="how">Zes uit eigen kring eerst, daarna ~9 via test-for-test. Build 43 met de fixes voor de eerste minuut</div></div>
+  <div class="clock"><div class="when">±19 sep – 3 okt</div><div class="what">De 14 dagen</div><div class="how">Elke paar dagen een build (#69/#70, feedback). Regelmatig uitbrengen <b>is</b> het bewijs</div></div>
+  <div><div class="when">Vanaf ±3 okt</div><div class="what">Aanvraag</div><div class="how">Google's vragen invullen vanuit de changelog, dan review, dan productie</div></div>
+</div>
+<p class="note">Realistisch vroegste moment in de winkel: <b>begin tot half oktober</b>. De enige knop waar we echt aan kunnen draaien is hoe snel de 12 er staan. Alles wat de werving vertraagt, schuift de hele lijn op.</p>
+
+<h2>Wat erin zit</h2>
+<div class="grid">
+  <div class="card"><span class="tag t-crit">Kritiek pad</span><h3>Console op orde</h3><ul>
+    <li>Build 42 naar internal, zelf testen vanaf Play, dan promoten naar closed</li>
+    <li>Gesloten test voor alle landen, feedback-adres, Google Group</li>
+    <li>Nederlandse winkelpagina (nl-NL)</li>
+    <li>PWA en privacybeleid opnieuw deployen met de naam Ridewindow, en de 34 commits naar GitHub pushen</li>
+  </ul></div>
+  <div class="card" style="border:2px solid var(--brand-dark)"><span class="tag t-crit">Kritiek pad · nieuw · eerste stap</span><h3>Wervingsonderzoek: waar zitten echte fietsers?</h3><ul>
+    <li><b>Uitzoeken, niet aannemen:</b> welke kanalen leveren testers die de app 14 dagen blijven openen?</li>
+    <li>Kandidaten: een <b>LinkedIn-post</b> van jou, een LinkedIn-vacature "vrijwillige tester" (werkte voor iemand anders: 220 aanmeldingen), Strava-clubs, NTFU-toerclubs, fiets-Facebookgroepen, collega's, r/AndroidClosedTesting</li>
+    <li>Per kanaal: bereik, hoe snel het oplevert, of het doelgroep is, en wat het van jou vraagt</li>
+    <li>Oplevering: een keuze voor 2–3 kanalen, met de teksten klaar om te versturen</li>
+  </ul></div>
+  <div class="card"><span class="tag t-crit">Kritiek pad</span><h3>Werving: 15 aanmeldingen</h3><ul>
+    <li>Zes uit eigen kring, met de persoonlijke uitnodiging</li>
+    <li>De rest via de kanalen uit het onderzoek</li>
+    <li>Bijhouden wie er is aangemeld, zodat afhakers vroeg opvallen</li>
+  </ul></div>
+  <div class="card"><span class="tag t-crit">Kritiek pad</span><h3>Eerste minuut van een tester</h3><ul>
+    <li>De lege app: wie zijn week niet invult, ziet niets en haakt af</li>
+    <li>Drie uitlegoverlays achter elkaar: minder, of later</li>
+    <li>#67: notificaties volgen de taal van de app (nu altijd Nederlands)</li>
+    <li>Feedback vragen op een natuurlijk moment, niet twee keer scrollen diep in Profiel</li>
+  </ul></div>
+  <div class="card"><span class="tag t-par">Loopt mee</span><h3>Bewijs en aanvraag</h3><ul>
+    <li>Changelog per build: welke feedback, van wie, opgelost in welke versie. Begint bij 41</li>
+    <li>Na dag 14: de productie-aanvraag met Google's vragen, ingevuld vanuit die changelog</li>
+  </ul></div>
+  <div class="card"><span class="tag t-par">Tijdens de 14 dagen</span><h3>Ingrids punten</h3><ul>
+    <li>#69: het groene blok in plaats van losse vensters</li>
+    <li>#70: waarom dít venster en niet het venster ernaast</li>
+    <li>Blokkeren niets. Ze vullen de 14 dagen met echte builds op echte feedback</li>
+  </ul></div>
+  <div class="card"><span class="tag t-par">Bewust niet</span><h3>Buiten deze milestone</h3><ul>
+    <li>Betaalde testdiensten: die breken de grens van €0 per maand</li>
+    <li>Marketing voor de lancering: dat is een eigen epic</li>
+    <li>Peloton v2 (#65), iPhone (#63), afgezegde ritten (#66)</li>
+  </ul></div>
+</div>
+
+<h2>Wat ik al vond (input voor het onderzoek)</h2>
+<div class="grid">
+  <div class="card"><h3>Google is strenger geworden</h3><ul>
+    <li>Sinds <b>april 2026</b> wijst Google aanvragen af als testers de app niet echt gebruiken. Installeren en wegleggen telt niet</li>
+    <li>Haakt een tester af en zak je onder de 12, dan <b>pauzeert of reset de klok</b>. Daarom een buffer: 15, liever meer</li>
+    <li>Alleen aanmelden via de Play-link telt. Een zelf geïnstalleerde APK telt niet</li>
+  </ul></div>
+  <div class="card"><h3>De aanvraag na dag 14</h3><ul>
+    <li>Ongeveer 9 vragen: hoe je testers vond, wat ze meldden, wat je veranderde, waarom de app klaar is</li>
+    <li>Minstens 250 tekens per antwoord, met concrete versies en fixes. "Testers vonden hem goed" wordt afgewezen</li>
+    <li>2–3 updates tijdens de 14 dagen laten zien dat er actief ontwikkeld wordt</li>
+  </ul></div>
+</div>
+
+<div class="alert"><b>Eén afweging die ik voor je heb gemaakt:</b> de werving wacht niet op build 43. Je zes eigen testers kunnen meteen instappen, want zij verdragen een lege eerste minuut, en jij kunt ze helpen. De Reddit-testers komen pas ná 43, want die haken bij een lege app direct af. Zo start de klok zo vroeg mogelijk.</div>
+
+</div></body>
+</html>
