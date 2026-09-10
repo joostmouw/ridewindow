@@ -12,6 +12,7 @@ _WeatherTolerances _$WeatherTolerancesFromJson(Map<String, dynamic> json) =>
       tempMaxIdealC: (json['tempMaxIdealC'] as num?)?.toDouble() ?? 26.0,
       windMaxIdealKmh: (json['windMaxIdealKmh'] as num?)?.toDouble() ?? 15.0,
       rainMaxIdealMm: (json['rainMaxIdealMm'] as num?)?.toDouble() ?? 0.5,
+      darknessWeight: (json['darknessWeight'] as num?)?.toDouble() ?? 0.5,
     );
 
 Map<String, dynamic> _$WeatherTolerancesToJson(_WeatherTolerances instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$WeatherTolerancesToJson(_WeatherTolerances instance) =>
       'tempMaxIdealC': instance.tempMaxIdealC,
       'windMaxIdealKmh': instance.windMaxIdealKmh,
       'rainMaxIdealMm': instance.rainMaxIdealMm,
+      'darknessWeight': instance.darknessWeight,
     };

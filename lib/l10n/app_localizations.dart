@@ -3114,6 +3114,156 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Nog niemand uitgenodigd'**
   String get pelotonNobodyInvitedYet;
+
+  /// No description provided for @weatherDaylight.
+  ///
+  /// In nl, this message translates to:
+  /// **'Daglicht'**
+  String get weatherDaylight;
+
+  /// No description provided for @daylightLightBetween.
+  ///
+  /// In nl, this message translates to:
+  /// **'licht van {from} tot {to}'**
+  String daylightLightBetween(String from, String to);
+
+  /// No description provided for @daylightMinutes.
+  ///
+  /// In nl, this message translates to:
+  /// **'{minutes} min'**
+  String daylightMinutes(int minutes);
+
+  /// No description provided for @daylightVerdictFull.
+  ///
+  /// In nl, this message translates to:
+  /// **'Volledig licht'**
+  String get daylightVerdictFull;
+
+  /// No description provided for @daylightVerdictMostlyLight.
+  ///
+  /// In nl, this message translates to:
+  /// **'Grotendeels licht'**
+  String get daylightVerdictMostlyLight;
+
+  /// No description provided for @daylightVerdictPartlyDark.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deels donker'**
+  String get daylightVerdictPartlyDark;
+
+  /// No description provided for @daylightVerdictMostlyDark.
+  ///
+  /// In nl, this message translates to:
+  /// **'Grotendeels donker'**
+  String get daylightVerdictMostlyDark;
+
+  /// No description provided for @daylightVerdictDark.
+  ///
+  /// In nl, this message translates to:
+  /// **'Donker'**
+  String get daylightVerdictDark;
+
+  /// No description provided for @daylightPolarDay.
+  ///
+  /// In nl, this message translates to:
+  /// **'de zon gaat niet onder'**
+  String get daylightPolarDay;
+
+  /// No description provided for @daylightPolarNight.
+  ///
+  /// In nl, this message translates to:
+  /// **'de zon komt niet op'**
+  String get daylightPolarNight;
+
+  /// No description provided for @daylightInfoTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Daglicht'**
+  String get daylightInfoTitle;
+
+  /// No description provided for @daylightInfo.
+  ///
+  /// In nl, this message translates to:
+  /// **'De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score — hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.'**
+  String get daylightInfo;
+
+  /// No description provided for @rideSunsetMostlyDark.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zon onder om {time} — grotendeels in het donker'**
+  String rideSunsetMostlyDark(String time);
+
+  /// No description provided for @rideSunsetPartly.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zon onder om {time} — laatste deel in de schemer'**
+  String rideSunsetPartly(String time);
+
+  /// No description provided for @rideSunriseAfter.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zon op om {time} — begin nog in het donker'**
+  String rideSunriseAfter(String time);
+
+  /// No description provided for @toleranceDaylight.
+  ///
+  /// In nl, this message translates to:
+  /// **'Daglicht'**
+  String get toleranceDaylight;
+
+  /// No description provided for @toleranceDaylightInfoTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Daglicht'**
+  String get toleranceDaylightInfoTitle;
+
+  /// No description provided for @toleranceDaylightInfo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst — ze staan achter de vensters bij daglicht.'**
+  String get toleranceDaylightInfo;
+
+  /// No description provided for @daylightWeightOff.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maakt me niet uit'**
+  String get daylightWeightOff;
+
+  /// No description provided for @daylightWeightLight.
+  ///
+  /// In nl, this message translates to:
+  /// **'Telt licht mee'**
+  String get daylightWeightLight;
+
+  /// No description provided for @daylightWeightHalf.
+  ///
+  /// In nl, this message translates to:
+  /// **'Telt half mee'**
+  String get daylightWeightHalf;
+
+  /// No description provided for @daylightWeightHeavy.
+  ///
+  /// In nl, this message translates to:
+  /// **'Telt zwaar mee'**
+  String get daylightWeightHeavy;
+
+  /// No description provided for @daylightWeightOnly.
+  ///
+  /// In nl, this message translates to:
+  /// **'Alleen bij daglicht'**
+  String get daylightWeightOnly;
+
+  /// No description provided for @daylightWeightDesc.
+  ///
+  /// In nl, this message translates to:
+  /// **'Een rit die helemaal in het donker valt verliest {points} van de 100 punten.'**
+  String daylightWeightDesc(int points);
+
+  /// No description provided for @daylightWeightDescNone.
+  ///
+  /// In nl, this message translates to:
+  /// **'Donker telt niet mee in je scores.'**
+  String get daylightWeightDescNone;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

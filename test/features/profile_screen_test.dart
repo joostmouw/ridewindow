@@ -105,7 +105,7 @@ void main() {
   });
 
   testWidgets(
-      'Test 1: ProfileScreen toont temperatuur-RangeSlider en twee Sliders bij een geladen profiel',
+      'Test 1: ProfileScreen toont temperatuur-RangeSlider en drie Sliders bij een geladen profiel',
       (tester) async {
     await pumpProfileScreen(tester, testProfile);
 
@@ -114,7 +114,8 @@ void main() {
     // 4 separate Sliders to 1 RangeSlider + 2 Sliders for the temperature
     // range (see lib/features/profile/profile_screen.dart RangeSlider).
     expect(find.byType(RangeSlider, skipOffstage: false), findsOneWidget);
-    expect(find.byType(Slider, skipOffstage: false), findsNWidgets(2));
+    // Drie sinds backlog #68: regen, wind en daglicht.
+    expect(find.byType(Slider, skipOffstage: false), findsNWidgets(3));
   });
 
   testWidgets(

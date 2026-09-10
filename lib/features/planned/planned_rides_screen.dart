@@ -14,6 +14,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/peloton/buddies_tab.dart';
+import 'package:ridewindow/features/shared/daylight_note.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -365,7 +366,8 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
     final entries = ref.watch(rideEntriesProvider);
     final allScores = ref.watch(allHourlyScoresProvider);
     final forecasts = ref.watch(weatherProvider).value ?? <HourlyForecast>[];
-    final cityName = ref.watch(locationProvider).value?.city ?? '';
+    final location = ref.watch(locationProvider).value;
+    final cityName = location?.city ?? '';
 
     if (entries.isEmpty) {
       return _EmptyState(
@@ -412,6 +414,7 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
               allScores: allScores,
               forecasts: forecasts,
               cityName: cityName,
+              location: location,
             ),
           ),
         ),
@@ -599,6 +602,7 @@ class RideCard extends StatelessWidget {
     required this.allScores,
     required this.forecasts,
     required this.cityName,
+    required this.location,
   });
 
   final RideEntry entry;
@@ -610,6 +614,10 @@ class RideCard extends StatelessWidget {
   final List<HourlyScore> allScores;
   final List<HourlyForecast> forecasts;
   final String cityName;
+
+  /// Waar je bent, of `null` als de app dat niet weet. Nodig voor de zonstand;
+  /// zonder locatie blijft de daglichtregel gewoon weg.
+  final LocationData? location;
 
   List<HourlyScore> _rideScores() {
     final result = <HourlyScore>[];
@@ -761,6 +769,14 @@ class RideCard extends StatelessWidget {
                             Text(cityName, style: theme.textTheme.bodySmall),
                           const SizedBox(height: 6),
                           RideRoleLine(entry: entry),
+                          if (location case final loc?)
+                            DaylightNote(
+                              start: entry.start,
+                              end: entry.end,
+                              latitude: loc.lat,
+                              longitude: loc.lon,
+                              dense: true,
+                            ),
                           if (summary != null) ...[
                             const SizedBox(height: 3),
                             Text(

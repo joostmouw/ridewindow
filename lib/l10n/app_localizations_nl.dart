@@ -1724,4 +1724,93 @@ class SNl extends S {
 
   @override
   String get pelotonNobodyInvitedYet => 'Nog niemand uitgenodigd';
+
+  @override
+  String get weatherDaylight => 'Daglicht';
+
+  @override
+  String daylightLightBetween(String from, String to) {
+    return 'licht van $from tot $to';
+  }
+
+  @override
+  String daylightMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get daylightVerdictFull => 'Volledig licht';
+
+  @override
+  String get daylightVerdictMostlyLight => 'Grotendeels licht';
+
+  @override
+  String get daylightVerdictPartlyDark => 'Deels donker';
+
+  @override
+  String get daylightVerdictMostlyDark => 'Grotendeels donker';
+
+  @override
+  String get daylightVerdictDark => 'Donker';
+
+  @override
+  String get daylightPolarDay => 'de zon gaat niet onder';
+
+  @override
+  String get daylightPolarNight => 'de zon komt niet op';
+
+  @override
+  String get daylightInfoTitle => 'Daglicht';
+
+  @override
+  String get daylightInfo =>
+      'De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score — hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.';
+
+  @override
+  String rideSunsetMostlyDark(String time) {
+    return 'Zon onder om $time — grotendeels in het donker';
+  }
+
+  @override
+  String rideSunsetPartly(String time) {
+    return 'Zon onder om $time — laatste deel in de schemer';
+  }
+
+  @override
+  String rideSunriseAfter(String time) {
+    return 'Zon op om $time — begin nog in het donker';
+  }
+
+  @override
+  String get toleranceDaylight => 'Daglicht';
+
+  @override
+  String get toleranceDaylightInfoTitle => 'Daglicht';
+
+  @override
+  String get toleranceDaylightInfo =>
+      'Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst — ze staan achter de vensters bij daglicht.';
+
+  @override
+  String get daylightWeightOff => 'Maakt me niet uit';
+
+  @override
+  String get daylightWeightLight => 'Telt licht mee';
+
+  @override
+  String get daylightWeightHalf => 'Telt half mee';
+
+  @override
+  String get daylightWeightHeavy => 'Telt zwaar mee';
+
+  @override
+  String get daylightWeightOnly => 'Alleen bij daglicht';
+
+  @override
+  String daylightWeightDesc(int points) {
+    return 'Een rit die helemaal in het donker valt verliest $points van de 100 punten.';
+  }
+
+  @override
+  String get daylightWeightDescNone => 'Donker telt niet mee in je scores.';
 }

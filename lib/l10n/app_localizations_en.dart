@@ -1718,4 +1718,94 @@ class SEn extends S {
 
   @override
   String get pelotonNobodyInvitedYet => 'Nobody invited yet';
+
+  @override
+  String get weatherDaylight => 'Daylight';
+
+  @override
+  String daylightLightBetween(String from, String to) {
+    return 'light from $from to $to';
+  }
+
+  @override
+  String daylightMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get daylightVerdictFull => 'Fully lit';
+
+  @override
+  String get daylightVerdictMostlyLight => 'Mostly lit';
+
+  @override
+  String get daylightVerdictPartlyDark => 'Partly dark';
+
+  @override
+  String get daylightVerdictMostlyDark => 'Mostly dark';
+
+  @override
+  String get daylightVerdictDark => 'Dark';
+
+  @override
+  String get daylightPolarDay => 'the sun does not set';
+
+  @override
+  String get daylightPolarNight => 'the sun does not rise';
+
+  @override
+  String get daylightInfoTitle => 'Daylight';
+
+  @override
+  String get daylightInfo =>
+      'The golden band shows when the sun is above the horizon, from midnight to midnight. Your ride sits in it as a block. The more of it falls in the dark, the lower the score — how much exactly is up to you, under Profile → Your limits → Daylight.\n\nDark rides never disappear from the list entirely: in December it is light here from 08:45 to 16:30, and otherwise nothing would be left.';
+
+  @override
+  String rideSunsetMostlyDark(String time) {
+    return 'Sunset at $time — mostly in the dark';
+  }
+
+  @override
+  String rideSunsetPartly(String time) {
+    return 'Sunset at $time — last stretch at dusk';
+  }
+
+  @override
+  String rideSunriseAfter(String time) {
+    return 'Sunrise at $time — starts in the dark';
+  }
+
+  @override
+  String get toleranceDaylight => 'Daylight';
+
+  @override
+  String get toleranceDaylightInfoTitle => 'Daylight';
+
+  @override
+  String get toleranceDaylightInfo =>
+      'Unlike the three above, this is not a limit but a weight: how much it matters to you that a ride falls in the dark.\n\nAll the way left nothing about your scores changes. All the way right, a ride entirely in the dark loses 40 of its 100 points. Even then such rides do not disappear — they sit behind the daylight windows.';
+
+  @override
+  String get daylightWeightOff => 'Doesn\'t matter to me';
+
+  @override
+  String get daylightWeightLight => 'Counts a little';
+
+  @override
+  String get daylightWeightHalf => 'Counts halfway';
+
+  @override
+  String get daylightWeightHeavy => 'Counts heavily';
+
+  @override
+  String get daylightWeightOnly => 'Daylight only';
+
+  @override
+  String daylightWeightDesc(int points) {
+    return 'A ride entirely in the dark loses $points of its 100 points.';
+  }
+
+  @override
+  String get daylightWeightDescNone =>
+      'Darkness does not count towards your scores.';
 }

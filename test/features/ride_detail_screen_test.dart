@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -26,6 +27,15 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
+
+/// Vaste locatie, zodat het detailscherm zijn daglichtbalk kan tekenen zonder
+/// aan de echte geolocatie te vragen -- die plant een timer die na afloop van
+/// de test nog open staat.
+class _FakeLocation extends LocationNotifier {
+  @override
+  Future<LocationData> build() async =>
+      const LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam');
+}
 
 /// NotificationService stub — avoids the real flutter_local_notifications
 /// platform channel, which is not available in a plain widget test
@@ -95,6 +105,7 @@ Widget wrapInMaterial(
 }) {
   return ProviderScope(
     overrides: [
+      locationProvider.overrideWith(_FakeLocation.new),
       weatherProvider.overrideWith(() => FakeWeatherNotifier(forecasts)),
       allHourlyScoresProvider.overrideWithValue(hours),
       plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),

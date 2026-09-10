@@ -16,6 +16,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
+import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
@@ -1496,6 +1497,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 // zonder op een toestel te controleren dat hij
                                 // nog tekent.
                                 firstChild: _buildWeatherBars(
+                                  slot: slot,
                                   avgTemp: avgTemp,
                                   totalPrecip: totalPrecip,
                                   avgWind: avgWind,
@@ -1563,6 +1565,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildWeatherBars({
+    required RideSlot slot,
     double? avgTemp,
     double? totalPrecip,
     double? avgWind,
@@ -1577,6 +1580,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final tempMax = tol?.tempMaxIdealC ?? 26.0;
     final windMax = tol?.windMaxIdealKmh ?? 15.0;
     final rainMax = tol?.rainMaxIdealMm ?? 0.5;
+    final location = ref.watch(locationProvider).value;
 
     return Column(
       children: [
@@ -1613,6 +1617,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             idealMax: windMax,
             infoText: s.infoWind,
             score: windScore,
+          ),
+        // De vierde balk (backlog #68, schets 011). Alleen als de app weet
+        // waar je bent -- zonder locatie is er geen zonstand, en een balk die
+        // dan een verzonnen dag tekent zou erger zijn dan geen balk.
+        if (location != null)
+          DaylightBar(
+            start: slot.start,
+            end: slot.end,
+            latitude: location.lat,
+            longitude: location.lon,
           ),
       ],
     );

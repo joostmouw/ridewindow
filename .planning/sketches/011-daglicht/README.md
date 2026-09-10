@@ -2,7 +2,7 @@
 sketch: 011
 name: daglicht
 question: "Hoe laat de app zien dat een venster in het donker valt, in zijn eigen vormtaal?"
-winner: null
+winner: "A + hele etmaal"
 tags: [daglicht, weerbalken, scoring, profiel, fase-26]
 ---
 
@@ -53,3 +53,18 @@ daglicht).
   gaan die twee betekenissen door elkaar lopen?
 - Ook helemaal rechts op de schuif verdwijnt een donkere rit niet. Ver genoeg, of wil je daar wél
   een harde uitsluiting?
+
+## Wat Joost koos (2026-09-10)
+
+**Variant A**, met de as over het **hele etmaal**. Gebouwd:
+
+- `DaylightBar` staat als vierde balk op Home's beste kaart (waar zijn drie broers ook staan) en
+  onderaan de weersectie op het detailscherm.
+- `DaylightNote` is de ene regel op de ritkaart, en verschijnt alleen als het donker de rit raakt —
+  negen van de tien vensters vallen volledig bij daglicht en daar is de zonsondergang ruis.
+- In Profiel staat een vierde schuif met vijf standen, met er onder wat die stand kost in punten.
+- `SlotGenerator.applyDaylight` past de aftrek toe, apart van `refine` omdat dit de enige stap is
+  die de locatie nodig heeft.
+
+**Migratie 0007 moet worden toegepast** voordat een build hiermee live gaat: `darkness_weight` staat
+in `toRow`, en zonder die kolom weigert Postgres de profiel-upsert.

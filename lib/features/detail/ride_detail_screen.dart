@@ -17,8 +17,10 @@ import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
+import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
@@ -534,6 +536,27 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// De daglichtbalk in de weersectie, of niets als de app niet weet waar je
+  /// bent -- zonder locatie is er geen zonstand.
+  Widget _buildDaylightRow() {
+    final location = ref.watch(locationProvider).value;
+    if (location == null) return const SizedBox.shrink();
+    final rw = context.rw;
+    final slot = _effectiveSlot;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: rw.borderDim)),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 2),
+      child: DaylightBar(
+        start: slot.start,
+        end: slot.end,
+        latitude: location.lat,
+        longitude: location.lon,
       ),
     );
   }
@@ -1164,6 +1187,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         _buildWeatherRow(
                             S.of(context).weatherWind, _avgWindString(context)),
                         if (_windPenaltyPercent() > 2) _buildWindPenaltyNote(),
+                        // De daglichtbalk sluit de weersectie af (backlog #68,
+                        // schets 011). Onderaan en niet bovenaan: het weer
+                        // bepaalt óf je wilt, daglicht bepaalt of het kán.
+                        _buildDaylightRow(),
                       ],
                     ),
                     _buildClothingTip(),

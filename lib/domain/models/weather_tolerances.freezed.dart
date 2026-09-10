@@ -19,6 +19,16 @@ mixin _$WeatherTolerances {
   double get windMaxIdealKmh;
   double get rainMaxIdealMm;
 
+  /// Hoe zwaar donker meetelt, van 0,0 (maakt niet uit) tot 1,0 (alleen bij
+  /// daglicht). Anders dan de vier hierboven is dit geen grens maar een
+  /// gewicht: er bestaat geen "maximaal aantal donkere minuten" waarboven het
+  /// ineens niet meer kan. Zie `daylight.dart` voor wat de app ermee doet.
+  ///
+  /// Staat bewust hier en niet los in [UserProfile]: op het profielscherm
+  /// staat hij naast temperatuur, regen en wind, en wie er één verandert
+  /// verwacht dat ze samen bewaard worden.
+  double get darknessWeight;
+
   /// Create a copy of WeatherTolerances
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -42,17 +52,19 @@ mixin _$WeatherTolerances {
             (identical(other.windMaxIdealKmh, windMaxIdealKmh) ||
                 other.windMaxIdealKmh == windMaxIdealKmh) &&
             (identical(other.rainMaxIdealMm, rainMaxIdealMm) ||
-                other.rainMaxIdealMm == rainMaxIdealMm));
+                other.rainMaxIdealMm == rainMaxIdealMm) &&
+            (identical(other.darknessWeight, darknessWeight) ||
+                other.darknessWeight == darknessWeight));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, tempMinIdealC, tempMaxIdealC,
-      windMaxIdealKmh, rainMaxIdealMm);
+      windMaxIdealKmh, rainMaxIdealMm, darknessWeight);
 
   @override
   String toString() {
-    return 'WeatherTolerances(tempMinIdealC: $tempMinIdealC, tempMaxIdealC: $tempMaxIdealC, windMaxIdealKmh: $windMaxIdealKmh, rainMaxIdealMm: $rainMaxIdealMm)';
+    return 'WeatherTolerances(tempMinIdealC: $tempMinIdealC, tempMaxIdealC: $tempMaxIdealC, windMaxIdealKmh: $windMaxIdealKmh, rainMaxIdealMm: $rainMaxIdealMm, darknessWeight: $darknessWeight)';
   }
 }
 
@@ -66,7 +78,8 @@ abstract mixin class $WeatherTolerancesCopyWith<$Res> {
       {double tempMinIdealC,
       double tempMaxIdealC,
       double windMaxIdealKmh,
-      double rainMaxIdealMm});
+      double rainMaxIdealMm,
+      double darknessWeight});
 }
 
 /// @nodoc
@@ -86,6 +99,7 @@ class _$WeatherTolerancesCopyWithImpl<$Res>
     Object? tempMaxIdealC = null,
     Object? windMaxIdealKmh = null,
     Object? rainMaxIdealMm = null,
+    Object? darknessWeight = null,
   }) {
     return _then(_self.copyWith(
       tempMinIdealC: null == tempMinIdealC
@@ -103,6 +117,10 @@ class _$WeatherTolerancesCopyWithImpl<$Res>
       rainMaxIdealMm: null == rainMaxIdealMm
           ? _self.rainMaxIdealMm
           : rainMaxIdealMm // ignore: cast_nullable_to_non_nullable
+              as double,
+      darknessWeight: null == darknessWeight
+          ? _self.darknessWeight
+          : darknessWeight // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }
@@ -201,8 +219,12 @@ extension WeatherTolerancesPatterns on WeatherTolerances {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(double tempMinIdealC, double tempMaxIdealC,
-            double windMaxIdealKmh, double rainMaxIdealMm)?
+    TResult Function(
+            double tempMinIdealC,
+            double tempMaxIdealC,
+            double windMaxIdealKmh,
+            double rainMaxIdealMm,
+            double darknessWeight)?
         $default, {
     required TResult orElse(),
   }) {
@@ -210,7 +232,7 @@ extension WeatherTolerancesPatterns on WeatherTolerances {
     switch (_that) {
       case _WeatherTolerances() when $default != null:
         return $default(_that.tempMinIdealC, _that.tempMaxIdealC,
-            _that.windMaxIdealKmh, _that.rainMaxIdealMm);
+            _that.windMaxIdealKmh, _that.rainMaxIdealMm, _that.darknessWeight);
       case _:
         return orElse();
     }
@@ -231,15 +253,19 @@ extension WeatherTolerancesPatterns on WeatherTolerances {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(double tempMinIdealC, double tempMaxIdealC,
-            double windMaxIdealKmh, double rainMaxIdealMm)
+    TResult Function(
+            double tempMinIdealC,
+            double tempMaxIdealC,
+            double windMaxIdealKmh,
+            double rainMaxIdealMm,
+            double darknessWeight)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _WeatherTolerances():
         return $default(_that.tempMinIdealC, _that.tempMaxIdealC,
-            _that.windMaxIdealKmh, _that.rainMaxIdealMm);
+            _that.windMaxIdealKmh, _that.rainMaxIdealMm, _that.darknessWeight);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -259,15 +285,19 @@ extension WeatherTolerancesPatterns on WeatherTolerances {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(double tempMinIdealC, double tempMaxIdealC,
-            double windMaxIdealKmh, double rainMaxIdealMm)?
+    TResult? Function(
+            double tempMinIdealC,
+            double tempMaxIdealC,
+            double windMaxIdealKmh,
+            double rainMaxIdealMm,
+            double darknessWeight)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _WeatherTolerances() when $default != null:
         return $default(_that.tempMinIdealC, _that.tempMaxIdealC,
-            _that.windMaxIdealKmh, _that.rainMaxIdealMm);
+            _that.windMaxIdealKmh, _that.rainMaxIdealMm, _that.darknessWeight);
       case _:
         return null;
     }
@@ -281,7 +311,8 @@ class _WeatherTolerances implements WeatherTolerances {
       {this.tempMinIdealC = 12.0,
       this.tempMaxIdealC = 26.0,
       this.windMaxIdealKmh = 15.0,
-      this.rainMaxIdealMm = 0.5});
+      this.rainMaxIdealMm = 0.5,
+      this.darknessWeight = 0.5});
   factory _WeatherTolerances.fromJson(Map<String, dynamic> json) =>
       _$WeatherTolerancesFromJson(json);
 
@@ -297,6 +328,18 @@ class _WeatherTolerances implements WeatherTolerances {
   @override
   @JsonKey()
   final double rainMaxIdealMm;
+
+  /// Hoe zwaar donker meetelt, van 0,0 (maakt niet uit) tot 1,0 (alleen bij
+  /// daglicht). Anders dan de vier hierboven is dit geen grens maar een
+  /// gewicht: er bestaat geen "maximaal aantal donkere minuten" waarboven het
+  /// ineens niet meer kan. Zie `daylight.dart` voor wat de app ermee doet.
+  ///
+  /// Staat bewust hier en niet los in [UserProfile]: op het profielscherm
+  /// staat hij naast temperatuur, regen en wind, en wie er één verandert
+  /// verwacht dat ze samen bewaard worden.
+  @override
+  @JsonKey()
+  final double darknessWeight;
 
   /// Create a copy of WeatherTolerances
   /// with the given fields replaced by the non-null parameter values.
@@ -325,17 +368,19 @@ class _WeatherTolerances implements WeatherTolerances {
             (identical(other.windMaxIdealKmh, windMaxIdealKmh) ||
                 other.windMaxIdealKmh == windMaxIdealKmh) &&
             (identical(other.rainMaxIdealMm, rainMaxIdealMm) ||
-                other.rainMaxIdealMm == rainMaxIdealMm));
+                other.rainMaxIdealMm == rainMaxIdealMm) &&
+            (identical(other.darknessWeight, darknessWeight) ||
+                other.darknessWeight == darknessWeight));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, tempMinIdealC, tempMaxIdealC,
-      windMaxIdealKmh, rainMaxIdealMm);
+      windMaxIdealKmh, rainMaxIdealMm, darknessWeight);
 
   @override
   String toString() {
-    return 'WeatherTolerances(tempMinIdealC: $tempMinIdealC, tempMaxIdealC: $tempMaxIdealC, windMaxIdealKmh: $windMaxIdealKmh, rainMaxIdealMm: $rainMaxIdealMm)';
+    return 'WeatherTolerances(tempMinIdealC: $tempMinIdealC, tempMaxIdealC: $tempMaxIdealC, windMaxIdealKmh: $windMaxIdealKmh, rainMaxIdealMm: $rainMaxIdealMm, darknessWeight: $darknessWeight)';
   }
 }
 
@@ -351,7 +396,8 @@ abstract mixin class _$WeatherTolerancesCopyWith<$Res>
       {double tempMinIdealC,
       double tempMaxIdealC,
       double windMaxIdealKmh,
-      double rainMaxIdealMm});
+      double rainMaxIdealMm,
+      double darknessWeight});
 }
 
 /// @nodoc
@@ -371,6 +417,7 @@ class __$WeatherTolerancesCopyWithImpl<$Res>
     Object? tempMaxIdealC = null,
     Object? windMaxIdealKmh = null,
     Object? rainMaxIdealMm = null,
+    Object? darknessWeight = null,
   }) {
     return _then(_WeatherTolerances(
       tempMinIdealC: null == tempMinIdealC
@@ -388,6 +435,10 @@ class __$WeatherTolerancesCopyWithImpl<$Res>
       rainMaxIdealMm: null == rainMaxIdealMm
           ? _self.rainMaxIdealMm
           : rainMaxIdealMm // ignore: cast_nullable_to_non_nullable
+              as double,
+      darknessWeight: null == darknessWeight
+          ? _self.darknessWeight
+          : darknessWeight // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }

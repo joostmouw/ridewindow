@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
+import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
 import 'package:ridewindow/domain/models/user_profile.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
@@ -32,6 +33,7 @@ class ProfileRepository {
   static const kTempMaxKey = 'profile.tempMaxIdealC';
   static const kWindMaxKey = 'profile.windMaxIdealKmh';
   static const kRainMaxKey = 'profile.rainMaxIdealMm';
+  static const kDarknessKey = 'profile.darknessWeight';
   static const kDurationsKey = 'profile.allowedDurations';
   static const kThemeKey = 'profile.theme';
   static const kLocationKey = 'profile.locationOverride';
@@ -54,6 +56,8 @@ class ProfileRepository {
     final tempMax = _prefs.getDouble(kTempMaxKey) ?? 26.0;
     final windMax = _prefs.getDouble(kWindMaxKey) ?? 15.0;
     final rainMax = _prefs.getDouble(kRainMaxKey) ?? 0.5;
+    // Standaard half: een volledig donker venster verliest 20 van de 100.
+    final darkness = _prefs.getDouble(kDarknessKey) ?? kDefaultDarknessWeight;
 
     final durationStrings =
         _prefs.getStringList(kDurationsKey) ?? ['2', '3', '5'];
@@ -77,6 +81,7 @@ class ProfileRepository {
         tempMaxIdealC: tempMax,
         windMaxIdealKmh: windMax,
         rainMaxIdealMm: rainMax,
+        darknessWeight: darkness,
       ),
       allowedDurations: durations.isEmpty ? [2, 3, 5] : durations,
       theme: theme,
@@ -121,6 +126,7 @@ class ProfileRepository {
     await _prefs.setDouble(kTempMaxKey, profile.tolerances.tempMaxIdealC);
     await _prefs.setDouble(kWindMaxKey, profile.tolerances.windMaxIdealKmh);
     await _prefs.setDouble(kRainMaxKey, profile.tolerances.rainMaxIdealMm);
+    await _prefs.setDouble(kDarknessKey, profile.tolerances.darknessWeight);
     await _prefs.setStringList(
       kDurationsKey,
       profile.allowedDurations.map((d) => d.toString()).toList(),

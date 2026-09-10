@@ -1,4 +1,5 @@
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
+import 'package:ridewindow/domain/services/daylight.dart';
 
 /// Immutable data class die alle gebruikersinstellingen bevat.
 /// Slaat WeatherTolerances op als nested object, rijlengte-voorkeuren als
@@ -28,16 +29,22 @@ class UserProfile {
 
   /// Bouwt de Postgres-rij voor `public.profiles` (SYNC-01, SYNC-02).
   ///
-  /// Exact de 13 kolommen die plan 21-02 op het live project heeft aangelegd
-  /// (12 datakolommen + `user_id`) — `updated_at`/`created_at` horen hier
-  /// bewust niet bij: de `BEFORE UPDATE`-trigger stempelt `updated_at`
-  /// server-side, dus de client stuurt die nooit mee.
+  /// De 13 kolommen die plan 21-02 op het live project heeft aangelegd (12
+  /// datakolommen + `user_id`), plus `darkness_weight` uit migratie 0007 —
+  /// `updated_at`/`created_at` horen hier bewust niet bij: de
+  /// `BEFORE UPDATE`-trigger stempelt `updated_at` server-side, dus de client
+  /// stuurt die nooit mee.
+  ///
+  /// **Migratie 0007 moet toegepast zijn voordat een build hiermee de lucht in
+  /// gaat.** Zonder die kolom weigert Postgres de upsert en blijft het profiel
+  /// in de sync-outbox hangen.
   Map<String, dynamic> toRow(String userId) => {
         'user_id': userId,
         'temp_min_ideal_c': tolerances.tempMinIdealC,
         'temp_max_ideal_c': tolerances.tempMaxIdealC,
         'wind_max_ideal_kmh': tolerances.windMaxIdealKmh,
         'rain_max_ideal_mm': tolerances.rainMaxIdealMm,
+        'darkness_weight': tolerances.darknessWeight,
         'allowed_durations': allowedDurations,
         'theme': theme,
         'locale': locale,
@@ -61,6 +68,10 @@ class UserProfile {
         tempMaxIdealC: (row['temp_max_ideal_c'] as num).toDouble(),
         windMaxIdealKmh: (row['wind_max_ideal_kmh'] as num).toDouble(),
         rainMaxIdealMm: (row['rain_max_ideal_mm'] as num).toDouble(),
+        // Verdraagt een rij van vóór migratie 0007, en een oudere app-versie
+        // die de kolom niet meestuurt.
+        darknessWeight: (row['darkness_weight'] as num?)?.toDouble() ??
+            kDefaultDarknessWeight,
       ),
       allowedDurations: (row['allowed_durations'] as List)
           .map((d) => (d as num).toInt())

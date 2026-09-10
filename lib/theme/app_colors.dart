@@ -26,20 +26,20 @@ class TierColors {
   static const light = TierColors(
     perfectFg: Color(0xFF1B5E20),
     perfectBg: Color(0xFFE8F5E9),
-    greatFg: Color(0xFF006457),   // 4.55:1 op brandLight
-    greatBg: Color(0xFFE0F2F1),   // teal 50
+    greatFg: Color(0xFF006457), // 4.55:1 op brandLight
+    greatBg: Color(0xFFE0F2F1), // teal 50
     // 4.53:1 op brandLight; ook nog 5.9:1 op acceptableBg
     acceptableFg: Color(0xFFA42E0A),
     acceptableBg: Color(0xFFFFF3E0),
-    poorFg: Color(0xFF585858),   // 4.56:1 op brandLight
+    poorFg: Color(0xFF585858), // 4.56:1 op brandLight
     poorBg: Color(0xFFF5F5F5),
   );
 
   static const dark = TierColors(
     perfectFg: Color(0xFFA5D6A7),
     perfectBg: Color(0xFF1B3A1E),
-    greatFg: Color(0xFF80CBC4),   // teal 200
-    greatBg: Color(0xFF1A332F),   // dark teal
+    greatFg: Color(0xFF80CBC4), // teal 200
+    greatBg: Color(0xFF1A332F), // dark teal
     acceptableFg: Color(0xFFFFCC80),
     acceptableBg: Color(0xFF3E2723),
     poorFg: Color(0xFF9E9E9E),
@@ -96,10 +96,10 @@ abstract final class AppColors {
   // onderscheiden**. Twee tokens met één visueel gewicht is precies de
   // vlakheid waar epic #64 over gaat. Op papier is er marge om ze uit elkaar te
   // trekken, en die marge is hier opgemaakt in plaats van opgepot.
-  static const lightTextPrimary = Color(0xFF1A2A20);   // 14.72:1
+  static const lightTextPrimary = Color(0xFF1A2A20); // 14.72:1
   static const lightTextSecondary = Color(0xFF3A4A40); //  9.20:1
-  static const lightTextTertiary = Color(0xFF5A6B60);  //  5.54:1 (was #4C5C52)
-  static const lightTextHint = Color(0xFF66756B);      //  4.75:1 (was #4E5C54)
+  static const lightTextTertiary = Color(0xFF5A6B60); //  5.54:1 (was #4C5C52)
+  static const lightTextHint = Color(0xFF66756B); //  4.75:1 (was #4E5C54)
 
   /// De oude, donkerdere waarden van [lightTextTertiary] en [lightTextHint].
   ///
@@ -116,6 +116,7 @@ abstract final class AppColors {
   static const lightSurface = lightSurfaceContainerLowest;
   static const lightSurfaceDim = Color(0xFFDAE2CC);
   static const lightBorder = Color(0xFFA9B79C);
+
   /// Geblokkeerd uur in de roosters. Zie `RideWindowTheme.gridBlocked`
   /// voor waarom dit neutraal is en niet uit de merkfamilie komt.
   static const lightGridBlocked = Color(0xFFEAEAE7);
@@ -123,7 +124,7 @@ abstract final class AppColors {
   static const lightBorderDim = Color(0xFFC0CCB4);
 
   static const lightScorePerfect = Color(0xFF2E7D32);
-  static const lightScoreGreat = Color(0xFF26A69A);  // teal 400
+  static const lightScoreGreat = Color(0xFF26A69A); // teal 400
   static const lightScoreAcceptable = Color(0xFFFFA726);
   static const lightScorePoor = Color(0xFFBDBDBD);
 
@@ -135,6 +136,11 @@ abstract final class AppColors {
   /// met het blauw van een geplande rit te laten samenvallen.
   static const lightRideOrganiser = Color(0xFF7B4B12);
   static const lightRidePending = Color(0xFFA42E0A);
+
+  /// Zonlicht op de daglichtbalk (schets 011). Een warme goudtint, bewust géén
+  /// groen: groen betekent in dit scherm al "binnen jouw bereik", en daglicht
+  /// is een andere uitspraak.
+  static const lightDaylight = Color(0xFFE8C86A);
   static const lightCalendarBusy = Color(0xFF64B5F6);
 
   static const lightWarning = Color(0xFFFF9800);
@@ -175,7 +181,7 @@ abstract final class AppColors {
   static const darkBorderDim = Color(0xFF333333);
 
   static const darkScorePerfect = Color(0xFF66BB6A);
-  static const darkScoreGreat = Color(0xFF80CBC4);   // teal 200
+  static const darkScoreGreat = Color(0xFF80CBC4); // teal 200
   static const darkScoreAcceptable = Color(0xFFFFB74D);
   static const darkScorePoor = Color(0xFF757575);
 
@@ -186,6 +192,9 @@ abstract final class AppColors {
   /// elke andere kleur in dit blok.
   static const darkRideOrganiser = Color(0xFFD9A264);
   static const darkRidePending = Color(0xFFF0865C);
+
+  /// Zie [lightDaylight].
+  static const darkDaylight = Color(0xFFD9B25A);
   static const darkCalendarBusy = Color(0xFF90CAF9);
 
   static const darkWarning = Color(0xFFFFB74D);

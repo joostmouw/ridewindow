@@ -21,10 +21,10 @@ void main() {
   );
 
   group('UserProfile.toRow — public.profiles kolomvorm (SYNC-01, SYNC-02)', () {
-    test('bevat exact de 13 verwachte kolommen met matchende waarden', () {
+    test('bevat exact de 14 verwachte kolommen met matchende waarden', () {
       final row = profile.toRow('uid-1');
 
-      expect(row.length, 13);
+      expect(row.length, 14);
       expect(row.keys.toSet(), {
         'user_id',
         'temp_min_ideal_c',
@@ -39,6 +39,8 @@ void main() {
         'notif_evening_before',
         'notif_morning_of',
         'notif_weekly_digest',
+        // Migratie 0007 (backlog #68).
+        'darkness_weight',
       });
 
       expect(row['user_id'], 'uid-1');

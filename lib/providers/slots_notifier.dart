@@ -6,6 +6,7 @@ import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/clock_provider.dart';
+import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 
@@ -109,6 +110,18 @@ class SlotsNotifier extends _$SlotsNotifier {
 
     // Pas slot-niveau penalties toe (trend + windconsistentie).
     allSlots = _generator.refine(allSlots, forecasts);
+
+    // En daarna daglicht (backlog #68). Bewust ná `refine`: die twee straffen
+    // op het weer binnen het venster, deze op wanneer het venster valt.
+    final location = ref.watch(locationProvider).value;
+    if (location != null) {
+      allSlots = _generator.applyDaylight(
+        allSlots,
+        latitude: location.lat,
+        longitude: location.lon,
+        darknessWeight: profile.tolerances.darknessWeight,
+      );
+    }
 
     // Verwijder geblokkeerde uren én Poor-tier slots.
     var filtered = _filter.apply(allSlots, blockedHours);

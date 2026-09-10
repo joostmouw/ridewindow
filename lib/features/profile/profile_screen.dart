@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/app_version.dart';
+import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/core/nl_cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/features/profile/account_section.dart';
@@ -47,6 +48,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late double _tempMax;
   late double _rainMax;
   late double _windMax;
+  double _darkness = kDefaultDarknessWeight;
 
   final _notifService = NotificationService();
   int _versionTapCount = 0;
@@ -105,6 +107,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _tempMax = profile?.tolerances.tempMaxIdealC ?? 26.0;
     _rainMax = profile?.tolerances.rainMaxIdealMm ?? 0.5;
     _windMax = profile?.tolerances.windMaxIdealKmh ?? 15.0;
+    _darkness = profile?.tolerances.darknessWeight ?? kDefaultDarknessWeight;
 
     // Backlog #36: check-only (niet-promptende) Google Calendar-status,
     // fire-and-forget zodat initState() synchroon blijft.
@@ -842,6 +845,64 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ],
                 ),
               ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+
+              // --- Daglicht (backlog #68, schets 011) ---
+              //
+              // Anders dan de drie hierboven is dit geen grens maar een
+              // gewicht, en daarom staat er een woordschaal in plaats van een
+              // getal met een eenheid: "20 km/u" betekent iets in de wereld,
+              // "0,5 daglicht" niet.
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            s.toleranceDaylight,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        _infoButton(
+                          context,
+                          s.toleranceDaylightInfoTitle,
+                          s.toleranceDaylightInfo,
+                          _darknessDescription(context, _darkness),
+                        ),
+                        Text(
+                          _darknessLabel(context, _darkness),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: _darkness,
+                      divisions: 4,
+                      activeColor: Theme.of(context).colorScheme.primary,
+                      onChanged: (v) => setState(() => _darkness = v),
+                      onChangeEnd: (v) =>
+                          ref.read(profileProvider.notifier).updateTolerances(
+                                profile.tolerances.copyWith(darknessWeight: v),
+                              ),
+                    ),
+                    Text(
+                      _darknessDescription(context, _darkness),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.outline,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+              ),
             ],
           ),
 
@@ -1076,6 +1137,27 @@ String _rainDescription(BuildContext context, double mm) {
   if (mm <= 1.0) return s.rainDescDrizzleOk;
   if (mm <= 3.0) return s.rainDescLightRainOk;
   return s.rainDescHeavyRainOk;
+}
+
+/// De stand van de daglichtschuif in woorden. Vijf standen, want een gewicht
+/// zonder eenheid valt met een getal niet uit te leggen.
+String _darknessLabel(BuildContext context, double weight) {
+  final s = S.of(context);
+  if (weight < 0.125) return s.daylightWeightOff;
+  if (weight < 0.375) return s.daylightWeightLight;
+  if (weight < 0.625) return s.daylightWeightHalf;
+  if (weight < 0.875) return s.daylightWeightHeavy;
+  return s.daylightWeightOnly;
+}
+
+/// Wat die stand concreet met een score doet. Bewust met het getal erbij: de
+/// woorden zeggen "zwaar", maar pas "verliest 32 van de 100 punten" maakt
+/// duidelijk wat je aan het instellen bent.
+String _darknessDescription(BuildContext context, double weight) {
+  final s = S.of(context);
+  final points = (100 * darknessPenalty(1, weight: weight)).round();
+  if (points == 0) return s.daylightWeightDescNone;
+  return s.daylightWeightDesc(points);
 }
 
 String _windDescription(BuildContext context, double kmh) {

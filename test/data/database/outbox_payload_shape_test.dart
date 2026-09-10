@@ -43,6 +43,8 @@ const _profileColumns = {
   'notif_evening_before',
   'notif_morning_of',
   'notif_weekly_digest',
+  // Migratie 0007 (backlog #68): daglicht als vijfde tolerantie.
+  'darkness_weight',
 };
 
 const _availabilityColumns = {

@@ -4,6 +4,7 @@ import '../models/hourly_forecast.dart';
 import '../models/hourly_score.dart';
 import '../models/ride_slot.dart';
 import '../models/ride_tier.dart';
+import 'daylight.dart';
 
 /// Computes wind direction variability penalty for a list of forecasts.
 /// Returns a value between 0.0 (consistent) and 0.10 (highly variable).
@@ -117,6 +118,44 @@ class SlotGenerator {
         end: slot.end,
         overallScore: adjusted,
         tier: tier,
+        hours: slot.hours,
+      );
+    }).toList();
+  }
+
+  /// Trekt de score omlaag naar rato van het donkere deel van het venster.
+  ///
+  /// **Apart van [refine] en niet erin, omdat dit de enige stap is die de
+  /// locatie nodig heeft.** Trend en windconsistentie volgen uit de uren zelf;
+  /// daglicht volgt uit waar je bent. Die twee door elkaar halen zou
+  /// [SlotGenerator] afhankelijk maken van de locatieprovider, en dan is hij
+  /// niet meer met een kale lijst scores te testen.
+  ///
+  /// Backlog #68: zonder deze stap zette de app een venster van 20:00–22:00 op
+  /// 100 terwijl de zon om 20:07 onderging.
+  List<RideSlot> applyDaylight(
+    List<RideSlot> slots, {
+    required double latitude,
+    required double longitude,
+    required double darknessWeight,
+  }) {
+    if (darknessWeight <= 0) return slots;
+    return slots.map((slot) {
+      final fraction = darkFraction(
+        start: slot.start,
+        end: slot.end,
+        latitude: latitude,
+        longitude: longitude,
+      );
+      if (fraction <= 0) return slot;
+      final adjusted =
+          (slot.overallScore * (1.0 - darknessPenalty(fraction, weight: darknessWeight)))
+              .clamp(0.0, 100.0);
+      return RideSlot(
+        start: slot.start,
+        end: slot.end,
+        overallScore: adjusted,
+        tier: rideTierFromScore(adjusted),
         hours: slot.hours,
       );
     }).toList();
