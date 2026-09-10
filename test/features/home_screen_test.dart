@@ -221,8 +221,8 @@ void main() {
 
     // Tijdreeks-tekst: 09:00 – 13:00 · 4u
     expect(find.textContaining('09:00'), findsOneWidget);
-    // Tier badge: Perfect
-    expect(find.text('Perfect'), findsOneWidget);
+    // Tier badge: Toprit (heette Perfect tot schets 010)
+    expect(find.text('Toprit'), findsOneWidget);
     // 'Inplannen' knop
     expect(find.text('Inplannen'), findsOneWidget);
   });

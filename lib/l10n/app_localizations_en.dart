@@ -234,28 +234,16 @@ class SEn extends S {
   String get dayUnknown => 'unknown';
 
   @override
-  String get tierPerfect => 'Perfect';
+  String get tierPerfect => 'Top ride';
 
   @override
-  String get tierGreat => 'Great';
+  String get tierGreat => 'Good ride';
 
   @override
-  String get tierAcceptable => 'Acceptable';
+  String get tierAcceptable => 'Doable';
 
   @override
-  String get tierPoor => 'Poor';
-
-  @override
-  String get tierPerfectAgenda => 'Perfect';
-
-  @override
-  String get tierGreatAgenda => 'Great';
-
-  @override
-  String get tierAcceptableAgenda => 'OK';
-
-  @override
-  String get tierPoorAgenda => 'Poor';
+  String get tierPoor => 'Indoor day';
 
   @override
   String get legendPlanned => 'Planned';
@@ -766,7 +754,7 @@ class SEn extends S {
   String get detailTierGreatDesc => 'Pleasant cycling weather';
 
   @override
-  String get detailTierAcceptableDesc => 'Doable, grab an extra layer';
+  String get detailTierAcceptableDesc => 'Grab an extra layer';
 
   @override
   String get detailTierPoorDesc => 'Not ideal, but possible';
@@ -1353,11 +1341,11 @@ class SEn extends S {
   String get calendarSignInCanceled => 'Sign-in cancelled';
 
   @override
-  String get notifEveningTitle => 'Great ride window tomorrow!';
+  String get notifEveningTitle => 'There\'s a ride window waiting tomorrow';
 
   @override
   String notifEveningBody(String slot) {
-    return '$slot — perfect conditions expected';
+    return '$slot — get your bike ready';
   }
 
   @override
@@ -1386,16 +1374,16 @@ class SEn extends S {
       'Sunday evening overview of the best ride moments';
 
   @override
-  String get widgetTierPerfect => 'Perfect';
+  String get widgetTierPerfect => 'Top ride';
 
   @override
-  String get widgetTierGreat => 'Great';
+  String get widgetTierGreat => 'Good ride';
 
   @override
-  String get widgetTierAcceptable => 'Acceptable';
+  String get widgetTierAcceptable => 'Doable';
 
   @override
-  String get widgetTierPoor => 'Poor';
+  String get widgetTierPoor => 'Indoor day';
 
   @override
   String get hourlyDry => 'dry';
@@ -1504,11 +1492,11 @@ class SEn extends S {
   String get pelotonFriends => 'Buddies';
 
   @override
-  String get pelotonNoFriends => 'No buddies yet';
+  String get pelotonNoFriends => 'Your peloton is empty';
 
   @override
   String get pelotonNoFriendsHint =>
-      'Send someone your code. Once they enter it, you can invite each other to rides.';
+      'A peloton is the group you ride with. Invite a buddy and you\'ll see each other\'s rides.';
 
   @override
   String get pelotonInviteFriend => 'Invite a buddy';
@@ -1602,7 +1590,7 @@ class SEn extends S {
 
   @override
   String get pelotonNeedFriendsFirst =>
-      'Add a buddy first — Rides, tab Buddies.';
+      'Add a buddy first — Rides, tab Peloton.';
 
   @override
   String get pelotonInviteAction => 'Invite';
@@ -1615,21 +1603,21 @@ class SEn extends S {
 
   @override
   String get pelotonSignInToJoin =>
-      'Sign in first, then enter this code under Rides, tab Buddies.';
+      'Sign in first, then enter this code under Rides, tab Peloton.';
 
   @override
-  String get pelotonGoToPeloton => 'Go to Buddies';
+  String get pelotonGoToPeloton => 'Go to Peloton';
 
   @override
   String pelotonInviteShareLink(String link, String code) {
-    return 'Ride with me on RideWindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Buddies.';
+    return 'Ride with me on RideWindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Peloton.';
   }
 
   @override
   String get ridesTabRides => 'Rides';
 
   @override
-  String get ridesTabBuddies => 'Buddies';
+  String get ridesTabBuddies => 'Peloton';
 
   @override
   String get ridesFilterAll => 'All';

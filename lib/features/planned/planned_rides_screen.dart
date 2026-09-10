@@ -37,10 +37,10 @@ import 'package:ridewindow/theme/app_theme.dart';
 
 String _tierLabel(double score, BuildContext context) {
   final s = S.of(context);
-  if (score >= 85) return s.tierPerfectAgenda;
-  if (score >= 70) return s.tierGreatAgenda;
-  if (score >= 50) return s.tierAcceptableAgenda;
-  return s.tierPoorAgenda;
+  if (score >= 85) return s.tierPerfect;
+  if (score >= 70) return s.tierGreat;
+  if (score >= 50) return s.tierAcceptable;
+  return s.tierPoor;
 }
 
 String _windDirection(double? deg, BuildContext context) {

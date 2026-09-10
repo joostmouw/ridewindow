@@ -211,7 +211,7 @@ void main() {
       // weggegooid: zonder de negatieve assertie sluipt een gezichtje er zo
       // weer in.
       expect(find.byIcon(Icons.sentiment_very_satisfied), findsNothing);
-      expect(find.text('Perfect'), findsWidgets);
+      expect(find.text('Toprit'), findsWidgets);
     });
 
     testWidgets('Score-banner toont het tier-woord voor Poor slot, zonder smiley',
@@ -254,7 +254,7 @@ void main() {
       ));
       await tester.pump();
 
-      expect(find.textContaining('Perfect'), findsWidgets);
+      expect(find.textContaining('Ideaal fietsweer'), findsWidgets);
     });
 
     testWidgets('Uurlijkse tabel toont tijd van elke HourlyRow',

@@ -29,12 +29,15 @@ class WidgetUpdateService {
       final timeStr =
           '${timeFmt.format(nextSlot.start)}\u2013${timeFmt.format(nextSlot.end)}';
 
-      // Tier label in het Nederlands
+      // Tier label in het Nederlands. Sinds schets 010 dezelfde vier namen
+      // als in de app zelf — dit stond eerder los en dreef af ('Geweldig'
+      // tegen 'Goed'). De widget draait buiten een BuildContext, dus S is
+      // hier niet beschikbaar; bij het lokaliseren (#67) verhuist dit mee.
       final tierLabel = switch (nextSlot.tier) {
-        Perfect() => 'Perfect',
-        Great() => 'Geweldig',
-        Acceptable() => 'Acceptabel',
-        Poor() => 'Slecht',
+        Perfect() => 'Toprit',
+        Great() => 'Fijne rit',
+        Acceptable() => 'Te doen',
+        Poor() => 'Binnenblijver',
       };
 
       await HomeWidget.saveWidgetData<String>('slot_date', dateStr);

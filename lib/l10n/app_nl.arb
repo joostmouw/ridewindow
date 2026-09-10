@@ -100,15 +100,10 @@
   "daySunLower": "zondag",
   "dayUnknown": "onbekend",
 
-  "tierPerfect": "Perfect",
-  "tierGreat": "Goed",
-  "tierAcceptable": "Acceptabel",
-  "tierPoor": "Slecht",
-
-  "tierPerfectAgenda": "Perfect",
-  "tierGreatAgenda": "Goed",
-  "tierAcceptableAgenda": "Ok\u00e9",
-  "tierPoorAgenda": "Slecht",
+  "tierPerfect": "Toprit",
+  "tierGreat": "Fijne rit",
+  "tierAcceptable": "Te doen",
+  "tierPoor": "Binnenblijver",
   "legendPlanned": "Gepland",
 
   "bestChoice": "Beste keuze",
@@ -322,7 +317,7 @@
 
   "detailTierPerfectDesc": "Ideaal fietsweer",
   "detailTierGreatDesc": "Prettig fietsweer",
-  "detailTierAcceptableDesc": "Te doen, pak een extra laag",
+  "detailTierAcceptableDesc": "Pak een extra laag",
   "detailTierPoorDesc": "Niet ideaal, maar mogelijk",
   "detailConditions": "omstandigheden",
 
@@ -619,30 +614,30 @@
   },
   "calendarSignInCanceled": "Inloggen geannuleerd",
 
-  "notifEveningTitle": "Mooi fietsmoment morgen!",
-  "notifEveningBody": "{slot} \u2014 perfecte omstandigheden verwacht",
+  "notifEveningTitle": "Morgen ligt er een fietsmoment klaar",
+  "notifEveningBody": "{slot} \u2014 zet je fiets alvast klaar",
   "@notifEveningBody": {
     "placeholders": {
       "slot": {"type": "String"}
     }
   },
-  "notifMorningTitle": "Over 2 uur een mooi fietsmoment!",
+  "notifMorningTitle": "Over 2 uur stap je op",
   "notifMorningBody": "{slot} \u2014 maak je klaar om te rijden",
   "@notifMorningBody": {
     "placeholders": {
       "slot": {"type": "String"}
     }
   },
-  "notifWeeklyTitle": "Je rijoverzicht voor deze week",
-  "notifChannelRideAlerts": "Rijmeldingen",
-  "notifChannelRideAlertsDesc": "Avond-van-tevoren en ochtend-van-de-dag rijmeldingen",
+  "notifWeeklyTitle": "De beste fietsmomenten van je week",
+  "notifChannelRideAlerts": "Fietsmeldingen",
+  "notifChannelRideAlertsDesc": "Avond-van-tevoren en ochtend-van-de-dag fietsmeldingen",
   "notifChannelWeeklyDigest": "Wekelijks overzicht",
   "notifChannelWeeklyDigestDesc": "Zondagavond overzicht van de beste fietsmomenten",
 
-  "widgetTierPerfect": "Perfect",
-  "widgetTierGreat": "Goed",
-  "widgetTierAcceptable": "Acceptabel",
-  "widgetTierPoor": "Slecht",
+  "widgetTierPerfect": "Toprit",
+  "widgetTierGreat": "Fijne rit",
+  "widgetTierAcceptable": "Te doen",
+  "widgetTierPoor": "Binnenblijver",
 
   "hourlyDry": "droog",
   "hourlyWindstil": "windstil",
@@ -685,8 +680,8 @@
   "pelotonSignedOut": "Log in om samen te fietsen",
   "pelotonSignedOutHint": "Samen fietsen heeft een account nodig, zodat je maatjes je kunnen vinden. De rest van de app blijft gewoon werken zonder.",
   "pelotonFriends": "Maatjes",
-  "pelotonNoFriends": "Nog geen maatjes",
-  "pelotonNoFriendsHint": "Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.",
+  "pelotonNoFriends": "Je peloton is nog leeg",
+  "pelotonNoFriendsHint": "Een peloton is de groep waarmee je rijdt. Nodig een maatje uit en jullie zien elkaars ritten.",
   "pelotonInviteFriend": "Nodig een maatje uit",
   "pelotonInviteShare": "Fiets met me mee in RideWindow. Open de app en vul code {code} in.",
   "pelotonYourCode": "Jouw code: {code}",
@@ -719,16 +714,16 @@
   "pelotonPickFriends": "Wie gaat er mee?",
   "pelotonInviteSent": "Uitnodiging verstuurd",
   "pelotonInviteFailed": "Uitnodigen is niet gelukt. Probeer het opnieuw.",
-  "pelotonNeedFriendsFirst": "Voeg eerst een maatje toe — Ritten, tab Maatjes.",
+  "pelotonNeedFriendsFirst": "Voeg eerst een maatje toe — Ritten, tab Peloton.",
   "pelotonInviteAction": "Uitnodigen",
   "pelotonJoinTitle": "Uitnodiging van een maatje",
   "pelotonJoining": "Je wordt toegevoegd…",
-  "pelotonSignInToJoin": "Log eerst in en vul deze code daarna in onder Ritten, tab Maatjes.",
-  "pelotonGoToPeloton": "Naar Maatjes",
-  "pelotonInviteShareLink": "Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Maatjes.",
+  "pelotonSignInToJoin": "Log eerst in en vul deze code daarna in onder Ritten, tab Peloton.",
+  "pelotonGoToPeloton": "Naar Peloton",
+  "pelotonInviteShareLink": "Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.",
   "@pelotonInviteShareLink": {"placeholders": {"link": {"type": "String"}, "code": {"type": "String"}}},
   "ridesTabRides": "Ritten",
-  "ridesTabBuddies": "Maatjes",
+  "ridesTabBuddies": "Peloton",
   "ridesFilterAll": "Alles",
   "ridesFilterOrganising": "Ik organiseer",
   "ridesFilterJoined": "Ik ga mee",

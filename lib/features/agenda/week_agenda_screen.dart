@@ -40,10 +40,10 @@ Color _scoreColor(double score, RideWindowTheme rw) {
 
 String _tierLabel(double score, BuildContext context) {
   final s = S.of(context);
-  if (score >= 85) return s.tierPerfectAgenda;
-  if (score >= 70) return s.tierGreatAgenda;
-  if (score >= 50) return s.tierAcceptableAgenda;
-  return s.tierPoorAgenda;
+  if (score >= 85) return s.tierPerfect;
+  if (score >= 70) return s.tierGreat;
+  if (score >= 50) return s.tierAcceptable;
+  return s.tierPoor;
 }
 
 HourlyScore? _findScore(DateTime day, int hour, List<HourlyScore> scores) {
@@ -259,32 +259,36 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
           // Legend + selection hint
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Row(
-              children: [
-                if (_selection == null) ...[
-                  _Dot(color: context.rw.scorePerfect, label: S.of(context).tierPerfectAgenda),
-                  const SizedBox(width: 8),
-                  _Dot(color: context.rw.scoreGreat, label: S.of(context).tierGreatAgenda),
-                  const SizedBox(width: 8),
-                  _Dot(color: context.rw.scoreAcceptable, label: S.of(context).tierAcceptableAgenda),
-                  const SizedBox(width: 8),
-                  _Dot(color: context.rw.scorePoor, label: S.of(context).tierPoorAgenda),
-                  const SizedBox(width: 8),
-                  _Dot(color: context.rw.plannedRide, label: S.of(context).legendPlanned),
-                ] else ...[
-                  Icon(AppIcons.handPointing, size: 14, color: theme.colorScheme.primary),
-                  const SizedBox(width: 4),
-                  Text(
-                    S.of(context).agendaHoursSelected(_selection!.count),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.primary,
-                    ),
+            // Wrap, geen Row: de vier oordelen heten sinds schets 010 Toprit /
+            // Fijne rit / Te doen / Binnenblijver en die passen samen met
+            // "Gepland" niet meer op een smalle telefoon op een regel.
+            child: _selection == null
+                ? Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      _Dot(color: context.rw.scorePerfect, label: S.of(context).tierPerfect),
+                      _Dot(color: context.rw.scoreGreat, label: S.of(context).tierGreat),
+                      _Dot(color: context.rw.scoreAcceptable, label: S.of(context).tierAcceptable),
+                      _Dot(color: context.rw.scorePoor, label: S.of(context).tierPoor),
+                      _Dot(color: context.rw.plannedRide, label: S.of(context).legendPlanned),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Icon(AppIcons.handPointing, size: 14, color: theme.colorScheme.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        S.of(context).agendaHoursSelected(_selection!.count),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ],
-            ),
           ),
           const Divider(height: 1),
           // Grid

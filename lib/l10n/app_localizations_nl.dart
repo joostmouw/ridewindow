@@ -234,28 +234,16 @@ class SNl extends S {
   String get dayUnknown => 'onbekend';
 
   @override
-  String get tierPerfect => 'Perfect';
+  String get tierPerfect => 'Toprit';
 
   @override
-  String get tierGreat => 'Goed';
+  String get tierGreat => 'Fijne rit';
 
   @override
-  String get tierAcceptable => 'Acceptabel';
+  String get tierAcceptable => 'Te doen';
 
   @override
-  String get tierPoor => 'Slecht';
-
-  @override
-  String get tierPerfectAgenda => 'Perfect';
-
-  @override
-  String get tierGreatAgenda => 'Goed';
-
-  @override
-  String get tierAcceptableAgenda => 'Oké';
-
-  @override
-  String get tierPoorAgenda => 'Slecht';
+  String get tierPoor => 'Binnenblijver';
 
   @override
   String get legendPlanned => 'Gepland';
@@ -766,7 +754,7 @@ class SNl extends S {
   String get detailTierGreatDesc => 'Prettig fietsweer';
 
   @override
-  String get detailTierAcceptableDesc => 'Te doen, pak een extra laag';
+  String get detailTierAcceptableDesc => 'Pak een extra laag';
 
   @override
   String get detailTierPoorDesc => 'Niet ideaal, maar mogelijk';
@@ -1356,15 +1344,15 @@ class SNl extends S {
   String get calendarSignInCanceled => 'Inloggen geannuleerd';
 
   @override
-  String get notifEveningTitle => 'Mooi fietsmoment morgen!';
+  String get notifEveningTitle => 'Morgen ligt er een fietsmoment klaar';
 
   @override
   String notifEveningBody(String slot) {
-    return '$slot — perfecte omstandigheden verwacht';
+    return '$slot — zet je fiets alvast klaar';
   }
 
   @override
-  String get notifMorningTitle => 'Over 2 uur een mooi fietsmoment!';
+  String get notifMorningTitle => 'Over 2 uur stap je op';
 
   @override
   String notifMorningBody(String slot) {
@@ -1372,14 +1360,14 @@ class SNl extends S {
   }
 
   @override
-  String get notifWeeklyTitle => 'Je rijoverzicht voor deze week';
+  String get notifWeeklyTitle => 'De beste fietsmomenten van je week';
 
   @override
-  String get notifChannelRideAlerts => 'Rijmeldingen';
+  String get notifChannelRideAlerts => 'Fietsmeldingen';
 
   @override
   String get notifChannelRideAlertsDesc =>
-      'Avond-van-tevoren en ochtend-van-de-dag rijmeldingen';
+      'Avond-van-tevoren en ochtend-van-de-dag fietsmeldingen';
 
   @override
   String get notifChannelWeeklyDigest => 'Wekelijks overzicht';
@@ -1389,16 +1377,16 @@ class SNl extends S {
       'Zondagavond overzicht van de beste fietsmomenten';
 
   @override
-  String get widgetTierPerfect => 'Perfect';
+  String get widgetTierPerfect => 'Toprit';
 
   @override
-  String get widgetTierGreat => 'Goed';
+  String get widgetTierGreat => 'Fijne rit';
 
   @override
-  String get widgetTierAcceptable => 'Acceptabel';
+  String get widgetTierAcceptable => 'Te doen';
 
   @override
-  String get widgetTierPoor => 'Slecht';
+  String get widgetTierPoor => 'Binnenblijver';
 
   @override
   String get hourlyDry => 'droog';
@@ -1507,11 +1495,11 @@ class SNl extends S {
   String get pelotonFriends => 'Maatjes';
 
   @override
-  String get pelotonNoFriends => 'Nog geen maatjes';
+  String get pelotonNoFriends => 'Je peloton is nog leeg';
 
   @override
   String get pelotonNoFriendsHint =>
-      'Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.';
+      'Een peloton is de groep waarmee je rijdt. Nodig een maatje uit en jullie zien elkaars ritten.';
 
   @override
   String get pelotonInviteFriend => 'Nodig een maatje uit';
@@ -1607,7 +1595,7 @@ class SNl extends S {
 
   @override
   String get pelotonNeedFriendsFirst =>
-      'Voeg eerst een maatje toe — Ritten, tab Maatjes.';
+      'Voeg eerst een maatje toe — Ritten, tab Peloton.';
 
   @override
   String get pelotonInviteAction => 'Uitnodigen';
@@ -1620,21 +1608,21 @@ class SNl extends S {
 
   @override
   String get pelotonSignInToJoin =>
-      'Log eerst in en vul deze code daarna in onder Ritten, tab Maatjes.';
+      'Log eerst in en vul deze code daarna in onder Ritten, tab Peloton.';
 
   @override
-  String get pelotonGoToPeloton => 'Naar Maatjes';
+  String get pelotonGoToPeloton => 'Naar Peloton';
 
   @override
   String pelotonInviteShareLink(String link, String code) {
-    return 'Fiets met me mee in RideWindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Ritten, tab Maatjes.';
+    return 'Fiets met me mee in RideWindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Ritten, tab Peloton.';
   }
 
   @override
   String get ridesTabRides => 'Ritten';
 
   @override
-  String get ridesTabBuddies => 'Maatjes';
+  String get ridesTabBuddies => 'Peloton';
 
   @override
   String get ridesFilterAll => 'Alles';

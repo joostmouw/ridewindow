@@ -82,8 +82,8 @@ void main() {
       await tester.pumpWidget(wrapInMaterial(InsightsSheet(slot: slot)));
       await tester.pump();
 
-      // Titel: "Waarom 'Perfect' — 93/100"
-      expect(find.textContaining('Perfect'), findsWidgets);
+      // Titel: "Waarom 'Toprit' — 93/100"
+      expect(find.textContaining('Toprit'), findsWidgets);
       expect(find.textContaining('93'), findsWidgets);
     });
 

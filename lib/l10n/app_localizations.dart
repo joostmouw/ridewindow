@@ -478,50 +478,26 @@ abstract class S {
   /// No description provided for @tierPerfect.
   ///
   /// In nl, this message translates to:
-  /// **'Perfect'**
+  /// **'Toprit'**
   String get tierPerfect;
 
   /// No description provided for @tierGreat.
   ///
   /// In nl, this message translates to:
-  /// **'Goed'**
+  /// **'Fijne rit'**
   String get tierGreat;
 
   /// No description provided for @tierAcceptable.
   ///
   /// In nl, this message translates to:
-  /// **'Acceptabel'**
+  /// **'Te doen'**
   String get tierAcceptable;
 
   /// No description provided for @tierPoor.
   ///
   /// In nl, this message translates to:
-  /// **'Slecht'**
+  /// **'Binnenblijver'**
   String get tierPoor;
-
-  /// No description provided for @tierPerfectAgenda.
-  ///
-  /// In nl, this message translates to:
-  /// **'Perfect'**
-  String get tierPerfectAgenda;
-
-  /// No description provided for @tierGreatAgenda.
-  ///
-  /// In nl, this message translates to:
-  /// **'Goed'**
-  String get tierGreatAgenda;
-
-  /// No description provided for @tierAcceptableAgenda.
-  ///
-  /// In nl, this message translates to:
-  /// **'Oké'**
-  String get tierAcceptableAgenda;
-
-  /// No description provided for @tierPoorAgenda.
-  ///
-  /// In nl, this message translates to:
-  /// **'Slecht'**
-  String get tierPoorAgenda;
 
   /// No description provided for @legendPlanned.
   ///
@@ -1456,7 +1432,7 @@ abstract class S {
   /// No description provided for @detailTierAcceptableDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Te doen, pak een extra laag'**
+  /// **'Pak een extra laag'**
   String get detailTierAcceptableDesc;
 
   /// No description provided for @detailTierPoorDesc.
@@ -2488,19 +2464,19 @@ abstract class S {
   /// No description provided for @notifEveningTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Mooi fietsmoment morgen!'**
+  /// **'Morgen ligt er een fietsmoment klaar'**
   String get notifEveningTitle;
 
   /// No description provided for @notifEveningBody.
   ///
   /// In nl, this message translates to:
-  /// **'{slot} — perfecte omstandigheden verwacht'**
+  /// **'{slot} — zet je fiets alvast klaar'**
   String notifEveningBody(String slot);
 
   /// No description provided for @notifMorningTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Over 2 uur een mooi fietsmoment!'**
+  /// **'Over 2 uur stap je op'**
   String get notifMorningTitle;
 
   /// No description provided for @notifMorningBody.
@@ -2512,19 +2488,19 @@ abstract class S {
   /// No description provided for @notifWeeklyTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Je rijoverzicht voor deze week'**
+  /// **'De beste fietsmomenten van je week'**
   String get notifWeeklyTitle;
 
   /// No description provided for @notifChannelRideAlerts.
   ///
   /// In nl, this message translates to:
-  /// **'Rijmeldingen'**
+  /// **'Fietsmeldingen'**
   String get notifChannelRideAlerts;
 
   /// No description provided for @notifChannelRideAlertsDesc.
   ///
   /// In nl, this message translates to:
-  /// **'Avond-van-tevoren en ochtend-van-de-dag rijmeldingen'**
+  /// **'Avond-van-tevoren en ochtend-van-de-dag fietsmeldingen'**
   String get notifChannelRideAlertsDesc;
 
   /// No description provided for @notifChannelWeeklyDigest.
@@ -2542,25 +2518,25 @@ abstract class S {
   /// No description provided for @widgetTierPerfect.
   ///
   /// In nl, this message translates to:
-  /// **'Perfect'**
+  /// **'Toprit'**
   String get widgetTierPerfect;
 
   /// No description provided for @widgetTierGreat.
   ///
   /// In nl, this message translates to:
-  /// **'Goed'**
+  /// **'Fijne rit'**
   String get widgetTierGreat;
 
   /// No description provided for @widgetTierAcceptable.
   ///
   /// In nl, this message translates to:
-  /// **'Acceptabel'**
+  /// **'Te doen'**
   String get widgetTierAcceptable;
 
   /// No description provided for @widgetTierPoor.
   ///
   /// In nl, this message translates to:
-  /// **'Slecht'**
+  /// **'Binnenblijver'**
   String get widgetTierPoor;
 
   /// No description provided for @hourlyDry.
@@ -2764,13 +2740,13 @@ abstract class S {
   /// No description provided for @pelotonNoFriends.
   ///
   /// In nl, this message translates to:
-  /// **'Nog geen maatjes'**
+  /// **'Je peloton is nog leeg'**
   String get pelotonNoFriends;
 
   /// No description provided for @pelotonNoFriendsHint.
   ///
   /// In nl, this message translates to:
-  /// **'Stuur iemand je code. Zodra hij die invult, kunnen jullie elkaar uitnodigen voor ritten.'**
+  /// **'Een peloton is de groep waarmee je rijdt. Nodig een maatje uit en jullie zien elkaars ritten.'**
   String get pelotonNoFriendsHint;
 
   /// No description provided for @pelotonInviteFriend.
@@ -2932,7 +2908,7 @@ abstract class S {
   /// No description provided for @pelotonNeedFriendsFirst.
   ///
   /// In nl, this message translates to:
-  /// **'Voeg eerst een maatje toe — Ritten, tab Maatjes.'**
+  /// **'Voeg eerst een maatje toe — Ritten, tab Peloton.'**
   String get pelotonNeedFriendsFirst;
 
   /// No description provided for @pelotonInviteAction.
@@ -2956,19 +2932,19 @@ abstract class S {
   /// No description provided for @pelotonSignInToJoin.
   ///
   /// In nl, this message translates to:
-  /// **'Log eerst in en vul deze code daarna in onder Ritten, tab Maatjes.'**
+  /// **'Log eerst in en vul deze code daarna in onder Ritten, tab Peloton.'**
   String get pelotonSignInToJoin;
 
   /// No description provided for @pelotonGoToPeloton.
   ///
   /// In nl, this message translates to:
-  /// **'Naar Maatjes'**
+  /// **'Naar Peloton'**
   String get pelotonGoToPeloton;
 
   /// No description provided for @pelotonInviteShareLink.
   ///
   /// In nl, this message translates to:
-  /// **'Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Maatjes.'**
+  /// **'Fiets met me mee in RideWindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.'**
   String pelotonInviteShareLink(String link, String code);
 
   /// No description provided for @ridesTabRides.
@@ -2980,7 +2956,7 @@ abstract class S {
   /// No description provided for @ridesTabBuddies.
   ///
   /// In nl, this message translates to:
-  /// **'Maatjes'**
+  /// **'Peloton'**
   String get ridesTabBuddies;
 
   /// No description provided for @ridesFilterAll.

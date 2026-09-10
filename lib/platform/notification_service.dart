@@ -16,15 +16,15 @@ const int kNotifIdWeeklyDigest = 1003;
 class NotificationService {
   static const _channelRideAlerts = AndroidNotificationChannel(
     'ride_alerts',
-    'Rijmeldingen',
-    description: 'Avond-van-tevoren en ochtend-van-de-dag rijmeldingen',
+    'Fietsmeldingen',
+    description: 'Avond-van-tevoren en ochtend-van-de-dag fietsmeldingen',
     importance: Importance.high,
   );
 
   static const _channelWeeklyDigest = AndroidNotificationChannel(
     'weekly_digest',
     'Wekelijks overzicht',
-    description: 'Zondagavond overzicht van de beste rijmomenten',
+    description: 'Zondagavond overzicht van de beste fietsmomenten',
     importance: Importance.defaultImportance,
   );
 
@@ -100,8 +100,8 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: kNotifIdEveningBefore,
-      title: 'Top rijmoment morgen!',
-      body: '$slotTitle — perfecte omstandigheden verwacht',
+      title: 'Morgen ligt er een fietsmoment klaar',
+      body: '$slotTitle — zet je fiets alvast klaar',
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
@@ -136,7 +136,7 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: kNotifIdMorningOf,
-      title: 'Over 2 uur een top rijmoment!',
+      title: 'Over 2 uur stap je op',
       body: '$slotTitle — maak je klaar om te rijden',
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
@@ -174,7 +174,7 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: kNotifIdWeeklyDigest,
-      title: 'Je rijoverzicht voor deze week',
+      title: 'De beste fietsmomenten van je week',
       body: bodySummary,
       scheduledDate: nextSunday,
       notificationDetails: NotificationDetails(
