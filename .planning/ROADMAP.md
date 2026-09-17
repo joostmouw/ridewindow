@@ -255,7 +255,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 26-01-PLAN.md — CON-06 verification + docs/testers/changelog.md (PROOF-01)
+- [x] 26-01-PLAN.md — CON-06 verification + docs/testers/changelog.md (PROOF-01)
 - [ ] 26-02-PLAN.md — CON-01: build 42 review check, Oppo Play-install wipe/verify, promote to closed testing
 - [ ] 26-03-PLAN.md — CON-02/03/04: countries, feedback address, Google Group + opt-in link
 - [ ] 26-04-PLAN.md — CON-05: nl-NL store listing translation
@@ -359,7 +359,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 23. Typografie & hiërarchie | v4.0 | quick | Complete | 2026-09-07 |
 | 24. Iconografie & eigen beeldtaal | v4.0 | quick | Complete | 2026-09-08 |
 | 25. Wrijving wegwerken | v4.0 | quick | Complete | 2026-09-08 |
-| 26. Console op orde | v4.1 | 0/4 | Not started | - |
+| 26. Console op orde | v4.1 | 1/4 | In Progress|  |
 | 27. Wervingsonderzoek | v4.1 | 0/TBD | Not started | - |
 | 28. Feedbackstroom | v4.1 | 0/TBD | Not started | - |
 | 29. Eerste minuut | v4.1 | 0/TBD | Not started | - |

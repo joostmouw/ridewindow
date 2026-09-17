@@ -21,7 +21,7 @@
 - [ ] **CON-03**: Een tester ziet in Play een feedback-adres dat bij Ridewindow hoort
 - [ ] **CON-04**: Een tester meldt zich aan via één vaste link — een Google Group is gekoppeld aan de gesloten test
 - [ ] **CON-05**: Een bezoeker met Nederlands als Play-taal ziet de winkelpagina in het Nederlands (nl-NL)
-- [ ] **CON-06**: PWA, gepubliceerd privacybeleid en GitHub `main` tonen dezelfde versie en naam (Ridewindow) als de laatste Play-build
+- [x] **CON-06**: PWA, gepubliceerd privacybeleid en GitHub `main` tonen dezelfde versie en naam (Ridewindow) als de laatste Play-build
 
 ### Werving (WERV)
 
@@ -52,7 +52,7 @@
 
 ### Bewijs (PROOF)
 
-- [ ] **PROOF-01**: Een changelog per build, vanaf build 41, legt vast: versie, datum, track, inhoud, en welke tester-feedback ermee is opgelost
+- [x] **PROOF-01**: Een changelog per build, vanaf build 41, legt vast: versie, datum, track, inhoud, en welke tester-feedback ermee is opgelost
 - [ ] **PROOF-02**: Tijdens de veertien dagen gaan minstens drie builds naar de gesloten test
 - [ ] **PROOF-03**: De productie-aanvraag is ingediend; elk antwoord is minstens 250 tekens en noemt concrete versies en fixes uit de changelog
 - [ ] **PROOF-04**: Ridewindow is installeerbaar uit de Play Store in productie
@@ -85,8 +85,8 @@
 | CON-03 | Phase 26 | Pending |
 | CON-04 | Phase 26 | Pending |
 | CON-05 | Phase 26 | Pending |
-| CON-06 | Phase 26 | Pending |
-| PROOF-01 | Phase 26 | Pending |
+| CON-06 | Phase 26 | Complete |
+| PROOF-01 | Phase 26 | Complete |
 | WERV-01 | Phase 27 | Pending |
 | WERV-02 | Phase 27 | Pending |
 | FEED-01 | Phase 28 | Pending |
