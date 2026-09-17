@@ -80,8 +80,27 @@ werkelijk fietsen**, aangevuld met test-for-test tot twaalf.
 - Niche als tussenweg: wielrenclubs en fiets-Discords leveren tragere werving maar
   testers die doelgroep zijn. Overwegen als de eigen kring onder de vijf blijft.
 
-**Open vraag:** hoeveel mensen kan Joost realistisch persoonlijk vragen? Dat getal
-bepaalt hoe groot de opvulling moet zijn en is het eerste dat we moeten weten.
+**Beantwoord (Joost, 2026-09-17): negen.** En die negen zijn grotendeels dezelfde
+mensen die al in de Play-lijst staan — het zijn geen negen extra.
+
+Wat de lijst van negen adressen werkelijk voorstelt, uitgelezen uit de Console op
+2026-09-17: `joostmouw@gmail.com` is Joost zelf, en `Andrea.farina@goflink.com` en
+`andrea.farina42@gmail.com` zijn één persoon met een werk- en een privéadres. De
+feitelijke stand is dus **zeven externe testers**, niet negen.
+
+Daarmee ligt de rekensom vast:
+
+| | Aantal |
+|---|---|
+| Nu extern opted-in | 7 |
+| Haalbaar uit eigen kring | 9 |
+| Doel om de klok te starten | 15 (12 vereist + 3 marge voor uitval) |
+| **Van buiten te werven** | **~6** |
+
+De vijftien is een bewuste keuze boven de twaalf: Google eist twaalf **aaneengesloten**
+veertien dagen, dus drie afhakers mogen de periode niet ongeldig maken. Wie ná de start
+binnenkomt, voegt zich gewoon toe — dat verstoort de lopende periode niet. Daarom hoeft
+werving niet af te zijn voordat de klok gaat lopen; zodra er vijftien staan, start hij.
 
 ### 2. Bewijsvoering voor Google
 
