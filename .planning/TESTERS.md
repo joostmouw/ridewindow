@@ -88,19 +88,40 @@ Wat de lijst van negen adressen werkelijk voorstelt, uitgelezen uit de Console o
 `andrea.farina42@gmail.com` zijn één persoon met een werk- en een privéadres. De
 feitelijke stand is dus **zeven externe testers**, niet negen.
 
-Daarmee ligt de rekensom vast:
+**Bijgesteld dezelfde dag, en dit is de maatgevende versie.** De eerste rekensom mikte
+op vijftien opted-in en dus ~6 van buiten. Joost draaide dat bij: er moet méér van
+buiten komen, juist omdat testers **actief** moeten testen. Dat is de juiste correctie,
+want de eerste som telde opt-ins waar Google gebruik telt.
+
+Reken je op **actieve** testers in plaats van vinkjes, dan ziet het er zo uit:
 
 | | Aantal |
 |---|---|
 | Nu extern opted-in | 7 |
-| Haalbaar uit eigen kring | 9 |
-| Doel om de klok te starten | 15 (12 vereist + 3 marge voor uitval) |
-| **Van buiten te werven** | **~6** |
+| Plafond eigen kring | 9 (grotendeels diezelfde 7) |
+| Nodig volgens Google | 12 opted-in, 14 aaneengesloten dagen |
+| **Doel: actieve testers** | **~12** |
+| **Van buiten te werven (opt-ins)** | **~12–16** |
+| **Totale pool** | **~20–25 opted-in** |
 
-De vijftien is een bewuste keuze boven de twaalf: Google eist twaalf **aaneengesloten**
-veertien dagen, dus drie afhakers mogen de periode niet ongeldig maken. Wie ná de start
-binnenkomt, voegt zich gewoon toe — dat verstoort de lopende periode niet. Daarom hoeft
-werving niet af te zijn voordat de klok gaat lopen; zodra er vijftien staan, start hij.
+De sprong van 6 naar 12–16 zit hem volledig in het activiteitspercentage. Van de eigen
+kring opent niet iedereen de app trouw, ook al fietsen ze; van externe kanalen ligt dat
+aantoonbaar lager — de ontwikkelaar die hierboven wordt geciteerd hield twee actieve
+testers over van twaalf uit een subreddit, ongeveer 17%. Wie twaalf actieve mensen wil,
+moet er dus fors meer dan twaalf werven.
+
+Die 20–25 is precies het getal dat Joost zelf al noemde voordat we het uitrekenden.
+
+**Gevolg voor de kanaalkeuze:** bereik telt nu wél mee. Bij zes van buiten kon een klein
+kanaal met hoge doelgroepmatch winnen van een groot kanaal; bij twaalf à zestien niet
+meer. De maat is **verwachte actieve testers per eenheid inspanning** — aanmeldingen ×
+realistisch activiteitspercentage — en de gekozen kanalen moeten elkaar aanvullen in
+plaats van hetzelfde publiek aanboren.
+
+**De klok hoeft niet te wachten tot alles binnen is.** Google eist twaalf
+*aaneengesloten* veertien dagen; wie ná de start binnenkomt voegt zich gewoon toe zonder
+de lopende periode te verstoren. Zodra er twaalf actieve testers staan, start hij — de
+rest van de werving loopt daar dan naast door.
 
 ### 2. Bewijsvoering voor Google
 
