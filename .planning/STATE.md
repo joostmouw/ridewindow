@@ -37,6 +37,7 @@ feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de ba
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-19 | #73 consistentie-sweep | 19 waarschuwingen → 0, elf radii → een benoemde schaal in `AppShapes`, nul hardgecodeerde radii. **Drie vondsten die geen opruimwerk waren**: de weerbalk-uitleg noemde een ander getal dan de balk, een "ongebruikte variabele" hield de Agenda levend, en mijn eigen dagkaart stond op paneel-radius. `ScoreBadge` bleek opzet, geen drift. |
 | 2026-09-19 | [blokweergave](quick/260919-h2c-blokweergave/) | #69 en #70: Vensters/Blok en Beste eerst/Op tijd als keuze op Home. **Vijf correctierondes van Joost**, die drie oudere fouten blootlegden: "Beste eerst" sorteerde op tier (85 boven 93), de Agenda bood uur 22 aan dat de motor nooit voorstelt, en de 6/22-grens stond op drie plekken los. Les in de SUMMARY: een schaal teken je als schaal, niet als palet. |
 | 2026-09-19 | #66 afgezegde ritten | Afzeggen was een deur die één kant op ging — `declined` viel uit alle drie de providers tegelijk. Eigen rol achteraan in de enum (voorrang, niet cosmetisch), eigen filter, weg terug op het ritdetail. **De functie bestond al, hij had nergens een knop.** |
 | 2026-09-19 | notificatieschakelaars | **Alle drie waren decoratie** — ze sloegen een voorkeur op die niemand ooit las. `planNotifications()` is nu puur en getest; aangesloten op de slots-listener en op de schakelaar zelf. Op web is de sectie weg (geen implementatie daar). Achtergrond-planning bewust niet: [[#74]]. |

@@ -59,8 +59,8 @@ vertrouwen; de App bundle explorer in de Console wel. Vandaar de sprong naar 41.
 
 ## 5. Losse einden zonder ticket
 
-- **De radii vormen geen systeem.** 24 op ritkaarten, 18 op detail- en sectiekaarten, 16 op PLANNED-regels, 12 en 3 elders. Material 3 kent 12, 16 en 20 — **18 en 24 zijn geen token**. Een aparte opruimronde waard.
-- **`ScoreBadge` staat naast `ScoreDisplay`** in `features/shared/`, twee vormtalen naast elkaar, nooit tegen het papier-uiterlijk gehouden.
+- ~~**De radii vormen geen systeem.**~~ ✅ **Opgelost 2026-09-19** — elke maat heeft een naam in `AppShapes` die zegt bij welk soort object hij hoort (hair/cell/xs/sm/md/lg/xl/panel/card). Nul hardgecodeerde radii over. Bewust **niet** naar de Material 3-schaal toegerekend: 24 op ritkaarten was een gemaakte keuze in v4.0.
+- ~~**`ScoreBadge` staat naast `ScoreDisplay`**~~ — **nagekeken 2026-09-19: dit is opzet, geen drift.** `score_display.dart` legt uit dat de badge blijft voor de compacte plekken waar een hele regel niet past; hij staat op de PLANNED-rijen en in de detail-AppBar. Niets aan gedaan.
 - **iOS-verificatie:** vijf vinkjes in `19-auth/REGRESSION-CHECKLIST.md`, geen iPhone in het project.
 - **De flaky notificatietest** (`scheduleEveningBefore tijdberekening`) faalt na 19:00 UTC. Op 10 september 's ochtends slaagde hij. Geen regressie, wel een test die van de klok afhangt.
 - **De PWA-cache.** De eerste herlaad na een deploy gaf op 8 september de **oude** bundel terug, inclusief een gebrek dat net gerepareerd was. De server had het goede bestand (byte-identiek nagemeten). Deel een link dus altijd mét `?v=N` of ⌘⇧R erbij.
