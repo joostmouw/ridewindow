@@ -405,6 +405,56 @@ Pas zinvol als slice 1 t/m 3 staan.
 [Partiful](https://partiful.com/), [Howbout](https://howbout.app/),
 [Strava Group Activities](https://support.strava.com/hc/en-us/articles/216919497-Group-Activities).
 
+## 75 — Epic "Dicht huis": bots, nepaccounts en wat een vreemde met de API kan
+
+Opgesteld 2026-09-19 op verzoek van Joost. **Er bestond nog geen samenhangend stuk hierover.**
+Wat er wél is, staat per migratie: RLS op elke tabel, grants die krap zijn, `anon` die op de
+gesynchroniseerde tabellen niets mag, en een uitnodigingscode met ~5·10^11 mogelijkheden uit
+`Random.secure()`. Dat is de fundering en die is beter dan gemiddeld. Wat ontbreekt is de laag
+erboven: **niets in deze app kent een snelheidsbegrenzing, en niemand telt mee hoe vaak iets
+gebeurt.**
+
+### Wat vandaag werkelijk open ligt
+
+De Supabase-URL en de `anon`-sleutel zitten in elke build — dat hoort zo, ze zijn publiek per
+ontwerp. Wie ze eruit haalt, kan praten met de REST-API als `anon`. Daarmee is dit bereikbaar:
+
+| | Wat | Waarom het nu kan |
+|---|---|---|
+| **A** | **`feedback` volpompen.** `anon` heeft `insert` (migratie 0004, en dat is de anonieme route die FB-03 eist). | Geen begrenzing, geen captcha, geen maximum per toestel. Een script schrijft er in een uur een miljoen rijen in. |
+| **B** | **`app_events` volpompen.** Zelfde vorm, sinds 0008. | Idem. Erger dan A op één punt: het vervuilt precies de cijfers waar fase 29 en 30 op sturen, en dat merk je pas als je conclusies al getrokken zijn. |
+| **C** | **Uitnodigingscodes raden.** `redeem_friend_invite` is een RPC voor `authenticated`. | De code is ruim genoeg (~5·10^11) dat blind raden kansloos is, maar er is **geen teller**: tienduizend pogingen per minuut kosten niets en vallen nergens op. Wie er één raadt, wordt maatje en ziet daarmee je naam en de ritten waarvoor je uitgenodigd bent. |
+| **D** | **Nepaccounts.** Inloggen kan alleen via Google. | Dat is een drempel, geen slot: Google-accounts zijn gratis en in bulk te maken. Vandaag is er niets te winnen met een nepaccount (je kunt alleen jezelf data geven), maar zodra slice 5 "zoeken op gebruikersnaam" brengt, wordt dit een echte vector. |
+| **E** | **De gevolgen van A/B op de begroting.** Free tier: geen back-ups, 500 MB database, en pauzeren na zeven dagen stilte. | Een volgepompte database is niet terug te draaien naar een moment ervoor. De blast radius is beperkt doordat het toestel zijn eigen kopie houdt — maar `feedback` en `app_events` bestaan alleen server-side. |
+
+### Wat dit epic zou moeten doen, in deze volgorde
+
+1. **Meten voor je dichttimmert.** Een dagtelling per tabel (rijen per dag, unieke `device_id`s)
+   zodat een aanval zichtbaar is. Zonder dit weet je niet of het al gebeurt — en `app_events` heeft
+   sinds 0009 een leesbare kant, dus dit is goedkoop.
+2. **Snelheidsbegrenzing op de twee open deuren.** Supabase kan dit niet op tafelniveau; de eerlijke
+   opties zijn (a) een `check` op een teller per `device_id` per dag via een trigger, (b) Cloudflare
+   Turnstile op de feedbackknop, (c) de insert achter een `security definer`-functie zetten die zelf
+   telt. Optie (c) past het best bij de constraint "alleen plpgsql, geen Edge Functions" — en is
+   meteen de plek waar een maximum per toestel kan staan.
+3. **Een teller op `redeem_friend_invite`.** Vijf mislukte pogingen per uur per gebruiker is ruim
+   voor een mens en dodelijk voor een script. De functie bestaat al; dit is er een tabel en tien
+   regels bij.
+4. **Een bovengrens op wat één account kan aanmaken.** Uitnodigingen, groepsritten, opties. Niet
+   omdat iemand het misbruikt, maar omdat een losgeslagen lus in de app hetzelfde doet.
+5. **Pas daarna captcha of App Check.** Dat is de zwaarste maatregel en raakt elke gebruiker; hij
+   hoort achteraan, niet vooraan.
+
+### Randvoorwaarden
+
+- **€0/maand blijft staan.** Turnstile is gratis, pg_cron en triggers ook. Een WAF is dat niet.
+- **Geen maatregel mag de uitgelogde gebruiker raken.** De app moet zonder account blijven werken;
+  dat is regel 8 van de requirements en het hele punt van accounts-zijn-additief.
+- **Geen maatregel mag de anonieme feedbackroute dichtgooien.** FB-03 eist dat een tester zonder
+  account feedback kan sturen. Begrenzen mag, blokkeren niet.
+- **Eerst het gat dat al bestaat, niet het gat dat ooit kan ontstaan.** A en B zijn er vandaag; D
+  wordt pas echt bij slice 5 van [[65]].
+
 ## 74 — Meldingen bij laten werken zonder dat de app geopend wordt
 
 De drie meldingsschakelaars werken sinds 2026-09-19, maar alleen vanuit de voorgrond: de

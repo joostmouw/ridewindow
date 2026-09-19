@@ -90,7 +90,7 @@ class SEn extends S {
 
   @override
   String scaleRain(Object ex1, Object ex2, Object score1, Object score2) {
-    return 'Above your limit the first drops cost the most and it flattens out after that: $ex1 scores $score1, $ex2 scores $score2. The chance of rain counts as well — whichever of the two is worse becomes the score.';
+    return 'Above your limit the first drops cost the most and it flattens out after that: $ex1 scores $score1, $ex2 scores $score2. The chance of rain counts as well: whichever of the two is worse becomes the score.';
   }
 
   @override
@@ -284,12 +284,12 @@ class SEn extends S {
 
   @override
   String staleDataBannerWithTime(String time) {
-    return 'Offline — showing ride windows from $time';
+    return 'Offline, showing ride windows from $time';
   }
 
   @override
   String get staleDataBannerNoTime =>
-      'Offline — showing last-known ride windows';
+      'Offline, showing last-known ride windows';
 
   @override
   String get unitKmh => 'km/h';
@@ -444,7 +444,7 @@ class SEn extends S {
 
   @override
   String get notifWeeklyDigestSub =>
-      'Sunday evening 19:00 — best moments of the week';
+      'Sunday evening 19:00, best moments of the week';
 
   @override
   String get notifExactTimingWarning =>
@@ -476,21 +476,21 @@ class SEn extends S {
 
   @override
   String get toleranceTempInfo =>
-      'Set your ideal cycling temperature. Hours within this range score 100 for temperature. Outside the range, the score drops gradually — the further from your range, the lower the score.\n\nA wider range means more ride windows; a narrower range shows only your ideal conditions.';
+      'Set your ideal cycling temperature. Hours within this range score 100 for temperature. Outside the range, the score drops gradually: the further from your range, the lower the score.\n\nA wider range means more ride windows; a narrower range shows only your ideal conditions.';
 
   @override
   String get toleranceRainInfoTitle => 'Rain tolerance';
 
   @override
   String get toleranceRainInfo =>
-      'Set the maximum rainfall per hour you\'re willing to ride in. Hours at or below this limit score 100 for rain. Above the limit, the score drops — heavier rain means a lower score.\n\nSet to 0 mm for only dry conditions, or higher if you don\'t mind some rain.';
+      'Set the maximum rainfall per hour you\'re willing to ride in. Hours at or below this limit score 100 for rain. Above the limit, the score drops: heavier rain means a lower score.\n\nSet to 0 mm for only dry conditions, or higher if you don\'t mind some rain.';
 
   @override
   String get toleranceWindInfoTitle => 'Wind tolerance';
 
   @override
   String get toleranceWindInfo =>
-      'Set the maximum wind speed you\'re comfortable cycling in. Hours at or below this limit score 100 for wind. Above the limit, the score drops — stronger wind means a lower score.\n\nHigher tolerance means more ride windows, but expect harder cycling.';
+      'Set the maximum wind speed you\'re comfortable cycling in. Hours at or below this limit score 100 for wind. Above the limit, the score drops: stronger wind means a lower score.\n\nHigher tolerance means more ride windows, but expect harder cycling.';
 
   @override
   String get tempDescAllWeather => 'You ride in almost any weather';
@@ -699,6 +699,13 @@ class SEn extends S {
   String get debugMenu => 'Debug Menu';
 
   @override
+  String get debugResetAnalytics => 'Reset usage-statistics consent';
+
+  @override
+  String get debugAnalyticsReset =>
+      'Consent, device id, launch count and waiting room wiped';
+
+  @override
   String get debugResetOnboarding => 'Reset onboarding';
 
   @override
@@ -729,7 +736,7 @@ class SEn extends S {
   String get debugOutboxTitle => 'Sync outbox';
 
   @override
-  String get debugOutboxEmpty => 'Outbox is empty — everything has been sent.';
+  String get debugOutboxEmpty => 'Outbox is empty. Everything has been sent.';
 
   @override
   String debugOutboxRowSubtitle(int attempts, String error) {
@@ -868,7 +875,7 @@ class SEn extends S {
 
   @override
   String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill) {
-    return 'The list says it feels like $airTemp°. On the bike that becomes $bikeTemp° — your own headwind takes $chill° off.';
+    return 'The list says it feels like $airTemp°. On the bike that becomes $bikeTemp°, because your own headwind takes $chill° off.';
   }
 
   @override
@@ -943,7 +950,7 @@ class SEn extends S {
 
   @override
   String insightsTitle(String tier, String score) {
-    return 'Why \'$tier\' — $score/100';
+    return 'Why \'$tier\': $score/100';
   }
 
   @override
@@ -974,34 +981,34 @@ class SEn extends S {
   String get insightsWindStrong => 'Strong';
 
   @override
-  String get insightsTempNoteIdeal => 'Ideal temperature — comfortable riding';
+  String get insightsTempNoteIdeal => 'Ideal temperature, comfortable riding';
 
   @override
   String get insightsTempNoteAcceptable =>
-      'Acceptable temperature — grab an extra layer';
+      'Acceptable temperature, grab an extra layer';
 
   @override
-  String get insightsTempNoteExtreme => 'Outside ideal range — adjust clothing';
+  String get insightsTempNoteExtreme => 'Outside ideal range, adjust clothing';
 
   @override
-  String get insightsRainNoteDry => 'Dry — no rain expected';
+  String get insightsRainNoteDry => 'Dry, no rain expected';
 
   @override
-  String get insightsRainNoteLight => 'Light rain expected — fenders handy';
+  String get insightsRainNoteLight => 'Light rain expected, fenders handy';
 
   @override
-  String get insightsRainNoteWet => 'Rain expected — consider a rain jacket';
+  String get insightsRainNoteWet => 'Rain expected, consider a rain jacket';
 
   @override
-  String get insightsWindNoteCalm => 'Light wind — barely noticeable';
+  String get insightsWindNoteCalm => 'Light wind, barely noticeable';
 
   @override
   String get insightsWindNoteModerate =>
-      'Moderate wind — expect some resistance';
+      'Moderate wind, expect some resistance';
 
   @override
   String get insightsWindNoteStrong =>
-      'Strong wind — plan your route strategically';
+      'Strong wind, plan your route strategically';
 
   @override
   String get totalScore => 'Total score';
@@ -1302,7 +1309,7 @@ class SEn extends S {
 
   @override
   String get tourAgendaBody =>
-      'Seven days of hour cells — green is good, orange is not. Tap a cell for the weather. Tap twice to select a range and plan a ride.';
+      'Seven days of hour cells: green is good, orange is not. Tap a cell for the weather. Tap twice to select a range and plan a ride.';
 
   @override
   String get tourRidesTitle => 'My rides';
@@ -1345,7 +1352,7 @@ class SEn extends S {
 
   @override
   String notifEveningBody(String slot) {
-    return '$slot — get your bike ready';
+    return '$slot. Get your bike ready';
   }
 
   @override
@@ -1353,7 +1360,7 @@ class SEn extends S {
 
   @override
   String notifMorningBody(String slot) {
-    return '$slot — get ready to ride';
+    return '$slot. Get ready to ride';
   }
 
   @override
@@ -1486,7 +1493,7 @@ class SEn extends S {
 
   @override
   String get pelotonSignedOutHint =>
-      'A peloton is the group you ride with. Signing in lets your buddies find you — everything else in the app keeps working without an account.';
+      'A peloton is the group you ride with. Signing in lets your buddies find you. Everything else in the app keeps working without an account.';
 
   @override
   String get pelotonFriends => 'Buddies';
@@ -1551,14 +1558,14 @@ class SEn extends S {
   }
 
   @override
-  String get feedbackThanks => 'Thanks — your feedback is on its way.';
+  String get feedbackThanks => 'Thanks, your feedback is on its way.';
 
   @override
   String get feedbackFailed => 'Couldn\'t save your feedback. Try again.';
 
   @override
   String scoreSemanticLabel(int score, String tier) {
-    return 'Score $score of 100 — $tier';
+    return 'Score $score of 100, $tier';
   }
 
   @override
@@ -1568,7 +1575,7 @@ class SEn extends S {
 
   @override
   String get pelotonCodeInvalid =>
-      'That code doesn\'t work — it may have expired.';
+      'That code doesn\'t work. It may have expired.';
 
   @override
   String get pelotonUnnamedFriend => 'Rider';
@@ -1642,7 +1649,7 @@ class SEn extends S {
 
   @override
   String get pelotonNeedFriendsFirst =>
-      'Add a buddy first — Rides, tab Peloton.';
+      'Add a buddy first via Rides, tab Peloton.';
 
   @override
   String get pelotonInviteAction => 'Invite';
@@ -1807,6 +1814,10 @@ class SEn extends S {
   }
 
   @override
+  String get daylightScoreAllLight =>
+      'This ride falls entirely in daylight, so daylight takes nothing off.';
+
+  @override
   String daylightScoreNone(String weight) {
     return 'Your sensitivity is set to “$weight”, so daylight does not change this window’s score.';
   }
@@ -1821,21 +1832,21 @@ class SEn extends S {
 
   @override
   String get daylightInfo =>
-      'The golden band shows when the sun is above the horizon, from midnight to midnight. Your ride sits in it as a block. The more of it falls in the dark, the lower the score — how much exactly is up to you, under Profile → Your limits → Daylight.\n\nDark rides never disappear from the list entirely: in December it is light here from 08:45 to 16:30, and otherwise nothing would be left.';
+      'The golden band shows when the sun is above the horizon, from midnight to midnight. Your ride sits in it as a block. The more of it falls in the dark, the lower the score. How much exactly is up to you, under Profile → Your limits → Daylight.\n\nDark rides never disappear from the list entirely: in December it is light here from 08:45 to 16:30, and otherwise nothing would be left.';
 
   @override
   String rideSunsetMostlyDark(String time) {
-    return 'Sunset at $time — mostly in the dark';
+    return 'Sunset at $time, mostly in the dark';
   }
 
   @override
   String rideSunsetPartly(String time) {
-    return 'Sunset at $time — last stretch at dusk';
+    return 'Sunset at $time, last stretch at dusk';
   }
 
   @override
   String rideSunriseAfter(String time) {
-    return 'Sunrise at $time — starts in the dark';
+    return 'Sunrise at $time, starts in the dark';
   }
 
   @override
@@ -1846,7 +1857,7 @@ class SEn extends S {
 
   @override
   String get toleranceDaylightInfo =>
-      'Unlike the three above, this is not a limit but a weight: how much it matters to you that a ride falls in the dark.\n\nAll the way left nothing about your scores changes. All the way right, a ride entirely in the dark loses 40 of its 100 points. Even then such rides do not disappear — they sit behind the daylight windows.';
+      'Unlike the three above, this is not a limit but a weight: how much it matters to you that a ride falls in the dark.\n\nAll the way left nothing about your scores changes. All the way right, a ride entirely in the dark loses 40 of its 100 points. Even then such rides do not disappear: they sit behind the daylight windows.';
 
   @override
   String get daylightWeightOff => 'Doesn\'t matter to me';
@@ -1896,7 +1907,7 @@ class SEn extends S {
 
   @override
   String get analyticsAskBody =>
-      'Ridewindow can anonymously track which screens you use, so I can see what works and what doesn\'t. No location, no text, no email address — and you can turn it off again in Profile.';
+      'Ridewindow can anonymously track which screens you use, so I can see what works and what doesn\'t. No location, no text, no email address, and you can turn it off again in Profile.';
 
   @override
   String get analyticsAskYes => 'Yes, go ahead';
@@ -1908,10 +1919,10 @@ class SEn extends S {
   String get analyticsSettingTitle => 'Anonymous usage statistics';
 
   @override
-  String get analyticsSettingOn => 'On — you\'re helping improve the app';
+  String get analyticsSettingOn => 'On, you\'re helping improve the app';
 
   @override
-  String get analyticsSettingOff => 'Off — nothing leaves your device';
+  String get analyticsSettingOff => 'Off, nothing leaves your device';
 
   @override
   String notifWeeklyBody(String slot) {

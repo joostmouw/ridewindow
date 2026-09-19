@@ -90,7 +90,7 @@ class SNl extends S {
 
   @override
   String scaleRain(Object ex1, Object ex2, Object score1, Object score2) {
-    return 'Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: $ex1 scoort $score1, $ex2 scoort $score2. De kans op regen telt ook mee — de slechtste van die twee wordt de score.';
+    return 'Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: $ex1 scoort $score1, $ex2 scoort $score2. De kans op regen telt ook mee: de slechtste van die twee wordt de score.';
   }
 
   @override
@@ -285,12 +285,12 @@ class SNl extends S {
 
   @override
   String staleDataBannerWithTime(String time) {
-    return 'Offline — toont fietsmomenten van $time';
+    return 'Offline, toont fietsmomenten van $time';
   }
 
   @override
   String get staleDataBannerNoTime =>
-      'Offline — toont laatst bekende fietsmomenten';
+      'Offline, toont laatst bekende fietsmomenten';
 
   @override
   String get unitKmh => 'km/u';
@@ -444,7 +444,7 @@ class SNl extends S {
 
   @override
   String get notifWeeklyDigestSub =>
-      'Zondagavond 19:00 — beste momenten van de week';
+      'Zondagavond 19:00, beste momenten van de week';
 
   @override
   String get notifExactTimingWarning =>
@@ -476,21 +476,21 @@ class SNl extends S {
 
   @override
   String get toleranceTempInfo =>
-      'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.';
+      'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk: hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.';
 
   @override
   String get toleranceRainInfoTitle => 'Regentolerantie';
 
   @override
   String get toleranceRainInfo =>
-      'Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score — meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.';
+      'Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score: meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.';
 
   @override
   String get toleranceWindInfoTitle => 'Windtolerantie';
 
   @override
   String get toleranceWindInfo =>
-      'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.';
+      'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score: hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.';
 
   @override
   String get tempDescAllWeather => 'Je fietst in bijna elk weer';
@@ -699,6 +699,13 @@ class SNl extends S {
   String get debugMenu => 'Debug Menu';
 
   @override
+  String get debugResetAnalytics => 'Statistiek-toestemming terugzetten';
+
+  @override
+  String get debugAnalyticsReset =>
+      'Toestemming, toestel-id, startteller en wachtkamer zijn gewist';
+
+  @override
   String get debugResetOnboarding => 'Onboarding resetten';
 
   @override
@@ -729,7 +736,7 @@ class SNl extends S {
   String get debugOutboxTitle => 'Sync-outbox';
 
   @override
-  String get debugOutboxEmpty => 'Outbox is leeg — alles is verzonden.';
+  String get debugOutboxEmpty => 'Outbox is leeg. Alles is verzonden.';
 
   @override
   String debugOutboxRowSubtitle(int attempts, String error) {
@@ -868,7 +875,7 @@ class SNl extends S {
 
   @override
   String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill) {
-    return 'In de weerlijst voelt het als $airTemp°. Op de fiets wordt dat $bikeTemp° — je eigen tegenwind haalt er $chill° af.';
+    return 'In de weerlijst voelt het als $airTemp°. Op de fiets wordt dat $bikeTemp°, want je eigen tegenwind haalt er $chill° af.';
   }
 
   @override
@@ -943,7 +950,7 @@ class SNl extends S {
 
   @override
   String insightsTitle(String tier, String score) {
-    return 'Waarom \'$tier\' — $score/100';
+    return 'Waarom \'$tier\': $score/100';
   }
 
   @override
@@ -974,35 +981,34 @@ class SNl extends S {
   String get insightsWindStrong => 'Sterk';
 
   @override
-  String get insightsTempNoteIdeal => 'Ideale temperatuur — comfortabel rijden';
+  String get insightsTempNoteIdeal => 'Ideale temperatuur, comfortabel rijden';
 
   @override
   String get insightsTempNoteAcceptable =>
-      'Acceptabele temperatuur — pak een extra laag';
+      'Acceptabele temperatuur, pak een extra laag';
 
   @override
   String get insightsTempNoteExtreme =>
-      'Buiten het ideale bereik — kleding aanpassen';
+      'Buiten het ideale bereik, kleding aanpassen';
 
   @override
-  String get insightsRainNoteDry => 'Droog — geen neerslag verwacht';
+  String get insightsRainNoteDry => 'Droog, geen neerslag verwacht';
 
   @override
   String get insightsRainNoteLight =>
-      'Lichte neerslag verwacht — spatborden handig';
+      'Lichte neerslag verwacht, spatborden handig';
 
   @override
-  String get insightsRainNoteWet => 'Neerslag verwacht — overweeg een regenjas';
+  String get insightsRainNoteWet => 'Neerslag verwacht, overweeg een regenjas';
 
   @override
-  String get insightsWindNoteCalm => 'Lichte wind — nauwelijks merkbaar';
+  String get insightsWindNoteCalm => 'Lichte wind, nauwelijks merkbaar';
 
   @override
-  String get insightsWindNoteModerate => 'Matige wind — verwacht wat weerstand';
+  String get insightsWindNoteModerate => 'Matige wind, verwacht wat weerstand';
 
   @override
-  String get insightsWindNoteStrong =>
-      'Sterke wind — plan de route strategisch';
+  String get insightsWindNoteStrong => 'Sterke wind, plan de route strategisch';
 
   @override
   String get totalScore => 'Totaalscore';
@@ -1305,7 +1311,7 @@ class SNl extends S {
 
   @override
   String get tourAgendaBody =>
-      'Zeven dagen met uurvakken — groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.';
+      'Zeven dagen met uurvakken: groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.';
 
   @override
   String get tourRidesTitle => 'Mijn ritten';
@@ -1348,7 +1354,7 @@ class SNl extends S {
 
   @override
   String notifEveningBody(String slot) {
-    return '$slot — zet je fiets alvast klaar';
+    return '$slot. Zet je fiets alvast klaar';
   }
 
   @override
@@ -1356,7 +1362,7 @@ class SNl extends S {
 
   @override
   String notifMorningBody(String slot) {
-    return '$slot — maak je klaar om te rijden';
+    return '$slot. Maak je klaar om te rijden';
   }
 
   @override
@@ -1489,7 +1495,7 @@ class SNl extends S {
 
   @override
   String get pelotonSignedOutHint =>
-      'Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden — de rest van de app werkt gewoon zonder.';
+      'Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden. De rest van de app werkt gewoon zonder.';
 
   @override
   String get pelotonFriends => 'Maatjes';
@@ -1554,7 +1560,7 @@ class SNl extends S {
   }
 
   @override
-  String get feedbackThanks => 'Dank je — je feedback is onderweg.';
+  String get feedbackThanks => 'Dank je, je feedback is onderweg.';
 
   @override
   String get feedbackFailed =>
@@ -1562,7 +1568,7 @@ class SNl extends S {
 
   @override
   String scoreSemanticLabel(int score, String tier) {
-    return 'Score $score van 100 — $tier';
+    return 'Score $score van 100, $tier';
   }
 
   @override
@@ -1572,7 +1578,7 @@ class SNl extends S {
 
   @override
   String get pelotonCodeInvalid =>
-      'Die code werkt niet — hij kan verlopen zijn.';
+      'Die code werkt niet. Hij kan verlopen zijn.';
 
   @override
   String get pelotonUnnamedFriend => 'Fietser';
@@ -1647,7 +1653,7 @@ class SNl extends S {
 
   @override
   String get pelotonNeedFriendsFirst =>
-      'Voeg eerst een maatje toe — Ritten, tab Peloton.';
+      'Voeg eerst een maatje toe via Ritten, tab Peloton.';
 
   @override
   String get pelotonInviteAction => 'Uitnodigen';
@@ -1813,6 +1819,10 @@ class SNl extends S {
   }
 
   @override
+  String get daylightScoreAllLight =>
+      'Deze rit valt helemaal in het licht, dus daglicht haalt er niets vanaf.';
+
+  @override
   String daylightScoreNone(String weight) {
     return 'Jouw gevoeligheid staat op “$weight”, dus daglicht verandert de score van dit venster niet.';
   }
@@ -1827,21 +1837,21 @@ class SNl extends S {
 
   @override
   String get daylightInfo =>
-      'De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score — hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.';
+      'De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score. Hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.';
 
   @override
   String rideSunsetMostlyDark(String time) {
-    return 'Zon onder om $time — grotendeels in het donker';
+    return 'Zon onder om $time, grotendeels in het donker';
   }
 
   @override
   String rideSunsetPartly(String time) {
-    return 'Zon onder om $time — laatste deel in de schemer';
+    return 'Zon onder om $time, laatste deel in de schemer';
   }
 
   @override
   String rideSunriseAfter(String time) {
-    return 'Zon op om $time — begin nog in het donker';
+    return 'Zon op om $time, begin nog in het donker';
   }
 
   @override
@@ -1852,7 +1862,7 @@ class SNl extends S {
 
   @override
   String get toleranceDaylightInfo =>
-      'Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst — ze staan achter de vensters bij daglicht.';
+      'Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst: ze staan achter de vensters bij daglicht.';
 
   @override
   String get daylightWeightOff => 'Maakt me niet uit';
@@ -1901,7 +1911,7 @@ class SNl extends S {
 
   @override
   String get analyticsAskBody =>
-      'Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres — en je kunt het altijd weer uitzetten in Profiel.';
+      'Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres, en je kunt het altijd weer uitzetten in Profiel.';
 
   @override
   String get analyticsAskYes => 'Ja, doe maar';
@@ -1913,10 +1923,10 @@ class SNl extends S {
   String get analyticsSettingTitle => 'Anonieme gebruiksstatistiek';
 
   @override
-  String get analyticsSettingOn => 'Aan — je helpt de app beter te maken';
+  String get analyticsSettingOn => 'Aan, je helpt de app beter te maken';
 
   @override
-  String get analyticsSettingOff => 'Uit — er verlaat niets je toestel';
+  String get analyticsSettingOff => 'Uit, er verlaat niets je toestel';
 
   @override
   String notifWeeklyBody(String slot) {

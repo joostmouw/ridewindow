@@ -1,46 +1,29 @@
 {
   "@@locale": "nl",
-
   "appTitle": "Ridewindow",
-
   "navHome": "Home",
   "navAgenda": "Agenda",
   "navRides": "Ritten",
   "navProfile": "Profiel",
-
   "greetingNightOwl": "Nachtuil",
   "greetingMorning": "Goedemorgen",
   "greetingAfternoon": "Goedemiddag",
   "greetingEvening": "Goedenavond",
   "greetingWithName": "{greeting}, {name}",
-  "@greetingWithName": {
-    "placeholders": {
-      "greeting": {"type": "String"},
-      "name": {"type": "String"}
-    }
-  },
-
+  "@greetingWithName": {"placeholders": {"greeting": {"type": "String"}, "name": {"type": "String"}}},
   "rideWindowCount": "{count} {count, plural, =1{fietsmoment} other{fietsmomenten}} deze week",
-  "@rideWindowCount": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
+  "@rideWindowCount": {"placeholders": {"count": {"type": "int"}}},
   "updatedAt": "Bijgewerkt {time}",
-  "@updatedAt": {
-    "placeholders": {
-      "time": {"type": "String"}
-    }
-  },
+  "@updatedAt": {"placeholders": {"time": {"type": "String"}}},
   "retryButton": "Opnieuw proberen",
   "thisWeek": "KOMENDE DAGEN",
   "rideTimes": "FIETSMOMENTEN",
   "plannedRidesLabel": "GEPLAND",
   "scoreSectionTitle": "Dit venster: {score} van de 100",
   "scoreInsideIdeal": "{value} valt binnen het bereik dat je hebt ingesteld, dus dit scoort de volle 100.",
-  "scoreOutsideIdeal": "{value} valt buiten het bereik dat je hebt ingesteld, en dát kost de punten.",
+  "scoreOutsideIdeal": "{value} valt buiten het bereik dat je hebt ingesteld, en d\u00e1t kost de punten.",
   "scaleTemp": "Buiten je bereik zakt de score met 5 punten per graad. {ex1} zou dus {score1} scoren, en {ex2} zou {score2} scoren.",
-  "scaleRain": "Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: {ex1} scoort {score1}, {ex2} scoort {score2}. De kans op regen telt ook mee — de slechtste van die twee wordt de score.",
+  "scaleRain": "Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: {ex1} scoort {score1}, {ex2} scoort {score2}. De kans op regen telt ook mee: de slechtste van die twee wordt de score.",
   "scaleWind": "Boven je grens zakt het eerst rustig en daarna steil, want harde wind is een veiligheidskwestie: {ex1} scoort {score1}, {ex2} scoort {score2}.",
   "scoreCombines": "De zwakste van temperatuur, regen en wind weegt het zwaarst: de ritscore is 60% van de laagste plus 40% van het gemiddelde van alle drie.",
   "showAllWindows": "Toon alle {count} momenten",
@@ -49,7 +32,6 @@
   "filterMorning": "Ochtend",
   "filterAfternoon": "Middag",
   "filterEvening": "Avond",
-
   "adjustTime": "TIJD AANPASSEN",
   "startLabel": "Start",
   "endLabel": "Eind",
@@ -57,24 +39,13 @@
   "increaseStartTime": "Starttijd later zetten",
   "decreaseEndTime": "Eindtijd vroeger zetten",
   "increaseEndTime": "Eindtijd later zetten",
-
   "weatherMetricInfoTooltip": "{label} info",
-  "@weatherMetricInfoTooltip": {
-    "placeholders": {
-      "label": {"type": "String"}
-    }
-  },
+  "@weatherMetricInfoTooltip": {"placeholders": {"label": {"type": "String"}}},
   "weatherTierDescription": "{tier} fietsweer",
-  "@weatherTierDescription": {
-    "placeholders": {
-      "tier": {"type": "String"}
-    }
-  },
-
+  "@weatherTierDescription": {"placeholders": {"tier": {"type": "String"}}},
   "infoTemp": "De groene zone toont je ideale temperatuurbereik. De stip toont de gemiddelde temperatuur voor dit fietsmoment. Pas je bereik aan in Profiel.",
   "infoRain": "De groene zone toont je regentolerantie. De stip toont de verwachte totale neerslag. Minder regen = betere rit.",
   "infoWind": "De groene zone toont je windcomfortlimiet. De stip toont de gemiddelde windsnelheid. Harde wind maakt fietsen zwaarder en minder veilig.",
-
   "dayMon": "MA",
   "dayTue": "DI",
   "dayWed": "WO",
@@ -82,7 +53,6 @@
   "dayFri": "VR",
   "daySat": "ZA",
   "daySun": "ZO",
-
   "dayMonFull": "Maandag",
   "dayTueFull": "Dinsdag",
   "dayWedFull": "Woensdag",
@@ -90,7 +60,6 @@
   "dayFriFull": "Vrijdag",
   "daySatFull": "Zaterdag",
   "daySunFull": "Zondag",
-
   "dayMonLower": "maandag",
   "dayTueLower": "dinsdag",
   "dayWedLower": "woensdag",
@@ -99,38 +68,25 @@
   "daySatLower": "zaterdag",
   "daySunLower": "zondag",
   "dayUnknown": "onbekend",
-
   "tierPerfect": "Toprit",
   "tierGreat": "Fijne rit",
   "tierAcceptable": "Te doen",
   "tierPoor": "Binnenblijver",
   "legendPlanned": "Gepland",
-
   "bestChoice": "Beste keuze",
   "schedule": "Inplannen",
   "addToCalendar": "Toevoegen aan agenda",
   "addedToGoogleCalendar": "Fietsmoment toegevoegd aan Google Agenda",
   "couldNotAdd": "Kon niet toevoegen: {error}",
-  "@couldNotAdd": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-
+  "@couldNotAdd": {"placeholders": {"error": {"type": "String"}}},
   "weatherLoadError": "Het weerbericht kon niet worden geladen.",
   "emptyBadWeather": "Geen goede fietsmomenten deze week. Slecht weer verwacht.",
   "emptyAllBlocked": "Alle goede momenten zijn geblokkeerd. Pas je schema aan.",
   "emptyNoSlots": "Geen fietsmomenten gevonden.",
   "emptyNoSlotsDay": "Geen fietsmomenten op deze dag.",
-
-  "staleDataBannerWithTime": "Offline — toont fietsmomenten van {time}",
-  "@staleDataBannerWithTime": {
-    "placeholders": {
-      "time": {"type": "String"}
-    }
-  },
-  "staleDataBannerNoTime": "Offline — toont laatst bekende fietsmomenten",
-
+  "staleDataBannerWithTime": "Offline, toont fietsmomenten van {time}",
+  "@staleDataBannerWithTime": {"placeholders": {"time": {"type": "String"}}},
+  "staleDataBannerNoTime": "Offline, toont laatst bekende fietsmomenten",
   "unitKmh": "km/u",
   "comboShortShort": "Kort/kort",
   "comboLongShort": "Lang/kort",
@@ -138,17 +94,11 @@
   "comboLongLongExtra": "Lang/lang +",
   "windCalm": "Windstil",
   "durationHours": "{hours}u",
-  "@durationHours": {
-    "placeholders": {
-      "hours": {"type": "int"}
-    }
-  },
-
+  "@durationHours": {"placeholders": {"hours": {"type": "int"}}},
   "welcomeTitle": "Jouw perfecte fietsmoment",
   "welcomeSubtitle": "Combineer het weerbericht met jouw agenda en ontdek de beste momenten om te fietsen.",
   "welcomeButton": "Aan de slag \u2192",
   "welcomeHaveAccount": "Ik heb al een account",
-
   "onboardingTitle": "Wanneer rijd jij het liefst?",
   "onboardingSubtitle": "Kies een schema om te beginnen. Je kunt dit later altijd aanpassen.",
   "onboardingNext": "Volgende \u2192",
@@ -160,7 +110,6 @@
   "presetWeekendsOnlySub": "Za/Zo de hele dag",
   "presetCustom": "Stel mijn eigen schema in",
   "presetCustomSub": "Ik pas mijn agenda zelf aan",
-
   "profileTitle": "Profiel",
   "sectionLocation": "LOCATIE",
   "sectionNotifications": "MELDINGEN",
@@ -170,7 +119,6 @@
   "sectionName": "NAAM",
   "sectionAbout": "OVER",
   "sectionLanguage": "TAAL",
-
   "locationBlocked": "Locatie-toegang geblokkeerd",
   "locationBlockedHint": "Kies een stad of open instellingen om GPS opnieuw in te schakelen.",
   "openSettings": "Instellingen openen",
@@ -182,46 +130,38 @@
   "locationBlockedWebHint": "Schakel locatietoegang in via de site-instellingen van je browser, of kies hieronder een stad.",
   "chooseCityPrimaryTitle": "Kies je stad voor een voorspelling",
   "chooseCityPrimaryHint": "We konden je locatie niet ophalen. Kies hieronder een stad om toch een weersvoorspelling te zien.",
-
   "notifEveningBefore": "Avond van tevoren",
   "notifEveningBeforeSub": "19:00 de avond ervoor, als er een mooi moment aankomt",
   "notifMorningOf": "Ochtend van de dag",
   "notifMorningOfSub": "2 uur voordat het begint",
   "notifWeeklyDigest": "Wekelijks overzicht",
-  "notifWeeklyDigestSub": "Zondagavond 19:00 \u2014 beste momenten van de week",
+  "notifWeeklyDigestSub": "Zondagavond 19:00, beste momenten van de week",
   "notifExactTimingWarning": "Exacte timing niet gegarandeerd. Sta exacte alarmen toe in Instellingen voor betrouwbaarheid.",
   "settingsLabel": "Instellingen",
-
   "themeSystem": "Systeem",
   "themeLight": "Licht",
   "themeDark": "Donker",
-
   "toleranceTemperature": "Temperatuur",
   "toleranceMaxRain": "Max. neerslag",
   "toleranceMaxWind": "Max. wind",
-
   "toleranceTempInfoTitle": "Temperatuurbereik",
-  "toleranceTempInfo": "Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.",
+  "toleranceTempInfo": "Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk: hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.",
   "toleranceRainInfoTitle": "Regentolerantie",
-  "toleranceRainInfo": "Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score — meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.",
+  "toleranceRainInfo": "Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score: meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.",
   "toleranceWindInfoTitle": "Windtolerantie",
-  "toleranceWindInfo": "Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.",
-
+  "toleranceWindInfo": "Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score: hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.",
   "tempDescAllWeather": "Je fietst in bijna elk weer",
   "tempDescComfortable": "Comfortabel fietsbereik",
   "tempDescNiceOnly": "Alleen bij lekker weer",
   "tempDescPerfectOnly": "Alleen bij perfect weer",
-
   "rainDescDryOnly": "Alleen bij droog weer",
   "rainDescDrizzleOk": "Een beetje motregen is prima",
   "rainDescLightRainOk": "Lichte regen geen probleem",
   "rainDescHeavyRainOk": "Ook bij flinke buien",
-
   "windDescCalmOnly": "Alleen bij windstil weer",
   "windDescBreezeOk": "Rustig briesje is prima",
   "windDescStrongOk": "Stevige wind geen probleem",
   "windDescHardWindOk": "Zelfs bij harde wind",
-
   "editMySchedule": "Mijn schema bewerken",
   "setYourName": "Stel je naam in",
   "nameHint": "Tik om je naam in te voeren voor een persoonlijke begroeting",
@@ -229,30 +169,23 @@
   "enterYourName": "Voer je naam in",
   "cancel": "Annuleren",
   "save": "Opslaan",
-
   "sendFeedback": "Feedback versturen",
   "feedbackRatingLabel": "Hoe zou je Ridewindow beoordelen?",
   "feedbackCommentHint": "Wil je iets delen? (optioneel)",
   "feedbackCommentLabel": "Opmerking",
   "feedbackStarRating": "{count, plural, =1{{count} ster} other{{count} sterren}}",
-  "@feedbackStarRating": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
+  "@feedbackStarRating": {"placeholders": {"count": {"type": "int"}}},
   "feedbackSendButton": "Versturen",
-
   "googleCalendarLabel": "Google Agenda",
-  "calendarStatusChecking": "Controleren…",
+  "calendarStatusChecking": "Controleren\u2026",
   "calendarStatusConnected": "Verbonden",
   "calendarStatusNotConnected": "Niet verbonden",
   "calendarDisconnectButton": "Loskoppelen",
   "calendarDisconnectedSnackbar": "Losgekoppeld van Google Agenda.",
-
   "sectionAccount": "Account",
   "signInWithGoogle": "Inloggen met Google",
   "accountSyncPromise": "Je instellingen en geplande ritten, op al je apparaten.",
-  "accountLoading": "Bezig met laden…",
+  "accountLoading": "Bezig met laden\u2026",
   "accountSignOut": "Uitloggen",
   "accountSignOutConfirmTitle": "Uitloggen?",
   "accountSignOutConfirmBody": "Je gegevens op dit toestel blijven staan. Je kunt altijd opnieuw inloggen.",
@@ -269,7 +202,7 @@
   "accountConflictKeepLocalAction": "Dit toestel",
   "accountConflictKeepCloudAction": "Cloud",
   "accountSyncStatusSynced": "Gesynchroniseerd",
-  "accountSyncStatusPending": "Wordt gesynchroniseerd…",
+  "accountSyncStatusPending": "Wordt gesynchroniseerd\u2026",
   "accountDeleteAction": "Account verwijderen",
   "accountDeleteConfirmTitle": "Account verwijderen?",
   "accountDeleteConfirmBody": "Dit kan niet ongedaan worden gemaakt. Je profiel, beschikbaarheid en geplande ritten worden permanent uit de cloud verwijderd.",
@@ -277,17 +210,13 @@
   "accountDeletedSnackbar": "Account verwijderd",
   "accountDeleteError": "Verwijderen mislukt. Probeer het opnieuw.",
   "calendarMismatchWarning": "Agenda gekoppeld aan een ander account: {email}",
-  "@calendarMismatchWarning": {
-    "placeholders": {
-      "email": {"type": "String"}
-    }
-  },
-
+  "@calendarMismatchWarning": {"placeholders": {"email": {"type": "String"}}},
   "privacyPolicy": "Privacybeleid",
   "weatherDataAttribution": "Weerdata door Open-Meteo.com",
   "version": "Versie",
-
   "debugMenu": "Debug Menu",
+  "debugResetAnalytics": "Statistiek-toestemming terugzetten",
+  "debugAnalyticsReset": "Toestemming, toestel-id, startteller en wachtkamer zijn gewist",
   "debugResetOnboarding": "Onboarding resetten",
   "debugOnboardingReset": "Onboarding gereset. Herstart de app.",
   "debugClearWeather": "Weerdata wissen",
@@ -298,39 +227,24 @@
   "debugWeatherRefreshing": "Weer wordt ververst.",
   "debugOutbox": "Sync-outbox bekijken",
   "debugOutboxTitle": "Sync-outbox",
-  "debugOutboxEmpty": "Outbox is leeg — alles is verzonden.",
-  "debugOutboxRowSubtitle": "{attempts} pogingen · {error}",
-  "@debugOutboxRowSubtitle": {
-    "placeholders": {
-      "attempts": {"type": "int"},
-      "error": {"type": "String"}
-    }
-  },
+  "debugOutboxEmpty": "Outbox is leeg. Alles is verzonden.",
+  "debugOutboxRowSubtitle": "{attempts} pogingen \u00b7 {error}",
+  "@debugOutboxRowSubtitle": {"placeholders": {"attempts": {"type": "int"}, "error": {"type": "String"}}},
   "debugOutboxNoError": "nog geen fout vastgelegd",
   "debugOutboxClear": "Outbox wissen",
   "debugOutboxCleared": "Outbox gewist ({count} rijen).",
-  "@debugOutboxCleared": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-
+  "@debugOutboxCleared": {"placeholders": {"count": {"type": "int"}}},
   "detailTierPerfectDesc": "Ideaal fietsweer",
   "detailTierGreatDesc": "Prettig fietsweer",
   "detailTierAcceptableDesc": "Pak een extra laag",
   "detailTierPoorDesc": "Niet ideaal, maar mogelijk",
   "detailConditions": "omstandigheden",
-
   "weatherSection": "WEER",
   "weatherTemperature": "Temperatuur",
   "weatherRain": "Neerslag",
   "weatherWind": "Wind",
-
   "weatherYourRange": "jouw bereik {range}",
-  "@weatherYourRange": {
-    "description": "Label onder een weerbalk met het eigen ideaalbereik, bijv. 'jouw bereik 12-26°'.",
-    "placeholders": { "range": { "type": "String" } }
-  },
+  "@weatherYourRange": {"description": "Label onder een weerbalk met het eigen ideaalbereik, bijv. 'jouw bereik 12-26\u00b0'.", "placeholders": {"range": {"type": "String"}}},
   "showWeatherDetails": "Toon de weerbalken",
   "hideWeatherDetails": "Verberg de weerbalken",
   "verdictDry": "Droog",
@@ -345,71 +259,27 @@
   "verdictWarm": "Warm",
   "weatherHourly": "UURLIJKS",
   "feelsLike": "voelt als {temp}\u00b0C",
-  "@feelsLike": {
-    "placeholders": {
-      "temp": {"type": "String"}
-    }
-  },
+  "@feelsLike": {"placeholders": {"temp": {"type": "String"}}},
   "dry": "Droog",
   "rainChance": "{mm}mm ({percent}% kans)",
-  "@rainChance": {
-    "placeholders": {
-      "mm": {"type": "String"},
-      "percent": {"type": "String"}
-    }
-  },
+  "@rainChance": {"placeholders": {"mm": {"type": "String"}, "percent": {"type": "String"}}},
   "windFrom": "{speed}km/u uit {direction}",
-  "@windFrom": {
-    "placeholders": {
-      "speed": {"type": "String"},
-      "direction": {"type": "String"}
-    }
-  },
+  "@windFrom": {"placeholders": {"speed": {"type": "String"}, "direction": {"type": "String"}}},
   "windPenalty": "Wisselende windrichting (-{pct}% op score)",
-  "@windPenalty": {
-    "placeholders": {
-      "pct": {"type": "String"}
-    }
-  },
-
+  "@windPenalty": {"placeholders": {"pct": {"type": "String"}}},
   "clothingTitle": "Wat trek je aan",
-
   "clothingOnTheBike": "Op de fiets",
-  "clothingBandBelow": "onder {to}\u00B0",
-  "@clothingBandBelow": {
-    "placeholders": {
-      "to": {"type": "int"}
-    }
-  },
-  "clothingBandAbove": "vanaf {from}\u00B0",
-  "@clothingBandAbove": {
-    "placeholders": {
-      "from": {"type": "int"}
-    }
-  },
-  "clothingBandBetween": "{from}\u2013{to}\u00B0",
-  "@clothingBandBetween": {
-    "placeholders": {
-      "from": {"type": "int"},
-      "to": {"type": "int"}
-    }
-  },
-  "clothingFeelsLikeInfo": "De \u201Cvoelt als\u201D in de weerlijst verrekent zon, vocht en de wind die er staat, maar gaat uit van stilstaan. Op de fiets maak je zelf zo\u2019n 15 km/u tegenwind, en alleen dat stukje gaat er hier nog af. Dit getal is waar je kledingadvies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.",
-  "clothingFeelsLikeDrop": "In de weerlijst voelt het als {airTemp}\u00B0. Op de fiets wordt dat {bikeTemp}\u00B0 \u2014 je eigen tegenwind haalt er {chill}\u00B0 af.",
-  "@clothingFeelsLikeDrop": {
-    "description": "De namen staan alfabetisch en dat is opzet: gen-l10n sorteert argumenten alfabetisch, niet op leesvolgorde -- zie b3ee1c1.",
-    "placeholders": {
-      "airTemp": {"type": "int"},
-      "bikeTemp": {"type": "int"},
-      "chill": {"type": "int"}
-    }
-  },
-  "clothingFeelsLikeNoDrop": "In de weerlijst voelt het als {airTemp}\u00B0, en het fietsen haalt daar nauwelijks iets af.",
-  "@clothingFeelsLikeNoDrop": {
-    "placeholders": {
-      "airTemp": {"type": "int"}
-    }
-  },
+  "clothingBandBelow": "onder {to}\u00b0",
+  "@clothingBandBelow": {"placeholders": {"to": {"type": "int"}}},
+  "clothingBandAbove": "vanaf {from}\u00b0",
+  "@clothingBandAbove": {"placeholders": {"from": {"type": "int"}}},
+  "clothingBandBetween": "{from}\u2013{to}\u00b0",
+  "@clothingBandBetween": {"placeholders": {"from": {"type": "int"}, "to": {"type": "int"}}},
+  "clothingFeelsLikeInfo": "De \u201cvoelt als\u201d in de weerlijst verrekent zon, vocht en de wind die er staat, maar gaat uit van stilstaan. Op de fiets maak je zelf zo\u2019n 15 km/u tegenwind, en alleen dat stukje gaat er hier nog af. Dit getal is waar je kledingadvies op stoelt. De gekleurde banden laten zien welk advies bij welke temperatuur hoort.",
+  "clothingFeelsLikeDrop": "In de weerlijst voelt het als {airTemp}\u00b0. Op de fiets wordt dat {bikeTemp}\u00b0, want je eigen tegenwind haalt er {chill}\u00b0 af.",
+  "@clothingFeelsLikeDrop": {"description": "De namen staan alfabetisch en dat is opzet: gen-l10n sorteert argumenten alfabetisch, niet op leesvolgorde -- zie b3ee1c1.", "placeholders": {"airTemp": {"type": "int"}, "bikeTemp": {"type": "int"}, "chill": {"type": "int"}}},
+  "clothingFeelsLikeNoDrop": "In de weerlijst voelt het als {airTemp}\u00b0, en het fietsen haalt daar nauwelijks iets af.",
+  "@clothingFeelsLikeNoDrop": {"placeholders": {"airTemp": {"type": "int"}}},
   "clothingWinterJacket": "Winterjas",
   "clothingThermalPants": "Thermobroek",
   "clothingGloves": "Handschoenen",
@@ -423,7 +293,6 @@
   "clothingExtraWater": "Extra water",
   "clothingRainJacket": "Regenjas",
   "clothingWindVest": "Windvest",
-
   "planRide": "Rit inplannen",
   "ridePlanned": "Rit ingepland!",
   "plannedButtonLabel": "Ingepland",
@@ -432,22 +301,9 @@
   "reminderPlanned": "Herinnering gepland voor de avond ervoor!",
   "shareRideWindow": "Deel dit fietsmoment",
   "shareText": "Fietsrit {day} {timeRange} ({tier})\n{summary}\n\nVia Ridewindow",
-  "@shareText": {
-    "placeholders": {
-      "day": {"type": "String"},
-      "timeRange": {"type": "String"},
-      "tier": {"type": "String"},
-      "summary": {"type": "String"}
-    }
-  },
-
-  "insightsTitle": "Waarom '{tier}' \u2014 {score}/100",
-  "@insightsTitle": {
-    "placeholders": {
-      "tier": {"type": "String"},
-      "score": {"type": "String"}
-    }
-  },
+  "@shareText": {"placeholders": {"day": {"type": "String"}, "timeRange": {"type": "String"}, "tier": {"type": "String"}, "summary": {"type": "String"}}},
+  "insightsTitle": "Waarom '{tier}': {score}/100",
+  "@insightsTitle": {"placeholders": {"tier": {"type": "String"}, "score": {"type": "String"}}},
   "insightsTempIdeal": "Ideaal",
   "insightsTempAcceptable": "Acceptabel",
   "insightsTempExtreme": "Koud/Warm",
@@ -457,24 +313,22 @@
   "insightsWindCalm": "Rustig",
   "insightsWindModerate": "Matig",
   "insightsWindStrong": "Sterk",
-  "insightsTempNoteIdeal": "Ideale temperatuur \u2014 comfortabel rijden",
-  "insightsTempNoteAcceptable": "Acceptabele temperatuur \u2014 pak een extra laag",
-  "insightsTempNoteExtreme": "Buiten het ideale bereik \u2014 kleding aanpassen",
-  "insightsRainNoteDry": "Droog \u2014 geen neerslag verwacht",
-  "insightsRainNoteLight": "Lichte neerslag verwacht \u2014 spatborden handig",
-  "insightsRainNoteWet": "Neerslag verwacht \u2014 overweeg een regenjas",
-  "insightsWindNoteCalm": "Lichte wind \u2014 nauwelijks merkbaar",
-  "insightsWindNoteModerate": "Matige wind \u2014 verwacht wat weerstand",
-  "insightsWindNoteStrong": "Sterke wind \u2014 plan de route strategisch",
+  "insightsTempNoteIdeal": "Ideale temperatuur, comfortabel rijden",
+  "insightsTempNoteAcceptable": "Acceptabele temperatuur, pak een extra laag",
+  "insightsTempNoteExtreme": "Buiten het ideale bereik, kleding aanpassen",
+  "insightsRainNoteDry": "Droog, geen neerslag verwacht",
+  "insightsRainNoteLight": "Lichte neerslag verwacht, spatborden handig",
+  "insightsRainNoteWet": "Neerslag verwacht, overweeg een regenjas",
+  "insightsWindNoteCalm": "Lichte wind, nauwelijks merkbaar",
+  "insightsWindNoteModerate": "Matige wind, verwacht wat weerstand",
+  "insightsWindNoteStrong": "Sterke wind, plan de route strategisch",
   "totalScore": "Totaalscore",
   "understood": "Duidelijk",
   "showScoreDetails": "Waarom deze score",
-
   "availabilityTitle": "Mijn schema",
   "legendFree": "Vrij",
   "legendBusy": "Bezet",
   "legendWork": "Werk",
-
   "riderNoTime": "Helemaal geen tijd?",
   "riderNoTimeDesc": "Maak wat uren vrij om je perfecte fietsmomenten te vinden.",
   "riderFulltime": "Fulltime fietser",
@@ -491,49 +345,27 @@
   "riderBusyDesc": "Krap schema, maar elke rit telt. We vinden de pareltjes in je vrije uren.",
   "riderFlexible": "Flexibele fietser",
   "riderFlexibleDesc": "Een mooie mix van vrije tijd door de week. Je hebt altijd opties.",
-
   "agendaTitle": "Agenda",
   "agendaCancel": "Annuleren",
   "agendaBusy": "Bezet",
   "agendaHoursSelected": "{count} uur geselecteerd",
-  "@agendaHoursSelected": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
+  "@agendaHoursSelected": {"placeholders": {"count": {"type": "int"}}},
   "dragRunsSelected": "{count} {count, plural, =1{tijdvak} other{losse tijdvakken}} geselecteerd",
-  "@dragRunsSelected": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
+  "@dragRunsSelected": {"placeholders": {"count": {"type": "int"}}},
   "agendaPlanRide": "Rit inplannen ({count}u)",
-  "@agendaPlanRide": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
+  "@agendaPlanRide": {"placeholders": {"count": {"type": "int"}}},
   "agendaRidePlanned": "Rit ingepland ({count}u)!",
-  "@agendaRidePlanned": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
+  "@agendaRidePlanned": {"placeholders": {"count": {"type": "int"}}},
   "agendaNow": "Nu",
   "agendaScoreBreakdown": "Score-opbouw",
   "agendaRain": "Regen",
   "agendaViewDetails": "Bekijk details",
-
   "ridesTitle": "Mijn Ritten",
   "ridesEmpty": "Nog geen ritten gepland",
   "ridesEmptyHint": "Plan een rit vanuit Home of selecteer uren in de Agenda.",
   "rideRemoved": "Rit verwijderd",
   "rideSincePlanning": "{delta} sinds planning",
-  "@rideSincePlanning": {
-    "placeholders": {
-      "delta": {"type": "String"}
-    }
-  },
+  "@rideSincePlanning": {"placeholders": {"delta": {"type": "String"}}},
   "ridesPerHour": "Per uur",
   "ridesAvgScoreBreakdown": "Gemiddelde score-opbouw",
   "ridesDeleteRide": "Rit verwijderen",
@@ -542,13 +374,7 @@
   "unplanConfirmMessage": "Dit verwijdert de rit uit je geplande ritten. Je kunt hem altijd opnieuw plannen.",
   "unplanConfirmAction": "Verwijderen",
   "ridesWindFrom": "Wind uit {direction}. {advice}.",
-  "@ridesWindFrom": {
-    "placeholders": {
-      "direction": {"type": "String"},
-      "advice": {"type": "String"}
-    }
-  },
-
+  "@ridesWindFrom": {"placeholders": {"direction": {"type": "String"}, "advice": {"type": "String"}}},
   "tailwindNorth": "Fiets noordwaarts voor wind mee terug",
   "tailwindNortheast": "Fiets noordoostwaarts voor wind mee terug",
   "tailwindEast": "Fiets oostwaarts voor wind mee terug",
@@ -557,7 +383,6 @@
   "tailwindSouthwest": "Fiets zuidwestwaarts voor wind mee terug",
   "tailwindWest": "Fiets westwaarts voor wind mee terug",
   "tailwindNorthwest": "Fiets noordwestwaarts voor wind mee terug",
-
   "compassN": "N",
   "compassNE": "NO",
   "compassE": "O",
@@ -566,7 +391,6 @@
   "compassSW": "ZW",
   "compassW": "W",
   "compassNW": "NW",
-
   "hintTapRideWindow": "Tik op een fietsmoment",
   "hintTapRideWindowDesc": "Bekijk weerdetails, plan de rit in of voeg toe aan Google Agenda.",
   "hintFilterDay": "Filter op dag",
@@ -591,63 +415,38 @@
   "tourHomeTitle": "Fietsmomenten",
   "tourHomeBody": "Home toont de beste momenten om deze week te fietsen. Elke kaart draagt de score, het tijdstip en het weer. Tik op een kaart voor details.",
   "tourAgendaTitle": "Agenda",
-  "tourAgendaBody": "Zeven dagen met uurvakken — groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.",
+  "tourAgendaBody": "Zeven dagen met uurvakken: groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.",
   "tourRidesTitle": "Mijn ritten",
   "tourRidesBody": "Plan een rit vanuit Home of de Agenda en volg hier of het weer nog meezit. De windtip helpt je een route kiezen: eerst tegenwind, dan mee terug.",
   "tourProfileTitle": "Profiel",
   "tourProfileBody": "Stel je locatie in, je grenzen voor temperatuur, regen en wind, en je beschikbaarheid. Daar worden je scores mee berekend.",
   "tourDone": "Aan de slag",
-
   "calendarEventTitle": "Fietsrit {timeRange}",
-  "@calendarEventTitle": {
-    "placeholders": {
-      "timeRange": {"type": "String"}
-    }
-  },
+  "@calendarEventTitle": {"placeholders": {"timeRange": {"type": "String"}}},
   "calendarNoWeatherData": "Geen weerdata beschikbaar",
   "calendarDry": "droog",
   "calendarWind": "{speed}km/u wind",
-  "@calendarWind": {
-    "placeholders": {
-      "speed": {"type": "String"}
-    }
-  },
+  "@calendarWind": {"placeholders": {"speed": {"type": "String"}}},
   "calendarSignInCanceled": "Inloggen geannuleerd",
-
   "notifEveningTitle": "Morgen ligt er een fietsmoment klaar",
-  "notifEveningBody": "{slot} \u2014 zet je fiets alvast klaar",
-  "@notifEveningBody": {
-    "placeholders": {
-      "slot": {"type": "String"}
-    }
-  },
+  "notifEveningBody": "{slot}. Zet je fiets alvast klaar",
+  "@notifEveningBody": {"placeholders": {"slot": {"type": "String"}}},
   "notifMorningTitle": "Over 2 uur stap je op",
-  "notifMorningBody": "{slot} \u2014 maak je klaar om te rijden",
-  "@notifMorningBody": {
-    "placeholders": {
-      "slot": {"type": "String"}
-    }
-  },
+  "notifMorningBody": "{slot}. Maak je klaar om te rijden",
+  "@notifMorningBody": {"placeholders": {"slot": {"type": "String"}}},
   "notifWeeklyTitle": "De beste fietsmomenten van je week",
   "notifChannelRideAlerts": "Fietsmeldingen",
   "notifChannelRideAlertsDesc": "Avond-van-tevoren en ochtend-van-de-dag fietsmeldingen",
   "notifChannelWeeklyDigest": "Wekelijks overzicht",
   "notifChannelWeeklyDigestDesc": "Zondagavond overzicht van de beste fietsmomenten",
-
   "widgetTierPerfect": "Toprit",
   "widgetTierGreat": "Fijne rit",
   "widgetTierAcceptable": "Te doen",
   "widgetTierPoor": "Binnenblijver",
-
   "hourlyDry": "droog",
   "hourlyWindstil": "windstil",
-  "hourlyFeelsLike": "voelt als {temp}°",
-  "@hourlyFeelsLike": {
-    "placeholders": {
-      "temp": {"type": "String"}
-    }
-  },
-
+  "hourlyFeelsLike": "voelt als {temp}\u00b0",
+  "@hourlyFeelsLike": {"placeholders": {"temp": {"type": "String"}}},
   "dayShortMon": "Ma",
   "dayShortTue": "Di",
   "dayShortWed": "Wo",
@@ -655,12 +454,10 @@
   "dayShortFri": "Vr",
   "dayShortSat": "Za",
   "dayShortSun": "Zo",
-
   "importFromCalendar": "Importeer uit Google Agenda",
   "legendCalendar": "Agenda",
-  "calendarImportSuccess": "Agenda-afspraken geïmporteerd",
+  "calendarImportSuccess": "Agenda-afspraken ge\u00efmporteerd",
   "calendarImportError": "Kon agenda-afspraken niet importeren",
-
   "cellInfoStatusWork": "Werk-geblokkeerd",
   "cellInfoStatusCalendar": "Agenda-geblokkeerd",
   "cellInfoStatusCustom": "Beschikbaar gezet",
@@ -678,7 +475,7 @@
   "pelotonCodeHint": "Uitnodigingscode",
   "pelotonJoin": "Meedoen",
   "pelotonSignedOut": "Log in om samen te fietsen",
-  "pelotonSignedOutHint": "Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden — de rest van de app werkt gewoon zonder.",
+  "pelotonSignedOutHint": "Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden. De rest van de app werkt gewoon zonder.",
   "pelotonFriends": "Maatjes",
   "pelotonNoFriends": "Je peloton is nog leeg",
   "pelotonNoFriendsHint": "Een peloton is de groep waarmee je rijdt. Nodig een maatje uit en jullie zien elkaars ritten.",
@@ -693,17 +490,17 @@
   "pelotonRejoined": "Je doet weer mee",
   "pelotonUndo": "Ongedaan maken",
   "accountSyncFailed": "Synchroniseren lukte nu even niet. De app probeert het vanzelf opnieuw.",
-  "pelotonCopyCode": "Code kopiëren",
+  "pelotonCopyCode": "Code kopi\u00ebren",
   "pelotonCodeCopied": "Code gekopieerd",
   "pelotonSignInAction": "Inloggen",
   "pelotonAutoJoined": "Je bent nu maatjes met {name}",
   "@pelotonAutoJoined": {"placeholders": {"name": {"type": "String"}}},
-  "feedbackThanks": "Dank je — je feedback is onderweg.",
+  "feedbackThanks": "Dank je, je feedback is onderweg.",
   "feedbackFailed": "Je feedback kon niet worden opgeslagen. Probeer het opnieuw.",
-  "scoreSemanticLabel": "Score {score} van 100 — {tier}",
+  "scoreSemanticLabel": "Score {score} van 100, {tier}",
   "@scoreSemanticLabel": {"placeholders": {"score": {"type": "int"}, "tier": {"type": "String"}}},
   "pelotonFriendAdded": "{name} is nu je maatje",
-  "pelotonCodeInvalid": "Die code werkt niet — hij kan verlopen zijn.",
+  "pelotonCodeInvalid": "Die code werkt niet. Hij kan verlopen zijn.",
   "pelotonUnnamedFriend": "Fietser",
   "pelotonRetry": "Opnieuw proberen",
   "@pelotonInviteShare": {"placeholders": {"code": {"type": "String"}}},
@@ -727,10 +524,10 @@
   "pelotonPickFriends": "Wie gaat er mee?",
   "pelotonInviteSent": "Uitnodiging verstuurd",
   "pelotonInviteFailed": "Uitnodigen is niet gelukt. Probeer het opnieuw.",
-  "pelotonNeedFriendsFirst": "Voeg eerst een maatje toe — Ritten, tab Peloton.",
+  "pelotonNeedFriendsFirst": "Voeg eerst een maatje toe via Ritten, tab Peloton.",
   "pelotonInviteAction": "Uitnodigen",
   "pelotonJoinTitle": "Uitnodiging van een maatje",
-  "pelotonJoining": "Je wordt toegevoegd…",
+  "pelotonJoining": "Je wordt toegevoegd\u2026",
   "pelotonSignInToJoin": "Log eerst in en vul deze code daarna in onder Ritten, tab Peloton.",
   "pelotonGoToPeloton": "Naar Peloton",
   "pelotonInviteShareLink": "Fiets met me mee in Ridewindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton.",
@@ -743,7 +540,7 @@
   "ridesFilterSolo": "Alleen ik",
   "ridesFilterPending": "Wacht op jou",
   "ridesFilterEmpty": "Geen ritten in dit filter",
-  "ridesFilterEmptyHint": "Tik op “Alles” om je hele week te zien.",
+  "ridesFilterEmptyHint": "Tik op \u201cAlles\u201d om je hele week te zien.",
   "roleOrganiser": "Jij organiseert",
   "roleJoinedWith": "Je gaat mee met {name}",
   "roleSolo": "Alleen jij",
@@ -775,25 +572,26 @@
   "daylightPolarNight": "de zon komt niet op",
   "daylightScoreTitle": "Wat daglicht met dit venster doet",
   "daylightScoreSplit": "Van de {total} minuten van deze rit valt {light} in het licht en {dark} in het donker.",
-  "daylightScorePenalty": "Jouw gevoeligheid staat op “{weight}”. Dat kost dit venster {points} punten.",
-  "daylightScoreNone": "Jouw gevoeligheid staat op “{weight}”, dus daglicht verandert de score van dit venster niet.",
+  "daylightScorePenalty": "Jouw gevoeligheid staat op \u201c{weight}\u201d. Dat kost dit venster {points} punten.",
+  "daylightScoreAllLight": "Deze rit valt helemaal in het licht, dus daglicht haalt er niets vanaf.",
+  "daylightScoreNone": "Jouw gevoeligheid staat op \u201c{weight}\u201d, dus daglicht verandert de score van dit venster niet.",
   "daylightScoreScale": "Bij deze stand verliest een venster dat volledig in het donker valt {full} punten; bij de zwaarste stand zijn dat er 40. Een venster dat helemaal in het licht valt verliest niets.",
   "@daylightScoreSplit": {"placeholders": {"total": {"type": "int"}, "light": {"type": "int"}, "dark": {"type": "int"}}},
   "@daylightScorePenalty": {"placeholders": {"weight": {"type": "String"}, "points": {"type": "int"}}},
   "@daylightScoreNone": {"placeholders": {"weight": {"type": "String"}}},
   "@daylightScoreScale": {"placeholders": {"full": {"type": "int"}}},
   "daylightInfoTitle": "Daglicht",
-  "daylightInfo": "De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score — hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.",
-  "rideSunsetMostlyDark": "Zon onder om {time} — grotendeels in het donker",
-  "rideSunsetPartly": "Zon onder om {time} — laatste deel in de schemer",
-  "rideSunriseAfter": "Zon op om {time} — begin nog in het donker",
+  "daylightInfo": "De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score. Hoeveel precies stel je in bij Profiel \u2192 Jouw grenzen \u2192 Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.",
+  "rideSunsetMostlyDark": "Zon onder om {time}, grotendeels in het donker",
+  "rideSunsetPartly": "Zon onder om {time}, laatste deel in de schemer",
+  "rideSunriseAfter": "Zon op om {time}, begin nog in het donker",
   "toleranceDaylight": "Daglicht",
   "toleranceDaylightInfoTitle": "Daglicht",
-  "toleranceDaylightInfo": "Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst — ze staan achter de vensters bij daglicht.",
+  "toleranceDaylightInfo": "Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst: ze staan achter de vensters bij daglicht.",
   "daylightWeightOff": "Maakt me niet uit",
-  "daylightWeightLight": "Telt licht mee",
-  "daylightWeightHalf": "Telt half mee",
-  "daylightWeightHeavy": "Telt zwaar mee",
+  "daylightWeightLight": "donker telt licht mee",
+  "daylightWeightHalf": "donker telt half mee",
+  "daylightWeightHeavy": "donker telt zwaar mee",
   "daylightWeightOnly": "Alleen bij daglicht",
   "daylightWeightDesc": "Een rit die helemaal in het donker valt verliest {points} van de 100 punten.",
   "daylightWeightDescNone": "Donker telt niet mee in je scores.",
@@ -811,12 +609,12 @@
   "@locationGuessBody": {"placeholders": {"city": {"type": "String"}}},
   "@locationClockBody": {"placeholders": {"city": {"type": "String"}}},
   "analyticsAskTitle": "Help je de app beter maken?",
-  "analyticsAskBody": "Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres \u2014 en je kunt het altijd weer uitzetten in Profiel.",
+  "analyticsAskBody": "Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres, en je kunt het altijd weer uitzetten in Profiel.",
   "analyticsAskYes": "Ja, doe maar",
   "analyticsAskNo": "Nee, liever niet",
   "analyticsSettingTitle": "Anonieme gebruiksstatistiek",
-  "analyticsSettingOn": "Aan \u2014 je helpt de app beter te maken",
-  "analyticsSettingOff": "Uit \u2014 er verlaat niets je toestel",
+  "analyticsSettingOn": "Aan, je helpt de app beter te maken",
+  "analyticsSettingOff": "Uit, er verlaat niets je toestel",
   "notifWeeklyBody": "Je beste moment: {slot}",
   "notifWeeklyBodyEmpty": "Kijk welke momenten er deze week in zitten",
   "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}},
@@ -835,9 +633,6 @@
   "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
   "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}},
   "daylightWeightNone": "donker telt niet mee",
-  "daylightWeightLight": "donker telt licht mee",
-  "daylightWeightHalf": "donker telt half mee",
-  "daylightWeightHeavy": "donker telt zwaar mee",
   "daylightLightShort": "licht {from}\u2013{to}",
   "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
 }

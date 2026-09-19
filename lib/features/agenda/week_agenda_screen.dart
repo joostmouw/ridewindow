@@ -635,7 +635,7 @@ class _CellWidget extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(color: tonal.bg, borderRadius: AppShapes.roundedLg),
                   child: Text(
-                    score != null ? '${score.overall.round()} — $tierText' : '?',
+                    score != null ? '${score.overall.round()}, $tierText' : '?',
                     style: TextStyle(color: tonal.fg, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
@@ -651,7 +651,7 @@ class _CellWidget extends ConsumerWidget {
                 value: '${forecast.temperatureC?.round() ?? '?'}°C (voelt als ${forecast.apparentTemperatureC?.round() ?? '?'}°C)'),
               const SizedBox(height: 8),
               _DetailRow(icon: AppIcons.drop, label: S.of(context).weatherRain,
-                value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm — ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
+                value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm, ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
               const SizedBox(height: 8),
               _DetailRow(icon: AppIcons.wind, label: S.of(context).weatherWind,
                 value: forecast.windspeedKmh != null && forecast.windspeedKmh! < 5

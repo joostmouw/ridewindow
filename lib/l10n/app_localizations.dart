@@ -220,7 +220,7 @@ abstract class S {
   /// No description provided for @scaleRain.
   ///
   /// In nl, this message translates to:
-  /// **'Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: {ex1} scoort {score1}, {ex2} scoort {score2}. De kans op regen telt ook mee — de slechtste van die twee wordt de score.'**
+  /// **'Boven je grens kosten de eerste druppels het meest en vlakt het daarna af: {ex1} scoort {score1}, {ex2} scoort {score2}. De kans op regen telt ook mee: de slechtste van die twee wordt de score.'**
   String scaleRain(Object ex1, Object ex2, Object score1, Object score2);
 
   /// No description provided for @scaleWind.
@@ -568,13 +568,13 @@ abstract class S {
   /// No description provided for @staleDataBannerWithTime.
   ///
   /// In nl, this message translates to:
-  /// **'Offline — toont fietsmomenten van {time}'**
+  /// **'Offline, toont fietsmomenten van {time}'**
   String staleDataBannerWithTime(String time);
 
   /// No description provided for @staleDataBannerNoTime.
   ///
   /// In nl, this message translates to:
-  /// **'Offline — toont laatst bekende fietsmomenten'**
+  /// **'Offline, toont laatst bekende fietsmomenten'**
   String get staleDataBannerNoTime;
 
   /// No description provided for @unitKmh.
@@ -862,7 +862,7 @@ abstract class S {
   /// No description provided for @notifWeeklyDigestSub.
   ///
   /// In nl, this message translates to:
-  /// **'Zondagavond 19:00 — beste momenten van de week'**
+  /// **'Zondagavond 19:00, beste momenten van de week'**
   String get notifWeeklyDigestSub;
 
   /// No description provided for @notifExactTimingWarning.
@@ -922,7 +922,7 @@ abstract class S {
   /// No description provided for @toleranceTempInfo.
   ///
   /// In nl, this message translates to:
-  /// **'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk — hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.'**
+  /// **'Stel je ideale fietstemperatuur in. Uren binnen dit bereik scoren 100 voor temperatuur. Buiten het bereik daalt de score geleidelijk: hoe verder van je bereik, hoe lager de score.\n\nEen breder bereik geeft meer fietsmomenten; een smaller bereik toont alleen je ideale omstandigheden.'**
   String get toleranceTempInfo;
 
   /// No description provided for @toleranceRainInfoTitle.
@@ -934,7 +934,7 @@ abstract class S {
   /// No description provided for @toleranceRainInfo.
   ///
   /// In nl, this message translates to:
-  /// **'Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score — meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.'**
+  /// **'Stel de maximale neerslag per uur in waar je in wilt fietsen. Uren op of onder deze limiet scoren 100 voor regen. Boven de limiet daalt de score: meer regen betekent een lagere score.\n\nZet op 0 mm voor alleen droog weer, of hoger als je wat regen niet erg vindt.'**
   String get toleranceRainInfo;
 
   /// No description provided for @toleranceWindInfoTitle.
@@ -946,7 +946,7 @@ abstract class S {
   /// No description provided for @toleranceWindInfo.
   ///
   /// In nl, this message translates to:
-  /// **'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score — hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.'**
+  /// **'Stel de maximale windsnelheid in waar je comfortabel in fietst. Uren op of onder deze limiet scoren 100 voor wind. Boven de limiet daalt de score: hardere wind betekent een lagere score.\n\nEen hogere tolerantie geeft meer fietsmomenten, maar verwacht zwaarder fietsen.'**
   String get toleranceWindInfo;
 
   /// No description provided for @tempDescAllWeather.
@@ -1327,6 +1327,18 @@ abstract class S {
   /// **'Debug Menu'**
   String get debugMenu;
 
+  /// No description provided for @debugResetAnalytics.
+  ///
+  /// In nl, this message translates to:
+  /// **'Statistiek-toestemming terugzetten'**
+  String get debugResetAnalytics;
+
+  /// No description provided for @debugAnalyticsReset.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toestemming, toestel-id, startteller en wachtkamer zijn gewist'**
+  String get debugAnalyticsReset;
+
   /// No description provided for @debugResetOnboarding.
   ///
   /// In nl, this message translates to:
@@ -1390,7 +1402,7 @@ abstract class S {
   /// No description provided for @debugOutboxEmpty.
   ///
   /// In nl, this message translates to:
-  /// **'Outbox is leeg — alles is verzonden.'**
+  /// **'Outbox is leeg. Alles is verzonden.'**
   String get debugOutboxEmpty;
 
   /// No description provided for @debugOutboxRowSubtitle.
@@ -1624,7 +1636,7 @@ abstract class S {
   /// De namen staan alfabetisch en dat is opzet: gen-l10n sorteert argumenten alfabetisch, niet op leesvolgorde -- zie b3ee1c1.
   ///
   /// In nl, this message translates to:
-  /// **'In de weerlijst voelt het als {airTemp}°. Op de fiets wordt dat {bikeTemp}° — je eigen tegenwind haalt er {chill}° af.'**
+  /// **'In de weerlijst voelt het als {airTemp}°. Op de fiets wordt dat {bikeTemp}°, want je eigen tegenwind haalt er {chill}° af.'**
   String clothingFeelsLikeDrop(int airTemp, int bikeTemp, int chill);
 
   /// No description provided for @clothingFeelsLikeNoDrop.
@@ -1762,7 +1774,7 @@ abstract class S {
   /// No description provided for @insightsTitle.
   ///
   /// In nl, this message translates to:
-  /// **'Waarom \'{tier}\' — {score}/100'**
+  /// **'Waarom \'{tier}\': {score}/100'**
   String insightsTitle(String tier, String score);
 
   /// No description provided for @insightsTempIdeal.
@@ -1822,55 +1834,55 @@ abstract class S {
   /// No description provided for @insightsTempNoteIdeal.
   ///
   /// In nl, this message translates to:
-  /// **'Ideale temperatuur — comfortabel rijden'**
+  /// **'Ideale temperatuur, comfortabel rijden'**
   String get insightsTempNoteIdeal;
 
   /// No description provided for @insightsTempNoteAcceptable.
   ///
   /// In nl, this message translates to:
-  /// **'Acceptabele temperatuur — pak een extra laag'**
+  /// **'Acceptabele temperatuur, pak een extra laag'**
   String get insightsTempNoteAcceptable;
 
   /// No description provided for @insightsTempNoteExtreme.
   ///
   /// In nl, this message translates to:
-  /// **'Buiten het ideale bereik — kleding aanpassen'**
+  /// **'Buiten het ideale bereik, kleding aanpassen'**
   String get insightsTempNoteExtreme;
 
   /// No description provided for @insightsRainNoteDry.
   ///
   /// In nl, this message translates to:
-  /// **'Droog — geen neerslag verwacht'**
+  /// **'Droog, geen neerslag verwacht'**
   String get insightsRainNoteDry;
 
   /// No description provided for @insightsRainNoteLight.
   ///
   /// In nl, this message translates to:
-  /// **'Lichte neerslag verwacht — spatborden handig'**
+  /// **'Lichte neerslag verwacht, spatborden handig'**
   String get insightsRainNoteLight;
 
   /// No description provided for @insightsRainNoteWet.
   ///
   /// In nl, this message translates to:
-  /// **'Neerslag verwacht — overweeg een regenjas'**
+  /// **'Neerslag verwacht, overweeg een regenjas'**
   String get insightsRainNoteWet;
 
   /// No description provided for @insightsWindNoteCalm.
   ///
   /// In nl, this message translates to:
-  /// **'Lichte wind — nauwelijks merkbaar'**
+  /// **'Lichte wind, nauwelijks merkbaar'**
   String get insightsWindNoteCalm;
 
   /// No description provided for @insightsWindNoteModerate.
   ///
   /// In nl, this message translates to:
-  /// **'Matige wind — verwacht wat weerstand'**
+  /// **'Matige wind, verwacht wat weerstand'**
   String get insightsWindNoteModerate;
 
   /// No description provided for @insightsWindNoteStrong.
   ///
   /// In nl, this message translates to:
-  /// **'Sterke wind — plan de route strategisch'**
+  /// **'Sterke wind, plan de route strategisch'**
   String get insightsWindNoteStrong;
 
   /// No description provided for @totalScore.
@@ -2398,7 +2410,7 @@ abstract class S {
   /// No description provided for @tourAgendaBody.
   ///
   /// In nl, this message translates to:
-  /// **'Zeven dagen met uurvakken — groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.'**
+  /// **'Zeven dagen met uurvakken: groen is goed, oranje niet. Tik op een vak voor het weer. Tik tweemaal om een periode te kiezen en een rit te plannen.'**
   String get tourAgendaBody;
 
   /// No description provided for @tourRidesTitle.
@@ -2470,7 +2482,7 @@ abstract class S {
   /// No description provided for @notifEveningBody.
   ///
   /// In nl, this message translates to:
-  /// **'{slot} — zet je fiets alvast klaar'**
+  /// **'{slot}. Zet je fiets alvast klaar'**
   String notifEveningBody(String slot);
 
   /// No description provided for @notifMorningTitle.
@@ -2482,7 +2494,7 @@ abstract class S {
   /// No description provided for @notifMorningBody.
   ///
   /// In nl, this message translates to:
-  /// **'{slot} — maak je klaar om te rijden'**
+  /// **'{slot}. Maak je klaar om te rijden'**
   String notifMorningBody(String slot);
 
   /// No description provided for @notifWeeklyTitle.
@@ -2728,7 +2740,7 @@ abstract class S {
   /// No description provided for @pelotonSignedOutHint.
   ///
   /// In nl, this message translates to:
-  /// **'Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden — de rest van de app werkt gewoon zonder.'**
+  /// **'Een peloton is de groep waarmee je rijdt. Inloggen is nodig zodat je maatjes je kunnen vinden. De rest van de app werkt gewoon zonder.'**
   String get pelotonSignedOutHint;
 
   /// No description provided for @pelotonFriends.
@@ -2842,7 +2854,7 @@ abstract class S {
   /// No description provided for @feedbackThanks.
   ///
   /// In nl, this message translates to:
-  /// **'Dank je — je feedback is onderweg.'**
+  /// **'Dank je, je feedback is onderweg.'**
   String get feedbackThanks;
 
   /// No description provided for @feedbackFailed.
@@ -2854,7 +2866,7 @@ abstract class S {
   /// No description provided for @scoreSemanticLabel.
   ///
   /// In nl, this message translates to:
-  /// **'Score {score} van 100 — {tier}'**
+  /// **'Score {score} van 100, {tier}'**
   String scoreSemanticLabel(int score, String tier);
 
   /// No description provided for @pelotonFriendAdded.
@@ -2866,7 +2878,7 @@ abstract class S {
   /// No description provided for @pelotonCodeInvalid.
   ///
   /// In nl, this message translates to:
-  /// **'Die code werkt niet — hij kan verlopen zijn.'**
+  /// **'Die code werkt niet. Hij kan verlopen zijn.'**
   String get pelotonCodeInvalid;
 
   /// No description provided for @pelotonUnnamedFriend.
@@ -2974,7 +2986,7 @@ abstract class S {
   /// No description provided for @pelotonNeedFriendsFirst.
   ///
   /// In nl, this message translates to:
-  /// **'Voeg eerst een maatje toe — Ritten, tab Peloton.'**
+  /// **'Voeg eerst een maatje toe via Ritten, tab Peloton.'**
   String get pelotonNeedFriendsFirst;
 
   /// No description provided for @pelotonInviteAction.
@@ -3235,6 +3247,12 @@ abstract class S {
   /// **'Jouw gevoeligheid staat op “{weight}”. Dat kost dit venster {points} punten.'**
   String daylightScorePenalty(String weight, int points);
 
+  /// No description provided for @daylightScoreAllLight.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deze rit valt helemaal in het licht, dus daglicht haalt er niets vanaf.'**
+  String get daylightScoreAllLight;
+
   /// No description provided for @daylightScoreNone.
   ///
   /// In nl, this message translates to:
@@ -3256,25 +3274,25 @@ abstract class S {
   /// No description provided for @daylightInfo.
   ///
   /// In nl, this message translates to:
-  /// **'De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score — hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.'**
+  /// **'De gouden band toont wanneer de zon boven de horizon staat, van middernacht tot middernacht. Jouw rit staat er als blok in. Hoe meer daarvan in het donker valt, hoe lager de score. Hoeveel precies stel je in bij Profiel → Jouw grenzen → Daglicht.\n\nDonkere ritten verdwijnen nooit helemaal uit de lijst: in december is het hier licht van 08:45 tot 16:30, en dan blijft er anders niets over.'**
   String get daylightInfo;
 
   /// No description provided for @rideSunsetMostlyDark.
   ///
   /// In nl, this message translates to:
-  /// **'Zon onder om {time} — grotendeels in het donker'**
+  /// **'Zon onder om {time}, grotendeels in het donker'**
   String rideSunsetMostlyDark(String time);
 
   /// No description provided for @rideSunsetPartly.
   ///
   /// In nl, this message translates to:
-  /// **'Zon onder om {time} — laatste deel in de schemer'**
+  /// **'Zon onder om {time}, laatste deel in de schemer'**
   String rideSunsetPartly(String time);
 
   /// No description provided for @rideSunriseAfter.
   ///
   /// In nl, this message translates to:
-  /// **'Zon op om {time} — begin nog in het donker'**
+  /// **'Zon op om {time}, begin nog in het donker'**
   String rideSunriseAfter(String time);
 
   /// No description provided for @toleranceDaylight.
@@ -3292,7 +3310,7 @@ abstract class S {
   /// No description provided for @toleranceDaylightInfo.
   ///
   /// In nl, this message translates to:
-  /// **'Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst — ze staan achter de vensters bij daglicht.'**
+  /// **'Anders dan de drie hierboven is dit geen grens maar een gewicht: hoe zwaar telt het voor jou dat een rit in het donker valt.\n\nHelemaal links verandert er niets aan je scores. Helemaal rechts verliest een rit die volledig in het donker valt 40 van de 100 punten. Zulke ritten verdwijnen ook dan niet uit je lijst: ze staan achter de vensters bij daglicht.'**
   String get toleranceDaylightInfo;
 
   /// No description provided for @daylightWeightOff.
@@ -3376,7 +3394,7 @@ abstract class S {
   /// No description provided for @analyticsAskBody.
   ///
   /// In nl, this message translates to:
-  /// **'Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres — en je kunt het altijd weer uitzetten in Profiel.'**
+  /// **'Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres, en je kunt het altijd weer uitzetten in Profiel.'**
   String get analyticsAskBody;
 
   /// No description provided for @analyticsAskYes.
@@ -3400,13 +3418,13 @@ abstract class S {
   /// No description provided for @analyticsSettingOn.
   ///
   /// In nl, this message translates to:
-  /// **'Aan — je helpt de app beter te maken'**
+  /// **'Aan, je helpt de app beter te maken'**
   String get analyticsSettingOn;
 
   /// No description provided for @analyticsSettingOff.
   ///
   /// In nl, this message translates to:
-  /// **'Uit — er verlaat niets je toestel'**
+  /// **'Uit, er verlaat niets je toestel'**
   String get analyticsSettingOff;
 
   /// No description provided for @notifWeeklyBody.

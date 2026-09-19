@@ -307,12 +307,18 @@ class DaylightBar extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                // Nul aftrek is een andere zin, niet "kost dit venster 0
-                // punten": dat laatste leest als een meting die toevallig nul
-                // uitkwam, terwijl het een instelling is die uit staat.
-                points == 0
-                    ? s.daylightScoreNone(weightLabel)
-                    : s.daylightScorePenalty(weightLabel, points),
+                // Drie gevallen, niet twee. Nul aftrek heeft twee heel
+                // verschillende oorzaken, en ze door elkaar halen levert een
+                // zin op die zichzelf tegenspreekt: op het toestel stond
+                // "jouw gevoeligheid staat op *donker telt een beetje*, dus
+                // daglicht verandert de score niet" -- bij een rit die
+                // gewoon volledig in het licht viel. Gezien op de Oppo,
+                // 2026-09-19, nadat de test met gevoeligheid nul groen stond.
+                switch ((darkFraction, points)) {
+                  (< 0.005, _) => s.daylightScoreAllLight,
+                  (_, 0) => s.daylightScoreNone(weightLabel),
+                  _ => s.daylightScorePenalty(weightLabel, points),
+                },
                 style: body,
               ),
               if (fullDarkPoints > 0) ...[

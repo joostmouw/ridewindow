@@ -26,6 +26,7 @@ import 'package:ridewindow/features/shared/app_tour_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/data/repositories/analytics_consent_store.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
@@ -300,6 +301,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(s.debugOnboardingReset)),
+                    );
+                  }
+                },
+              ),
+              // De toestemmingsvraag komt bij de tweede start en daarna nooit
+              // meer. Zonder deze knop is hij op een toestel maar een keer te
+              // zien: `pm clear` weigert ColorOS, en deinstalleren laat
+              // Android's back-up de oude staat gewoon terugzetten. Gevonden
+              // bij de verificatieronde van 2026-09-19, toen precies die twee
+              // wegen doodliepen.
+              ListTile(
+                leading: const Icon(AppIcons.arrowCounterClockwise),
+                title: Text(s.debugResetAnalytics),
+                onTap: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  for (final key in const [
+                    AnalyticsConsentStore.kConsentKey,
+                    AnalyticsConsentStore.kDeviceIdKey,
+                    AnalyticsConsentStore.kAppOpensKey,
+                    AnalyticsConsentStore.kPendingKey,
+                  ]) {
+                    await prefs.remove(key);
+                  }
+                  ref.invalidate(analyticsConsentProvider);
+                  if (ctx.mounted) Navigator.of(ctx).pop();
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(s.debugAnalyticsReset)),
                     );
                   }
                 },

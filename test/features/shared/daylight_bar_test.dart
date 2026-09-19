@@ -58,7 +58,14 @@ void main() {
 
   testWidgets('het gewicht staat niet op de balk maar in de uitleg',
       (tester) async {
-    await _pump(tester, start: middayRide.start, end: middayRide.end);
+    // Een rit die deels in het donker valt: bij een rit volledig in het licht
+    // noemt de uitleg terecht de rit als reden en niet de stand, en dan zou
+    // deze test het verkeerde meten.
+    await _pump(
+      tester,
+      start: DateTime(2026, 12, 20, 15),
+      end: DateTime(2026, 12, 20, 18),
+    );
 
     // "half mee" is de standaardstand. Op de balk hoort hij niet te staan.
     expect(find.textContaining('half'), findsNothing);
@@ -85,6 +92,29 @@ void main() {
     expect(find.text('Daglicht'), findsWidgets);
     expect(find.text('Wat daglicht met dit venster doet'), findsOneWidget);
     expect(find.textContaining('120 minuten'), findsOneWidget);
+  });
+
+  testWidgets('een rit volledig in het licht noemt dát de reden, niet de stand',
+      (tester) async {
+    // Dit ging mis op het toestel (2026-09-19): de uitleg zei "jouw
+    // gevoeligheid staat op *donker telt een beetje*, dus daglicht verandert
+    // de score niet" -- bij een rit die gewoon helemaal in het licht viel.
+    // Nul aftrek heeft twee oorzaken en de zin moet zeggen wélke.
+    await _pump(
+      tester,
+      start: middayRide.start,
+      end: middayRide.end,
+      darknessWeight: 0.25,
+    );
+
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+
+    // "Deze rit valt helemaal" en niet "helemaal in het licht": die kortere
+    // zinsnede staat ook in de schaalzin eronder ("Een venster dat helemaal in
+    // het licht valt verliest niets"), en dan meet de test twee dingen tegelijk.
+    expect(find.textContaining('Deze rit valt helemaal'), findsOneWidget);
+    expect(find.textContaining('gevoeligheid staat op'), findsNothing);
   });
 
   testWidgets('bij gevoeligheid nul zegt de uitleg dat, en geen "0 punten"',
