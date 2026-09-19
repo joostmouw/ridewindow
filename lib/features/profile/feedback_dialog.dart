@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/app_version.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
@@ -15,6 +16,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/services/feedback_payload.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -117,6 +119,10 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
       // meteen aankomt in plaats van bij toeval. `drainOutbox` heeft een eigen
       // try/catch en een re-entrancy-guard, dus dit kan geen scherm raken.
       unawaited(reconciler.drainOutbox());
+
+      // Alleen dat er feedback is, en hoeveel sterren. Nooit de tekst -- die
+      // staat in `public.feedback`, waar de gebruiker zelf op verzenden drukte.
+      trackEvent(ref, kEvFeedbackSent, props: {'rating': _rating});
 
       navigator.pop();
       messenger.showSnackBar(SnackBar(content: Text(s.feedbackThanks)));

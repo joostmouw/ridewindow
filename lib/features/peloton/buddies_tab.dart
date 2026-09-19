@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/services/invite_code.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -63,6 +65,8 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
         // De code staat óók in de tekst, niet alleen in de link: de link opent
         // vandaag de PWA en niet de native app (daarvoor zijn Android App
         // Links nodig), dus wie de app al heeft is met overtypen sneller uit.
+        // De code zelf gaat nooit mee: dat is een sleutel, geen statistiek.
+        trackEvent(ref, kEvPelotonInvite, props: {'kind': 'link_created'});
         await Share.share(
           s.pelotonInviteShareLink(inviteLinkFor(code), code),
         );
@@ -81,6 +85,7 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
               await ref.read(pelotonGatewayProvider).redeemFriendInvite(raw);
           _codeController.clear();
           _invalidateAll();
+          trackEvent(ref, kEvPelotonInvite, props: {'kind': 'redeemed'});
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

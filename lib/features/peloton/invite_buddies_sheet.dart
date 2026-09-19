@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 
@@ -73,6 +75,12 @@ Future<void> showInviteBuddiesSheet(
     }
 
     ref.invalidate(groupRidesProvider);
+    // Hoeveel maatjes tegelijk, niet wie. Een aantal is een getal; een naam
+    // zou een persoon zijn.
+    trackEvent(ref, kEvPelotonInvite, props: {
+      'kind': 'ride',
+      'count': selected.length,
+    });
     messenger.showSnackBar(SnackBar(content: Text(s.pelotonInviteSent)));
   } catch (error) {
     // Een uitnodiging die niet aankomt mag geen scherm laten crashen; de rit

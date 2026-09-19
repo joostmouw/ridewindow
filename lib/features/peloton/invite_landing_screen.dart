@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/services/pending_invite_store.dart';
@@ -67,6 +69,11 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
           .redeemFriendInvite(widget.code)
           .then((friend) {
         ref.invalidate(friendsProvider);
+        // Alleen de geslaagde tak: een link die faalt is geen uitnodiging die
+        // is aangenomen. `kind` scheidt de weg via de link van die via de
+        // overgetypte code, want dat is precies het verschil dat fase 27 wil
+        // weten.
+        trackEvent(ref, kEvPelotonInvite, props: {'kind': 'redeemed_link'});
         return friend;
       });
     });

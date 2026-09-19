@@ -12,11 +12,13 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/theme/app_shapes.dart';
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/domain/services/drag_run_counter.dart';
 import 'package:ridewindow/domain/services/range_fill.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
 import 'package:ridewindow/services/calendar_service.dart';
@@ -36,6 +38,11 @@ class AvailabilityScreen extends ConsumerStatefulWidget {
 class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
   // Import state
   bool _isImporting = false;
+
+  /// Hoeveel keer er in dit bezoek iets aan het rooster veranderd is. Alleen
+  /// de eerste keer telt voor de statistiek: een sleep over twintig cellen is
+  /// één antwoord op "komen ze voorbij de standaardweek", geen twintig.
+  int _editsThisVisit = 0;
 
   // Drag state
   bool _isDragging = false;
@@ -561,6 +568,19 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     };
   }
 
+  /// De enige weg naar de schrijfkant van de beschikbaarheid.
+  ///
+  /// **Waarom een getter en geen `trackEvent` op elke plek.** Het rooster
+  /// wordt op zes plekken gewijzigd -- tik, tweede tik, opvulling, sleep,
+  /// dagkop, uurkop. Het meten daar zes keer herhalen is precies het soort
+  /// ding dat bij de zevende plek vergeten wordt.
+  AvailabilityNotifier get _availabilityEdit {
+    if (_editsThisVisit++ == 0) {
+      trackEvent(ref, kEvAvailabilityEdited);
+    }
+    return ref.read(availabilityProvider.notifier);
+  }
+
   // --- Single cell tap ---
 
   void _onCellTap(DateTime key, Map<DateTime, BlockType> blocked) {
@@ -574,7 +594,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (currentType == BlockType.custom) {
       // Already-selected cell: always toggles off (existing behavior).
       HapticFeedback.lightImpact();
-      ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+      _availabilityEdit.toggleCustomHour(key);
       if (_pendingAnchor == key) {
         // Re-tapping the anchor itself cancels the pending block (RNE-01 point 5).
         setState(() => _pendingAnchor = null);
@@ -592,7 +612,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       // an empty hour always opens a brand-new, independent anchor
       // (RNE-01 point 3).
       HapticFeedback.lightImpact();
-      ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+      _availabilityEdit.toggleCustomHour(key);
       setState(() => _pendingAnchor = key);
       return;
     }
@@ -608,14 +628,14 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
         blockedHours: blocked,
       );
       HapticFeedback.mediumImpact();
-      ref.read(availabilityProvider.notifier).setCustomHours(fillKeys, block: true);
+      _availabilityEdit.setCustomHours(fillKeys, block: true);
       setState(() => _pendingAnchor = null);
     } else {
       // Second tap, different day: closes the old anchor's block as a
       // standalone 1-hour block (it was already selected from its own first
       // tap) and opens a brand-new block anchored on the new day (RNE-01 point 7).
       HapticFeedback.lightImpact();
-      ref.read(availabilityProvider.notifier).toggleCustomHour(key);
+      _availabilityEdit.toggleCustomHour(key);
       setState(() => _pendingAnchor = key);
     }
   }
@@ -751,9 +771,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
     if (!_isDragging) return;
 
     final cells = _draggedCells.toList();
-    ref
-        .read(availabilityProvider.notifier)
-        .setCustomHours(cells, block: _dragBlocking);
+    _availabilityEdit.setCustomHours(cells, block: _dragBlocking);
 
     setState(() {
       _isDragging = false;
@@ -787,7 +805,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     final block = freeCount >= customCount;
     HapticFeedback.mediumImpact();
-    ref.read(availabilityProvider.notifier).setCustomHours(keys, block: block);
+    _availabilityEdit.setCustomHours(keys, block: block);
   }
 
   void _onHourHeaderTap(
@@ -814,7 +832,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
 
     final block = freeCount >= customCount;
     HapticFeedback.mediumImpact();
-    ref.read(availabilityProvider.notifier).setCustomHours(keys, block: block);
+    _availabilityEdit.setCustomHours(keys, block: block);
   }
 
   // --- Google Calendar import ---

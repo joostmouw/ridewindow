@@ -2066,6 +2066,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         onTap: () {
           HapticFeedback.selectionClick();
           setState(() => _cardExpanded[slot.start] = !expanded);
+          // Alleen het openklappen telt: dichtklappen is geen tweede keer
+          // "kijkt hij verder dan de kaart". De score gaat mee -- dezelfde
+          // vorm als bij `ride_planned` en `ride_unplanned` -- omdat de vraag
+          // erachter is of mensen ook de mindere vensters nog openmaken.
+          if (!expanded) {
+            trackEvent(ref, kEvSlotOpened, props: {
+              'score': slot.overallScore,
+            });
+          }
         },
         child: expanded
             ? SizedBox(height: 28, child: Center(child: icon))
