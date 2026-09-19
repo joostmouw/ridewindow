@@ -33,7 +33,11 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/data/repositories/home_view_store.dart';
+import 'package:ridewindow/domain/services/ride_block.dart';
 import 'package:ridewindow/features/shared/analytics_consent_sheet.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -126,6 +130,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _DayPeriod.evening,
   };
 
+  /// Kijkvoorkeuren (backlog #69/#70). Beginnen op de oude waarden, zodat de
+  /// app er precies zo uitziet als altijd tot de opslag iets anders zegt.
+  HomeView _view = HomeView.windows;
+  SlotSort _sort = SlotSort.best;
+  HomeViewStore? _viewStore;
+
+  Future<void> _loadViewPrefs() async {
+    try {
+      final store = HomeViewStore(await SharedPreferences.getInstance());
+      if (!mounted) return;
+      setState(() {
+        _viewStore = store;
+        _view = store.view;
+        _sort = store.sort;
+      });
+    } catch (_) {
+      // Standaardweergave laten staan.
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -139,6 +163,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // methode is one-shot per account, dus opnieuw naar Home navigeren kost
     // geen tweede reconcile.
     ref.read(cloudSyncReconcilerProvider).reconcileOnStartup();
+    _loadViewPrefs();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Delay to ensure all widgets have completed layout for spotlight measurement
       await Future.delayed(const Duration(milliseconds: 500));
@@ -335,19 +360,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 // ── Planned rides ──
                 _buildPlannedRidesSliver(),
 
-                // ── Section label ──
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                    child: Text(
-                      S.of(context).rideTimes,
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: cs.onSurfaceVariant,
-                            letterSpacing: 0.5,
-                          ),
-                    ),
-                  ),
-                ),
+                // ── Weergave en volgorde ──
+                // Vervangt het vaste sectielabel "RIJTIJDEN": de twee keuzes
+                // zeggen zelf al wat de lijst is, dus het label was dubbelop.
+                SliverToBoxAdapter(child: _buildViewRow()),
 
                 // ── Cards ──
                 _buildCardsSliver(weatherState, slotsState),
@@ -501,6 +517,98 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// De iconen (zon, wolk, maan) zijn met de vakken meegegaan. Ze waren
   /// decoratie: "Morning" zegt al wat er staat, en drie iconen op een rij die
   /// niets toevoegen is precies het soort ruis dat deze stap moet wegnemen.
+  /// De rij met "wat zie ik" en "in welke volgorde".
+  ///
+  /// Dezelfde vormtaal als het periodefilter sinds fase 23: tekst met een
+  /// onderstreping op wat actief is, geen knoppen. Twee keuzes naast elkaar en
+  /// niet weggestopt in een menu -- de tester die hierom vroeg zou een menu
+  /// nooit gevonden hebben, en dan staat de keuze er alleen voor de vorm.
+  Widget _buildViewRow() {
+    final s = S.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
+      child: Row(
+        children: [
+          _buildViewItem(s.homeViewWindows, _view == HomeView.windows,
+              () => _setView(HomeView.windows)),
+          const SizedBox(width: 14),
+          _buildViewItem(s.homeViewBlocks, _view == HomeView.blocks,
+              () => _setView(HomeView.blocks)),
+          const Spacer(),
+          // De volgorde slaat alleen op de vensterlijst. In blokweergave is er
+          // per dag maar één kaart, dus er valt niets te sorteren.
+          if (_view == HomeView.windows) ...[
+            _buildViewItem(s.homeSortBest, _sort == SlotSort.best,
+                () => _setSort(SlotSort.best)),
+            const SizedBox(width: 14),
+            _buildViewItem(s.homeSortTime, _sort == SlotSort.time,
+                () => _setSort(SlotSort.time)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildViewItem(String label, bool isOn, VoidCallback onTap) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Semantics(
+      selected: isOn,
+      button: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+          // IntrinsicWidth zodat de streep precies zo breed is als het woord.
+          // Het periodefilter kan dat met Expanded omdat die drie de rij
+          // verdelen; hier staan vier woorden van verschillende lengte naast
+          // elkaar en moet elk zijn eigen maat houden.
+          child: IntrinsicWidth(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: isOn ? cs.primary : cs.onSurfaceVariant,
+                        fontWeight: isOn ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  height: 2,
+                  decoration: BoxDecoration(
+                    color: isOn ? cs.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _setView(HomeView view) {
+    if (_view == view) return;
+    setState(() => _view = view);
+    _viewStore?.setView(view);
+  }
+
+  void _setSort(SlotSort sort) {
+    if (_sort == sort) return;
+    setState(() => _sort = sort);
+    _viewStore?.setSort(sort);
+  }
+
   Widget _buildPeriodFilter() {
     final s = S.of(context);
     // Alle drie actief betekent "geen filter", en dan hoort er niets
@@ -1087,24 +1195,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         );
       }
 
-      // Dart's List.sort is niet stabiel, dus binnen een tier moet de tiebreak
-      // expliciet; anders wisselt de kaartvolgorde per rebuild. Binnen een tier
-      // blijft de lijst chronologisch — dat leest als een agenda, en dat is wat
-      // je van een lijst tijdvakken verwacht.
-      slots.sort((a, b) {
-        final byTier = _tierOrder(a.tier).compareTo(_tierOrder(b.tier));
-        return byTier != 0 ? byTier : a.start.compareTo(b.start);
-      });
+      // Blokweergave (backlog #69): één kaart per aaneengesloten goed dagdeel
+      // in plaats van één per venster. Staat hier en niet eerder, zodat de
+      // blokken over exact dezelfde gefilterde vensters gaan als de lijst --
+      // dag, dagdeel en al geplande ritten tellen dus net zo goed mee.
+      if (_view == HomeView.blocks) {
+        return _buildBlocksSliver(buildRideBlocks(slots));
+      }
 
-      // ...met één uitzondering: het best scorende slot wordt naar voren
-      // gehaald. Zonder dit droeg de kaart op plek 0 het "Best choice"-label
-      // terwijl dat de vroegste van de beste tier was en niet de beste — een
-      // rit van 99 boven een 100. Zolang die kaart nauwelijks opviel bleef dat
-      // onopgemerkt; sinds hij met schaduw en accentrand domineert, wijst het
-      // scherm met nadruk de verkeerde aan. Zie [indexOfBestSlot].
-      final bestIndex = indexOfBestSlot(slots);
-      if (bestIndex > 0) {
-        slots.insert(0, slots.removeAt(bestIndex));
+      // Dart's List.sort is niet stabiel, dus de tiebreak moet expliciet;
+      // anders wisselt de kaartvolgorde per rebuild.
+      switch (_sort) {
+        case SlotSort.best:
+          // Op kwaliteit, binnen een tier chronologisch.
+          slots.sort((a, b) {
+            final byTier = _tierOrder(a.tier).compareTo(_tierOrder(b.tier));
+            return byTier != 0 ? byTier : a.start.compareTo(b.start);
+          });
+
+          // ...met één uitzondering: het best scorende slot wordt naar voren
+          // gehaald. Zonder dit droeg de kaart op plek 0 het "Best choice"-label
+          // terwijl dat de vroegste van de beste tier was en niet de beste — een
+          // rit van 99 boven een 100. Zolang die kaart nauwelijks opviel bleef dat
+          // onopgemerkt; sinds hij met schaduw en accentrand domineert, wijst het
+          // scherm met nadruk de verkeerde aan. Zie [indexOfBestSlot].
+          final bestIndex = indexOfBestSlot(slots);
+          if (bestIndex > 0) {
+            slots.insert(0, slots.removeAt(bestIndex));
+          }
+        case SlotSort.time:
+          // Puur chronologisch, als een agenda. Geen tier-groepering en geen
+          // beste-naar-voren: wie hierop schakelt vraagt "wanneer", niet "welke
+          // is het beste", en dan is elke herschikking een leugen over de tijd.
+          slots.sort((a, b) {
+            final byStart = a.start.compareTo(b.start);
+            return byStart != 0
+                ? byStart
+                : b.overallScore.compareTo(a.overallScore);
+          });
       }
 
       // Afgetopt op de beste vijf, met een rij eronder die de rest erbij haalt.
@@ -1113,13 +1241,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       final hidden = total - _kVisibleSlotCount;
       final visible = _showAllSlots || hidden <= 0 ? total : _kVisibleSlotCount;
 
+      // Wélke kaart het "beste keuze"-label draagt, los van wáár hij staat.
+      // Op score gesorteerd is dat kaart 0 en was `index == 0` genoeg; op tijd
+      // gesorteerd is kaart 0 de vroegste. Dat vasthouden zou exact de fout
+      // herhalen die [indexOfBestSlot] ooit oploste: het scherm wijst met veel
+      // nadruk de verkeerde kaart aan.
+      final bestIdx = indexOfBestSlot(slots);
+      final bestTier = bestIdx >= 0 ? slots[bestIdx].tier : null;
+
       return SliverList.builder(
         // +1 voor de "toon alles"-rij, maar alleen als er iets te tonen valt.
         itemCount: hidden > 0 ? visible + 1 : visible,
         itemBuilder: (context, index) {
           if (index == visible) return _buildShowAllSlotsRow(total);
-          final isBest = index == 0 &&
-              (slots.first.tier is Perfect || slots.first.tier is Great);
+          final isBest = index == bestIdx &&
+              (bestTier is Perfect || bestTier is Great);
           final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
           Widget card = _buildRideCard(slots[index], isBest: isBest);
           if (index == 0) {
@@ -1136,6 +1272,120 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return const SliverFillRemaining(
       hasScrollBody: false,
       child: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Blokweergave (backlog #69)
+  // ---------------------------------------------------------------------------
+
+  Widget _buildBlocksSliver(List<RideBlock> blocks) {
+    if (blocks.isEmpty) {
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: _buildEmptyState(S.of(context).emptyNoSlots),
+      );
+    }
+
+    return SliverList.builder(
+      itemCount: blocks.length,
+      itemBuilder: (context, index) {
+        final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
+        return SpringEntrance(
+          delay: AppMotion.staggerDelay * staggerIndex,
+          child: _buildBlockCard(blocks[index]),
+        );
+      },
+    );
+  }
+
+  /// Eén kaart per aaneengesloten goed dagdeel.
+  ///
+  /// De kaart beantwoordt de twee vragen die een losse vensterlijst openliet:
+  /// *wanneer is het goed* (de balk en de kop) en *hoe lang kan ik weg* (het
+  /// aantal uren). Het beste venster staat als donkere markering in de balk,
+  /// zodat het niet verdwijnt maar ook niet de enige waarheid meer is.
+  Widget _buildBlockCard(RideBlock block) {
+    final rw = context.rw;
+    final s = S.of(context);
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+      child: Material(
+        color: rw.surface,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          // Doorklikken opent het béste venster van het blok -- dat is de rit
+          // die je hier zou boeken.
+          onTap: () {
+            HapticFeedback.selectionClick();
+            final forecasts = ref.watch(weatherProvider).value
+                    ?.where((f) =>
+                        !f.time.isBefore(block.best.start) &&
+                        f.time.isBefore(block.best.end))
+                    .toList() ??
+                const <HourlyForecast>[];
+            context.push(
+              '/detail',
+              extra: DetailArgs(slot: block.best, forecasts: forecasts),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _formatDayName(block.start),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: rw.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            s.blockGoodFromTo(
+                              _formatTime(block.start),
+                              _formatTime(block.end),
+                            ),
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: rw.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Dezelfde ScoreDisplay als de ritkaarten, niet een eigen
+                    // getal met een eigen kleur ernaast. Twee vormtalen voor
+                    // hetzelfde cijfer is precies wat v4.0 wegwerkte.
+                    ScoreDisplay(
+                      score: block.best.overallScore,
+                      tier: block.best.tier,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _BlockRail(block: block),
+                const SizedBox(height: 8),
+                Text(
+                  '${s.blockBestWindow('${_formatTime(block.best.start)}\u2013${_formatTime(block.best.end)}')} \u00b7 ${s.blockDuration(block.hours)}',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: rw.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -2174,4 +2424,90 @@ class _GreetingWithWhisperNameState extends State<_GreetingWithWhisperName>
       ],
     );
   }
+}
+
+/// De dagbalk van een blok: het goede dagdeel als staaf, met het beste venster
+/// er donker in.
+///
+/// **Waarom een balk en geen lijst.** De vraag die hierachter zit is
+/// ruimtelijk -- *wanneer op de dag, en hoe lang* -- en daar is een tijdlijn
+/// het antwoord op. Drie regels tekst onder elkaar waren juist het probleem.
+///
+/// De schaal loopt van het begin tot het eind van het blok, niet van 00:00 tot
+/// 24:00. Een blok van twee uur zou op een etmaalschaal een streepje zijn.
+class _BlockRail extends StatelessWidget {
+  const _BlockRail({required this.block});
+
+  final RideBlock block;
+
+  @override
+  Widget build(BuildContext context) {
+    final rw = context.rw;
+    final theme = Theme.of(context);
+
+    final total = block.end.difference(block.start).inMinutes;
+    // Een blok van nul minuten kan niet bestaan -- een venster heeft altijd
+    // duur -- maar delen door nul is te goedkoop om niet af te vangen.
+    if (total <= 0) return const SizedBox.shrink();
+
+    final bestStart =
+        block.best.start.difference(block.start).inMinutes / total;
+    final bestWidth =
+        block.best.end.difference(block.best.start).inMinutes / total;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: SizedBox(
+            height: 24,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: ColoredBox(color: rw.tiers.greatBg),
+                ),
+                // Met een LayoutBuilder en niet met FractionallySizedBox: die
+                // kan wel een breedte uitdrukken maar geen beginpunt, en het
+                // beginpunt is hier het halve verhaal.
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final w = constraints.maxWidth;
+                    return Stack(
+                      children: [
+                        Positioned(
+                          left: (bestStart.clamp(0.0, 1.0)) * w,
+                          width: (bestWidth.clamp(0.0, 1.0)) * w,
+                          top: 0,
+                          bottom: 0,
+                          child: ColoredBox(color: rw.scorePerfect),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _hhmm(block.start),
+              style: theme.textTheme.labelSmall?.copyWith(color: rw.textTertiary),
+            ),
+            Text(
+              _hhmm(block.end),
+              style: theme.textTheme.labelSmall?.copyWith(color: rw.textTertiary),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  static String _hhmm(DateTime dt) =>
+      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }

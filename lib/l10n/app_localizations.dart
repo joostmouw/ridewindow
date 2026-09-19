@@ -3354,6 +3354,48 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Dat is niet gelukt. Probeer het opnieuw.'**
   String get rideRejoinFailed;
+
+  /// No description provided for @homeViewWindows.
+  ///
+  /// In nl, this message translates to:
+  /// **'Vensters'**
+  String get homeViewWindows;
+
+  /// No description provided for @homeViewBlocks.
+  ///
+  /// In nl, this message translates to:
+  /// **'Blok'**
+  String get homeViewBlocks;
+
+  /// No description provided for @homeSortBest.
+  ///
+  /// In nl, this message translates to:
+  /// **'Beste eerst'**
+  String get homeSortBest;
+
+  /// No description provided for @homeSortTime.
+  ///
+  /// In nl, this message translates to:
+  /// **'Op tijd'**
+  String get homeSortTime;
+
+  /// No description provided for @blockGoodFromTo.
+  ///
+  /// In nl, this message translates to:
+  /// **'goed van {from} tot {to}'**
+  String blockGoodFromTo(String from, String to);
+
+  /// No description provided for @blockBestWindow.
+  ///
+  /// In nl, this message translates to:
+  /// **'Beste moment: {slot}'**
+  String blockBestWindow(String slot);
+
+  /// No description provided for @blockDuration.
+  ///
+  /// In nl, this message translates to:
+  /// **'{hours} uur aaneengesloten'**
+  String blockDuration(int hours);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

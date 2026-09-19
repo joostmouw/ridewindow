@@ -21,6 +21,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
+import 'package:ridewindow/data/repositories/home_view_store.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -297,5 +298,107 @@ void main() {
     // HomeScreen toont: 'Alle goede momenten zijn geblokkeerd. Pas je schema aan.'
     expect(find.textContaining('geblokkeerd'), findsOneWidget);
     expect(find.text('Inplannen'), findsNothing);
+  });
+
+  // ── Weergave en volgorde (backlog #69/#70) ──
+  //
+  // Home kon maar op één manier kijken: losse vensters, gesorteerd op score.
+  // Een tester vroeg om het aaneengesloten blok én om chronologische volgorde.
+  // Deze tests leggen vast dat beide keuzes er zijn en werkelijk iets doen.
+
+  RideSlot slotAt(int hour, int endHour, double score) => RideSlot(
+        start: DateTime(2026, 6, 8, hour),
+        end: DateTime(2026, 6, 8, endHour),
+        overallScore: score,
+        tier: rideTierFromScore(score),
+        hours: const [],
+      );
+
+  Future<void> pumpHomeWithSlots(
+    WidgetTester tester,
+    List<RideSlot> slots,
+  ) async {
+    // De hint-overlay van de eerste start ligt over het hele scherm en vangt
+    // elke tik. Hem als gezien markeren hoort bij het opzetten van deze test,
+    // niet bij wat er getoetst wordt.
+    SharedPreferences.setMockInitialValues({'hint_seen_home': true});
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          weatherProvider.overrideWith(() => FakeWeatherReady()),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+          slotsProvider.overrideWith(
+            () => FakeStaticSlotsNotifier(SlotsLoaded(slots, reason: null)),
+          ),
+        ],
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+  }
+
+  testWidgets('de vier keuzes staan op Home', (tester) async {
+    await pumpHomeWithSlots(tester, [slotAt(9, 11, 100)]);
+
+    expect(find.text('Vensters'), findsOneWidget);
+    expect(find.text('Blok'), findsOneWidget);
+    expect(find.text('Beste eerst'), findsOneWidget);
+    expect(find.text('Op tijd'), findsOneWidget);
+  });
+
+  testWidgets('de volgordekeuze verdwijnt in blokweergave', (tester) async {
+    // In blokweergave is er per dag één kaart, dus er valt niets te sorteren.
+    // Een keuze tonen die niets doet is erger dan geen keuze.
+    await pumpHomeWithSlots(tester, [slotAt(9, 11, 100)]);
+
+    await tester.tap(find.text('Blok'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(find.text('Beste eerst'), findsNothing);
+    expect(find.text('Op tijd'), findsNothing);
+  });
+
+  testWidgets('blokweergave voegt Ingrids drie vensters tot één kaart',
+      (tester) async {
+    // De melding van 9 september: 09:00-11:00 (100), 06:00-09:00 (99) en
+    // 11:00-13:00 (95) op één zaterdag.
+    await pumpHomeWithSlots(tester, [
+      slotAt(9, 11, 100),
+      slotAt(6, 9, 99),
+      slotAt(11, 13, 95),
+    ]);
+
+    await tester.tap(find.text('Blok'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(
+      find.text('goed van 06:00 tot 13:00'),
+      findsOneWidget,
+      reason: 'drie regels, één ochtend',
+    );
+    expect(find.textContaining('7 uur aaneengesloten'), findsOneWidget);
+  });
+
+  testWidgets('de keuze wordt onthouden', (tester) async {
+    await pumpHomeWithSlots(tester, [slotAt(9, 11, 100)]);
+
+    await tester.tap(find.text('Blok'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(HomeViewStore.kViewKey), 'blocks');
   });
 }

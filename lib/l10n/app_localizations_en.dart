@@ -1862,4 +1862,31 @@ class SEn extends S {
 
   @override
   String get rideRejoinFailed => 'That didn\'t work. Please try again.';
+
+  @override
+  String get homeViewWindows => 'Windows';
+
+  @override
+  String get homeViewBlocks => 'Block';
+
+  @override
+  String get homeSortBest => 'Best first';
+
+  @override
+  String get homeSortTime => 'By time';
+
+  @override
+  String blockGoodFromTo(String from, String to) {
+    return 'good from $from to $to';
+  }
+
+  @override
+  String blockBestWindow(String slot) {
+    return 'Best moment: $slot';
+  }
+
+  @override
+  String blockDuration(int hours) {
+    return '$hours hours straight';
+  }
 }

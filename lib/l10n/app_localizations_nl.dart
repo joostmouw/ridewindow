@@ -1868,4 +1868,31 @@ class SNl extends S {
 
   @override
   String get rideRejoinFailed => 'Dat is niet gelukt. Probeer het opnieuw.';
+
+  @override
+  String get homeViewWindows => 'Vensters';
+
+  @override
+  String get homeViewBlocks => 'Blok';
+
+  @override
+  String get homeSortBest => 'Beste eerst';
+
+  @override
+  String get homeSortTime => 'Op tijd';
+
+  @override
+  String blockGoodFromTo(String from, String to) {
+    return 'goed van $from tot $to';
+  }
+
+  @override
+  String blockBestWindow(String slot) {
+    return 'Beste moment: $slot';
+  }
+
+  @override
+  String blockDuration(int hours) {
+    return '$hours uur aaneengesloten';
+  }
 }
