@@ -180,7 +180,11 @@ class _CacheKey {
 final Map<_CacheKey, SunTimes> _cache = {};
 
 class SunTimes {
-  const SunTimes._({this.sunrise, this.sunset, this.polarDaylight = false});
+  // `polarDaylight` heeft hier bewust géén default meer: de enige aanroeper van
+  // deze constructor geeft hem nooit mee, en de poolvarianten lopen via
+  // [SunTimes._polar]. Een optionele parameter die nooit gezet wordt, suggereert
+  // een tak die niet bestaat. Gevonden bij de sweep van #73.
+  const SunTimes._({this.sunrise, this.sunset}) : polarDaylight = false;
 
   const SunTimes._polar({required this.polarDaylight})
       : sunrise = null,

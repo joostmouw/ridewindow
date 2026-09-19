@@ -30,7 +30,6 @@
 import 'dart:async';
 
 import 'package:drift/native.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,13 +62,17 @@ class _Log {
 }
 
 class _FakeGateway implements CloudSyncGateway {
-  _FakeGateway(this._log, {this.plannedRows = const []});
+  _FakeGateway(this._log);
 
   final _Log _log;
 
   /// Wat `planned_rides` teruggeeft. Default leeg, zodat de merge niets te doen
-  /// heeft en de test over volgorde gaat en niet over merge-gedrag.
-  List<Map<String, dynamic>> plannedRows;
+  /// heeft en de test over volgorde gaat en niet over merge-gedrag; de tests
+  /// die wél over de merge gaan zetten hem na constructie.
+  ///
+  /// Er stond ook een constructorparameter voor, maar die werd nooit
+  /// meegegeven -- een knop die niemand omdraait. Verdwenen bij de sweep van #73.
+  List<Map<String, dynamic>> plannedRows = const [];
 
   /// Wat `profiles` teruggeeft. Default `null` (geen cloud-rij).
   Map<String, dynamic>? profileRow;

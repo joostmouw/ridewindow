@@ -14,7 +14,6 @@ import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
-import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -215,13 +214,18 @@ class _WeekAgendaScreenState extends ConsumerState<WeekAgendaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final slotsState = ref.watch(slotsProvider);
     final availValue = ref.watch(availabilityProvider);
     final allScores = ref.watch(allHourlyScoresProvider);
     final weatherValue = ref.watch(weatherProvider);
     final locationAsync = ref.watch(locationProvider);
-    final plannedRides = ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
-    final slots = (slotsState is SlotsLoaded) ? slotsState.slots : <RideSlot>[];
+    // Geen variabele, wél een abonnement -- en dat is hier het hele punt.
+    //
+    // De enige andere plek die geplande ritten leest (`_isPlanned`) gebruikt
+    // `ref.read`, en dat abonneert niet. Deze `watch` is dus wat de Agenda laat
+    // verversen zodra je elders een rit plant. Hij stond er als ongebruikte
+    // variabele en zag er daarmee uit als dood hout; weghalen zou het scherm
+    // stilletjes hebben laten bevriezen. Gevonden bij de sweep van #73.
+    ref.watch(plannedRidesProvider);
     final blockedHours = availValue.value ?? <DateTime, BlockType>{};
     final forecasts = weatherValue.value ?? <HourlyForecast>[];
     final cityName = locationAsync.value?.city ?? '';

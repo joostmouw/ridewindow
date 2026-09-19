@@ -376,9 +376,14 @@ class WeatherIndicatorBar extends StatelessWidget {
       ),
       const SizedBox(height: 8),
       Text(
+        // `valueLabel` en niet `'$value$unit'`: die eerste is de afgeronde
+        // waarde die op de balk staat. De variabele bestond al mét deze uitleg
+        // erboven, maar was nooit aangesloten -- de uitleg noemde dus alsnog
+        // "15,4°" terwijl de balk "15°" toonde. Gevonden bij de sweep van
+        // backlog #73.
         inRange
-            ? s.scoreInsideIdeal('$value$unit')
-            : s.scoreOutsideIdeal('$value$unit'),
+            ? s.scoreInsideIdeal(valueLabel)
+            : s.scoreOutsideIdeal(valueLabel),
         style: body,
       ),
       const SizedBox(height: 8),

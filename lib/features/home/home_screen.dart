@@ -11,7 +11,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
-import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
@@ -28,7 +27,6 @@ import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
-import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
@@ -44,7 +42,6 @@ import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
-import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -54,11 +51,6 @@ import 'package:ridewindow/theme/app_icons.dart';
 /// wegveegt dat de gebruiker ziet.
 const _rideCardMargin = EdgeInsets.symmetric(horizontal: 20, vertical: 6);
 const double _rideCardRadius = 24;
-
-const _pi = math.pi;
-final _sin = math.sin;
-final _cos = math.cos;
-final _atan2 = math.atan2;
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -222,7 +214,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final rw = context.rw;
     final cs = Theme.of(context).colorScheme;
     final weatherState = ref.watch(weatherProvider);
     // REFRESH-03: keeps lastRefreshedProvider in sync with every successful
@@ -241,7 +232,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final lastRefreshedAsync = ref.watch(lastRefreshedProvider);
     final userName = ref.watch(profileProvider).value?.userName;
     final slotCount = slotsState is SlotsLoaded ? slotsState.slots.length : 0;
-    final greeting = _buildGreeting(context, userName);
 
     // Subtitle: last-updated label is appended whenever known, regardless of
     // slot count (REFRESH-03), while preserving the existing priority of
@@ -455,25 +445,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // Greeting
   // ---------------------------------------------------------------------------
 
-  String _buildGreeting(BuildContext context, String? userName) {
-    final s = S.of(context);
-    final hour = DateTime.now().hour;
-    final String timeGreeting;
-    if (hour < 6) {
-      timeGreeting = s.greetingNightOwl;
-    } else if (hour < 12) {
-      timeGreeting = s.greetingMorning;
-    } else if (hour < 17) {
-      timeGreeting = s.greetingAfternoon;
-    } else {
-      timeGreeting = s.greetingEvening;
-    }
-    if (userName != null && userName.isNotEmpty) {
-      return s.greetingWithName(timeGreeting, userName);
-    }
-    return timeGreeting;
-  }
-
   String _buildTimeGreeting(BuildContext context) {
     final s = S.of(context);
     final hour = DateTime.now().hour;
@@ -488,7 +459,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildWeekStrip(SlotsState slotsState) {
-    final cs = Theme.of(context).colorScheme;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final days = List.generate(7, (i) => today.add(Duration(days: i)));
@@ -1570,7 +1540,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildRideCard(RideSlot slot, {bool isBest = false}) {
-    final rw = context.rw;
     final cs = Theme.of(context).colorScheme;
     final weatherState = ref.watch(weatherProvider);
 
@@ -2280,30 +2249,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         Poor() => 3,
       };
 
-  String _windArrow(double degrees) {
-    const arrows = [
-      '\u2193',
-      '\u2199',
-      '\u2190',
-      '\u2196',
-      '\u2191',
-      '\u2197',
-      '\u2192',
-      '\u2198'
-    ];
-    final index = ((degrees + 22.5) % 360 / 45).floor();
-    return arrows[index];
-  }
-
-  Color _tierBorderColor(RideTier tier) {
-    final rw = context.rw;
-    return switch (tier) {
-      Perfect() => rw.scorePerfect,
-      Great() => rw.scoreGreat,
-      Acceptable() => rw.scoreAcceptable,
-      Poor() => rw.scorePoor,
-    };
-  }
 }
 
 // ---------------------------------------------------------------------------

@@ -4,8 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:ridewindow/data/database/app_database.dart';
-import 'package:ridewindow/data/database/tables/forecast_cache_entries.dart';
-import 'package:ridewindow/data/database/tables/hourly_forecast_entries.dart';
 import 'package:ridewindow/data/remote/open_meteo_client.dart';
 import 'package:ridewindow/data/repositories/weather_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';

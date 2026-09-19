@@ -141,15 +141,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     };
   }
 
-  Color _bannerFg(RideTier tier) {
-    final t = context.rw.tiers;
-    return switch (tier) {
-      Perfect() => t.perfectFg,
-      Great() => t.perfectFg,
-      Acceptable() => t.acceptableFg,
-      Poor() => t.poorFg,
-    };
-  }
 
   String _tierDescription(BuildContext context, RideTier tier) {
     final s = S.of(context);
@@ -1131,7 +1122,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   Widget _buildSecondaryActions(BuildContext context) {
-    final rw = context.rw;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
