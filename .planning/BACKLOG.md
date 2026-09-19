@@ -326,16 +326,23 @@ tekst is opgeschreven. Beide staan uitgewerkt in `.planning/PELOTON.md`; deze li
 Wat daarmee overblijft vóór slice 1: die ene verificatie, en het privacybeleid dat sinds
 2026-09-19 vertelt wat een maatje van je ziet.
 
-**Slice 1 — meekijken zonder account** (Partiful). Vandaag moet je maatje eerst een account maken
-voordat hij weet waarvoor hij wordt uitgenodigd. Dit draait dat om: `/invite/:code` toont de rit
-mét weerscore en de "wat trek je aan"-tip, en hij kan reageren; een account is pas nodig als hij de
-app zelf wil gebruiken. **Dit is architectureel de zwaarste stap:** alle RLS gaat nu uit van
-`authenticated`, dus er moet een pad komen waarin een niet-ingelogde bezoeker precies één rit mag
-zien en precies één antwoord mag geven, op grond van een token in de URL — en niets anders. Dat is
-een eigen security-ontwerp, geen policy-aanpassing onderweg.
+**~~Slice 1 — meekijken zonder account~~ (Partiful). ❌ Afgewezen door Joost op 2026-09-19:
+voor Peloton hoort een account verplicht te zijn.** Niet opnieuw voorstellen.
 
-**Slice 2 — meerdere vensters voorleggen.** Het idee uit het uitgangspunt. Bouwt op slice 1 (ook
-gasten moeten kunnen stemmen) en op de bestaande slot-generator.
+De oorspronkelijke tekst stond hier: `/invite/:code` zou de rit met weerscore en kledingtip tonen
+aan iemand zonder account, die dan ter plekke kon antwoorden. Architectureel was dit de zwaarste
+stap van het hele epic — alle RLS gaat uit van `authenticated`, dus er had een aparte deur moeten
+komen voor een niet-ingelogde bezoeker met een token in de URL. Die deur hoeft er nu niet te komen,
+en dat scheelt een eigen beveiligingsontwerp.
+
+**Gevolg voor de rest:** slice 2 leunde hierop ("ook gasten moeten kunnen stemmen") en staat nu
+volledig op ingelogde deelnemers. De `/invite/:code`-route blijft gewoon bestaan als weg naar de
+app — hij vraagt alleen eerst om inloggen, zoals nu.
+
+**Slice 2 — meerdere vensters voorleggen.** Het idee uit het uitgangspunt: nodig niet uit voor één
+moment, maar leg de best scorende vensters van de week voor en laat de deelnemers kiezen. Bouwt
+alleen op de bestaande slot-generator; sinds slice 1 vervalt, stemmen uitsluitend ingelogde
+deelnemers. Daarmee is dit de **eerste** slice van de epic.
 
 **Slice 3 — "wanneer kunnen wij allebei"** (Howbout, was [[41]]). Het snijvlak van beider roosters
 met de weerscore eroverheen. Vereist dat A B's beschikbaarheid mag lezen: de zwaarste RLS-vraag van

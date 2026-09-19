@@ -211,7 +211,9 @@ uur werk, zinvol pas als Peloton in een Play-build zit.
   het opmerkt.
 - **Volgende feature-slices staan nu uitgewerkt als epic #65 in `BACKLOG.md`** ("Peloton v2"),
   afgeleid uit een vergelijking met Partiful, Komoot, Howbout en Strava. Kern: nodig niet uit voor
-  één rit maar voor de best scorende vensters van de week, en laat iemand meekijken zónder account.
+  één rit maar voor de best scorende vensters van de week. **Meekijken zonder account is op
+  2026-09-19 door Joost afgewezen** — voor Peloton hoort een account verplicht te zijn; die slice
+  is in `BACKLOG.md` doorgehaald en hoeft niet opnieuw voorgesteld te worden.
   De volgorde begint bij de twee gaten hierboven — een geaccepteerde rit die nergens zichtbaar is,
   en de eenzijdige maatjeslijst. Het snijvlak van beider beschikbaarheid ("wanneer kunnen wij
   allebei") is daar slice 3; dat vereist dat A B's rooster mag lezen, de zwaarste RLS-vraag van het
