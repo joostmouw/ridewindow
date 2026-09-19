@@ -390,7 +390,11 @@ void main() {
     );
     // Niet "7 uur aaneengesloten": dat zou beweren dat je zeven uur achter
     // elkaar fietst. Wat de app aanbiedt is de langste rit in dat blok.
-    expect(find.textContaining('tot 3 uur mogelijk'), findsOneWidget);
+    expect(find.text('Je kunt hier tot 3 uur weg'), findsOneWidget);
+
+    // En de beoordeling hangt aan een tijdvak, niet aan de dag: het beste
+    // venster staat boven het cijfer.
+    expect(find.text('09:00\u201311:00'), findsOneWidget);
   });
 
   testWidgets('de keuze wordt onthouden', (tester) async {
@@ -402,57 +406,5 @@ void main() {
 
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString(HomeViewStore.kViewKey), 'blocks');
-  });
-
-  testWidgets('blokweergave licht één toprit uit, niet één per dag',
-      (tester) async {
-    // Elke dagkaart markeert zijn eigen beste venster op de balk. Zonder deze
-    // regel waren er vijf "beste" naast elkaar en sprong er niets uit.
-    await pumpHomeWithSlots(tester, [
-      RideSlot(
-        start: DateTime(2026, 6, 8, 9),
-        end: DateTime(2026, 6, 8, 11),
-        overallScore: 88,
-        tier: rideTierFromScore(88),
-        hours: const [],
-      ),
-      RideSlot(
-        start: DateTime(2026, 6, 9, 9),
-        end: DateTime(2026, 6, 9, 11),
-        overallScore: 100,
-        tier: rideTierFromScore(100),
-        hours: const [],
-      ),
-    ]);
-
-    await tester.tap(find.text('Blok'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-
-    expect(
-      find.byType(BestChoicePill),
-      findsOneWidget,
-      reason: 'twee dagen, één toprit',
-    );
-  });
-
-  testWidgets('geen toprit als de hele week matig is', (tester) async {
-    // De beste van een slechte week is geen toprit. Dezelfde drempel als de
-    // vensterlijst.
-    await pumpHomeWithSlots(tester, [
-      RideSlot(
-        start: DateTime(2026, 6, 8, 9),
-        end: DateTime(2026, 6, 8, 11),
-        overallScore: 55,
-        tier: rideTierFromScore(55),
-        hours: const [],
-      ),
-    ]);
-
-    await tester.tap(find.text('Blok'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-
-    expect(find.byType(BestChoicePill), findsNothing);
   });
 }

@@ -1894,4 +1894,9 @@ class SEn extends S {
   String blockGoodSpans(String spans) {
     return 'good: $spans';
   }
+
+  @override
+  String blockCanRideUpTo(int hours) {
+    return 'You can ride up to $hours hours here';
+  }
 }

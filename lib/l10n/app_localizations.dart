@@ -3402,6 +3402,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'goed: {spans}'**
   String blockGoodSpans(String spans);
+
+  /// No description provided for @blockCanRideUpTo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je kunt hier tot {hours} uur weg'**
+  String blockCanRideUpTo(int hours);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

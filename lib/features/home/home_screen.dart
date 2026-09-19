@@ -1287,31 +1287,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       );
     }
 
-    // Eén moment van de hele week eruit lichten, niet één per dag.
-    //
-    // Elke dagkaart markeert al zijn eigen beste venster op de balk, maar
-    // daarmee waren er vijf "beste" naast elkaar en sprong er niets uit. Dit is
-    // dezelfde afweging als bij de vensterlijst: de kaart die het label draagt
-    // moet de werkelijk hoogste score dragen, anders wijst het scherm met veel
-    // nadruk de verkeerde aan.
-    var topIndex = 0;
-    for (var i = 1; i < days.length; i++) {
-      if (days[i].best.overallScore > days[topIndex].best.overallScore) {
-        topIndex = i;
-      }
-    }
-    // Alleen als het werkelijk een goede rit is. Dezelfde drempel als de
-    // vensterlijst: de beste van een slechte week is geen toprit.
-    final topTier = days[topIndex].best.tier;
-    final hasTop = topTier is Perfect || topTier is Great;
-
     return SliverList.builder(
       itemCount: days.length,
       itemBuilder: (context, index) {
         final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
         return SpringEntrance(
           delay: AppMotion.staggerDelay * staggerIndex,
-          child: _buildBlockCard(days[index], isTop: hasTop && index == topIndex),
+          child: _buildBlockCard(days[index]),
         );
       },
     );
@@ -1324,7 +1306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// in de dag en niet wat de rest deed -- terwijl dat juist de vraag is waar
   /// deze weergave voor bestaat: *wanneer is het vandaag goed*. Zonder de grijze
   /// randen eromheen is "goed van 06:00 tot 21:00" een mededeling zonder maat.
-  Widget _buildBlockCard(RideDay day, {bool isTop = false}) {
+  Widget _buildBlockCard(RideDay day) {
     final rw = context.rw;
     final s = S.of(context);
     final theme = Theme.of(context);
@@ -1363,11 +1345,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (isTop)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 10),
-                    child: BestChoicePill(),
-                  ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1392,22 +1369,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Dezelfde ScoreDisplay als de ritkaarten, niet een eigen
-                    // getal met een eigen kleur ernaast. Twee vormtalen voor
-                    // hetzelfde cijfer is precies wat v4.0 wegwerkte.
-                    ScoreDisplay(
-                      score: day.best.overallScore,
-                      tier: day.best.tier,
-                      emphasis:
-                          isTop ? ScoreEmphasis.hero : ScoreEmphasis.normal,
+                    // Het tijdvak staat bóven het cijfer, niet in een regel
+                    // eronder.
+                    //
+                    // De eerste versie zette de score rechtsboven naast de
+                    // dagnaam en het tijdvak drie regels lager. Je las dan
+                    // "zondag: 98" terwijl die 98 over 17:00-19:00 gaat en niet
+                    // over de zondag. Joost wees daarop: het moet duidelijk zijn
+                    // om welk tijdvak de beoordeling gaat. Nu leest de kolom als
+                    // één zin -- van 17:00 tot 19:00, score 98, Toprit.
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${_formatTime(day.best.start)}\u2013${_formatTime(day.best.end)}',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: rw.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        // Dezelfde ScoreDisplay als de ritkaarten, niet een
+                        // eigen getal met een eigen kleur ernaast. Twee
+                        // vormtalen voor hetzelfde cijfer is precies wat v4.0
+                        // wegwerkte.
+                        ScoreDisplay(
+                          score: day.best.overallScore,
+                          tier: day.best.tier,
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                _DayRail(day: day, isTop: isTop),
+                _DayRail(day: day),
                 const SizedBox(height: 8),
                 Text(
-                  '${s.blockBestWindow('${_formatTime(day.best.start)}\u2013${_formatTime(day.best.end)}')} \u00b7 ${s.blockUpToHours(day.longestRideHours)}',
+                  s.blockCanRideUpTo(day.longestRideHours),
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: rw.textSecondary),
                 ),
@@ -2442,13 +2440,9 @@ class _GreetingWithWhisperNameState extends State<_GreetingWithWhisperName>
 /// (6 tot 22 uur). Een bredere balk zou grijs tonen waar de app sowieso nooit
 /// iets aanbiedt, en dat leest als "hier viel iets te halen".
 class _DayRail extends StatelessWidget {
-  const _DayRail({required this.day, this.isTop = false});
+  const _DayRail({required this.day});
 
   final RideDay day;
-
-  /// Draagt deze dag de toprit van de week? Dan krijgt de markering een rand,
-  /// zodat het moment ook in de balk aan te wijzen is en niet alleen in de kop.
-  final bool isTop;
 
   @override
   Widget build(BuildContext context) {
@@ -2499,19 +2493,7 @@ class _DayRail extends StatelessWidget {
                           w,
                       top: 0,
                       bottom: 0,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: rw.scorePerfect,
-                          border: isTop
-                              ? Border.symmetric(
-                                  vertical: BorderSide(
-                                    color: rw.textPrimary,
-                                    width: 2,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ),
+                      child: ColoredBox(color: rw.scorePerfect),
                     ),
                   ],
                 );

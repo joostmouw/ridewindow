@@ -1900,4 +1900,9 @@ class SNl extends S {
   String blockGoodSpans(String spans) {
     return 'goed: $spans';
   }
+
+  @override
+  String blockCanRideUpTo(int hours) {
+    return 'Je kunt hier tot $hours uur weg';
+  }
 }

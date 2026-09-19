@@ -815,5 +815,7 @@
   "blockUpToHours": "tot {hours} uur mogelijk",
   "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}},
   "blockGoodSpans": "goed: {spans}",
-  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}}
+  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}},
+  "blockCanRideUpTo": "Je kunt hier tot {hours} uur weg",
+  "@blockCanRideUpTo": {"placeholders": {"hours": {"type": "int"}}}
 }

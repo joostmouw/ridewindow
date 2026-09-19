@@ -647,5 +647,7 @@
   "blockUpToHours": "up to {hours} hours",
   "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}},
   "blockGoodSpans": "good: {spans}",
-  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}}
+  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}},
+  "blockCanRideUpTo": "You can ride up to {hours} hours here",
+  "@blockCanRideUpTo": {"placeholders": {"hours": {"type": "int"}}}
 }
