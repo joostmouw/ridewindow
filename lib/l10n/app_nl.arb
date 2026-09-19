@@ -811,5 +811,11 @@
   "blockRidableSpans": "je kunt rijden: {spans}",
   "blockLongestRide": "Langste rit hier: {hours} uur",
   "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
-  "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}}
+  "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}},
+  "daylightWeightNone": "donker telt niet mee",
+  "daylightWeightLight": "donker telt licht mee",
+  "daylightWeightHalf": "donker telt half mee",
+  "daylightWeightHeavy": "donker telt zwaar mee",
+  "daylightLightShort": "licht {from}\u2013{to}",
+  "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
 }

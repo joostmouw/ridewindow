@@ -23,6 +23,20 @@ import 'package:ridewindow/theme/app_theme.dart';
 ///    (keuze van Joost, schets 011) — bij daglicht is juist de hele dag de
 ///    betekenisvolle context;
 ///  * de rit is een blok en geen streepje, want hij duurt.
+///
+/// **Het middenlabel draagt twee uitspraken, en dat is met opzet.** De andere
+/// drie balken zetten daar "jouw bereik ≤15 km/u" -- jóuw instelling, in het
+/// groen van de zone die op de balk staat. Deze balk zette er alleen een feit
+/// over de wereld ("licht van 06:32 tot 18:37"), in een oranje die elders "jij
+/// organiseert" betekent. Zelfde plek, zelfde typografie, ander soort
+/// uitspraak en een geleende kleur: Joost merkte op dat deze balk anders
+/// spreekt dan de andere drie (2026-09-19).
+///
+/// Nu staan ze er allebei, elk in de kleur van waar hij over gaat: de gouden
+/// lichtperiode uit de balk, en jouw gewicht in hetzelfde groen als de andere
+/// drie. Die twee kunnen niet tot één uitspraak worden samengevoegd, want
+/// daglicht is een *gewicht* en geen grens -- er is geen bereik waarbinnen je
+/// tevreden bent, alleen hoe zwaar donker je aanrekent.
 class DaylightBar extends StatelessWidget {
   const DaylightBar({
     super.key,
@@ -30,12 +44,17 @@ class DaylightBar extends StatelessWidget {
     required this.end,
     required this.latitude,
     required this.longitude,
+    required this.darknessWeight,
   });
 
   final DateTime start;
   final DateTime end;
   final double latitude;
   final double longitude;
+
+  /// Hoe zwaar donker meetelt in de score: 0 = niet, 1 = maximaal. Dezelfde
+  /// waarde die Profiel > Jouw grenzen > Daglicht instelt.
+  final double darknessWeight;
 
   static String _hhmm(DateTime t) =>
       '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
@@ -81,13 +100,20 @@ class DaylightBar extends StatelessWidget {
       fontFeatures: const [FontFeature.tabularFigures()],
     );
 
-    final middleLabel = sun.hasSunTimes
-        ? s.daylightLightBetween(_hhmm(sun.sunrise!), _hhmm(sun.sunset!))
+    final lightLabel = sun.hasSunTimes
+        ? s.daylightLightShort(_hhmm(sun.sunrise!), _hhmm(sun.sunset!))
         : (sun.polarDaylight ? s.daylightPolarDay : s.daylightPolarNight);
+
+    final weightLabel = switch (darknessWeight) {
+      <= 0.05 => s.daylightWeightNone,
+      < 0.4 => s.daylightWeightLight,
+      < 0.75 => s.daylightWeightHalf,
+      _ => s.daylightWeightHeavy,
+    };
 
     return Semantics(
       label: '${s.weatherDaylight} ${s.daylightMinutes(lightMinutes)}, '
-          '$verdict, $middleLabel',
+          '$verdict, $lightLabel, $weightLabel',
       excludeSemantics: true,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -171,13 +197,29 @@ class DaylightBar extends StatelessWidget {
               children: [
                 Text('00:00', style: scaleStyle),
                 Expanded(
-                  child: Text(
-                    middleLabel,
-                    textAlign: TextAlign.center,
-                    style: scaleStyle?.copyWith(
-                      color: rw.rideOrganiser,
-                      fontWeight: FontWeight.w600,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        // De gouden band uit de balk, in de kleur van die band
+                        // -- niet in `rw.rideOrganiser`, dat elders "jij
+                        // organiseert" betekent en hier niets te zoeken had.
+                        TextSpan(
+                          text: lightLabel,
+                          style: TextStyle(color: rw.daylight),
+                        ),
+                        const TextSpan(text: '  \u00b7  '),
+                        // Jouw instelling, in hetzelfde groen waarin de andere
+                        // drie balken "jouw bereik" zetten.
+                        TextSpan(
+                          text: weightLabel,
+                          style: TextStyle(color: rw.scorePerfect),
+                        ),
+                      ],
                     ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: scaleStyle?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ),
                 Text('24:00', style: scaleStyle),

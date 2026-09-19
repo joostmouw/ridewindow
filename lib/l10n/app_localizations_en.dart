@@ -1777,13 +1777,13 @@ class SEn extends S {
   String get daylightWeightOff => 'Doesn\'t matter to me';
 
   @override
-  String get daylightWeightLight => 'Counts a little';
+  String get daylightWeightLight => 'dark counts a little';
 
   @override
-  String get daylightWeightHalf => 'Counts halfway';
+  String get daylightWeightHalf => 'dark counts half';
 
   @override
-  String get daylightWeightHeavy => 'Counts heavily';
+  String get daylightWeightHeavy => 'dark counts heavily';
 
   @override
   String get daylightWeightOnly => 'Daylight only';
@@ -1883,5 +1883,13 @@ class SEn extends S {
   @override
   String blockLongestRide(int hours) {
     return 'Longest ride here: $hours hours';
+  }
+
+  @override
+  String get daylightWeightNone => 'dark doesn\'t count';
+
+  @override
+  String daylightLightShort(String from, String to) {
+    return 'light $from–$to';
   }
 }

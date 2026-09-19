@@ -3208,19 +3208,19 @@ abstract class S {
   /// No description provided for @daylightWeightLight.
   ///
   /// In nl, this message translates to:
-  /// **'Telt licht mee'**
+  /// **'donker telt licht mee'**
   String get daylightWeightLight;
 
   /// No description provided for @daylightWeightHalf.
   ///
   /// In nl, this message translates to:
-  /// **'Telt half mee'**
+  /// **'donker telt half mee'**
   String get daylightWeightHalf;
 
   /// No description provided for @daylightWeightHeavy.
   ///
   /// In nl, this message translates to:
-  /// **'Telt zwaar mee'**
+  /// **'donker telt zwaar mee'**
   String get daylightWeightHeavy;
 
   /// No description provided for @daylightWeightOnly.
@@ -3390,6 +3390,18 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Langste rit hier: {hours} uur'**
   String blockLongestRide(int hours);
+
+  /// No description provided for @daylightWeightNone.
+  ///
+  /// In nl, this message translates to:
+  /// **'donker telt niet mee'**
+  String get daylightWeightNone;
+
+  /// No description provided for @daylightLightShort.
+  ///
+  /// In nl, this message translates to:
+  /// **'licht {from}–{to}'**
+  String daylightLightShort(String from, String to);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

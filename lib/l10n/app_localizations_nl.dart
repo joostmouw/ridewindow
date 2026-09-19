@@ -1783,13 +1783,13 @@ class SNl extends S {
   String get daylightWeightOff => 'Maakt me niet uit';
 
   @override
-  String get daylightWeightLight => 'Telt licht mee';
+  String get daylightWeightLight => 'donker telt licht mee';
 
   @override
-  String get daylightWeightHalf => 'Telt half mee';
+  String get daylightWeightHalf => 'donker telt half mee';
 
   @override
-  String get daylightWeightHeavy => 'Telt zwaar mee';
+  String get daylightWeightHeavy => 'donker telt zwaar mee';
 
   @override
   String get daylightWeightOnly => 'Alleen bij daglicht';
@@ -1889,5 +1889,13 @@ class SNl extends S {
   @override
   String blockLongestRide(int hours) {
     return 'Langste rit hier: $hours uur';
+  }
+
+  @override
+  String get daylightWeightNone => 'donker telt niet mee';
+
+  @override
+  String daylightLightShort(String from, String to) {
+    return 'licht $from–$to';
   }
 }

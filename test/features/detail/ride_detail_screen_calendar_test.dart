@@ -22,6 +22,8 @@ import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -175,6 +177,31 @@ List<HourlyForecast> makeForecasts() {
   ];
 }
 
+
+/// Profiel-stub. De daglichtbalk leest sinds 2026-09-19 het daglichtgewicht uit
+/// het profiel. Zonder deze override haalt `profileProvider` de echte
+/// Drift-database op en blijft er een timer hangen tot na de test.
+class _FakeProfile extends ProfileNotifier {
+  @override
+  Future<UserProfile> build() async => const UserProfile(
+        tolerances: WeatherTolerances(
+          tempMinIdealC: 12,
+          tempMaxIdealC: 26,
+          windMaxIdealKmh: 15,
+          rainMaxIdealMm: 0.5,
+          darknessWeight: 0.5,
+        ),
+        allowedDurations: [2],
+        theme: 'system',
+        locationOverride: null,
+        userName: null,
+        locale: 'nl',
+        notifEveningBefore: false,
+        notifMorningOf: false,
+        notifWeeklyDigest: false,
+      );
+}
+
 Widget wrapInMaterial(
   Widget child, {
   List<HourlyForecast> forecasts = const [],
@@ -183,6 +210,7 @@ Widget wrapInMaterial(
   return ProviderScope(
     overrides: [
       locationProvider.overrideWith(_FakeLocation.new),
+      profileProvider.overrideWith(_FakeProfile.new),
       weatherProvider.overrideWith(() => FakeWeatherNotifier(forecasts)),
       allHourlyScoresProvider.overrideWithValue(hours),
       plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),

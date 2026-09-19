@@ -36,6 +36,7 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/data/repositories/home_view_store.dart';
 import 'package:ridewindow/domain/services/ride_block.dart';
 import 'package:ridewindow/features/shared/analytics_consent_sheet.dart';
@@ -1995,6 +1996,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             end: slot.end,
             latitude: location.lat,
             longitude: location.lon,
+            darknessWeight: ref.watch(profileProvider).value?.tolerances
+                    .darknessWeight ??
+                kDefaultDarknessWeight,
           ),
       ],
     );

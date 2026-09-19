@@ -643,5 +643,11 @@
   "blockRidableSpans": "you can ride: {spans}",
   "blockLongestRide": "Longest ride here: {hours} hours",
   "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
-  "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}}
+  "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}},
+  "daylightWeightNone": "dark doesn't count",
+  "daylightWeightLight": "dark counts a little",
+  "daylightWeightHalf": "dark counts half",
+  "daylightWeightHeavy": "dark counts heavily",
+  "daylightLightShort": "light {from}\u2013{to}",
+  "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
 }

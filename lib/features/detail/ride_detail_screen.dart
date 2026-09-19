@@ -35,8 +35,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
@@ -591,6 +593,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         end: slot.end,
         latitude: location.lat,
         longitude: location.lon,
+        darknessWeight:
+            ref.watch(profileProvider).value?.tolerances.darknessWeight ??
+                kDefaultDarknessWeight,
       ),
     );
   }
