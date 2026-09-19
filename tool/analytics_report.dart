@@ -13,15 +13,30 @@
 // Eenmalige inrichting
 // --------------------
 // De service-role sleutel staat in Supabase onder Project Settings > API.
-// Zet hem in je omgeving, niet in de repo:
+// Hij hoort NERGENS in de repo: deze sleutel omzeilt RLS volledig en mag dus
+// niet in een commit, niet in een chatlog en niet in een shell-history belanden.
 //
-//   export SUPABASE_SERVICE_ROLE_KEY='eyJ...'
+// Standaardplek, hetzelfde patroon als `tool/play_upload.dart` met zijn
+// dienstsleutel: een bestand in `~/.config/`, buiten het project, waar geen
+// `git add .` bij kan.
+//
+//   mkdir -p ~/.config/ridewindow
+//   (umask 077; cat > ~/.config/ridewindow/supabase-service-role.key)
+//   <plak de sleutel, Enter, Ctrl-D>
+//
+// `umask 077` zet de rechten op 600 vóórdat er iets in staat -- schrijven en
+// daarna chmod'en laat de sleutel een moment leesbaar achter.
+//
+// Een omgevingsvariabele werkt ook (`SUPABASE_SERVICE_ROLE_KEY`), maar die
+// komt in je shell-history terecht zodra je hem een keer met `export` op de
+// regel zet. Het bestand is de veiligere standaard.
 //
 // Gebruik
 // -------
 //   dart run tool/analytics_report.dart                # laatste 14 dagen
 //   dart run tool/analytics_report.dart --days 30
 //   dart run tool/analytics_report.dart --html rapport.html
+//   dart run tool/analytics_report.dart --key /ander/pad
 
 import 'dart:convert';
 import 'dart:io';
@@ -29,12 +44,45 @@ import 'dart:io';
 const _projectUrl = 'https://hcdrydlgqpnmumfupgcx.supabase.co';
 const _table = 'app_events';
 
+/// Waar de sleutel standaard staat. Buiten de repo, met opzet.
+String get _defaultKeyPath {
+  final home = Platform.environment['HOME'] ?? '.';
+  return '$home/.config/ridewindow/supabase-service-role.key';
+}
+
+/// Leest de sleutel uit -- eerst `--key`, dan de omgeving, dan het
+/// standaardbestand. Geeft null als hij nergens staat.
+String? _readKey(List<String> args) {
+  final fromArg = _stringArg(args, '--key');
+  final path = fromArg ?? _defaultKeyPath;
+
+  final fromEnv = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
+  if (fromArg == null && fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+
+  final file = File(path);
+  if (!file.existsSync()) return null;
+  final key = file.readAsStringSync().trim();
+  return key.isEmpty ? null : key;
+}
+
 Future<void> main(List<String> args) async {
-  final key = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
-  if (key == null || key.isEmpty) {
-    stderr.writeln('SUPABASE_SERVICE_ROLE_KEY ontbreekt.');
-    stderr.writeln('Supabase > Project Settings > API > service_role.');
-    stderr.writeln("  export SUPABASE_SERVICE_ROLE_KEY='eyJ...'");
+  final key = _readKey(args);
+  if (key == null) {
+    stderr.writeln('Geen service-role sleutel gevonden.');
+    stderr.writeln('');
+    stderr.writeln('Gezocht in:');
+    stderr.writeln('  SUPABASE_SERVICE_ROLE_KEY (omgevingsvariabele)');
+    stderr.writeln('  $_defaultKeyPath');
+    stderr.writeln('');
+    stderr.writeln('De sleutel staat in Supabase > Project Settings > API >');
+    stderr.writeln('service_role. Zo zet je hem neer zonder dat hij in je');
+    stderr.writeln('shell-history belandt:');
+    stderr.writeln('');
+    stderr.writeln('  mkdir -p ~/.config/ridewindow');
+    stderr.writeln(
+      '  (umask 077; cat > ~/.config/ridewindow/supabase-service-role.key)',
+    );
+    stderr.writeln('  <plak de sleutel, Enter, Ctrl-D>');
     exitCode = 1;
     return;
   }
