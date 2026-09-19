@@ -1800,6 +1800,29 @@ class SNl extends S {
   String get daylightPolarNight => 'de zon komt niet op';
 
   @override
+  String get daylightScoreTitle => 'Wat daglicht met dit venster doet';
+
+  @override
+  String daylightScoreSplit(int total, int light, int dark) {
+    return 'Van de $total minuten van deze rit valt $light in het licht en $dark in het donker.';
+  }
+
+  @override
+  String daylightScorePenalty(String weight, int points) {
+    return 'Jouw gevoeligheid staat op “$weight”. Dat kost dit venster $points punten.';
+  }
+
+  @override
+  String daylightScoreNone(String weight) {
+    return 'Jouw gevoeligheid staat op “$weight”, dus daglicht verandert de score van dit venster niet.';
+  }
+
+  @override
+  String daylightScoreScale(int full) {
+    return 'Bij deze stand verliest een venster dat volledig in het donker valt $full punten; bij de zwaarste stand zijn dat er 40. Een venster dat helemaal in het licht valt verliest niets.';
+  }
+
+  @override
   String get daylightInfoTitle => 'Daglicht';
 
   @override

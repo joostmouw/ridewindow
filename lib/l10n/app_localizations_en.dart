@@ -1794,6 +1794,29 @@ class SEn extends S {
   String get daylightPolarNight => 'the sun does not rise';
 
   @override
+  String get daylightScoreTitle => 'What daylight does to this window';
+
+  @override
+  String daylightScoreSplit(int total, int light, int dark) {
+    return 'Of this ride’s $total minutes, $light fall in daylight and $dark in the dark.';
+  }
+
+  @override
+  String daylightScorePenalty(String weight, int points) {
+    return 'Your sensitivity is set to “$weight”. That costs this window $points points.';
+  }
+
+  @override
+  String daylightScoreNone(String weight) {
+    return 'Your sensitivity is set to “$weight”, so daylight does not change this window’s score.';
+  }
+
+  @override
+  String daylightScoreScale(int full) {
+    return 'At this setting a window that falls entirely in the dark loses $full points; at the heaviest setting it loses 40. A window entirely in daylight loses nothing.';
+  }
+
+  @override
   String get daylightInfoTitle => 'Daylight';
 
   @override

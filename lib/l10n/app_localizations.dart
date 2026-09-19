@@ -3217,6 +3217,36 @@ abstract class S {
   /// **'de zon komt niet op'**
   String get daylightPolarNight;
 
+  /// No description provided for @daylightScoreTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wat daglicht met dit venster doet'**
+  String get daylightScoreTitle;
+
+  /// No description provided for @daylightScoreSplit.
+  ///
+  /// In nl, this message translates to:
+  /// **'Van de {total} minuten van deze rit valt {light} in het licht en {dark} in het donker.'**
+  String daylightScoreSplit(int total, int light, int dark);
+
+  /// No description provided for @daylightScorePenalty.
+  ///
+  /// In nl, this message translates to:
+  /// **'Jouw gevoeligheid staat op “{weight}”. Dat kost dit venster {points} punten.'**
+  String daylightScorePenalty(String weight, int points);
+
+  /// No description provided for @daylightScoreNone.
+  ///
+  /// In nl, this message translates to:
+  /// **'Jouw gevoeligheid staat op “{weight}”, dus daglicht verandert de score van dit venster niet.'**
+  String daylightScoreNone(String weight);
+
+  /// No description provided for @daylightScoreScale.
+  ///
+  /// In nl, this message translates to:
+  /// **'Bij deze stand verliest een venster dat volledig in het donker valt {full} punten; bij de zwaarste stand zijn dat er 40. Een venster dat helemaal in het licht valt verliest niets.'**
+  String daylightScoreScale(int full);
+
   /// No description provided for @daylightInfoTitle.
   ///
   /// In nl, this message translates to:

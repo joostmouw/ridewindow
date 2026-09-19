@@ -24,19 +24,18 @@ import 'package:ridewindow/theme/app_theme.dart';
 ///    betekenisvolle context;
 ///  * de rit is een blok en geen streepje, want hij duurt.
 ///
-/// **Het middenlabel draagt twee uitspraken, en dat is met opzet.** De andere
-/// drie balken zetten daar "jouw bereik ≤15 km/u" -- jóuw instelling, in het
-/// groen van de zone die op de balk staat. Deze balk zette er alleen een feit
-/// over de wereld ("licht van 06:32 tot 18:37"), in een oranje die elders "jij
-/// organiseert" betekent. Zelfde plek, zelfde typografie, ander soort
-/// uitspraak en een geleende kleur: Joost merkte op dat deze balk anders
-/// spreekt dan de andere drie (2026-09-19).
+/// **Waar jouw instelling staat, en waarom niet op de balk.** De andere drie
+/// balken zetten in het middenlabel "jouw bereik ≤15 km/u" -- een grens. Bij
+/// daglicht bestaat zo'n grens niet: het is een *gewicht*, en er is geen
+/// bereik waarbinnen je tevreden bent. Op 2026-09-19 stond dat gewicht er een
+/// middag lang wél ("half mee"), naast de lichtperiode. Joost: dat hoort in de
+/// uitleg, niet op de balk.
 ///
-/// Nu staan ze er allebei, elk in de kleur van waar hij over gaat: de gouden
-/// lichtperiode uit de balk, en jouw gewicht in hetzelfde groen als de andere
-/// drie. Die twee kunnen niet tot één uitspraak worden samengevoegd, want
-/// daglicht is een *gewicht* en geen grens -- er is geen bereik waarbinnen je
-/// tevreden bent, alleen hoe zwaar donker je aanrekent.
+/// Dus staat er nu één uitspraak onder de balk -- de gouden lichtperiode, in
+/// de kleur van die band -- en vertelt het infovenster wat jouw gevoeligheid
+/// met dít venster doet. Dat infovenster heeft nu ook dezelfde vorm als dat
+/// van de andere drie: dezelfde sheet, dezelfde koprij, en eronder hetzelfde
+/// tweede blok over waarom deze score deze score is.
 class DaylightBar extends StatelessWidget {
   const DaylightBar({
     super.key,
@@ -113,7 +112,7 @@ class DaylightBar extends StatelessWidget {
 
     return Semantics(
       label: '${s.weatherDaylight} ${s.daylightMinutes(lightMinutes)}, '
-          '$verdict, $lightLabel, $weightLabel',
+          '$verdict, $lightLabel',
       excludeSemantics: true,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -154,7 +153,13 @@ class DaylightBar extends StatelessWidget {
                   button: true,
                   label: s.weatherMetricInfoTooltip(s.weatherDaylight),
                   child: GestureDetector(
-                    onTap: () => _showInfo(context),
+                    onTap: () => _showInfo(
+                      context,
+                      weightLabel: weightLabel,
+                      lightMinutes: lightMinutes,
+                      totalMinutes: totalMinutes,
+                      darkFraction: dark,
+                    ),
                     behavior: HitTestBehavior.opaque,
                     child: SizedBox(
                       width: 36,
@@ -197,29 +202,18 @@ class DaylightBar extends StatelessWidget {
               children: [
                 Text('00:00', style: scaleStyle),
                 Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        // De gouden band uit de balk, in de kleur van die band
-                        // -- niet in `rw.rideOrganiser`, dat elders "jij
-                        // organiseert" betekent en hier niets te zoeken had.
-                        TextSpan(
-                          text: lightLabel,
-                          style: TextStyle(color: rw.daylight),
-                        ),
-                        const TextSpan(text: '  \u00b7  '),
-                        // Jouw instelling, in hetzelfde groen waarin de andere
-                        // drie balken "jouw bereik" zetten.
-                        TextSpan(
-                          text: weightLabel,
-                          style: TextStyle(color: rw.scorePerfect),
-                        ),
-                      ],
-                    ),
+                  // Eén uitspraak: de gouden band uit de balk, in de kleur van
+                  // die band. Jouw gevoeligheid stond hier tot 2026-09-19 ook,
+                  // en is verhuisd naar het infovenster -- zie de klassenoot.
+                  child: Text(
+                    lightLabel,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: scaleStyle?.copyWith(fontWeight: FontWeight.w600),
+                    style: scaleStyle?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: rw.daylight,
+                    ),
                   ),
                 ),
                 Text('24:00', style: scaleStyle),
@@ -231,19 +225,103 @@ class DaylightBar extends StatelessWidget {
     );
   }
 
-  void _showInfo(BuildContext context) {
+  /// Het infovenster, in dezelfde vorm als dat van de andere drie balken.
+  ///
+  /// **Dit was het echte verschil.** Tot 2026-09-19 opende deze ⓘ een
+  /// `AlertDialog` met één alinea, terwijl temperatuur, regen en wind een
+  /// bottom sheet openen met een koprij, de algemene uitleg, en daaronder een
+  /// tweede blok over waarom déze meting híér deze score kreeg. Joost zei twee
+  /// keer dat de daglicht-info anders was dan de rest; de eerste keer
+  /// repareerde ik het label onder de balk, en dat was de verkeerde helft.
+  ///
+  /// De getallen hieronder komen uit `darknessPenalty()`, dezelfde functie die
+  /// `SlotGenerator` gebruikt. Dat is geen netheid maar noodzaak -- dezelfde
+  /// reden die `weather_indicator_bar.dart` voor zijn voorbeelden geeft:
+  /// verschuift de curve, dan moet deze tekst meebewegen, anders vertelt de
+  /// app iets anders dan hij doet.
+  void _showInfo(
+    BuildContext context, {
+    required String weightLabel,
+    required int lightMinutes,
+    required int totalMinutes,
+    required double darkFraction,
+  }) {
     final s = S.of(context);
-    showDialog<void>(
+    final rw = context.rw;
+    final cs = Theme.of(context).colorScheme;
+
+    // De aftrek voor dit venster, en die voor een volledig donker venster bij
+    // dezelfde stand. Twee getallen, want één ervan geeft het andere pas maat.
+    final points = (darknessPenalty(darkFraction, weight: darknessWeight) * 100)
+        .round();
+    final fullDarkPoints =
+        (darknessPenalty(1.0, weight: darknessWeight) * 100).round();
+    final body = TextStyle(fontSize: 14, color: rw.textSecondary, height: 1.5);
+
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(s.daylightInfoTitle),
-        content: SingleChildScrollView(child: Text(s.daylightInfo)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(s.understood),
+      // Zelfde reden als bij de andere drie: een sheet zonder dit knipt zijn
+      // onderkant af zodra de vertaalde tekst niet past.
+      isScrollControlled: true,
+      builder: (ctx) => SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(AppIcons.sunHorizon, size: 20, color: rw.scorePerfect),
+                  const SizedBox(width: 8),
+                  Text(
+                    s.daylightInfoTitle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(s.daylightInfo, style: body),
+              const SizedBox(height: 20),
+              Divider(height: 1, color: cs.outlineVariant),
+              const SizedBox(height: 16),
+              Text(
+                s.daylightScoreTitle,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: rw.scorePerfect,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                s.daylightScoreSplit(
+                  totalMinutes,
+                  lightMinutes,
+                  totalMinutes - lightMinutes,
+                ),
+                style: body,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                // Nul aftrek is een andere zin, niet "kost dit venster 0
+                // punten": dat laatste leest als een meting die toevallig nul
+                // uitkwam, terwijl het een instelling is die uit staat.
+                points == 0
+                    ? s.daylightScoreNone(weightLabel)
+                    : s.daylightScorePenalty(weightLabel, points),
+                style: body,
+              ),
+              if (fullDarkPoints > 0) ...[
+                const SizedBox(height: 8),
+                Text(s.daylightScoreScale(fullDarkPoints), style: body),
+              ],
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
