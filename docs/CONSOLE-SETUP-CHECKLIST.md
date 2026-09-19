@@ -90,7 +90,7 @@ Providers page: `https://supabase.com/dashboard/project/hcdrydlgqpnmumfupgcx/aut
 
 | Item | Value | Verified |
 |---|---|---|
-| Policy live at published URL | Yes — HTTP 200, byte-identical to `docs/privacy-policy.html` | ✓ 2026-07-25 |
+| Policy live at published URL | Yes — HTTP 200, byte-identical to `docs/privacy-policy.html` | ✓ 2026-09-19, re-checked after the analytics rewrite |
 | Dutch and English sections both render | Yes — 14 `<h2>` sections per language | ✓ 2026-07-25 |
 | Deletion anchors resolve | Yes — `#verwijderen` and `#delete-account` both present | ✓ 2026-07-25 |
 | Old device-only claims removed | Yes — no surviving "data stays on your device" promise; the phrase appears only as a section heading scoping what genuinely remains local | ✓ 2026-07-25 |
