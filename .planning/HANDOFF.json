@@ -1,69 +1,61 @@
 {
-  "timestamp": "2026-09-10T21:15:00.000Z",
-  "reason": "Joost wist de context en gaat verder met /gsd-plan-phase 26",
-  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store' — fase 26 'Console op orde' is de eerstvolgende",
+  "timestamp": "2026-09-19T21:00:00.000Z",
+  "reason": "Lange werkdag afgesloten: alle vier Joosts punten af plus zes dingen die onderweg opkwamen. Context mag gewist.",
+  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store' — fase 26 'Console op orde' is voor 1 van de 4 plannen af",
   "position": {
-    "last_commit": "zie git log — handoff-commit volgt op 8149b35",
-    "last_activity": "Milestone v4.1 opgezet in GSD (7 fases, 26 requirements), 41 live in de gesloten test, winkelpagina gepubliceerd, schets 013 gekozen (A+B)"
+    "last_commit": "834bf6a",
+    "last_activity": "25 commits op 2026-09-19; flutter analyze zonder fouten of waarschuwingen, 661 tests groen"
   },
   "start_here": [
-    "/gsd-plan-phase 26 — dat is wat Joost wil als eerste commando",
-    ".planning/ROADMAP.md — fase 26 t/m 32, met succescriteria",
-    ".planning/REQUIREMENTS.md — 26 requirements (CON, WERV, FEED, EERST, WIN, PROOF)",
-    ".planning/STATE.md — blok 'Stand na 2026-09-10 avond' bovenaan"
+    ".planning/STATE.md — de tabel 'Quick Tasks Completed' bovenaan heeft de regels van vandaag",
+    ".planning/OPEN.md — losse einden, twee ervan zijn vandaag doorgestreept",
+    ".planning/ROADMAP.md — fase 26 t/m 32",
+    "De vier quick-taken van vandaag staan elk met een SUMMARY in .planning/quick/"
   ],
-  "live_on_play": {
-    "closed_testing_alpha": "41 (1.0.30) live; 42 (1.0.31) in review sinds ±23:15 — dit is de track die Google telt",
-    "internal_testing": "42 (1.0.31), live sinds 2026-09-10 23:09",
-    "store_listing": "gepubliceerd 2026-09-10: naam Ridewindow, nieuwe korte + lange omschrijving (en-GB), RW-icoon, 5 screenshots op 9:16, nieuwe feature graphic 06_banner. Alleen en-GB; nl-NL ontbreekt",
-    "testers": "2 aangemeld (Google's teller), 9 adressen in lijst 'First Testers RideWindow', geen Google Group",
-    "countries": "gesloten test alleen BE, IT, NL, UK, US",
-    "feedback_address": "leeg",
-    "managed_publishing": "uit — opslaan in de listing gaat direct naar review en live"
-  },
-  "completed_this_session": [
-    "Play Console uitgelezen en opgeruimd: build 41 naar de gesloten test, winkelpagina volledig vernieuwd en door de review",
-    "Naam wordt Ridewindow (Joosts keuze in de Console), overal doorgevoerd waar een gebruiker hem ziet (a28886f); klassenamen en toegepaste migraties bewust niet",
-    "Intro twee keer zo kort: 2,47 s (059e352), gezien en goedgekeurd door Joost",
-    "1.0.31+42 gebouwd (7f29940): ~/Desktop/ridewindow-1.0.31-42.aab, manifest-label Ridewindow",
-    "Milestone v4.1 in GSD: PROJECT.md, STATE.md, REQUIREMENTS.md, ROADMAP.md (2ec41e3, d084b2b, 03f6d46); v3.0-requirements gearchiveerd",
-    "Schets 013 'fietser bij verversen': Joost koos A+B (volgt de vinger, fietst na het laden weg) — gemeten zonder vertraging; op de backlog als #72 (nice to have)",
-    "Release-notes herschreven voor 42 (naam + kortere intro)",
-    "PWA 1.0.31+42 gedeployd en hash-geverifieerd; GitHub gepusht (c8e7e6b), Pages-privacybeleid zegt Ridewindow",
-    "42 op internal testing live (23:09) en ingestuurd voor closed testing; het concept met de mislukte upload en de foute naam \"41 (1.0.31)\" is hersteld via Add from library"
+  "afgerond_op_2026_09_19": [
+    "#67 notificaties volgen de app-taal (3a1beaf) — bleek bedrading, niet vertaling: de negen sleutels stonden al in beide ARB's",
+    "Aruba-tijdzone, richting A (351e0f4) — drie oorzaken; de app volgt nu de fietser en zegt het als hij hem kwijt is. Diagnose met bewijs: https://claude.ai/artifact/Kvof7uzvxx43EUFicVDTPX",
+    "Analytics met expliciete toestemming (66286f4, 3efcae2) — privacy-constraint in CLAUDE.md bewust herschreven",
+    "De drie notificatieschakelaars in Profiel deden niets en doen nu iets (5d4db64)",
+    "#66 afgezegde ritten zijn weer te vinden (265e282)",
+    "#63 geen doodlopende schermen meer op de iOS-webapp (99600e4), met een structuurtest als vangnet",
+    "De 'zet op beginscherm'-balk is weg te klikken (b84bd16) — D-04 uit fase 16 bewust teruggedraaid",
+    "#69/#70 blokweergave als keuze naast de vensterlijst (18507d7 t/m a360573) — vijf correctierondes van Joost, zie de SUMMARY",
+    "Daglichtbalk spreekt nu dezelfde taal als de andere drie weerbalken (d072e45)",
+    "#73 consistentie-sweep (ff47f2e, a388701) — 19 waarschuwingen naar 0, elke radius benoemd"
   ],
   "blockers": [],
-  "remaining_before_phase_26_planning": [
+  "wacht_op_joost": [
     {
-      "task": "Review van 42 op closed afwachten",
-      "description": "Publishing overview toont 42 (1.0.31) in review voor Closed testing - Alpha. Na goedkeuring: controleren dat de bundel op Active staat en de gesloten test 42 serveert.",
-      "owner": "Google, dan Claude controleert"
-    },
-    {
-      "task": "Oppo terug naar een Play-installatie",
-      "description": "Op de Oppo staat sinds 22:50 een sideload 1.0.31 (42), over 31 heen geïnstalleerd met behoud van data (Joost wilde hem eerst als APK zien), plus een record in kloonprofiel user 10. Deïnstalleren (adb uninstall + adb shell pm uninstall --user 10 ridewindow.joost.amsterdam) wist lokale data; ingelogd komt profiel/week/ritten terug uit de cloud. Vraag Joost eerst om akkoord. Daarna 42 via de internal-link installeren en de korte intro bij de eerste start zien.",
+      "task": "Migratie 0008 draaien op Supabase",
+      "description": "supabase/migrations/0008_app_events.sql. Zonder deze tabel schrijft analytics niets weg -- rijen blijven in de lokale outbox staan, waar ze niets stukmaken maar ook niets opleveren. De hele keten toestemming -> outbox -> drain -> Postgres is per schakel getest maar nooit in zijn geheel gelopen.",
       "owner": "Claude, na akkoord"
     },
     {
-      "task": "Android developer verification",
-      "description": "Console-melding: registreren vóór 30 sept 2026. Handhaving eerst alleen in Brazilië, Indonesië, Singapore, Thailand; wereldwijd 2027. Play-apps zijn meestal automatisch geregistreerd; het menu-item heeft een stipje — controleren. Relevant omdat de gesloten test voor alle landen opengaat. Hoort in fase 26.",
-      "owner": "Joost kijkt, of fase 26"
+      "task": "SUPABASE_SERVICE_ROLE_KEY in de omgeving",
+      "description": "Project Settings > API > service_role. Nodig voor tool/analytics_report.dart; die leest buiten de app om, want app_events heeft met opzet geen select-grant.",
+      "owner": "Joost"
+    },
+    {
+      "task": "Privacybeleid en Data Safety bijwerken voor analytics",
+      "description": "Een alinea over anonieme statistiek na toestemming, en in de Play Console 'App activity > App interactions', optioneel, niet gedeeld met derden. Teksten kan Claude schrijven, indienen doet Joost.",
+      "owner": "Joost"
+    },
+    {
+      "task": "De Oppo aansluiten voor de verificatielijst",
+      "description": "Niets van vandaag is op glas gezien. Na te lopen: de locatiebanner in beide helderheden, de toestemmingsvraag bij de tweede start, een melding die echt afgaat in de goede taal en op de goede tijd, het filter 'Afgezegd' met de knop 'Toch meegaan' (vraagt twee ingelogde accounts), en de nieuwe keuzerij op Home. De install-balk kan alleen op een echte iPhone in Safari.",
+      "owner": "Joost sluit aan, Claude loopt na"
     }
   ],
-  "decisions_this_session": [
-    "Merknaam Ridewindow (kleine w) — Joost",
-    "Elke build eerst via internal testing (door Play ondertekend, zelf getest), dan promoten naar closed — CON-01",
-    "Eigen kring (6) stapt direct in; kanalen met onbekenden pas na build 43 met de eerste-minuut-fixes",
-    "Wervingsonderzoek is een eigen fase (27), niet ad hoc — Joost",
-    "Feedback wordt een gestructureerde stroom met beoordelingsronde naar de backlog (fase 28) — Joost",
-    "Schets 013: stand A+B, zonder vertraging — daarna door Joost als nice to have naar de backlog (#72), niet in v4.1",
-    "AI-asset-label in de Console: niet labelen — Joost"
+  "openstaand_werk": [
+    "Fase 26 plannen 02, 03 en 04 — release-route via internal, landen open, feedbackadres, Google Group, nl-NL winkelpagina",
+    "#70 is maar half af: de dagbalk toont nu alle vensters van een dag met hun tint, dus het alternatief is zichtbaar. De score van het weggegooide venster nog niet, en dat was Ingrids letterlijke vraag",
+    "#74 (nieuw vandaag) meldingen laten werken zonder dat de app geopend wordt. De achtergrondtaak heeft geen tz.initializeTimeZones() en geen tijdzone van het toestel; daar plannen zou tz.local op UTC laten staan. Niet op te lossen zonder toestel",
+    "Stand 2 van de schets was oorspronkelijk groter bedoeld; Joost koos bewust voor een knop tussen twee weergaven in plaats van één model"
   ],
   "notes": [
-    "Onderzoek dat al gedaan is (input voor fase 27/32): sinds april 2026 wijst Google aanvragen af op gebrek aan tester-gebruik; een afhaker die het aantal onder 12 brengt pauzeert/reset de klok; de aanvraag stelt ~9 vragen, 250+ tekens per antwoord, 2–3 updates tijdens de 14 dagen helpen. LinkedIn-vacature 'vrijwillige tester' leverde bij Rocket Form 220 aanmeldingen (indiehackers.com).",
-    "Play-screenshots moeten binnen 2:1 blijven: de Oppo-screenshots (1272×2772) zijn op 1560×2772 gezet met een brandLight-rand; die staan in ~/Desktop/ridewindow-store/upload-naar-play/.",
-    "De bundel 41 in de gesloten test heeft nog de oude naam RideWindow onder het icoon; 42 lost dat op.",
-    "Webservers: 8765 (repo-root: schetsen en .planning/testers/*.html) en 8766 (build/web, versie 1.0.31+42). Intro zien: nieuw incognitovenster op localhost:8766.",
-    "Suite: alles groen behalve de bekende klokafhankelijke notificatietest na 19:00 UTC."
+    "Webserver draait op 8766 met de laatste build (build/web). Na elke flutter build web is een harde herlaad nodig (Cmd+Shift+R), anders serveert de browsercache de oude bundel.",
+    "Remote Control stond aan op de sessie van vandaag; opnieuw aanzetten kan met /remote-control of /rc.",
+    "De les uit de vijf correctierondes op de blokweergave staat in .planning/quick/260919-h2c-blokweergave/SUMMARY.md: een ordinale schaal teken je als schaal, niet als palet. Kaartkleuren en balkkleuren zijn niet hetzelfde probleem."
   ]
 }
