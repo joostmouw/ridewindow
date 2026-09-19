@@ -201,8 +201,11 @@ uur werk, zinvol pas als Peloton in een Play-build zit.
   en waarom elk er staat. Het waren er zes, niet vijf: naast de vier `rpc()`-functies
   (`migrate_account_data`, `delete_own_account`, `friend_profiles`, `redeem_friend_invite`) telt ook
   de RLS-helper `is_ride_member` mee én de trigger-functie `set_updated_at` uit `0001`.
-- **Privacybeleid**: een maatje ziet nu je naam en de ritten waarvoor je uitgenodigd bent. Dat staat
-  nog niet in het gepubliceerde beleid.
+- ~~**Privacybeleid**: een maatje ziet nu je naam en de ritten waarvoor je uitgenodigd bent.~~
+  **Opgelost 2026-09-19**: de sectie "Wat een maatje van je ziet" staat in beide talen in
+  `docs/privacy-policy.html` en is gepubliceerd. Nagelopen tegen de tabellen uit `0002` en tegen
+  `friend_profiles()`, die alleen `user_id` en `user_name` teruggeeft -- beschikbaarheid en
+  toleranties blijven van jou.
 - Namen worden gedenormaliseerd gekopieerd bij accepteren; wie later zijn naam wijzigt, blijft bij
   bestaande uitnodigingen onder de oude naam staan. Bewust, maar het wordt zichtbaar zodra iemand
   het opmerkt.

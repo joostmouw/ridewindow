@@ -311,17 +311,20 @@ op iets nieuws — de kandidaten zijn gewoon de best scorende slots.
 
 ### Volgorde
 
-**Slice 0 — eerst dichten wat kapot is.** Geen van het onderstaande heeft zin zolang deze twee open
-staan; beide zijn op 2026-09-07 op een toestel vastgesteld en staan uitgewerkt in
-`.planning/PELOTON.md`:
+**Slice 0 — eerst dichten wat kapot is.** ✅ **Afgerond op 2026-09-07**, nog dezelfde dag als deze
+tekst is opgeschreven. Beide staan uitgewerkt in `.planning/PELOTON.md`; deze lijst bleef tot
+2026-09-19 staan alsof er niets was gebeurd, en dat was misleidend voor wie de volgorde las.
 
-- Een **geaccepteerde rit is bij de genodigde nergens zichtbaar** — niet in "My rides", niet op
-  Home, niet op de Peloton-tab. De belofte "de rit verschijnt bij de ander" is daarmee nog niet
-  waar. Dit is het echte gat.
-- **Profielzichtbaarheid klopt niet**: B ziet A in zijn maatjeslijst, A ziet B niet. Oorzaak nog
-  onbekend, kandidaten en de beslissende query staan in `PELOTON.md`. Wie onzichtbaar is in een
-  maatjeslijst, is ook onvindbaar via gebruikersnaam of contacten — dit is de fundering onder
-  slice 5.
+- ~~Een **geaccepteerde rit is bij de genodigde nergens zichtbaar**~~ — opgelost (`3ff18ed`):
+  `joinedGroupRides` als derde categorie, zichtbaar op de Peloton-tab én op Home onder PLANNED.
+  **Op een toestel bevestigd 2026-09-07 09:49.**
+- ~~**Profielzichtbaarheid klopt niet**~~ — symptoom opgelost (`ef391bf`): `_ensureCloudProfileRow()`
+  draait na elke sign-in en herstelt bestaande accounts bij hun eerstvolgende login. **Wélke stap in
+  `onSignIn` faalde is nooit gevonden**, maar een stille mislukking komt niet meer als "Synced" weg.
+  Openstaand: opnieuw inloggen als `joost.oppo` en controleren dat hij in de maatjeslijst verschijnt.
+
+Wat daarmee overblijft vóór slice 1: die ene verificatie, en het privacybeleid dat sinds
+2026-09-19 vertelt wat een maatje van je ziet.
 
 **Slice 1 — meekijken zonder account** (Partiful). Vandaag moet je maatje eerst een account maken
 voordat hij weet waarvoor hij wordt uitgenodigd. Dit draait dat om: `/invite/:code` toont de rit
