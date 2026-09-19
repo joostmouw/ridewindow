@@ -7,11 +7,13 @@
 // flutter_local_notifications 21.x: initialize en zonedSchedule zijn volledig
 // named-parameters — override signatures moeten exact overeenkomen.
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 
 // ---------------------------------------------------------------------------
@@ -20,8 +22,15 @@ import 'package:ridewindow/platform/notification_service.dart';
 
 class FakeFlutterLocalNotificationsPlugin extends Fake
     implements FlutterLocalNotificationsPlugin {
-  /// Sla geplande zonedSchedule-aanroepen op: (id, scheduledDate).
-  final List<({int id, tz.TZDateTime scheduledDate})> zonedScheduleCalls = [];
+  /// Sla geplande zonedSchedule-aanroepen op: (id, scheduledDate, title, body).
+  /// Titel en body zijn nodig sinds #67 -- de taal van de melding is testbaar.
+  final List<
+      ({
+        int id,
+        tz.TZDateTime scheduledDate,
+        String? title,
+        String? body,
+      })> zonedScheduleCalls = [];
 
   @override
   Future<bool?> initialize({
@@ -43,7 +52,9 @@ class FakeFlutterLocalNotificationsPlugin extends Fake
     String? payload,
     DateTimeComponents? matchDateTimeComponents,
   }) async {
-    zonedScheduleCalls.add((id: id, scheduledDate: scheduledDate));
+    zonedScheduleCalls.add(
+      (id: id, scheduledDate: scheduledDate, title: title, body: body),
+    );
   }
 
   @override
@@ -57,8 +68,15 @@ class FakeFlutterLocalNotificationsPlugin extends Fake
 void main() {
   late FakeFlutterLocalNotificationsPlugin fakePlugin;
   late NotificationService service;
+  late S nl;
+  late S en;
 
-  setUpAll(() {
+  setUpAll(() async {
+    // S zonder BuildContext -- dezelfde route die main.dart gebruikt bij een
+    // taalwissel. Bevestigt dat die route werkt.
+    WidgetsFlutterBinding.ensureInitialized();
+    nl = await S.delegate.load(const Locale('nl'));
+    en = await S.delegate.load(const Locale('en'));
     tz_data.initializeTimeZones();
     // Gebruik UTC als locale voor tests — tijdberekeningen zijn relatief (morgen/gisteren)
     // en hangen niet af van de specifieke tijdzone.
@@ -80,6 +98,7 @@ void main() {
         slotDay: slotDay,
         slotTitle: 'Test slot',
         exact: false,
+        strings: nl,
       );
 
       expect(fakePlugin.zonedScheduleCalls, hasLength(1));
@@ -102,6 +121,7 @@ void main() {
         slotDay: slotDay,
         slotTitle: 'Test slot',
         exact: false,
+        strings: nl,
       );
 
       // zonedSchedule mag NIET aangeroepen zijn
@@ -120,6 +140,7 @@ void main() {
         slotStart: slotStart,
         slotTitle: 'Test slot',
         exact: false,
+        strings: nl,
       );
 
       expect(fakePlugin.zonedScheduleCalls, hasLength(1));
@@ -139,6 +160,7 @@ void main() {
       await service.scheduleWeeklyDigest(
         bodySummary: 'Beste rijmomenten van de week',
         exact: false,
+        strings: nl,
       );
 
       expect(fakePlugin.zonedScheduleCalls, hasLength(1));
@@ -153,6 +175,73 @@ void main() {
         isTrue,
         reason: 'Digest moet in de toekomst gepland zijn',
       );
+    });
+  });
+
+  // #67 -- de meldingteksten kwamen uit een tweede, Nederlandse kopie naast de
+  // ARB-bestanden. Deze groep is het vangnet dat die kopie niet terugkomt.
+  group('taal van de melding', () {
+    test('avond van tevoren volgt de taal van de app', () async {
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final slotDay = DateTime(tomorrow.year, tomorrow.month, tomorrow.day);
+
+      await service.scheduleEveningBefore(
+        slotDay: slotDay,
+        slotTitle: '09:00-11:00',
+        exact: false,
+        strings: en,
+      );
+
+      final call = fakePlugin.zonedScheduleCalls.single;
+      expect(call.title, en.notifEveningTitle);
+      expect(call.body, en.notifEveningBody('09:00-11:00'));
+      expect(call.title, isNot(nl.notifEveningTitle));
+      expect(call.body, contains('09:00-11:00'));
+    });
+
+    test('ochtend van de dag volgt de taal van de app', () async {
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final slotStart =
+          DateTime.utc(tomorrow.year, tomorrow.month, tomorrow.day, 10, 0);
+
+      await service.scheduleMorningOf(
+        slotStart: slotStart,
+        slotTitle: '10:00-12:00',
+        exact: false,
+        strings: en,
+      );
+
+      final call = fakePlugin.zonedScheduleCalls.single;
+      expect(call.title, en.notifMorningTitle);
+      expect(call.body, en.notifMorningBody('10:00-12:00'));
+      expect(call.title, isNot(nl.notifMorningTitle));
+    });
+
+    test('weekoverzicht volgt de taal van de app', () async {
+      await service.scheduleWeeklyDigest(
+        bodySummary: 'samenvatting',
+        exact: false,
+        strings: en,
+      );
+
+      final call = fakePlugin.zonedScheduleCalls.single;
+      expect(call.title, en.notifWeeklyTitle);
+      expect(call.title, isNot(nl.notifWeeklyTitle));
+    });
+
+    test('NL levert de Nederlandse ARB-tekst, niet een hardgecodeerde kopie',
+        () async {
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final slotDay = DateTime(tomorrow.year, tomorrow.month, tomorrow.day);
+
+      await service.scheduleEveningBefore(
+        slotDay: slotDay,
+        slotTitle: '07:00-09:00',
+        exact: false,
+        strings: nl,
+      );
+
+      expect(fakePlugin.zonedScheduleCalls.single.title, nl.notifEveningTitle);
     });
   });
 }

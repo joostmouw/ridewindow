@@ -1,51 +1,84 @@
 // lib/platform/notification_service.dart
 // NotificationService: centraliseert alle notificatie-logica voor Ridewindow.
 // Geen @riverpod — plain klasse, injecteerbaar voor tests.
+//
+// Alle gebruikerszichtbare tekst komt uit `S` (backlog #67). De service heeft
+// geen BuildContext, dus de aanroeper levert de geladen `S` aan: vanuit een
+// scherm met `S.of(context)`, vanuit main.dart met `S.delegate.load(locale)`.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
+
+import 'package:ridewindow/l10n/app_localizations.dart';
 
 /// Unieke notificatie-ID's per notificatietype.
 const int kNotifIdEveningBefore = 1001;
 const int kNotifIdMorningOf = 1002;
 const int kNotifIdWeeklyDigest = 1003;
 
+/// Kanaal-id's. De id is de identiteit van het kanaal en ligt vast; naam en
+/// omschrijving zijn vertaalbaar en worden bijgewerkt in [ensureChannels].
+const String kChannelRideAlerts = 'ride_alerts';
+const String kChannelWeeklyDigest = 'weekly_digest';
+
 /// Gecentraliseerde notification-service voor Ridewindow.
 /// Beheert kanaal-registratie, permissies en drie notificatie-schedulers.
 class NotificationService {
-  static const _channelRideAlerts = AndroidNotificationChannel(
-    'ride_alerts',
-    'Fietsmeldingen',
-    description: 'Avond-van-tevoren en ochtend-van-de-dag fietsmeldingen',
-    importance: Importance.high,
-  );
-
-  static const _channelWeeklyDigest = AndroidNotificationChannel(
-    'weekly_digest',
-    'Wekelijks overzicht',
-    description: 'Zondagavond overzicht van de beste fietsmomenten',
-    importance: Importance.defaultImportance,
-  );
-
   final FlutterLocalNotificationsPlugin _plugin;
+
+  bool _pluginInitialized = false;
 
   NotificationService({FlutterLocalNotificationsPlugin? plugin})
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
-  /// Initialiseer plugin + maak beide kanalen aan.
-  /// Aanroepen in main() na tz.initializeTimeZones().
-  Future<void> init() async {
-    const initSettings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-    );
-    await _plugin.initialize(settings: initSettings);
+  AndroidFlutterLocalNotificationsPlugin? get _androidPlugin =>
+      _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
 
-    final androidPlugin = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    await androidPlugin?.createNotificationChannel(_channelRideAlerts);
-    await androidPlugin?.createNotificationChannel(_channelWeeklyDigest);
+  /// Initialiseer plugin + zet beide kanalen in de taal van [strings].
+  /// Idempotent: aanroepen bij elke taalwissel is veilig en bedoeld.
+  Future<void> init({required S strings}) async {
+    if (kIsWeb) return;
+
+    if (!_pluginInitialized) {
+      const initSettings = InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      );
+      await _plugin.initialize(settings: initSettings);
+      _pluginInitialized = true;
+    }
+
+    await ensureChannels(strings);
+  }
+
+  /// Maak beide kanalen aan, of werk naam en omschrijving bij als ze al bestaan.
+  ///
+  /// Bewust bijwerken en niet verwijderen-en-opnieuw-aanmaken: Android werkt bij
+  /// een bestaande kanaal-id alleen naam en omschrijving bij en laat de keuzes
+  /// van de gebruiker (geluid, trilling, belang) staan. Een delete zou die
+  /// wissen — een taalwissel mag geen instellingen kosten.
+  Future<void> ensureChannels(S strings) async {
+    final androidPlugin = _androidPlugin;
+    if (androidPlugin == null) return;
+
+    await androidPlugin.createNotificationChannel(
+      AndroidNotificationChannel(
+        kChannelRideAlerts,
+        strings.notifChannelRideAlerts,
+        description: strings.notifChannelRideAlertsDesc,
+        importance: Importance.high,
+      ),
+    );
+    await androidPlugin.createNotificationChannel(
+      AndroidNotificationChannel(
+        kChannelWeeklyDigest,
+        strings.notifChannelWeeklyDigest,
+        description: strings.notifChannelWeeklyDigestDesc,
+        importance: Importance.defaultImportance,
+      ),
+    );
   }
 
   /// Vraag POST_NOTIFICATIONS-permissie op (Android 13+).
@@ -57,20 +90,14 @@ class NotificationService {
 
   /// Controleer of exacte alarmen mogelijk zijn (Android 12+).
   Future<bool> canScheduleExact() async {
-    final androidPlugin = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-    return await androidPlugin?.canScheduleExactNotifications() ?? false;
+    return await _androidPlugin?.canScheduleExactNotifications() ?? false;
   }
 
   /// Deep-link naar systeeminstellingen voor exacte alarmen (Android 12+).
   /// Valt terug op openAppSettings() als requestExactAlarmsPermission faalt.
   Future<void> openExactAlarmSettings() async {
-    final androidPlugin = _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
     try {
-      await androidPlugin?.requestExactAlarmsPermission();
+      await _androidPlugin?.requestExactAlarmsPermission();
     } catch (_) {
       await openAppSettings();
     }
@@ -82,6 +109,7 @@ class NotificationService {
     required DateTime slotDay,
     required String slotTitle,
     required bool exact,
+    required S strings,
   }) async {
     final scheduledDate = tz.TZDateTime(
       tz.local,
@@ -94,25 +122,13 @@ class NotificationService {
 
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
-    final mode = exact
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
-
     await _plugin.zonedSchedule(
       id: kNotifIdEveningBefore,
-      title: 'Morgen ligt er een fietsmoment klaar',
-      body: '$slotTitle — zet je fiets alvast klaar',
+      title: strings.notifEveningTitle,
+      body: strings.notifEveningBody(slotTitle),
       scheduledDate: scheduledDate,
-      notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelRideAlerts.id,
-          _channelRideAlerts.name,
-          channelDescription: _channelRideAlerts.description,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-      ),
-      androidScheduleMode: mode,
+      notificationDetails: _rideAlertDetails(strings),
+      androidScheduleMode: _mode(exact),
     );
   }
 
@@ -122,6 +138,7 @@ class NotificationService {
     required DateTime slotStart,
     required String slotTitle,
     required bool exact,
+    required S strings,
   }) async {
     final scheduledDate = tz.TZDateTime.from(
       slotStart.subtract(const Duration(hours: 2)),
@@ -130,25 +147,13 @@ class NotificationService {
 
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
-    final mode = exact
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
-
     await _plugin.zonedSchedule(
       id: kNotifIdMorningOf,
-      title: 'Over 2 uur stap je op',
-      body: '$slotTitle — maak je klaar om te rijden',
+      title: strings.notifMorningTitle,
+      body: strings.notifMorningBody(slotTitle),
       scheduledDate: scheduledDate,
-      notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelRideAlerts.id,
-          _channelRideAlerts.name,
-          channelDescription: _channelRideAlerts.description,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-      ),
-      androidScheduleMode: mode,
+      notificationDetails: _rideAlertDetails(strings),
+      androidScheduleMode: _mode(exact),
     );
   }
 
@@ -156,6 +161,7 @@ class NotificationService {
   Future<void> scheduleWeeklyDigest({
     required String bodySummary,
     required bool exact,
+    required S strings,
   }) async {
     final now = tz.TZDateTime.now(tz.local);
     final daysUntilSunday = (DateTime.sunday - now.weekday + 7) % 7;
@@ -168,27 +174,37 @@ class NotificationService {
       0,
     );
 
-    final mode = exact
-        ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.inexact;
-
     await _plugin.zonedSchedule(
       id: kNotifIdWeeklyDigest,
-      title: 'De beste fietsmomenten van je week',
+      title: strings.notifWeeklyTitle,
       body: bodySummary,
       scheduledDate: nextSunday,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          _channelWeeklyDigest.id,
-          _channelWeeklyDigest.name,
-          channelDescription: _channelWeeklyDigest.description,
+          kChannelWeeklyDigest,
+          strings.notifChannelWeeklyDigest,
+          channelDescription: strings.notifChannelWeeklyDigestDesc,
           importance: Importance.defaultImportance,
         ),
       ),
-      androidScheduleMode: mode,
+      androidScheduleMode: _mode(exact),
     );
   }
 
   /// Annuleer alle geplande notificaties (bijv. bij toggle uitzetten).
   Future<void> cancelAll() async => _plugin.cancelAll();
+
+  AndroidScheduleMode _mode(bool exact) => exact
+      ? AndroidScheduleMode.exactAllowWhileIdle
+      : AndroidScheduleMode.inexact;
+
+  NotificationDetails _rideAlertDetails(S strings) => NotificationDetails(
+        android: AndroidNotificationDetails(
+          kChannelRideAlerts,
+          strings.notifChannelRideAlerts,
+          channelDescription: strings.notifChannelRideAlertsDesc,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      );
 }

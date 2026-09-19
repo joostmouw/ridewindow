@@ -22,6 +22,7 @@ import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
+import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/locale_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
@@ -104,6 +105,19 @@ class RideWindowApp extends ConsumerWidget {
         }
       }
     });
+
+    // De Android-notificatiekanalen dragen hun naam in de taal van de app (#67).
+    // Het kanaal zelf ontstaat bij de eerste melding, met de vertaalde naam die
+    // meegaat in AndroidNotificationDetails -- daar is niets voor nodig. Android
+    // bevriest die naam echter bij aanmaak, dus een latere taalwissel moet hem
+    // bijwerken. Dat is wat deze listener doet. Het is ook het enige punt waar de
+    // taal bekend is zonder BuildContext, vandaar S.delegate.load().
+    if (!kIsWeb) {
+      ref.listen<Locale>(appLocaleProvider, (previous, next) async {
+        if (previous == next) return;
+        await NotificationService().init(strings: await S.delegate.load(next));
+      });
+    }
 
     final router = ref.watch(routerProvider);
     final locale = ref.watch(appLocaleProvider);

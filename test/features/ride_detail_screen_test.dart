@@ -49,6 +49,7 @@ class FakeNotificationService extends NotificationService {
     required DateTime slotDay,
     required String slotTitle,
     required bool exact,
+    required S strings,
   }) async {}
 }
 

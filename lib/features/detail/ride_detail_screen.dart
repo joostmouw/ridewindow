@@ -1123,6 +1123,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           FilledButton.tonalIcon(
             onPressed: () async {
               final notifService = widget.notificationServiceFactory();
+              // Pak S vóór de eerste await -- daarna is context gebruiken
+              // een lint-overtreding (use_build_context_synchronously).
+              final strings = S.of(context);
               final canExact = await notifService.canScheduleExact();
               final slotTitle =
                   '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
@@ -1130,6 +1133,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 slotDay: widget.slot.start,
                 slotTitle: slotTitle,
                 exact: canExact,
+                strings: strings,
               );
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
