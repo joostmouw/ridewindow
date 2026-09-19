@@ -62,6 +62,24 @@ class FakeFlutterLocalNotificationsPlugin extends Fake
 }
 
 // ---------------------------------------------------------------------------
+// Een slotdag die ver genoeg weg ligt
+// ---------------------------------------------------------------------------
+
+/// Geeft middernacht op de dag `days` verderop.
+///
+/// **Waarom niet gewoon morgen.** Dat stond hier tot 2026-09-19, en daardoor
+/// viel de suite elke avond om -- "de avond ervoor" van *morgen* is 19:00
+/// vandaag, en `scheduleEveningBefore` slaat een tijd in het verleden over. Wie
+/// na 19:00 UTC testte kreeg drie rode tests zonder dat er iets veranderd was,
+/// en moest elke keer opnieuw vaststellen dat het geen regressie was.
+///
+/// Twee dagen vooruit is altijd toekomst, hoe laat je ook draait.
+DateTime _slotDayAhead([int days = 2]) {
+  final d = DateTime.now().add(Duration(days: days));
+  return DateTime(d.year, d.month, d.day);
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -90,9 +108,7 @@ void main() {
 
   group('scheduleEveningBefore', () {
     test('tijdberekening: 19:00 de dag voor slotDay', () async {
-      // slotDay = morgen
-      final tomorrow = DateTime.now().add(const Duration(days: 1));
-      final slotDay = DateTime(tomorrow.year, tomorrow.month, tomorrow.day);
+      final slotDay = _slotDayAhead();
 
       await service.scheduleEveningBefore(
         slotDay: slotDay,
@@ -104,10 +120,20 @@ void main() {
       expect(fakePlugin.zonedScheduleCalls, hasLength(1));
       final scheduled = fakePlugin.zonedScheduleCalls.first.scheduledDate;
 
-      // De geplande datum moet de dag VOOR slotDay zijn (slotDay.day - 1), om 19:00
-      expect(scheduled.year, slotDay.year);
-      expect(scheduled.month, slotDay.month);
-      expect(scheduled.day, slotDay.day - 1);
+      // De geplande datum moet de dag VOOR slotDay zijn, om 19:00. Uitgerekend
+      // met dezelfde datumrekenkunde als de service, want `slotDay.day - 1`
+      // met de hand vergelijken breekt op de eerste van de maand: dag 0 is
+      // geen dag, en `DateTime` rolt hem terug naar de laatste van de vorige.
+      final expected = tz.TZDateTime(
+        tz.local,
+        slotDay.year,
+        slotDay.month,
+        slotDay.day - 1,
+        19,
+      );
+      expect(scheduled.year, expected.year);
+      expect(scheduled.month, expected.month);
+      expect(scheduled.day, expected.day);
       expect(scheduled.hour, 19);
       expect(scheduled.minute, 0);
     });
@@ -182,8 +208,7 @@ void main() {
   // ARB-bestanden. Deze groep is het vangnet dat die kopie niet terugkomt.
   group('taal van de melding', () {
     test('avond van tevoren volgt de taal van de app', () async {
-      final tomorrow = DateTime.now().add(const Duration(days: 1));
-      final slotDay = DateTime(tomorrow.year, tomorrow.month, tomorrow.day);
+      final slotDay = _slotDayAhead();
 
       await service.scheduleEveningBefore(
         slotDay: slotDay,
@@ -231,8 +256,7 @@ void main() {
 
     test('NL levert de Nederlandse ARB-tekst, niet een hardgecodeerde kopie',
         () async {
-      final tomorrow = DateTime.now().add(const Duration(days: 1));
-      final slotDay = DateTime(tomorrow.year, tomorrow.month, tomorrow.day);
+      final slotDay = _slotDayAhead();
 
       await service.scheduleEveningBefore(
         slotDay: slotDay,
