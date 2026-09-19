@@ -18,7 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/core/cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -83,7 +83,7 @@ UserProfile baseProfile({String? locationOverride}) => UserProfile(
       notifWeeklyDigest: false,
     );
 
-const _defaultLocation = LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam');
+const _defaultLocation = LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam', source: LocationSource.override);
 
 Future<void> _pumpProfileScreen(
   WidgetTester tester, {
@@ -282,6 +282,6 @@ void main() {
     await tester.tap(find.text(s.tapToChooseCity, skipOffstage: false).first);
     await tester.pumpAndSettle();
 
-    expect(find.text(kNlCities.first.name, skipOffstage: false), findsOneWidget);
+    expect(find.text(kCities.first.name, skipOffstage: false), findsOneWidget);
   });
 }

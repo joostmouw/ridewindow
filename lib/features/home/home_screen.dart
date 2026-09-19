@@ -287,6 +287,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     child: _buildStaleBanner(context, lastRefreshedAsync.value),
                   ),
 
+                // ── Locatie-waarschuwing ──
+                // De app viel tot 2026-09-19 stilzwijgend terug op Amsterdam.
+                // Een tester in Aruba kreeg daardoor de Amsterdamse zon op zijn
+                // eigen klok te zien en las "licht van 01:32 tot 13:29". Zwijgen
+                // is hier het gebrek, niet de terugval zelf.
+                if (locationAsync.value?.needsWarning ?? false)
+                  SliverToBoxAdapter(
+                    child: _buildLocationBanner(context, locationAsync.value!),
+                  ),
+
                 // ── Week strip ──
                 SliverToBoxAdapter(
                   child: KeyedSubtree(
@@ -1133,6 +1143,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: cs.onErrorContainer,
                   ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Zegt hardop dat de getoonde plek niet de gemeten plek is -- of dat de
+  /// klok van dit toestel bij een heel ander werelddeel hoort dan die plek.
+  Widget _buildLocationBanner(BuildContext context, LocationData location) {
+    final cs = Theme.of(context).colorScheme;
+    final s = S.of(context);
+    final isGuess = location.isGuess;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+      decoration: BoxDecoration(
+        color: cs.tertiaryContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isGuess ? AppIcons.mapPin : AppIcons.hourglass,
+            color: cs.onTertiaryContainer,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isGuess ? s.locationGuessTitle : s.locationClockTitle,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: cs.onTertiaryContainer,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isGuess
+                      ? s.locationGuessBody(location.city)
+                      : s.locationClockBody(location.city),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onTertiaryContainer,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => context.push('/profile'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: cs.onTertiaryContainer,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: const Size(0, 36),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(s.locationFixAction),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

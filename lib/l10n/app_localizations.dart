@@ -3240,6 +3240,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Donker telt niet mee in je scores.'**
   String get daylightWeightDescNone;
+
+  /// No description provided for @locationGuessTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'We weten niet waar je bent'**
+  String get locationGuessTitle;
+
+  /// No description provided for @locationGuessBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je ziet het weer voor {city}. Zet locatie aan of kies zelf je stad.'**
+  String locationGuessBody(String city);
+
+  /// No description provided for @locationClockTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je klok en je plek lopen uiteen'**
+  String get locationClockTitle;
+
+  /// No description provided for @locationClockBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit toestel staat in een andere tijdzone dan {city}. De tijden hieronder zijn die van je toestel.'**
+  String locationClockBody(String city);
+
+  /// No description provided for @locationFixAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kies je stad'**
+  String get locationFixAction;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -47,7 +47,7 @@ class FakeLocationLoading extends LocationNotifier {
   @override
   Future<LocationData> build() async {
     await Completer<void>().future; // hangt oneindig
-    return const LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam');
+    return const LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam', source: LocationSource.override);
   }
 }
 
@@ -143,7 +143,7 @@ void main() {
         overrides: [
           locationProvider.overrideWith(
             () => FakeLocationNotifier(
-              const LocationData(lat: 51.92, lon: 4.48, city: 'Rotterdam'),
+              const LocationData(lat: 51.92, lon: 4.48, city: 'Rotterdam', source: LocationSource.override),
             ),
           ),
           weatherProvider.overrideWith(() => FakeWeatherNotifier()),

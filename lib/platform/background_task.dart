@@ -8,7 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/core/config.dart';
-import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/core/cities.dart';
+import 'package:ridewindow/data/repositories/last_known_location_store.dart';
 import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/data/remote/open_meteo_client.dart';
 import 'package:ridewindow/data/repositories/availability_repository.dart';
@@ -61,19 +62,15 @@ Future<void> _runWeatherRefresh() async {
     final profileRepo = ProfileRepository(prefs);
     final locationOverride = profileRepo.readLocal().locationOverride;
 
-    // 4. Bepaal lat/lon — locatie-override heeft prioriteit boven kDefaultLat/kDefaultLon
-    double lat = kDefaultLat;
-    double lon = kDefaultLon;
-
-    if (locationOverride != null && locationOverride.isNotEmpty) {
-      final city = kNlCities
-          .where((c) => c.name == locationOverride)
-          .firstOrNull;
-      if (city != null) {
-        lat = city.lat;
-        lon = city.lon;
-      }
-    }
+    // 4. Bepaal lat/lon. Dezelfde volgorde als location_provider.dart, op GPS
+    //    na -- dit is een isolate zonder scherm en kan geen peiling vragen.
+    //    Vandaar de laatst bekende positie: zonder die stap overschreef deze
+    //    taak elke drie uur de verse GPS-voorspelling met die van Amsterdam,
+    //    en hing het van het toeval af welke van de twee je te zien kreeg.
+    final (lat, lon) = resolveBackgroundLocation(
+      prefs: prefs,
+      locationOverride: locationOverride,
+    );
 
     // 5. Fetch uitvoeren via OpenMeteoClient (direct — geen WeatherRepository wrapper)
     final meteoClient = OpenMeteoClient(client: client);
@@ -144,4 +141,29 @@ Future<RideSlot?> _computeNextSlot(
   filtered = generator.dedup(filtered);
 
   return filtered.firstOrNull;
+}
+
+/// Welke plek de achtergrondtaak moet ophalen.
+///
+/// Dezelfde volgorde als `location_provider.dart`, op GPS na -- dit draait in
+/// een isolate zonder scherm en kan geen peiling vragen. De middelste stap is
+/// de reparatie van 2026-09-19: zonder de laatst bekende positie viel deze taak
+/// terug op Amsterdam en overschreef ze elke drie uur de verse voorspelling van
+/// een gebruiker die GPS gebruikt. Welke van de twee je zag, hing af van
+/// wanneer je keek.
+///
+/// Staat apart van [callbackDispatcher] zodat hij zonder WorkManager te testen is.
+(double, double) resolveBackgroundLocation({
+  required SharedPreferences prefs,
+  required String? locationOverride,
+}) {
+  if (locationOverride != null && locationOverride.isNotEmpty) {
+    final city = kCities.where((c) => c.name == locationOverride).firstOrNull;
+    if (city != null) return (city.lat, city.lon);
+  }
+
+  final lastKnown = LastKnownLocationStore(prefs).read();
+  if (lastKnown != null) return (lastKnown.lat, lastKnown.lon);
+
+  return (kDefaultLat, kDefaultLon);
 }

@@ -780,5 +780,12 @@
   "@rideSunsetMostlyDark": {"placeholders": {"time": {"type": "String"}}},
   "@rideSunsetPartly": {"placeholders": {"time": {"type": "String"}}},
   "@rideSunriseAfter": {"placeholders": {"time": {"type": "String"}}},
-  "@daylightWeightDesc": {"placeholders": {"points": {"type": "int"}}}
+  "@daylightWeightDesc": {"placeholders": {"points": {"type": "int"}}},
+  "locationGuessTitle": "We weten niet waar je bent",
+  "locationGuessBody": "Je ziet het weer voor {city}. Zet locatie aan of kies zelf je stad.",
+  "locationClockTitle": "Je klok en je plek lopen uiteen",
+  "locationClockBody": "Dit toestel staat in een andere tijdzone dan {city}. De tijden hieronder zijn die van je toestel.",
+  "locationFixAction": "Kies je stad",
+  "@locationGuessBody": {"placeholders": {"city": {"type": "String"}}},
+  "@locationClockBody": {"placeholders": {"city": {"type": "String"}}}
 }

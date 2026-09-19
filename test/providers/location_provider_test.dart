@@ -111,7 +111,7 @@ void main() {
         'geen override + permission whileInUse → build() completeert via FakeLocationNotifier',
         () async {
       const fakeLocation =
-          LocationData(lat: 52.3676, lon: 4.9041, city: 'GPS');
+          LocationData(lat: 52.3676, lon: 4.9041, city: 'GPS', source: LocationSource.gps);
 
       final container = ProviderContainer(
         overrides: [

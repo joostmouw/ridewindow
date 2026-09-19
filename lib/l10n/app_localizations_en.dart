@@ -1796,4 +1796,23 @@ class SEn extends S {
   @override
   String get daylightWeightDescNone =>
       'Darkness does not count towards your scores.';
+
+  @override
+  String get locationGuessTitle => 'We don\'t know where you are';
+
+  @override
+  String locationGuessBody(String city) {
+    return 'You\'re seeing the weather for $city. Turn on location or pick your city.';
+  }
+
+  @override
+  String get locationClockTitle => 'Your clock and your place disagree';
+
+  @override
+  String locationClockBody(String city) {
+    return 'This device is in a different time zone than $city. The times below are your device\'s.';
+  }
+
+  @override
+  String get locationFixAction => 'Pick your city';
 }

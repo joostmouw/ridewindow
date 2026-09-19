@@ -21,8 +21,7 @@ class FakeLocationNotifier extends LocationNotifier {
   Future<LocationData> build() async => const LocationData(
         lat: 52.3676,
         lon: 4.9041,
-        city: 'Amsterdam',
-      );
+        city: 'Amsterdam', source: LocationSource.override);
 }
 
 void main() {

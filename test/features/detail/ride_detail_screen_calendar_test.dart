@@ -35,7 +35,7 @@ import 'package:ridewindow/theme/app_theme.dart';
 class _FakeLocation extends LocationNotifier {
   @override
   Future<LocationData> build() async =>
-      const LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam');
+      const LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam', source: LocationSource.override);
 }
 
 // ---------------------------------------------------------------------------

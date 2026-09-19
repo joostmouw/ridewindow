@@ -39,7 +39,7 @@ final class LocationNotifierProvider
   LocationNotifier create() => LocationNotifier();
 }
 
-String _$locationNotifierHash() => r'dba8db1047e13d9d94372f84a1806a8eb37bce35';
+String _$locationNotifierHash() => r'773ded6a79c4bceff9f35e59be688b7164f3fc4e';
 
 /// Gegenereerde providernaam: locationProvider (Notifier-suffix gestript door code-gen).
 /// Bestaande consumers (HomeScreen, WeatherNotifier) blijven ongewijzigd.

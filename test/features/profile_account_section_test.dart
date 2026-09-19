@@ -128,7 +128,7 @@ UserProfile _baseProfile() => const UserProfile(
     );
 
 const _defaultLocation =
-    LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam');
+    LocationData(lat: 52.3676, lon: 4.9041, city: 'Amsterdam', source: LocationSource.override);
 
 final _fakeUser = User(
   id: 'test-uid-123',

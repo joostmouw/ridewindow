@@ -1801,4 +1801,23 @@ class SNl extends S {
 
   @override
   String get daylightWeightDescNone => 'Donker telt niet mee in je scores.';
+
+  @override
+  String get locationGuessTitle => 'We weten niet waar je bent';
+
+  @override
+  String locationGuessBody(String city) {
+    return 'Je ziet het weer voor $city. Zet locatie aan of kies zelf je stad.';
+  }
+
+  @override
+  String get locationClockTitle => 'Je klok en je plek lopen uiteen';
+
+  @override
+  String locationClockBody(String city) {
+    return 'Dit toestel staat in een andere tijdzone dan $city. De tijden hieronder zijn die van je toestel.';
+  }
+
+  @override
+  String get locationFixAction => 'Kies je stad';
 }

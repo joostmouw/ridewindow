@@ -15,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/app_version.dart';
 import 'package:ridewindow/domain/services/daylight.dart';
-import 'package:ridewindow/core/nl_cities.dart';
+import 'package:ridewindow/core/cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
@@ -407,9 +407,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         return SizedBox(
           height: MediaQuery.of(context).size.height * 0.5,
           child: ListView.builder(
-            itemCount: kNlCities.length,
+            itemCount: kCities.length,
             itemBuilder: (_, i) {
-              final city = kNlCities[i];
+              final city = kCities[i];
               return ListTile(
                 title: Text(city.name),
                 onTap: () {
