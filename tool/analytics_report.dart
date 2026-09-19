@@ -50,25 +50,56 @@ String get _defaultKeyPath {
   return '$home/.config/ridewindow/supabase-service-role.key';
 }
 
+/// Een JWT: drie met punten gescheiden base64url-delen, en verder niets.
+final _jwtPattern = RegExp(r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$');
+
 /// Leest de sleutel uit -- eerst `--key`, dan de omgeving, dan het
-/// standaardbestand. Geeft null als hij nergens staat.
+/// standaardbestand. Geeft null als hij nergens staat of nergens op lijkt.
+///
+/// **Waarom hier een vormcontrole staat.** De eerste versie gaf de ruwe
+/// bestandsinhoud rechtstreeks door aan een HTTP-header. Stond er iets anders
+/// in dan een sleutel -- op 2026-09-19 was dat de commandoregel die per ongeluk
+/// was meegeplakt -- dan gooide Dart een `FormatException` met *de volledige
+/// waarde erin*. Daarmee lekte een service-role sleutel naar de uitvoer, en
+/// die moest ingetrokken worden. Een sleutel hoort nooit in een foutmelding te
+/// kunnen belanden.
+///
+/// Vandaar twee dingen: er wordt gezocht naar de eerste regel die op een JWT
+/// lijkt (zodat een meegeplakte regel ervoor of erna niets breekt), en wat er
+/// niet op lijkt wordt geweigerd zónder de inhoud te tonen.
 String? _readKey(List<String> args) {
   final fromArg = _stringArg(args, '--key');
-  final path = fromArg ?? _defaultKeyPath;
 
-  final fromEnv = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
-  if (fromArg == null && fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+  if (fromArg == null) {
+    final fromEnv = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
+    if (fromEnv != null && fromEnv.trim().isNotEmpty) {
+      return _firstJwt(fromEnv);
+    }
+  }
 
-  final file = File(path);
+  final file = File(fromArg ?? _defaultKeyPath);
   if (!file.existsSync()) return null;
-  final key = file.readAsStringSync().trim();
-  return key.isEmpty ? null : key;
+  return _firstJwt(file.readAsStringSync());
+}
+
+/// De eerste regel die de vorm van een JWT heeft, of null.
+String? _firstJwt(String raw) {
+  for (final line in raw.split('\n')) {
+    final candidate = line.trim();
+    if (_jwtPattern.hasMatch(candidate)) return candidate;
+  }
+  return null;
 }
 
 Future<void> main(List<String> args) async {
   final key = _readKey(args);
   if (key == null) {
-    stderr.writeln('Geen service-role sleutel gevonden.');
+    stderr.writeln('Geen bruikbare service-role sleutel gevonden.');
+    stderr.writeln('');
+    stderr
+        .writeln('Als het bestand wél bestaat: er staat geen regel in die de');
+    stderr.writeln('vorm van een JWT heeft. De inhoud wordt met opzet niet');
+    stderr.writeln('getoond -- een sleutel hoort niet in een foutmelding.');
     stderr.writeln('');
     stderr.writeln('Gezocht in:');
     stderr.writeln('  SUPABASE_SERVICE_ROLE_KEY (omgevingsvariabele)');
@@ -91,7 +122,23 @@ Future<void> main(List<String> args) async {
   final htmlPath = _stringArg(args, '--html');
   final since = DateTime.now().toUtc().subtract(Duration(days: days));
 
-  final events = await _fetchEvents(key: key, since: since);
+  final List<Map<String, dynamic>> events;
+  try {
+    events = await _fetchEvents(key: key, since: since);
+  } on HttpException catch (e) {
+    // Een nette regel in plaats van een stacktrace: de meest voorkomende fout
+    // hier is een ingetrokken of verkeerd geplakte sleutel, en daar helpt een
+    // Dart-stack niemand mee.
+    stderr.writeln(e.message);
+    stderr.writeln('');
+    stderr
+        .writeln('Bij 401: de sleutel klopt niet meer. Haal een verse op bij');
+    stderr
+        .writeln('Supabase > Project Settings > API > service_role en zet hem');
+    stderr.writeln('opnieuw neer met het commando hierboven.');
+    exitCode = 1;
+    return;
+  }
   if (events.isEmpty) {
     stdout.writeln('Geen gebeurtenissen in de laatste $days dagen.');
     stdout.writeln('');
