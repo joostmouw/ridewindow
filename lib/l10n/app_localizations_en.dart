@@ -1577,6 +1577,58 @@ class SEn extends S {
   String get pelotonRetry => 'Try again';
 
   @override
+  String get pelotonPickWindows => 'Which windows do you propose?';
+
+  @override
+  String get pelotonPickWindowsHint =>
+      'Pick two or three. Your buddies say when they can ride.';
+
+  @override
+  String get pelotonChooseTogether => 'Pick a window together';
+
+  @override
+  String get pelotonOptionCanRide => 'I can';
+
+  @override
+  String get pelotonOptionCannot => 'I can\'t';
+
+  @override
+  String pelotonOptionTally(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count can',
+      one: '1 can',
+      zero: 'nobody yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pelotonOptionFrontRunner => 'Leading';
+
+  @override
+  String get pelotonOptionChoose => 'Choose this';
+
+  @override
+  String get pelotonOptionChosen => 'The ride is now set to this window';
+
+  @override
+  String get pelotonOptionVoteFailed =>
+      'Your answer could not be saved. Please try again.';
+
+  @override
+  String pelotonWindowsSent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count windows proposed',
+      one: '1 window proposed',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get pelotonInviteToRide => 'Invite a buddy';
 
   @override

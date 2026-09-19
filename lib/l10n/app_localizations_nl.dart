@@ -1581,6 +1581,58 @@ class SNl extends S {
   String get pelotonRetry => 'Opnieuw proberen';
 
   @override
+  String get pelotonPickWindows => 'Welke vensters leg je voor?';
+
+  @override
+  String get pelotonPickWindowsHint =>
+      'Kies er twee of drie. Je maatjes geven aan wanneer ze kunnen.';
+
+  @override
+  String get pelotonChooseTogether => 'Kies samen een venster';
+
+  @override
+  String get pelotonOptionCanRide => 'Ik kan';
+
+  @override
+  String get pelotonOptionCannot => 'Kan niet';
+
+  @override
+  String pelotonOptionTally(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kunnen',
+      one: '1 kan',
+      zero: 'nog niemand',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pelotonOptionFrontRunner => 'Voorop';
+
+  @override
+  String get pelotonOptionChoose => 'Kies dit';
+
+  @override
+  String get pelotonOptionChosen => 'De rit staat nu op dit venster';
+
+  @override
+  String get pelotonOptionVoteFailed =>
+      'Je antwoord kon niet worden opgeslagen. Probeer het opnieuw.';
+
+  @override
+  String pelotonWindowsSent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vensters voorgelegd',
+      one: '1 venster voorgelegd',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get pelotonInviteToRide => 'Nodig een maatje uit';
 
   @override

@@ -50,6 +50,31 @@ abstract class PelotonGateway {
   });
 
   Future<void> deleteGroupRide(String rideId);
+
+  /// Legt vensters voor bij een rit (slice 2 van epic #65).
+  ///
+  /// Vervangt wat er lag: een tweede ronde voorleggen is een nieuwe vraag, en
+  /// oude opties die half blijven staan zijn onnavolgbaar voor wie al gestemd
+  /// had. De stemmen gaan mee weg via `on delete cascade`.
+  Future<List<RideOption>> proposeOptions({
+    required String rideId,
+    required List<({DateTime start, DateTime end, double plannedScore})>
+        windows,
+  });
+
+  /// Stemmen op een venster. Kan alleen namens jezelf -- dat staat in de
+  /// policy, niet alleen hier. Nog een keer stemmen overschrijft je antwoord.
+  Future<void> voteOnOption({
+    required String optionId,
+    required bool canRide,
+  });
+
+  /// De eigenaar hakt de knoop door: de rit verhuist naar dit venster en de
+  /// keuze verdwijnt.
+  Future<void> chooseOption({
+    required String rideId,
+    required RideOption option,
+  });
 }
 
 class SupabasePelotonGateway implements PelotonGateway {
@@ -134,11 +159,38 @@ class SupabasePelotonGateway implements PelotonGateway {
           .add(RideParticipant.fromRow(row));
     }
 
+    // Opties en stemmen in twee vaste rondgangen, niet een per rit: RLS
+    // levert toch alleen wat je mag zien, en een lus over ritten zou bij tien
+    // gedeelde ritten twintig verzoeken doen.
+    final optionRows = await _client
+        .from(kGroupRideOptionsTable)
+        .select()
+        .order('start_at', ascending: true);
+    final options = (optionRows as List).cast<Map<String, dynamic>>();
+
+    final votesByOption = <String, List<OptionVote>>{};
+    if (options.isNotEmpty) {
+      final voteRows = await _client.from(kGroupRideOptionVotesTable).select();
+      for (final row in (voteRows as List).cast<Map<String, dynamic>>()) {
+        (votesByOption[row['option_id'] as String] ??= [])
+            .add(OptionVote.fromRow(row));
+      }
+    }
+
+    final optionsByRide = <String, List<RideOption>>{};
+    for (final row in options) {
+      final id = row['id'] as String;
+      (optionsByRide[row['ride_id'] as String] ??= []).add(
+        RideOption.fromRow(row, votes: votesByOption[id] ?? const []),
+      );
+    }
+
     return rides
         .map(
           (r) => GroupRide.fromRow(
             r,
             participants: byRide[r['id'] as String] ?? const [],
+            options: optionsByRide[r['id'] as String] ?? const [],
           ),
         )
         .toList();
@@ -204,5 +256,66 @@ class SupabasePelotonGateway implements PelotonGateway {
   @override
   Future<void> deleteGroupRide(String rideId) async {
     await _client.from(kGroupRidesTable).delete().eq('id', rideId);
+  }
+
+  @override
+  Future<List<RideOption>> proposeOptions({
+    required String rideId,
+    required List<({DateTime start, DateTime end, double plannedScore})>
+        windows,
+  }) async {
+    await _client.from(kGroupRideOptionsTable).delete().eq('ride_id', rideId);
+    if (windows.isEmpty) return const [];
+
+    // Expliciet UTC, dezelfde les als in createGroupRide: een offsetloze
+    // string leest Postgres in de sessiezone.
+    final rows = await _client
+        .from(kGroupRideOptionsTable)
+        .insert([
+          for (final w in windows)
+            {
+              'ride_id': rideId,
+              'start_at': w.start.toUtc().toIso8601String(),
+              'end_at': w.end.toUtc().toIso8601String(),
+              'planned_score': w.plannedScore,
+            },
+        ])
+        .select();
+    return (rows as List)
+        .cast<Map<String, dynamic>>()
+        .map((r) => RideOption.fromRow(r))
+        .toList();
+  }
+
+  @override
+  Future<void> voteOnOption({
+    required String optionId,
+    required bool canRide,
+  }) async {
+    await _client.from(kGroupRideOptionVotesTable).upsert({
+      'option_id': optionId,
+      'user_id': _uid,
+      'can_ride': canRide,
+      'voted_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
+  @override
+  Future<void> chooseOption({
+    required String rideId,
+    required RideOption option,
+  }) async {
+    // Eerst de rit verzetten, dan pas de opties weghalen. Andersom zou een
+    // mislukte update een rit achterlaten op de oude tijd zonder dat er nog
+    // iets voorligt -- en dan is niet meer te zien wat de groep koos.
+    await _client
+        .from(kGroupRidesTable)
+        .update({
+          'start_at': option.start.toUtc().toIso8601String(),
+          'end_at': option.end.toUtc().toIso8601String(),
+          'planned_score': option.plannedScore,
+        })
+        .eq('id', rideId);
+    await _client.from(kGroupRideOptionsTable).delete().eq('ride_id', rideId);
   }
 }

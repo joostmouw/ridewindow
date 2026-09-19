@@ -21,5 +21,8 @@ const kFriendshipsTable = 'friendships';
 const kFriendInvitesTable = 'friend_invites';
 const kGroupRidesTable = 'group_rides';
 const kGroupRideParticipantsTable = 'group_ride_participants';
+// Slice 2 van epic #65, migratie 0010_group_ride_options.sql.
+const kGroupRideOptionsTable = 'group_ride_options';
+const kGroupRideOptionVotesTable = 'group_ride_option_votes';
 const kRedeemFriendInviteRpc = 'redeem_friend_invite';
 const kFriendProfilesRpc = 'friend_profiles';

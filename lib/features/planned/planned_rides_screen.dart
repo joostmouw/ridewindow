@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
+import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -19,6 +20,7 @@ import 'package:ridewindow/features/shared/daylight_note.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
@@ -219,6 +221,13 @@ abstract class RideCardHost {
   Future<bool> confirmRemove(RideEntry entry);
 
   void removePlanned(RideEntry entry);
+
+  /// Zeggen of je bij dit voorgelegde venster kunt (slice 2 van epic #65).
+  Future<void> voteOnOption(RideEntry entry, RideOption option,
+      {required bool canRide});
+
+  /// De knoop doorhakken. Alleen de organisator ziet dit.
+  Future<void> chooseOption(RideEntry entry, RideOption option);
 }
 
 /// Alle ritten, chronologisch, met een filterrij erboven.
@@ -265,6 +274,48 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
             .respondToRide(rideId: group.id, accepted: accepted);
         _invalidatePeloton();
       });
+
+  @override
+  Future<void> voteOnOption(
+    RideEntry entry,
+    RideOption option, {
+    required bool canRide,
+  }) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await _run(() async {
+        await ref
+            .read(pelotonGatewayProvider)
+            .voteOnOption(optionId: option.id, canRide: canRide);
+        _invalidatePeloton();
+      });
+    } catch (error) {
+      // Eigen melding, niet die van uitnodigen: een foutmelding die naar de
+      // verkeerde oorzaak wijst heeft op 2026-09-06 een halve sessie gekost.
+      debugPrint('Peloton: stemmen mislukt: $error');
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(s.pelotonOptionVoteFailed)),
+      );
+    }
+  }
+
+  @override
+  Future<void> chooseOption(RideEntry entry, RideOption option) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final group = entry.group;
+    if (group == null) return;
+    await _run(() async {
+      await ref
+          .read(pelotonGatewayProvider)
+          .chooseOption(rideId: group.id, option: option);
+      _invalidatePeloton();
+    });
+    if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(s.pelotonOptionChosen)));
+  }
 
   /// Terugkomen op een "ik ga mee".
   ///
@@ -420,6 +471,7 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
               key: i == 0 ? widget.firstRideKey : null,
               entry: shown[i],
               host: this,
+              myUserId: ref.watch(currentUserIdProvider),
               allScores: allScores,
               forecasts: forecasts,
               cityName: cityName,
@@ -609,6 +661,7 @@ class RideCard extends StatelessWidget {
     super.key,
     required this.entry,
     required this.host,
+    this.myUserId,
     required this.allScores,
     required this.forecasts,
     required this.cityName,
@@ -616,6 +669,11 @@ class RideCard extends StatelessWidget {
   });
 
   final RideEntry entry;
+
+  /// Wie jij bent, of `null` als je uitgelogd bent. Nodig om je eigen stem op
+  /// een voorgelegd venster terug te vinden; de kaart leest zelf geen
+  /// providers, om dezelfde reden als [host].
+  final String? myUserId;
 
   /// Wie de handelingen uitvoert. Zie [RideCardHost] voor waarom dat niet de
   /// kaart zelf is.
@@ -890,6 +948,21 @@ class RideCard extends StatelessWidget {
                     ],
                   ),
                 ],
+                // Slice 2 van epic #65: meerdere vensters voorgelegd, de
+                // groep kiest. Eén venster is geen keuze -- zie
+                // [GroupRide.hasOpenChoice].
+                if (entry.group?.hasOpenChoice ?? false) ...[
+                  const SizedBox(height: 10),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  _OptionsBlock(
+                    ride: entry.group!,
+                    entry: entry,
+                    host: host,
+                    isOwner: entry.role == RideRole.organiser,
+                    myUserId: myUserId,
+                  ),
+                ],
                 if (avgTemp != null) ...[
                   const SizedBox(height: 10),
                   const Divider(height: 1),
@@ -1018,6 +1091,228 @@ class _WeatherChip extends StatelessWidget {
         const SizedBox(width: 3),
         Text(value, style: const TextStyle(fontSize: 12)),
       ],
+    );
+  }
+}
+
+
+/// De vensters die voorliggen, met ieders antwoord erbij (slice 2, epic #65).
+///
+/// **Waarom dit op de ritkaart staat en niet op een eigen scherm.** Een keuze
+/// tussen vensters is een keuze tussen wéértypes, en de kaart is de enige plek
+/// waar het weer al staat. Een apart stemscherm zou dat allemaal opnieuw
+/// moeten tonen, of -- erger -- de keuze laten maken zonder.
+///
+/// De volgorde is die van [GroupRide.frontRunner]: meeste stemmen, dan hoogste
+/// score, dan vroegste. Dat is dezelfde volgorde die Home aanhoudt, zodat "de
+/// beste" overal hetzelfde betekent.
+class _OptionsBlock extends StatelessWidget {
+  const _OptionsBlock({
+    required this.ride,
+    required this.entry,
+    required this.host,
+    required this.isOwner,
+    required this.myUserId,
+  });
+
+  final GroupRide ride;
+  final RideEntry entry;
+  final RideCardHost host;
+  final bool isOwner;
+  final String? myUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final theme = Theme.of(context);
+    final rw = context.rw;
+    final front = ride.frontRunner;
+
+    final sorted = [...ride.options]..sort((a, b) {
+        final byVotes = b.yesCount.compareTo(a.yesCount);
+        if (byVotes != 0) return byVotes;
+        final byScore = b.plannedScore.compareTo(a.plannedScore);
+        if (byScore != 0) return byScore;
+        return a.start.compareTo(b.start);
+      });
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          s.pelotonChooseTogether,
+          style: theme.textTheme.labelLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 6),
+        for (final option in sorted) ...[
+          _OptionRow(
+            option: option,
+            entry: entry,
+            host: host,
+            isOwner: isOwner,
+            myVote: option.voteOf(myUserId),
+            // Alleen markeren als er werkelijk iets voorop ligt. Bij nul
+            // stemmen wint de hoogste score, en die "Voorop" noemen zou
+            // suggereren dat iemand al gekozen heeft.
+            isFrontRunner: front != null &&
+                front.id == option.id &&
+                option.yesCount > 0,
+            tonal: _scoreTonal(option.plannedScore, rw),
+          ),
+          const SizedBox(height: 4),
+        ],
+      ],
+    );
+  }
+}
+
+class _OptionRow extends StatelessWidget {
+  const _OptionRow({
+    required this.option,
+    required this.entry,
+    required this.host,
+    required this.isOwner,
+    required this.myVote,
+    required this.isFrontRunner,
+    required this.tonal,
+  });
+
+  final RideOption option;
+  final RideEntry entry;
+  final RideCardHost host;
+  final bool isOwner;
+
+  /// `null` = nog niet geantwoord, en dat is iets anders dan "nee".
+  final bool? myVote;
+
+  final bool isFrontRunner;
+  final ({Color bg, Color fg}) tonal;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
+    final day = DateFormat('EEE d MMM', locale == 'en' ? 'en_US' : 'nl_NL')
+        .format(option.start);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: tonal.bg,
+                borderRadius: AppShapes.roundedSm,
+              ),
+              child: Text(
+                '${option.plannedScore.round()}',
+                style: TextStyle(
+                  color: tonal.fg,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$day  ${_fmtTime(option.start)} – ${_fmtTime(option.end)}',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+            if (isFrontRunner)
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: Text(
+                  s.pelotonOptionFrontRunner,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            Text(
+              s.pelotonOptionTally(option.yesCount),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            // Twee knoppen en geen schakelaar: "ik kan" en "kan niet" zijn
+            // allebei een antwoord, en geen van beide is de standaard. Een
+            // schakelaar zou een van de twee al voor je hebben ingevuld.
+            _VoteButton(
+              label: s.pelotonOptionCanRide,
+              selected: myVote == true,
+              onPressed: host.busy
+                  ? null
+                  : () => host.voteOnOption(entry, option, canRide: true),
+            ),
+            const SizedBox(width: 4),
+            _VoteButton(
+              label: s.pelotonOptionCannot,
+              selected: myVote == false,
+              onPressed: host.busy
+                  ? null
+                  : () => host.voteOnOption(entry, option, canRide: false),
+            ),
+            if (isOwner) ...[
+              const SizedBox(width: 4),
+              TextButton(
+                onPressed:
+                    host.busy ? null : () => host.chooseOption(entry, option),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 32),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(s.pelotonOptionChoose),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _VoteButton extends StatelessWidget {
+  const _VoteButton({
+    required this.label,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final style = OutlinedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      minimumSize: const Size(0, 32),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      backgroundColor:
+          selected ? theme.colorScheme.secondaryContainer : Colors.transparent,
+      foregroundColor: selected
+          ? theme.colorScheme.onSecondaryContainer
+          : theme.colorScheme.onSurfaceVariant,
+    );
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: style,
+      child: Text(label, style: const TextStyle(fontSize: 12)),
     );
   }
 }

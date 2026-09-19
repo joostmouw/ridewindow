@@ -62,6 +62,77 @@ class RideParticipant {
       );
 }
 
+/// Een venster dat voorligt bij een gedeelde rit (slice 2 van epic #65).
+///
+/// De score staat erin en wordt niet herberekend. Het weerbericht verandert
+/// namelijk, en dan zou achteraf niet meer te zien zijn waarop iemand zijn stem
+/// baseerde -- dezelfde reden waarom `group_rides.planned_score` bestaat.
+class RideOption {
+  const RideOption({
+    required this.id,
+    required this.rideId,
+    required this.start,
+    required this.end,
+    required this.plannedScore,
+    this.votes = const [],
+  });
+
+  final String id;
+  final String rideId;
+  final DateTime start;
+  final DateTime end;
+  final double plannedScore;
+  final List<OptionVote> votes;
+
+  /// `.toLocal()` om dezelfde reden als bij [GroupRide.fromRow].
+  factory RideOption.fromRow(
+    Map<String, dynamic> row, {
+    List<OptionVote> votes = const [],
+  }) =>
+      RideOption(
+        id: row['id'] as String,
+        rideId: row['ride_id'] as String,
+        start: DateTime.parse(row['start_at'] as String).toLocal(),
+        end: DateTime.parse(row['end_at'] as String).toLocal(),
+        plannedScore: (row['planned_score'] as num).toDouble(),
+        votes: votes,
+      );
+
+  /// Hoeveel mensen bij dit venster kunnen.
+  int get yesCount => votes.where((v) => v.canRide).length;
+
+  /// Het antwoord van [userId], of `null` als hij nog niet gestemd heeft.
+  ///
+  /// Geen rij is iets anders dan "nee": dat onderscheid is de reden dat dit
+  /// een `bool?` teruggeeft en geen `bool`.
+  bool? voteOf(String? userId) {
+    if (userId == null) return null;
+    for (final v in votes) {
+      if (v.userId == userId) return v.canRide;
+    }
+    return null;
+  }
+}
+
+/// Eén stem van één persoon op één venster.
+class OptionVote {
+  const OptionVote({
+    required this.optionId,
+    required this.userId,
+    required this.canRide,
+  });
+
+  final String optionId;
+  final String userId;
+  final bool canRide;
+
+  factory OptionVote.fromRow(Map<String, dynamic> row) => OptionVote(
+        optionId: row['option_id'] as String,
+        userId: row['user_id'] as String,
+        canRide: row['can_ride'] as bool,
+      );
+}
+
 /// Een gedeelde rit: één object met deelnemers, geen kopie per persoon.
 ///
 /// Dat onderscheid is Joost's keuze (2026-09-03) en het is de reden dat deze
@@ -78,6 +149,7 @@ class GroupRide {
     this.ownerName,
     this.note,
     this.participants = const [],
+    this.options = const [],
   });
 
   final String id;
@@ -89,12 +161,17 @@ class GroupRide {
   final String? note;
   final List<RideParticipant> participants;
 
+  /// De vensters die nog voorliggen (slice 2). Leeg is de gewone toestand: dan
+  /// is er niets te kiezen en geldt gewoon [start]/[end].
+  final List<RideOption> options;
+
   /// `.toLocal()` is niet cosmetisch (dezelfde les als plan 21-13): de UI drukt
   /// de velden van de `DateTime` rechtstreeks af, dus zonder omzetting staat
   /// een rit van 20:00 in de zomer als 18:00 op het scherm.
   factory GroupRide.fromRow(
     Map<String, dynamic> row, {
     List<RideParticipant> participants = const [],
+    List<RideOption> options = const [],
   }) =>
       GroupRide(
         id: row['id'] as String,
@@ -105,6 +182,7 @@ class GroupRide {
         ownerName: row['owner_name'] as String?,
         note: row['note'] as String?,
         participants: participants,
+        options: options,
       );
 
   bool isOwnedBy(String? userId) => userId != null && userId == ownerId;
@@ -113,6 +191,25 @@ class GroupRide {
   /// niet in zijn eigen deelnemerslijst.
   Iterable<RideParticipant> get accepted =>
       participants.where((p) => p.status == ParticipantStatus.accepted);
+
+  /// Ligt er nog een keuze voor? Eén venster is geen keuze -- dan is het het
+  /// voorstel zelf, en hoort er geen stemming omheen te staan.
+  bool get hasOpenChoice => options.length > 1;
+
+  /// De optie waar de meeste mensen bij kunnen. Bij gelijkspel wint de hoogste
+  /// score, en daarna de vroegste -- dezelfde volgorde als Home aanhoudt, zodat
+  /// "de beste" overal hetzelfde betekent.
+  RideOption? get frontRunner {
+    if (options.isEmpty) return null;
+    final sorted = [...options]..sort((a, b) {
+        final byVotes = b.yesCount.compareTo(a.yesCount);
+        if (byVotes != 0) return byVotes;
+        final byScore = b.plannedScore.compareTo(a.plannedScore);
+        if (byScore != 0) return byScore;
+        return a.start.compareTo(b.start);
+      });
+    return sorted.first;
+  }
 
   /// De status van [userId] op deze rit, of `null` als hij er niet bij hoort.
   ParticipantStatus? statusFor(String? userId) {

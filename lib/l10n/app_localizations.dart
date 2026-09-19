@@ -2881,6 +2881,72 @@ abstract class S {
   /// **'Opnieuw proberen'**
   String get pelotonRetry;
 
+  /// No description provided for @pelotonPickWindows.
+  ///
+  /// In nl, this message translates to:
+  /// **'Welke vensters leg je voor?'**
+  String get pelotonPickWindows;
+
+  /// No description provided for @pelotonPickWindowsHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kies er twee of drie. Je maatjes geven aan wanneer ze kunnen.'**
+  String get pelotonPickWindowsHint;
+
+  /// No description provided for @pelotonChooseTogether.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kies samen een venster'**
+  String get pelotonChooseTogether;
+
+  /// No description provided for @pelotonOptionCanRide.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ik kan'**
+  String get pelotonOptionCanRide;
+
+  /// No description provided for @pelotonOptionCannot.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kan niet'**
+  String get pelotonOptionCannot;
+
+  /// No description provided for @pelotonOptionTally.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =0{nog niemand} =1{1 kan} other{{count} kunnen}}'**
+  String pelotonOptionTally(int count);
+
+  /// No description provided for @pelotonOptionFrontRunner.
+  ///
+  /// In nl, this message translates to:
+  /// **'Voorop'**
+  String get pelotonOptionFrontRunner;
+
+  /// No description provided for @pelotonOptionChoose.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kies dit'**
+  String get pelotonOptionChoose;
+
+  /// No description provided for @pelotonOptionChosen.
+  ///
+  /// In nl, this message translates to:
+  /// **'De rit staat nu op dit venster'**
+  String get pelotonOptionChosen;
+
+  /// No description provided for @pelotonOptionVoteFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je antwoord kon niet worden opgeslagen. Probeer het opnieuw.'**
+  String get pelotonOptionVoteFailed;
+
+  /// No description provided for @pelotonWindowsSent.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 venster voorgelegd} other{{count} vensters voorgelegd}}'**
+  String pelotonWindowsSent(int count);
+
   /// No description provided for @pelotonInviteToRide.
   ///
   /// In nl, this message translates to:
