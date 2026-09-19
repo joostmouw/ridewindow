@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
@@ -89,7 +90,15 @@ class _InviteLandingScreenState extends ConsumerState<InviteLandingScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.pelotonJoinTitle)),
+      // SafeBackButton en niet de impliciete terugknop van Flutter: hier kom je
+      // van buiten de app binnen, dus er is meestal niets om naar terug te
+      // poppen en toont Flutter helemaal geen knop. Op een iOS-webapp in
+      // standalone-modus is dat een doodlopende weg -- geen browserbalk, geen
+      // randveeg. De knop valt dan terug op Home.
+      appBar: AppBar(
+        leading: const SafeBackButton(),
+        title: Text(s.pelotonJoinTitle),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),

@@ -1234,7 +1234,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () => context.push('/profile'),
+                    // `go` en niet `push`: Profiel is een tab in de shell met
+                    // de onderbalk. Pushen zou die hele shell op zichzelf
+                    // stapelen; zo wisselt hij gewoon van tab en is de
+                    // onderbalk de weg terug -- ook op een iOS-webapp, waar
+                    // geen randveeg bestaat.
+                    onPressed: () => context.go('/profile'),
                     style: TextButton.styleFrom(
                       foregroundColor: cs.onTertiaryContainer,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
