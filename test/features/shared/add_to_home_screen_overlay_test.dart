@@ -6,8 +6,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/data/repositories/install_hint_store.dart';
 import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -80,4 +82,67 @@ void main() {
       expect(find.byType(Text), findsNothing);
     },
   );
+
+  // ── Wegklikken (D-04 teruggedraaid op 2026-09-19) ──
+  //
+  // De balk had bewust geen wegklikknop, zodat hij zou blijven aandringen tot
+  // de app geïnstalleerd was. Een tester meldde het gevolg: hij dekt bovenaan
+  // permanent een strook van elk scherm af.
+
+  testWidgets('de balk is weg te klikken', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    debugIsWebOverride = true;
+    debugIsIosBrowserOverride = true;
+    debugIsStandaloneOverride = false;
+
+    await _pumpOverlay(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(IconButton), findsOneWidget);
+
+    await tester.tap(find.byType(IconButton));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byType(IconButton),
+      findsNothing,
+      reason: 'na wegklikken hoort er niets meer te staan',
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getInt(InstallHintStore.kDismissCountKey), 1);
+  });
+
+  testWidgets('een eerder weggeklikte balk komt binnen een week niet terug',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({
+      InstallHintStore.kDismissCountKey: 1,
+      InstallHintStore.kDismissedAtKey:
+          DateTime.now().subtract(const Duration(days: 2)).millisecondsSinceEpoch,
+    });
+    debugIsWebOverride = true;
+    debugIsIosBrowserOverride = true;
+    debugIsStandaloneOverride = false;
+
+    await _pumpOverlay(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Text), findsNothing);
+  });
+
+  testWidgets('maar na een week wel', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      InstallHintStore.kDismissCountKey: 1,
+      InstallHintStore.kDismissedAtKey:
+          DateTime.now().subtract(const Duration(days: 9)).millisecondsSinceEpoch,
+    });
+    debugIsWebOverride = true;
+    debugIsIosBrowserOverride = true;
+    debugIsStandaloneOverride = false;
+
+    await _pumpOverlay(tester);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(IconButton), findsOneWidget);
+  });
 }
