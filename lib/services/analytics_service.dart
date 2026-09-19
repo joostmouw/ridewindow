@@ -58,7 +58,9 @@ class AnalyticsService {
   }) async {
     if (!_consent.isEnabled) return false;
     if (!kKnownAnalyticsEvents.contains(name)) {
-      assert(false, 'Onbekende gebeurtenis "$name" -- zet hem in '
+      assert(
+          false,
+          'Onbekende gebeurtenis "$name" -- zet hem in '
           'lib/core/analytics_events.dart of gebruik hem niet.');
       return false;
     }
