@@ -1207,22 +1207,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       // anders wisselt de kaartvolgorde per rebuild.
       switch (_sort) {
         case SlotSort.best:
-          // Op kwaliteit, binnen een tier chronologisch.
+          // Op score, hoog naar laag. Bij gelijke score wint de vroegste rit --
+          // dezelfde afspraak als [indexOfBestSlot].
+          //
+          // Sorteerde tot 2026-09-19 op *tier* en binnen een tier
+          // chronologisch, met het beste venster daarna naar voren gehaald. Die
+          // keuze had een reden: binnen een tier las de lijst als een agenda.
+          // Maar alles boven de 85 is "Toprit", dus een 85 van zes uur 's
+          // ochtends stond boven een 93 van acht uur -- onder een knop die
+          // letterlijk "Beste eerst" belooft. Joost zag het meteen.
+          //
+          // De agendalezing is niet verdwenen, die heeft nu een eigen knop:
+          // SlotSort.time. Dat maakt de weg vrij om hier te doen wat er staat.
           slots.sort((a, b) {
-            final byTier = _tierOrder(a.tier).compareTo(_tierOrder(b.tier));
-            return byTier != 0 ? byTier : a.start.compareTo(b.start);
+            final byScore = b.overallScore.compareTo(a.overallScore);
+            return byScore != 0 ? byScore : a.start.compareTo(b.start);
           });
-
-          // ...met één uitzondering: het best scorende slot wordt naar voren
-          // gehaald. Zonder dit droeg de kaart op plek 0 het "Best choice"-label
-          // terwijl dat de vroegste van de beste tier was en niet de beste — een
-          // rit van 99 boven een 100. Zolang die kaart nauwelijks opviel bleef dat
-          // onopgemerkt; sinds hij met schaduw en accentrand domineert, wijst het
-          // scherm met nadruk de verkeerde aan. Zie [indexOfBestSlot].
-          final bestIndex = indexOfBestSlot(slots);
-          if (bestIndex > 0) {
-            slots.insert(0, slots.removeAt(bestIndex));
-          }
         case SlotSort.time:
           // Puur chronologisch, als een agenda. Geen tier-groepering en geen
           // beste-naar-voren: wie hierop schakelt vraagt "wanneer", niet "welke
@@ -2474,7 +2474,15 @@ class _DayRail extends StatelessWidget {
                     // De dag zelf: wat de app niet aanbiedt.
                     Positioned.fill(child: ColoredBox(color: rw.surfaceDim)),
 
-                    // De goede stukken.
+                    // De goede stukken, elk in de tint van hun eigen oordeel.
+                    //
+                    // Stonden eerst allemaal in dezelfde lichte tint. Joost
+                    // vroeg wat de kleuren zeiden, en het eerlijke antwoord was
+                    // "niets" -- drie grijstinten zonder betekenis. Nu dragen ze
+                    // dezelfde betekenis als overal elders in de app: de tint
+                    // van Toprit, Fijne rit, Te doen of Binnenblijver. Een blik
+                    // op de balk zegt daarmee hoe goed elk stuk is, niet alleen
+                    // dát het goed is.
                     for (final block in day.blocks)
                       Positioned(
                         left: fraction(block.start) * w,
@@ -2482,10 +2490,14 @@ class _DayRail extends StatelessWidget {
                             (fraction(block.end) - fraction(block.start)) * w,
                         top: 0,
                         bottom: 0,
-                        child: ColoredBox(color: rw.tiers.greatBg),
+                        child: ColoredBox(
+                          color: _tierBg(rw, block.best.tier),
+                        ),
                       ),
 
-                    // Het beste venster, als donkere markering.
+                    // Het beste venster van de dag, vol doorgekleurd in
+                    // dezelfde kleur die het cijfer rechtsboven draagt -- zo
+                    // wijst de balk aan waar die score vandaan komt.
                     Positioned(
                       left: fraction(day.best.start) * w,
                       width: (fraction(day.best.end) -
@@ -2493,7 +2505,7 @@ class _DayRail extends StatelessWidget {
                           w,
                       top: 0,
                       bottom: 0,
-                      child: ColoredBox(color: rw.scorePerfect),
+                      child: ColoredBox(color: _tierSolid(rw, day.best.tier)),
                     ),
                   ],
                 );
@@ -2557,3 +2569,19 @@ class BestChoicePill extends StatelessWidget {
     );
   }
 }
+
+/// De tint van een oordeel, zoals de kaarten hem ook gebruiken.
+Color _tierBg(RideWindowTheme rw, RideTier tier) => switch (tier) {
+      Perfect() => rw.tiers.perfectBg,
+      Great() => rw.tiers.greatBg,
+      Acceptable() => rw.tiers.acceptableBg,
+      Poor() => rw.tiers.poorBg,
+    };
+
+/// Dezelfde kleur die [ScoreDisplay] aan het cijfer geeft.
+Color _tierSolid(RideWindowTheme rw, RideTier tier) => switch (tier) {
+      Perfect() => rw.scorePerfect,
+      Great() => rw.scoreGreat,
+      Acceptable() => rw.scoreAcceptable,
+      Poor() => rw.scorePoor,
+    };

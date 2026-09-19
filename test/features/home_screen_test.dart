@@ -21,6 +21,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
+import 'package:ridewindow/features/shared/score_display.dart';
 import 'package:ridewindow/data/repositories/home_view_store.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
@@ -406,5 +407,60 @@ void main() {
 
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString(HomeViewStore.kViewKey), 'blocks');
+  });
+
+  testWidgets('"Beste eerst" sorteert op score, niet op tier-dan-tijd',
+      (tester) async {
+    // Joost zag 85 boven 93 staan, allebei "Toprit". De lijst sorteerde op
+    // tier en binnen een tier chronologisch, dus de vroegste won -- onder een
+    // knop die letterlijk "Beste eerst" belooft.
+    await pumpHomeWithSlots(tester, [
+      slotAt(6, 9, 85),
+      slotAt(9, 12, 93),
+      slotAt(12, 15, 100),
+    ]);
+
+    // Alleen de kaarten die daadwerkelijk gebouwd zijn -- SliverList bouwt
+    // niet wat buiten het testvenster valt. De bewering gaat over de volgorde,
+    // niet over het aantal.
+    final scores = tester
+        .widgetList<ScoreDisplay>(find.byType(ScoreDisplay))
+        .map((w) => w.score)
+        .toList();
+
+    expect(scores.length, greaterThanOrEqualTo(2));
+    expect(scores.first, 100.0, reason: 'de hoogste score staat bovenaan');
+    for (var i = 1; i < scores.length; i++) {
+      expect(
+        scores[i],
+        lessThanOrEqualTo(scores[i - 1]),
+        reason: 'hoog naar laag, ongeacht starttijd: $scores',
+      );
+    }
+  });
+
+  testWidgets('"Op tijd" zet ze chronologisch, ook als dat de beste omlaag haalt',
+      (tester) async {
+    await pumpHomeWithSlots(tester, [
+      slotAt(6, 9, 85),
+      slotAt(9, 12, 93),
+      slotAt(12, 15, 100),
+    ]);
+
+    await tester.tap(find.text('Op tijd'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    final scores = tester
+        .widgetList<ScoreDisplay>(find.byType(ScoreDisplay))
+        .map((w) => w.score)
+        .toList();
+
+    expect(scores.length, greaterThanOrEqualTo(2));
+    expect(
+      scores.first,
+      85.0,
+      reason: 'de vroegste rit staat bovenaan, ook al scoort hij het laagst',
+    );
   });
 }
