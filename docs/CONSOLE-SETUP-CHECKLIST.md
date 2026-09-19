@@ -113,8 +113,22 @@ Google added sub-questions after the previous 21 June declaration, which is why 
 | Personal info — User IDs | Collected, not shared, not ephemeral, optional, Account management | Supabase auth UUID |
 | App activity — Other user-generated content | Collected, not shared, not ephemeral, optional, App functionality | weekly availability pattern and planned rides |
 | Calendar | **Not declared** | calendar-imported blocked hours never leave the device, see F-7 |
+| App activity — App interactions | Collected, not shared, not ephemeral, **optional**, Analytics | v4.1 usage statistics; only sent after explicit consent, see the block below |
+| Device or other IDs | Collected, not shared, not ephemeral, **optional**, Analytics | the random `device_id` from `analytics_consent_store.dart`; not an advertising ID and not the Android ID |
 
 **Why nothing is declared as "Shared".** Google exempts transfers to a service provider processing on the developer's behalf. The published privacy policy lists Open-Meteo, Supabase and Google under *"Wie namens ons gegevens verwerkt"* — processors, not recipients. Declaring "Shared" would have put a "shares data with third parties" label on the Store listing that directly contradicts the policy. The resulting listing reads **"No data shared with third parties"**.
+
+### Analytics, added in v4.1 (not yet submitted)
+
+Two rows above are new and turn the answer to *"Does your app collect or share any of the required user data types?"* into a broader Yes than the July declaration. What changes and why:
+
+* **Purpose is `Analytics`, not `App functionality`.** These events measure how the app is used; nothing in the app stops working without them.
+* **Both rows are `optional`.** Google's definition of optional is exactly this case: the user is asked and can refuse. The question appears on the second launch and the answer is reversible in Profile.
+* **`Device or other IDs` is the row that is easy to get wrong.** The `device_id` is a random UUID v4 the app generates itself and discards when consent is withdrawn. It is still an ID under Google's definition, so it is declared. It is **not** the advertising ID: no ad SDK is present, and the app declares no `AD_ID` permission.
+* **Nothing is `Shared`.** Same reasoning as below: the events go to Supabase, a processor, in the same Paris project as everything else. No third party is involved.
+* **No free text, no location.** Migration 0008 caps `props` at 500 characters and `AnalyticsService` strips anything that is not a number, a boolean or a short code, so *"User-generated content"* stays undeclared for analytics.
+
+The matching privacy-policy section is *"Anonieme gebruiksstatistiek — alleen als je ja zegt"* / *"Anonymous usage statistics — only if you say yes"*, published at the URL above. **The policy promises a twelve-month retention limit; there is no job that enforces it yet** — see `.planning/OPEN.md`.
 
 **Why everything is "optional".** Signing in is optional and the policy states the app works fully without an account; location has a manual override for users who deny the permission.
 
@@ -145,7 +159,7 @@ _Recorded rather than omitted — findings are the most valuable thing this file
 
 **F-7 (resolved in favour of the policy). Plan 18-04 and the published privacy policy contradicted each other about calendar data.** The plan instructed that Data Safety declare "location data and calendar-derived availability are collected and stored on servers". The policy rewritten in plan 18-02 and published states the opposite under *"Wat op je toestel blijft"*: calendar-imported blocked hours "worden nooit naar een server gestuurd". The policy is published and is the promise to users; the plan text predates 18-02's execution. **Calendar was therefore not declared.** If Phase 21 ever syncs calendar-derived hours server-side, both the policy and this declaration must change together.
 
-**F-8 (open, user-visible bug). The in-app privacy policy link is dead.** `lib/features/profile/profile_screen.dart:35` points at `https://joostmouw.github.io/ridewindow-privacy/`, which returns **HTTP 404** — a repo that does not exist. The correct URL, and the one registered on the Store listing and the OAuth consent screen, is `https://joostmouw.github.io/ridewindow/privacy-policy.html`. Every tester tapping "Privacybeleid" in Profile currently gets a 404. This predates accounts and is a one-line fix, but it is the kind of defect that reads as negligence in a privacy context.
+**F-8 (resolved 2026-09-19, `lib/features/profile/profile_screen.dart`). The in-app privacy policy link was dead.** It pointed at `https://joostmouw.github.io/ridewindow-privacy/`, which returns **HTTP 404** — a repo that does not exist. The correct URL, and the one registered on the Store listing and the OAuth consent screen, is `https://joostmouw.github.io/ridewindow/privacy-policy.html`. Every tester who tapped "Privacybeleid" in Profile got a 404. This predated accounts and stayed open from July to September because nobody tapped the link; it is now the same URL as the Store listing and the OAuth consent screen.
 
 **F-9 (open, permission hygiene). `ACCESS_FINE_LOCATION` is declared but never used.** `AndroidManifest.xml` declares both `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION`, while `lib/providers/location_provider.dart` requests `LocationAccuracy.reduced`. The fine-location permission is therefore over-broad, and on Android 12+ it makes the system show users a precise/approximate toggle for a choice the app does not act on. Dropping the fine permission would match the declared Data Safety answer (approximate only) to the manifest.
 

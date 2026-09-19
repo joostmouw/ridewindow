@@ -45,7 +45,13 @@ class ProfileScreen extends ConsumerStatefulWidget {
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-const _kPrivacyPolicyUrl = 'https://joostmouw.github.io/ridewindow-privacy/';
+// De gepubliceerde pagina staat in `docs/` van deze repo en wordt door GitHub
+// Pages onder `/ridewindow/` geserveerd. Het oude adres (`ridewindow-privacy`)
+// wees naar een repo die niet bestaat en gaf sinds de eerste release een 404 --
+// zie F-8 in `docs/CONSOLE-SETUP-CHECKLIST.md`. Dit is hetzelfde adres als op de
+// winkelpagina en het OAuth-toestemmingsscherm; die drie horen gelijk te lopen.
+const _kPrivacyPolicyUrl =
+    'https://joostmouw.github.io/ridewindow/privacy-policy.html';
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   // Lokale state voor live slider-waarden (vóór onChangeEnd persistentie).
