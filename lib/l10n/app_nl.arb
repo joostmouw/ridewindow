@@ -808,14 +808,8 @@
   "homeViewBlocks": "Blok",
   "homeSortBest": "Beste eerst",
   "homeSortTime": "Op tijd",
-  "blockGoodFromTo": "goed van {from} tot {to}",
-  "blockBestWindow": "Beste moment: {slot}",
-  "@blockGoodFromTo": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
-  "@blockBestWindow": {"placeholders": {"slot": {"type": "String"}}},
-  "blockUpToHours": "tot {hours} uur mogelijk",
-  "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}},
-  "blockGoodSpans": "goed: {spans}",
-  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}},
-  "blockCanRideUpTo": "Je kunt hier tot {hours} uur weg",
-  "@blockCanRideUpTo": {"placeholders": {"hours": {"type": "int"}}}
+  "blockRidableSpans": "je kunt rijden: {spans}",
+  "blockLongestRide": "Langste rit hier: {hours} uur",
+  "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
+  "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}}
 }

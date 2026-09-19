@@ -1876,27 +1876,12 @@ class SEn extends S {
   String get homeSortTime => 'By time';
 
   @override
-  String blockGoodFromTo(String from, String to) {
-    return 'good from $from to $to';
+  String blockRidableSpans(String spans) {
+    return 'you can ride: $spans';
   }
 
   @override
-  String blockBestWindow(String slot) {
-    return 'Best moment: $slot';
-  }
-
-  @override
-  String blockUpToHours(int hours) {
-    return 'up to $hours hours';
-  }
-
-  @override
-  String blockGoodSpans(String spans) {
-    return 'good: $spans';
-  }
-
-  @override
-  String blockCanRideUpTo(int hours) {
-    return 'You can ride up to $hours hours here';
+  String blockLongestRide(int hours) {
+    return 'Longest ride here: $hours hours';
   }
 }

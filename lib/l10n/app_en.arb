@@ -640,14 +640,8 @@
   "homeViewBlocks": "Block",
   "homeSortBest": "Best first",
   "homeSortTime": "By time",
-  "blockGoodFromTo": "good from {from} to {to}",
-  "blockBestWindow": "Best moment: {slot}",
-  "@blockGoodFromTo": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
-  "@blockBestWindow": {"placeholders": {"slot": {"type": "String"}}},
-  "blockUpToHours": "up to {hours} hours",
-  "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}},
-  "blockGoodSpans": "good: {spans}",
-  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}},
-  "blockCanRideUpTo": "You can ride up to {hours} hours here",
-  "@blockCanRideUpTo": {"placeholders": {"hours": {"type": "int"}}}
+  "blockRidableSpans": "you can ride: {spans}",
+  "blockLongestRide": "Longest ride here: {hours} hours",
+  "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
+  "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}}
 }

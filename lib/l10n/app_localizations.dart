@@ -3379,35 +3379,17 @@ abstract class S {
   /// **'Op tijd'**
   String get homeSortTime;
 
-  /// No description provided for @blockGoodFromTo.
+  /// No description provided for @blockRidableSpans.
   ///
   /// In nl, this message translates to:
-  /// **'goed van {from} tot {to}'**
-  String blockGoodFromTo(String from, String to);
+  /// **'je kunt rijden: {spans}'**
+  String blockRidableSpans(String spans);
 
-  /// No description provided for @blockBestWindow.
+  /// No description provided for @blockLongestRide.
   ///
   /// In nl, this message translates to:
-  /// **'Beste moment: {slot}'**
-  String blockBestWindow(String slot);
-
-  /// No description provided for @blockUpToHours.
-  ///
-  /// In nl, this message translates to:
-  /// **'tot {hours} uur mogelijk'**
-  String blockUpToHours(int hours);
-
-  /// No description provided for @blockGoodSpans.
-  ///
-  /// In nl, this message translates to:
-  /// **'goed: {spans}'**
-  String blockGoodSpans(String spans);
-
-  /// No description provided for @blockCanRideUpTo.
-  ///
-  /// In nl, this message translates to:
-  /// **'Je kunt hier tot {hours} uur weg'**
-  String blockCanRideUpTo(int hours);
+  /// **'Langste rit hier: {hours} uur'**
+  String blockLongestRide(int hours);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

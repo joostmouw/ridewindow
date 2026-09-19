@@ -1882,27 +1882,12 @@ class SNl extends S {
   String get homeSortTime => 'Op tijd';
 
   @override
-  String blockGoodFromTo(String from, String to) {
-    return 'goed van $from tot $to';
+  String blockRidableSpans(String spans) {
+    return 'je kunt rijden: $spans';
   }
 
   @override
-  String blockBestWindow(String slot) {
-    return 'Beste moment: $slot';
-  }
-
-  @override
-  String blockUpToHours(int hours) {
-    return 'tot $hours uur mogelijk';
-  }
-
-  @override
-  String blockGoodSpans(String spans) {
-    return 'goed: $spans';
-  }
-
-  @override
-  String blockCanRideUpTo(int hours) {
-    return 'Je kunt hier tot $hours uur weg';
+  String blockLongestRide(int hours) {
+    return 'Langste rit hier: $hours uur';
   }
 }

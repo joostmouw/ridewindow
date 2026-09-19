@@ -1361,7 +1361,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            s.blockGoodSpans(spans),
+                            s.blockRidableSpans(spans),
                             style: theme.textTheme.bodySmall
                                 ?.copyWith(color: rw.textSecondary),
                           ),
@@ -1405,7 +1405,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 _DayRail(day: day),
                 const SizedBox(height: 8),
                 Text(
-                  s.blockCanRideUpTo(day.longestRideHours),
+                  s.blockLongestRide(day.longestRideHours),
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: rw.textSecondary),
                 ),
@@ -2472,7 +2472,18 @@ class _DayRail extends StatelessWidget {
                 return Stack(
                   children: [
                     // De dag zelf: wat de app niet aanbiedt.
-                    Positioned.fill(child: ColoredBox(color: rw.surfaceDim)),
+                    //
+                    // Bewust géén `rw.surfaceDim` -- die is #DAE2CC, een
+                    // gróénige beige, en daarmee was het gat zelf al half
+                    // groen. Naast een bleke tint werd het verwisselbaar met
+                    // een stuk dat wél iets aanbood. Een neutrale sluier over
+                    // de kaartkleur leest in beide helderheden als "hier is
+                    // niets".
+                    Positioned.fill(
+                      child: ColoredBox(
+                        color: rw.textPrimary.withValues(alpha: 0.07),
+                      ),
+                    ),
 
                     // De goede stukken, elk in de tint van hun eigen oordeel.
                     //
@@ -2570,12 +2581,27 @@ class BestChoicePill extends StatelessWidget {
   }
 }
 
-/// De tint van een oordeel, zoals de kaarten hem ook gebruiken.
+/// Hoe sterk een stuk van de dagbalk doorkleurt: meer groen is beter.
+///
+/// **Waarom niet de kaartkleuren.** Die zijn hier één keer geprobeerd en
+/// werkten niet: `perfectBg` is bleekgroen, `greatBg` is teal en
+/// `acceptableBg` is oranje -- drie verschillende kleurfamilies voor iets dat
+/// een volgorde is. Op een kaart werkt dat, want daar staat het woord ernaast
+/// en is er oppervlak genoeg. Op een balk van 24 pixels zonder legenda niet:
+/// Joost vroeg wat de vakken bepaalde, en dat is precies het bewijs dat je het
+/// er niet uit kon lezen. Bovendien lag het grijs van de gaten er visueel
+/// tussenin, dus gaten en stukken werden verwisselbaar.
+///
+/// Eén kleur in drie sterktes leest wél als een schaal, en de volle kleur
+/// onderaan is dezelfde die het cijfer rechtsboven draagt.
 Color _tierBg(RideWindowTheme rw, RideTier tier) => switch (tier) {
-      Perfect() => rw.tiers.perfectBg,
-      Great() => rw.tiers.greatBg,
-      Acceptable() => rw.tiers.acceptableBg,
-      Poor() => rw.tiers.poorBg,
+      Perfect() => rw.scorePerfect.withValues(alpha: 0.50),
+      Great() => rw.scorePerfect.withValues(alpha: 0.32),
+      Acceptable() => rw.scorePerfect.withValues(alpha: 0.22),
+      // Onbereikbaar in de praktijk -- SlotsNotifier filtert Poor-vensters weg
+      // voordat er ooit een blok van gemaakt wordt. Staat hier voor de
+      // volledigheid van de switch, niet omdat het voorkomt.
+      Poor() => rw.scorePerfect.withValues(alpha: 0.12),
     };
 
 /// Dezelfde kleur die [ScoreDisplay] aan het cijfer geeft.

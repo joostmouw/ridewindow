@@ -385,13 +385,13 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
 
     expect(
-      find.text('goed: 06:00\u201313:00'),
+      find.text('je kunt rijden: 06:00\u201313:00'),
       findsOneWidget,
       reason: 'drie regels, één ochtend',
     );
     // Niet "7 uur aaneengesloten": dat zou beweren dat je zeven uur achter
     // elkaar fietst. Wat de app aanbiedt is de langste rit in dat blok.
-    expect(find.text('Je kunt hier tot 3 uur weg'), findsOneWidget);
+    expect(find.text('Langste rit hier: 3 uur'), findsOneWidget);
 
     // En de beoordeling hangt aan een tijdvak, niet aan de dag: het beste
     // venster staat boven het cijfer.
