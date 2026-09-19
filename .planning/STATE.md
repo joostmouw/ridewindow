@@ -37,6 +37,7 @@ feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de ba
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-19 | #66 afgezegde ritten | Afzeggen was een deur die één kant op ging — `declined` viel uit alle drie de providers tegelijk. Eigen rol achteraan in de enum (voorrang, niet cosmetisch), eigen filter, weg terug op het ritdetail. **De functie bestond al, hij had nergens een knop.** |
 | 2026-09-19 | notificatieschakelaars | **Alle drie waren decoratie** — ze sloegen een voorkeur op die niemand ooit las. `planNotifications()` is nu puur en getest; aangesloten op de slots-listener en op de schakelaar zelf. Op web is de sectie weg (geen implementatie daar). Achtergrond-planning bewust niet: [[#74]]. |
 | 2026-09-19 | [analytics](quick/260919-g1b-analytics/) | Anonieme gebruiksstatistiek na expliciete toestemming. **De privacy-constraint is bewust herschreven**, niet opgerekt — zonder ja vertrekt er niets. Drie sloten, tien gebeurtenissen, rapport via `tool/analytics_report.dart`. **Vier dingen wachten op Joost**, zie de SUMMARY — migratie 0008 is er daar één van. |
 | 2026-09-19 | [a-locatie-volgt-de-fietser](quick/260919-f0a-a-locatie-volgt-de-fietser/) | Tester in Aruba zag "licht van 01:32 tot 13:29". **Drie oorzaken, niet één** — de app rekende de zon voor Amsterdam en tekende hem op de klok van Aruba. Laatst bekende positie gedeeld met de achtergrondtaak, waarschuwing op Home, stedenlijst voorbij de grens. De tijdas zelf blijft bewust staan; [diagnose met bewijs](https://claude.ai/artifact/Kvof7uzvxx43EUFicVDTPX). |

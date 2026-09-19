@@ -51,8 +51,8 @@ vertrouwen; de App bundle explorer in de Console wel. Vandaar de sprong naar 41.
 | **69** | **De lijst toont losse vensters, niet het groene blok.** Ingrid kreeg op één zaterdag 09:00–11:00 (100), 06:00–09:00 (99) én 11:00–13:00 (95) achter elkaar. Geen fout — `dedup` doet zijn werk — maar een ánder model dan dat van de gebruiker: de app beantwoordt *"welk venster van N uur is het beste"*, zij vraagt *"wanneer is het vandaag goed en hoe lang kan ik weg"*. | Ingrid, 2026-09-09 |
 | **70** | **Waarom dít venster en niet dat ernaast.** Haar vermoeden klopte — 09:00–11:00 scoort echt hoger dan 08:00–11:00 — maar het weggegooide alternatief en zijn score zijn onzichtbaar. `insights_sheet.dart` legt al uit waarom een score die score is; dit is de buurman-vraag. | Ingrid, 2026-09-09 |
 | **63** | **iPhone-tester komt niet terug uit het beschikbaarheidsscherm.** Niet op te lossen zonder iPhone; de knop bestáát in alle drie de takken, dus het is een safe-area-kwestie op iOS-standalone. | v4.0 |
-| **66** | **Afgezegde ritten blijven onbereikbaar.** De snackbar met ongedaan-maken dekt de misklik, niet "morgen toch wel". | v4.0 |
-| **67** | **Notificaties zijn hardgecodeerd Nederlands.** Zes teksten in `notification_service.dart`. De weg is bekend: `AppLocalizations.delegate.load(Locale(profile.locale))` levert een `S` zonder `BuildContext`. | v4.0 |
+| ~~**66**~~ | ~~Afgezegde ritten blijven onbereikbaar.~~ **Opgelost 2026-09-19** (`265e282`): eigen filter "Afgezegd", weg terug op het ritdetail. | v4.0 |
+| ~~**67**~~ | ✅ **Opgelost 2026-09-19** (`3a1beaf`) — ~~Notificaties zijn hardgecodeerd Nederlands.~~ Zes teksten in `notification_service.dart`. De weg is bekend: `AppLocalizations.delegate.load(Locale(profile.locale))` levert een `S` zonder `BuildContext`. | v4.0 |
 | **65** | **Epic "Peloton v2"** — meekijken zonder account, meerdere geschoorde vensters voorleggen, gedeelde beschikbaarheid, maatjes via gebruikersnaam. | v3.0 |
 
 ---
