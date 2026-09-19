@@ -1837,4 +1837,12 @@ class SEn extends S {
 
   @override
   String get analyticsSettingOff => 'Off — nothing leaves your device';
+
+  @override
+  String notifWeeklyBody(String slot) {
+    return 'Your best moment: $slot';
+  }
+
+  @override
+  String get notifWeeklyBodyEmpty => 'See which moments this week has in store';
 }

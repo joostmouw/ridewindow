@@ -626,5 +626,8 @@
   "analyticsAskNo": "No thanks",
   "analyticsSettingTitle": "Anonymous usage statistics",
   "analyticsSettingOn": "On \u2014 you're helping improve the app",
-  "analyticsSettingOff": "Off \u2014 nothing leaves your device"
+  "analyticsSettingOff": "Off \u2014 nothing leaves your device",
+  "notifWeeklyBody": "Your best moment: {slot}",
+  "notifWeeklyBodyEmpty": "See which moments this week has in store",
+  "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}}
 }

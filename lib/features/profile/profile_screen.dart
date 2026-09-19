@@ -6,6 +6,7 @@
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +28,9 @@ import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
+import 'package:ridewindow/domain/services/notification_plan.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
+import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
@@ -96,7 +99,43 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
       }
     }
-    // Verdere scheduling vindt plaats via SlotsNotifier data in de toekomst (Phase 8 scope: permissie-flow)
+
+    // 3. En dan ook werkelijk plannen.
+    //
+    // Hier stond jarenlang: "Verdere scheduling vindt plaats via SlotsNotifier
+    // data in de toekomst (Phase 8 scope: permissie-flow)". Die toekomst is
+    // nooit gekomen, en daardoor sloegen alle drie de schakelaars alleen een
+    // voorkeur op. Een tester zette ze aan en kreeg nooit iets.
+    await _applyNotificationPlans(canExact: canExact);
+  }
+
+  /// Plant de meldingen opnieuw op grond van het huidige profiel en het
+  /// eerstvolgende venster. Wordt ook aangeroepen bij het uitzetten van een
+  /// schakelaar -- dan levert [planNotifications] minder plannen op en
+  /// annuleert [NotificationService.applyPlans] wat er stond.
+  Future<void> _applyNotificationPlans({bool? canExact}) async {
+    if (kIsWeb) return;
+    try {
+      final profile = ref.read(profileProvider).value;
+      if (profile == null) return;
+
+      final slotsState = ref.read(slotsProvider);
+      final slot =
+          slotsState is SlotsLoaded ? slotsState.slots.firstOrNull : null;
+
+      await _notifService.applyPlans(
+        planNotifications(
+          profile: profile,
+          nextSlot: slot,
+          now: DateTime.now(),
+        ),
+        strings: await S.delegate.load(Locale(profile.locale)),
+        exact: canExact ?? await _notifService.canScheduleExact(),
+        weeklySlotTitle: slot == null ? null : formatSlotTitle(slot),
+      );
+    } catch (_) {
+      // Meldingen mogen nooit de reden zijn dat een schakelaar hapert.
+    }
   }
 
   @override
@@ -555,7 +594,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
 
           // Sectie: NOTIFICATIES (NOTIF-01, NOTIF-02, NOTIF-03)
-          SectionCard(
+          //
+          // Niet op web: `flutter_local_notifications` heeft daar geen
+          // implementatie, dus de drie schakelaars konden er sowieso nooit iets
+          // doen. Ze stonden er tot 2026-09-19 wel -- een iOS-tester kon ze
+          // aanzetten en wachten op meldingen die nooit zouden komen.
+          if (!kIsWeb)
+            SectionCard(
             title: s.sectionNotifications,
             children: [
               SwitchListTile(
@@ -568,6 +613,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       .setNotifEveningBefore(v);
                   if (v && context.mounted) {
                     await _scheduleNotificationsIfPermitted(context);
+                  } else if (!v) {
+                    // Uitzetten moet ook iets doen: applyPlans annuleert wat
+                    // er stond en plant alleen wat nog aan staat terug.
+                    await _applyNotificationPlans();
                   }
                 },
               ),
@@ -579,6 +628,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   await ref.read(profileProvider.notifier).setNotifMorningOf(v);
                   if (v && context.mounted) {
                     await _scheduleNotificationsIfPermitted(context);
+                  } else if (!v) {
+                    // Uitzetten moet ook iets doen: applyPlans annuleert wat
+                    // er stond en plant alleen wat nog aan staat terug.
+                    await _applyNotificationPlans();
                   }
                 },
               ),
@@ -592,6 +645,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       .setNotifWeeklyDigest(v);
                   if (v && context.mounted) {
                     await _scheduleNotificationsIfPermitted(context);
+                  } else if (!v) {
+                    // Uitzetten moet ook iets doen: applyPlans annuleert wat
+                    // er stond en plant alleen wat nog aan staat terug.
+                    await _applyNotificationPlans();
                   }
                 },
               ),

@@ -11,6 +11,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:ridewindow/domain/services/notification_plan.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 
 /// Unieke notificatie-ID's per notificatietype.
@@ -193,6 +194,53 @@ class NotificationService {
 
   /// Annuleer alle geplande notificaties (bijv. bij toggle uitzetten).
   Future<void> cancelAll() async => _plugin.cancelAll();
+
+  /// Voer [plans] uit: annuleer wat er stond en plan opnieuw.
+  ///
+  /// **Waarom eerst alles annuleren.** De drie meldingen hangen aan het
+  /// eerstvolgende beste venster, en dat venster verschuift bij elke nieuwe
+  /// voorspelling. Bijwerken-waar-nodig zou bijhouden vergen wat er stond;
+  /// opnieuw opbouwen is korter en kan niet uit de pas lopen. Er staan er
+  /// hooguit drie.
+  ///
+  /// [weeklySlotTitle] is het beste venster van de week, of null als er geen is.
+  Future<void> applyPlans(
+    List<NotificationPlan> plans, {
+    required S strings,
+    required bool exact,
+    String? weeklySlotTitle,
+  }) async {
+    if (kIsWeb) return;
+
+    await cancelAll();
+
+    for (final plan in plans) {
+      switch (plan) {
+        case EveningBeforePlan(:final slotDay, :final slotTitle):
+          await scheduleEveningBefore(
+            slotDay: slotDay,
+            slotTitle: slotTitle,
+            exact: exact,
+            strings: strings,
+          );
+        case MorningOfPlan(:final slotStart, :final slotTitle):
+          await scheduleMorningOf(
+            slotStart: slotStart,
+            slotTitle: slotTitle,
+            exact: exact,
+            strings: strings,
+          );
+        case WeeklyDigestPlan():
+          await scheduleWeeklyDigest(
+            bodySummary: weeklySlotTitle == null
+                ? strings.notifWeeklyBodyEmpty
+                : strings.notifWeeklyBody(weeklySlotTitle),
+            exact: exact,
+            strings: strings,
+          );
+      }
+    }
+  }
 
   AndroidScheduleMode _mode(bool exact) => exact
       ? AndroidScheduleMode.exactAllowWhileIdle

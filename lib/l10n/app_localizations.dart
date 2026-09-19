@@ -3312,6 +3312,18 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Uit — er verlaat niets je toestel'**
   String get analyticsSettingOff;
+
+  /// No description provided for @notifWeeklyBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je beste moment: {slot}'**
+  String notifWeeklyBody(String slot);
+
+  /// No description provided for @notifWeeklyBodyEmpty.
+  ///
+  /// In nl, this message translates to:
+  /// **'Kijk welke momenten er deze week in zitten'**
+  String get notifWeeklyBodyEmpty;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

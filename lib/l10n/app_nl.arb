@@ -794,5 +794,8 @@
   "analyticsAskNo": "Nee, liever niet",
   "analyticsSettingTitle": "Anonieme gebruiksstatistiek",
   "analyticsSettingOn": "Aan \u2014 je helpt de app beter te maken",
-  "analyticsSettingOff": "Uit \u2014 er verlaat niets je toestel"
+  "analyticsSettingOff": "Uit \u2014 er verlaat niets je toestel",
+  "notifWeeklyBody": "Je beste moment: {slot}",
+  "notifWeeklyBodyEmpty": "Kijk welke momenten er deze week in zitten",
+  "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}}
 }

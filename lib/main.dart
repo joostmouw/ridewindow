@@ -23,7 +23,10 @@ import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
+import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:ridewindow/domain/services/notification_plan.dart';
 import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/locale_provider.dart';
@@ -129,6 +132,40 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
     }
   }
 
+
+  /// Plant de meldingen opnieuw voor het eerstvolgende venster.
+  ///
+  /// **Waarom vanuit de voorgrond en niet vanuit de achtergrondtaak.** Die
+  /// draait in een eigen isolate zonder `tz.initializeTimeZones()` en zonder de
+  /// tijdzone van het toestel. Daar plannen zou `tz.local` op UTC laten staan en
+  /// elke melding uren verkeerd laten afgaan -- precies dezelfde klasse fout als
+  /// de Aruba-melding van dezelfde dag. De prijs is dat de meldingen alleen
+  /// bijwerken zolang iemand de app af en toe opent; dat is een bewuste keuze en
+  /// staat als vervolg op de backlog.
+  Future<void> _rescheduleNotifications(RideSlot? slot) async {
+    try {
+      final profile = ref.read(profileProvider).value;
+      if (profile == null) return;
+
+      final service = NotificationService();
+      final plans = planNotifications(
+        profile: profile,
+        nextSlot: slot,
+        now: DateTime.now(),
+      );
+
+      final strings = await S.delegate.load(Locale(profile.locale));
+      await service.applyPlans(
+        plans,
+        strings: strings,
+        exact: await service.canScheduleExact(),
+        weeklySlotTitle: slot == null ? null : formatSlotTitle(slot),
+      );
+    } catch (_) {
+      // Meldingen mogen nooit de reden zijn dat de app hapert.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Luister op slotsProvider en update het Android home screen widget
@@ -139,6 +176,11 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
         if (next is SlotsLoaded) {
           final slot = next.slots.firstOrNull;
           WidgetUpdateService.update(slot);
+          // Dezelfde aanleiding, tweede gevolg: de drie meldingsschakelaars in
+          // Profiel hangen aan datzelfde eerstvolgende venster. Tot 2026-09-19
+          // las niemand die voorkeuren ooit om iets te plannen -- ze sloegen
+          // alleen een waarde op. Hier gebeurt het wel.
+          _rescheduleNotifications(slot);
         }
       }
     });

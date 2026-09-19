@@ -1842,4 +1842,13 @@ class SNl extends S {
 
   @override
   String get analyticsSettingOff => 'Uit — er verlaat niets je toestel';
+
+  @override
+  String notifWeeklyBody(String slot) {
+    return 'Je beste moment: $slot';
+  }
+
+  @override
+  String get notifWeeklyBodyEmpty =>
+      'Kijk welke momenten er deze week in zitten';
 }
