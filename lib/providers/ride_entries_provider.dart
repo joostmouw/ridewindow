@@ -7,7 +7,7 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 
 part 'ride_entries_provider.g.dart';
 
-/// Alle aankomende ritten, uit alle vier de bronnen, in chronologische
+/// Alle aankomende ritten, uit alle vijf de bronnen, in chronologische
 /// volgorde en met jouw rol erbij.
 ///
 /// **Eén provider en niet vier losse watches per scherm.** Home en het
@@ -30,6 +30,8 @@ List<RideEntry> rideEntries(Ref ref) {
       ref.watch(joinedGroupRidesProvider).value ?? const <GroupRide>[];
   final invites =
       ref.watch(pendingRideInvitesProvider).value ?? const <GroupRide>[];
+  final declined =
+      ref.watch(declinedGroupRidesProvider).value ?? const <GroupRide>[];
 
   final now = DateTime.now();
   return buildRideEntries(
@@ -37,6 +39,7 @@ List<RideEntry> rideEntries(Ref ref) {
     owned: owned,
     joined: joined,
     invites: invites,
+    declined: declined,
     // Vanaf het begin van vandaag, niet vanaf dit moment: een rit die vanochtend
     // om 07:00 begon en om 09:00 eindigde hoort de rest van de dag nog zichtbaar
     // te zijn. Dezelfde grens die "Mijn ritten" al hanteerde.

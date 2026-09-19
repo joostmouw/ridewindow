@@ -81,3 +81,29 @@ Future<List<GroupRide>> joinedGroupRides(Ref ref) async {
       )
       .toList();
 }
+
+/// Andermans gedeelde ritten waar jij nee op hebt gezegd.
+///
+/// **Waarom dit bestaat.** Afzeggen was een deur die één kant op ging: een rit
+/// met status `declined` viel uit [pendingRideInvites] (niet meer `invited`),
+/// uit [joinedGroupRides] (niet `accepted`) én uit [ownedGroupRides] (niet van
+/// jou), en was daarmee nergens meer aan te wijzen -- terwijl de rij gewoon
+/// bestaat en RLS een terugweg toestaat. De snackbar met ongedaan-maken uit
+/// september dekte de misklik, niet "morgen toch wel" (backlog #66).
+///
+/// Deze ritten horen bewust níét op Home en niet in de standaardlijst: wie nee
+/// zegt, wil er niet aan herinnerd worden. Ze zijn te vinden via het filter
+/// "Afgezegd", en daar is de weg terug.
+@riverpod
+Future<List<GroupRide>> declinedGroupRides(Ref ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const [];
+  final rides = await ref.watch(groupRidesProvider.future);
+  return rides
+      .where(
+        (r) =>
+            !r.isOwnedBy(userId) &&
+            r.statusFor(userId) == ParticipantStatus.declined,
+      )
+      .toList();
+}

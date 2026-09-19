@@ -151,7 +151,10 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final entries = ref.watch(rideEntriesProvider);
+    final entries = ref
+        .watch(rideEntriesProvider)
+        .where((e) => !e.isDeclined)
+        .toList();
 
     return Stack(
       children: [
@@ -378,6 +381,11 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
       );
     }
 
+    // Afgezegde ritten horen niet in de gewone lijst: wie nee zegt, wil er niet
+    // aan herinnerd worden. Ze blijven wel te vinden via hun eigen filter --
+    // dat is precies het gat dat backlog #66 beschreef.
+    final actief = entries.where((e) => !e.isDeclined).toList();
+
     final counts = countByRole(entries);
     // Een filter dat op nul staat verdwijnt: een chip die gegarandeerd een lege
     // lijst oplevert is geen keuze maar een valstrik. "Wacht op jou" is er
@@ -391,13 +399,13 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
     final filter = visibleFilters.contains(_filter) ? _filter : null;
 
     final shown =
-        (filter == null ? entries : entries.where((e) => e.role == filter))
+        (filter == null ? actief : entries.where((e) => e.role == filter))
             .toList();
 
     return Column(
       children: [
         _FilterRow(
-          total: entries.length,
+          total: actief.length,
           counts: counts,
           roles: visibleFilters,
           selected: filter,
@@ -450,6 +458,7 @@ class _FilterRow extends StatelessWidget {
       RideRole.organiser => s.ridesFilterOrganising,
       RideRole.joined => s.ridesFilterJoined,
       RideRole.solo => s.ridesFilterSolo,
+      RideRole.declined => s.ridesFilterDeclined,
     };
   }
 

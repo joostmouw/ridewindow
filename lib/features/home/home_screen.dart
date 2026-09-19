@@ -791,7 +791,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // zélf organiseert stond op geen enkel scherm buiten de Peloton-tab. Home
     // toonde zo'n rit hooguit als "gewone" geplande rit, zonder enig teken dat
     // er maatjes aan hingen.
-    final entries = ref.watch(rideEntriesProvider);
+    // Afgezegde ritten blijven hier weg: die zijn sinds backlog #66 wel te
+    // vinden, maar via hun eigen filter op het rittenscherm. Wie nee zegt hoort
+    // de rit niet op zijn Home terug te zien.
+    final entries =
+        ref.watch(rideEntriesProvider).where((e) => !e.isDeclined).toList();
     if (entries.isEmpty) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }

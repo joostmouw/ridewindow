@@ -396,8 +396,12 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     }
   }
 
-  /// Afzeggen met een terugweg, net als in de rittenlijst -- `declined` valt
-  /// uit alle providers en zou zonder deze snackbar onherstelbaar zijn.
+  /// Afzeggen met een snackbar om het meteen terug te draaien.
+  ///
+  /// Die snackbar dekte tot 2026-09-19 de misklik en verder niets: daarna viel
+  /// de rit uit alle providers en was hij nergens meer aan te wijzen. Sinds
+  /// backlog #66 is hij te vinden onder het filter "Afgezegd", met dezelfde weg
+  /// terug -- ook morgen nog.
   Future<void> _withdrawFromRide(RideEntry entry) async {
     final s = S.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -410,6 +414,20 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           label: s.pelotonUndo,
           onPressed: () => _respondToRide(entry, accepted: true),
         ),
+      ),
+    );
+  }
+
+  /// Alsnog ja zeggen tegen een rit die je eerder afzegde.
+  Future<void> _rejoinRide(RideEntry entry) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final before = entry.group;
+    await _respondToRide(entry, accepted: true);
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(before == null ? s.rideRejoinFailed : s.rideRejoined),
       ),
     );
   }
@@ -534,6 +552,20 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 child: TextButton(
                   onPressed: _isLoading ? null : () => _withdrawFromRide(entry),
                   child: Text(s.pelotonWithdraw),
+                ),
+              ),
+            ),
+          // De weg terug (backlog #66). Deze bestond al als functie -- hij had
+          // alleen nergens een knop, waardoor afzeggen een deur was die maar
+          // één kant op ging.
+          if (entry.role == RideRole.declined)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+                child: FilledButton.tonal(
+                  onPressed: _isLoading ? null : () => _rejoinRide(entry),
+                  child: Text(s.rideRejoin),
                 ),
               ),
             ),

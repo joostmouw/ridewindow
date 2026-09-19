@@ -1,6 +1,7 @@
 // test/domain/models/ride_entry_test.dart
 //
-// De samenvoeging van vier bronnen tot één lijst (schets 008).
+// De samenvoeging van vijf bronnen tot één lijst (schets 008, en sinds
+// backlog #66 ook de afgezegde ritten).
 //
 // Wat hier bewaakt wordt is niet dat er een lijst uitkomt, maar dat een rit
 // die in twee bronnen zit één regel blijft en dan de júiste rol draagt.
@@ -196,6 +197,12 @@ void main() {
                 owned: const [],
                 joined: const [],
                 invites: [_group(id: 'g', ownerId: _other, day: 14)]).single,
+            RideRole.declined => buildRideEntries(
+                planned: const [],
+                owned: const [],
+                joined: const [],
+                invites: const [],
+                declined: [_group(id: 'g', ownerId: _other, day: 14)]).single,
           };
 
       expect(entryFor(RideRole.solo).isRemovable, isTrue);
@@ -204,6 +211,9 @@ void main() {
       // alleen niet mee.
       expect(entryFor(RideRole.joined).isRemovable, isFalse);
       expect(entryFor(RideRole.pending).isRemovable, isFalse);
+      // En een afgezegde rit al helemaal niet: die is juist bewaard gebleven
+      // om er nog op terug te kunnen komen (backlog #66).
+      expect(entryFor(RideRole.declined).isRemovable, isFalse);
     });
 
     test('ownerName is leeg op je eigen rit, en gevuld op die van een ander',
@@ -258,6 +268,84 @@ void main() {
       expect(counts[RideRole.pending], 0,
           reason: 'een rol op nul hoort in de map te staan, niet te ontbreken '
               '-- de filterrij leest hem op om te beslissen of hij verschijnt');
+    });
+  });
+
+  // ── Afgezegde ritten (backlog #66) ──
+  //
+  // Afzeggen was een deur die één kant op ging: `declined` viel uit
+  // pendingRideInvites, joinedGroupRides en ownedGroupRides tegelijk en was
+  // nergens meer aan te wijzen, terwijl de rij bestond en RLS een terugweg
+  // toestond. Deze groep legt de twee eisen vast die elkaar in de weg zitten:
+  // de rit moet vindbaar zijn, en hij mag niet in de weg lopen.
+  group('afgezegde ritten', () {
+    test('krijgen de rol declined en zijn dus vindbaar', () {
+      final entries = buildRideEntries(
+        planned: const [],
+        owned: const [],
+        joined: const [],
+        invites: const [],
+        declined: [_group(id: 'g1', ownerId: _other, day: 14)],
+      );
+
+      expect(entries, hasLength(1));
+      expect(entries.single.role, RideRole.declined);
+      expect(entries.single.isDeclined, isTrue);
+    });
+
+    test('staan achteraan in voorrang, dus een eigen plan wint', () {
+      // Je zei nee tegen andermans rit, maar datzelfde tijdvak staat nog als
+      // jouw eigen rit. Dan is het gewoon jouw rit en hoort hij op Home.
+      final entries = buildRideEntries(
+        planned: [_planned(14)],
+        owned: const [],
+        joined: const [],
+        invites: const [],
+        declined: [_group(id: 'g1', ownerId: _other, day: 14)],
+      );
+
+      expect(entries, hasLength(1), reason: 'één tijdvak, één regel');
+      expect(entries.single.role, RideRole.solo);
+      expect(entries.single.isDeclined, isFalse);
+      expect(
+        entries.single.planned,
+        isNotNull,
+        reason: 'de persoonlijke rij blijft eraan hangen',
+      );
+    });
+
+    test('een geaccepteerde rit wint van een afgezegde op hetzelfde tijdvak',
+        () {
+      // Kan in theorie niet samen bestaan, maar als de cloud ooit beide
+      // teruggeeft moet de lijst niet twee regels tonen.
+      final entries = buildRideEntries(
+        planned: const [],
+        owned: const [],
+        joined: [_group(id: 'g1', ownerId: _other, day: 14)],
+        invites: const [],
+        declined: [_group(id: 'g1', ownerId: _other, day: 14)],
+      );
+
+      expect(entries, hasLength(1));
+      expect(entries.single.role, RideRole.joined);
+    });
+
+    test('zonder afgezegde ritten verandert er niets', () {
+      // De parameter heeft een default, dus bestaande aanroepers blijven werken.
+      final entries = buildRideEntries(
+        planned: const [],
+        owned: [_group(id: 'g1', ownerId: _me, day: 14)],
+        joined: const [],
+        invites: const [],
+      );
+
+      expect(entries.single.role, RideRole.organiser);
+    });
+
+    test('declined staat achteraan in de enum, en dat is niet cosmetisch', () {
+      // De voorrang bij ontdubbeling leunt op deze volgorde.
+      expect(RideRole.values.last, RideRole.declined);
+      expect(RideRole.declined.index, greaterThan(RideRole.solo.index));
     });
   });
 }

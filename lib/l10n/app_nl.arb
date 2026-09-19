@@ -797,5 +797,11 @@
   "analyticsSettingOff": "Uit \u2014 er verlaat niets je toestel",
   "notifWeeklyBody": "Je beste moment: {slot}",
   "notifWeeklyBodyEmpty": "Kijk welke momenten er deze week in zitten",
-  "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}}
+  "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}},
+  "roleDeclined": "Je zei nee tegen {name}",
+  "ridesFilterDeclined": "Afgezegd",
+  "rideRejoin": "Toch meegaan",
+  "rideRejoined": "Je gaat toch mee",
+  "rideRejoinFailed": "Dat is niet gelukt. Probeer het opnieuw.",
+  "@roleDeclined": {"placeholders": {"name": {"type": "String"}}}
 }

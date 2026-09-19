@@ -3324,6 +3324,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Kijk welke momenten er deze week in zitten'**
   String get notifWeeklyBodyEmpty;
+
+  /// No description provided for @roleDeclined.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je zei nee tegen {name}'**
+  String roleDeclined(String name);
+
+  /// No description provided for @ridesFilterDeclined.
+  ///
+  /// In nl, this message translates to:
+  /// **'Afgezegd'**
+  String get ridesFilterDeclined;
+
+  /// No description provided for @rideRejoin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toch meegaan'**
+  String get rideRejoin;
+
+  /// No description provided for @rideRejoined.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je gaat toch mee'**
+  String get rideRejoined;
+
+  /// No description provided for @rideRejoinFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dat is niet gelukt. Probeer het opnieuw.'**
+  String get rideRejoinFailed;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

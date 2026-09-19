@@ -1845,4 +1845,21 @@ class SEn extends S {
 
   @override
   String get notifWeeklyBodyEmpty => 'See which moments this week has in store';
+
+  @override
+  String roleDeclined(String name) {
+    return 'You said no to $name';
+  }
+
+  @override
+  String get ridesFilterDeclined => 'Declined';
+
+  @override
+  String get rideRejoin => 'Join after all';
+
+  @override
+  String get rideRejoined => 'You\'re joining after all';
+
+  @override
+  String get rideRejoinFailed => 'That didn\'t work. Please try again.';
 }

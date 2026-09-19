@@ -24,6 +24,19 @@ enum RideRole {
 
   /// Een rit uit `planned_rides` waar geen gedeelde rit bij hoort.
   solo,
+
+  /// Andermans gedeelde rit waar jij nee op hebt gezegd.
+  ///
+  /// Staat achteraan en dat is de hele bedoeling: afzeggen viel tot 2026-09-19
+  /// uit alle drie de lijsten tegelijk, waarmee de rit nergens meer aan te
+  /// wijzen was terwijl de rij gewoon bestond en RLS een terugweg toestond
+  /// (backlog #66). Nu is hij te vinden, maar alleen als je er expliciet naar
+  /// filtert -- een afzegging hoort niet terug te komen op Home.
+  ///
+  /// De laatste plek in de enum betekent ook de laagste voorrang: heb je een
+  /// groepsrit afgezegd maar staat datzelfde tijdvak nog als je eigen rit, dan
+  /// wint die eigen rit.
+  declined,
 }
 
 /// Eén rit in de lijst, ongeacht waar hij vandaan komt.
@@ -61,6 +74,9 @@ class RideEntry {
   int get durationHours => end.difference(start).inHours;
 
   bool get isShared => role != RideRole.solo;
+
+  /// Afgezegd, en daarmee uit de gewone lijst. Zie [RideRole.declined].
+  bool get isDeclined => role == RideRole.declined;
 
   /// Wie de rit organiseert. `null` als jij dat zelf bent of als de rit solo is.
   String? get ownerName => role == RideRole.organiser ? null : group?.ownerName;
@@ -111,6 +127,7 @@ List<RideEntry> buildRideEntries({
   required List<GroupRide> owned,
   required List<GroupRide> joined,
   required List<GroupRide> invites,
+  List<GroupRide> declined = const [],
   DateTime? notBefore,
 }) {
   final byKey = <String, RideEntry>{};
@@ -142,6 +159,9 @@ List<RideEntry> buildRideEntries({
   for (final g in joined) {
     putGroup(g, RideRole.joined);
   }
+  for (final g in declined) {
+    putGroup(g, RideRole.declined);
+  }
   for (final p in planned) {
     final key = RideEntry.slotKey(p.start, p.end);
     final existing = byKey[key];
@@ -149,11 +169,18 @@ List<RideEntry> buildRideEntries({
       // De gedeelde rit blijft staan, maar onthoudt wél de persoonlijke rij
       // eronder -- anders is die na het afzeggen van de groepsrit niet meer
       // op te ruimen en blijft er een wees achter in `planned_rides`.
+      //
+      // Uitzondering: een afgezegde groepsrit mag jouw eigen rit niet
+      // meetrekken naar de verborgen hoek. Zeg je nee tegen andermans rit maar
+      // stond datzelfde tijdvak al als jouw eigen plan, dan is het gewoon jouw
+      // rit -- die hoort op Home te blijven staan.
       byKey[key] = RideEntry(
         start: existing.start,
         end: existing.end,
         plannedScore: existing.plannedScore,
-        role: existing.role,
+        role: existing.role == RideRole.declined
+            ? RideRole.solo
+            : existing.role,
         group: existing.group,
         planned: p,
       );

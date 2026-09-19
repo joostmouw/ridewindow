@@ -629,5 +629,11 @@
   "analyticsSettingOff": "Off \u2014 nothing leaves your device",
   "notifWeeklyBody": "Your best moment: {slot}",
   "notifWeeklyBodyEmpty": "See which moments this week has in store",
-  "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}}
+  "@notifWeeklyBody": {"placeholders": {"slot": {"type": "String"}}},
+  "roleDeclined": "You said no to {name}",
+  "ridesFilterDeclined": "Declined",
+  "rideRejoin": "Join after all",
+  "rideRejoined": "You're joining after all",
+  "rideRejoinFailed": "That didn't work. Please try again.",
+  "@roleDeclined": {"placeholders": {"name": {"type": "String"}}}
 }

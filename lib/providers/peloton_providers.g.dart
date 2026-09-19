@@ -300,3 +300,76 @@ final class JoinedGroupRidesProvider extends $FunctionalProvider<
 }
 
 String _$joinedGroupRidesHash() => r'eea3a06a01e52001c403ef901f5923ecfe245e6b';
+
+/// Andermans gedeelde ritten waar jij nee op hebt gezegd.
+///
+/// **Waarom dit bestaat.** Afzeggen was een deur die één kant op ging: een rit
+/// met status `declined` viel uit [pendingRideInvites] (niet meer `invited`),
+/// uit [joinedGroupRides] (niet `accepted`) én uit [ownedGroupRides] (niet van
+/// jou), en was daarmee nergens meer aan te wijzen -- terwijl de rij gewoon
+/// bestaat en RLS een terugweg toestaat. De snackbar met ongedaan-maken uit
+/// september dekte de misklik, niet "morgen toch wel" (backlog #66).
+///
+/// Deze ritten horen bewust níét op Home en niet in de standaardlijst: wie nee
+/// zegt, wil er niet aan herinnerd worden. Ze zijn te vinden via het filter
+/// "Afgezegd", en daar is de weg terug.
+
+@ProviderFor(declinedGroupRides)
+final declinedGroupRidesProvider = DeclinedGroupRidesProvider._();
+
+/// Andermans gedeelde ritten waar jij nee op hebt gezegd.
+///
+/// **Waarom dit bestaat.** Afzeggen was een deur die één kant op ging: een rit
+/// met status `declined` viel uit [pendingRideInvites] (niet meer `invited`),
+/// uit [joinedGroupRides] (niet `accepted`) én uit [ownedGroupRides] (niet van
+/// jou), en was daarmee nergens meer aan te wijzen -- terwijl de rij gewoon
+/// bestaat en RLS een terugweg toestaat. De snackbar met ongedaan-maken uit
+/// september dekte de misklik, niet "morgen toch wel" (backlog #66).
+///
+/// Deze ritten horen bewust níét op Home en niet in de standaardlijst: wie nee
+/// zegt, wil er niet aan herinnerd worden. Ze zijn te vinden via het filter
+/// "Afgezegd", en daar is de weg terug.
+
+final class DeclinedGroupRidesProvider extends $FunctionalProvider<
+        AsyncValue<List<GroupRide>>, List<GroupRide>, FutureOr<List<GroupRide>>>
+    with $FutureModifier<List<GroupRide>>, $FutureProvider<List<GroupRide>> {
+  /// Andermans gedeelde ritten waar jij nee op hebt gezegd.
+  ///
+  /// **Waarom dit bestaat.** Afzeggen was een deur die één kant op ging: een rit
+  /// met status `declined` viel uit [pendingRideInvites] (niet meer `invited`),
+  /// uit [joinedGroupRides] (niet `accepted`) én uit [ownedGroupRides] (niet van
+  /// jou), en was daarmee nergens meer aan te wijzen -- terwijl de rij gewoon
+  /// bestaat en RLS een terugweg toestaat. De snackbar met ongedaan-maken uit
+  /// september dekte de misklik, niet "morgen toch wel" (backlog #66).
+  ///
+  /// Deze ritten horen bewust níét op Home en niet in de standaardlijst: wie nee
+  /// zegt, wil er niet aan herinnerd worden. Ze zijn te vinden via het filter
+  /// "Afgezegd", en daar is de weg terug.
+  DeclinedGroupRidesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'declinedGroupRidesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$declinedGroupRidesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<GroupRide>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<GroupRide>> create(Ref ref) {
+    return declinedGroupRides(ref);
+  }
+}
+
+String _$declinedGroupRidesHash() =>
+    r'6cd2c714d39367fe525e4e47cee03efb8cb3fc36';

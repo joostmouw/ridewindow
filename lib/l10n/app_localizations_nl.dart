@@ -1851,4 +1851,21 @@ class SNl extends S {
   @override
   String get notifWeeklyBodyEmpty =>
       'Kijk welke momenten er deze week in zitten';
+
+  @override
+  String roleDeclined(String name) {
+    return 'Je zei nee tegen $name';
+  }
+
+  @override
+  String get ridesFilterDeclined => 'Afgezegd';
+
+  @override
+  String get rideRejoin => 'Toch meegaan';
+
+  @override
+  String get rideRejoined => 'Je gaat toch mee';
+
+  @override
+  String get rideRejoinFailed => 'Dat is niet gelukt. Probeer het opnieuw.';
 }

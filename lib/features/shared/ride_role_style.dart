@@ -43,6 +43,13 @@ import 'package:ridewindow/theme/app_theme.dart';
         color: rw.textTertiary,
         label: s.roleSolo,
       ),
+    // Gedempt en met een doorhaal-icoon: een afgezegde rit is te vinden, maar
+    // hij hoort niet om aandacht te vragen tussen de ritten die wel doorgaan.
+    RideRole.declined => (
+        icon: AppIcons.prohibit,
+        color: rw.textTertiary,
+        label: s.roleDeclined(who),
+      ),
   };
 }
 

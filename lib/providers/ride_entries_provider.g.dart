@@ -8,7 +8,7 @@ part of 'ride_entries_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Alle aankomende ritten, uit alle vier de bronnen, in chronologische
+/// Alle aankomende ritten, uit alle vijf de bronnen, in chronologische
 /// volgorde en met jouw rol erbij.
 ///
 /// **Eén provider en niet vier losse watches per scherm.** Home en het
@@ -26,7 +26,7 @@ part of 'ride_entries_provider.dart';
 @ProviderFor(rideEntries)
 final rideEntriesProvider = RideEntriesProvider._();
 
-/// Alle aankomende ritten, uit alle vier de bronnen, in chronologische
+/// Alle aankomende ritten, uit alle vijf de bronnen, in chronologische
 /// volgorde en met jouw rol erbij.
 ///
 /// **Eén provider en niet vier losse watches per scherm.** Home en het
@@ -43,7 +43,7 @@ final rideEntriesProvider = RideEntriesProvider._();
 
 final class RideEntriesProvider extends $FunctionalProvider<List<RideEntry>,
     List<RideEntry>, List<RideEntry>> with $Provider<List<RideEntry>> {
-  /// Alle aankomende ritten, uit alle vier de bronnen, in chronologische
+  /// Alle aankomende ritten, uit alle vijf de bronnen, in chronologische
   /// volgorde en met jouw rol erbij.
   ///
   /// **Eén provider en niet vier losse watches per scherm.** Home en het
@@ -90,4 +90,4 @@ final class RideEntriesProvider extends $FunctionalProvider<List<RideEntry>,
   }
 }
 
-String _$rideEntriesHash() => r'809a344e250dc75203d771ecb93390fe0930a5c1';
+String _$rideEntriesHash() => r'456a448c4a310cc7af1b031bc8de193ae15ff20d';
