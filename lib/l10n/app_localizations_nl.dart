@@ -1892,7 +1892,7 @@ class SNl extends S {
   }
 
   @override
-  String blockDuration(int hours) {
-    return '$hours uur aaneengesloten';
+  String blockUpToHours(int hours) {
+    return 'tot $hours uur mogelijk';
   }
 }

@@ -1377,7 +1377,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 _BlockRail(block: block),
                 const SizedBox(height: 8),
                 Text(
-                  '${s.blockBestWindow('${_formatTime(block.best.start)}\u2013${_formatTime(block.best.end)}')} \u00b7 ${s.blockDuration(block.hours)}',
+                  '${s.blockBestWindow('${_formatTime(block.best.start)}\u2013${_formatTime(block.best.end)}')} \u00b7 ${s.blockUpToHours(block.longestRideHours)}',
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: rw.textSecondary),
                 ),

@@ -39,9 +39,22 @@ class RideBlock {
   /// Alle vensters in dit blok, chronologisch.
   final List<RideSlot> slots;
 
-  /// Hoe lang je aaneengesloten weg kunt. Dit is het getal waar de vraag
-  /// werkelijk over ging.
+  /// Hoe lang het goede dagdeel duurt. Dit is de schaal van de balk, géén
+  /// ritduur -- op een mooie dag is dit vijftien uur, en niemand fietst
+  /// vijftien uur.
   int get hours => end.difference(start).inHours;
+
+  /// De langste rit die in dit blok past.
+  ///
+  /// **Dit is het antwoord op "hoe lang kan ik weg"**, en niet [hours]. De
+  /// vensters zijn al begrensd door de toegestane ritduren uit het profiel
+  /// (2, 3, 4 of 5 uur), dus de langste hiervan is wat de app werkelijk
+  /// aanbiedt. De eerste versie toonde [hours] op die regel en beweerde
+  /// daarmee dat je vijftien uur aaneengesloten kon fietsen -- Joost wees daar
+  /// meteen op.
+  int get longestRideHours => slots
+      .map((s) => s.end.difference(s.start).inHours)
+      .reduce((a, b) => a > b ? a : b);
 
   /// De dag waar dit blok in valt.
   DateTime get day => DateTime(start.year, start.month, start.day);

@@ -37,8 +37,17 @@ void main() {
       expect(blocks.single.end, DateTime(2026, 9, 19, 13));
     });
 
-    test('beantwoordt "hoe lang kan ik weg" met zeven uur', () {
+    test('het dagdeel duurt zeven uur', () {
       expect(buildRideBlocks(ingrid).single.hours, 7);
+    });
+
+    test('maar "hoe lang kan ik weg" is de langste rit erin, niet die zeven',
+        () {
+      // De eerste versie zette `hours` op die regel en beweerde daarmee dat je
+      // zeven uur aaneengesloten kon fietsen. Op een mooie dag werd dat
+      // vijftien uur, en dat is onzin: de vensters zijn al begrensd door de
+      // toegestane ritduren uit het profiel.
+      expect(buildRideBlocks(ingrid).single.longestRideHours, 3);
     });
 
     test('markeert het beste venster, niet het vroegste', () {
@@ -131,6 +140,26 @@ void main() {
       final block = buildRideBlocks([_slot(6, 8, 95), _slot(8, 10, 95)]).single;
 
       expect(block.best.start.hour, 6);
+    });
+  });
+
+  group('longestRideHours', () {
+    test('is de langste rit die de app werkelijk aanbiedt', () {
+      final block = buildRideBlocks([
+        _slot(6, 8, 90),
+        _slot(8, 13, 95),
+        _slot(13, 15, 88),
+      ]).single;
+
+      expect(block.hours, 9, reason: 'het dagdeel duurt negen uur');
+      expect(block.longestRideHours, 5, reason: 'maar de langste rit is vijf');
+    });
+
+    test('bij één venster zijn ze gelijk', () {
+      final block = buildRideBlocks([_slot(9, 11, 100)]).single;
+
+      expect(block.hours, 2);
+      expect(block.longestRideHours, 2);
     });
   });
 }

@@ -1886,7 +1886,7 @@ class SEn extends S {
   }
 
   @override
-  String blockDuration(int hours) {
-    return '$hours hours straight';
+  String blockUpToHours(int hours) {
+    return 'up to $hours hours';
   }
 }

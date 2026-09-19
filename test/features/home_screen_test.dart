@@ -388,7 +388,9 @@ void main() {
       findsOneWidget,
       reason: 'drie regels, één ochtend',
     );
-    expect(find.textContaining('7 uur aaneengesloten'), findsOneWidget);
+    // Niet "7 uur aaneengesloten": dat zou beweren dat je zeven uur achter
+    // elkaar fietst. Wat de app aanbiedt is de langste rit in dat blok.
+    expect(find.textContaining('tot 3 uur mogelijk'), findsOneWidget);
   });
 
   testWidgets('de keuze wordt onthouden', (tester) async {

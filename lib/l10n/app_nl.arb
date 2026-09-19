@@ -810,8 +810,8 @@
   "homeSortTime": "Op tijd",
   "blockGoodFromTo": "goed van {from} tot {to}",
   "blockBestWindow": "Beste moment: {slot}",
-  "blockDuration": "{hours} uur aaneengesloten",
   "@blockGoodFromTo": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
   "@blockBestWindow": {"placeholders": {"slot": {"type": "String"}}},
-  "@blockDuration": {"placeholders": {"hours": {"type": "int"}}}
+  "blockUpToHours": "tot {hours} uur mogelijk",
+  "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}}
 }

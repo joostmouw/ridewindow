@@ -3391,11 +3391,11 @@ abstract class S {
   /// **'Beste moment: {slot}'**
   String blockBestWindow(String slot);
 
-  /// No description provided for @blockDuration.
+  /// No description provided for @blockUpToHours.
   ///
   /// In nl, this message translates to:
-  /// **'{hours} uur aaneengesloten'**
-  String blockDuration(int hours);
+  /// **'tot {hours} uur mogelijk'**
+  String blockUpToHours(int hours);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
