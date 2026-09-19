@@ -1200,7 +1200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       // blokken over exact dezelfde gefilterde vensters gaan als de lijst --
       // dag, dagdeel en al geplande ritten tellen dus net zo goed mee.
       if (_view == HomeView.blocks) {
-        return _buildBlocksSliver(buildRideBlocks(slots));
+        return _buildBlocksSliver(buildRideDays(slots));
       }
 
       // Dart's List.sort is niet stabiel, dus de tiebreak moet expliciet;
@@ -1279,8 +1279,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // Blokweergave (backlog #69)
   // ---------------------------------------------------------------------------
 
-  Widget _buildBlocksSliver(List<RideBlock> blocks) {
-    if (blocks.isEmpty) {
+  Widget _buildBlocksSliver(List<RideDay> days) {
+    if (days.isEmpty) {
       return SliverFillRemaining(
         hasScrollBody: false,
         child: _buildEmptyState(S.of(context).emptyNoSlots),
@@ -1288,27 +1288,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
 
     return SliverList.builder(
-      itemCount: blocks.length,
+      itemCount: days.length,
       itemBuilder: (context, index) {
         final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
         return SpringEntrance(
           delay: AppMotion.staggerDelay * staggerIndex,
-          child: _buildBlockCard(blocks[index]),
+          child: _buildBlockCard(days[index]),
         );
       },
     );
   }
 
-  /// Eén kaart per aaneengesloten goed dagdeel.
+  /// Eén kaart per dag: de hele rijdag als balk, met de goede stukken erin.
   ///
-  /// De kaart beantwoordt de twee vragen die een losse vensterlijst openliet:
-  /// *wanneer is het goed* (de balk en de kop) en *hoe lang kan ik weg* (het
-  /// aantal uren). Het beste venster staat als donkere markering in de balk,
-  /// zodat het niet verdwijnt maar ook niet de enige waarheid meer is.
-  Widget _buildBlockCard(RideBlock block) {
+  /// **Waarom de dag de schaal is en niet het blok.** De eerste versie schaalde
+  /// de balk op het blok zelf. Je zag dan wel dát het goed was, maar niet waar
+  /// in de dag en niet wat de rest deed -- terwijl dat juist de vraag is waar
+  /// deze weergave voor bestaat: *wanneer is het vandaag goed*. Zonder de grijze
+  /// randen eromheen is "goed van 06:00 tot 21:00" een mededeling zonder maat.
+  Widget _buildBlockCard(RideDay day) {
     final rw = context.rw;
     final s = S.of(context);
     final theme = Theme.of(context);
+
+    final spans = day.blocks
+        .map((b) =>
+            '${_formatTime(b.start)}\u2013${_formatTime(b.end)}')
+        .join(' \u00b7 ');
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
@@ -1317,19 +1323,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         borderRadius: BorderRadius.circular(18),
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          // Doorklikken opent het béste venster van het blok -- dat is de rit
-          // die je hier zou boeken.
+          // Doorklikken opent het beste venster van de dag -- dat is de rit die
+          // je hier zou boeken.
           onTap: () {
             HapticFeedback.selectionClick();
-            final forecasts = ref.watch(weatherProvider).value
+            final forecasts = ref
+                    .read(weatherProvider)
+                    .value
                     ?.where((f) =>
-                        !f.time.isBefore(block.best.start) &&
-                        f.time.isBefore(block.best.end))
+                        !f.time.isBefore(day.best.start) &&
+                        f.time.isBefore(day.best.end))
                     .toList() ??
                 const <HourlyForecast>[];
             context.push(
               '/detail',
-              extra: DetailArgs(slot: block.best, forecasts: forecasts),
+              extra: DetailArgs(slot: day.best, forecasts: forecasts),
             );
           },
           child: Padding(
@@ -1345,7 +1353,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _formatDayName(block.start),
+                            _formatDayName(day.day),
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: rw.textPrimary,
@@ -1353,10 +1361,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            s.blockGoodFromTo(
-                              _formatTime(block.start),
-                              _formatTime(block.end),
-                            ),
+                            s.blockGoodSpans(spans),
                             style: theme.textTheme.bodySmall
                                 ?.copyWith(color: rw.textSecondary),
                           ),
@@ -1368,16 +1373,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     // getal met een eigen kleur ernaast. Twee vormtalen voor
                     // hetzelfde cijfer is precies wat v4.0 wegwerkte.
                     ScoreDisplay(
-                      score: block.best.overallScore,
-                      tier: block.best.tier,
+                      score: day.best.overallScore,
+                      tier: day.best.tier,
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                _BlockRail(block: block),
+                _DayRail(day: day),
                 const SizedBox(height: 8),
                 Text(
-                  '${s.blockBestWindow('${_formatTime(block.best.start)}\u2013${_formatTime(block.best.end)}')} \u00b7 ${s.blockUpToHours(block.longestRideHours)}',
+                  '${s.blockBestWindow('${_formatTime(day.best.start)}\u2013${_formatTime(day.best.end)}')} \u00b7 ${s.blockUpToHours(day.longestRideHours)}',
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: rw.textSecondary),
                 ),
@@ -2426,34 +2431,36 @@ class _GreetingWithWhisperNameState extends State<_GreetingWithWhisperName>
   }
 }
 
-/// De dagbalk van een blok: het goede dagdeel als staaf, met het beste venster
-/// er donker in.
+/// De rijdag als staaf: van 06:00 tot 22:00, met de goede stukken erin en het
+/// beste venster donker gemarkeerd.
 ///
-/// **Waarom een balk en geen lijst.** De vraag die hierachter zit is
-/// ruimtelijk -- *wanneer op de dag, en hoe lang* -- en daar is een tijdlijn
-/// het antwoord op. Drie regels tekst onder elkaar waren juist het probleem.
+/// **Waarom de hele dag en niet alleen het goede stuk.** De eerste versie
+/// schaalde op het blok. "Goed van 06:00 tot 21:00" zag er dan precies zo uit
+/// als "goed van 09:00 tot 11:00" -- een volle balk -- en de vraag *wanneer is
+/// het vandaag goed* bleef onbeantwoord. Het grijs eromheen is hier niet de
+/// achtergrond maar de helft van de informatie.
 ///
-/// De schaal loopt van het begin tot het eind van het blok, niet van 00:00 tot
-/// 24:00. Een blok van twee uur zou op een etmaalschaal een streepje zijn.
-class _BlockRail extends StatelessWidget {
-  const _BlockRail({required this.block});
+/// De grenzen zijn dezelfde die `SlotsNotifier` aan de generator meegeeft
+/// (6 tot 22 uur). Een bredere balk zou grijs tonen waar de app sowieso nooit
+/// iets aanbiedt, en dat leest als "hier viel iets te halen".
+class _DayRail extends StatelessWidget {
+  const _DayRail({required this.day});
 
-  final RideBlock block;
+  final RideDay day;
 
   @override
   Widget build(BuildContext context) {
     final rw = context.rw;
     final theme = Theme.of(context);
 
-    final total = block.end.difference(block.start).inMinutes;
-    // Een blok van nul minuten kan niet bestaan -- een venster heeft altijd
-    // duur -- maar delen door nul is te goedkoop om niet af te vangen.
-    if (total <= 0) return const SizedBox.shrink();
+    const dayStart = kRideDayStartHour;
+    const dayEnd = kRideDayEndHour;
+    const totalMinutes = (dayEnd - dayStart) * 60;
 
-    final bestStart =
-        block.best.start.difference(block.start).inMinutes / total;
-    final bestWidth =
-        block.best.end.difference(block.best.start).inMinutes / total;
+    double fraction(DateTime t) {
+      final minutes = (t.hour - dayStart) * 60 + t.minute;
+      return (minutes / totalMinutes).clamp(0.0, 1.0);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2462,52 +2469,57 @@ class _BlockRail extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: SizedBox(
             height: 24,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ColoredBox(color: rw.tiers.greatBg),
-                ),
-                // Met een LayoutBuilder en niet met FractionallySizedBox: die
-                // kan wel een breedte uitdrukken maar geen beginpunt, en het
-                // beginpunt is hier het halve verhaal.
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final w = constraints.maxWidth;
-                    return Stack(
-                      children: [
-                        Positioned(
-                          left: (bestStart.clamp(0.0, 1.0)) * w,
-                          width: (bestWidth.clamp(0.0, 1.0)) * w,
-                          top: 0,
-                          bottom: 0,
-                          child: ColoredBox(color: rw.scorePerfect),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final w = constraints.maxWidth;
+
+                return Stack(
+                  children: [
+                    // De dag zelf: wat de app niet aanbiedt.
+                    Positioned.fill(child: ColoredBox(color: rw.surfaceDim)),
+
+                    // De goede stukken.
+                    for (final block in day.blocks)
+                      Positioned(
+                        left: fraction(block.start) * w,
+                        width:
+                            (fraction(block.end) - fraction(block.start)) * w,
+                        top: 0,
+                        bottom: 0,
+                        child: ColoredBox(color: rw.tiers.greatBg),
+                      ),
+
+                    // Het beste venster, als donkere markering.
+                    Positioned(
+                      left: fraction(day.best.start) * w,
+                      width: (fraction(day.best.end) -
+                              fraction(day.best.start)) *
+                          w,
+                      top: 0,
+                      bottom: 0,
+                      child: ColoredBox(color: rw.scorePerfect),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
         const SizedBox(height: 4),
+        // Vier ijkpunten: begin, ochtend, middag, eind. Genoeg om een stuk te
+        // plaatsen, weinig genoeg om op 400px leesbaar te blijven.
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              _hhmm(block.start),
-              style: theme.textTheme.labelSmall?.copyWith(color: rw.textTertiary),
-            ),
-            Text(
-              _hhmm(block.end),
-              style: theme.textTheme.labelSmall?.copyWith(color: rw.textTertiary),
-            ),
+            for (final hour in const [6, 12, 18, 22])
+              Text(
+                '${hour.toString().padLeft(2, '0')}:00',
+                style: theme.textTheme.labelSmall
+                    ?.copyWith(color: rw.textTertiary),
+              ),
           ],
         ),
       ],
     );
   }
-
-  static String _hhmm(DateTime dt) =>
-      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }

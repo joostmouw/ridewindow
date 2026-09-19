@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/services/availability_filter.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
@@ -103,8 +104,8 @@ class SlotsNotifier extends _$SlotsNotifier {
     var allSlots = _generator.generate(
       scores,
       allowedDurations: profile.allowedDurations,
-      minHour: 6,
-      maxHour: 22,
+      minHour: kRideDayStartHour,
+      maxHour: kRideDayEndHour,
       notBefore: now,
     );
 

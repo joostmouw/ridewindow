@@ -162,4 +162,59 @@ void main() {
       expect(block.longestRideHours, 2);
     });
   });
+
+  group('per dag (RideDay)', () {
+    test('Ingrids zaterdag is één dag met één blok', () {
+      final days = buildRideDays([
+        _slot(9, 11, 100),
+        _slot(6, 9, 99),
+        _slot(11, 13, 95),
+      ]);
+
+      expect(days, hasLength(1));
+      expect(days.single.blocks, hasLength(1));
+      expect(days.single.best.overallScore, 100);
+      expect(days.single.longestRideHours, 3);
+    });
+
+    test('een natte middag levert één dag met twee blokken', () {
+      // Dit is wat de eerste versie niet kon laten zien: twee kaarten voor
+      // dezelfde dag, elk met een eigen schaal, zonder dat je zag dat er een
+      // gat tussen zat.
+      final days = buildRideDays([
+        _slot(7, 9, 92),
+        _slot(16, 19, 88),
+      ]);
+
+      expect(days, hasLength(1));
+      expect(days.single.blocks, hasLength(2));
+      expect(days.single.blocks.first.start.hour, 7);
+      expect(days.single.blocks.last.end.hour, 19);
+      expect(days.single.best.overallScore, 92);
+    });
+
+    test('twee dagen blijven twee kaarten, chronologisch', () {
+      final days = buildRideDays([
+        _slot(9, 11, 80, day: 21),
+        _slot(9, 11, 95, day: 19),
+      ]);
+
+      expect(days, hasLength(2));
+      expect(days.first.day, DateTime(2026, 9, 19));
+      expect(days.last.day, DateTime(2026, 9, 21));
+    });
+
+    test('de langste rit van de dag telt over alle blokken heen', () {
+      final day = buildRideDays([
+        _slot(7, 9, 92),
+        _slot(14, 19, 88),
+      ]).single;
+
+      expect(day.longestRideHours, 5);
+    });
+
+    test('geen vensters, geen dagen', () {
+      expect(buildRideDays(const []), isEmpty);
+    });
+  });
 }

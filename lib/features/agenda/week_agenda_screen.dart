@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -21,7 +22,14 @@ import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
 const int _kDayCount = 7;
-const _kHours = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+/// De uren die als rij getoond worden.
+///
+/// Stond hier als handgeschreven lijst en liep één rij te ver: uur 22 is het
+/// blok 22:00-23:00, en de motor biedt dat nooit aan (`maxHour` is exclusief).
+/// Je kon daar dus een rit inplannen die de app zelf nooit zou voorstellen.
+/// Nu afgeleid van dezelfde constante die `SlotsNotifier` aan de generator
+/// meegeeft -- zie `kRideDayHours`.
+final _kHours = kRideDayHours;
 
 Color _scoreColor(double score, RideWindowTheme rw) {
   if (score >= 85) return rw.scorePerfect;

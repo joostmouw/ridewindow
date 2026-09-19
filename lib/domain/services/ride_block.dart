@@ -109,3 +109,50 @@ RideBlock _toBlock(List<RideSlot> slots, DateTime end) {
     slots: List.unmodifiable(slots),
   );
 }
+
+
+/// Alle blokken van één kalenderdag, plus het beste venster van die dag.
+///
+/// **Waarom een dag en niet een blok de kaart is.** De eerste versie toonde één
+/// kaart per blok, met de balk geschaald op dat blok. Daarmee zag je wel dát
+/// het goed was maar niet wáár in de dag, en al helemaal niet wat de rest van
+/// de dag deed -- de vraag waar dit hele scherm over gaat. Joost wees daarop
+/// zodra hij het zag. Eén kaart per dag, met de dag als schaal, zet het goede
+/// stuk terug in zijn context.
+class RideDay {
+  const RideDay({required this.day, required this.blocks, required this.best});
+
+  final DateTime day;
+
+  /// De goede stukken van deze dag, chronologisch. Meestal één, soms twee --
+  /// een ochtend en een avond met een natte middag ertussen.
+  final List<RideBlock> blocks;
+
+  /// Het beste venster van de hele dag.
+  final RideSlot best;
+
+  /// De langste rit die deze dag aanbiedt.
+  int get longestRideHours =>
+      blocks.map((b) => b.longestRideHours).reduce((a, b) => a > b ? a : b);
+}
+
+/// Groepeert [slots] per kalenderdag, met de blokken erbinnen.
+List<RideDay> buildRideDays(List<RideSlot> slots) {
+  final byDay = <DateTime, List<RideSlot>>{};
+  for (final slot in slots) {
+    final day = DateTime(slot.start.year, slot.start.month, slot.start.day);
+    (byDay[day] ??= []).add(slot);
+  }
+
+  final days = byDay.entries.map((entry) {
+    final blocks = buildRideBlocks(entry.value);
+    var best = blocks.first.best;
+    for (final block in blocks.skip(1)) {
+      if (block.best.overallScore > best.overallScore) best = block.best;
+    }
+    return RideDay(day: entry.key, blocks: blocks, best: best);
+  }).toList()
+    ..sort((a, b) => a.day.compareTo(b.day));
+
+  return days;
+}

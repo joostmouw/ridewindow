@@ -1889,4 +1889,9 @@ class SEn extends S {
   String blockUpToHours(int hours) {
     return 'up to $hours hours';
   }
+
+  @override
+  String blockGoodSpans(String spans) {
+    return 'good: $spans';
+  }
 }

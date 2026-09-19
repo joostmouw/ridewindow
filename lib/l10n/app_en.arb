@@ -645,5 +645,7 @@
   "@blockGoodFromTo": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
   "@blockBestWindow": {"placeholders": {"slot": {"type": "String"}}},
   "blockUpToHours": "up to {hours} hours",
-  "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}}
+  "@blockUpToHours": {"placeholders": {"hours": {"type": "int"}}},
+  "blockGoodSpans": "good: {spans}",
+  "@blockGoodSpans": {"placeholders": {"spans": {"type": "String"}}}
 }

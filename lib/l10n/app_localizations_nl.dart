@@ -1895,4 +1895,9 @@ class SNl extends S {
   String blockUpToHours(int hours) {
     return 'tot $hours uur mogelijk';
   }
+
+  @override
+  String blockGoodSpans(String spans) {
+    return 'goed: $spans';
+  }
 }

@@ -3396,6 +3396,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'tot {hours} uur mogelijk'**
   String blockUpToHours(int hours);
+
+  /// No description provided for @blockGoodSpans.
+  ///
+  /// In nl, this message translates to:
+  /// **'goed: {spans}'**
+  String blockGoodSpans(String spans);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -384,7 +384,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
 
     expect(
-      find.text('goed van 06:00 tot 13:00'),
+      find.text('goed: 06:00\u201313:00'),
       findsOneWidget,
       reason: 'drie regels, één ochtend',
     );
