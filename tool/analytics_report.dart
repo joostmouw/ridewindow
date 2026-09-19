@@ -50,8 +50,17 @@ String get _defaultKeyPath {
   return '$home/.config/ridewindow/supabase-service-role.key';
 }
 
-/// Een JWT: drie met punten gescheiden base64url-delen, en verder niets.
-final _jwtPattern = RegExp(r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$');
+/// Hoe een sleutel eruitziet. Twee vormen, want Supabase kent er twee:
+///  * de klassieke JWT -- drie met punten gescheiden base64url-delen;
+///  * het nieuwe formaat `sb_secret_...`, dat geen JWT is.
+///
+/// Alleen op de JWT controleren leek veiliger, maar zou een geldige sleutel van
+/// het nieuwe soort botweg weigeren met "geen regel die op een JWT lijkt" -- een
+/// foutmelding die naar de verkeerde kant wijst.
+final _keyPattern = RegExp(
+  r'^(?:[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'
+  r'|sb_secret_[A-Za-z0-9_-]+)$',
+);
 
 /// Leest de sleutel uit -- eerst `--key`, dan de omgeving, dan het
 /// standaardbestand. Geeft null als hij nergens staat of nergens op lijkt.
@@ -73,20 +82,20 @@ String? _readKey(List<String> args) {
   if (fromArg == null) {
     final fromEnv = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
     if (fromEnv != null && fromEnv.trim().isNotEmpty) {
-      return _firstJwt(fromEnv);
+      return _firstKey(fromEnv);
     }
   }
 
   final file = File(fromArg ?? _defaultKeyPath);
   if (!file.existsSync()) return null;
-  return _firstJwt(file.readAsStringSync());
+  return _firstKey(file.readAsStringSync());
 }
 
-/// De eerste regel die de vorm van een JWT heeft, of null.
-String? _firstJwt(String raw) {
+/// De eerste regel die de vorm van een sleutel heeft, of null.
+String? _firstKey(String raw) {
   for (final line in raw.split('\n')) {
     final candidate = line.trim();
-    if (_jwtPattern.hasMatch(candidate)) return candidate;
+    if (_keyPattern.hasMatch(candidate)) return candidate;
   }
   return null;
 }
@@ -98,8 +107,10 @@ Future<void> main(List<String> args) async {
     stderr.writeln('');
     stderr
         .writeln('Als het bestand wél bestaat: er staat geen regel in die de');
-    stderr.writeln('vorm van een JWT heeft. De inhoud wordt met opzet niet');
-    stderr.writeln('getoond -- een sleutel hoort niet in een foutmelding.');
+    stderr.writeln(
+      'vorm van een sleutel heeft (JWT of sb_secret_...). De inhoud',
+    );
+    stderr.writeln('wordt met opzet niet getoond.');
     stderr.writeln('');
     stderr.writeln('Gezocht in:');
     stderr.writeln('  SUPABASE_SERVICE_ROLE_KEY (omgevingsvariabele)');
