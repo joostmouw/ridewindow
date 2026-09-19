@@ -3,6 +3,7 @@
 // als drie LinearProgressIndicator balken met uitleg per factor.
 
 import 'package:flutter/material.dart';
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -164,7 +165,7 @@ class InsightsSheet extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: AppShapes.roundedXs,
           child: LinearProgressIndicator(
             value: (score / 100.0).clamp(0.0, 1.0),
             minHeight: 8,
@@ -223,7 +224,7 @@ class InsightsSheet extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: rw.border,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppShapes.roundedHair,
               ),
             ),
           ),
@@ -288,7 +289,7 @@ class InsightsSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: rw.surface,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppShapes.roundedMd,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

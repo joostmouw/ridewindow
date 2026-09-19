@@ -14,6 +14,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/core/app_version.dart';
 import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/core/cities.dart';
@@ -1176,7 +1177,7 @@ Widget _infoButton(BuildContext context, String title, String explanation,
                     .colorScheme
                     .primaryContainer
                     .withAlpha(80),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppShapes.roundedSm,
               ),
               child: Row(
                 children: [
@@ -1414,7 +1415,7 @@ class _AnimatedWindFlagState extends State<_AnimatedWindFlag>
                       const Color(0x99666666),
                       widget.intensity,
                     ),
-                    borderRadius: BorderRadius.circular(1),
+                    borderRadius: AppShapes.roundedHair,
                   ),
                 ),
               ),

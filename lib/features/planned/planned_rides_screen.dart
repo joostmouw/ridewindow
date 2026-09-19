@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
@@ -515,7 +516,7 @@ class _FilterItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppShapes.roundedSm,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
@@ -549,7 +550,7 @@ class _FilterItem extends StatelessWidget {
               height: 2,
               decoration: BoxDecoration(
                 color: selected ? rw.textPrimary : Colors.transparent,
-                borderRadius: BorderRadius.circular(1),
+                borderRadius: AppShapes.roundedHair,
               ),
             ),
             const SizedBox(height: 6),
@@ -806,7 +807,7 @@ class RideCard extends StatelessWidget {
                               horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: tonal.bg,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppShapes.roundedMd,
                           ),
                           child: Text(
                             currentScore != null

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
@@ -422,7 +424,7 @@ ThemeData buildAppTheme(Brightness brightness) {
     cardTheme: CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppShapes.roundedCard,
         side: BorderSide(color: colorScheme.surfaceContainerHigh),
       ),
       color: colorScheme.surfaceContainerLowest,
@@ -474,7 +476,7 @@ ThemeData buildAppTheme(Brightness brightness) {
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShapes.roundedMd,
       ),
     ),
 

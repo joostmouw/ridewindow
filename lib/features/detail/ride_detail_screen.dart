@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_row.dart';
@@ -665,7 +666,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       elevation: 0,
       color: cs.primaryContainer.withAlpha(30),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppShapes.roundedLg,
         side: BorderSide(color: cs.primary.withAlpha(40)),
       ),
       child: Padding(
@@ -916,7 +917,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         // als de niet-beste ritkaarten op Home. Hiermee is ook de laatste
         // handmatige `BoxShadow` uit de app verdwenen.
         color: cs.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: AppShapes.roundedPanel,
         border: Border.all(color: cs.surfaceContainerHigh),
       ),
       child: Column(
@@ -1002,7 +1003,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: rw.surface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppShapes.roundedSm,
                 ),
                 child: Text(
                   S.of(context).durationHours(_end.difference(_start).inHours),
@@ -1032,7 +1033,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 1),
                     decoration: BoxDecoration(
                       color: isInRange ? color : color.withAlpha(40),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: AppShapes.roundedXs,
                       border: isInRange
                           ? Border.all(color: rw.tiers.perfectFg, width: 1)
                           : null,

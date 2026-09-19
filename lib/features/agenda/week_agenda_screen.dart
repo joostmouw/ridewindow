@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
@@ -569,7 +570,7 @@ class _CellWidget extends ConsumerWidget {
                 : blocked
                     ? rw.gridBlocked
                     : color,
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: AppShapes.roundedCell,
             border: isSelected
                 ? Border.all(color: rw.tiers.perfectFg, width: 2)
                 : isPlanned
@@ -632,7 +633,7 @@ class _CellWidget extends ConsumerWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: tonal.bg, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: tonal.bg, borderRadius: AppShapes.roundedLg),
                   child: Text(
                     score != null ? '${score.overall.round()} — $tierText' : '?',
                     style: TextStyle(color: tonal.fg, fontWeight: FontWeight.bold, fontSize: 13),
@@ -756,7 +757,7 @@ class _ScoreBar extends StatelessWidget {
         SizedBox(width: 90, child: Text(label, style: const TextStyle(fontSize: 12))),
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: AppShapes.roundedXs,
             child: LinearProgressIndicator(
               value: value / 100,
               minHeight: 8,

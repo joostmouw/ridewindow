@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -50,7 +51,7 @@ import 'package:ridewindow/theme/app_icons.dart';
 /// InkWell-ripple gebruiken dezelfde waarden, zodat je precies het blokje
 /// wegveegt dat de gebruiker ziet.
 const _rideCardMargin = EdgeInsets.symmetric(horizontal: 20, vertical: 6);
-const double _rideCardRadius = 24;
+const double _rideCardRadius = AppShapes.radiusCard;
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -528,7 +529,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       selected: isOn,
       button: true,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppShapes.roundedSm,
         onTap: () {
           HapticFeedback.lightImpact();
           onTap();
@@ -557,7 +558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   height: 2,
                   decoration: BoxDecoration(
                     color: isOn ? cs.primary : Colors.transparent,
-                    borderRadius: BorderRadius.circular(1),
+                    borderRadius: AppShapes.roundedHair,
                   ),
                 ),
               ],
@@ -609,7 +610,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         selected: isOn,
         button: true,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppShapes.roundedSm,
           onTap: () {
             HapticFeedback.lightImpact();
             setState(() {
@@ -660,7 +661,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   width: 28,
                   decoration: BoxDecoration(
                     color: isOn ? cs.primary : cs.outlineVariant,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: AppShapes.roundedHair,
                   ),
                 ),
               ],
@@ -779,7 +780,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           padding: const EdgeInsets.fromLTRB(0, 8, 0, 6),
           decoration: BoxDecoration(
             color: isSelected ? cs.surfaceContainer : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppShapes.roundedLg,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -848,7 +849,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: _barColor(bestScore, rw),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: AppShapes.roundedHair,
                   ),
                 ),
               ),
@@ -954,7 +955,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: Material(
         color: rw.plannedRide.withAlpha(18),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppShapes.roundedLg,
           // Op volle sterkte, en 2px, precies zoals de agendacel (zie
           // `week_agenda_screen.dart`: een geplande cel houdt zijn scorekleur en
           // krijgt er een volle `plannedRide`-rand omheen). De rand stond hier
@@ -972,7 +973,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         // wat Material Design hier niet voorschrijft.
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppShapes.roundedLg,
           onTap: () => _openPlannedRideDetail(entry),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1291,9 +1292,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
       child: Material(
         color: rw.surface,
-        borderRadius: BorderRadius.circular(18),
+        // Een kaart, geen paneel. Deze kaart ís de ritkaart van de
+        // blokweergave, dus hij hoort dezelfde vorm te hebben als de kaarten
+        // waar hij voor in de plaats komt. Stond op 18 omdat ik hem vanmiddag
+        // uit de sectiekaart heb overgeschreven -- gevonden bij de sweep.
+        borderRadius: AppShapes.roundedCard,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: AppShapes.roundedCard,
           // Doorklikken opent het beste venster van de dag -- dat is de rit die
           // je hier zou boeken.
           onTap: () {
@@ -1403,7 +1408,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: cs.errorContainer,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppShapes.roundedLg,
       ),
       child: Row(
         children: [
@@ -1449,7 +1454,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
       decoration: BoxDecoration(
         color: cs.tertiaryContainer,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppShapes.roundedLg,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2057,7 +2062,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       label: expanded ? s.hideWeatherDetails : s.showWeatherDetails,
       excludeSemantics: true,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppShapes.roundedSm,
         onTap: () {
           HapticFeedback.selectionClick();
           setState(() => _cardExpanded[slot.start] = !expanded);
@@ -2411,7 +2416,7 @@ class _DayRail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: AppShapes.roundedXs,
           child: SizedBox(
             height: 24,
             child: LayoutBuilder(
@@ -2510,7 +2515,7 @@ class BestChoicePill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: cs.primaryContainer,
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: AppShapes.roundedXl,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

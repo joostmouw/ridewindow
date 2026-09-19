@@ -18,6 +18,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:ridewindow/theme/app_shapes.dart';
+
 class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
@@ -87,7 +89,7 @@ class _CardSurface extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       color: cs.surfaceContainerLowest,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: AppShapes.roundedPanel,
         side: BorderSide(color: cs.surfaceContainerHigh),
       ),
       // Geen eigen binnenmarge: `ListTile` brengt zijn eigen hoogte mee, en een

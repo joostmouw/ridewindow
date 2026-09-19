@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/services/availability_key.dart';
 import 'package:ridewindow/domain/services/drag_run_counter.dart';
@@ -375,7 +376,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
           decoration: BoxDecoration(
             color: color,
             border: Border.all(color: context.rw.border, width: 0.5),
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: AppShapes.roundedCell,
           ),
         ),
         const SizedBox(width: 6),
@@ -399,7 +400,7 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppShapes.roundedMd,
       ),
       child: Row(
         children: [

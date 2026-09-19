@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -208,7 +209,7 @@ class _PresetTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppShapes.roundedLg,
         // Dashed-optie krijgt geen standaard border — CustomPaint tekent die
         border: option.isDashed
             ? null

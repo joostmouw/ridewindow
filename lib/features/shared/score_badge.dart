@@ -2,6 +2,7 @@
 // ScoreBadge: M3 Expressive pill-shaped tonal badge with spring entrance.
 
 import 'package:flutter/material.dart';
+import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_motion.dart';
@@ -64,7 +65,7 @@ class _ScoreBadgeState extends State<ScoreBadge>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppShapes.roundedXl,
       ),
       // Geen smiley meer. Die verdween in v4.0 al van de ritkaarten toen de
       // score daar een groot getal werd (zie `ScoreDisplay`), maar hij bleef
