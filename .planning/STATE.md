@@ -37,6 +37,7 @@ feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de ba
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-19 | [a-locatie-volgt-de-fietser](quick/260919-f0a-a-locatie-volgt-de-fietser/) | Tester in Aruba zag "licht van 01:32 tot 13:29". **Drie oorzaken, niet één** — de app rekende de zon voor Amsterdam en tekende hem op de klok van Aruba. Laatst bekende positie gedeeld met de achtergrondtaak, waarschuwing op Home, stedenlijst voorbij de grens. De tijdas zelf blijft bewust staan; [diagnose met bewijs](https://claude.ai/artifact/Kvof7uzvxx43EUFicVDTPX). |
 | 2026-09-19 | [67-notificaties-in-de-taal-van-de-app](quick/260919-eq9-67-notificaties-in-de-taal-van-de-app/) | Meldingen volgen de app-taal. **Het was geen vertaalklus** — alle negen sleutels stonden al in beide ARB's; de service hield er een Nederlandse kopie naast. Twee vondsten in de SUMMARY: `init()` werd nooit aangeroepen, en twee van de drie notificatiesoorten worden nergens gepland. |
 | 2026-09-10 | [schets-010-stand-3](quick/260910-bu9-schets-010-stand-3-fietstaal-in-oordelen/) | De vier oordelen worden Toprit / Fijne rit / Te doen / Binnenblijver; Peloton terug als tabnaam mét introductie. Sweep ruimde drie afgedreven woordenlijsten op. |
 | 2026-09-07 | [home-papier-en-inkt](quick/20260907-home-papier-en-inkt/) | Fase 23 stap 1+2: achtergrond wordt papier, beste ritkaart licht op met een schaduw buiten de `ClipRRect`. |

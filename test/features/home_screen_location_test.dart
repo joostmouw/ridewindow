@@ -23,6 +23,7 @@ import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
+import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -212,6 +213,97 @@ void main() {
     // Flush the pending 500ms spotlight-hint timer (initState's
     // postFrameCallback in HomeScreen) so the test framework doesn't
     // fail teardown with "A Timer is still pending".
+    await tester.pump(const Duration(milliseconds: 600));
+  });
+
+  // ── De locatie-waarschuwing (Aruba, 2026-09-19) ──
+  //
+  // De app viel stilzwijgend terug op Amsterdam en een tester las daardoor
+  // "licht van 01:32 tot 13:29". Zwijgen was het gebrek. Deze drie tests
+  // leggen vast wanneer de app praat en -- net zo belangrijk -- wanneer niet.
+
+  Future<void> pumpHomeWith(WidgetTester tester, LocationData location) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          locationProvider.overrideWith(() => FakeLocationNotifier(location)),
+          weatherProvider.overrideWith(() => FakeWeatherNotifier()),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+          slotsProvider.overrideWith(
+            () => FakeStaticSlotsNotifier(const SlotsLoaded([], reason: null)),
+          ),
+        ],
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+
+  testWidgets('zegt het wanneer de plek een gok is', (tester) async {
+    await pumpHomeWith(
+      tester,
+      const LocationData(
+        lat: kDefaultLat,
+        lon: kDefaultLon,
+        city: kDefaultCity,
+        source: LocationSource.fallback,
+      ),
+    );
+
+    expect(find.text('We weten niet waar je bent'), findsOneWidget);
+    expect(find.text('Kies je stad'), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 600));
+  });
+
+  testWidgets('zwijgt wanneer de plek gemeten is', (tester) async {
+    await pumpHomeWith(
+      tester,
+      LocationData(
+        lat: kDefaultLat,
+        lon: kDefaultLon,
+        city: 'GPS',
+        source: LocationSource.gps,
+        measuredAt: DateTime.now(),
+      ),
+    );
+
+    expect(find.text('We weten niet waar je bent'), findsNothing);
+    expect(find.text('Je klok en je plek lopen uiteen'), findsNothing);
+
+    await tester.pump(const Duration(milliseconds: 600));
+  });
+
+  testWidgets('waarschuwt als de klok bij een ander werelddeel hoort',
+      (tester) async {
+    // De klok van de testmachine staat vast; kies daarom een lengtegraad die
+    // er hoe dan ook meer dan drie uur vanaf ligt. Hawai of Nieuw-Zeeland doet
+    // het vanuit Europa en vanuit Amerika.
+    final deviceHours = DateTime.now().timeZoneOffset.inMinutes / 60.0;
+    final farLon = deviceHours > -3 ? -157.8583 : 174.7633;
+
+    await pumpHomeWith(
+      tester,
+      LocationData(
+        lat: 21.3069,
+        lon: farLon,
+        city: 'GPS',
+        source: LocationSource.gps,
+        measuredAt: DateTime.now(),
+      ),
+    );
+
+    expect(find.text('Je klok en je plek lopen uiteen'), findsOneWidget);
+
     await tester.pump(const Duration(milliseconds: 600));
   });
 }
