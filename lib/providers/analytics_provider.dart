@@ -27,9 +27,21 @@ class AnalyticsConsent extends _$AnalyticsConsent {
   }
 
   /// Leg het antwoord van de gebruiker vast en laat iedereen het weten.
+  ///
+  /// Bij een ja gaat wat er in de wachtkamer lag alsnog de outbox in. Dit is
+  /// de enige plek waar dat gebeurt -- `setConsent` is het enige moment waarop
+  /// "nog niet gevraagd" in "ja" verandert, en de wachtkamer mag nooit half
+  /// geleegd achterblijven. Bij een nee wist de store hem zelf.
   Future<void> setConsent(bool granted) async {
     final store = _store ?? await future;
     await store.setConsent(granted);
+    if (granted) {
+      try {
+        await buildAnalyticsService(ref, store).flushPending();
+      } catch (_) {
+        // Statistiek mag nooit de reden zijn dat een antwoord niet landt.
+      }
+    }
     ref.invalidateSelf();
   }
 }
@@ -39,8 +51,18 @@ class AnalyticsConsent extends _$AnalyticsConsent {
 @riverpod
 Future<AnalyticsService> analytics(Ref ref) async {
   final consent = await ref.watch(analyticsConsentProvider.future);
+  return buildAnalyticsService(ref, consent);
+}
+
+/// Bouwt de service uit een toestemmingsstand.
+///
+/// Apart van de provider omdat `setConsent` hem óók nodig heeft, op een moment
+/// dat de provider zelf nog aan het omvallen is. Twee keer dezelfde constructor
+/// uitschrijven is precies hoe `appVersion` of `platform` op één van de twee
+/// plekken achterloopt.
+AnalyticsService buildAnalyticsService(Ref ref, AnalyticsConsentStore consent) {
   return AnalyticsService(
-    outbox: ref.watch(appDatabaseProvider).syncOutboxDao,
+    outbox: ref.read(appDatabaseProvider).syncOutboxDao,
     consent: consent,
     appVersion: '$kAppVersionName+$kAppBuildNumber',
     platform: kIsWeb ? 'web' : 'android',

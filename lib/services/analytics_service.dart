@@ -56,7 +56,8 @@ class AnalyticsService {
     Map<String, Object?> props = const {},
     DateTime? now,
   }) async {
-    if (!_consent.isEnabled) return false;
+    // Een nee is een nee -- ook geen wachtkamer.
+    if (_consent.consent == false) return false;
     if (!kKnownAnalyticsEvents.contains(name)) {
       assert(
           false,
@@ -65,20 +66,31 @@ class AnalyticsService {
       return false;
     }
 
+    // `null` = nog niet gevraagd. Die gebeurtenissen gaan de wachtkamer in;
+    // zie [AnalyticsConsentStore.pending] voor waarom dat moet.
     final deviceId = _consent.deviceId;
-    if (deviceId == null) return false;
+    final waitingForAnswer = !_consent.isEnabled;
 
     try {
       final id = _uuidV4();
       final row = <String, dynamic>{
         'id': id,
-        'device_id': deviceId,
+        // In de wachtkamer nog leeg: de toestel-id ontstaat pas bij een ja, en
+        // [flushPending] vult hem dan alsnog in.
+        if (deviceId != null) 'device_id': deviceId,
         'name': name,
         'props': sanitizeProps(props),
         'platform': _platform,
         'app_version': _appVersion,
         'occurred_at': (now ?? DateTime.now()).toUtc().toIso8601String(),
       };
+
+      if (waitingForAnswer) {
+        // Niet verstuurd, alleen vastgelegd. Past hij niet meer, dan valt hij
+        // stil af -- statistiek mag nooit ergens tegenaan lopen.
+        await _consent.addPending(jsonEncode(row));
+        return false;
+      }
 
       // Een verse id per gebeurtenis, zodat de coalescing van de outbox ze niet
       // samenvouwt -- exact de reden die FeedbackService voor zijn id geeft.
@@ -93,6 +105,42 @@ class AnalyticsService {
       // Statistiek mag nooit iets in de app breken.
       return false;
     }
+  }
+
+  /// Verstuurt alsnog wat er op het antwoord lag te wachten.
+  ///
+  /// Aangeroepen op één plek -- `AnalyticsConsent.setConsent` -- zodat de
+  /// wachtkamer nooit half geleegd kan achterblijven. Bij een nee wordt hij
+  /// niet geleegd maar gewist; dat doet de store zelf.
+  ///
+  /// Geeft terug hoeveel rijen er in de outbox zijn gezet.
+  Future<int> flushPending() async {
+    if (!_consent.isEnabled) return 0;
+    final deviceId = _consent.deviceId;
+    if (deviceId == null) return 0;
+
+    final rows = _consent.pending;
+    if (rows.isEmpty) return 0;
+
+    var sent = 0;
+    for (final raw in rows) {
+      try {
+        final row = jsonDecode(raw) as Map<String, dynamic>;
+        // De id die er bij het vastleggen nog niet was.
+        row['device_id'] = deviceId;
+        await _outbox.enqueueOrCoalesce(
+          entity: kOutboxEntityAnalytics,
+          entityKey: row['id'] as String,
+          operation: 'upsert',
+          payload: jsonEncode(row),
+        );
+        sent++;
+      } catch (_) {
+        // Een onleesbare rij houdt de rest niet tegen.
+      }
+    }
+    await _consent.clearPending();
+    return sent;
   }
 
   /// Snoeit props tot wat een gebeurtenis mag dragen.

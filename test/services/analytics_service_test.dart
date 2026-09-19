@@ -45,6 +45,24 @@ void main() {
 
   Future<int> pendingCount() async => (await outbox.select(db.syncOutboxEntries).get()).length;
 
+  /// Store én service, voor de tests die de wachtkamer zelf bekijken.
+  Future<(AnalyticsConsentStore, AnalyticsService)> pairWith({
+    required bool? consent,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final store = AnalyticsConsentStore(prefs);
+    if (consent != null) await store.setConsent(consent);
+    return (
+      store,
+      AnalyticsService(
+        outbox: outbox,
+        consent: store,
+        appVersion: '1.0.31+42',
+        platform: 'android',
+      )
+    );
+  }
+
   group('slot 1 — zonder toestemming vertrekt er niets', () {
     test('nooit gevraagd', () async {
       final service = await serviceWith(consent: null);
@@ -166,6 +184,71 @@ void main() {
       final entries = await outbox.select(db.syncOutboxEntries).get();
       final row = jsonDecode(entries.single.payload) as Map<String, dynamic>;
       expect(row['occurred_at'], '2026-09-19T08:36:00.000Z');
+    });
+  });
+
+  // De wachtkamer (2026-09-19). `first_run` en `onboarding_done` gebeuren bij
+  // de eerste start en de vraag komt bij de tweede; zonder deze groep kon geen
+  // van beide ooit aankomen. Het eerste echte rapport had ze allebei op nul.
+  group('de wachtkamer', () {
+    test('wat voor het antwoord gebeurt wacht, en draagt nog geen toestel-id',
+        () async {
+      final (store, service) = await pairWith(consent: null);
+
+      expect(await service.track(kEvFirstRun), isFalse);
+      expect(await pendingCount(), 0, reason: 'niets verstuurd');
+      expect(store.pending, hasLength(1));
+
+      final row = jsonDecode(store.pending.single) as Map<String, dynamic>;
+      expect(row['name'], kEvFirstRun);
+      expect(row.containsKey('device_id'), isFalse);
+    });
+
+    test('een ja stuurt alsnog wat er lag, met de verse toestel-id', () async {
+      final (store, service) = await pairWith(consent: null);
+      await service.track(kEvFirstRun);
+      await service.track(kEvOnboardingDone, props: {'preset': 'weekend'});
+
+      await store.setConsent(true);
+      expect(await service.flushPending(), 2);
+
+      expect(store.pending, isEmpty);
+      final entries = await outbox.select(db.syncOutboxEntries).get();
+      expect(entries, hasLength(2));
+      for (final entry in entries) {
+        final row = jsonDecode(entry.payload) as Map<String, dynamic>;
+        expect(row['device_id'], store.deviceId);
+        expect(row['device_id'], isNotNull);
+      }
+    });
+
+    test('een nee wist de wachtkamer zonder iets te versturen', () async {
+      final (store, service) = await pairWith(consent: null);
+      await service.track(kEvFirstRun);
+      expect(store.pending, hasLength(1));
+
+      await store.setConsent(false);
+
+      expect(store.pending, isEmpty);
+      expect(await pendingCount(), 0);
+      expect(await service.flushPending(), 0);
+    });
+
+    test('een nee laat ook daarna niets meer in de wachtkamer belanden',
+        () async {
+      final (store, service) = await pairWith(consent: false);
+      expect(await service.track(kEvAppOpen), isFalse);
+      expect(store.pending, isEmpty);
+    });
+
+    test('de wachtkamer loopt niet vol als de vraag weggeklikt blijft',
+        () async {
+      final (store, service) = await pairWith(consent: null);
+      for (var i = 0; i < AnalyticsConsentStore.kMaxPending + 10; i++) {
+        await service.track(kEvAppOpen);
+      }
+      expect(store.pending, hasLength(AnalyticsConsentStore.kMaxPending));
+      expect(await pendingCount(), 0);
     });
   });
 }

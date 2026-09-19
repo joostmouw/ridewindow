@@ -26,6 +26,15 @@ class AnalyticsConsentStore {
   static const kConsentKey = 'analytics.consent';
   static const kDeviceIdKey = 'analytics.deviceId';
   static const kAppOpensKey = 'analytics.appOpens';
+  static const kPendingKey = 'analytics.pending';
+
+  /// Hoeveel gebeurtenissen er hoogstens wachten op een antwoord.
+  ///
+  /// De vraag komt bij de tweede start, dus in de praktijk zijn het er een
+  /// handvol. Het plafond is er voor de gebruiker die de vraag blijft
+  /// wegklikken: dan mag deze lijst niet ongemerkt doorgroeien. Vol is vol --
+  /// de oudste blijven staan, want juist die gaan over de eerste minuut.
+  static const int kMaxPending = 50;
 
   /// Bij de hoeveelste start de vraag gesteld wordt.
   ///
@@ -63,6 +72,34 @@ class AnalyticsConsentStore {
   /// Moet de vraag nu gesteld worden?
   bool get shouldAsk => !hasBeenAsked && appOpens >= kAskAtOpenCount;
 
+  /// De gebeurtenissen die wachten tot de vraag beantwoord is.
+  ///
+  /// **Waarom dit bestaat.** `first_run` en `onboarding_done` gebeuren bij de
+  /// eerste start, en de vraag komt pas bij de tweede. Zonder wachtkamer kon
+  /// geen van beide ooit aankomen -- de twee metingen waar fase 29 op stuurt
+  /// waren daarmee per definitie leeg. Vastgesteld op 2026-09-19, toen het
+  /// eerste echte rapport ze allebei op nul had staan.
+  ///
+  /// **Waarom dit de belofte niet breekt.** Hier ligt alleen vast; versturen is
+  /// iets anders. Zonder een ja verlaat er niets het toestel, en bij een nee
+  /// wordt deze lijst gewist zonder ooit verstuurd te zijn. De rijen dragen
+  /// geen toestel-id -- die bestaat op dit moment nog niet.
+  List<String> get pending => _prefs.getStringList(kPendingKey) ?? const [];
+
+  /// Zet een gebeurtenis in de wachtkamer. Geeft terug of hij erin paste.
+  Future<bool> addPending(String row) async {
+    final rows = List<String>.from(pending);
+    if (rows.length >= kMaxPending) return false;
+    rows.add(row);
+    await _prefs.setStringList(kPendingKey, rows);
+    return true;
+  }
+
+  /// Leeg de wachtkamer -- na verzenden, of na een nee.
+  Future<void> clearPending() async {
+    await _prefs.remove(kPendingKey);
+  }
+
   /// Leg het antwoord van de gebruiker vast.
   ///
   /// Bij een ja komt er een verse toestel-id als die er nog niet was; bij een
@@ -76,6 +113,11 @@ class AnalyticsConsentStore {
       }
     } else {
       await _prefs.remove(kDeviceIdKey);
+      // Een nee geldt ook met terugwerkende kracht voor wat er in de
+      // wachtkamer lag. Wie hier alleen het versturen zou stoppen, laat de
+      // rijen staan tot iemand later ja zegt -- en dat is niet wat "nee"
+      // betekende op het moment dat het gezegd werd.
+      await clearPending();
     }
   }
 

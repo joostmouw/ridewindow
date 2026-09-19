@@ -325,10 +325,18 @@ String _renderText(_Report r) {
       '${r.devices > 0 ? ' (${(r.returningDevices / r.devices * 100).round()}%)' : ''}');
   b.writeln('');
 
+  // Wat deze regel wel en niet zegt
+  // -------------------------------
+  // Dit is geen install-verloop. Wie de app eenmaal opent en nooit terugkomt,
+  // krijgt de toestemmingsvraag nooit en blijft dus onzichtbaar -- onder elke
+  // opzet, niet alleen deze. Het echte verloop van installatie naar eerste
+  // start staat in de Play Console, en dat getal is eerlijker dan wat wij hier
+  // kunnen meten. Deze regel gaat over de toestellen die terugkwamen: van hen
+  // is te zien wie de onboarding had afgemaakt en wie niet.
   if (r.firstRuns > 0) {
     final pct = (r.onboardingDone / r.firstRuns * 100).round();
     b.writeln('  Eerste minuut    ${r.onboardingDone} van ${r.firstRuns} '
-        'nieuwe toestellen rondden de onboarding af ($pct%)');
+        'toestellen die terugkwamen hadden de onboarding af ($pct%)');
     b.writeln('');
   }
 
