@@ -787,5 +787,12 @@
   "locationClockBody": "Dit toestel staat in een andere tijdzone dan {city}. De tijden hieronder zijn die van je toestel.",
   "locationFixAction": "Kies je stad",
   "@locationGuessBody": {"placeholders": {"city": {"type": "String"}}},
-  "@locationClockBody": {"placeholders": {"city": {"type": "String"}}}
+  "@locationClockBody": {"placeholders": {"city": {"type": "String"}}},
+  "analyticsAskTitle": "Help je de app beter maken?",
+  "analyticsAskBody": "Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres \u2014 en je kunt het altijd weer uitzetten in Profiel.",
+  "analyticsAskYes": "Ja, doe maar",
+  "analyticsAskNo": "Nee, liever niet",
+  "analyticsSettingTitle": "Anonieme gebruiksstatistiek",
+  "analyticsSettingOn": "Aan \u2014 je helpt de app beter te maken",
+  "analyticsSettingOff": "Uit \u2014 er verlaat niets je toestel"
 }

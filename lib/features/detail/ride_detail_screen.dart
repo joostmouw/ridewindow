@@ -34,7 +34,9 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
@@ -1055,6 +1057,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         plannedScore: slot.overallScore,
                       ),
                     );
+                trackEvent(ref, kEvRideUnplanned, props: {
+                  'score': slot.overallScore,
+                  'hours': slot.end.difference(slot.start).inHours,
+                });
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(S.of(context).rideRemoved)),
@@ -1073,6 +1079,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         plannedScore: slot.overallScore,
                       ),
                     );
+                trackEvent(ref, kEvRidePlanned, props: {
+                  'score': slot.overallScore,
+                  'hours': slot.end.difference(slot.start).inHours,
+                });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(S.of(context).ridePlanned)),
                 );
@@ -1213,3 +1223,4 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     );
   }
 }
+

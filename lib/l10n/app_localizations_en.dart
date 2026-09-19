@@ -1815,4 +1815,26 @@ class SEn extends S {
 
   @override
   String get locationFixAction => 'Pick your city';
+
+  @override
+  String get analyticsAskTitle => 'Help make the app better?';
+
+  @override
+  String get analyticsAskBody =>
+      'Ridewindow can anonymously track which screens you use, so I can see what works and what doesn\'t. No location, no text, no email address — and you can turn it off again in Profile.';
+
+  @override
+  String get analyticsAskYes => 'Yes, go ahead';
+
+  @override
+  String get analyticsAskNo => 'No thanks';
+
+  @override
+  String get analyticsSettingTitle => 'Anonymous usage statistics';
+
+  @override
+  String get analyticsSettingOn => 'On — you\'re helping improve the app';
+
+  @override
+  String get analyticsSettingOff => 'Off — nothing leaves your device';
 }

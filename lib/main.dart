@@ -18,11 +18,14 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
 import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/locale_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
@@ -89,11 +92,45 @@ Future<void> main() async {
   }
 }
 
-class RideWindowApp extends ConsumerWidget {
+class RideWindowApp extends ConsumerStatefulWidget {
   const RideWindowApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RideWindowApp> createState() => _RideWindowAppState();
+}
+
+class _RideWindowAppState extends ConsumerState<RideWindowApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Tel deze start mee en leg hem vast (v4.1). Hier en niet in HomeScreen:
+    // een tester die op het welkomscherm afhaakt is juist de meting die fase 29
+    // nodig heeft, en die zou Home nooit bereiken.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _recordAppOpen());
+  }
+
+  Future<void> _recordAppOpen() async {
+    try {
+      final consent = await ref.read(analyticsConsentProvider.future);
+      final wasFirstRun = consent.isFirstRun;
+      await consent.recordAppOpen();
+
+      // De telling loopt altijd -- die staat lokaal en verlaat het toestel
+      // niet. Of er iets vertrekt, beslist AnalyticsService zelf op grond van
+      // de toestemming.
+      final analytics = await ref.read(analyticsProvider.future);
+      if (wasFirstRun) await analytics.track(kEvFirstRun);
+      await analytics.track(
+        kEvAppOpen,
+        props: {'signed_in': ref.read(currentUserIdProvider) != null},
+      );
+    } catch (_) {
+      // Statistiek mag nooit de reden zijn dat de app niet start.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Luister op slotsProvider en update het Android home screen widget
     // telkens als de slots-staat verandert (b.v. na WeatherRefresh of profielwijziging).
     ref.listen<SlotsState>(slotsProvider, (_, next) {

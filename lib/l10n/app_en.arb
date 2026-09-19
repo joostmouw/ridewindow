@@ -619,5 +619,12 @@
   "locationClockBody": "This device is in a different time zone than {city}. The times below are your device's.",
   "locationFixAction": "Pick your city",
   "@locationGuessBody": {"placeholders": {"city": {"type": "String"}}},
-  "@locationClockBody": {"placeholders": {"city": {"type": "String"}}}
+  "@locationClockBody": {"placeholders": {"city": {"type": "String"}}},
+  "analyticsAskTitle": "Help make the app better?",
+  "analyticsAskBody": "Ridewindow can anonymously track which screens you use, so I can see what works and what doesn't. No location, no text, no email address \u2014 and you can turn it off again in Profile.",
+  "analyticsAskYes": "Yes, go ahead",
+  "analyticsAskNo": "No thanks",
+  "analyticsSettingTitle": "Anonymous usage statistics",
+  "analyticsSettingOn": "On \u2014 you're helping improve the app",
+  "analyticsSettingOff": "Off \u2014 nothing leaves your device"
 }

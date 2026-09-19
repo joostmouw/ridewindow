@@ -27,6 +27,7 @@ import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
@@ -592,6 +593,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   if (v && context.mounted) {
                     await _scheduleNotificationsIfPermitted(context);
                   }
+                },
+              ),
+            ],
+          ),
+
+          // Sectie: GEBRUIKSSTATISTIEK (v4.1)
+          //
+          // Staat bewust als eigen kaart en niet weggestopt onder NOTIFICATIES:
+          // dit is de plek waar de gebruiker een toestemming intrekt, en die
+          // moet vindbaar zijn zonder te zoeken.
+          SectionCard(
+            title: s.analyticsSettingTitle,
+            children: [
+              Consumer(
+                builder: (context, ref, _) {
+                  final consentAsync = ref.watch(analyticsConsentProvider);
+                  final enabled = consentAsync.value?.consent == true;
+                  return SwitchListTile(
+                    title: Text(s.analyticsSettingTitle),
+                    subtitle: Text(
+                      enabled ? s.analyticsSettingOn : s.analyticsSettingOff,
+                    ),
+                    value: enabled,
+                    onChanged: consentAsync.hasValue
+                        ? (v) => ref
+                            .read(analyticsConsentProvider.notifier)
+                            .setConsent(v)
+                        : null,
+                  );
                 },
               ),
             ],

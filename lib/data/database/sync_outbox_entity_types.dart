@@ -24,3 +24,9 @@ const kOutboxEntityPlannedRide = 'planned_ride';
 /// UPDATE -- en PostgREST's upsert vraagt om UPDATE-rechten, dus die weg is
 /// hier fysiek afgesloten. Zie de aparte tak in `CloudSyncReconciler.drainOutbox`.
 const kOutboxEntityFeedback = 'feedback';
+
+/// Gebruiksstatistiek (v4.1, migratie 0008). Zelfde soort als feedback: een
+/// *insert* van een nieuwe rij per gebeurtenis, geen upsert van een bestaande.
+/// `public.app_events` heeft dan ook alleen een INSERT-grant. Zie de aparte tak
+/// in `CloudSyncReconciler.drainOutbox`.
+const kOutboxEntityAnalytics = 'analytics_event';

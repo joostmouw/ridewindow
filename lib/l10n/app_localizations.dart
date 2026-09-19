@@ -3270,6 +3270,48 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Kies je stad'**
   String get locationFixAction;
+
+  /// No description provided for @analyticsAskTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Help je de app beter maken?'**
+  String get analyticsAskTitle;
+
+  /// No description provided for @analyticsAskBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres — en je kunt het altijd weer uitzetten in Profiel.'**
+  String get analyticsAskBody;
+
+  /// No description provided for @analyticsAskYes.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ja, doe maar'**
+  String get analyticsAskYes;
+
+  /// No description provided for @analyticsAskNo.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nee, liever niet'**
+  String get analyticsAskNo;
+
+  /// No description provided for @analyticsSettingTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Anonieme gebruiksstatistiek'**
+  String get analyticsSettingTitle;
+
+  /// No description provided for @analyticsSettingOn.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aan — je helpt de app beter te maken'**
+  String get analyticsSettingOn;
+
+  /// No description provided for @analyticsSettingOff.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uit — er verlaat niets je toestel'**
+  String get analyticsSettingOff;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

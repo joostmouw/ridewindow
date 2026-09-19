@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
@@ -83,6 +86,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     await ref.read(availabilityProvider.notifier).seedPreset(preset);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
+    // De meting waar fase 29 op stuurt: haakt een nieuwe tester af in de eerste
+    // minuut? Zonder dit is alleen te zien dat iemand de app installeerde.
+    trackEvent(ref, kEvOnboardingDone, props: {'preset': _selected!.name});
     if (mounted) context.go('/home');
   }
 

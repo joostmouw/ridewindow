@@ -1820,4 +1820,26 @@ class SNl extends S {
 
   @override
   String get locationFixAction => 'Kies je stad';
+
+  @override
+  String get analyticsAskTitle => 'Help je de app beter maken?';
+
+  @override
+  String get analyticsAskBody =>
+      'Ridewindow kan anoniem bijhouden welke schermen je gebruikt, zodat ik zie wat werkt en wat niet. Geen locatie, geen tekst, geen e-mailadres — en je kunt het altijd weer uitzetten in Profiel.';
+
+  @override
+  String get analyticsAskYes => 'Ja, doe maar';
+
+  @override
+  String get analyticsAskNo => 'Nee, liever niet';
+
+  @override
+  String get analyticsSettingTitle => 'Anonieme gebruiksstatistiek';
+
+  @override
+  String get analyticsSettingOn => 'Aan — je helpt de app beter te maken';
+
+  @override
+  String get analyticsSettingOff => 'Uit — er verlaat niets je toestel';
 }

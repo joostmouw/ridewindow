@@ -4,6 +4,7 @@ const kProfilesTable = 'profiles';
 const kAvailabilityTable = 'availability';
 const kPlannedRidesTable = 'planned_rides';
 const kFeedbackTable = 'feedback';
+const kAppEventsTable = 'app_events';
 const kMigrateAccountDataRpc = 'migrate_account_data';
 const kDeleteOwnAccountRpc = 'delete_own_account';
 

@@ -302,6 +302,20 @@ class CloudSyncReconciler {
             await _gateway.insertRow(kFeedbackTable, payload);
             return;
           }
+          // Gebruiksstatistiek (v4.1, migratie 0008) is van dezelfde soort als
+          // feedback: een insert per gebeurtenis, op een tabel zonder UPDATE-
+          // grant.
+          //
+          // De rij draagt bewust geen `user_id`, ook niet als je ingelogd bent.
+          // De kolom bestaat wel -- de policy heeft hem nodig om een uitgelogde
+          // insert te kunnen toestaan -- maar de app vult hem nooit. Wat de
+          // analyse moet weten is "gedragen ingelogde gebruikers zich anders",
+          // en dat antwoordt de prop `signed_in` net zo goed zonder de rij aan
+          // een persoon te knopen.
+          if (entity == kOutboxEntityAnalytics) {
+            await _gateway.insertRow(kAppEventsTable, payload);
+            return;
+          }
           final table = _tableForEntity(entity);
           if (table == null) return;
           await _gateway.upsertRow(table, payload);

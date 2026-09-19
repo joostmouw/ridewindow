@@ -102,7 +102,7 @@ void main() {
   });
 
   testWidgets(
-    'Test 1: Toont MELDINGEN sectie met 3 SwitchListTile widgets',
+    'Test 1: Toont MELDINGEN sectie met zijn drie schakelaars',
     (tester) async {
       final notifier = FakeProfileNotifier(testProfile);
       await tester.pumpWidget(await _buildProfileScreen(notifier));
@@ -112,11 +112,23 @@ void main() {
       // MELDINGEN sectie-koptekst zichtbaar
       expect(find.text('MELDINGEN', skipOffstage: false), findsOneWidget);
 
-      // Drie SwitchListTile widgets aanwezig
-      expect(
-        find.byType(SwitchListTile, skipOffstage: false),
-        findsNWidgets(3),
-      );
+      // De drie meldingsschakelaars, elk op naam.
+      //
+      // Telde vroeger simpelweg alle SwitchListTiles op het scherm. Dat brak
+      // zodra Profiel er in v4.1 een vierde bij kreeg (gebruiksstatistiek),
+      // terwijl er aan MELDINGEN niets veranderd was. Op naam toetsen zegt
+      // bovendien wat de bedoeling was: dat déze drie er staan.
+      for (final label in [
+        'Avond van tevoren',
+        'Ochtend van de dag',
+        'Wekelijks overzicht',
+      ]) {
+        expect(
+          find.widgetWithText(SwitchListTile, label, skipOffstage: false),
+          findsOneWidget,
+          reason: 'schakelaar "$label" hoort in MELDINGEN te staan',
+        );
+      }
     },
   );
 

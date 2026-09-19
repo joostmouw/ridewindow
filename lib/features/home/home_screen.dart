@@ -33,6 +33,9 @@ import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/features/shared/analytics_consent_sheet.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -141,8 +144,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       await Future.delayed(const Duration(milliseconds: 500));
       if (await shouldShowHint('home') && mounted) {
         setState(() => _showHints = true);
+        return;
       }
+      // De toestemmingsvraag voor gebruiksstatistiek (v4.1). Bewust ná de
+      // hint-tak en met een `return` daarboven: twee overlays tegelijk op de
+      // eerste minuut is precies wat fase 29 wil voorkomen. En bewust niet op
+      // de allereerste start -- zie AnalyticsConsentStore.kAskAtOpenCount.
+      await _maybeAskAnalyticsConsent();
     });
+  }
+
+  Future<void> _maybeAskAnalyticsConsent() async {
+    try {
+      final consent = await ref.read(analyticsConsentProvider.future);
+      if (!consent.shouldAsk || !mounted) return;
+      await showAnalyticsConsentSheet(context, ref);
+    } catch (_) {
+      // Nooit de reden zijn dat Home niet opent.
+    }
   }
 
   @override
@@ -1152,7 +1171,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   /// Zegt hardop dat de getoonde plek niet de gemeten plek is -- of dat de
   /// klok van dit toestel bij een heel ander werelddeel hoort dan die plek.
+  /// Eén melding per sessie -- de banner wordt bij elke rebuild opnieuw
+  /// gebouwd en dat is geen nieuwe gebeurtenis.
+  bool _locationWarningReported = false;
+
   Widget _buildLocationBanner(BuildContext context, LocationData location) {
+    // De gebeurtenis die de Aruba-melding van 2026-09-19 zichtbaar had gemaakt
+    // voordat een mens hem opmerkte. Draagt geen coördinaten -- alleen wélke
+    // van de twee gebreken het is.
+    if (!_locationWarningReported) {
+      _locationWarningReported = true;
+      trackEvent(ref, kEvLocationWarning, props: {
+        'source': location.source.name,
+        'clock_mismatch': location.clockMismatch,
+      });
+    }
+
     final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
     final isGuess = location.isGuess;
