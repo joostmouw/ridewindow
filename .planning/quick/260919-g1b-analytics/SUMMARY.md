@@ -59,12 +59,12 @@ select-grant. Een artifact kan het niet doen: de CSP daar blokkeert fetch naar S
 
 | | Wat | Waar |
 |---|---|---|
-| **1** | **Migratie 0008 draaien** op het Supabase-project. Zonder dit bestaat de tabel niet en blijven alle rijen in de lokale outbox staan (waar ze niets stukmaken). | Supabase > SQL Editor, plak `supabase/migrations/0008_app_events.sql` |
+| ~~**1**~~ | ✅ **Gedraaid 2026-09-19** via de SQL Editor, en geverifieerd met een query die wél een resultaat teruggeeft — die editor toont geen NOTICE-output, dus `create table if not exists` zou er bij een overgeslagen run identiek uitzien. Uitkomst: 9 kolommen, RLS aan, 1 policy, 3 indexen, rechten `anon:INSERT, authenticated:INSERT`, 0 rijen. | — |
 | **2** | **De service-role sleutel in je omgeving zetten** — anders kan het rapport niet lezen. | Project Settings > API > `service_role`, dan `export SUPABASE_SERVICE_ROLE_KEY='eyJ...'` |
 | **3** | **Privacybeleid bijwerken**: een alinea over anonieme statistiek na toestemming. De tekst staat op GitHub Pages. | `docs/` |
 | **4** | **Data Safety-formulier** in de Play Console: "App activity → App interactions", optioneel, niet gedeeld met derden. | Play Console |
 
-Punt 1 en 2 zijn Console-instellingen; die doe ik voor je zodra je zegt dat het mag. Punt 3
+Punt 2 is een Console-instelling; die doe ik voor je zodra je zegt dat het mag. Punt 3
 en 4 zijn teksten die ik kan schrijven maar die jij moet indienen.
 
 ## Verificatie
@@ -76,6 +76,7 @@ en 4 zijn teksten die ik kan schrijven maar die jij moet indienen.
 
 ## Niet met eigen ogen gezien
 
-Er is nog geen enkele rij geschreven — de tabel bestaat nog niet. De hele keten
-(toestemming → outbox → drain → Postgres) is per schakel getest maar nooit in zijn geheel
-gelopen. Dat kan pas na punt 1.
+De tabel bestaat nu en staat op nul rijen. De hele keten — toestemming → outbox → drain →
+Postgres — is per schakel getest maar nooit in zijn geheel gelopen. De eerste echte rij komt
+er pas als iemand op een toestel bij de tweede start "ja" antwoordt. Dat is meteen de beste
+test: verschijnt er daarna een rij, dan werkt alles ertussenin ook.

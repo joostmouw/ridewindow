@@ -27,11 +27,6 @@
   "blockers": [],
   "wacht_op_joost": [
     {
-      "task": "Migratie 0008 draaien op Supabase",
-      "description": "supabase/migrations/0008_app_events.sql. Zonder deze tabel schrijft analytics niets weg -- rijen blijven in de lokale outbox staan, waar ze niets stukmaken maar ook niets opleveren. De hele keten toestemming -> outbox -> drain -> Postgres is per schakel getest maar nooit in zijn geheel gelopen.",
-      "owner": "Claude, na akkoord"
-    },
-    {
       "task": "SUPABASE_SERVICE_ROLE_KEY in de omgeving",
       "description": "Project Settings > API > service_role. Nodig voor tool/analytics_report.dart; die leest buiten de app om, want app_events heeft met opzet geen select-grant.",
       "owner": "Joost"
@@ -54,6 +49,7 @@
     "Stand 2 van de schets was oorspronkelijk groter bedoeld; Joost koos bewust voor een knop tussen twee weergaven in plaats van één model"
   ],
   "notes": [
+    "Migratie 0008 is op 2026-09-19 gedraaid via de Supabase SQL Editor en geverifieerd met een query die wél een resultaat teruggeeft (die editor toont geen NOTICE-output, dus een geslaagde en een stilletjes overgeslagen run zien er anders hetzelfde uit): 9 kolommen, RLS aan, 1 policy, 3 indexen, rechten precies 'anon:INSERT, authenticated:INSERT' -- geen select, geen update. Nul rijen.",
     "Webserver draait op 8766 met de laatste build (build/web). Na elke flutter build web is een harde herlaad nodig (Cmd+Shift+R), anders serveert de browsercache de oude bundel.",
     "Remote Control stond aan op de sessie van vandaag; opnieuw aanzetten kan met /remote-control of /rc.",
     "De les uit de vijf correctierondes op de blokweergave staat in .planning/quick/260919-h2c-blokweergave/SUMMARY.md: een ordinale schaal teken je als schaal, niet als palet. Kaartkleuren en balkkleuren zijn niet hetzelfde probleem."
