@@ -1287,13 +1287,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       );
     }
 
+    // Eén moment van de hele week eruit lichten, niet één per dag.
+    //
+    // Elke dagkaart markeert al zijn eigen beste venster op de balk, maar
+    // daarmee waren er vijf "beste" naast elkaar en sprong er niets uit. Dit is
+    // dezelfde afweging als bij de vensterlijst: de kaart die het label draagt
+    // moet de werkelijk hoogste score dragen, anders wijst het scherm met veel
+    // nadruk de verkeerde aan.
+    var topIndex = 0;
+    for (var i = 1; i < days.length; i++) {
+      if (days[i].best.overallScore > days[topIndex].best.overallScore) {
+        topIndex = i;
+      }
+    }
+    // Alleen als het werkelijk een goede rit is. Dezelfde drempel als de
+    // vensterlijst: de beste van een slechte week is geen toprit.
+    final topTier = days[topIndex].best.tier;
+    final hasTop = topTier is Perfect || topTier is Great;
+
     return SliverList.builder(
       itemCount: days.length,
       itemBuilder: (context, index) {
         final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
         return SpringEntrance(
           delay: AppMotion.staggerDelay * staggerIndex,
-          child: _buildBlockCard(days[index]),
+          child: _buildBlockCard(days[index], isTop: hasTop && index == topIndex),
         );
       },
     );
@@ -1306,7 +1324,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// in de dag en niet wat de rest deed -- terwijl dat juist de vraag is waar
   /// deze weergave voor bestaat: *wanneer is het vandaag goed*. Zonder de grijze
   /// randen eromheen is "goed van 06:00 tot 21:00" een mededeling zonder maat.
-  Widget _buildBlockCard(RideDay day) {
+  Widget _buildBlockCard(RideDay day, {bool isTop = false}) {
     final rw = context.rw;
     final s = S.of(context);
     final theme = Theme.of(context);
@@ -1345,6 +1363,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (isTop)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: BestChoicePill(),
+                  ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1375,11 +1398,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ScoreDisplay(
                       score: day.best.overallScore,
                       tier: day.best.tier,
+                      emphasis:
+                          isTop ? ScoreEmphasis.hero : ScoreEmphasis.normal,
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                _DayRail(day: day),
+                _DayRail(day: day, isTop: isTop),
                 const SizedBox(height: 8),
                 Text(
                   '${s.blockBestWindow('${_formatTime(day.best.start)}\u2013${_formatTime(day.best.end)}')} \u00b7 ${s.blockUpToHours(day.longestRideHours)}',
@@ -1734,36 +1759,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           children: [
                             // "Beste keuze" label
                             if (isBest)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: cs.primaryContainer,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(AppIcons.star,
-                                          size: 14,
-                                          color: cs.onPrimaryContainer),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        S.of(context).bestChoice,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                              color: cs.onPrimaryContainer,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 10),
+                                child: BestChoicePill(),
                               ),
                             // Card top: dag + badge
                             Row(
@@ -2444,9 +2442,13 @@ class _GreetingWithWhisperNameState extends State<_GreetingWithWhisperName>
 /// (6 tot 22 uur). Een bredere balk zou grijs tonen waar de app sowieso nooit
 /// iets aanbiedt, en dat leest als "hier viel iets te halen".
 class _DayRail extends StatelessWidget {
-  const _DayRail({required this.day});
+  const _DayRail({required this.day, this.isTop = false});
 
   final RideDay day;
+
+  /// Draagt deze dag de toprit van de week? Dan krijgt de markering een rand,
+  /// zodat het moment ook in de balk aan te wijzen is en niet alleen in de kop.
+  final bool isTop;
 
   @override
   Widget build(BuildContext context) {
@@ -2497,7 +2499,19 @@ class _DayRail extends StatelessWidget {
                           w,
                       top: 0,
                       bottom: 0,
-                      child: ColoredBox(color: rw.scorePerfect),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: rw.scorePerfect,
+                          border: isTop
+                              ? Border.symmetric(
+                                  vertical: BorderSide(
+                                    color: rw.textPrimary,
+                                    width: 2,
+                                  ),
+                                )
+                              : null,
+                        ),
+                      ),
                     ),
                   ],
                 );
@@ -2520,6 +2534,44 @@ class _DayRail extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// De "beste keuze"-pil.
+///
+/// **Waarom een eigen widget.** Hij stond als dertig regels opmaak in
+/// `_buildRideCard`, en de blokweergave had hem ook nodig. Twee kopieën van
+/// hetzelfde signaal is precies hoe twee vormtalen ontstaan -- dat is wat v4.0
+/// bij de kaarten heeft weggewerkt en het hoeft er niet via een achterdeur
+/// weer in.
+class BestChoicePill extends StatelessWidget {
+  const BestChoicePill({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: cs.primaryContainer,
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(AppIcons.star, size: 14, color: cs.onPrimaryContainer),
+          const SizedBox(width: 4),
+          Text(
+            S.of(context).bestChoice,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: cs.onPrimaryContainer,
+                ),
+          ),
+        ],
+      ),
     );
   }
 }
