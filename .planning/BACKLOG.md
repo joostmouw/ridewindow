@@ -394,3 +394,20 @@ Pas zinvol als slice 1 t/m 3 staan.
 [Partiful RSVP](https://help.partiful.com/en-us/articles/15525505-how-do-i-rsvp-to-an-event-on-partiful),
 [Partiful](https://partiful.com/), [Howbout](https://howbout.app/),
 [Strava Group Activities](https://support.strava.com/hc/en-us/articles/216919497-Group-Activities).
+
+## 74 — Meldingen bij laten werken zonder dat de app geopend wordt
+
+De drie meldingsschakelaars werken sinds 2026-09-19, maar alleen vanuit de voorgrond: de
+meldingen worden opnieuw gepland wanneer `slotsProvider` verandert, en dat gebeurt als
+iemand de app opent. Opent een tester de app drie dagen niet, dan lapsen ze.
+
+De achtergrondtaak draait elke drie uur en berekent het beste venster al (voor de widget),
+dus de naad ligt er. Wat er ontbreekt is de tijdzone: die isolate heeft geen
+`tz.initializeTimeZones()` en geen `flutter_timezone`-peiling, en zonder die twee staat
+`tz.local` op UTC. Dan gaat elke melding uren verkeerd af — dezelfde klasse fout als de
+Aruba-melding van dezelfde dag, en daarom bewust niet blind aangezet.
+
+Wat het nodig heeft: `DartPluginRegistrant.ensureInitialized()` in de isolate, en
+verifiëren dát `flutter_timezone` daar werkt. Niet op te lossen zonder een toestel.
+
+Herkomst: quick-taak notificatieschakelaars, 2026-09-19.
