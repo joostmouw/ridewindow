@@ -227,6 +227,40 @@ void main() {
     );
 
     test(
+      'uitgelogd draint de outbox wel degelijk -- anonieme feedback en '
+      'gebruiksstatistiek hebben geen account nodig',
+      () async {
+        // Waargenomen op de Oppo (2026-09-19): toestemming voor statistiek
+        // gegeven, app een paar keer koud gestart, en er kwam geen enkele rij
+        // aan. De drain hing aan de uid-controle, en die was terecht zolang de
+        // outbox alleen ingelogde rijen droeg. Sinds fase 22 en v4.1 is dat
+        // niet meer waar.
+        final auth = StreamController<User?>.broadcast();
+        addTearDown(auth.close);
+        final container = containerFor(auth.stream);
+        final reconciler = container.read(cloudSyncReconcilerProvider);
+        await Future<void>.delayed(Duration.zero);
+
+        auth.add(null);
+        await Future<void>.delayed(Duration.zero);
+        await reconciler.reconcileOnStartup();
+
+        expect(
+          outbox.drainCount,
+          1,
+          reason: 'Wie de app opent, gebruikt en wegveegt, maakt nooit een '
+              'achtergrond-naar-voorgrond-overgang. Gebeurt het hier niet, '
+              'dan vertrekt er nooit iets.',
+        );
+
+        // En precies één keer: opnieuw naar Home navigeren mag geen tweede
+        // rondgang kosten.
+        await reconciler.reconcileOnStartup();
+        expect(outbox.drainCount, 1);
+      },
+    );
+
+    test(
       'uitgelogd reconcilet niet, en zet de guard ook niet vast -- inloggen na '
       'een uitgelogde start moet alsnog een reconcile opleveren',
       () async {
@@ -240,10 +274,12 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         await reconciler.reconcileOnStartup();
 
+        final afterSignedOut = outbox.drainCount;
         expect(
-          outbox.drainCount,
-          0,
-          reason: 'Uitgelogd is er niets om op te halen.',
+          afterSignedOut,
+          1,
+          reason: 'Uitgelogd valt er niets op te halen, maar wel iets te '
+              'versturen -- zie de test hierboven.',
         );
 
         auth.add(_fakeUser('u-1'));
@@ -252,7 +288,7 @@ void main() {
 
         expect(
           outbox.drainCount,
-          greaterThan(0),
+          greaterThan(afterSignedOut),
           reason: 'De guard mag niet dichtslaan op de uitgelogde ronde -- dan '
               'zou een gebruiker die de app opent, daarna inlogt en terugkeert '
               'naar Home nog steeds een lege lijst zien. Dat is dezelfde bug '

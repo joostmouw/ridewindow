@@ -148,6 +148,10 @@ class CloudSyncReconciler {
   /// app-start per account".
   String? _startupReconciledUid;
 
+  /// Of de outbox deze app-start al geleegd is. Per start, niet per account:
+  /// een uitgelogde gebruiker heeft ook rijen te versturen.
+  bool _startupDrained = false;
+
   /// Opstart-reconcile (backlog #61) -- het pad dat ontbrak.
   ///
   /// Tot deze methode bestond hing de pull van geplande ritten uitsluitend aan
@@ -168,6 +172,26 @@ class CloudSyncReconciler {
   /// §4's grens van 2 seconden tot het eerste zichtbare ride slot mag hier niet
   /// aan hangen.
   Future<void> reconcileOnStartup() async {
+    // Duwen mag altijd, ook uitgelogd -- en dat is nieuw sinds deze methode
+    // geschreven werd. Toen was de outbox er alleen voor een ingelogde
+    // gebruiker, en "uitgelogd is er niets te doen" klopte. Sinds fase 22
+    // (anonieme feedback) en v4.1 (gebruiksstatistiek na toestemming) staan er
+    // rijen in die geen account nodig hebben, en die bleven hier liggen.
+    //
+    // Waargenomen op de Oppo, 2026-09-19: toestemming gegeven, app een paar
+    // keer koud gestart, en er kwam geen enkele rij aan. Ze vertrokken pas bij
+    // een achtergrond-naar-voorgrond-overgang, want alleen `reconcileOnForeground`
+    // draint zonder de uid-controle. Wie de app opent, gebruikt en wegveegt,
+    // maakt die overgang nooit.
+    //
+    // Eigen eenmalige vlag, los van `_startupReconciledUid`: die is per
+    // account, deze is per app-start. Zonder dat onderscheid zou elke
+    // terugkeer naar Home opnieuw draaien.
+    if (!_startupDrained) {
+      _startupDrained = true;
+      await drainOutbox();
+    }
+
     final userId = _signedInUserId();
     if (userId == null) return;
     if (_startupReconciledUid == userId) return;
