@@ -68,7 +68,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 **Milestone Goal:** Ridewindow staat in productie op Google Play. Het kritieke pad is de klok: veertien dagen die pas starten bij twaalf aangemelde testers.
 
 - [ ] **Phase 26: Console op orde** - Release-route via internal, landen open, feedback-adres, Google Group, nl-NL-winkelpagina, alles gelijk aan de Play-build, en de changelog vanaf build 41
-- [ ] **Phase 27: Wervingsonderzoek** - Uitzoeken welke kanalen testers opleveren die veertien dagen blijven; keuze voor 2–3 kanalen met teksten klaar
+- [x] **Phase 27: Wervingsonderzoek** - Uitzoeken welke kanalen testers opleveren die veertien dagen blijven; keuze voor 2–3 kanalen met teksten klaar
 - [ ] **Phase 28: Feedbackstroom** - Eén register voor alle bronnen, gestructureerd formulier, een natuurlijk vraagmoment, een vaste beoordelingsronde naar de backlog, en terugkoppeling aan de tester
 - [ ] **Phase 29: Eerste minuut** - Lege staat, hooguit één uitlegoverlay vooraf, notificaties in de taal van de app — samen met fase 28 in build 43
 - [ ] **Phase 30: Werving** - Eigen kring direct na fase 26, de gekozen kanalen na build 43; minstens 15 aangemeld en afhakers binnen twee dagen gezien
