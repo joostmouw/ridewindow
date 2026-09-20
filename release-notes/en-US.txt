@@ -1,4 +1,11 @@
-The app is now called Ridewindow, spelled the same everywhere: under the icon,
-in the store and in the app.
+New on Home: your day as one block, with the best window marked. Choose
+"Best first" or "On time" as the order.
 
-The opening animation is twice as short: 2.5 seconds instead of 5.
+Shared rides: propose several windows, the group votes and the organizer
+picks. You can decline a shared ride, with undo.
+
+At its second start the app asks once about anonymous usage statistics.
+Nothing leaves your phone without a yes.
+
+Fixes: signed-out feedback that left late, a black screen after Info, and
+"Longest ride here" always saying 2 hours.

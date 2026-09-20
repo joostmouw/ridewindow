@@ -1,4 +1,11 @@
-De app heet nu Ridewindow, overal op dezelfde manier geschreven: onder het
-icoon, in de winkel en in de app.
+Nieuw op Home: je dag als één blok, met het beste venster gemarkeerd.
+Kies "Beste eerst" of "Op tijd" als volgorde.
 
-De openingsanimatie duurt half zo lang: 2,5 seconde in plaats van 5.
+Gedeelde ritten: leg meerdere vensters voor, de groep stemt en de
+organisator kiest. Een gedeelde rit afzeggen kan, met ongedaan maken.
+
+Bij de tweede start vraagt de app eenmalig om anonieme statistiek.
+Zonder ja verlaat niets je toestel.
+
+Fixes: feedback van uitgelogd gebruik die te laat vertrok, een zwart scherm
+na Info, en "Longest ride here" dat bijna altijd 2 uur zei.

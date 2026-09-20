@@ -3,6 +3,76 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 45 — 1.0.34+45
+
+**Datum:** 2026-09-20
+**Track:** Internal testing — klaargezet op 2026-09-20, wacht op de
+service-accountsleutel (`tool/README-play-release.md`). Dit is de build die de
+inhoud van 43 en 44, die nooit op Play hebben gestaan, naar de testers brengt.
+
+**Inhoud**
+- Alles uit build 43 en 44, zie de blokken daaronder
+- "Longest ride here" zei bijna altijd 2 uur — een artefact van de dedup, die
+  een lang venster weggooide voor het korte venster dat erin zat (`93d9e27`)
+- Releasepapier: notities bij de upload en dit blok zelf
+
+**Feedback opgelost:** geen nieuwe boven op 43 en 44 — Ingrid's #69 en #70 zitten
+in 43, en de "longest ride here"-tekst hierboven haalt daar de laatste scherpte af.
+
+## Build 44 — 1.0.33+44
+
+**Datum:** 2026-09-20
+**Track:** nooit naar Play gegaan. Sideload op de Oppo, tweede verificatieronde.
+
+**Inhoud**
+- Geen kwadraatstreepjes (em-dashes) meer in de app, met een structuurtest erop
+  (`ae161d0`)
+- Uitgelogd vertrok er bij het opstarten niets uit de outbox: feedback en
+  statistiek bleven liggen tot er toevallig een voorgrond-overgang kwam (`e0aab7a`)
+- Eenheden: Fahrenheit, Beaufort en mijl per uur in Profiel. De motor blijft in
+  Celsius en km/u; alleen de tekst rekent om (`9adaff6`)
+- Zwarte schermbug bij info → OK in Profiel: de OK-knop popte de pagina in
+  plaats van de dialoog (`9adaff6`)
+
+**Feedback opgelost:** geen — dit was een eigen ronde op het toestel, die vijf
+dingen vond die alleen op glas te zien zijn. De "longest ride here"-fix volgde ná
+de bump en zat al wel in de sideload op de Oppo; naar de testers gaat hij via 45.
+
+## Build 43 — 1.0.32+43
+
+**Datum:** 2026-09-19
+**Track:** nooit naar Play gegaan. Sideload op de Oppo, voor de verificatieronde
+van 19 september.
+
+**Inhoud**
+- Home kent twee gezichten: vensters als lijst, of als één blok per dag met het
+  beste venster uitgelicht. "Beste eerst" sorteert op score, niet op oordeel
+  (`18507d7`, `b198901`, `f3709fd`)
+- Bij een gedeelde rit kun je meerdere vensters voorleggen: de groep stemt en de
+  organisator kiest (`008b516`)
+- Een gedeelde rit is af te zeggen, met ongedaan maken; afgezegde ritten staan
+  onder een eigen filter (`265e282`)
+- Anonieme gebruiksstatistiek, pas na een expliciete ja bij de tweede start;
+  gebeurtenissen van daarvoor wachten in een wachtkamer (`66286f4`, `8a67953`)
+- Notificaties volgen de taal van de app (`3a1beaf`) en de drie schakelaars in
+  Profiel doen nu werkelijk iets (`5d4db64`)
+- De app volgt de fietser: laatst bekende positie gedeeld met de achtergrondtaak,
+  zonstand voor de eigen plek, waarschuwing op Home (`351e0f4`)
+- De daglicht-uitleg is dezelfde sheet als de andere drie balken en spreekt hun
+  taal (`d072e45`, `ea75154`)
+- Het privacybeleid vertelt over de statistiek en wat een maatje van je ziet; de
+  link ernaartoe was sinds juli een 404 en wijst nu goed (`187ca5b`, `1738a93`)
+- Consistentie-sweep #73: nul hardgecodeerde hoeken, en de weerbalk-uitleg noemt
+  hetzelfde getal als de balk (`a388701`, `ff47f2e`)
+- PWA: de "zet op beginscherm"-balk is weg te klikken (`b84bd16`) en er zijn geen
+  doodlopende schermen meer op de iOS-webapp (`99600e4`)
+
+**Feedback opgelost:** Ingrid (tester) vroeg op 2026-09-09 om het aaneengesloten
+goede blok (#69) en om te zien waarom dit venster (#70). Beide staan in deze
+build: de blokweergave hierboven. De tester op Aruba zag "licht van 01:32 tot
+13:29" — de app rekende de zon voor Amsterdam en tekende hem op de klok van
+Aruba; de locatiefix hierboven is het antwoord (`351e0f4`).
+
 ## Build 42 — 1.0.31+42
 
 **Datum:** 2026-09-10
