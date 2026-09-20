@@ -20,7 +20,8 @@ key-files:
   modified: []
 
 key-decisions:
-  - "Taak 2 (de wipe) niet uitgevoerd: hij hangt aan de keuze in Taak 1, en dat is Joost's beslissing over zijn eigen toestel"
+  - "Taak 2 (de wipe) later dezelfde dag wél uitgevoerd: Joost koos option-a, en het pakket is uit user 0 en user 10 verdwenen"
+  - "Taak 2 (de wipe) niet uitgevoerd bij het schrijven van deze SUMMARY: hij hing aan de keuze in Taak 1, en dat is Joost's beslissing over zijn eigen toestel"
   - "De promotie-stap (Taak 3, stap 4) niet als open werk genoteerd maar als al-gebeurd: 26-01 constateerde op 2026-09-17 in de Console dat build 42 Active staat op de gesloten test sinds 2026-09-10 23:24"
   - "Build 45 erbij genoteerd als context: dezelfde CON-01-route geldt ongewijzigd voor hem zodra hij op internal staat"
 
@@ -33,6 +34,34 @@ completed: 2026-09-20
 # Fase 26 Plan 02: CON-01 Summary
 
 **Uitgevoerd tot waar de hand van Joost begint: de Oppo draait een sideload van 44, het pakket zit opnieuw in het kloonprofiel, en de wipe wacht op zijn keuze.**
+
+**Nagekomen, 2026-09-20 (dezelfde dag, latere sessie):** Joost koos **option-a**.
+Taak 2 is daarmee uitgevoerd en geverifieerd:
+
+```
+adb shell pm uninstall --user 0  ridewindow.joost.amsterdam   # Success
+adb shell pm uninstall --user 10 ridewindow.joost.amsterdam   # Success
+adb shell pm list packages | grep ridewindow                  # leeg
+```
+
+Precies één toestel aangesloten (`3B15AD01LEN00000`) en na de wipe noemt geen van
+beide profielen het pakket nog. De Oppo is nu een schoon toestel voor deze app,
+en dat is een toestand die alleen bestaat tot de eerstvolgende installatie: wie
+hier verder gaat en eerst sideloadt, gooit het bewijs weg waar CON-01 op wacht.
+
+Wat er nog moet gebeuren voor CON-01, in deze volgorde:
+
+1. Joost zet zijn eigen adres op de **Internal testing → Testers**-lijst en
+   installeert 45 via de opt-in-link uit Play (internal heeft een eigen
+   testerlijst, los van de 9 adressen op de gesloten test).
+2. Meten: `installerPackageName` moet `com.android.vending` zijn, `versionCode`
+   45, de tijd tot het eerste scherm tegen de 2 s uit `CLAUDE.md`, en of profiel,
+   week en geplande ritten terugkomen uit Supabase na inloggen. Dat laatste is
+   meteen een tweede bewijs voor de herstelroute uit MIG-02.
+3. Dán **Promote release** van internal naar Closed testing / Alpha, zodat de 9
+   testers dezelfde bundel krijgen die Joost getest heeft. Promoveren en niet
+   opnieuw uploaden: dat is Pitfall 1 uit het plan, en het scheelt de vraag of
+   testers wel zien wat jij zag.
 
 ## Performance
 
