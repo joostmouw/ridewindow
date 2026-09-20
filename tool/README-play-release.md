@@ -67,6 +67,22 @@ Nederlandse console heten ze ongeveer hetzelfde):
 Rechten hebben tot ~24 uur nodig om door te werken. Krijg je vlak na het
 uitnodigen een 401 of 403, wacht dan even; dat is geen fout in het script.
 
+### Als de 403 blijft: maak de uitnodiging opnieuw
+
+Op 2026-09-20 hield `The caller does not have permission` aan, ook na wachten en
+zelfs na admin-rechten. De oorzaak: het service-account was in Cloud verwijderd
+en opnieuw aangemaakt (eerst met een typefout in de naam). Play bindt zo'n rij
+aan de identiteit, niet aan de tekst van het adres. Een opnieuw aangemaakt
+account met hetzelfde e-mailadres is een ándere identiteit, dus de rechten
+landen op niemand en er is aan de rij niets bijzonders te zien. Rechten
+bijstellen helpt niet: **haal de rij weg met *Remove access* en nodig hetzelfde
+adres opnieuw uit.**
+
+Scheelt veel gokwerk bij een 403: roep `edits.insert` aan op een package dat
+zeker niet bestaat en vergelijk. Krijg je daar een 404 *Package not found* en op
+`ridewindow.joost.amsterdam` een 403, dan bestaat de app en ligt het puur bij de
+rechten van dit account. Twee keer dezelfde 403 wijst naar de sleutel of de API.
+
 ## Wat het script doet, en wat het weigert
 
 Eén Play-*edit* van begin tot eind: `insert` → bundel uploaden → track
@@ -98,11 +114,14 @@ vermoeden.
 | `--dry-run` | — | Controleert alles en logt in, schrijft niets |
 | `--force` | — | Negeert de staleness-vangrail |
 
-## Wat er nog niet bewezen is
+## Wat er bewezen is
 
-Alles tot en met de authenticatie is gedraaid: argumenten, de staleness-vangrail
-(uitgelokt met een afwijkende `versionCode`), het inlezen van de release-notes,
-en `dart analyze` is schoon. De vier API-aanroepen zelf zijn nooit uitgevoerd —
-daarvoor is de sleutel uit stap 1 nodig. Draai de eerste keer met
-`--track internal --status draft`, zodat een fout in de console blijft staan en
-niet bij testers terechtkomt.
+Op 2026-09-20 is 1.0.34+45 hiermee naar internal gegaan: de hele edit-cyclus
+(`insert` → bundel van 66,2 MB resumable geüpload → track bijgewerkt →
+`commit`), met release-notes in en-US en nl-NL. Daarmee is de route compleet
+gedraaid en is handwerk in de console niet meer nodig.
+
+Eerder waren alleen de argumenten, de staleness-vangrail (uitgelokt met een
+afwijkende `versionCode`) en het inlezen van de release-notes gedraaid. Twijfel
+je bij een release, dan blijft `--status draft` de veilige eerste stap: dan komt
+hij in de console te staan en niet meteen bij testers.

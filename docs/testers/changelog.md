@@ -6,9 +6,10 @@
 ## Build 45 — 1.0.34+45
 
 **Datum:** 2026-09-20
-**Track:** Internal testing — klaargezet op 2026-09-20, wacht op de
-service-accountsleutel (`tool/README-play-release.md`). Dit is de build die de
-inhoud van 43 en 44, die nooit op Play hebben gestaan, naar de testers brengt.
+**Track:** Internal testing, geüpload op 2026-09-20 met
+`tool/play_upload.dart` (de eerste release via de API, niet met de hand). Dit is
+de build die de inhoud van 43 en 44, die nooit op Play hebben gestaan, naar de
+testers brengt.
 
 **Inhoud**
 - Alles uit build 43 en 44, zie de blokken daaronder

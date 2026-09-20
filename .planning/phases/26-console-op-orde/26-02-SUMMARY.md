@@ -72,6 +72,14 @@ onbewezen en blokkeert de rest van de fase). Zonder zijn keuze gaat Taak 2 niet 
    staat, geldt CON-01 ongewijzigd voor 45: eerst door Joost getest vanaf
    een Play-installatie, dán pas promoten naar de gesloten test.
 
+   **Nagekomen, 2026-09-20:** de sleutel is er en 45 staat op internal, via
+   `tool/play_upload.dart` en dus niet met de hand. Dat kostte drie omwegen
+   die in `tool/README-play-release.md` staan opgeschreven; de hardnekkigste:
+   een in Cloud verwijderd en opnieuw aangemaakt service-account houdt zijn
+   Play-rechten niet, ook al is het e-mailadres identiek. De rij moet weg en
+   opnieuw uitgenodigd. CON-01 staat daarmee weer bij Joost: eerst de wipe,
+   dan installeren vanaf Play.
+
 ## Wat Joost doet (resume-signals)
 
 Naar het plan, in deze volgorde:
