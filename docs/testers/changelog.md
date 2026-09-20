@@ -25,6 +25,12 @@
 **Feedback opgelost:** geen. Dit was een vondst op het toestel, precies waar
 een Play-installatie voor bedoeld is.
 
+**Geverifieerd op het toestel (2026-09-20, 12:34):** 46 uit Play geinstalleerd,
+daarna de Oppo echt opnieuw opgestart. De crashbuffer bleef leeg waar 45 er een
+FATAL in achterliet. Wel opgemerkt: direct na de herstart stond er geen
+achtergrondtaak gepland; die verschijnt pas zodra de app een keer geopend is.
+Dat is dezelfde familie als het openstaande punt #74 en wordt apart bekeken.
+
 ## Build 45: 1.0.34+45
 
 **Datum:** 2026-09-20
