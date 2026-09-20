@@ -1,36 +1,36 @@
 {
-  "timestamp": "2026-09-20T09:25:00.000Z",
-  "reason": "Twee sessies aaneen (19 september avond + 20 september ochtend). Alles gepusht, werkende boom, context mag gewist.",
-  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store' -- fase 26 'Console op orde' is voor 1 van de 4 plannen af. Daarnaast is slice 2 van epic #65 gebouwd, buiten de roadmap om.",
+  "timestamp": "2026-09-20T12:45:00.000Z",
+  "reason": "Middagsessie afgerond. Alles gepusht, werkende boom, 695 tests groen. Context mag gewist; fase 27 verdient een vers venster.",
+  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store'. Fase 26 'Console op orde': plannen 01 en 02 zijn af, 03 en 04 staan open en wachten op twee beslissingen van Joost.",
   "position": {
-    "last_commit": "93d9e27",
-    "version": "1.0.33+44, geinstalleerd op de Oppo als sideload",
-    "last_activity": "693 tests groen, flutter analyze schoon, origin/main gelijk aan lokaal"
+    "last_commit": "2fce87e",
+    "version": "1.0.35+46 -- op internal EN op de gesloten test (alpha), en op de Oppo geinstalleerd vanaf Play",
+    "last_activity": "695 tests groen. flutter analyze: 0 errors, 0 warnings, 178 info (140 daarvan require_trailing_commas)."
   },
   "start_here": [
+    "AGENTS.md -- geldt voor elke agent, ook Factory Droid",
     ".planning/STATE.md -- de tabel 'Quick Tasks Completed' bovenaan",
-    ".planning/OPEN.md -- losse einden",
-    ".planning/BACKLOG.md -- nieuw: epic #75 'Dicht huis' (bots, nepaccounts, hardening)",
+    "docs/testers/changelog.md -- blok Build 46, met wat er op het toestel bewezen is",
     "Deze handoff: 'wacht_op_joost' en 'openstaand_werk'"
   ],
   "afgerond_in_deze_sessie": [
-    "Analytics-rapport werkt (6475504): 0009 gaf service_role de select die 0008 wel opschreef maar nooit gaf. Migratie is gedraaid en nagemeten.",
-    "Privacybeleid herschreven voor de statistiek en voor wat een maatje ziet (187ca5b, 1738a93). Live op GitHub Pages, hash-geverifieerd. De link in de app was sinds juli een 404 (F-8) en wijst nu goed.",
-    "Wachtkamer voor gebeurtenissen van voor de toestemming (8a67953) -- first_run en onboarding_done konden anders nooit aankomen.",
-    "Vier ongebruikte analytics-namen aangesloten (5bb7fec).",
-    "Peloton slice 2 (008b516): meerdere vensters voorleggen, stemmen, organisator kiest. Migratie 0010 is gedraaid en nagemeten (tabellen bestaan, 42501 in plaats van PGRST205).",
-    "Daglicht-uitleg: de info is nu dezelfde sheet als de andere drie balken (ea75154), en het gewicht staat niet meer op de balk.",
-    "Geen em-dashes meer in de app (ae161d0), met een structuurtest die het bewaakt.",
-    "Uitgelogd vertrok er bij het opstarten niets uit de outbox (e0aab7a). Gevonden op het toestel; feedback en statistiek van een uitgelogde gebruiker bleven liggen tot er toevallig een voorgrond-overgang kwam.",
-    "Eenheden: Fahrenheit, Beaufort en mph in Profiel (9adaff6). Omrekening alleen bij het tekst worden; de motor blijft in Celsius en km/u.",
-    "Zwarte schermbug bij info -> OK in Profiel (9adaff6). De OK-knop popte de pagina in plaats van de dialoog; alleen zichtbaar binnen de go_router-shell.",
-    "'Longest ride here' zei bijna altijd 2 uur (93d9e27) -- artefact van dedup. Op het toestel nagemeten: nu 5 en 3 uur op de eerste twee dagen."
+    "AGENTS.md toegevoegd (14eab98): gedeelde projectinstructies, omdat Factory Droid AGENTS.md leest en CLAUDE.md niet. Gemeten met een droid exec zonder gereedschap: hij kende de versieregel over twee bestanden zonder er een te openen. Daarnaast droid 0.223, model op Factory Router, kennis-skills via symlinks in ~/.factory/skills, en een ai-switcher in ~/.zshrc die openstaand werk eerst commit.",
+    "Fase 26 met Factory Droid uitgevoerd in plaats van met Claude (experiment geslaagd): 1.0.34+45 via de API naar internal, service-account op minimale rechten, Oppo gewipet.",
+    "DE VONDST VAN DE DAG (7bb52c9): de app crashte na ELKE herstart. AndroidManifest.xml noemde sinds 3 juni een receiver be.tramckrijte.workmanager.RescheduleOnBootReceiver; die klasse bestaat niet (workmanager heet sinds 0.6 dev.fluttercommunity.workmanager en heeft geen boot-receiver). Android maakt zo'n klasse pas aan als hij vuurt, dus alleen een reboot raakte hem. Gevonden in de logcat van een Play-installatie van 45. Nieuwe test: test/structure/manifest_classes_exist_test.dart.",
+    "1.0.35+46 gebouwd, naar internal, op het toestel geinstalleerd, toestel echt herstart, crashbuffer leeg. Daarna gepromoveerd naar de gesloten test (alpha).",
+    "play_upload.dart kan nu promoveren en tracks tonen (2fce87e): --promote <code> --track alpha en --list-tracks. Promoveren uploadt niets, dus de testers krijgen byte voor byte de build die op internal getest is.",
+    "Em-dashes: de winkelpagina en de testers-changelog vielen buiten de regel van 19 september. Opgeruimd en de structuurtest dekt die twee bestanden nu ook (c9b4627)."
   ],
   "wacht_op_joost": [
     {
-      "task": "Regentolerantie terugzetten naar 2,3 mm",
-      "description": "Staat nu op 1,9 mm door een verdwaalde tik van Claude tijdens de toestelronde. De temperatuur (12-30) is al hersteld. Claude kan het ook doen met adb.",
-      "owner": "Joost of Claude"
+      "task": "Twee beslissingen voor fase 26-03",
+      "description": "Welk feedback-adres komt er bij de gesloten test, en neemt de Google Group de negen bestaande adressen over of beginnen we schoon?",
+      "owner": "Joost"
+    },
+    {
+      "task": "Android developer verification",
+      "description": "Deadline 30 september 2026, dus binnen tien dagen. Vijf minuten op Play Console Home. Staat nergens anders opgeschreven.",
+      "owner": "Joost"
     },
     {
       "task": "Data Safety indienen in de Play Console",
@@ -39,29 +39,25 @@
     },
     {
       "task": "Tweede account op een toestel voor Peloton",
-      "description": "Nodig voor slice 2 (stemmen op vensters), het filter Afgezegd, en de openstaande controle of joost.oppo na opnieuw inloggen in de maatjeslijst verschijnt.",
+      "description": "Nodig voor slice 2 (stemmen op vensters), het filter Afgezegd, en de controle of joost.oppo na opnieuw inloggen in de maatjeslijst verschijnt.",
       "owner": "Joost"
+    },
+    {
+      "task": "Regentolerantie nakijken",
+      "description": "Stond op 1,9 mm door een verdwaalde tik. De Oppo is sindsdien gewipet en opnieuw geinstalleerd, dus waarschijnlijk staat hij weer op de standaard -- tenzij hij uit Supabase terugkomt bij het inloggen. Dat is meteen een gratis controle of het profiel echt synchroniseert.",
+      "owner": "Joost of Claude"
     }
   ],
   "openstaand_werk": [
-    "Fase 26 plannen 02, 03 en 04 -- release-route via internal, landen open, feedbackadres, Google Group, nl-NL winkelpagina",
-    "Epic #75 'Dicht huis' (nieuw): niets in de app kent een snelheidsbegrenzing. anon mag feedback en app_events vullen; een script kan dat miljoenen keren doen. Volgorde staat in de backlog: eerst meten, dan de twee open deuren, dan een teller op redeem_friend_invite, captcha achteraan.",
-    "#74 meldingen zonder dat de app geopend wordt -- de achtergrondtaak mist tz.initializeTimeZones().",
-    "Er is geen push: een uitnodiging of een stem op een venster bereikt de ander pas als die de app opent. Slice 4 van #65, en het raakt slice 2 direct.",
-    "calendar_service.dart zet nog '?km/u wind' in Google Calendar-events, hardgecodeerd Nederlands en in km/u -- ontsnapt aan zowel de i18n-sweep als de eenhedenkeuze.",
+    "Fase 26 plannen 03 en 04: landen open, feedbackadres, Google Group met een aanmeldlink, nl-NL winkelpagina.",
+    "De LIVE winkelpagina in de Console draagt nog de oude tekst met kwadraatstreepjes; docs/store-listing.md is bijgewerkt. Mogelijk via dezelfde Play-API te doen, maar de sleutel staat nu op release-only rechten.",
+    "Achtergrondtaak overleeft een herstart niet uit zichzelf: vlak na de reboot stond er geen job gepland, pas na het openen van de app verscheen er een van androidx.work. Zelfde familie als #74 (de achtergrondtaak mist tz.initializeTimeZones()).",
+    "Epic #75 'Dicht huis': niets in de app kent een snelheidsbegrenzing; anon mag feedback en app_events vullen.",
+    "Geen push: een uitnodiging of een stem op een venster bereikt de ander pas als die de app opent. Slice 4 van #65.",
+    "calendar_service.dart zet nog '?km/u wind' in Google Calendar-events, hardgecodeerd Nederlands en in km/u.",
     "Het privacybeleid belooft twaalf maanden bewaartermijn voor app_events en niets dwingt dat af.",
     "i18n: in ongeveer twaalf bestanden staan strings nog hardgecodeerd."
   ],
-  "niet_op_glas_gezien": [
-    "De verse eerste start met de toestemmingsvraag bij de tweede start. Het debugmenu heeft nu 'Statistiek-toestemming terugzetten' zodat dit herhaalbaar is -- pm clear weigert ColorOS en deinstalleren laat Android's back-up de oude staat terugzetten.",
-    "Een melding die echt afgaat, in de goede taal en op de goede tijd.",
-    "Slice 2 met twee accounts.",
-    "De installatiebalk op een echte iPhone in Safari."
-  ],
-  "notes": [
-    "Waargenomen maar onverklaard: tijdens de toestelronde belandde de app na OK in een infovenster eenmalig op het ritdetail. Daarna niet meer te reproduceren; de fix en de test zijn omgekeerd geverifieerd (met de bug erin valt de test om).",
-    "De Oppo-ronde loopt via adb: monkey -p ridewindow.joost.amsterdam om te starten, input tap/swipe, exec-out screencap -p. Tikken onderaan het scherm (y > 2550) openen soms de camera; blijf erboven.",
-    "Android zette bij een herinstallatie de oude app-data terug uit een back-up. Een verse installatie is dus niet vanzelf een eerste start.",
-    "Migraties 0009 en 0010 zijn allebei gedraaid en nagemeten. 0011 bestaat niet: de eenhedenkeuze staat lokaal, met opzet."
-  ]
+  "volgende_stap": "Fase 27 'Wervingsonderzoek' in een vers venster: /gsd-plan-phase 27. De lange lijn naar live is 12 testers die 14 aaneengesloten dagen aangemeld blijven op de gesloten test; er zijn er 9 en de klok loopt nog niet. Fase 26-03/04 kan daarnaast zodra de twee beslissingen er zijn.",
+  "notes": "De gesloten test (alpha) staat op 1.0.35 (46) maar gaat langs de review van Google; internal niet. Controleer met: dart run tool/play_upload.dart --list-tracks"
 }
