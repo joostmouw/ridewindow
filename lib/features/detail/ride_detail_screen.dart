@@ -180,7 +180,6 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .toList();
     if (temps.isEmpty) return '\u2013';
     final avg = temps.reduce((a, b) => a + b) / temps.length;
-    final avgRounded = avg.round();
 
     final apparent = widget.forecasts
         .where((f) => f.apparentTemperatureC != null)
