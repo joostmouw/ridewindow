@@ -18,6 +18,11 @@ Ridewindow is an Android app for casual cyclists who want to know — at a glanc
 - **Performance:** App must show forecast + slots within 2s of cold start (after first run). Weather refresh runs in background via WorkManager.
 <!-- GSD:project-end -->
 
+> **Andere agents:** `AGENTS.md` in de repo-root is de gedeelde ingang voor
+> coding agents die dit bestand niet lezen (Factory Droid leest `AGENTS.md`, niet
+> `CLAUDE.md`). Dit bestand blijft de bron van waarheid; verandert er iets aan de
+> commando's, de werkwijze of de grenzen, werk dan beide bij.
+
 <!-- GSD:stack-start source:research/STACK.md -->
 ## Technology Stack
 
