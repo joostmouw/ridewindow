@@ -868,7 +868,7 @@ class SEn extends S {
 
   @override
   String windFrom(String speed, String direction) {
-    return '${speed}km/h from $direction';
+    return '$speed from $direction';
   }
 
   @override

@@ -28,10 +28,24 @@ final class SlotsLoaded extends SlotsState {
   /// Gefilterde, niet-Poor ride slots; leeg als [reason] != null.
   final List<RideSlot> slots;
 
+  /// Dezelfde vensters, maar vóór `dedup`.
+  ///
+  /// De lijst waar de app mee werkt is opgeschoond: van twee overlappende
+  /// vensters blijft het best scorende over. Dat is precies goed voor een
+  /// lijst met suggesties, maar het maakt de vraag "hoe lang kan ik weg"
+  /// onbeantwoordbaar -- een venster van vijf uur bevat een venster van twee
+  /// uur dat hoger scoort, en verdwijnt daardoor. De blokweergave leest deze
+  /// lijst om die ene regel eerlijk te houden; zie
+  /// [RideBlock.longestRideHours].
+  ///
+  /// Leeg wanneer niemand hem vult; dan valt de blokweergave terug op [slots]
+  /// en gedraagt alles zich als voorheen.
+  final List<RideSlot> candidates;
+
   /// Reden voor lege lijst, of null als er wel slots zijn.
   final SlotsEmptyReason? reason;
 
-  const SlotsLoaded(this.slots, {this.reason});
+  const SlotsLoaded(this.slots, {this.reason, this.candidates = const []});
 }
 
 /// Reden waarom de slots-lijst leeg is.
@@ -127,11 +141,15 @@ class SlotsNotifier extends _$SlotsNotifier {
     // Verwijder geblokkeerde uren én Poor-tier slots.
     var filtered = _filter.apply(allSlots, blockedHours);
 
+    // Bewaar de lijst van vóór het opschonen: de blokweergave heeft hem nodig
+    // om te kunnen zeggen hoe lang je werkelijk weg kunt.
+    final candidates = List<RideSlot>.unmodifiable(filtered);
+
     // Dedup: verwijder overlappende inferieure slots.
     filtered = _generator.dedup(filtered);
 
     if (filtered.isNotEmpty) {
-      return SlotsLoaded(filtered);
+      return SlotsLoaded(filtered, candidates: candidates);
     }
 
     // Bepaal reden voor lege lijst.

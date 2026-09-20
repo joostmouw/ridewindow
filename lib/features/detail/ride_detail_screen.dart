@@ -226,7 +226,12 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     if (vals.isEmpty) return '\u2013';
     final avg = vals.reduce((a, b) => a + b) / vals.length;
     final s = S.of(context);
+    // De drempel blijft in km/u: "windstil" is een eigenschap van de wind, niet
+    // van de schaal waarin je hem opschrijft.
     if (avg < 5) return s.windCalm;
+    final units = ref.read(unitsProvider);
+    final shownWind = '${convertWind(avg, units.wind).round()} '
+        '${windSuffix(units.wind)}';
     final dirs = widget.forecasts
         .map((f) => f.winddirectionDeg)
         .whereType<double>()
@@ -238,10 +243,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         cosSum += _cos(d * _pi / 180);
       }
       final avgDir = (_atan2(sinSum, cosSum) * 180 / _pi + 360) % 360;
-      return s.windFrom(
-          avg.round().toString(), _compassDirection(context, avgDir));
+      return s.windFrom(shownWind, _compassDirection(context, avgDir));
     }
-    return '${avg.round()}${s.unitKmh}';
+    return shownWind;
   }
 
   // ---------------------------------------------------------------------------

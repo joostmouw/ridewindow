@@ -1147,19 +1147,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       // Filter out already-planned rides
       final planned =
           ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
-      var slots = slotsState.slots.where((s) {
-        return !planned.any((r) => r.start == s.start && r.end == s.end);
-      }).toList();
-
-      if (_selectedDay != null) {
-        slots = slots.where((s) {
-          return s.start.year == _selectedDay!.year &&
-              s.start.month == _selectedDay!.month &&
-              s.start.day == _selectedDay!.day;
-        }).toList();
+      // Dezelfde drie filters over twee lijsten: de opgeschoonde vensters die
+      // je ziet, en de vensters van vóór `dedup` die alleen de regel "hoe lang
+      // kan ik weg" voeden. Zouden die twee verschillend gefilterd worden, dan
+      // kan de blokweergave een ritduur noemen die door het periodefilter net
+      // is weggevallen.
+      List<RideSlot> applyFilters(List<RideSlot> input) {
+        var out = input
+            .where((s) =>
+                !planned.any((r) => r.start == s.start && r.end == s.end))
+            .toList();
+        if (_selectedDay != null) {
+          out = out
+              .where((s) =>
+                  s.start.year == _selectedDay!.year &&
+                  s.start.month == _selectedDay!.month &&
+                  s.start.day == _selectedDay!.day)
+              .toList();
+        }
+        return out.where(_slotMatchesPeriod).toList();
       }
 
-      slots = slots.where(_slotMatchesPeriod).toList();
+      var slots = applyFilters(slotsState.slots);
+      final candidates = applyFilters(slotsState.candidates);
 
       if (slots.isEmpty &&
           (_selectedDay != null || _activePeriods.length < 3)) {
@@ -1174,7 +1184,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       // blokken over exact dezelfde gefilterde vensters gaan als de lijst --
       // dag, dagdeel en al geplande ritten tellen dus net zo goed mee.
       if (_view == HomeView.blocks) {
-        return _buildBlocksSliver(buildRideDays(slots));
+        return _buildBlocksSliver(
+          buildRideDays(slots, candidates: candidates),
+        );
       }
 
       // Dart's List.sort is niet stabiel, dus de tiebreak moet expliciet;

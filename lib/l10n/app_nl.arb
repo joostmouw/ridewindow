@@ -272,7 +272,7 @@
   "dry": "Droog",
   "rainChance": "{mm}mm ({percent}% kans)",
   "@rainChance": {"placeholders": {"mm": {"type": "String"}, "percent": {"type": "String"}}},
-  "windFrom": "{speed}km/u uit {direction}",
+  "windFrom": "{speed} uit {direction}",
   "@windFrom": {"placeholders": {"speed": {"type": "String"}, "direction": {"type": "String"}}},
   "windPenalty": "Wisselende windrichting (-{pct}% op score)",
   "@windPenalty": {"placeholders": {"pct": {"type": "String"}}},

@@ -155,6 +155,48 @@ void main() {
       expect(block.longestRideHours, 5, reason: 'maar de langste rit is vijf');
     });
 
+    test('leest de vensters van vóór dedup, niet de opgeschoonde lijst', () {
+      // Dit is de fout die Joost op 2026-09-20 op het toestel zag: een dag met
+      // tien goede uren en alle ritlengtes aangevinkt, en er stond "Longest
+      // ride here: 2 hours".
+      //
+      // De oorzaak zit in `SlotGenerator.dedup`: die houdt van twee
+      // overlappende vensters het best scorende over, en een kort venster wint
+      // dat vrijwel altijd -- het pikt de beste uren eruit. Het venster van
+      // vijf uur hieronder bevat dat van twee uur en verdwijnt dus uit de
+      // lijst die het scherm toont. "De langste van wat overblijft" is dan een
+      // uitspraak over dedup, niet over wat je kunt.
+      final naDedup = [_slot(13, 15, 99)];
+      final voorDedup = [
+        _slot(11, 21, 70),
+        _slot(13, 18, 92),
+        _slot(13, 15, 99),
+      ];
+
+      final zonder = buildRideBlocks(naDedup).single;
+      expect(zonder.longestRideHours, 2, reason: 'zonder kandidaten als vanouds');
+
+      final met = buildRideBlocks(naDedup, candidates: voorDedup).single;
+      expect(
+        met.longestRideHours,
+        2,
+        reason: 'een venster dat buiten het blok valt telt niet mee -- het '
+            'blok loopt hier maar van 13:00 tot 15:00',
+      );
+
+      // En met een blok dat de langere vensters wél omspant:
+      final breed = buildRideBlocks(
+        [_slot(11, 13, 95), _slot(13, 15, 99), _slot(15, 21, 80)],
+        candidates: voorDedup,
+      ).single;
+      expect(breed.hours, 10);
+      expect(
+        breed.longestRideHours,
+        10,
+        reason: 'het venster van 11 tot 21 past binnen dit blok',
+      );
+    });
+
     test('bij één venster zijn ze gelijk', () {
       final block = buildRideBlocks([_slot(9, 11, 100)]).single;
 

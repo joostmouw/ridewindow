@@ -1642,7 +1642,7 @@ abstract class S {
   /// No description provided for @windFrom.
   ///
   /// In nl, this message translates to:
-  /// **'{speed}km/u uit {direction}'**
+  /// **'{speed} uit {direction}'**
   String windFrom(String speed, String direction);
 
   /// No description provided for @windPenalty.

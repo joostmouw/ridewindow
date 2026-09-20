@@ -868,7 +868,7 @@ class SNl extends S {
 
   @override
   String windFrom(String speed, String direction) {
-    return '${speed}km/u uit $direction';
+    return '$speed uit $direction';
   }
 
   @override

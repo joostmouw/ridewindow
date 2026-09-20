@@ -25,6 +25,7 @@ class RideBlock {
     required this.end,
     required this.best,
     required this.slots,
+    this.candidates = const [],
   });
 
   /// Begin van het vroegste venster in dit blok.
@@ -47,12 +48,25 @@ class RideBlock {
   /// De langste rit die in dit blok past.
   ///
   /// **Dit is het antwoord op "hoe lang kan ik weg"**, en niet [hours]. De
-  /// vensters zijn al begrensd door de toegestane ritduren uit het profiel
-  /// (2, 3, 4 of 5 uur), dus de langste hiervan is wat de app werkelijk
-  /// aanbiedt. De eerste versie toonde [hours] op die regel en beweerde
-  /// daarmee dat je vijftien uur aaneengesloten kon fietsen -- Joost wees daar
-  /// meteen op.
-  int get longestRideHours => slots
+  /// eerste versie toonde [hours] en beweerde daarmee dat je vijftien uur
+  /// aaneengesloten kon fietsen; Joost wees daar meteen op.
+  ///
+  /// **Waarom dit niet uit [slots] komt.** Dat was de tweede versie, en die
+  /// zei vrijwel altijd "2 uur" -- ook op een dag met tien goede uren en alle
+  /// ritlengtes aangevinkt. De oorzaak zit in `SlotGenerator.dedup`: die
+  /// houdt van twee overlappende vensters het best scorende over, en een kort
+  /// venster wint dat vrijwel altijd omdat het de beste uren eruit pikt. Een
+  /// venster van vijf uur dat een venster van twee uur bevat, overlapt dat
+  /// laatste voor 100% en verdwijnt dus. Wat overblijft is een lijst van korte
+  /// vensters, en "de langste daarvan" is dan een uitspraak over `dedup`, niet
+  /// over jouw mogelijkheden.
+  ///
+  /// Daarom kijkt deze regel naar de vensters van vóór die opschoning, voor
+  /// zover ze binnen dit blok vallen. Gevonden op het toestel, 2026-09-20,
+  /// toen Joost vroeg wat "Longest ride here: 2 hours" nu eigenlijk betekende.
+  final List<RideSlot> candidates;
+
+  int get longestRideHours => (candidates.isEmpty ? slots : candidates)
       .map((s) => s.end.difference(s.start).inHours)
       .reduce((a, b) => a > b ? a : b);
 
@@ -68,7 +82,13 @@ class RideBlock {
 /// twee blokken, en dat is dan ook de waarheid.
 ///
 /// Blokken komen chronologisch terug.
-List<RideBlock> buildRideBlocks(List<RideSlot> slots) {
+/// [candidates] zijn de vensters van vóór `dedup`. Ze bepalen niets aan de
+/// indeling -- alleen [RideBlock.longestRideHours] leest ze, en alleen de
+/// vensters die binnen het blok vallen tellen mee.
+List<RideBlock> buildRideBlocks(
+  List<RideSlot> slots, {
+  List<RideSlot> candidates = const [],
+}) {
   if (slots.isEmpty) return const [];
 
   final sorted = [...slots]..sort((a, b) => a.start.compareTo(b.start));
@@ -84,17 +104,21 @@ List<RideBlock> buildRideBlocks(List<RideSlot> slots) {
       current.add(slot);
       if (slot.end.isAfter(end)) end = slot.end;
     } else {
-      blocks.add(_toBlock(current, end));
+      blocks.add(_toBlock(current, end, candidates));
       current = [slot];
       end = slot.end;
     }
   }
-  blocks.add(_toBlock(current, end));
+  blocks.add(_toBlock(current, end, candidates));
 
   return blocks;
 }
 
-RideBlock _toBlock(List<RideSlot> slots, DateTime end) {
+RideBlock _toBlock(
+  List<RideSlot> slots,
+  DateTime end,
+  List<RideSlot> candidates,
+) {
   var best = slots.first;
   for (final slot in slots.skip(1)) {
     // Bij een gelijke score wint het vroegste venster -- dezelfde afspraak als
@@ -102,11 +126,19 @@ RideBlock _toBlock(List<RideSlot> slots, DateTime end) {
     // bruikbaarste.
     if (slot.overallScore > best.overallScore) best = slot;
   }
+  final start = slots.first.start;
   return RideBlock(
-    start: slots.first.start,
+    start: start,
     end: end,
     best: best,
     slots: List.unmodifiable(slots),
+    // Alleen wat helemaal binnen het blok past: een venster dat eroverheen
+    // steekt hoort bij het volgende stuk van de dag, niet bij dit.
+    candidates: List.unmodifiable(
+      candidates.where(
+        (c) => !c.start.isBefore(start) && !c.end.isAfter(end),
+      ),
+    ),
   );
 }
 
@@ -137,7 +169,10 @@ class RideDay {
 }
 
 /// Groepeert [slots] per kalenderdag, met de blokken erbinnen.
-List<RideDay> buildRideDays(List<RideSlot> slots) {
+List<RideDay> buildRideDays(
+  List<RideSlot> slots, {
+  List<RideSlot> candidates = const [],
+}) {
   final byDay = <DateTime, List<RideSlot>>{};
   for (final slot in slots) {
     final day = DateTime(slot.start.year, slot.start.month, slot.start.day);
@@ -145,7 +180,7 @@ List<RideDay> buildRideDays(List<RideSlot> slots) {
   }
 
   final days = byDay.entries.map((entry) {
-    final blocks = buildRideBlocks(entry.value);
+    final blocks = buildRideBlocks(entry.value, candidates: candidates);
     var best = blocks.first.best;
     for (final block in blocks.skip(1)) {
       if (block.best.overallScore > best.overallScore) best = block.best;

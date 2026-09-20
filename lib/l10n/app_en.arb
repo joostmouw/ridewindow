@@ -261,7 +261,7 @@
   "feelsLike": "feels like {temp}\u00b0C",
   "dry": "Dry",
   "rainChance": "{mm}mm ({percent}% chance)",
-  "windFrom": "{speed}km/h from {direction}",
+  "windFrom": "{speed} from {direction}",
   "windPenalty": "Variable wind direction (-{pct}% on score)",
   "clothingTitle": "What to wear",
   "clothingOnTheBike": "On the bike",
