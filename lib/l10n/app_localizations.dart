@@ -733,6 +733,60 @@ abstract class S {
   /// **'THEMA'**
   String get sectionTheme;
 
+  /// No description provided for @sectionUnits.
+  ///
+  /// In nl, this message translates to:
+  /// **'EENHEDEN'**
+  String get sectionUnits;
+
+  /// No description provided for @unitsTemperature.
+  ///
+  /// In nl, this message translates to:
+  /// **'Temperatuur'**
+  String get unitsTemperature;
+
+  /// No description provided for @unitsWind.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wind'**
+  String get unitsWind;
+
+  /// No description provided for @unitsCelsius.
+  ///
+  /// In nl, this message translates to:
+  /// **'°C'**
+  String get unitsCelsius;
+
+  /// No description provided for @unitsFahrenheit.
+  ///
+  /// In nl, this message translates to:
+  /// **'°F'**
+  String get unitsFahrenheit;
+
+  /// No description provided for @unitsKmh.
+  ///
+  /// In nl, this message translates to:
+  /// **'km/u'**
+  String get unitsKmh;
+
+  /// No description provided for @unitsBeaufort.
+  ///
+  /// In nl, this message translates to:
+  /// **'Bft'**
+  String get unitsBeaufort;
+
+  /// No description provided for @unitsMph.
+  ///
+  /// In nl, this message translates to:
+  /// **'mph'**
+  String get unitsMph;
+
+  /// No description provided for @unitsHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Alleen hoe de app getallen toont. Je grenzen hierboven blijven staan waar ze staan.'**
+  String get unitsHint;
+
   /// No description provided for @sectionTolerances.
   ///
   /// In nl, this message translates to:

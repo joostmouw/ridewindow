@@ -15,8 +15,10 @@ import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
+import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -606,6 +608,7 @@ class _CellWidget extends ConsumerWidget {
     final rw = context.rw;
     final tonal = score != null ? _scoreTonal(score.overall, rw) : (bg: rw.tiers.poorBg, fg: rw.tiers.poorFg);
     final tierText = score != null ? _tierLabel(score.overall, context) : '?';
+    final units = ref.read(unitsProvider);
 
     showModalBottomSheet(
       context: context,
@@ -648,7 +651,10 @@ class _CellWidget extends ConsumerWidget {
             const SizedBox(height: 16),
             if (forecast != null) ...[
               _DetailRow(icon: AppIcons.thermometerSimple, label: S.of(context).weatherTemperature,
-                value: '${forecast.temperatureC?.round() ?? '?'}°C (voelt als ${forecast.apparentTemperatureC?.round() ?? '?'}°C)'),
+                value: _tempText(forecast.temperatureC, units) +
+                    ' (voelt als ' +
+                    _tempText(forecast.apparentTemperatureC, units) +
+                    ')'),
               const SizedBox(height: 8),
               _DetailRow(icon: AppIcons.drop, label: S.of(context).weatherRain,
                 value: '${forecast.precipitationMm?.toStringAsFixed(1) ?? '?'} mm, ${forecast.precipitationProbability?.round() ?? '?'}% kans'),
@@ -657,8 +663,8 @@ class _CellWidget extends ConsumerWidget {
                 value: forecast.windspeedKmh != null && forecast.windspeedKmh! < 5
                     ? S.of(context).windCalm
                     : forecast.windspeedKmh != null && forecast.windspeedKmh! >= 15 && forecast.winddirectionDeg != null
-                        ? '${forecast.windspeedKmh!.round()} km/h ${_windDirection(forecast.winddirectionDeg, context)}'
-                        : '${forecast.windspeedKmh?.round() ?? '?'} km/h'),
+                        ? '${_windText(forecast.windspeedKmh, units)} ${_windDirection(forecast.winddirectionDeg, context)}'
+                        : _windText(forecast.windspeedKmh, units)),
             ],
             if (score != null) ...[
               const SizedBox(height: 16),
@@ -779,3 +785,14 @@ class _ScoreBar extends StatelessWidget {
     );
   }
 }
+
+/// Een temperatuur in de eenheid van de gebruiker, of "?" als hij ontbreekt.
+String _tempText(double? celsius, UnitPrefs units) => celsius == null
+    ? '?'
+    : '${convertTemp(celsius, units.temp).round()}${units.temp.suffix}';
+
+/// Idem voor wind. Beaufort krijgt hier hetzelfde achtervoegsel als elders,
+/// zodat "5 Bft" overal hetzelfde leest.
+String _windText(double? kmh, UnitPrefs units) => kmh == null
+    ? '?'
+    : '${convertWind(kmh, units.wind).round()} ${windSuffix(units.wind)}';

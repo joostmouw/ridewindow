@@ -376,6 +376,34 @@ class SNl extends S {
   String get sectionTheme => 'THEMA';
 
   @override
+  String get sectionUnits => 'EENHEDEN';
+
+  @override
+  String get unitsTemperature => 'Temperatuur';
+
+  @override
+  String get unitsWind => 'Wind';
+
+  @override
+  String get unitsCelsius => '°C';
+
+  @override
+  String get unitsFahrenheit => '°F';
+
+  @override
+  String get unitsKmh => 'km/u';
+
+  @override
+  String get unitsBeaufort => 'Bft';
+
+  @override
+  String get unitsMph => 'mph';
+
+  @override
+  String get unitsHint =>
+      'Alleen hoe de app getallen toont. Je grenzen hierboven blijven staan waar ze staan.';
+
+  @override
   String get sectionTolerances => 'TOLERANTIES';
 
   @override

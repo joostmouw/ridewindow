@@ -36,10 +36,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
@@ -176,7 +178,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
         .toList();
-    if (temps.isEmpty) return '\u2014';
+    if (temps.isEmpty) return '\u2013';
     final avg = temps.reduce((a, b) => a + b) / temps.length;
     final avgRounded = avg.round();
 
@@ -184,10 +186,15 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .where((f) => f.apparentTemperatureC != null)
         .map((f) => f.apparentTemperatureC!)
         .toList();
-    if (apparent.isEmpty) return '$avgRounded\u00B0C';
-    final avgApparent =
-        (apparent.reduce((a, b) => a + b) / apparent.length).round();
-    return '$avgRounded\u00B0C, ${S.of(context).feelsLike(avgApparent.toString())}';
+    final units = ref.read(unitsProvider);
+    final shownAvg = convertTemp(avg, units.temp).round();
+    if (apparent.isEmpty) return '$shownAvg${units.temp.suffix}';
+    final avgApparent = convertTemp(
+      apparent.reduce((a, b) => a + b) / apparent.length,
+      units.temp,
+    ).round();
+    return '$shownAvg${units.temp.suffix}, '
+        '${S.of(context).feelsLike(avgApparent.toString())}';
   }
 
   String _totalPrecipString(BuildContext context) {
@@ -195,7 +202,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .toList();
-    if (vals.isEmpty) return '\u2014';
+    if (vals.isEmpty) return '\u2013';
     final total = vals.reduce((a, b) => a + b);
     final probs = widget.forecasts
         .map((f) => f.precipitationProbability)
@@ -216,7 +223,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
-    if (vals.isEmpty) return '\u2014';
+    if (vals.isEmpty) return '\u2013';
     final avg = vals.reduce((a, b) => a + b) / vals.length;
     final s = S.of(context);
     if (avg < 5) return s.windCalm;
@@ -710,11 +717,17 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final rw = context.rw;
     final s = S.of(context);
     final time = _fmtTime(row.time);
+    final units = ref.read(unitsProvider);
     final temp = row.temperatureC != null
-        ? '${row.temperatureC!.round()}\u00B0C'
-        : '\u2014';
+        ? '${convertTemp(row.temperatureC!, units.temp).round()}'
+            '${units.temp.suffix}'
+        : '\u2013';
     final apparent = row.apparentTemperatureC != null
-        ? s.hourlyFeelsLike(row.apparentTemperatureC!.round().toString())
+        ? s.hourlyFeelsLike(
+            convertTemp(row.apparentTemperatureC!, units.temp)
+                .round()
+                .toString(),
+          )
         : '';
     final IconData precipIcon = row.precipitationMm == 0.0 &&
             (row.precipitationProbability == null ||
@@ -735,14 +748,17 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     row.precipitationProbability! > 0
                 ? '${row.precipitationMm!.toStringAsFixed(1)}mm ${row.precipitationProbability!.round()}%'
                 : '${row.precipitationMm!.toStringAsFixed(1)}mm')
-        : '\u2014';
+        : '\u2013';
     final wind = row.windspeedKmh != null
         ? row.windspeedKmh! < 5
             ? s.hourlyWindstil
             : row.windspeedKmh! < 15 || row.winddirectionDeg == null
-                ? '${row.windspeedKmh!.round()}${s.unitKmh}'
-                : '${row.windspeedKmh!.round()}${s.unitKmh} ${_compassDirection(context, row.winddirectionDeg!)}'
-        : '\u2014';
+                ? '${convertWind(row.windspeedKmh!, units.wind).round()}'
+                    '${windSuffix(units.wind)}'
+                : '${convertWind(row.windspeedKmh!, units.wind).round()}'
+                    '${windSuffix(units.wind)} '
+                    '${_compassDirection(context, row.winddirectionDeg!)}'
+        : '\u2013';
 
     // Subtiele achtergrondkleur op basis van uur-score
     final Color rowBg;

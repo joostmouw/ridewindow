@@ -511,8 +511,10 @@ void main() {
       ));
       await tester.pump();
 
-      // Screen should render without crashing and show dash fallback
-      expect(find.textContaining('—'), findsWidgets);
+      // Het scherm moet blijven staan en een streepje tonen waar geen meting
+      // is. Sinds 2026-09-20 is dat een en-dash: em-dashes horen niet in de
+      // app (zie test/structure/no_em_dash_test.dart).
+      expect(find.textContaining('\u2013'), findsWidgets);
     });
   });
 }

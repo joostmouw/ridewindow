@@ -11,6 +11,7 @@ import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
@@ -26,6 +27,7 @@ import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
@@ -471,6 +473,7 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
               key: i == 0 ? widget.firstRideKey : null,
               entry: shown[i],
               host: this,
+              units: ref.watch(unitsProvider),
               myUserId: ref.watch(currentUserIdProvider),
               allScores: allScores,
               forecasts: forecasts,
@@ -661,6 +664,7 @@ class RideCard extends StatelessWidget {
     super.key,
     required this.entry,
     required this.host,
+    required this.units,
     this.myUserId,
     required this.allScores,
     required this.forecasts,
@@ -669,6 +673,10 @@ class RideCard extends StatelessWidget {
   });
 
   final RideEntry entry;
+
+  /// In welke eenheden de getallen op deze kaart komen. Net als [myUserId]
+  /// aangereikt in plaats van zelf gelezen: de kaart raakt geen providers aan.
+  final UnitPrefs units;
 
   /// Wie jij bent, of `null` als je uitgelogd bent. Nodig om je eigen stem op
   /// een voorgelegd venster terug te vinden; de kaart leest zelf geen
@@ -973,8 +981,10 @@ class RideCard extends StatelessWidget {
                         icon: AppIcons.thermometerSimple,
                         value: avgApparent != null &&
                                 (avgApparent - avgTemp).abs() >= 2
-                            ? '${avgTemp.round()}° (${avgApparent.round()}°)'
-                            : '${avgTemp.round()}°C',
+                            ? '${convertTemp(avgTemp, units.temp).round()}° '
+                                '(${convertTemp(avgApparent, units.temp).round()}°)'
+                            : '${convertTemp(avgTemp, units.temp).round()}'
+                                '${units.temp.suffix}',
                       ),
                       const SizedBox(width: 12),
                       _WeatherChip(
@@ -989,8 +999,11 @@ class RideCard extends StatelessWidget {
                         value: avgWind! < 5
                             ? s.windCalm
                             : avgWindDir != null
-                                ? '${avgWind.round()} km/h ${_windDirection(avgWindDir, context)}'
-                                : '${avgWind.round()} km/h',
+                                ? '${convertWind(avgWind, units.wind).round()} '
+                                    '${windSuffix(units.wind)} '
+                                    '${_windDirection(avgWindDir, context)}'
+                                : '${convertWind(avgWind, units.wind).round()} '
+                                    '${windSuffix(units.wind)}',
                       ),
                     ],
                   ),

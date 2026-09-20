@@ -376,6 +376,34 @@ class SEn extends S {
   String get sectionTheme => 'THEME';
 
   @override
+  String get sectionUnits => 'UNITS';
+
+  @override
+  String get unitsTemperature => 'Temperature';
+
+  @override
+  String get unitsWind => 'Wind';
+
+  @override
+  String get unitsCelsius => '°C';
+
+  @override
+  String get unitsFahrenheit => '°F';
+
+  @override
+  String get unitsKmh => 'km/h';
+
+  @override
+  String get unitsBeaufort => 'Bft';
+
+  @override
+  String get unitsMph => 'mph';
+
+  @override
+  String get unitsHint =>
+      'Only how the app shows numbers. Your limits above stay exactly where they are.';
+
+  @override
   String get sectionTolerances => 'TOLERANCES';
 
   @override

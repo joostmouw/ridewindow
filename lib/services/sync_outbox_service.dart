@@ -111,7 +111,7 @@ class SyncOutboxService {
           await _dao.dropRow(row.id);
           debugPrint(
             'SyncOutboxService: dropping ${row.entity}/${row.entityKey} '
-            'after $attemptNumber failed attempts — it will not be retried '
+            'after $attemptNumber failed attempts; it will not be retried '
             'again. Last error: $e',
           );
         } else {
@@ -136,7 +136,7 @@ class SyncOutboxService {
     // onterechte PASS op.
     final sentDetail = sentEntities.isEmpty ? '' : ' (${sentEntities.join(', ')})';
     debugPrint(
-      'SyncOutboxService: drain done — ${rows.length} pending, '
+      'SyncOutboxService: drain done: ${rows.length} pending, '
       '$sent sent$sentDetail, $failed failed',
     );
   }

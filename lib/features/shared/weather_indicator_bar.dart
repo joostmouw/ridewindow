@@ -32,6 +32,7 @@ class WeatherIndicatorBar extends StatelessWidget {
     required this.label,
     required this.value,
     required this.unit,
+    this.convert,
     required this.idealMax,
     this.idealMin,
     this.infoText,
@@ -45,6 +46,20 @@ class WeatherIndicatorBar extends StatelessWidget {
 
   /// Achter het getal geplakt: `°`, ` mm`, ` km/h`.
   final String unit;
+
+  /// Zet een waarde om naar de eenheid die de gebruiker koos, vlak voordat hij
+  /// tekst wordt.
+  ///
+  /// **Alleen tekst, nooit de balk en nooit de score.** De baan, de groene zone
+  /// en de marker staan op hun plek op grond van graden Celsius en kilometers
+  /// per uur -- dezelfde getallen waarin de motor rekent. Zou de omrekening
+  /// dieper zitten, dan zou Beaufort (een schaal met dertien standen) de
+  /// geometrie van de balk vergroven, en zou een ingestelde grens in een andere
+  /// eenheid kunnen belanden dan de gemeten waarde ernaast.
+  ///
+  /// `null` betekent: laat staan. Dat is wat regen doet -- millimeters zijn
+  /// millimeters.
+  final double Function(double)? convert;
 
   /// Het bereik dat de gebruiker zelf ideaal noemt. [idealMin] is null voor
   /// regen en wind — die kennen alleen een bovengrens.
@@ -91,8 +106,8 @@ class WeatherIndicatorBar extends StatelessWidget {
     };
 
     final rangeLabel = idealMin != null
-        ? '${_trim(idealMin!)}–${_trim(idealMax)}${unit.trim()}'
-        : '≤${_trim(idealMax)}${unit.trim()}';
+        ? '${_num(idealMin!)}–${_num(idealMax)}${unit.trim()}'
+        : '≤${_num(idealMax)}${unit.trim()}';
 
     final scaleStyle = theme.textTheme.labelSmall?.copyWith(
       fontSize: 9,
@@ -189,7 +204,7 @@ class WeatherIndicatorBar extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${_trim(metric.zoomMin)}${unit.trim()}',
+                  '${_num(metric.zoomMin)}${unit.trim()}',
                   style: scaleStyle,
                 ),
                 Expanded(
@@ -203,7 +218,7 @@ class WeatherIndicatorBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${_trim(metric.zoomMax)}${unit.trim()}${beyondScale ? '+' : ''}',
+                  '${_num(metric.zoomMax)}${unit.trim()}${beyondScale ? '+' : ''}',
                   style: scaleStyle,
                 ),
               ],
@@ -225,8 +240,22 @@ class WeatherIndicatorBar extends StatelessWidget {
         WeatherMetric.rain => _trim(value),
         WeatherMetric.temperature ||
         WeatherMetric.wind =>
-          value.round().toString(),
+          _d(value).round().toString(),
       };
+
+  /// Naar de eenheid van de gebruiker, of ongemoeid als er geen omrekening is.
+  double _d(double v) => convert?.call(v) ?? v;
+
+  /// Een getal zoals het op deze balk hoort te staan.
+  ///
+  /// Alleen regen heeft tienden nodig -- daar zit het verschil tussen droog en
+  /// nat in (de standaardgrens is 0,5 mm). Temperatuur en wind zijn hele
+  /// getallen, en dat is niet cosmetisch: 12 en 26 graden worden in Fahrenheit
+  /// 53,6 en 78,8, en een grens die je zelf op een rond getal zette, hoort niet
+  /// als een meetwaarde te gaan lezen.
+  String _num(double v) => metric == WeatherMetric.rain
+      ? _trim(_d(v))
+      : _d(v).round().toString();
 
   /// 0,5 blijft "0.5" maar 18,0 wordt "18" — anders staat er "18.0" waar een
   /// heel getal bedoeld is.
@@ -349,8 +378,11 @@ class WeatherIndicatorBar extends StatelessWidget {
     // scherm: "32 graden zou 40 graden scoren, en 70 zou 30 scoren".
     // Waargenomen 2026-09-07, en alleen te zien door de zin echt te lezen --
     // de analyzer merkt niets, want alle parameters zijn `Object`.
-    final e1 = '${_trim(ex1)}$unit';
-    final e2 = '${_trim(ex2)}$unit';
+    // De scores hierboven zijn in Celsius en km/u uitgerekend -- dat is waar
+    // de motor in denkt. Pas hier wordt het tekst, en pas hier telt de keuze
+    // van de gebruiker.
+    final e1 = '${_num(ex1)}$unit';
+    final e2 = '${_num(ex2)}$unit';
     final s1 = sc1.round();
     final s2 = sc2.round();
 

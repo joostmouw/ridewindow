@@ -27,6 +27,7 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
 import 'package:ridewindow/data/repositories/analytics_consent_store.dart';
+import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/gps_permission_notifier.dart';
@@ -34,6 +35,7 @@ import 'package:ridewindow/domain/services/notification_plan.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -505,6 +507,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider).value;
+    final units = ref.watch(unitsProvider);
     if (profile == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -779,6 +782,98 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
           ),
 
+          // Sectie: EENHEDEN
+          //
+          // Staat bóven de toleranties en niet eronder: wie zijn grenzen gaat
+          // instellen, wil eerst weten in welke maat hij ze leest. Andersom
+          // stel je eerst een grens in graden in en ontdek je daarna dat het
+          // ook in Fahrenheit kon.
+          SectionCard(
+            title: s.sectionUnits,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        s.unitsTemperature,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    SegmentedButton<TempUnit>(
+                      showSelectedIcon: false,
+                      segments: [
+                        ButtonSegment(
+                          value: TempUnit.celsius,
+                          label: Text(s.unitsCelsius),
+                        ),
+                        ButtonSegment(
+                          value: TempUnit.fahrenheit,
+                          label: Text(s.unitsFahrenheit),
+                        ),
+                      ],
+                      selected: {units.temp},
+                      onSelectionChanged: (set) {
+                        HapticFeedback.lightImpact();
+                        ref
+                            .read(unitPrefsProvider.notifier)
+                            .setTemp(set.first);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        s.unitsWind,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    SegmentedButton<WindUnit>(
+                      showSelectedIcon: false,
+                      segments: [
+                        ButtonSegment(
+                          value: WindUnit.kmh,
+                          label: Text(s.unitsKmh),
+                        ),
+                        ButtonSegment(
+                          value: WindUnit.beaufort,
+                          label: Text(s.unitsBeaufort),
+                        ),
+                        ButtonSegment(
+                          value: WindUnit.mph,
+                          label: Text(s.unitsMph),
+                        ),
+                      ],
+                      selected: {units.wind},
+                      onSelectionChanged: (set) {
+                        HapticFeedback.lightImpact();
+                        ref
+                            .read(unitPrefsProvider.notifier)
+                            .setWind(set.first);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Text(
+                  s.unitsHint,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
           // Sectie: TOLERANTIES
           SectionCard(
             title: s.sectionTolerances,
@@ -808,7 +903,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _tempRangeDescription(context, _tempMin, _tempMax),
                         ),
                         Text(
-                          '${_tempMin.round()}°C – ${_tempMax.round()}°C',
+                          // De schuif zelf blijft in graden Celsius staan --
+                          // dat is waarin de motor rekent en wat er opgeslagen
+                          // wordt. Alleen het bijschrift praat jouw taal.
+                          '${convertTemp(_tempMin, units.temp).round()}'
+                          '${units.temp.suffix} \u2013 '
+                          '${convertTemp(_tempMax, units.temp).round()}'
+                          '${units.temp.suffix}',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.primary,
@@ -822,8 +923,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       max: 40,
                       divisions: 40,
                       labels: RangeLabels(
-                        '${_tempMin.round()}°C',
-                        '${_tempMax.round()}°C',
+                        '${convertTemp(_tempMin, units.temp).round()}'
+                            '${units.temp.suffix}',
+                        '${convertTemp(_tempMax, units.temp).round()}'
+                            '${units.temp.suffix}',
                       ),
                       activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (v) => setState(() {
@@ -932,7 +1035,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _windDescription(context, _windMax),
                         ),
                         Text(
-                          '${_windMax.round()} ${s.unitKmh}',
+                          '${convertWind(_windMax, units.wind).round()} '
+                          '${windSuffix(units.wind)}',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.primary,
@@ -1195,9 +1299,16 @@ Widget _infoButton(BuildContext context, String title, String explanation,
     padding: EdgeInsets.zero,
     constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
     tooltip: title,
+    // `dialogContext` en niet `_`: de OK-knop hieronder popt hiermee de
+    // dialoog zelf. Stond daar de context van het profielscherm, dan zoekt
+    // `Navigator.of` de navigator van dat scherm op -- en dat is binnen
+    // go_router de *shell*-navigator, terwijl `showDialog` zijn route
+    // standaard op de root-navigator zet. De pop haalde dan de profielpagina
+    // onder de dialoog vandaan en je hield een zwart scherm over. Gemeld door
+    // Joost op 2026-09-20; dit was de enige dialoog in de app met die vorm.
     onPressed: () => showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1236,7 +1347,7 @@ Widget _infoButton(BuildContext context, String title, String explanation,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('OK'),
           ),
         ],

@@ -35,12 +35,14 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/domain/services/daylight.dart';
 import 'package:ridewindow/data/repositories/home_view_store.dart';
 import 'package:ridewindow/domain/services/ride_block.dart';
 import 'package:ridewindow/features/shared/analytics_consent_sheet.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
+import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_motion.dart';
@@ -1924,6 +1926,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final windMax = tol?.windMaxIdealKmh ?? 15.0;
     final rainMax = tol?.rainMaxIdealMm ?? 0.5;
     final location = ref.watch(locationProvider).value;
+    final units = ref.watch(unitsProvider);
 
     return Column(
       children: [
@@ -1933,7 +1936,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             icon: AppIcons.thermometerSimple,
             label: s.weatherTemperature,
             value: avgTemp,
-            unit: '\u00B0',
+            // Celsius houdt het kale gradenteken, zoals altijd; Fahrenheit
+            // krijgt zijn letter erbij, want 68 graden zonder letter leest als
+            // een hittegolf.
+            unit: units.temp == TempUnit.celsius ? '\u00B0' : '\u00B0F',
+            convert: (v) => convertTemp(v, units.temp),
             idealMin: tempMin,
             idealMax: tempMax,
             infoText: s.infoTemp,
@@ -1956,7 +1963,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             icon: AppIcons.wind,
             label: s.weatherWind,
             value: avgWind,
-            unit: ' ${s.unitKmh}',
+            unit: ' ${windSuffix(units.wind)}',
+            convert: (v) => convertWind(v, units.wind),
             idealMax: windMax,
             infoText: s.infoWind,
             score: windScore,
@@ -2099,6 +2107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // meteen alles, terwijl "0 mm" je nog laat nadenken. Temperatuur en wind
     // zijn als getal juist directer.
     final rainMax = tol?.rainMaxIdealMm ?? 0.5;
+    final units = ref.watch(unitsProvider);
 
     final style = Theme.of(context).textTheme.labelMedium?.copyWith(
       color: rw.textTertiary,
@@ -2117,7 +2126,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Row(
       children: [
         if (avgTemp != null) ...[
-          item(AppIcons.thermometerSimple, '${avgTemp.round()}\u00B0'),
+          item(
+            AppIcons.thermometerSimple,
+            '${convertTemp(avgTemp, units.temp).round()}\u00B0',
+          ),
           const SizedBox(width: 16),
         ],
         if (totalPrecip != null) ...[
@@ -2134,7 +2146,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
           const SizedBox(width: 16),
         ],
-        if (avgWind != null) item(AppIcons.wind, '${avgWind.round()} km/h'),
+        if (avgWind != null)
+          item(
+            AppIcons.wind,
+            '${convertWind(avgWind, units.wind).round()} ${windSuffix(units.wind)}',
+          ),
       ],
     );
   }

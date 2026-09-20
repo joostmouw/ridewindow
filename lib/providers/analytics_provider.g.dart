@@ -39,7 +39,7 @@ final class AnalyticsConsentProvider
   AnalyticsConsent create() => AnalyticsConsent();
 }
 
-String _$analyticsConsentHash() => r'84951c3d097081532a3219b4d344d783472ee844';
+String _$analyticsConsentHash() => r'a71fa2657102b94cbbd80b219991063ec343e1c3';
 
 /// De toestemmingsstand. Een `Notifier` en geen simpele lees-provider, omdat
 /// Profiel hem moet kunnen omzetten en Home moet zien dat de vraag beantwoord is.
@@ -103,4 +103,4 @@ final class AnalyticsProvider extends $FunctionalProvider<
   }
 }
 
-String _$analyticsHash() => r'78e9add599996c281d1cc29c40f6a6d91469f85f';
+String _$analyticsHash() => r'5f02729fa36584df30f69daf476b17b1ebd19f44';

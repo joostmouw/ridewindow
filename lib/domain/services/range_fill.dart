@@ -29,7 +29,7 @@ List<DateTime> computeRangeFillKeys({
     anchorKey.year == secondTapKey.year &&
         anchorKey.month == secondTapKey.month &&
         anchorKey.day == secondTapKey.day,
-    'computeRangeFillKeys is day-scoped only — anchorKey and secondTapKey must share the same calendar day',
+    'computeRangeFillKeys is day-scoped only: anchorKey and secondTapKey must share the same calendar day',
   );
 
   final startHour = anchorKey.hour < secondTapKey.hour ? anchorKey.hour : secondTapKey.hour;
