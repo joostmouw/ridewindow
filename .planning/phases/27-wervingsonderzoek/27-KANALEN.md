@@ -47,20 +47,41 @@ De gekozen mix, in D-12's prioriteitsvolgorde:
    uit D-12: pas inzetten als kanaal 1 en 2 samen na een week onder de vijftien
    aangemelde testers blijven.
 
-**De rekensom (D-13/D-10/D-11).** Google's Console-teller stond op 2026-09-20 op **2
-aangemeld** ("2 testers currently opted in"). Joost heeft **tien** mensen die hij
-persoonlijk kan activeren, dus het gat binnen de eigen kring is **acht** conversies —
-niet nieuwe mensen vinden, maar mensen die al gevraagd zijn daadwerkelijk door de
-opt-in-stappen heen krijgen (groep accepteren, link openen, knop indrukken — D-10). Plus
-ongeveer **vijf** van buiten voor de buffer die WERV-04 op vijftien zet:
+**De rekensom (D-13/D-10/D-11), gecorrigeerd op 2026-09-20.** Google's Console-teller
+stond op 2026-09-20 op **2 aangemeld** ("2 testers currently opted in"). D-13 ging ervan
+uit dat de eigen kring **tien** mensen telt. Dat blijkt niet te kloppen. De Play-lijst
+"First Testers RideWindow" bevat tien adressen, maar dat zijn geen tien mensen: twee
+deelnemers staan er met twee accounts in, en een van de tien adressen is Joost zelf. De
+bereikbare eigen kring is daarmee **zeven** mensen, niet tien.
 
-**2 + 8 + 5 = 15**
+Nuance die hierbij hoort: Google telt **accounts**, niet personen. De twee deelnemers met
+een dubbel account zouden dus elk twee keer kunnen meetellen als ze op twee toestellen
+opt-in doen. Dat is mogelijk maar niet aannemelijk, en het is geen basis om op te plannen:
+reken met zeven, en beschouw een achtste of negende account als meevaller.
 
-Dit is geen volumekanaal-probleem (D-03, herzien): met een gat van acht binnen een
-kring van tien, plus vijf van buiten, is er geen reden om twintig tot vijfendertig
-opt-ins uit een reciprocal-kanaal te halen — dat was de eis bij het oorspronkelijke,
-inmiddels achterhaalde gat van tien opt-ins uit zo'n kanaal. Een tweede reciprocal-kanaal
-is daarmee niet nodig; zie ook de tabelrij voor r/TestersCommunity hierboven.
+De gecorrigeerde rekensom naar de vijftien die WERV-04 vraagt:
+
+**2 aangemeld + maximaal 5 conversies binnen de eigen kring + ~8 van buiten = 15**
+
+Wat daaruit volgt, en dat is de kern van de correctie: **het gat naar buiten is groter dan
+deze fase aannam.** De oude rekensom liet ongeveer vijf testers van buiten over; de
+gecorrigeerde laat er ongeveer acht over, en dat nog alleen als alle vijf de resterende
+mensen in de eigen kring daadwerkelijk converteren. Dat verzwakt de kanaalkeuze niet, het
+versterkt hem:
+
+- **kanaal 2 (de fiets-Facebookgroep) wordt belangrijker**, niet minder belangrijk: het
+  moet nu het leeuwendeel van de externe aanwas leveren in plaats van een restje.
+- **de drempel onder kanaal 3 (r/AndroidClosedTesting) gaat eerder af.** Die drempel staat
+  op "kanaal 1 en 2 samen na een week onder de vijftien"; met een kleinere eigen kring is
+  dat een waarschijnlijker uitkomst dan bij het opstellen werd aangenomen. De achtervang is
+  daarmee geen formaliteit meer maar een reëel scenario, en de tekst ervoor hoort klaar te
+  liggen (dat doet hij, zie `27-TEKSTEN.md`).
+
+Dit blijft desondanks geen volumekanaal-probleem (D-03, herzien): acht opt-ins van buiten
+is nog altijd geen twintig tot vijfendertig, dus er is geen reden om een tweede
+reciprocal-kanaal op te tuigen. Een tweede reciprocal-kanaal is daarmee nog steeds niet
+nodig; zie ook de tabelrij voor r/TestersCommunity hierboven. De marge is wel dunner dan
+gedacht, dus als kanaal 2 tegenvalt is de achtervang de eerste stap, niet een vierde kanaal.
 
 D-11 stelt vast dat er **twee latten** zijn, niet één, en de kanaalkeuze moet aan beide
 voldoen: de Console-teller (alleen opt-ins, twaalf tegelijk, veertien aaneengesloten
