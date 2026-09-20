@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-17T16:06:08.984Z"
-last_activity: 2026-09-20 -- Eenheden, slice 2, drie bugs van glas
+last_updated: "2026-09-20T07:45:00.000Z"
+last_activity: 2026-09-20 -- AGENTS.md, Factory kan overnemen
 progress:
   total_phases: 12
   completed_phases: 4
@@ -37,6 +37,7 @@ feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de ba
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-20 | [AGENTS.md voor Factory](quick/260920-d85-agents-md-als-gedeelde-projectinstructie/) | Claude op? Dan verder met `droid` in dezelfde repo. **Droid leest `AGENTS.md` en niet `CLAUDE.md`** -- bewezen met een exec zonder gereedschap. Veertien kennis-skills via symlinks in `~/.factory/skills` (de GSD-skills bewust niet: die orkestreren via Claude Codes eigen subagents). Droid 0.223, model op Factory Router, en een `ai`-switcher die openstaand werk eerst vastlegt -- de overdracht tussen agents is git, niet de prompt. |
 | 2026-09-20 | toestelronde: eenheden, bugs, slice 2 | **Drie dingen die alleen op glas te vinden waren.** Uitgelogd vertrok er bij het opstarten niets uit de outbox (`e0aab7a`) -- feedback en statistiek bleven liggen tot er toevallig een voorgrond-overgang kwam. "Longest ride here" zei bijna altijd 2 uur (`93d9e27`), een artefact van `dedup`: een lang venster wordt weggegooid door het korte venster dat erin zit. En de daglicht-uitleg sprak zichzelf tegen bij een rit volledig in het licht. Verder: eenheden (°F, Bft, mph) in Profiel, de zwarte-schermbug bij info → OK, Peloton slice 2, en alle em-dashes uit de app met een structuurtest erop. |
 | 2026-09-19 | analytics-rapport, privacybeleid, avondtest | Het rapport gaf 403, geen 401 — **geen sleutelprobleem maar een rechtenprobleem**: 0008 schreef op dat de service-role leest en maakte daar nooit een grant van (migratie 0009, **moet nog gedraaid worden**). Het beleid zei nog "geen analytics" en is herschreven in beide talen; **de link ernaartoe in Profiel was al sinds juli een 404** (F-8). Data Safety-rijen uitgeschreven. En de notificatietest die elke avond omviel valt niet meer om: het waren er inmiddels drie. |
 | 2026-09-19 | #73 consistentie-sweep | 19 waarschuwingen → 0, elf radii → een benoemde schaal in `AppShapes`, nul hardgecodeerde radii. **Drie vondsten die geen opruimwerk waren**: de weerbalk-uitleg noemde een ander getal dan de balk, een "ongebruikte variabele" hield de Agenda levend, en mijn eigen dagkaart stond op paneel-radius. `ScoreBadge` bleek opzet, geen drift. |
