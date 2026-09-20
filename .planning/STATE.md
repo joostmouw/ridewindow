@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-20T11:18:49.171Z"
+last_updated: "2026-09-20T13:38:40.000Z"
 last_activity: 2026-09-20
 progress:
   total_phases: 12
-  completed_phases: 5
-  total_plans: 36
-  completed_plans: 36
-  percent: 42
+  completed_phases: 6
+  total_plans: 37
+  completed_plans: 37
+  percent: 50
 ---
 
 # Project State
@@ -358,13 +358,13 @@ Items acknowledged and deferred at v2.0 milestone close on 2026-07-17. The `audi
 See: .planning/PROJECT.md (updated 2026-07-25)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 27 — wervingsonderzoek
+**Current focus:** Phase 26 — console-op-orde
 
 ## Current Position
 
-Phase: 27 (wervingsonderzoek) — EXECUTING
+Phase: 27 (wervingsonderzoek) — COMPLETE (27-01 en 27-02; WERV-01 en WERV-02)
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase 27 afgerond 2026-09-20; verder met fase 26, plan 26-02
 Last activity: 2026-09-20
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
@@ -746,6 +746,7 @@ en volle testsuite zelf geverifieerd op main.
 | Phase 16 P03 | ~10min | 2 tasks | 6 files |
 | Phase 21 P02 | 23min | 3 tasks | 4 files |
 | Phase 27 P01 | 4min | 2 tasks | 2 files |
+| Phase 27 P02 | ~2,5u over twee sessies | 3 tasks | 4 files |
 
 ## Accumulated Context
 

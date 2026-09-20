@@ -276,7 +276,7 @@ Plans:
 
 **Wave 2** *(blocked on 27-01)*
 
-- [ ] 27-02-PLAN.md — WERV-02: fresh Reddit self-promo rule check (D-08) + 3 ready-to-send texts + HTML preview shown to Joost before approval (D-05)
+- [x] 27-02-PLAN.md — WERV-02: fresh Reddit self-promo rule check (D-08) + 3 ready-to-send texts + HTML preview shown to Joost before approval (D-05)
 
 ### Phase 28: Feedbackstroom
 **Goal**: Elke melding van een tester komt gestructureerd binnen, krijgt een uitkomst op de backlog, en de tester hoort terug wat ermee gebeurde.
@@ -368,7 +368,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 24. Iconografie & eigen beeldtaal | v4.0 | quick | Complete | 2026-09-08 |
 | 25. Wrijving wegwerken | v4.0 | quick | Complete | 2026-09-08 |
 | 26. Console op orde | v4.1 | 1/4 | In Progress|  |
-| 27. Wervingsonderzoek | v4.1 | 1/2 | In Progress|  |
+| 27. Wervingsonderzoek | v4.1 | 2/2 | Complete | 2026-09-20 |
 | 28. Feedbackstroom | v4.1 | 0/TBD | Not started | - |
 | 29. Eerste minuut | v4.1 | 0/TBD | Not started | - |
 | 30. Werving | v4.1 | 0/TBD | Not started | - |

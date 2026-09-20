@@ -26,7 +26,7 @@
 ### Werving (WERV)
 
 - [x] **WERV-01**: Voor elk kandidaat-kanaal — eigen LinkedIn-post, LinkedIn-vacature "vrijwillige tester", Strava-clubs, NTFU-toerclubs, fiets-Facebookgroepen, collega's, r/AndroidClosedTesting — is vastgelegd: bereik, doorlooptijd, doelgroepgehalte, inspanning voor Joost, en wat ervaringen van anderen laten zien; de uitkomst is een gemotiveerde keuze voor 2–3 kanalen
-- [ ] **WERV-02**: Per gekozen kanaal ligt een verzendklare tekst (NL en/of EN) die de veertien dagen, het regelmatig openen, en het waarom uitlegt
+- [x] **WERV-02**: Per gekozen kanaal ligt een verzendklare tekst (NL en/of EN) die de veertien dagen, het regelmatig openen, en het waarom uitlegt
 - [ ] **WERV-03**: Zes testers uit de eigen kring zijn persoonlijk uitgenodigd en staan als aangemeld in Google's eigen teller
 - [ ] **WERV-04**: Google's teller toont minstens 15 aangemelde testers (12 plus buffer)
 - [ ] **WERV-05**: Een testerslijst houdt per tester bij: bron, aanmelddatum en laatste teken van gebruik; een afhaker wordt binnen twee dagen opgemerkt en vervangen
@@ -88,7 +88,7 @@
 | CON-06 | Phase 26 | Complete |
 | PROOF-01 | Phase 26 | Complete |
 | WERV-01 | Phase 27 | Complete |
-| WERV-02 | Phase 27 | Pending |
+| WERV-02 | Phase 27 | Complete |
 | FEED-01 | Phase 28 | Pending |
 | FEED-02 | Phase 28 | Pending |
 | FEED-03 | Phase 28 | Pending |

@@ -3,7 +3,10 @@
 > Aangemaakt 2026-09-10. Dit bestand is de werkstand van de epic; **begin hier.**
 > Backlog-epic: **#71** in `BACKLOG.md`. Loopt naast v4.0, blokkeert niets.
 >
-> **Stand:** nog niet begonnen. `1.0.30+41` ligt klaar om te uploaden.
+> **Stand:** fase 27 (wervingsonderzoek) is op 2026-09-20 afgerond: de kanalen zijn gekozen
+> en de drie verzendklare teksten liggen klaar in
+> `phases/27-wervingsonderzoek/27-TEKSTEN.md`. Huidige build: 1.0.35+46 op internal. Google's
+> teller: **2 testers aangemeld** (Play Console, 2026-09-20).
 
 ## Waar deze epic over gaat
 
@@ -111,6 +114,17 @@ testers over van twaalf uit een subreddit, ongeveer 17%. Wie twaalf actieve mens
 moet er dus fors meer dan twaalf werven.
 
 Die 20–25 is precies het getal dat Joost zelf al noemde voordat we het uitrekenden.
+
+**Gecorrigeerd op 2026-09-20 (fase 27, D-13); díe versie is nu maatgevend.** De som
+hierboven las de Console-lijst verkeerd: negen adressen op een lijst zijn geen negen
+opt-ins. Google's teller stond op 2026-09-20 op **2 aangemeld** ("2 testers currently opted
+in"), en Joost heeft **tien** mensen binnen bereik die hij persoonlijk kan activeren. Het
+gat is daarmee geen ~12–16 van buiten, maar acht conversies in de eigen kring plus ongeveer
+vijf van buiten voor de buffer die WERV-04 op vijftien zet: **2 + 8 + 5 = 15**. Het gevolg
+hieronder ("bereik telt nu wél mee") vervalt mee: bij vijf van buiten wint doelgroepfit het
+weer van bereik. De volledige afleiding staat in
+`phases/27-wervingsonderzoek/27-CONTEXT.md` (D-03 herzien, D-10 t/m D-13) en
+`27-KANALEN.md`; de tabel hierboven blijft staan als gedateerde tussenstand.
 
 **Gevolg voor de kanaalkeuze:** bereik telt nu wél mee. Bij zes van buiten kon een klein
 kanaal met hoge doelgroepmatch winnen van een groot kanaal; bij twaalf à zestien niet
