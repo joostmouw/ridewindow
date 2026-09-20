@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-20T11:09:35.267Z"
-last_activity: 2026-09-20 -- Phase 27 planning complete
+last_updated: "2026-09-20T11:18:49.171Z"
+last_activity: 2026-09-20
 progress:
   total_phases: 12
   completed_phases: 5
   total_plans: 36
-  completed_plans: 35
+  completed_plans: 36
   percent: 42
 ---
 
@@ -358,14 +358,14 @@ Items acknowledged and deferred at v2.0 milestone close on 2026-07-17. The `audi
 See: .planning/PROJECT.md (updated 2026-07-25)
 
 **Core value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots
-**Current focus:** Phase 26 — console-op-orde
+**Current focus:** Phase 27 — wervingsonderzoek
 
 ## Current Position
 
-Phase: 26 (console-op-orde) — EXECUTING
-Plan: 1 of 4
+Phase: 27 (wervingsonderzoek) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-09-20 -- Phase 27 planning complete
+Last activity: 2026-09-20
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
@@ -745,6 +745,7 @@ en volle testsuite zelf geverifieerd op main.
 | Phase 16 P02 | 25min | 2 tasks | 12 files |
 | Phase 16 P03 | ~10min | 2 tasks | 6 files |
 | Phase 21 P02 | 23min | 3 tasks | 4 files |
+| Phase 27 P01 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -906,7 +907,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-09-02T06:10:00.000Z
+Last session: 2026-09-20T11:18:49.165Z
 Last activity: 2026-09-02 - Fase 21 vrijwel dicht. Stap 1b: backlog #61 tegengeproefd op het toestel, **PASS aan beide helften** (inlogflow én koude start), met een negatieve controle op de pre-fix build 1.0.21+22 die de bug live reproduceerde. §6 (AUTH-09) uitgevoerd op de PWA: app-kant PASS inclusief D-03 op drie schermen, en de Supabase-kant geverifieerd via twee leesqueries (nul weesrijen, account weg uit `auth.users`). De `feedback`-controle is **vervallen, niet gehaald** — die tabel is leeg, dus `on delete set null` is alleen door het schema gedekt. Onderweg gevonden en gefixt: `lib/core/app_version.dart` liep achter op `pubspec.yaml` (quick 260901-r92) — de rode test die dat aanwees was maandenlang afgedaan als "de bekende flaky notificatietest". Suite nu **451/451**. Alles staat op **1.0.23+24**: main gepusht, PWA live geverifieerd in de bundel, toestel bijgewerkt via `adb install -r` (data behouden), en Play internal testing uitgerold op 2026-09-02 08:00. `21-08-SUMMARY.md` geschreven (compleet), `21-09-SUMMARY.md` geschreven (**incomplete**).
 
 **Enige openstaande stap voor fase 21:** de app één keer via Play installeren op het toestel. Vereist eerst deïnstalleren (sideload vs. Play-signing) en wist daarmee lokale data + de Calendar-OAuth-grant. Let daarna specifiek op inloggen en Google Calendar — zie `.planning/phases/21-sync-migration/MORGEN.md` stap 3. Blijft daarnaast staan: fase 19's ontbrekende koude-start-basislijn (plan 19-07), waardoor REG-03 geen vóór/ná-vergelijking heeft.

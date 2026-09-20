@@ -272,7 +272,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 27-01-PLAN.md — WERV-01: sourced 8-channel comparison + motivated 2-3 channel choice (LinkedIn ruled out per D-01, backlog #76 for the deferred launch post)
+- [x] 27-01-PLAN.md — WERV-01: sourced 8-channel comparison + motivated 2-3 channel choice (LinkedIn ruled out per D-01, backlog #76 for the deferred launch post)
 
 **Wave 2** *(blocked on 27-01)*
 
@@ -368,7 +368,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 24. Iconografie & eigen beeldtaal | v4.0 | quick | Complete | 2026-09-08 |
 | 25. Wrijving wegwerken | v4.0 | quick | Complete | 2026-09-08 |
 | 26. Console op orde | v4.1 | 1/4 | In Progress|  |
-| 27. Wervingsonderzoek | v4.1 | 0/2 | Not started | - |
+| 27. Wervingsonderzoek | v4.1 | 1/2 | In Progress|  |
 | 28. Feedbackstroom | v4.1 | 0/TBD | Not started | - |
 | 29. Eerste minuut | v4.1 | 0/TBD | Not started | - |
 | 30. Werving | v4.1 | 0/TBD | Not started | - |
