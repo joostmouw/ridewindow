@@ -17,8 +17,22 @@
   .sub {
     color: #666;
     font-size: 0.9rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
+  .blocker {
+    background: #fdeee0;
+    border: 1px solid #e8b788;
+    border-radius: 10px;
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 2rem;
+    font-size: 0.92rem;
+  }
+  .blocker h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: #8a4a10;
+  }
+  .blocker ol { margin: 0.4rem 0 0.4rem 1.2rem; padding: 0; }
   section {
     background: #fff;
     border: 1px solid #ddd;
@@ -27,7 +41,7 @@
     margin-bottom: 2rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
-  section h2 {
+  section > h2 {
     margin-top: 0;
     font-size: 1.15rem;
     border-bottom: 2px solid #2b6f4e;
@@ -62,7 +76,9 @@
     border-radius: 6px;
     font-size: 0.95rem;
     margin: 0.75rem 0;
+    word-break: break-word;
   }
+  pre.text-body a { color: #1d4d36; }
   .image-note {
     font-size: 0.88rem;
     background: #fff8e8;
@@ -75,6 +91,15 @@
   .stale-warning {
     color: #8a4a10;
     font-weight: 600;
+  }
+  .authoritative-note {
+    font-size: 0.82rem;
+    color: #555;
+    background: #eef3f8;
+    border: 1px solid #cddaea;
+    border-radius: 6px;
+    padding: 0.6rem 0.9rem;
+    margin-top: 0.75rem;
   }
   figure {
     margin: 0.75rem 0 0 0;
@@ -103,14 +128,28 @@
   .findings h3 { margin-top: 0; font-size: 0.95rem; }
   .findings ol, .findings ul { margin: 0.4rem 0 0.4rem 1.1rem; padding: 0; }
   .resolved { color: #1d6b2f; font-weight: 600; }
+  code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85em; }
 </style>
 </head>
 <body>
 
 <h1>Fase 27 Plan 2 — Wervingsteksten (WERV-02)</h1>
 <div class="sub">
-  Preview gegenereerd uit <code>27-TEKSTEN.md</code> op 2026-09-20, in D-12's prioriteitsvolgorde.
-  Dit venster is geopend vóór er om goedkeuring is gevraagd (D-05).
+  Preview geregenereerd uit <code>27-TEKSTEN.md</code> op 2026-09-20 (na verwerking van de
+  echte Play-links en de bevestigde testersgroep), in D-12's prioriteitsvolgorde. Dit venster
+  is geopend vóór er om goedkeuring is gevraagd (D-05).
+</div>
+
+<div class="blocker">
+  <h2>Controlepunt vóór verzending (Fase 26 plan 03) — geen taak voor de lezer van de tekst</h2>
+  <p>De testersgroep bestaat al: <code>https://groups.google.com/g/ridewindow-testers</code>.
+  Vóór een van de drie teksten hieronder daadwerkelijk uitgaat in Fase 30, controleert de
+  verzender twee dingen: (1) dat de groep in Play Console gekoppeld is onder Closed testing
+  &gt; Alpha &gt; Testers &gt; "Choose testers", en (2) dat de negen bestaande adressen uit de
+  handmatige lijst "First Testers RideWindow" als lid aan de groep zijn toegevoegd — die
+  import wordt apart afgehandeld, buiten dit plan. Alle drie de links (groep, opt-in,
+  installeren) staan hieronder al ingevuld
+  (<code>applicationId</code> in <code>android/app/build.gradle.kts:37</code>).</p>
 </div>
 
 <section>
@@ -123,13 +162,16 @@ wat je nog moet doen om echt aangemeld te staan. Google telt namelijk alleen de 
 handeling zelf, en daar lijkt een aantal van jullie nog niet aan toegekomen:
 
 1. Accepteer de uitnodiging voor de Google Groep (mail van Google Groups — check ook je
-   spam als je hem niet ziet).
+   spam als je hem niet ziet), of word direct lid via
+   <a href="https://groups.google.com/g/ridewindow-testers">https://groups.google.com/g/ridewindow-testers</a>.
 2. Open de opt-in-link terwijl je bent ingelogd op datzelfde Google-account waarmee je de
-   groep hebt geaccepteerd: [opt-in-link].
+   groep hebt geaccepteerd: <a href="https://play.google.com/apps/testing/ridewindow.joost.amsterdam">https://play.google.com/apps/testing/ridewindow.joost.amsterdam</a>.
 3. Druk op "Word tester" op de pagina die daarna verschijnt.
 
-Installeren is een aparte, latere stap — die telt niet mee als opt-in. Pas als deze drie
-stappen staan, sta je bij Google op de lijst, ook al heb je de app al geïnstalleerd.
+Installeren is een aparte, latere stap, via
+<a href="https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam">https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam</a> — die telt niet
+mee als opt-in. Pas als deze drie stappen staan, sta je bij Google op de lijst, ook al heb
+je de app al geïnstalleerd.
 
 Waarom dit ertoe doet: Ridewindow is de app die ik zelf bouw om in één oogopslag te zien
 wanneer het deze week goed fietsweer is, afgestemd op je eigen agenda. Om productietoegang
@@ -148,6 +190,11 @@ ruwe week beschikbaarheid in na het installeren, anders oogt het eerste scherm l
     die al ja zeiden, geen wervende post, dus een plaatje is hier "leuk om te hebben", niet
     noodzakelijk. Wil je er toch een bij: zie de screenshot en de ververs-kanttekening bij
     de Facebookgroep hieronder.
+  </div>
+  <div class="authoritative-note">
+    Play Console's Testers-tabblad (Closed testing &gt; Alpha &gt; Testers) is leidend voor de
+    opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
+    tabblad.
   </div>
 </section>
 
@@ -175,7 +222,16 @@ Twee dingen vooraf: de app kan openen in de taal van je telefoon (dus Engels als
 op Engels staat) — dat zet je zelf om in Profiel. En vul na het installeren meteen een ruwe
 week beschikbaarheid in, anders oogt het eerste scherm leeg.
 
-Interesse? Reageer hieronder of stuur een bericht, dan stuur ik je de opt-in-link.</pre>
+Zo doe je mee:
+
+1. Word lid van de testersgroep (Google Groep):
+   <a href="https://groups.google.com/g/ridewindow-testers">https://groups.google.com/g/ridewindow-testers</a>.
+2. Open de opt-in-link met datzelfde Google-account:
+   <a href="https://play.google.com/apps/testing/ridewindow.joost.amsterdam">https://play.google.com/apps/testing/ridewindow.joost.amsterdam</a>.
+3. Installeer de app: <a href="https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam">https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam</a>.
+
+Reageer gerust hieronder als je meedoet — leuk om te weten wie er zit, en dan kan ik je ook
+gericht om feedback vragen.</pre>
   <div class="image-note">
     <strong>Afbeelding bij de post:</strong> gebruik het Home-scherm met de ritvensters —
     de kernwaarde van de app in één beeld (zie hieronder).
@@ -189,6 +245,11 @@ Interesse? Reageer hieronder of stuur een bericht, dan stuur ik je de opt-in-lin
       <img src="../../../docs/screenshots/01_home.png" alt="Ridewindow Home-scherm, versie 1.0.30 (2026-09-10) — ter illustratie, ververs vóór gebruik">
       <figcaption>docs/screenshots/01_home.png — vastgelegd 2026-09-10, versie 1.0.30 (0704c39). Ter illustratie, niet actueel.</figcaption>
     </figure>
+  </div>
+  <div class="authoritative-note">
+    Play Console's Testers-tabblad (Closed testing &gt; Alpha &gt; Testers) is leidend voor de
+    opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
+    tabblad.
   </div>
 </section>
 
@@ -220,9 +281,10 @@ turns them into concrete, bookable ride windows against your own calendar (e.g. 
 09:00–13:00, 4h — Perfect"). Looking for a few testers to help me clear Google's closed-
 testing requirement — happy to test back.
 
-1. Join the Google Group: [group link]
-2. Opt in using the SAME Google account as step 1, at: play.google.com/apps/testing/&lt;id&gt;
-3. Install from: play.google.com/store/apps/details?id=&lt;id&gt;
+1. Join the Google Group: <a href="https://groups.google.com/g/ridewindow-testers">https://groups.google.com/g/ridewindow-testers</a>
+2. Opt in using the SAME Google account as step 1, at:
+   <a href="https://play.google.com/apps/testing/ridewindow.joost.amsterdam">https://play.google.com/apps/testing/ridewindow.joost.amsterdam</a>
+3. Install from: <a href="https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam">https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam</a>
 
 Joining the group alone does not opt you into the test — step 2 is the one Google actually
 counts. Please stay opted in for at least 14 consecutive days; the streak resets if the
@@ -248,6 +310,11 @@ Thanks!</pre>
       <img src="../../../docs/screenshots/01_home.png" alt="Ridewindow Home-scherm, versie 1.0.30 (2026-09-10) — ter illustratie, ververs vóór gebruik">
       <figcaption>docs/screenshots/01_home.png — vastgelegd 2026-09-10, versie 1.0.30 (0704c39). Ter illustratie, niet actueel.</figcaption>
     </figure>
+  </div>
+  <div class="authoritative-note">
+    Play Console's Testers-tabblad (Closed testing &gt; Alpha &gt; Testers) is leidend voor de
+    opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
+    tabblad.
   </div>
   <div class="meta" style="margin-top:1rem;">
     Deze tekst is nu geschreven en wordt vastgehouden als achtervang (D-12) — hij gaat pas uit
