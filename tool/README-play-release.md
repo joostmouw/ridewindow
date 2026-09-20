@@ -42,13 +42,27 @@ Beide zijn rechtenwijzigingen op jouw Google-account. Ik kan ze niet doen.
 
 ### 2. Het service-account rechten geven in Play
 
-Play Console → **Users and permissions → Invite new user**. Plak het
-`client_email` uit de JSON (`...@my-project-joost.iam.gserviceaccount.com`),
-beperk tot **Ridewindow**, en vink aan:
+Google Cloud maakt de identiteit en de sleutel, maar Play Console kent ze nog
+niet: zonder deze stap weigert de API elke aanroep met 401/403. Klik-voor-klik
+(namen nagekeken tegen Google's eigen documentatie, 2026-09-20; in de
+Nederlandse console heten ze ongeveer hetzelfde):
 
-- *Release to testing tracks* — genoeg voor internal, alpha en beta.
-- *Release to production* — alleen als je ook naar productie wilt kunnen
-  uploaden.
+1. **Users and permissions** — direct:
+   `https://play.google.com/console/users-and-permissions`
+2. Rechtsboven: **Invite new users**.
+3. Plak het `client_email` uit de JSON
+   (`...@my-project-joost.iam.gserviceaccount.com`) in het e-mailveld.
+   Vervaldatum leeg laten, anders stopt uploaden op een dag zomaar.
+4. Tabblad **App permissions** — niet Account permissions, dat geldt voor alle
+   apps — dan **Add app** → **Ridewindow** → **Apply**.
+5. Alléén het vinkje bij **Release apps to testing tracks**: genoeg voor
+   internal, alpha en beta, en expliciet géén productie. "View app information
+   (read-only)" mag al aan staan. Niet aanzetten: *Release to production,
+   exclude devices, and use Play App Signing* — lekt de sleutel, dan kan de
+   houder niets verder dan test-tracks van deze ene app.
+6. **Invite user**. Een service-account krijgt geen mail en accepteert niets;
+   de machtiging staat meteen. (Naar productie uploaden kan later, met een
+   bewuste tweede uitnodiging met het productierecht.)
 
 Rechten hebben tot ~24 uur nodig om door te werken. Krijg je vlak na het
 uitnodigen een 401 of 403, wacht dan even; dat is geen fout in het script.
