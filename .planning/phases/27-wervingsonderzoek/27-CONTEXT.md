@@ -24,7 +24,13 @@ Het daadwerkelijk versturen, het uitnodigen van de eigen kring, en het bijhouden
 
 - **D-02:** Er is geen warm contact bij een fietsclub of fiets-Facebookgroep. Elk fietsgericht kanaal is een koude benadering via een beheerder of bestuur. Gevolg: de doelgroepfit blijft het hoogst van alle kanalen, maar doorlooptijd en slagingskans zijn onzeker en mogen niet als volumegarantie worden ingeboekt. Dit weerlegt de aanname in 27-RESEARCH.md §Recommended Channel Mix dat dit kanaal "snel" kan worden via een bestaand contact.
 
-- **D-03:** D-01 en D-02 samen verschuiven het zwaartepunt naar wederkerig testen — precies het kanaal met het slechtste gedocumenteerde activatiepercentage (~17% ondergrens, bron in 27-RESEARCH.md). De gekozen mix moet daarom **minstens twee onafhankelijke wederkerige kanalen** bevatten (bijvoorbeeld r/AndroidClosedTesting plus één tweede tester-uitwisselingsgemeenschap), zodat de volumeroute niet op één subreddit en diens moderatiebeleid rust. Eén enkel wederkerig kanaal is een onacceptabel enkelvoudig faalpunt gegeven dat LinkedIn is weggevallen.
+- **D-03 (herzien 2026-09-20, vervangt de eerdere lezing):** Het zwaartepunt ligt **niet** bij wederkerig testen. Joost heeft tien mensen die hij persoonlijk kan activeren; Google's teller staat op **2 aangemeld** ("2 testers currently opted in", afgelezen in de Play Console op 2026-09-20). Het gat is dus acht *conversies* binnen de eigen kring plus ongeveer vijf van buiten voor de buffer die WERV-04 al op vijftien zet — geen twintig tot vijfendertig opt-ins uit een volumekanaal. De eerdere eis van twee onafhankelijke wederkerige kanalen is daarmee vervallen; die volgde uit een gat van tien dat niet bestaat.
+
+- **D-10 — wat "opted in" betekent, en waarom het gat er is.** Google telt uitsluitend de handeling van de tester zelf: ingelogd op het Google-account dat op de testerslijst staat, de opt-in-link openen en op *Word tester* drukken. Op de lijst gezet worden telt niet, en bij gebruik van een Google Groep moet de tester éérst het groepslidmaatschap accepteren, anders werkt de opt-in-link voor hem niet eens [VERIFIED in 27-RESEARCH.md uit support.google.com/googleplay/android-developer/answer/9845334]. Installeren is een aparte stap daarna en zit niet in dat getal. De acht die ontbreken stranden dus vrijwel zeker op een handeling, niet op overtuiging. Gevolg voor de teksten: de belangrijkste verzendklare tekst van deze fase is een **opt-in-instructie aan de eigen kring** die die stappen letterlijk benoemt — groep accepteren, link openen, knop indrukken — niet een wervende pitch.
+
+- **D-11 — twee latten, niet één.** De teller in de Console meet alleen opt-ins (twaalf tegelijk, veertien aaneengesloten dagen; wie tussentijds uitstapt breekt de reeks en de klok begint opnieuw). De vragenlijst voor productie-toegang daarná vraagt of testers alle functies gebruikten en of het gebruik op echt productiegebruik leek — dáár telt activiteit [VERIFIED in 27-RESEARCH.md uit answer/14151465]. De kanaalkeuze moet aan beide latten worden gemotiveerd, niet alleen aan de teller.
+
+- **D-12 — de mix.** Drie kanalen, in deze volgorde van prioriteit: (1) **de eigen kring van tien**, als conversiekanaal met een opt-in-instructie; (2) **één koude fiets-Facebookgroep** via een beheerder, voor de ongeveer vijf extra met echte doelgroepfit; (3) **r/AndroidClosedTesting uitsluitend als achtervang**, in te zetten met een expliciete drempel — pas als kanaal 1 en 2 na een week samen onder de vijftien aangemelde testers blijven. Wederkerig testen is nadrukkelijk niet de hoofdroute: tegen de ~17%-activatie-ondergrens uit 27-RESEARCH.md kost het twintig tot vijfendertig opt-ins voor een handvol actieve testers, en een tros aanmeldingen die binnen een uur na één post binnenkomt en nooit terugkeert is precies het patroon waar de beoordeling uit D-11 op let (27-RESEARCH.md, Pitfall 3). Een tweede wederkerig kanaal is daarmee overbodig geworden.
 
 - **D-04:** Alles blijft binnen het €0/maand-plafond uit CLAUDE.md. Betaalde testersdiensten en credit-systemen die geld kosten vallen af; een gratis credit-systeem mag wel worden beoordeeld, met de commerciële herkomst expliciet benoemd.
 
@@ -44,10 +50,12 @@ Het daadwerkelijk versturen, het uitnodigen van de eigen kring, en het bijhouden
 
 - **D-09:** Joosts LinkedIn-netwerk telt 500-1000 connecties. Relevant voor de latere lanceerpost (D-01), niet voor de kanaalkeuze in deze fase.
 
+- **D-13:** Stand op 2026-09-20: tien mensen binnen bereik die Joost persoonlijk kan activeren, twee daadwerkelijk aangemeld in Google's teller. `STATE.md` en `TESTERS.md` dateren van 10 september en zijn op dit punt verouderd; de Console is leidend.
+
 ### Claude's Discretion
 
 - De exacte formulering van de teksten, de kolomindeling van de vergelijkingstabel, bestandsnamen en de vorm van het HTML-venster.
-- Welk tweede wederkerige kanaal naast r/AndroidClosedTesting wordt gekozen (D-03 stelt de eis, niet de invulling).
+- Welke fiets-Facebookgroep wordt benaderd (D-12 stelt het kanaal vast, niet de specifieke groep).
 - Of de vergelijking zeven of meer kanalen beslaat — zeven is de ondergrens uit het success criterion.
 
 </decisions>
