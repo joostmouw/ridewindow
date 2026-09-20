@@ -1,7 +1,7 @@
 name: ridewindow
 description: "Ridewindow — cyclist-specific weather windows"
 publish_to: 'none'
-version: 1.0.34+45
+version: 1.0.35+46
 
 environment:
   sdk: ">=3.6.0 <4.0.0"

@@ -1,11 +1,7 @@
-New on Home: your day as one block, with the best window marked. Choose
-"Best first" or "On time" as the order.
+Fix: the app could quietly crash after you restarted your phone. It
+pointed at code that did not exist, and that is gone now. Feel free to
+reboot once.
 
-Shared rides: propose several windows, the group votes and the organizer
-picks. You can decline a shared ride, with undo.
-
-At its second start the app asks once about anonymous usage statistics.
-Nothing leaves your phone without a yes.
-
-Fixes: signed-out feedback that left late, a black screen after Info, and
-"Longest ride here" always saying 2 hours.
+Otherwise the same as build 45: your day as one block on Home, shared
+rides with several windows to vote on, and the one-time question about
+anonymous usage statistics at the second start.

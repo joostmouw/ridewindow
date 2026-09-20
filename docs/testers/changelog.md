@@ -3,6 +3,28 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 46: 1.0.35+46
+
+**Datum:** 2026-09-20
+**Track:** Internal testing.
+
+**Inhoud**
+- **De app crashte na elke herstart van het toestel.** `AndroidManifest.xml`
+  noemde sinds 3 juni een receiver `be.tramckrijte.workmanager.
+  RescheduleOnBootReceiver`; die klasse bestaat niet, want workmanager heet
+  sinds 0.6 anders en heeft helemaal geen boot-receiver meer. Android maakt
+  zo'n receiver pas aan als hij vuurt, dus alleen een reboot raakte hem, en
+  dan viel het proces om voordat er een scherm was. Gevonden in de logcat van
+  build 45 op de Oppo (`7bb52c9`)
+- Een test die elke klassenaam in de manifest nakijkt, zodat dit soort
+  verwijzing niet nog eens maanden kan blijven staan
+- De winkelpagina en deze changelog zijn ontdaan van kwadraatstreepjes, en de
+  test die dat in de app bewaakt kijkt nu ook naar deze twee bestanden
+  (`c9b4627`)
+
+**Feedback opgelost:** geen. Dit was een vondst op het toestel, precies waar
+een Play-installatie voor bedoeld is.
+
 ## Build 45: 1.0.34+45
 
 **Datum:** 2026-09-20

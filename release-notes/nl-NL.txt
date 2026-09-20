@@ -1,11 +1,7 @@
-Nieuw op Home: je dag als één blok, met het beste venster gemarkeerd.
-Kies "Beste eerst" of "Op tijd" als volgorde.
+Fix: de app kon na het opnieuw opstarten van je telefoon stilletjes
+crashen. De oorzaak was een verwijzing naar code die niet bestond, en die
+is weg. Herstart je toestel gerust een keer.
 
-Gedeelde ritten: leg meerdere vensters voor, de groep stemt en de
-organisator kiest. Een gedeelde rit afzeggen kan, met ongedaan maken.
-
-Bij de tweede start vraagt de app eenmalig om anonieme statistiek.
-Zonder ja verlaat niets je toestel.
-
-Fixes: feedback van uitgelogd gebruik die te laat vertrok, een zwart scherm
-na Info, en "Longest ride here" dat bijna altijd 2 uur zei.
+Verder gelijk aan build 45: je dag als een blok op Home, gedeelde ritten
+met meerdere vensters om op te stemmen, en de eenmalige vraag om anonieme
+statistiek bij de tweede start.
