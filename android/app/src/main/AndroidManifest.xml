@@ -39,16 +39,18 @@
             android:foregroundServiceType="dataSync"
             android:exported="false" />
 
-        <!-- WorkManager boot-completed receiver voor herscheduling na herstart -->
-        <receiver
-            android:name="be.tramckrijte.workmanager.RescheduleOnBootReceiver"
-            android:directBootAware="false"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+        <!--
+            Hier stond een receiver `be.tramckrijte.workmanager.RescheduleOnBootReceiver`,
+            toegevoegd op 2026-06-03. Die klasse bestaat niet: workmanager heet sinds
+            0.6 `dev.fluttercommunity.workmanager` en kent helemaal geen boot-receiver
+            meer. Android instantieert een receiver pas als hij vuurt, dus dit bleef
+            drie maanden onzichtbaar -- tot een herstart, en dan crasht het proces met
+            ClassNotFoundException voordat er een scherm is. Gevonden op 2026-09-20 in
+            de logcat van build 45.
+
+            Er komt niets voor in de plaats: androidx.work herplant zijn eigen werk na
+            een herstart via zijn eigen receiver, die het via de plugin zelf meebrengt.
+        -->
 
         <!-- flutter_local_notifications: standaard notificatiekanaal -->
         <meta-data
