@@ -115,13 +115,45 @@ Er is **geen zelfpromotieregel gevonden** bij deze handmatige controle — vastg
 gevonden bij handmatige controle op 2026-09-20", niet als "zelfpromotie is toegestaan". Regel 2
 is de regel die de tekst hieronder direct raakt: de post mag geen andere subreddit noemen of
 hinten (dus geen r/TestersCommunity, geen r/AndroidAppTesters, in geen enkele vorm) — de tekst
-hieronder voldoet daaraan. Regel 1's formulering is dubbelzinnig: het kan een regeltitel zijn,
-of de banner die Reddit een geband account toont; dit kon niet worden vastgesteld. **Open
-risico:** vóór er in Fase 30 daadwerkelijk wordt gepost, eerst bevestigen dat het account nog
-kan posten in deze subreddit — kan dat niet, dan vervalt dit achtervangkanaal en moet
-`27-KANALEN.md`'s mix worden herzien. Deze tekst is een vastgehouden achtervang (D-08/D-12) die
-mogelijk een tijd ongebruikt blijft; wie hem in Fase 30 daadwerkelijk verstuurt, verifieert de
-regels op dat moment opnieuw, in plaats van op deze vastlegging te vertrouwen.
+hieronder voldoet daaraan.
+
+**Tweede controleronde, dezelfde dag: Regel 1 opgelost.** Joost heeft de subreddit-feed zelf
+geladen en ~20 posts geplakt (2026-09-20). Daaruit blijkt dat het account "Lid geworden" is van
+de subreddit en een actieve knop "Post maken" heeft — het account kan dus gewoon posten. Regel
+1's formulering ("You are no longer able to participate in this community") is een regeltitel,
+geen banner die aan een geband account wordt getoond. Het eerder genoteerde open risico
+("mogelijk geband, onbevestigd") is daarmee **vervallen** — het enige dat blijft staan is de
+standaard D-08-afspraak: wie deze tekst in Fase 30 daadwerkelijk verstuurt, verifieert de regels
+op dat moment opnieuw, in plaats van op deze vastlegging te vertrouwen.
+
+**Gebruiken afgelezen uit de feed op 2026-09-20** (geen geschreven regels — dit zijn patronen
+die Joost zag in ~20 posts, vastgelegd als waargenomen gedrag, niet als subreddit-regel):
+
+1. Geen flair in gebruik. Sommige posts zetten wel een tag tussen haakjes in de TITEL, zoals
+   `[T4T]`, `[Test-for-test | 18+]`, `[Brazil]` — optioneel, niet afgedwongen.
+2. Wederkerigheid is de norm. Vrijwel elke post biedt "test for test" / "I'll test yours back"
+   aan. Posts zonder dat aanbod (een kale Play-link, geen tegenprestatie) krijgen geen
+   engagement. De tekst hieronder biedt daarom expliciet terugtesten aan — dit stond al in het
+   plan als D-12's wederkerige toon, en de feed bevestigt dat het de norm is, geen aardigheidje.
+3. Links staan in de POSTTEKST zelf, nooit pas in een comment. Het standaardpatroon is een
+   genummerde 3-stappenlijst: (1) de Google Groep joinen, (2) opt-in op
+   `play.google.com/apps/testing/<id>`, (3) installeren via
+   `play.google.com/store/apps/details?id=<id>`. Meerdere posts waarschuwen expliciet dat
+   "joining the group alone doesn't opt you into the Play test" en dat je "the SAME Google
+   account" voor alle stappen moet gebruiken — precies dezelfde wrijving die D-10 al voor
+   Joost's eigen kring identificeerde. De tekst hieronder spiegelt die structuur.
+4. De veertien dagen worden altijd expliciet genoemd: "stay opted in for at least 14 consecutive
+   days", "keep it for 14 days".
+5. Lengte: de goed-lopende posts zijn één korte alinea over wat de app doet, dan de genummerde
+   stappen, dan welke feedback gewenst is — twee tot drie korte alinea's. Kale-link-posts worden
+   genegeerd.
+6. Zichtbare valkuilen in de feed, vermeden in de tekst hieronder: nooit vragen om een
+   Google-e-mailadres publiekelijk te plaatsen (meerdere posts waarschuwen hiertegen); nooit
+   positieve reviews aanbieden of vragen — één post stelt expliciet "Honest feedback only, no
+   positive-review swaps". Ook: zware pure-T4T-posts (die met de ruilhandel openen in plaats van
+   met wat de app is) krijgen veel downvotes (20+), dus de tekst opent met wat Ridewindow doet,
+   niet met het ruilaanbod.
+7. Regel 2 blijft gelden: geen andere subreddit noemen of hinten.
 
 **Deze tekst is nu geschreven en wordt vastgehouden als achtervang (D-12) — hij gaat pas uit
 als de eigen kring en de fiets-Facebookgroep samen na een week onder de vijftien aangemelde
@@ -129,31 +161,36 @@ testers blijven.**
 
 ## r/AndroidClosedTesting (EN) — achtervang
 
-Engels, wederkerige-testen-toon (aanbod om terug te testen). Geen verwijzing naar een andere
-subreddit (Regel 2, zie hierboven).
+Engels, genummerde 3-stappenlijst in de posttekst zelf (norm 3 hierboven), leidt met wat de app
+is vóór het ruilaanbod (norm 6), noemt de veertien dagen expliciet (norm 4), en vermijdt de twee
+zichtbare valkuilen: geen verzoek om een publiek e-mailadres, geen review-ruil (norm 6). Geen
+verwijzing naar een andere subreddit (Regel 2). Optioneel: een titel-tag zoals `[T4T]` is bij
+sommige posts te zien maar niet verplicht (norm 1) — aan degene die in Fase 30 post.
 
-> Hi all,
+> Ridewindow — a cycling app that scores upcoming hours for temperature, rain and wind and
+> turns them into concrete, bookable ride windows against your own calendar (e.g. "Saturday
+> 09:00–13:00, 4h — Perfect"). Looking for a few testers to help me clear Google's closed-
+> testing requirement — happy to test back.
 >
-> I'm building Ridewindow, a cycling app that scores upcoming hours for temperature, rain and
-> wind and turns them into concrete, bookable ride windows against your own calendar (e.g.
-> "Saturday 09:00–13:00, 4h — Perfect"). Looking for a few testers to help me clear Google's
-> closed-testing requirement.
+> 1. Join the Google Group: [group link]
+> 2. Opt in using the SAME Google account as step 1, at: play.google.com/apps/testing/<id>
+> 3. Install from: play.google.com/store/apps/details?id=<id>
 >
-> What I'm asking: install the app and open it across **14 consecutive days** — not just
-> install-and-forget. The streak resets if the opted-in count drops below Google's threshold
-> mid-way, so regular opens matter more than a single install.
+> Joining the group alone does not opt you into the test — step 2 is the one Google actually
+> counts. Please stay opted in for **at least 14 consecutive days**; the streak resets if the
+> opted-in count drops below the required number mid-way.
 >
-> What I offer: happy to test your app back in return — reciprocal. Tell me what you need
-> (install + X days, or a specific flow to check) and I'll do it.
+> Happy to test yours back — tell me what you need (install + X days, or a specific flow to
+> check) and I'll do it. Honest feedback only, no positive-review swaps.
 >
 > You'll hear back from me on anything you report — a bug, an odd score, unclear copy — once
 > it's fixed, and which version it landed in.
 >
-> Two things to expect in the first minute: the app may open in your phone's language (English,
-> even if you'd expect Dutch) — switch it in Profile. And fill in a rough week of availability
-> right after installing, otherwise the first screen looks empty.
+> First-minute heads-up: the app may open in your phone's language (English, even if you'd
+> expect Dutch) — switch it in Profile. Fill in a rough week of availability right after
+> installing, otherwise the first screen looks empty.
 >
-> Link: [Play opt-in link]
+> (Please don't post your Google account email publicly — DM me if needed.)
 >
 > Thanks!
 
