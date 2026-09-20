@@ -18,22 +18,14 @@ is zichtbaar veranderd sindsdien (de Vensters/Blok-schakelaar en de keuze Beste 
 uit #69/#70 staan er niet op). Ververs de screenshot vanaf het toestel vlak vóór een post
 daadwerkelijk de deur uitgaat in Fase 30 — presenteer dit plaatje nooit ongezien als actueel.
 
-**Openstaand vanuit Fase 26 — de Google Groep bestaat nog niet (D-10-blokkade).** Volgens
-`26-03-SUMMARY.md` is er nog geen Google Group gekoppeld; de negen bestaande testers staan los
-in de lijst "First Testers RideWindow". Voordat stap 1 van alle drie de teksten hieronder echt
-ingevuld kan worden:
-
-1. De groep moet eerst worden aangemaakt op groups.google.com — voorgestelde naam
-   `ridewindow-testers`, wat uitkomt op https://groups.google.com/g/ridewindow-testers.
-2. De negen bestaande adressen moeten aan die groep worden toegevoegd (optie-a uit Fase 26).
-3. De groep moet daarna in Play Console gekoppeld worden onder Closed testing > Alpha >
-   Testers > "Choose testers".
-
-Tot die drie stappen zijn gezet, blijft stap 1 van alle drie de teksten hieronder een
-placeholder — en dat is precies waar D-10 zegt dat de acht ontbrekende conversies binnen de
-eigen kring vastzitten. Dit is een openstaand punt geërfd van Fase 26 plan 03, geen gat in
-Fase 27. De install- en opt-in-link zijn wel al bekend (`applicationId` in
-`android/app/build.gradle.kts:37`) en staan hieronder al ingevuld.
+**Controlepunt vóór verzending (Fase 26 plan 03) — geen taak voor de lezer van de tekst.** De
+testersgroep bestaat al: https://groups.google.com/g/ridewindow-testers. Vóór een van de drie
+teksten hieronder daadwerkelijk uitgaat in Fase 30, controleert de verzender twee dingen: (1)
+dat de groep in Play Console gekoppeld is onder Closed testing > Alpha > Testers > "Choose
+testers", en (2) dat de negen bestaande adressen uit de handmatige lijst "First Testers
+RideWindow" als lid aan de groep zijn toegevoegd — die import wordt apart afgehandeld, buiten
+dit plan. Alle drie de links (groep, opt-in, installeren) staan hieronder al ingevuld
+(`applicationId` in `android/app/build.gradle.kts:37`).
 
 ---
 
@@ -49,7 +41,8 @@ al ja gezegd. Het gat zit vrijwel zeker op een van drie letterlijke stappen, nie
 > handeling zelf, en daar lijkt een aantal van jullie nog niet aan toegekomen:
 >
 > 1. **Accepteer de uitnodiging voor de Google Groep** (mail van Google Groups — check ook je
->    spam als je hem niet ziet). Groepslink: [groepslink — groep bestaat nog niet, zie hierboven].
+>    spam als je hem niet ziet), of word direct lid via
+>    https://groups.google.com/g/ridewindow-testers.
 > 2. **Open de opt-in-link** terwijl je bent ingelogd op datzelfde Google-account waarmee je de
 >    groep hebt geaccepteerd: https://play.google.com/apps/testing/ridewindow.joost.amsterdam.
 > 3. **Druk op "Word tester"** op de pagina die daarna verschijnt.
@@ -111,11 +104,14 @@ dat de post met toestemming van de beheerder/moderator wordt geplaatst (D-02).
 >
 > Zo doe je mee:
 >
-> 1. Reageer hieronder of stuur een bericht, dan voeg ik je toe aan de testersgroep (Google
->    Groep): [groepslink — groep bestaat nog niet, zie bovenaan dit document].
+> 1. Word lid van de testersgroep (Google Groep):
+>    https://groups.google.com/g/ridewindow-testers.
 > 2. Open de opt-in-link met datzelfde Google-account:
 >    https://play.google.com/apps/testing/ridewindow.joost.amsterdam.
 > 3. Installeer de app: https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam.
+>
+> Reageer gerust hieronder als je meedoet — leuk om te weten wie er zit, en dan kan ik je ook
+> gericht om feedback vragen.
 
 **Afbeelding bij de post:** gebruik `docs/screenshots/01_home.png` — het Home-scherm met de
 ritvensters, de kernwaarde van de app in één beeld. Let op: die screenshot is vastgelegd op
@@ -205,7 +201,7 @@ sommige posts te zien maar niet verplicht (norm 1) — aan degene die in Fase 30
 > 09:00–13:00, 4h — Perfect"). Looking for a few testers to help me clear Google's closed-
 > testing requirement — happy to test back.
 >
-> 1. Join the Google Group: [group link — group does not exist yet, see the note near the top of this document]
+> 1. Join the Google Group: https://groups.google.com/g/ridewindow-testers
 > 2. Opt in using the SAME Google account as step 1, at:
 >    https://play.google.com/apps/testing/ridewindow.joost.amsterdam
 > 3. Install from: https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam
