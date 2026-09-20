@@ -55,9 +55,14 @@ Nederlandse console heten ze ongeveer hetzelfde):
    Vervaldatum leeg laten, anders stopt uploaden op een dag zomaar.
 4. Tabblad **App permissions** — niet Account permissions, dat geldt voor alle
    apps — dan **Add app** → **Ridewindow** → **Apply**.
-5. Alléén het vinkje bij **Release apps to testing tracks**: genoeg voor
-   internal, alpha en beta, en expliciet géén productie. "View app information
-   (read-only)" mag al aan staan. Niet aanzetten: *Release to production,
+5. Twee vinkjes, niet één. Bovenaan in dat venster, onder **App access**:
+   **View app information and download bulk reports (read-only)** — zonder een
+   app-toegangsrecht blijft **Apply** grijs, met onderaan de uitleg "To apply
+   permissions, select an app access permission". Daaronder, onder **Releases**:
+   **Release apps to testing tracks**, genoeg voor internal, alpha en beta en
+   expliciet géén productie. Staat dat vinkje grijs in plaats van wit, dan heeft
+   het account het recht al via het tabblad **Account permissions** (admin), en
+   moet dat er eerst af. Niet aanzetten: *Release to production,
    exclude devices, and use Play App Signing* — lekt de sleutel, dan kan de
    houder niets verder dan test-tracks van deze ene app.
 6. **Invite user**. Een service-account krijgt geen mail en accepteert niets;
