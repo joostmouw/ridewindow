@@ -18,6 +18,23 @@ is zichtbaar veranderd sindsdien (de Vensters/Blok-schakelaar en de keuze Beste 
 uit #69/#70 staan er niet op). Ververs de screenshot vanaf het toestel vlak vóór een post
 daadwerkelijk de deur uitgaat in Fase 30 — presenteer dit plaatje nooit ongezien als actueel.
 
+**Openstaand vanuit Fase 26 — de Google Groep bestaat nog niet (D-10-blokkade).** Volgens
+`26-03-SUMMARY.md` is er nog geen Google Group gekoppeld; de negen bestaande testers staan los
+in de lijst "First Testers RideWindow". Voordat stap 1 van alle drie de teksten hieronder echt
+ingevuld kan worden:
+
+1. De groep moet eerst worden aangemaakt op groups.google.com — voorgestelde naam
+   `ridewindow-testers`, wat uitkomt op https://groups.google.com/g/ridewindow-testers.
+2. De negen bestaande adressen moeten aan die groep worden toegevoegd (optie-a uit Fase 26).
+3. De groep moet daarna in Play Console gekoppeld worden onder Closed testing > Alpha >
+   Testers > "Choose testers".
+
+Tot die drie stappen zijn gezet, blijft stap 1 van alle drie de teksten hieronder een
+placeholder — en dat is precies waar D-10 zegt dat de acht ontbrekende conversies binnen de
+eigen kring vastzitten. Dit is een openstaand punt geërfd van Fase 26 plan 03, geen gat in
+Fase 27. De install- en opt-in-link zijn wel al bekend (`applicationId` in
+`android/app/build.gradle.kts:37`) en staan hieronder al ingevuld.
+
 ---
 
 ## Eigen kring — opt-in-instructie (NL)
@@ -32,13 +49,15 @@ al ja gezegd. Het gat zit vrijwel zeker op een van drie letterlijke stappen, nie
 > handeling zelf, en daar lijkt een aantal van jullie nog niet aan toegekomen:
 >
 > 1. **Accepteer de uitnodiging voor de Google Groep** (mail van Google Groups — check ook je
->    spam als je hem niet ziet).
+>    spam als je hem niet ziet). Groepslink: [groepslink — groep bestaat nog niet, zie hierboven].
 > 2. **Open de opt-in-link** terwijl je bent ingelogd op datzelfde Google-account waarmee je de
->    groep hebt geaccepteerd: [opt-in-link].
+>    groep hebt geaccepteerd: https://play.google.com/apps/testing/ridewindow.joost.amsterdam.
 > 3. **Druk op "Word tester"** op de pagina die daarna verschijnt.
 >
-> Installeren is een aparte, latere stap — die telt niet mee als opt-in. Pas als deze drie
-> stappen staan, sta je bij Google op de lijst, ook al heb je de app al geïnstalleerd.
+> Installeren is een aparte, latere stap, via
+> https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam — die telt niet mee
+> als opt-in. Pas als deze drie stappen staan, sta je bij Google op de lijst, ook al heb je de
+> app al geïnstalleerd.
 >
 > Waarom dit ertoe doet: Ridewindow is de app die ik zelf bouw om in één oogopslag te zien
 > wanneer het deze week goed fietsweer is, afgestemd op je eigen agenda. Om productietoegang
@@ -57,6 +76,10 @@ al ja gezegd. Het gat zit vrijwel zeker op een van drie letterlijke stappen, nie
 zeiden, geen wervende post, dus een plaatje is hier "leuk om te hebben", niet noodzakelijk.
 Wil je er toch een bij: `docs/screenshots/01_home.png`, met dezelfde ververs-kanttekening als
 hierboven.
+
+[Play Console's Testers-tabblad (Closed testing > Alpha > Testers) is leidend voor de
+opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
+tabblad.]
 
 ---
 
@@ -86,7 +109,13 @@ dat de post met toestemming van de beheerder/moderator wordt geplaatst (D-02).
 > op Engels staat) — dat zet je zelf om in Profiel. En vul na het installeren meteen een ruwe
 > week beschikbaarheid in, anders oogt het eerste scherm leeg.
 >
-> Interesse? Reageer hieronder of stuur een bericht, dan stuur ik je de opt-in-link.
+> Zo doe je mee:
+>
+> 1. Reageer hieronder of stuur een bericht, dan voeg ik je toe aan de testersgroep (Google
+>    Groep): [groepslink — groep bestaat nog niet, zie bovenaan dit document].
+> 2. Open de opt-in-link met datzelfde Google-account:
+>    https://play.google.com/apps/testing/ridewindow.joost.amsterdam.
+> 3. Installeer de app: https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam.
 
 **Afbeelding bij de post:** gebruik `docs/screenshots/01_home.png` — het Home-scherm met de
 ritvensters, de kernwaarde van de app in één beeld. Let op: die screenshot is vastgelegd op
@@ -94,6 +123,10 @@ ritvensters, de kernwaarde van de app in één beeld. Let op: die screenshot is 
 is zichtbaar veranderd sindsdien (de Vensters/Blok-schakelaar en de keuze Beste eerst/Op tijd
 uit #69/#70 staan er niet op). Ververs deze screenshot vanaf het toestel vlak vóór de post
 daadwerkelijk de deur uitgaat in Fase 30 — presenteer dit plaatje niet ongezien als actueel.
+
+[Play Console's Testers-tabblad (Closed testing > Alpha > Testers) is leidend voor de
+opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
+tabblad.]
 
 ---
 
@@ -172,9 +205,10 @@ sommige posts te zien maar niet verplicht (norm 1) — aan degene die in Fase 30
 > 09:00–13:00, 4h — Perfect"). Looking for a few testers to help me clear Google's closed-
 > testing requirement — happy to test back.
 >
-> 1. Join the Google Group: [group link]
-> 2. Opt in using the SAME Google account as step 1, at: play.google.com/apps/testing/<id>
-> 3. Install from: play.google.com/store/apps/details?id=<id>
+> 1. Join the Google Group: [group link — group does not exist yet, see the note near the top of this document]
+> 2. Opt in using the SAME Google account as step 1, at:
+>    https://play.google.com/apps/testing/ridewindow.joost.amsterdam
+> 3. Install from: https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam
 >
 > Joining the group alone does not opt you into the test — step 2 is the one Google actually
 > counts. Please stay opted in for **at least 14 consecutive days**; the streak resets if the
@@ -198,6 +232,10 @@ sommige posts te zien maar niet verplicht (norm 1) — aan degene die in Fase 30
 de Facebookgroep: die screenshot is van 2026-09-10, versie 1.0.30 (`0704c39`); ververs hem
 vanaf het toestel vlak vóór verzending in Fase 30 — Home is sindsdien zichtbaar veranderd
 (#69/#70).
+
+[Play Console's Testers-tabblad (Closed testing > Alpha > Testers) is leidend voor de
+opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
+tabblad.]
 
 ---
 
