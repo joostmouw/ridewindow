@@ -1,9 +1,9 @@
-# Testers changelog — Ridewindow
+# Testers changelog: Ridewindow
 
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
-## Build 45 — 1.0.34+45
+## Build 45: 1.0.34+45
 
 **Datum:** 2026-09-20
 **Track:** Internal testing, geüpload op 2026-09-20 met
@@ -13,14 +13,14 @@ testers brengt.
 
 **Inhoud**
 - Alles uit build 43 en 44, zie de blokken daaronder
-- "Longest ride here" zei bijna altijd 2 uur — een artefact van de dedup, die
+- "Longest ride here" zei bijna altijd 2 uur, een artefact van de dedup, die
   een lang venster weggooide voor het korte venster dat erin zat (`93d9e27`)
 - Releasepapier: notities bij de upload en dit blok zelf
 
-**Feedback opgelost:** geen nieuwe boven op 43 en 44 — Ingrid's #69 en #70 zitten
+**Feedback opgelost:** geen nieuwe boven op 43 en 44. Ingrid's #69 en #70 zitten
 in 43, en de "longest ride here"-tekst hierboven haalt daar de laatste scherpte af.
 
-## Build 44 — 1.0.33+44
+## Build 44: 1.0.33+44
 
 **Datum:** 2026-09-20
 **Track:** nooit naar Play gegaan. Sideload op de Oppo, tweede verificatieronde.
@@ -35,11 +35,11 @@ in 43, en de "longest ride here"-tekst hierboven haalt daar de laatste scherpte 
 - Zwarte schermbug bij info → OK in Profiel: de OK-knop popte de pagina in
   plaats van de dialoog (`9adaff6`)
 
-**Feedback opgelost:** geen — dit was een eigen ronde op het toestel, die vijf
+**Feedback opgelost:** geen. Dit was een eigen ronde op het toestel, die vijf
 dingen vond die alleen op glas te zien zijn. De "longest ride here"-fix volgde ná
 de bump en zat al wel in de sideload op de Oppo; naar de testers gaat hij via 45.
 
-## Build 43 — 1.0.32+43
+## Build 43: 1.0.32+43
 
 **Datum:** 2026-09-19
 **Track:** nooit naar Play gegaan. Sideload op de Oppo, voor de verificatieronde
@@ -71,23 +71,23 @@ van 19 september.
 **Feedback opgelost:** Ingrid (tester) vroeg op 2026-09-09 om het aaneengesloten
 goede blok (#69) en om te zien waarom dit venster (#70). Beide staan in deze
 build: de blokweergave hierboven. De tester op Aruba zag "licht van 01:32 tot
-13:29" — de app rekende de zon voor Amsterdam en tekende hem op de klok van
+13:29". De app rekende de zon voor Amsterdam en tekende hem op de klok van
 Aruba; de locatiefix hierboven is het antwoord (`351e0f4`).
 
-## Build 42 — 1.0.31+42
+## Build 42: 1.0.31+42
 
 **Datum:** 2026-09-10
 **Track:** Internal testing → Closed testing "Alpha" (actief sinds 2026-09-10 23:24,
 beschikbaar voor de geselecteerde testers)
 
 **Inhoud**
-- De app heet Ridewindow, overal waar een gebruiker de naam ziet — app, winkelpagina,
+- De app heet Ridewindow, overal waar een gebruiker de naam ziet: app, winkelpagina,
   privacybeleid en PWA zeggen nu hetzelfde (`a28886f`)
 - De openingsintro is twee keer zo kort: 2,47 s in plaats van 4,94 s (`059e352`)
 
-**Feedback opgelost:** geen — dit was een eigen keuze (merknaam en een snellere start).
+**Feedback opgelost:** geen. Dit was een eigen keuze (merknaam en een snellere start).
 
-## Build 41 — 1.0.30+41
+## Build 41: 1.0.30+41
 
 **Datum:** 2026-09-10
 **Track:** Closed testing "Alpha"
@@ -103,6 +103,6 @@ beschikbaar voor de geselecteerde testers)
 
 **Feedback opgelost:** Ingrid (tester) vroeg op 2026-09-09 of de app rekening houdt met
 het moment van zonsondergang. Daaruit kwam backlog **#68**, en de daglichtscore hierboven
-is het antwoord — de eerste testerfeedback die tot een uitgeleverde wijziging leidde.
+is het antwoord, de eerste testerfeedback die tot een uitgeleverde wijziging leidde.
 Uit diezelfde melding kwamen ook #69 (het groene blok) en #70 (waarom dit venster), die
 nog openstaan.

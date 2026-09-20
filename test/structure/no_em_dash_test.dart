@@ -100,4 +100,30 @@ void main() {
 
     expect(offenders, isEmpty, reason: offenders.join('\n'));
   });
+
+  // De teksten die buiten `lib/` om bij een gebruiker komen. Joost las ze op
+  // 2026-09-20 terug in de Play Store, vol kwadraatstreepjes: de regel gold
+  // wel voor de app en niet voor de winkelpagina, en dus dreef het uit
+  // elkaar. Wat een tester of een bezoeker leest, telt hier mee.
+  test('geen em-dash in de teksten die buiten de app om gelezen worden', () {
+    const paths = ['docs/store-listing.md', 'docs/testers/changelog.md'];
+    final offenders = <String>[];
+
+    for (final path in paths) {
+      final file = File(path);
+      expect(file.existsSync(), isTrue, reason: '$path bestaat niet meer');
+      final lines = file.readAsLinesSync();
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].contains(_emDash)) offenders.add('$path:${i + 1}: ${lines[i]}');
+      }
+    }
+
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'Em-dashes horen ook niet in wat een tester of een bezoeker '
+          'van de winkelpagina leest. Gebruik een dubbele punt of een punt.\n'
+          '${offenders.join('\n')}',
+    );
+  });
 }
