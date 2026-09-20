@@ -59,6 +59,10 @@ vertrouwen; de App bundle explorer in de Console wel. Vandaar de sprong naar 41.
 
 ## 5. Losse einden zonder ticket
 
+- **Er is geen push.** Een uitnodiging, een stem op een venster of een verzette tijd bereikt de ander pas als die de app zelf opent. Dat raakt slice 2 direct. Push vereist FCM (nieuwe dependency, Google-sleutel, derde sub-processor) of Supabase Realtime (geen nieuwe partij, maar werkt alleen met de app open). Beslissing staat open; zie slice 4 van [[65]].
+- **`calendar_service.dart` zet nog `?km/u wind` in Google Calendar-events** -- hardgecodeerd Nederlands én in km/u. Ontsnapt aan zowel de i18n-sweep als de eenhedenkeuze van 2026-09-20.
+- **De regentolerantie op de Oppo staat op 1,9 mm** door een verdwaalde tik tijdens de toestelronde; hij stond op 2,3. De temperatuur (12-30) is wel hersteld.
+
 - ~~**De radii vormen geen systeem.**~~ ✅ **Opgelost 2026-09-19** — elke maat heeft een naam in `AppShapes` die zegt bij welk soort object hij hoort (hair/cell/xs/sm/md/lg/xl/panel/card). Nul hardgecodeerde radii over. Bewust **niet** naar de Material 3-schaal toegerekend: 24 op ritkaarten was een gemaakte keuze in v4.0.
 - ~~**`ScoreBadge` staat naast `ScoreDisplay`**~~ — **nagekeken 2026-09-19: dit is opzet, geen drift.** `score_display.dart` legt uit dat de badge blijft voor de compacte plekken waar een hele regel niet past; hij staat op de PLANNED-rijen en in de detail-AppBar. Niets aan gedaan.
 - **iOS-verificatie:** vijf vinkjes in `19-auth/REGRESSION-CHECKLIST.md`, geen iPhone in het project.

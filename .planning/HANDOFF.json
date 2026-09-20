@@ -1,57 +1,67 @@
 {
-  "timestamp": "2026-09-19T21:00:00.000Z",
-  "reason": "Lange werkdag afgesloten: alle vier Joosts punten af plus zes dingen die onderweg opkwamen. Context mag gewist.",
-  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store' — fase 26 'Console op orde' is voor 1 van de 4 plannen af",
+  "timestamp": "2026-09-20T09:25:00.000Z",
+  "reason": "Twee sessies aaneen (19 september avond + 20 september ochtend). Alles gepusht, werkende boom, context mag gewist.",
+  "phase": "Milestone v4.1 'Zo snel mogelijk live in de store' -- fase 26 'Console op orde' is voor 1 van de 4 plannen af. Daarnaast is slice 2 van epic #65 gebouwd, buiten de roadmap om.",
   "position": {
-    "last_commit": "834bf6a",
-    "last_activity": "25 commits op 2026-09-19; flutter analyze zonder fouten of waarschuwingen, 661 tests groen"
+    "last_commit": "93d9e27",
+    "version": "1.0.33+44, geinstalleerd op de Oppo als sideload",
+    "last_activity": "693 tests groen, flutter analyze schoon, origin/main gelijk aan lokaal"
   },
   "start_here": [
-    ".planning/STATE.md — de tabel 'Quick Tasks Completed' bovenaan heeft de regels van vandaag",
-    ".planning/OPEN.md — losse einden, twee ervan zijn vandaag doorgestreept",
-    ".planning/ROADMAP.md — fase 26 t/m 32",
-    "De vier quick-taken van vandaag staan elk met een SUMMARY in .planning/quick/"
+    ".planning/STATE.md -- de tabel 'Quick Tasks Completed' bovenaan",
+    ".planning/OPEN.md -- losse einden",
+    ".planning/BACKLOG.md -- nieuw: epic #75 'Dicht huis' (bots, nepaccounts, hardening)",
+    "Deze handoff: 'wacht_op_joost' en 'openstaand_werk'"
   ],
-  "afgerond_op_2026_09_19": [
-    "#67 notificaties volgen de app-taal (3a1beaf) — bleek bedrading, niet vertaling: de negen sleutels stonden al in beide ARB's",
-    "Aruba-tijdzone, richting A (351e0f4) — drie oorzaken; de app volgt nu de fietser en zegt het als hij hem kwijt is. Diagnose met bewijs: https://claude.ai/artifact/Kvof7uzvxx43EUFicVDTPX",
-    "Analytics met expliciete toestemming (66286f4, 3efcae2) — privacy-constraint in CLAUDE.md bewust herschreven",
-    "De drie notificatieschakelaars in Profiel deden niets en doen nu iets (5d4db64)",
-    "#66 afgezegde ritten zijn weer te vinden (265e282)",
-    "#63 geen doodlopende schermen meer op de iOS-webapp (99600e4), met een structuurtest als vangnet",
-    "De 'zet op beginscherm'-balk is weg te klikken (b84bd16) — D-04 uit fase 16 bewust teruggedraaid",
-    "#69/#70 blokweergave als keuze naast de vensterlijst (18507d7 t/m a360573) — vijf correctierondes van Joost, zie de SUMMARY",
-    "Daglichtbalk spreekt nu dezelfde taal als de andere drie weerbalken (d072e45)",
-    "#73 consistentie-sweep (ff47f2e, a388701) — 19 waarschuwingen naar 0, elke radius benoemd"
+  "afgerond_in_deze_sessie": [
+    "Analytics-rapport werkt (6475504): 0009 gaf service_role de select die 0008 wel opschreef maar nooit gaf. Migratie is gedraaid en nagemeten.",
+    "Privacybeleid herschreven voor de statistiek en voor wat een maatje ziet (187ca5b, 1738a93). Live op GitHub Pages, hash-geverifieerd. De link in de app was sinds juli een 404 (F-8) en wijst nu goed.",
+    "Wachtkamer voor gebeurtenissen van voor de toestemming (8a67953) -- first_run en onboarding_done konden anders nooit aankomen.",
+    "Vier ongebruikte analytics-namen aangesloten (5bb7fec).",
+    "Peloton slice 2 (008b516): meerdere vensters voorleggen, stemmen, organisator kiest. Migratie 0010 is gedraaid en nagemeten (tabellen bestaan, 42501 in plaats van PGRST205).",
+    "Daglicht-uitleg: de info is nu dezelfde sheet als de andere drie balken (ea75154), en het gewicht staat niet meer op de balk.",
+    "Geen em-dashes meer in de app (ae161d0), met een structuurtest die het bewaakt.",
+    "Uitgelogd vertrok er bij het opstarten niets uit de outbox (e0aab7a). Gevonden op het toestel; feedback en statistiek van een uitgelogde gebruiker bleven liggen tot er toevallig een voorgrond-overgang kwam.",
+    "Eenheden: Fahrenheit, Beaufort en mph in Profiel (9adaff6). Omrekening alleen bij het tekst worden; de motor blijft in Celsius en km/u.",
+    "Zwarte schermbug bij info -> OK in Profiel (9adaff6). De OK-knop popte de pagina in plaats van de dialoog; alleen zichtbaar binnen de go_router-shell.",
+    "'Longest ride here' zei bijna altijd 2 uur (93d9e27) -- artefact van dedup. Op het toestel nagemeten: nu 5 en 3 uur op de eerste twee dagen."
   ],
-  "blockers": [],
   "wacht_op_joost": [
     {
-      "task": "SUPABASE_SERVICE_ROLE_KEY in de omgeving",
-      "description": "Project Settings > API > service_role. Nodig voor tool/analytics_report.dart; die leest buiten de app om, want app_events heeft met opzet geen select-grant.",
+      "task": "Regentolerantie terugzetten naar 2,3 mm",
+      "description": "Staat nu op 1,9 mm door een verdwaalde tik van Claude tijdens de toestelronde. De temperatuur (12-30) is al hersteld. Claude kan het ook doen met adb.",
+      "owner": "Joost of Claude"
+    },
+    {
+      "task": "Data Safety indienen in de Play Console",
+      "description": "De twee nieuwe rijen staan uitgeschreven in docs/CONSOLE-SETUP-CHECKLIST.md: App interactions en Device or other IDs, beide optioneel, doel Analytics.",
       "owner": "Joost"
     },
     {
-      "task": "Privacybeleid en Data Safety bijwerken voor analytics",
-      "description": "Een alinea over anonieme statistiek na toestemming, en in de Play Console 'App activity > App interactions', optioneel, niet gedeeld met derden. Teksten kan Claude schrijven, indienen doet Joost.",
+      "task": "Tweede account op een toestel voor Peloton",
+      "description": "Nodig voor slice 2 (stemmen op vensters), het filter Afgezegd, en de openstaande controle of joost.oppo na opnieuw inloggen in de maatjeslijst verschijnt.",
       "owner": "Joost"
-    },
-    {
-      "task": "De Oppo aansluiten voor de verificatielijst",
-      "description": "Niets van vandaag is op glas gezien. Na te lopen: de locatiebanner in beide helderheden, de toestemmingsvraag bij de tweede start, een melding die echt afgaat in de goede taal en op de goede tijd, het filter 'Afgezegd' met de knop 'Toch meegaan' (vraagt twee ingelogde accounts), en de nieuwe keuzerij op Home. De install-balk kan alleen op een echte iPhone in Safari.",
-      "owner": "Joost sluit aan, Claude loopt na"
     }
   ],
   "openstaand_werk": [
-    "Fase 26 plannen 02, 03 en 04 — release-route via internal, landen open, feedbackadres, Google Group, nl-NL winkelpagina",
-    "#70 is maar half af: de dagbalk toont nu alle vensters van een dag met hun tint, dus het alternatief is zichtbaar. De score van het weggegooide venster nog niet, en dat was Ingrids letterlijke vraag",
-    "#74 (nieuw vandaag) meldingen laten werken zonder dat de app geopend wordt. De achtergrondtaak heeft geen tz.initializeTimeZones() en geen tijdzone van het toestel; daar plannen zou tz.local op UTC laten staan. Niet op te lossen zonder toestel",
-    "Stand 2 van de schets was oorspronkelijk groter bedoeld; Joost koos bewust voor een knop tussen twee weergaven in plaats van één model"
+    "Fase 26 plannen 02, 03 en 04 -- release-route via internal, landen open, feedbackadres, Google Group, nl-NL winkelpagina",
+    "Epic #75 'Dicht huis' (nieuw): niets in de app kent een snelheidsbegrenzing. anon mag feedback en app_events vullen; een script kan dat miljoenen keren doen. Volgorde staat in de backlog: eerst meten, dan de twee open deuren, dan een teller op redeem_friend_invite, captcha achteraan.",
+    "#74 meldingen zonder dat de app geopend wordt -- de achtergrondtaak mist tz.initializeTimeZones().",
+    "Er is geen push: een uitnodiging of een stem op een venster bereikt de ander pas als die de app opent. Slice 4 van #65, en het raakt slice 2 direct.",
+    "calendar_service.dart zet nog '?km/u wind' in Google Calendar-events, hardgecodeerd Nederlands en in km/u -- ontsnapt aan zowel de i18n-sweep als de eenhedenkeuze.",
+    "Het privacybeleid belooft twaalf maanden bewaartermijn voor app_events en niets dwingt dat af.",
+    "i18n: in ongeveer twaalf bestanden staan strings nog hardgecodeerd."
+  ],
+  "niet_op_glas_gezien": [
+    "De verse eerste start met de toestemmingsvraag bij de tweede start. Het debugmenu heeft nu 'Statistiek-toestemming terugzetten' zodat dit herhaalbaar is -- pm clear weigert ColorOS en deinstalleren laat Android's back-up de oude staat terugzetten.",
+    "Een melding die echt afgaat, in de goede taal en op de goede tijd.",
+    "Slice 2 met twee accounts.",
+    "De installatiebalk op een echte iPhone in Safari."
   ],
   "notes": [
-    "Migratie 0008 is op 2026-09-19 gedraaid via de Supabase SQL Editor en geverifieerd met een query die wél een resultaat teruggeeft (die editor toont geen NOTICE-output, dus een geslaagde en een stilletjes overgeslagen run zien er anders hetzelfde uit): 9 kolommen, RLS aan, 1 policy, 3 indexen, rechten precies 'anon:INSERT, authenticated:INSERT' -- geen select, geen update. Nul rijen.",
-    "Webserver draait op 8766 met de laatste build (build/web). Na elke flutter build web is een harde herlaad nodig (Cmd+Shift+R), anders serveert de browsercache de oude bundel.",
-    "Remote Control stond aan op de sessie van vandaag; opnieuw aanzetten kan met /remote-control of /rc.",
-    "De les uit de vijf correctierondes op de blokweergave staat in .planning/quick/260919-h2c-blokweergave/SUMMARY.md: een ordinale schaal teken je als schaal, niet als palet. Kaartkleuren en balkkleuren zijn niet hetzelfde probleem."
+    "Waargenomen maar onverklaard: tijdens de toestelronde belandde de app na OK in een infovenster eenmalig op het ritdetail. Daarna niet meer te reproduceren; de fix en de test zijn omgekeerd geverifieerd (met de bug erin valt de test om).",
+    "De Oppo-ronde loopt via adb: monkey -p ridewindow.joost.amsterdam om te starten, input tap/swipe, exec-out screencap -p. Tikken onderaan het scherm (y > 2550) openen soms de camera; blijf erboven.",
+    "Android zette bij een herinstallatie de oude app-data terug uit een back-up. Een verse installatie is dus niet vanzelf een eerste start.",
+    "Migraties 0009 en 0010 zijn allebei gedraaid en nagemeten. 0011 bestaat niet: de eenhedenkeuze staat lokaal, met opzet."
   ]
 }
