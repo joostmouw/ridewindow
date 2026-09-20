@@ -9,14 +9,14 @@ om regelmatig te openen, het waarom, de terugkoppel-belofte en de eerste-minuut-
 (D-07). Dit document levert de tekst, niet de verzending: versturen, uitnodigen en
 bijhouden horen bij Fase 30 (WERV-03 t/m WERV-05).
 
-**Afbeelding bij de posts (deviatie op verzoek van Joost tijdens de Task 1-checkpoint):**
-elke sectie hieronder draagt een eigen `**Afbeelding bij de post:**`-regel met instructie.
-Het basisplaatje is `docs/screenshots/01_home.png`: het Home-scherm met de ritvensters, de
-kernwaarde van de app in één beeld. Let op bij elk gebruik: die screenshot is vastgelegd op
-2026-09-10 voor versie 1.0.30 (commit `0704c39`); de app staat inmiddels op 1.0.35+46 en Home
-is zichtbaar veranderd sindsdien (de Vensters/Blok-schakelaar en de keuze Beste eerst/Op tijd
-uit #69/#70 staan er niet op). Ververs de screenshot vanaf het toestel vlak vóór een post
-daadwerkelijk de deur uitgaat in Fase 30; presenteer dit plaatje nooit ongezien als actueel.
+**Afbeelding bij de posts (deviatie op verzoek van Joost tijdens de Task 1-checkpoint,
+ververst tijdens Task 3):** elke sectie hieronder draagt een eigen
+`**Afbeelding bij de post:**`-regel met instructie. Het basisplaatje is
+`docs/promo/home-1.0.35.jpg`: het Home-scherm met de ritvensters, de kernwaarde van de app
+in één beeld. Vastgelegd op 2026-09-20 om 14:32 op de huidige build (1.0.35+46) en toont de
+Vensters/Blok-schakelaar, de keuze Beste eerst/Op tijd (#69/#70), de dagstrip, een geplande
+rit en een "100 Toprit"-kaart. Dit plaatje is actueel; de eerdere kanttekening over een
+verouderde screenshot (versie 1.0.30) is daarmee vervallen.
 
 **Controlepunt vóór verzending (Fase 26 plan 03): geen taak voor de lezer van de tekst.** De
 testersgroep bestaat al: https://groups.google.com/g/ridewindow-testers. Vóór een van de drie
@@ -67,8 +67,7 @@ al ja gezegd. Het gat zit vrijwel zeker op een van drie letterlijke stappen, nie
 
 **Afbeelding bij de post:** optioneel: dit is een procedurenotitie aan mensen die al ja
 zeiden, geen wervende post, dus een plaatje is hier "leuk om te hebben", niet noodzakelijk.
-Wil je er toch een bij: `docs/screenshots/01_home.png`, met dezelfde ververs-kanttekening als
-hierboven.
+Wil je er toch een bij: `docs/promo/home-1.0.35.jpg` (zie hierboven, actueel per 2026-09-20).
 
 [Play Console's Testers-tabblad (Closed testing > Alpha > Testers) is leidend voor de
 opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
@@ -113,12 +112,9 @@ dat de post met toestemming van de beheerder/moderator wordt geplaatst (D-02).
 > Reageer gerust hieronder als je meedoet, leuk om te weten wie er zit, en dan kan ik je ook
 > gericht om feedback vragen.
 
-**Afbeelding bij de post:** gebruik `docs/screenshots/01_home.png`: het Home-scherm met de
-ritvensters, de kernwaarde van de app in één beeld. Let op: die screenshot is vastgelegd op
-2026-09-10 voor versie 1.0.30 (commit `0704c39`); de app staat inmiddels op 1.0.35+46 en Home
-is zichtbaar veranderd sindsdien (de Vensters/Blok-schakelaar en de keuze Beste eerst/Op tijd
-uit #69/#70 staan er niet op). Ververs deze screenshot vanaf het toestel vlak vóór de post
-daadwerkelijk de deur uitgaat in Fase 30; presenteer dit plaatje niet ongezien als actueel.
+**Afbeelding bij de post:** gebruik `docs/promo/home-1.0.35.jpg`: het Home-scherm met de
+ritvensters, de kernwaarde van de app in één beeld. Vastgelegd op 2026-09-20 op de huidige
+build (1.0.35+46); actueel.
 
 [Play Console's Testers-tabblad (Closed testing > Alpha > Testers) is leidend voor de
 opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
@@ -224,10 +220,8 @@ sommige posts te zien maar niet verplicht (norm 1); aan degene die in Fase 30 po
 >
 > Thanks!
 
-**Afbeelding bij de post:** gebruik `docs/screenshots/01_home.png`. Zelfde kanttekening als bij
-de Facebookgroep: die screenshot is van 2026-09-10, versie 1.0.30 (`0704c39`); ververs hem
-vanaf het toestel vlak vóór verzending in Fase 30; Home is sindsdien zichtbaar veranderd
-(#69/#70).
+**Afbeelding bij de post:** gebruik `docs/promo/home-1.0.35.jpg`. Zelfde plaatje als bij de
+Facebookgroep: vastgelegd op 2026-09-20 op de huidige build (1.0.35+46); actueel.
 
 [Play Console's Testers-tabblad (Closed testing > Alpha > Testers) is leidend voor de
 opt-in-link hierboven; wijkt dat tabblad op het moment van versturen af, dan wint het
