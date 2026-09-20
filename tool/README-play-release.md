@@ -107,6 +107,34 @@ merken duur is:
 `--force` zet de eerste vangrail uit. De tweede niet — die is een feit, geen
 vermoeden.
 
+## Promoveren zonder opnieuw te uploaden
+
+Een build die op internal getest is, hoort naar de gesloten test te gaan als
+*dezelfde bytes*. Opnieuw uploaden kan niet (Play weigert een bestaande
+versionCode) en zou die garantie ook weggooien. Daarom:
+
+```bash
+dart run tool/play_upload.dart --list-tracks
+dart run tool/play_upload.dart --promote 46 --track alpha \
+  --notes en-US:release-notes/en-US.txt \
+  --notes nl-NL:release-notes/nl-NL.txt
+```
+
+`--list-tracks` bestaat omdat de naam van een gesloten track niet te raden is:
+"Alpha" in de Console heet `alpha` in de API, maar een zelfgemaakte track
+krijgt een gegenereerde naam. Zonder die lijst is de Console de enige plek waar
+je het kunt zien. De uitvoer toont meteen welke build op welke track staat:
+
+```
+  production   (leeg)
+  beta         (leeg)
+  alpha        1.0.35 (46) [46] completed
+  internal     1.0.35 (46) [46] completed
+```
+
+Let op: een promotie naar een gesloten of open track gaat langs de review van
+Google; internal niet. De testers zien de build dus niet meteen.
+
 ## Opties
 
 | Optie | Standaard | |

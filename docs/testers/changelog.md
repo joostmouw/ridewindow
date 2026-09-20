@@ -6,7 +6,9 @@
 ## Build 46: 1.0.35+46
 
 **Datum:** 2026-09-20
-**Track:** Internal testing.
+**Track:** Internal testing, diezelfde middag gepromoveerd naar de gesloten
+test (`alpha`) met `--promote 46`, dus exact dezelfde bytes die op internal
+geverifieerd zijn.
 
 **Inhoud**
 - **De app crashte na elke herstart van het toestel.** `AndroidManifest.xml`

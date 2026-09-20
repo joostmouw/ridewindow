@@ -50,6 +50,13 @@ Uploadt een release-AAB naar Google Play.
   --force            Upload ook als de AAB niet bij de huidige broncode lijkt te horen.
   --dry-run          Controleert alles en logt in, maar schrijft niets naar Play.
   --help             Deze tekst.
+
+Zonder te uploaden:
+
+  --promote <code>   Zet een versionCode die al op Play staat op --track.
+                     Geen upload, geen AAB nodig. Bijv.:
+                       --promote 46 --track alpha
+  --list-tracks      Toont welke tracks er zijn en welke builds erop staan.
 ''';
 
 Future<void> main(List<String> args) async {
@@ -85,6 +92,34 @@ Future<int> _run(List<String> args) async {
     stderr.writeln('✗ Onbekende status "$status". '
         'Kies uit: ${_validStatuses.join(', ')}.');
     return 64;
+  }
+
+  // Twee routes die geen bundel nodig hebben. Ze staan bewust vóór de
+  // AAB-controles: promoveren gaat over een build die al op Play staat, en
+  // die hoeft hier niet meer op schijf te liggen.
+  final promoteCode = opts['promote'];
+  final listTracks = flags.contains('list-tracks');
+  if (promoteCode != null && int.tryParse(promoteCode) == null) {
+    stderr.writeln('✗ --promote verwacht een versionCode, geen "$promoteCode".');
+    return 64;
+  }
+
+  if (promoteCode != null || listTracks) {
+    final api = await _connect(keyPath);
+    if (api == null) return 66;
+    try {
+      if (listTracks) return await _listTracks(api.$1);
+      return await _promote(
+        api.$1,
+        track: track,
+        versionCode: promoteCode!,
+        status: status,
+        releaseNotes: _readNotes(notesArgs),
+        dryRun: dryRun,
+      );
+    } finally {
+      api.$2.close();
+    }
   }
 
   final aab = File(aabPath);
@@ -180,6 +215,122 @@ Future<int> _run(List<String> args) async {
     );
   } finally {
     client.close();
+  }
+}
+
+/// Logt in en geeft de API plus de client terug, zodat de aanroeper hem kan
+/// sluiten. Apart van `_run` omdat promoveren en tracks tonen dezelfde
+/// inlogstap delen maar geen bundel nodig hebben.
+Future<(play.AndroidPublisherApi, auth.AutoRefreshingAuthClient)?> _connect(
+  String keyPath,
+) async {
+  final key = File(keyPath);
+  if (!key.existsSync()) {
+    stderr.writeln('✗ Geen service-account-sleutel op $keyPath.\n'
+        '  Zie tool/README-play-release.md — het is een eenmalige inrichting.');
+    return null;
+  }
+  final credentials = auth.ServiceAccountCredentials.fromJson(
+    jsonDecode(key.readAsStringSync()) as Map<String, dynamic>,
+  );
+  final client = await auth.clientViaServiceAccount(
+    credentials,
+    [play.AndroidPublisherApi.androidpublisherScope],
+  );
+  stdout.writeln('✓ Ingelogd als ${credentials.email}');
+  return (play.AndroidPublisherApi(client), client);
+}
+
+/// Toont welke tracks er zijn en wat erop staat. Bestaat omdat de naam van een
+/// gesloten track niet te raden is: "Alpha" in de console heet `alpha` in de
+/// API, maar een zelfgemaakte track heeft een gegenereerde naam. Zonder deze
+/// route is de enige manier om dat te weten de Console openen.
+Future<int> _listTracks(play.AndroidPublisherApi api) async {
+  final edit = await api.edits.insert(play.AppEdit(), _packageName);
+  try {
+    final tracks = await api.edits.tracks.list(_packageName, edit.id!);
+    stdout.writeln('');
+    for (final track in tracks.tracks ?? const <play.Track>[]) {
+      final releases = (track.releases ?? const <play.TrackRelease>[])
+          .map(
+            (r) => '${r.name ?? '?'} '
+                '[${(r.versionCodes ?? const []).join(', ')}] ${r.status}',
+          )
+          .join('  |  ');
+      stdout.writeln('  ${track.track?.padRight(12)} '
+          '${releases.isEmpty ? '(leeg)' : releases}');
+    }
+    return 0;
+  } finally {
+    // Alleen gelezen, dus de edit hoeft niet doorgevoerd te worden.
+    await api.edits.delete(_packageName, edit.id!);
+  }
+}
+
+/// Zet een build die al op Play staat op een andere track: precies wat
+/// "Promote release" in de Console doet.
+///
+/// Waarom dit geen upload is: de bundel ligt er al. Hem opnieuw versturen zou
+/// Play weigeren (dezelfde versionCode bestaat al) en zou 66 MB kosten voor
+/// niets. Belangrijker nog, promoveren is juist veilig omdát het dezelfde
+/// bytes zijn als de build die op internal getest is — een tweede upload zou
+/// die garantie weggooien.
+Future<int> _promote(
+  play.AndroidPublisherApi api, {
+  required String track,
+  required String versionCode,
+  required String status,
+  required List<play.LocalizedText> releaseNotes,
+  required bool dryRun,
+}) async {
+  stdout.writeln('\nPromoveren van versionCode $versionCode naar '
+      '"$track" ($status)');
+  if (dryRun) {
+    stdout.writeln('— dry-run: er is niets naar Play geschreven.');
+    return 0;
+  }
+
+  // De releasenaam in de Console. Hoort dezelfde te zijn als op de track waar
+  // hij vandaan komt, dus bij een promotie van de huidige build nemen we de
+  // naam uit pubspec.yaml over; promoveer je een oudere code, dan blijft er
+  // alleen het nummer over en dat is eerlijker dan een naam die niet klopt.
+  final pubspec = _readPubspecVersion();
+  final releaseName = pubspec != null && '${pubspec.code}' == versionCode
+      ? '${pubspec.name} ($versionCode)'
+      : versionCode;
+
+  final edit = await api.edits.insert(play.AppEdit(), _packageName);
+  final editId = edit.id!;
+  stdout.writeln('✓ Edit $editId geopend');
+  try {
+    await api.edits.tracks.update(
+      play.Track(
+        track: track,
+        releases: [
+          play.TrackRelease(
+            name: releaseName,
+            versionCodes: [versionCode],
+            status: status,
+            releaseNotes: releaseNotes.isEmpty ? null : releaseNotes,
+          ),
+        ],
+      ),
+      _packageName,
+      editId,
+      track,
+    );
+    stdout.writeln('✓ Track "$track" wijst nu naar $versionCode');
+    await api.edits.commit(_packageName, editId);
+    stdout.writeln('✓ Edit doorgevoerd\n');
+    stdout.writeln('versionCode $versionCode staat op $track.');
+    return 0;
+  } catch (e) {
+    stderr.writeln('\n✗ Mislukt: $e');
+    try {
+      await api.edits.delete(_packageName, editId);
+      stderr.writeln('  Edit $editId is opgeruimd.');
+    } catch (_) {}
+    return 70;
   }
 }
 
@@ -357,8 +508,8 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
   final opts = <String, String>{};
   final notes = <String>[];
   final flags = <String>{};
-  const valueOptions = {'track', 'aab', 'key', 'status'};
-  const boolFlags = {'help', 'dry-run', 'force'};
+  const valueOptions = {'track', 'aab', 'key', 'status', 'promote'};
+  const boolFlags = {'help', 'dry-run', 'force', 'list-tracks'};
 
   for (var i = 0; i < args.length; i++) {
     final arg = args[i];
