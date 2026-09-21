@@ -1429,7 +1429,7 @@ class SEn extends S {
 
   @override
   String calendarWind(String speed) {
-    return '${speed}km/h wind';
+    return '$speed wind';
   }
 
   @override

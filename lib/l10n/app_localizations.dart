@@ -2626,7 +2626,7 @@ abstract class S {
   /// No description provided for @calendarWind.
   ///
   /// In nl, this message translates to:
-  /// **'{speed}km/u wind'**
+  /// **'{speed} wind'**
   String calendarWind(String speed);
 
   /// No description provided for @calendarSignInCanceled.

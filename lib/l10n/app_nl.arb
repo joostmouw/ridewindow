@@ -452,7 +452,7 @@
   "@calendarEventTitle": {"placeholders": {"timeRange": {"type": "String"}}},
   "calendarNoWeatherData": "Geen weerdata beschikbaar",
   "calendarDry": "droog",
-  "calendarWind": "{speed}km/u wind",
+  "calendarWind": "{speed} wind",
   "@calendarWind": {"placeholders": {"speed": {"type": "String"}}},
   "calendarSignInCanceled": "Inloggen geannuleerd",
   "notifEveningTitle": "Morgen ligt er een fietsmoment klaar",

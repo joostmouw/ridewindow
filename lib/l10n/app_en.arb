@@ -425,7 +425,7 @@
   "calendarEventTitle": "Bike ride {timeRange}",
   "calendarNoWeatherData": "No weather data available",
   "calendarDry": "dry",
-  "calendarWind": "{speed}km/h wind",
+  "calendarWind": "{speed} wind",
   "calendarSignInCanceled": "Sign-in cancelled",
   "notifEveningTitle": "There's a ride window waiting tomorrow",
   "notifEveningBody": "{slot}. Get your bike ready",

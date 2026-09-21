@@ -1432,7 +1432,7 @@ class SNl extends S {
 
   @override
   String calendarWind(String speed) {
-    return '${speed}km/u wind';
+    return '$speed wind';
   }
 
   @override

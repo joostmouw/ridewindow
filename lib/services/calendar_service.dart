@@ -33,7 +33,6 @@ import 'package:crypto/crypto.dart';
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart';
-import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -155,14 +154,19 @@ class CalendarService {
   }
 
   /// [CalendarService.addRideSlotToCalendar] voegt het rijvenster [slot] toe
-  /// aan de primaire Google Calendar van de ingelogde gebruiker.
+  /// aan de primaire Google Calendar van de ingelogde gebruiker, met de
+  /// kant-en-klare [title] en [description] die de aanroeper al heeft
+  /// vertaald en in de juiste eenheden gezet. Deze service is een pure
+  /// datalaag (quick 260921-p3d): geen S, geen BuildContext, geen
+  /// eenhedenkennis -- die verantwoordelijkheid ligt bij ride_detail_screen.dart.
   /// Vraagt OAuth-toestemming on-demand (CAL-02).
   ///
   /// Geeft een [Exception] als de gebruiker annuleert of OAuth mislukt.
   Future<void> addRideSlotToCalendar(
-    RideSlot slot,
-    List<HourlyForecast> forecasts,
-  ) async {
+    RideSlot slot, {
+    required String title,
+    required String description,
+  }) async {
     // Stap 1: Zorg dat GoogleSignIn is geinitialiseerd (lazy).
     await _ensureInitialized();
 
@@ -188,13 +192,7 @@ class CalendarService {
       final calendarApi = CalendarApi(client);
       await _cachePrimaryCalendarAccount(calendarApi);
 
-      // Stap 5: Weersamenvatting opbouwen (CAL-03).
-      final description = buildWeatherSummary(forecasts);
-
-      // Stap 6: Event-titel en Event-object samenstellen.
-      final title =
-          'Fietsrit ${_fmtTime(slot.start)}\u2013${_fmtTime(slot.end)}';
-
+      // Stap 5: Event-object samenstellen met de meegegeven title/description.
       final event = Event(
         summary: title,
         description: description,
@@ -208,10 +206,10 @@ class CalendarService {
         ),
       );
 
-      // Stap 7: Event invoegen in de primaire agenda (CAL-01, CAL-05).
+      // Stap 6: Event invoegen in de primaire agenda (CAL-01, CAL-05).
       await calendarApi.events.insert(event, 'primary');
     } finally {
-      // Stap 8: HTTP-client altijd sluiten (T-09-01-01: token opruimen).
+      // Stap 7: HTTP-client altijd sluiten (T-09-01-01: token opruimen).
       client.close();
     }
   }
@@ -324,49 +322,4 @@ class CalendarService {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Public helpers (testbaar)
-  // ---------------------------------------------------------------------------
-
-  /// Bouwt een één-regel weersamenvatting van forecast-data (CAL-03).
-  /// Voorbeeld: "~18°C, droog, 12km/u wind"
-  /// Geeft "Geen weerdata beschikbaar" terug als [forecasts] leeg is.
-  static String buildWeatherSummary(List<HourlyForecast> forecasts) {
-    if (forecasts.isEmpty) return 'Geen weerdata beschikbaar';
-
-    // Gemiddelde temperatuur.
-    final temps = forecasts
-        .where((f) => f.temperatureC != null)
-        .map((f) => f.temperatureC!)
-        .toList();
-    final tempStr = temps.isEmpty
-        ? '?°C'
-        : '~${(temps.reduce((a, b) => a + b) / temps.length).round()}°C';
-
-    // Totale neerslag.
-    final precips = forecasts
-        .where((f) => f.precipitationMm != null)
-        .map((f) => f.precipitationMm!)
-        .toList();
-    final totalPrecip = precips.isEmpty ? 0.0 : precips.reduce((a, b) => a + b);
-    final precipStr = totalPrecip == 0.0 ? 'droog' : '${totalPrecip.round()}mm';
-
-    // Gemiddelde wind.
-    final winds = forecasts
-        .where((f) => f.windspeedKmh != null)
-        .map((f) => f.windspeedKmh!)
-        .toList();
-    final windStr = winds.isEmpty
-        ? '?km/u wind'
-        : '${(winds.reduce((a, b) => a + b) / winds.length).round()}km/u wind';
-
-    return '$tempStr, $precipStr, $windStr';
-  }
-
-  // ---------------------------------------------------------------------------
-  // Private helpers
-  // ---------------------------------------------------------------------------
-
-  String _fmtTime(DateTime dt) =>
-      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }
