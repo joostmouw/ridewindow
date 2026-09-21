@@ -48,6 +48,10 @@ dart run tool/play_upload.dart --track internal \
   --notes nl-NL:release-notes/nl-NL.txt
 ```
 
+De hele weg naar de testers (lokale APK, PWA, internal, closed) staat in
+`docs/RELEASE-ROUTE.md`. Kort: alles via internal, de PWA op hetzelfde
+releasemoment, en pas na toestelgoedkeuring promoveren naar alpha.
+
 `adb` staat niet op `PATH`:
 
 ```bash

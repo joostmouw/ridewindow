@@ -1,5 +1,9 @@
 # Een release naar Play, in één commando
 
+De plek van dit script in de hele release-route (lokale APK, PWA, internal,
+closed) staat in `docs/RELEASE-ROUTE.md`; hieronder staat alleen wat het
+script doet.
+
 ```bash
 flutter build appbundle --release
 dart run tool/play_upload.dart --track internal \
