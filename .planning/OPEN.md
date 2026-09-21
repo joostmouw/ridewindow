@@ -211,9 +211,10 @@ feature-graphic en de intro-video. Zie `docs/promo/README.md`.
 - **De afdrukken verouderen.** Home toont de week van 21 tot en met 27
   september en een geplande rit op maandag. Voor echte promotie wil je een week
   met louter groene dagen; maak dan nieuwe.
-- **Er zijn drie varianten van de login-animatie** in `photos/`: gewoon, zonder
-  watermerk, en "special edition". In `docs/promo/` staat de versie zonder
-  watermerk. Joost heeft niet bevestigd dat dat de juiste is.
+- ~~**Er zijn drie varianten van de login-animatie**~~ **Bevestigd op
+  2026-09-21:** de versie zonder watermerk, en die stond al in `docs/promo/`.
+  Joost zag de drie naast elkaar en koos deze. De keuze staat in
+  `docs/promo/README.md`, zodat de vraag niet terugkomt.
 
 ---
 

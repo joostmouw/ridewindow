@@ -38,8 +38,10 @@ dagen verkoopt beter dan een rij met regen.
 ## De filmpjes
 
 In `photos/` staan vier mp4's, waarvan drie varianten van dezelfde
-login-animatie: gewoon, zonder watermerk, en "special edition". Hier staat de
-versie zonder watermerk. De andere blijven in `photos/`.
+login-animatie: gewoon, zonder watermerk, en "special edition". **Joost koos op
+2026-09-21 de versie zonder watermerk**, na ze naast elkaar te hebben gezien:
+dat is het beste filmpje. Die staat hier als `intro.mp4`; de andere twee
+blijven in `photos/` en hoeven niet opnieuw beoordeeld te worden.
 
 `photos/*.mp4` staat in `.gitignore` en die keuze is hier aangehouden: de
 `intro.mp4` in deze mapjes wordt niet meegecommit. De repo is openbaar en tien
