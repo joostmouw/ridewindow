@@ -1,6 +1,4 @@
-The peloton has a mark of its own.
+Sign in with any email address. A Google account is no longer required.
 
-On a planned ride you see what kind of ride it is: three cyclists for a
-group ride, a single cyclist when you go alone. A megaphone means you are
-organising it. Below it you see who said yes: one cyclist per person, faded
-while someone still has to answer.
+In your profile you can now create an account with an email address and a
+password. New accounts are confirmed by email first.

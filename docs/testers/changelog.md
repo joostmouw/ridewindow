@@ -3,6 +3,21 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 50: 1.0.39+50
+
+**Datum:** 2026-09-21
+**Track:** Internal testing. De gesloten test volgt pas na toestelgoedkeuring
+van Joost (release-route, `docs/RELEASE-ROUTE.md`)
+
+**Inhoud**
+- Inloggen kan nu met elk e-mailadres in plaats van alleen Google: in Profiel
+  staat "Inloggen met e-mail" onder "Inloggen met Google" (OPEN.md punt 11)
+- Een account maak je in hetzelfde scherm aan met een e-mailadres en een
+  wachtwoord; een nieuw account moet eerst per e-mail bevestigd worden
+  voordat inloggen werkt
+- Daarna werkt alles hetzelfde als bij Google: instellingen en geplande ritten
+  worden weer gesynchroniseerd
+
 ## Build 49: 1.0.38+49
 
 **Datum:** 2026-09-21

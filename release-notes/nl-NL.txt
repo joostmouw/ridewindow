@@ -1,6 +1,4 @@
-Het peloton heeft een eigen teken.
+Inloggen kan nu met elk e-mailadres. Een Google-account is niet meer nodig.
 
-Bij een geplande rit zie je links wat voor rit het is: drie fietsers bij een
-groepsrit, een enkele fietser als je alleen gaat. Een megafoon zegt dat jij
-hem organiseert. En eronder zie je wie al ja zei: een fietsje per persoon,
-doorzichtig zolang iemand nog moet antwoorden.
+Maak in Profiel een account aan met een e-mailadres en een wachtwoord. Een
+nieuw account bevestig je eerst per e-mail.
