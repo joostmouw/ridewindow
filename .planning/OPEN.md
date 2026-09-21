@@ -123,19 +123,16 @@ het privacybeleid.
 
 ---
 
-## 4. De vastgeprikte "20 testers"-post op r/AndroidClosedTesting
+## 4. De testerseis is twaalf, niet twintig: nagekeken op 2026-09-21
 
-**Prioriteit: laag, kost één blik.**
-
-De vastgeprikte community-post van die subreddit heet "App testing requirements
-for new personal developer accounts, a minimum of 20 testers". De hele
-milestone-rekensom gaat uit van **twaalf**, wat is wat Play Console voor dit
-project toont.
-
-Vermoedelijk is de vastgeprikte post verouderd (Google verlaagde het aantal
-medio 2025), maar dat is een aanname. Play Console is leidend. Eén controle
-daar sluit het af. Als het tóch twintig is, verandert de rekensom in
-`.planning/phases/27-wervingsonderzoek/27-KANALEN.md` en het doel van fase 30.
+**Status: rond.** Google's eigen hulppagina zegt twaalf testers, veertien dagen
+ononderbroken, voor persoonlijke ontwikkelaarsaccounts van na 13 november 2023:
+<https://support.google.com/googleplay/android-developer/answer/14151465>. De
+eis stond ooit op twintig en is in december 2024 verlaagd. De vastgeprikte post
+op r/AndroidClosedTesting is dus achterhaald, en de rekensom in
+`.planning/phases/27-wervingsonderzoek/27-KANALEN.md` en het doel van fase 30
+kloppen zoals ze staan. Play Console blijft leidend als de twee ooit uiteen
+gaan lopen.
 
 ---
 
@@ -183,20 +180,26 @@ rekensom.
 
 ---
 
-## 7. Fase 26 staat nog als open in de ROADMAP-checklist
+## 7. Fase 26: beide resterende controles zijn gedaan op 2026-09-21
 
-De checklistregel voor fase 26 is niet afgevinkt, terwijl alle vier de plannen
-een SUMMARY hebben en de meeste openstaande Console-punten op 20 en 21
-september zijn afgerond:
+De checklistregel stond open op twee punten, en allebei zijn ze nu nagekeken
+met de Play Developer API in plaats van met een ronde door de Console:
 
-- Landen/regio's staan op 177 van 177. **Gedaan.**
-- Feedbackadres is ingevuld. **Gedaan**, zie punt 3 voor de vraag welk adres.
-- Google Groep bestaat en is gekoppeld. **Gedaan op 21 september.**
-- Release-route via internal. **Gedaan**, `tool/play_upload.dart` werkt.
+- **De nl-NL winkelpagina bestaat wel.** Titel "Ridewindow", korte omschrijving
+  73 van 80 tekens, volledige 1255 van 4000. En-GB staat er net zo bij. De
+  notitie dat nl-NL ontbrak stamt van 10 september en is sindsdien ingehaald.
+- **De changelog loopt vanaf build 41**, nu inclusief build 53
+  (`docs/testers/changelog.md`).
 
-Wat nog nagekeken moet worden voordat je de regel afvinkt: de **nl-NL
-winkelpagina** (die ontbrak nog op 10 september) en de **changelog vanaf build
-41**. Controleer die twee in de Console, vink dan af.
+Dat controleren kost sinds vandaag één commando, en dat is het punt:
+
+```bash
+dart run tool/play_upload.dart --list-listings
+```
+
+De rest van fase 26 was al af (landen op 177 van 177, feedbackadres ingevuld,
+Google Groep gekoppeld, release-route via internal). **De checklistregel in de
+ROADMAP kan afgevinkt worden.**
 
 ---
 

@@ -3,6 +3,24 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 53: 1.0.42+53
+
+**Datum:** 2026-09-21
+**Track:** Internal testing en, op verzoek dezelfde dag, closed testing (Alpha)
+
+**Inhoud**
+- De welkomstintro heeft geluid gekregen: een echte fietsopname die opstart en
+  uitrijdt, met trillingen die de hoorbaarheid van de clip volgen. Tikken slaat
+  de intro nog steeds over
+- De opname lag al klaar maar mocht niet mee in een release zolang niet
+  vaststond onder welke licentie hij valt. Dat is nu uitgezocht: Pixabay
+  Content License, commercieel gebruik en bewerken toegestaan, geen
+  naamsvermelding verplicht
+- Elk beeld- en geluidsbestand in de app heeft sindsdien een herkomst die naast
+  het bestand staat, ook de intro-animatie
+- Eén adres voor de hele app: het privacybeleid noemde nog een ander adres dan
+  de Play Console. Beide staan nu op joostmouw@gmail.com
+
 ## Build 52: 1.0.41+52
 
 **Datum:** 2026-09-21

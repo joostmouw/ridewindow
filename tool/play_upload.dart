@@ -62,6 +62,9 @@ Zonder te uploaden:
                      worden. Bijv.:
                        --set-notes 48 --track internal
   --list-tracks      Toont welke tracks er zijn en welke builds erop staan.
+  --list-listings    Toont per taal de winkelpagina: titel, korte en
+                     volledige omschrijving, met hun lengte tegen de
+                     grenzen van Play. Leest alleen.
 ''';
 
 Future<void> main(List<String> args) async {
@@ -105,6 +108,7 @@ Future<int> _run(List<String> args) async {
   final promoteCode = opts['promote'];
   final setNotesCode = opts['set-notes'];
   final listTracks = flags.contains('list-tracks');
+  final listListings = flags.contains('list-listings');
   if (promoteCode != null && int.tryParse(promoteCode) == null) {
     stderr.writeln('✗ --promote verwacht een versionCode, geen "$promoteCode".');
     return 64;
@@ -115,12 +119,16 @@ Future<int> _run(List<String> args) async {
     return 64;
   }
 
-  if (promoteCode != null || setNotesCode != null || listTracks) {
+  if (promoteCode != null ||
+      setNotesCode != null ||
+      listTracks ||
+      listListings) {
     final api = await _connect(keyPath);
     if (api == null) return 66;
     final notes = _readNotes(notesArgs);
     try {
       if (listTracks) return await _listTracks(api.$1);
+      if (listListings) return await _listListings(api.$1);
       if (promoteCode != null) {
         return await _promote(
           api.$1,
@@ -280,6 +288,42 @@ Future<int> _listTracks(play.AndroidPublisherApi api) async {
           .join('  |  ');
       stdout.writeln('  ${track.track?.padRight(12)} '
           '${releases.isEmpty ? '(leeg)' : releases}');
+    }
+    return 0;
+  } finally {
+    // Alleen gelezen, dus de edit hoeft niet doorgevoerd te worden.
+    await api.edits.delete(_packageName, edit.id!);
+  }
+}
+
+/// Toont per taal wat er op de winkelpagina staat.
+///
+/// Bestaat omdat de vraag "staat de Nederlandse winkelpagina er al?" anders
+/// alleen in de Console te beantwoorden is, en die vraag hoort bij een release
+/// en niet bij een handmatige ronde. Leest alleen; schrijft nooit een listing.
+///
+/// De lengtes staan erbij omdat Play daar grenzen aan stelt (titel 30, korte
+/// omschrijving 80, volledige 4000) en een afgekapte tekst in de winkel pas
+/// opvalt als iemand hem leest.
+Future<int> _listListings(play.AndroidPublisherApi api) async {
+  final edit = await api.edits.insert(play.AppEdit(), _packageName);
+  try {
+    final listings = await api.edits.listings.list(_packageName, edit.id!);
+    final all = listings.listings ?? const <play.Listing>[];
+    stdout.writeln('');
+    if (all.isEmpty) {
+      stdout.writeln('  (geen enkele winkelpagina ingevuld)');
+      return 0;
+    }
+    for (final l in all) {
+      final title = l.title ?? '';
+      final short = l.shortDescription ?? '';
+      final full = l.fullDescription ?? '';
+      stdout.writeln('  ${(l.language ?? '?').padRight(8)} '
+          '"$title" (${title.length}/30)');
+      stdout.writeln('           kort ${short.length}/80, '
+          'volledig ${full.length}/4000');
+      if (short.isNotEmpty) stdout.writeln('           $short');
     }
     return 0;
   } finally {
@@ -607,7 +651,13 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
   final notes = <String>[];
   final flags = <String>{};
   const valueOptions = {'track', 'aab', 'key', 'status', 'promote', 'set-notes'};
-  const boolFlags = {'help', 'dry-run', 'force', 'list-tracks'};
+  const boolFlags = {
+    'help',
+    'dry-run',
+    'force',
+    'list-tracks',
+    'list-listings',
+  };
 
   for (var i = 0; i < args.length; i++) {
     final arg = args[i];
