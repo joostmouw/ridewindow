@@ -3,6 +3,30 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 49: 1.0.38+49
+
+**Datum:** 2026-09-21
+**Track:** Internal testing
+
+**Inhoud**
+- Een gedeelde rit draagt nu een eigen teken: drie fietsers achter elkaar, en
+  een enkele fietser als je alleen rijdt. Het staat links op de geplande rit op
+  Home en in de kop van het ritdetail (schets 014)
+- Het vlaggetje bij "Jij organiseert" is een megafoon geworden, zoals de coach
+  bij het roeien. Meerijden draagt helemaal geen icoon meer: de zin zegt het al
+- Nieuw is de teller onder de rit: een fietsje per persoon, doorzichtig zolang
+  iemand nog moet antwoorden, met "3 gaan mee, 1 wacht nog" ernaast. Die stond
+  tot nu toe alleen onder je eigen rit, en staat nu onder elke gedeelde rit
+- Past die zin niet op de kaart, dan kort de app hem in plaats van hem af te
+  kappen. Op Home is dat vrijwel altijd, op een smalle telefoon ook in de lijst
+
+**Feedback opgelost:** geen melding van een tester. Dit komt uit Joosts eigen
+waarneming dat een vlaggetje niets zegt over een groepsrit.
+
+**Bewijs:** het merkteken is uit Flutter zelf naar beeld gerenderd en op 14, 16,
+20 en 64 px bekeken; acht nieuwe tests rond de teller en de icoonregels; volle
+suite 722/722, `flutter analyze` 0 errors. Nog niet op een toestel bekeken.
+
 ## Build 48: 1.0.37+48
 
 **Datum:** 2026-09-21

@@ -1,7 +1,6 @@
-Reparaties uit jullie meldingen. Dank voor het doorgeven.
+Het peloton heeft een eigen teken.
 
-Dingen die stil faalden zeggen het nu: een uitnodiging beantwoorden, een
-venster kiezen, maatjes uitnodigen, een link delen, een maatje verwijderen
-en uitloggen. Een herinnering aanzetten terwijl meldingen uit staan wijst
-je naar je instellingen. Nieuwe gebruikers lopen niet meer vast op het
-eerste scherm.
+Bij een geplande rit zie je links wat voor rit het is: drie fietsers bij een
+groepsrit, een enkele fietser als je alleen gaat. Een megafoon zegt dat jij
+hem organiseert. En eronder zie je wie al ja zei: een fietsje per persoon,
+doorzichtig zolang iemand nog moet antwoorden.

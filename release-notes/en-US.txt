@@ -1,7 +1,6 @@
-Fixes from your reports. Thanks for sending them in.
+The peloton has a mark of its own.
 
-Things that failed silently now say so: answering an invite, choosing a
-window, inviting buddies, sharing an invite link, removing a buddy, and
-signing out. Enabling a reminder while notifications are off now points
-you to your settings. New users can no longer get stuck on the first
-screen.
+On a planned ride you see what kind of ride it is: three cyclists for a
+group ride, a single cyclist when you go alone. A megaphone means you are
+organising it. Below it you see who said yes: one cyclist per person, faded
+while someone still has to answer.
