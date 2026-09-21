@@ -27,7 +27,7 @@ punten in `HANDOFF.json`.
 | Play internal testing | **1.0.38 (49)**, live sinds 2026-09-21 |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
 | main | 1.0.38+49, lokaal; alles vanaf c03f334 nog niet gepusht |
-| PWA live | niet aangeraakt in deze sessie; stand zie OPEN.md |
+| PWA live | **1.0.38 (49)** op `my-project-joost.web.app`, gedeployd 2026-09-21 (`firebase deploy --only hosting`); stond drie builds achter op 46 |
 | Oppo | app uit Play; 49 komt binnen als normale Play-update. **Het peloton-lint is nog niet op glas bekeken** (14/16 px). Zie OPEN.md punt 5: Agenda staat op "Not connected", app op Engels |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en

@@ -7,7 +7,8 @@
 
 **Datum:** 2026-09-21
 **Track:** Internal testing, daarna als dezelfde bytes gepromoveerd naar de
-gesloten test (`--promote 49 --track alpha`)
+gesloten test (`--promote 49 --track alpha`). De PWA op
+`my-project-joost.web.app` is dezelfde dag meegegaan; die stond nog op 46
 
 **Inhoud**
 - Een gedeelde rit draagt nu een eigen teken: drie fietsers achter elkaar, en
