@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
+import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -32,9 +33,32 @@ class PelotonCounter extends StatelessWidget {
   /// draagt de precieze aantallen.
   static const _maxDrawn = 5;
 
+  /// De korte lezing, voor de smalle kaartjes op Home.
+  ///
+  /// "Nog niemand geantwoord · 1 wacht nog" past daar niet: in het Engels werd
+  /// het "Nobody has answered yet · 1 still to a..." en viel het van de kaart
+  /// (gezien op het toestelformaat, 2026-09-21). Kort is hier ook eerlijker --
+  /// de fietsjes zeggen al wie er mee is en wie nog moet antwoorden, de tekst
+  /// hoeft dat alleen te tellen. Staat er nog niemand mee, dan is het
+  /// wachtende deel het hele verhaal.
+  String? _shortSummary(BuildContext context) {
+    final s = S.of(context);
+    final accepted = entry.acceptedCount;
+    final pending = entry.pendingCount;
+    if (accepted == 0 && pending == 0) return null;
+    if (accepted == 0) return s.ridePelotonWaitingShort(pending);
+    if (pending == 0) return s.ridePelotonGoingShort(accepted);
+    return '${s.ridePelotonGoingShort(accepted)} · '
+        '${s.ridePelotonWaitingShort(pending)}';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final summary = pelotonSummary(context, entry);
+    // De lange lezing bepaalt ook of de teller überhaupt hoort te staan: geen
+    // groep, of een afgezegde rit, betekent geen teller.
+    final full = pelotonSummary(context, entry);
+    if (full == null) return const SizedBox.shrink();
+    final summary = dense ? _shortSummary(context) : full;
     if (summary == null) return const SizedBox.shrink();
 
     final rw = context.rw;

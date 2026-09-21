@@ -3193,6 +3193,18 @@ abstract class S {
   /// **'{count, plural, =1{1 wacht nog} other{{count} wachten nog}}'**
   String ridePelotonWaiting(int count);
 
+  /// No description provided for @ridePelotonGoingShort.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 mee} other{{count} mee}}'**
+  String ridePelotonGoingShort(int count);
+
+  /// No description provided for @ridePelotonWaitingShort.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 wacht} other{{count} wachten}}'**
+  String ridePelotonWaitingShort(int count);
+
   /// No description provided for @pelotonStatusGoing.
   ///
   /// In nl, this message translates to:

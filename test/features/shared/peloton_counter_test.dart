@@ -55,14 +55,25 @@ RideEntry _entry({
   );
 }
 
-Future<void> _pump(WidgetTester tester, RideEntry entry) async {
+Future<void> _pump(
+  WidgetTester tester,
+  RideEntry entry, {
+  bool dense = false,
+  Locale locale = const Locale('nl'),
+  double width = 800,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
-      locale: const Locale('nl'),
+      locale: locale,
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: ThemeData(extensions: const [RideWindowTheme.light]),
-      home: Scaffold(body: PelotonCounter(entry: entry)),
+      home: Scaffold(
+        body: SizedBox(
+          width: width,
+          child: PelotonCounter(entry: entry, dense: dense),
+        ),
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -109,6 +120,40 @@ void main() {
     await _pump(tester, _entry(role: RideRole.declined, accepted: 3));
     expect(find.text('3 gaan mee'), findsNothing);
     expect(_bikes(tester), isEmpty);
+  });
+
+  testWidgets('op Home is de zin kort genoeg om níét af te kappen',
+      (tester) async {
+    // Dit ging mis op het toestel (2026-09-21): "Nobody has answered yet ·
+    // 1 still to a..." viel van de kaart. Home krijgt daarom de korte lezing,
+    // en 190px is ongeveer wat een ritkaartje op Home overhoudt.
+    await _pump(
+      tester,
+      _entry(role: RideRole.organiser, invited: 1),
+      dense: true,
+      locale: const Locale('en'),
+      width: 190,
+    );
+
+    expect(find.text('1 waiting'), findsOneWidget);
+    final text = tester.widget<Text>(find.text('1 waiting'));
+    final painter = TextPainter(
+      text: TextSpan(text: text.data, style: text.style),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    expect(painter.didExceedMaxLines, isFalse);
+    expect(painter.width, lessThan(150),
+        reason: 'naast de fietsjes en het scorepilletje is er weinig ruimte');
+  });
+
+  testWidgets('en de lange lezing blijft staan waar hij wél past',
+      (tester) async {
+    await _pump(
+      tester,
+      _entry(role: RideRole.organiser, accepted: 2, invited: 1),
+      locale: const Locale('en'),
+    );
+    expect(find.text('2 are coming · 1 still to answer'), findsOneWidget);
   });
 
   testWidgets('een rit van jou alleen heeft geen teller', (tester) async {

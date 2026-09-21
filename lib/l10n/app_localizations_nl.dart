@@ -1787,6 +1787,28 @@ class SNl extends S {
   }
 
   @override
+  String ridePelotonGoingShort(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mee',
+      one: '1 mee',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ridePelotonWaitingShort(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count wachten',
+      one: '1 wacht',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get pelotonStatusGoing => 'gaat mee';
 
   @override
