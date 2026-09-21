@@ -508,4 +508,37 @@ void main() {
     // extra check dat de widget-boom niet is gecrasht).
     expect(find.text('Rider Test', skipOffstage: false), findsOneWidget);
   });
+
+  testWidgets(
+      'Test 13 — een mislukte afmelding zegt het nu, in plaats van stil niets '
+      'te doen (sweep "stille takken", 2026-09-21)',
+      (tester) async {
+    // Zelfde truc als Test 12: Supabase is niet geïnitialiseerd, dus
+    // `auth.signOut()` gooit. Vóór de sweep gebeurde daar zichtbaar niets
+    // mee; nu hoort er een snackbar te komen.
+    await _pumpProfileScreen(
+      tester,
+      authStream: Stream<User?>.value(_fakeUser),
+    );
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.accountSignOut, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text(s.accountSignOutConfirmTitle), findsOneWidget);
+
+    // "Uitloggen" staat op twee plekken zolang de dialoog open is: de rij in
+    // Profiel en de bevestigingsknop. De knop is de TextButton achteraan.
+    await tester.tap(find.widgetWithText(TextButton, s.accountSignOut).last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountSignOutFailed, skipOffstage: false),
+        findsOneWidget);
+    // De gebruiker is niet uitgelogd -- dat is de waarheid die de snackbar
+    // vertelt, anders dan een stille mislukking.
+    expect(find.text('Rider Test', skipOffstage: false), findsOneWidget);
+  });
 }

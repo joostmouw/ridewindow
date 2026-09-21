@@ -232,9 +232,26 @@ class _AvailabilityScreenState extends ConsumerState<AvailabilityScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('onboarding_complete', true);
-                        if (mounted) context.go('/home');
+                        // Zelfde vorm als onboarding `_handleNext`: het
+                        // klaarzetten mag de navigatie niet stil laten
+                        // sterven -- ook hier liep anders een nieuwe tester
+                        // vast op de eerste knop die hij indrukt.
+                        try {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('onboarding_complete', true);
+                        } catch (error, stack) {
+                          FlutterError.reportError(
+                            FlutterErrorDetails(
+                              exception: error,
+                              stack: stack,
+                              library: 'ridewindow availability',
+                              context: ErrorDescription(
+                                  'bij het afronden van de onboarding'),
+                            ),
+                          );
+                        } finally {
+                          if (mounted) context.go('/home');
+                        }
                       },
                       child: Text(S.of(context).onboardingNext),
                     ),

@@ -925,6 +925,12 @@ abstract class S {
   /// **'Exacte timing niet gegarandeerd. Sta exacte alarmen toe in Instellingen voor betrouwbaarheid.'**
   String get notifExactTimingWarning;
 
+  /// No description provided for @notifPermissionDenied.
+  ///
+  /// In nl, this message translates to:
+  /// **'Meldingen staan uit in de systeeminstellingen.'**
+  String get notifPermissionDenied;
+
   /// No description provided for @settingsLabel.
   ///
   /// In nl, this message translates to:
@@ -1236,6 +1242,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Inloggen mislukt. Probeer het opnieuw.'**
   String get accountSignInError;
+
+  /// No description provided for @accountSignOutFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitloggen is niet gelukt. Probeer het opnieuw.'**
+  String get accountSignOutFailed;
 
   /// No description provided for @accountAvatarSemanticLabel.
   ///
@@ -2839,6 +2851,12 @@ abstract class S {
   /// **'Maatje verwijderen'**
   String get pelotonRemoveFriend;
 
+  /// No description provided for @pelotonRemoveFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit maatje kon niet worden verwijderd. Probeer het opnieuw.'**
+  String get pelotonRemoveFailed;
+
   /// No description provided for @pelotonAccept.
   ///
   /// In nl, this message translates to:
@@ -3006,6 +3024,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Je antwoord kon niet worden opgeslagen. Probeer het opnieuw.'**
   String get pelotonOptionVoteFailed;
+
+  /// No description provided for @pelotonOptionChosenFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'De rit kon niet op het gekozen venster worden gezet. Probeer het opnieuw.'**
+  String get pelotonOptionChosenFailed;
 
   /// No description provided for @pelotonWindowsSent.
   ///

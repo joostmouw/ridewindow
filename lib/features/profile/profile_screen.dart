@@ -134,7 +134,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _scheduleNotificationsIfPermitted(BuildContext context) async {
     // 1. Vraag POST_NOTIFICATIONS op
     final granted = await _notifService.requestPostNotificationsPermission();
-    if (!granted) return;
+    if (!granted) {
+      // Stond hier sinds NOTIF-04 als stille return: de schakelaar ging aan,
+      // maar er zou nooit een melding komen -- en niets vertelde dat. De
+      // systeeminstellingen zijn de enige weg terug, dus de melding wijst
+      // ernaartoe (2026-09-21, sweep "stille takken").
+      if (context.mounted) {
+        final s = S.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(s.notifPermissionDenied),
+            action: SnackBarAction(
+              label: s.settingsLabel,
+              onPressed: () => _notifService.openSystemSettings(),
+            ),
+            duration: const Duration(seconds: 6),
+          ),
+        );
+      }
+      return;
+    }
 
     // 2. Controleer SCHEDULE_EXACT_ALARM
     final canExact = await _notifService.canScheduleExact();

@@ -95,6 +95,10 @@ en in de testsuite.
 elke `if` rond een platform-aanroep zonder `else`. Vraag bij elk: wat ziet de
 gebruiker als dit misgaat. Is het antwoord "niets", dan is het fout.
 
+**Eerste uitvoering: 2026-09-21.** Tien plekken gedicht, zes daarvan in de
+Peloton-flow. Zie `.planning/quick/260921-stille-takken-sweep/SUMMARY.md` en de
+aanvulling onderaan `consent-card-en-privacy-link.md`.
+
 Volledige uitwerking in `.planning/debug/consent-card-en-privacy-link.md`.
 
 ---

@@ -58,6 +58,7 @@ RideOption _option({
 GroupRide _ride({
   String ownerId = _other,
   List<RideOption> options = const [],
+  List<RideParticipant>? participants,
 }) =>
     GroupRide(
       id: 'ride',
@@ -66,9 +67,10 @@ GroupRide _ride({
       end: _day(1, 13),
       plannedScore: 80,
       ownerName: ownerId == _me ? 'Ik' : 'Peter',
-      participants: const [
-        RideParticipant(userId: _me, status: ParticipantStatus.accepted),
-      ],
+      participants: participants ??
+          const [
+            RideParticipant(userId: _me, status: ParticipantStatus.accepted),
+          ],
       options: options,
     );
 
@@ -104,6 +106,47 @@ class _RecordingGateway implements PelotonGateway {
       throw UnimplementedError('${invocation.memberName} niet nodig');
 }
 
+/// De tegenhanger van [_RecordingGateway] voor de sweep "stille takken"
+/// (2026-09-21): elke Peloton-aanroep faalt. Vóór de sweep deden de
+/// antwoord-, stem- en kies-knoppen daar zichtbaar niets bij; deze gateway
+/// bewijst dat er nu altijd een melding komt.
+class _ThrowingGateway implements PelotonGateway {
+  _ThrowingGateway(this.rides);
+
+  final List<GroupRide> rides;
+
+  @override
+  Future<List<GroupRide>> listGroupRides() async => rides;
+
+  @override
+  Future<List<Friend>> listFriends() async => const [];
+
+  @override
+  Future<void> respondToRide({
+    required String rideId,
+    required bool accepted,
+  }) async =>
+      throw Exception('netwerk');
+
+  @override
+  Future<void> voteOnOption({
+    required String optionId,
+    required bool canRide,
+  }) async =>
+      throw Exception('netwerk');
+
+  @override
+  Future<void> chooseOption({
+    required String rideId,
+    required RideOption option,
+  }) async =>
+      throw Exception('netwerk');
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} niet nodig');
+}
+
 class _FakePlannedRides extends PlannedRidesNotifier {
   @override
   Future<List<PlannedRide>> build() async => const [];
@@ -118,8 +161,16 @@ Future<_RecordingGateway> _pump(
   WidgetTester tester, {
   required List<GroupRide> rides,
 }) async {
-  SharedPreferences.setMockInitialValues({});
   final gateway = _RecordingGateway(rides);
+  await _pumpGateway(tester, gateway);
+  return gateway;
+}
+
+Future<void> _pumpGateway(
+  WidgetTester tester,
+  PelotonGateway gateway,
+) async {
+  SharedPreferences.setMockInitialValues({});
   final router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (_, __) => const Scaffold(body: RidesTab())),
@@ -145,7 +196,6 @@ Future<_RecordingGateway> _pump(
     ),
   );
   await tester.pumpAndSettle();
-  return gateway;
 }
 
 void main() {
@@ -261,6 +311,77 @@ void main() {
       await tester.tap(find.text('Kies dit').first);
       await tester.pumpAndSettle();
       expect(gateway.chosen, hasLength(1));
+    });
+
+    // Sweep "stille takken" (2026-09-21): een mislukte aanroep deed voorheen
+    // zichtbaar niets -- geen fout, geen melding. Deze drie bewijzen dat de
+    // knoppen nu altijd antwoorden.
+
+    testWidgets('een mislukt antwoord zegt het, in plaats van stil niets te doen',
+        (tester) async {
+      await _pumpGateway(
+        tester,
+        _ThrowingGateway([
+          _ride(
+            ownerId: _other,
+            participants: const [
+              RideParticipant(userId: _me, status: ParticipantStatus.invited),
+            ],
+          ),
+        ]),
+      );
+
+      await tester.tap(find.text('Ik ga mee'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Je antwoord kon niet worden opgeslagen. Probeer het opnieuw.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('een mislukte stem zegt het, in plaats van stil niets te doen',
+        (tester) async {
+      await _pumpGateway(
+        tester,
+        _ThrowingGateway([
+          _ride(options: [
+            _option(id: 'a', dayOffset: 1),
+            _option(id: 'b', dayOffset: 2),
+          ]),
+        ]),
+      );
+
+      await tester.tap(find.text('Ik kan').first);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Je antwoord kon niet worden opgeslagen. Probeer het opnieuw.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('kiezen faalt: de foutmelding staat er, en het succes niet',
+        (tester) async {
+      await _pumpGateway(
+        tester,
+        _ThrowingGateway([
+          _ride(ownerId: _me, options: [
+            _option(id: 'a', dayOffset: 1),
+            _option(id: 'b', dayOffset: 2),
+          ]),
+        ]),
+      );
+
+      await tester.tap(find.text('Kies dit').first);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+            'De rit kon niet op het gekozen venster worden gezet. Probeer het opnieuw.'),
+        findsOneWidget,
+      );
+      expect(find.text('De rit staat nu op dit venster'), findsNothing);
     });
   });
 }

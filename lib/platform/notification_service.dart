@@ -94,6 +94,11 @@ class NotificationService {
     return await _androidPlugin?.canScheduleExactNotifications() ?? false;
   }
 
+  /// Opent de app-instellingen van het systeem, voor permissies die buiten de
+  /// app liggen (bijv. POST_NOTIFICATIONS geweigerd). Exacte alarmen hebben een
+  /// eigen route, [openExactAlarmSettings].
+  Future<void> openSystemSettings() => openAppSettings();
+
   /// Deep-link naar systeeminstellingen voor exacte alarmen (Android 12+).
   /// Valt terug op openAppSettings() als requestExactAlarmsPermission faalt.
   Future<void> openExactAlarmSettings() async {

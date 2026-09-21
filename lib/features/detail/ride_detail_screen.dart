@@ -386,15 +386,28 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     return null;
   }
 
-  Future<void> _respondToRide(RideEntry entry, {required bool accepted}) async {
+  /// Antwoorden op een uitnodiging. Geeft `false` terug als de aanroep faalde;
+  /// de aanroeper mag dan geen succesmelding tonen.
+  Future<bool> _respondToRide(RideEntry entry, {required bool accepted}) async {
     final group = entry.group;
-    if (group == null || _isLoading) return;
+    if (group == null || _isLoading) return false;
     setState(() => _isLoading = true);
     try {
       await ref
           .read(pelotonGatewayProvider)
           .respondToRide(rideId: group.id, accepted: accepted);
       ref.invalidate(groupRidesProvider);
+      return true;
+    } catch (error) {
+      // Zelfde stille vorm als op de ritkaart was: een mislukte aanroep liet
+      // de knop zichtbaar niets doen (2026-09-21, sweep "stille takken").
+      debugPrint('Peloton: antwoorden mislukt: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context).pelotonOptionVoteFailed)),
+        );
+      }
+      return false;
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -409,8 +422,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   Future<void> _withdrawFromRide(RideEntry entry) async {
     final s = S.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    await _respondToRide(entry, accepted: false);
-    if (!mounted) return;
+    final ok = await _respondToRide(entry, accepted: false);
+    if (!mounted || !ok) return;
     messenger.showSnackBar(
       SnackBar(
         content: Text(s.pelotonWithdrawn),
@@ -427,8 +440,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final s = S.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final before = entry.group;
-    await _respondToRide(entry, accepted: true);
-    if (!mounted) return;
+    final ok = await _respondToRide(entry, accepted: true);
+    if (!mounted || !ok) return;
     messenger.showSnackBar(
       SnackBar(
         content: Text(before == null ? s.rideRejoinFailed : s.rideRejoined),

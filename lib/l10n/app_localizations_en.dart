@@ -479,6 +479,10 @@ class SEn extends S {
       'Exact timing not guaranteed. Allow exact alarms in Settings for reliability.';
 
   @override
+  String get notifPermissionDenied =>
+      'Notifications are switched off in system settings.';
+
+  @override
   String get settingsLabel => 'Settings';
 
   @override
@@ -647,6 +651,9 @@ class SEn extends S {
 
   @override
   String get accountSignInError => 'Sign-in failed. Please try again.';
+
+  @override
+  String get accountSignOutFailed => 'Signing out failed. Try again.';
 
   @override
   String get accountAvatarSemanticLabel => 'Profile photo';
@@ -1550,6 +1557,9 @@ class SEn extends S {
   String get pelotonRemoveFriend => 'Remove buddy';
 
   @override
+  String get pelotonRemoveFailed => 'Couldn\'t remove this buddy. Try again.';
+
+  @override
   String get pelotonAccept => 'Join';
 
   @override
@@ -1651,6 +1661,10 @@ class SEn extends S {
   @override
   String get pelotonOptionVoteFailed =>
       'Your answer could not be saved. Please try again.';
+
+  @override
+  String get pelotonOptionChosenFailed =>
+      'Couldn\'t set this ride to the chosen window. Try again.';
 
   @override
   String pelotonWindowsSent(int count) {

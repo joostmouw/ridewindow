@@ -474,7 +474,18 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     if (confirmed == true) {
       // D-12: uitloggen beeindigt alleen de Supabase-sessie -- de Calendar-
       // autorisatie en lokale SharedPreferences blijven onaangeroerd.
-      await Supabase.instance.client.auth.signOut();
+      try {
+        await Supabase.instance.client.auth.signOut();
+      } catch (error) {
+        // Stil doorlaten was een knop die zichtbaar niets deed: de gebruiker
+        // bleef ingelogd zonder enig signaal (2026-09-21, sweep "stille
+        // takken"). De sessie is niet veranderd, dus opnieuw proberen is veilig.
+        debugPrint('AccountSection: uitloggen mislukt: $error');
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(s.accountSignOutFailed)),
+        );
+      }
     }
   }
 

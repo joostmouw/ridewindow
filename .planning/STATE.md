@@ -37,6 +37,7 @@ feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de ba
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-21 | [stille-takken-sweep](quick/260921-stille-takken-sweep/) | De sweep van 19 september is over heel `lib/` herhaald: **tien plekken zeiden nog stil niets, zes daarvan in de Peloton-flow die nu bij twintig testers draait** -- accepteren/afzeggen en kiezen (ritkaart én detail), maatjes ophalen en vensters voorleggen bij uitnodigen, deel-link en maatje verwijderen. Verder uitloggen, geweigerde notificatiepermissie, en twee navigaties achter een schrijffout. `_respondToRide` geeft nu `bool` terug zodat de succesmelding na een mislukking niet meer liegt. Vier regressietests, suite 714/714. |
 | 2026-09-20 | Play-installatie van 45, en wat die opleverde | **De app crashte na elke herstart, en dat stond er sinds 3 juni in.** `AndroidManifest.xml` noemde een workmanager-receiver die in 0.9 niet meer bestaat; Android maakt zo'n klasse pas aan als hij vuurt, dus alleen een reboot raakte hem (`7bb52c9`). Nieuwe structuurtest kijkt nu elke klassenaam in de manifest na. Ook: de winkelpagina en de testers-changelog vielen buiten de em-dash-regel (`c9b4627`). 1.0.35+46 staat op internal en is na een echte herstart op het toestel schoon bevonden. |
 | 2026-09-20 | [AGENTS.md voor Factory](quick/260920-d85-agents-md-als-gedeelde-projectinstructie/) | Claude op? Dan verder met `droid` in dezelfde repo. **Droid leest `AGENTS.md` en niet `CLAUDE.md`** -- bewezen met een exec zonder gereedschap. Veertien kennis-skills via symlinks in `~/.factory/skills` (de GSD-skills bewust niet: die orkestreren via Claude Codes eigen subagents). Droid 0.223, model op Factory Router, en een `ai`-switcher die openstaand werk eerst vastlegt -- de overdracht tussen agents is git, niet de prompt. |
 | 2026-09-20 | toestelronde: eenheden, bugs, slice 2 | **Drie dingen die alleen op glas te vinden waren.** Uitgelogd vertrok er bij het opstarten niets uit de outbox (`e0aab7a`) -- feedback en statistiek bleven liggen tot er toevallig een voorgrond-overgang kwam. "Longest ride here" zei bijna altijd 2 uur (`93d9e27`), een artefact van `dedup`: een lang venster wordt weggegooid door het korte venster dat erin zit. En de daglicht-uitleg sprak zichzelf tegen bij een rit volledig in het licht. Verder: eenheden (°F, Bft, mph) in Profiel, de zwarte-schermbug bij info → OK, Peloton slice 2, en alle em-dashes uit de app met een structuurtest erop. |
@@ -254,7 +255,7 @@ De eerste verklaring die voor de hand ligt — sideload met de upload-sleutel
 tegenover Play App Signing — was hier níét de oorzaak. Kijk dus eerst naar
 `installed=` per gebruiker voordat je over handtekeningen begint.
 
-**Migratiestand op de gehoste database.** Bijgewerkt 2026-09-08. De repo zegt
+**Migratiestand op de gehoste database.** Bijgewerkt 2026-09-21. De repo zegt
 niets over wat er drááit, dus dit is de enige plek waar het staat:
 
 | Migratie | Toegepast |
@@ -262,6 +263,10 @@ niets over wat er drááit, dus dit is de enige plek waar het staat:
 | 0001 t/m 0004 | ja |
 | 0005 tighten_table_grants | ja, 2026-09-08 |
 | 0006 tighten_grants_schema_wide | ja, 2026-09-08 |
+| 0007 profile_darkness_weight | ja, 2026-09-10 (267f22b: "SQL gedraaid") |
+| 0008 app_events | ja, 2026-09-19, geverifieerd (0665ec3) |
+| 0009 app_events service_role select | ja — bewezen 2026-09-21: een SELECT met de service-role-sleutel geeft rijen terug, dus de grant bestaat |
+| 0010 group_ride_options | ja — bewezen 2026-09-21: Postgres lost beide tabellen op (42501/42703 ipv 42P01); slice 2 is op 2026-09-20 al op glas beproefd met deze tabellen |
 
 Na 0006 geverifieerd met de controlequery: **`anon` heeft nog exact één recht
 in het hele schema** — INSERT op `feedback`. Geen SELECT op feedback voor wie

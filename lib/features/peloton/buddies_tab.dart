@@ -59,21 +59,32 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
 
   Future<void> _shareInvite() => _run(() async {
         final s = S.of(context);
-        final code =
-            await ref.read(pelotonGatewayProvider).createFriendInvite();
-        if (!mounted) return;
-        // De code staat óók in de tekst, niet alleen in de link: de link opent
-        // vandaag de PWA en niet de native app (daarvoor zijn Android App
-        // Links nodig), dus wie de app al heeft is met overtypen sneller uit.
-        // De code zelf gaat nooit mee: dat is een sleutel, geen statistiek.
-        trackEvent(ref, kEvPelotonInvite, props: {'kind': 'link_created'});
-        await Share.share(
-          s.pelotonInviteShareLink(inviteLinkFor(code), code),
-        );
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(s.pelotonYourCode(code))),
-        );
+        final messenger = ScaffoldMessenger.of(context);
+        try {
+          final code =
+              await ref.read(pelotonGatewayProvider).createFriendInvite();
+          if (!mounted) return;
+          // De code staat óók in de tekst, niet alleen in de link: de link opent
+          // vandaag de PWA en niet de native app (daarvoor zijn Android App
+          // Links nodig), dus wie de app al heeft is met overtypen sneller uit.
+          // De code zelf gaat nooit mee: dat is een sleutel, geen statistiek.
+          trackEvent(ref, kEvPelotonInvite, props: {'kind': 'link_created'});
+          await Share.share(
+            s.pelotonInviteShareLink(inviteLinkFor(code), code),
+          );
+          if (!mounted) return;
+          messenger.showSnackBar(
+            SnackBar(content: Text(s.pelotonYourCode(code))),
+          );
+        } catch (error) {
+          // De knop deed tot 2026-09-21 stil niets als het maken van de link
+          // of het deelmenu faalde (sweep "stille takken").
+          debugPrint('Peloton: deel-link maken mislukt: $error');
+          if (!mounted) return;
+          messenger.showSnackBar(
+            SnackBar(content: Text(s.pelotonInviteFailed)),
+          );
+        }
       });
 
   Future<void> _redeemCode() => _run(() async {
@@ -143,10 +154,29 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
                               onRemove: _busy
                                   ? null
                                   : () => _run(() async {
-                                        await ref
-                                            .read(pelotonGatewayProvider)
-                                            .removeFriend(friend.userId);
-                                        _invalidateAll();
+                                        final s = S.of(context);
+                                        final messenger =
+                                            ScaffoldMessenger.of(context);
+                                        try {
+                                          await ref
+                                              .read(pelotonGatewayProvider)
+                                              .removeFriend(friend.userId);
+                                          _invalidateAll();
+                                        } catch (error) {
+                                          // Zelfde stille vorm als het
+                                          // uitnodigen: een mislukte verwijdering
+                                          // liet het kruisje niets doen
+                                          // (2026-09-21, sweep "stille takken").
+                                          debugPrint(
+                                              'Peloton: maatje verwijderen mislukt: $error');
+                                          if (!mounted) return;
+                                          messenger.showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  s.pelotonRemoveFailed),
+                                            ),
+                                          );
+                                        }
                                       }),
                             ),
                         ],

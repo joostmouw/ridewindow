@@ -399,3 +399,30 @@ await, en wat gebeurt er als die await gooit.
 En tot slot: dit is gevonden door een vreemde, niet door Joost. Joost weet waar
 hij moet drukken en wat er hoort te gebeuren. Dat is precies de blindheid die
 externe testers opheffen, en het argument om er meer te hebben.
+
+## Vervolg-sweep 2026-09-21 (OPEN.md punt 2, tweede ronde)
+
+De eerste sweep heeft de drie bekende gevallen gedicht; deze ronde herhaalde de
+zoektocht over heel `lib/` met dezelfde vraag: wat ziet de gebruiker als dit
+misgaat. Gevonden en gedicht (10 plekken; zes daarvan in de Peloton-flow die nu
+bij twintig testers op de gesloten test draait):
+
+- Stille falers in `planned_rides_screen.dart` (`respond`, `chooseOption`),
+  `ride_detail_screen.dart` (`_respondToRide`, inclusief de valkuil dat de
+  succesmelding van `_withdrawFromRide`/`_rejoinRide` na een mislukking niet
+  meer verschijnt — `_respondToRide` geeft nu `bool` terug),
+  `invite_buddies_sheet.dart` (maatjes ophalen + vensters voorleggen stonden
+  buiten de try/catch), `buddies_tab.dart` (`_shareInvite`, `removeFriend`),
+  `account_section.dart` `_confirmAndSignOut`, en de geweigerde
+  notificatiepermissie in Profiel.
+- Navigatie achter een schrijffout: `welcome_screen.dart` `_goToSignIn` en de
+  onboarding-knop in `availability_screen.dart` navigeren nu in `finally`.
+
+Volledige lijst, bewezen regressietests (4 nieuw, suite 714/714) en wat bewust
+niet is veranderd: `.planning/quick/260921-stille-takken-sweep/SUMMARY.md`.
+
+**Zoekpatroon blijft staan:** bij elke wijziging controleren op `if (await …)`
+zonder `else`, navigatie/sluiten achter `await`, en netwerk- of platform-
+aanroepen zonder catch in button-handlers. De vorige aanname dat `_pickWindows`'
+switch kon gooien bleek onjuist (sealed `SlotsState` heeft één subtype) — de
+aanroepende plek is ingepakt, de switch zelf niet.

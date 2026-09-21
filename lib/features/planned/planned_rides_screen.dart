@@ -267,8 +267,11 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
   void _invalidatePeloton() => ref.invalidate(groupRidesProvider);
 
   @override
-  Future<void> respond(RideEntry entry, {required bool accepted}) =>
-      _run(() async {
+  Future<void> respond(RideEntry entry, {required bool accepted}) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await _run(() async {
         final group = entry.group;
         if (group == null) return;
         await ref
@@ -276,6 +279,18 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
             .respondToRide(rideId: group.id, accepted: accepted);
         _invalidatePeloton();
       });
+    } catch (error) {
+      // Een uitnodiging die niet aankomt mag geen scherm laten crashen, maar
+      // stil doorlaten was hetzelfde als een knop die zichtbaar niets deed:
+      // geen fout, geen log, geen melding. Accepteren en afzeggen zijn precies
+      // de acties waar de sweep van 2026-09-21 naar zoekt.
+      debugPrint('Peloton: antwoorden mislukt: $error');
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(s.pelotonOptionVoteFailed)),
+      );
+    }
+  }
 
   @override
   Future<void> voteOnOption(
@@ -309,12 +324,24 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
     final messenger = ScaffoldMessenger.of(context);
     final group = entry.group;
     if (group == null) return;
-    await _run(() async {
-      await ref
-          .read(pelotonGatewayProvider)
-          .chooseOption(rideId: group.id, option: option);
-      _invalidatePeloton();
-    });
+    try {
+      await _run(() async {
+        await ref
+            .read(pelotonGatewayProvider)
+            .chooseOption(rideId: group.id, option: option);
+        _invalidatePeloton();
+      });
+    } catch (error) {
+      // Zelfde vorm als [voteOnOption] erboven: door de await te laten gooien
+      // deed de knop zichtbaar niets, en de succesmelding eronder bleef ook
+      // weg. De rit is niet veranderd, dus opnieuw proberen is veilig.
+      debugPrint('Peloton: kiezen mislukt: $error');
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(s.pelotonOptionChosenFailed)),
+      );
+      return;
+    }
     if (!mounted) return;
     messenger.showSnackBar(SnackBar(content: Text(s.pelotonOptionChosen)));
   }

@@ -479,6 +479,10 @@ class SNl extends S {
       'Exacte timing niet gegarandeerd. Sta exacte alarmen toe in Instellingen voor betrouwbaarheid.';
 
   @override
+  String get notifPermissionDenied =>
+      'Meldingen staan uit in de systeeminstellingen.';
+
+  @override
   String get settingsLabel => 'Instellingen';
 
   @override
@@ -647,6 +651,10 @@ class SNl extends S {
 
   @override
   String get accountSignInError => 'Inloggen mislukt. Probeer het opnieuw.';
+
+  @override
+  String get accountSignOutFailed =>
+      'Uitloggen is niet gelukt. Probeer het opnieuw.';
 
   @override
   String get accountAvatarSemanticLabel => 'Profielfoto';
@@ -1552,6 +1560,10 @@ class SNl extends S {
   String get pelotonRemoveFriend => 'Maatje verwijderen';
 
   @override
+  String get pelotonRemoveFailed =>
+      'Dit maatje kon niet worden verwijderd. Probeer het opnieuw.';
+
+  @override
   String get pelotonAccept => 'Ik ga mee';
 
   @override
@@ -1654,6 +1666,10 @@ class SNl extends S {
   @override
   String get pelotonOptionVoteFailed =>
       'Je antwoord kon niet worden opgeslagen. Probeer het opnieuw.';
+
+  @override
+  String get pelotonOptionChosenFailed =>
+      'De rit kon niet op het gekozen venster worden gezet. Probeer het opnieuw.';
 
   @override
   String pelotonWindowsSent(int count) {

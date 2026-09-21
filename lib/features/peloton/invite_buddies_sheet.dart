@@ -38,7 +38,18 @@ Future<void> showInviteBuddiesSheet(
 }) async {
   final s = S.of(context);
   final messenger = ScaffoldMessenger.of(context);
-  final friends = await ref.read(friendsProvider.future);
+
+  final List<Friend> friends;
+  try {
+    friends = await ref.read(friendsProvider.future);
+  } catch (error) {
+    // Stond tot 2026-09-21 buiten de try/catch van het versturen: een
+    // netwerkfout bij het ophalen van je maatjes liet de uitnodigknop
+    // zichtbaar niets doen (sweep "stille takken").
+    debugPrint('Peloton: maatjes ophalen mislukt: $error');
+    messenger.showSnackBar(SnackBar(content: Text(s.pelotonInviteFailed)));
+    return;
+  }
 
   if (!context.mounted) return;
 
@@ -61,13 +72,23 @@ Future<void> showInviteBuddiesSheet(
   // Stap 2: welke vensters leg je voor? Het venster waar je vandaan komt staat
   // aangevinkt; de rest komt uit dezelfde slot-generator die Home voedt, zodat
   // de keuze over vensters gaat die de app ook echt aanbeveelt.
-  final windows = await _pickWindows(
-    context,
-    ref,
-    start: start,
-    end: end,
-    plannedScore: plannedScore,
-  );
+  //
+  // Ook dit stond buiten de try/catch: een fout in het voorleggen (bijv. de
+  // sheet zelf) liet de knop stil niets doen.
+  final List<RideSlot>? windows;
+  try {
+    windows = await _pickWindows(
+      context,
+      ref,
+      start: start,
+      end: end,
+      plannedScore: plannedScore,
+    );
+  } catch (error) {
+    debugPrint('Peloton: vensters voorleggen mislukt: $error');
+    messenger.showSnackBar(SnackBar(content: Text(s.pelotonInviteFailed)));
+    return;
+  }
   if (windows == null || windows.isEmpty) return;
 
   final gateway = ref.read(pelotonGatewayProvider);

@@ -135,9 +135,25 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   /// staat als een nieuwe gebruiker ná onboarding, en vanuit Profiel alsnog aan
   /// te passen.
   Future<void> _goToSignIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_complete', true);
-    if (mounted) context.go('/profile');
+    // Zelfde vorm als `_handleNext` in onboarding: een schrijffout mocht de
+    // navigatie niet stil laten sterven. Lukt het wegschrijven niet, dan wordt
+    // dat gemeld en gaat de gebruiker alsnog naar Profiel (2026-09-21, sweep
+    // "stille takken").
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_complete', true);
+    } catch (error, stack) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'ridewindow welcome',
+          context: ErrorDescription('bij het overslaan van de onboarding'),
+        ),
+      );
+    } finally {
+      if (mounted) context.go('/profile');
+    }
   }
 
   @override
