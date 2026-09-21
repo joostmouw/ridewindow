@@ -3565,6 +3565,24 @@ abstract class S {
   /// **'donker telt niet mee'**
   String get daylightWeightNone;
 
+  /// No description provided for @linkOpenFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'De link kon niet geopend worden.'**
+  String get linkOpenFailed;
+
+  /// No description provided for @linkCopyAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Adres kopiëren'**
+  String get linkCopyAction;
+
+  /// No description provided for @linkCopied.
+  ///
+  /// In nl, this message translates to:
+  /// **'Adres gekopieerd'**
+  String get linkCopied;
+
   /// No description provided for @daylightLightShort.
   ///
   /// In nl, this message translates to:

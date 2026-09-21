@@ -2003,6 +2003,15 @@ class SEn extends S {
   String get daylightWeightNone => 'dark doesn\'t count';
 
   @override
+  String get linkOpenFailed => 'Could not open the link.';
+
+  @override
+  String get linkCopyAction => 'Copy address';
+
+  @override
+  String get linkCopied => 'Address copied';
+
+  @override
   String daylightLightShort(String from, String to) {
     return 'light $from–$to';
   }

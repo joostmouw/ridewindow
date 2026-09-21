@@ -56,6 +56,11 @@ class ProfileScreen extends ConsumerStatefulWidget {
 const _kPrivacyPolicyUrl =
     'https://joostmouw.github.io/ridewindow/privacy-policy.html';
 
+/// De bron van het weerbericht, genoemd omdat de licentie van Open-Meteo dat
+/// vraagt. Stond als letterlijke string in de `onTap` eronder; hier gezet zodat
+/// hij naast het privacy-adres staat en niet los in de boom rondzwerft.
+const _kOpenMeteoUrl = 'https://open-meteo.com/';
+
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   // Lokale state voor live slider-waarden (vóór onChangeEnd persistentie).
   late double _tempMin;
@@ -77,11 +82,51 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   // het Calendar-account als het ingelogde account bekend zijn EN verschillen.
   String? _calendarMismatchEmail;
 
-  Future<void> _launchPrivacyPolicy() async {
-    final uri = Uri.parse(_kPrivacyPolicyUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+  /// Opent een adres buiten de app, en zegt het als dat niet lukt.
+  ///
+  /// **Waarom hier geen `canLaunchUrl` meer staat.** Die stond er wel, met een
+  /// `if` zonder `else`. Op Android 11+ geeft `canLaunchUrl` false zodra het
+  /// manifest geen `<queries>` voor `VIEW`/`https` declareert -- ook met Chrome
+  /// op het toestel. De rij deed dan zichtbaar niets. Een tester tikte
+  /// vervolgens de rij eronder aan, Open-Meteo, die geen guard had, en meldde
+  /// dat het privacybeleid een weer-API opende. Het manifest is aangevuld,
+  /// maar de guard zelf was het echte probleem: een link die stil niets doet
+  /// is in elke situatie fout, en `canLaunchUrl` beantwoordt sowieso een
+  /// andere vraag ("is er iets dat dit kan?") dan de vraag die telt ("ging het
+  /// open?"). Dus gewoon proberen, en het resultaat serieus nemen.
+  ///
+  /// **Waarom een kopieerknop.** Lukt openen niet, dan is de gebruiker met
+  /// alleen "het lukte niet" niets opgeschoten -- zeker niet bij een
+  /// privacybeleid, waar hij recht op heeft. Met het adres op het klembord kan
+  /// hij zelf een browser openen.
+  Future<void> _openExternal(BuildContext context, String url) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    var opened = false;
+    try {
+      opened = await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (error) {
+      debugPrint('Openen van $url mislukt: $error');
     }
+    if (opened) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(s.linkOpenFailed),
+        action: SnackBarAction(
+          label: s.linkCopyAction,
+          onPressed: () async {
+            await Clipboard.setData(ClipboardData(text: url));
+            messenger.showSnackBar(
+              SnackBar(content: Text(s.linkCopied)),
+            );
+          },
+        ),
+        duration: const Duration(seconds: 6),
+      ),
+    );
   }
 
   /// Vraag POST_NOTIFICATIONS op en toon SnackBar als SCHEDULE_EXACT_ALARM niet beschikbaar is.
@@ -1258,15 +1303,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           )
                         : null),
               ),
+              // Twee rijen met hetzelfde pijltje horen zich hetzelfde te
+              // gedragen. Tot 1.0.35 deed de bovenste het via `canLaunchUrl`
+              // met `externalApplication` en de onderste via een kale
+              // `launchUrl` zonder mode, dus in een in-app tab. Dat verschil
+              // was niet bedoeld en het was precies wat de melding onleesbaar
+              // maakte. Nu allebei door dezelfde helper.
               ListTile(
                 title: Text(s.privacyPolicy),
                 trailing: const Icon(AppIcons.arrowSquareOut),
-                onTap: _launchPrivacyPolicy,
+                onTap: () => _openExternal(context, _kPrivacyPolicyUrl),
               ),
               ListTile(
                 title: Text(s.weatherDataAttribution),
                 trailing: const Icon(AppIcons.arrowSquareOut),
-                onTap: () => launchUrl(Uri.parse('https://open-meteo.com/')),
+                onTap: () => _openExternal(context, _kOpenMeteoUrl),
               ),
               ListTile(
                 title: Text(s.version),

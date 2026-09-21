@@ -2008,6 +2008,15 @@ class SNl extends S {
   String get daylightWeightNone => 'donker telt niet mee';
 
   @override
+  String get linkOpenFailed => 'De link kon niet geopend worden.';
+
+  @override
+  String get linkCopyAction => 'Adres kopiëren';
+
+  @override
+  String get linkCopied => 'Adres gekopieerd';
+
+  @override
   String daylightLightShort(String from, String to) {
     return 'licht $from–$to';
   }

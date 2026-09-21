@@ -85,5 +85,24 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!--
+            Zonder dit blok ziet de app op Android 11+ geen enkele browser.
+            Package visibility verbergt sinds API 30 alles wat niet expliciet
+            bevraagd wordt, en `canLaunchUrl` bouwt op precies die bevraging.
+            url_launcher_android brengt deze declaratie niet zelf mee (zijn
+            manifest bevat alleen een WebViewActivity), dus de app moet het
+            doen.
+
+            Wat het kostte: de rij "Privacy Policy" in Profiel stond achter een
+            `if (await canLaunchUrl(...))` zonder else. Die gaf false, er
+            gebeurde niets, en de tester tikte door naar de rij eronder. Dat is
+            de Open-Meteo-link, die geen guard had en dus wel opende -- met
+            "Free Weather API" bovenaan. Zo werd dit gemeld als "het
+            privacybeleid opent een weer-API". Gevonden op 2026-09-21.
+        -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
     </queries>
 </manifest>

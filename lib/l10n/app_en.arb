@@ -610,6 +610,9 @@
   "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
   "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}},
   "daylightWeightNone": "dark doesn't count",
+  "linkOpenFailed": "Could not open the link.",
+  "linkCopyAction": "Copy address",
+  "linkCopied": "Address copied",
   "daylightLightShort": "light {from}\u2013{to}",
   "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
 }

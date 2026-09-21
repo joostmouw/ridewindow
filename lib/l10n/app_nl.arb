@@ -642,6 +642,9 @@
   "@blockRidableSpans": {"placeholders": {"spans": {"type": "String"}}},
   "@blockLongestRide": {"placeholders": {"hours": {"type": "int"}}},
   "daylightWeightNone": "donker telt niet mee",
+  "linkOpenFailed": "De link kon niet geopend worden.",
+  "linkCopyAction": "Adres kopiëren",
+  "linkCopied": "Adres gekopieerd",
   "daylightLightShort": "licht {from}\u2013{to}",
   "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
 }
