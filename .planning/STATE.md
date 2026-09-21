@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-21T16:10:00.000Z"
+last_updated: "2026-09-21T16:45:00.000Z"
 last_activity: 2026-09-21
 progress:
   total_phases: 12
@@ -23,14 +23,14 @@ punten in `HANDOFF.json`.
 
 | Waar | Stand |
 |---|---|
-| Play closed testing (Alpha) | **1.0.38 (49)** — build 50 en 51 gaan hier pas heen na toestelgoedkeuring (release-route, `docs/RELEASE-ROUTE.md`) |
-| Play internal testing | **1.0.40 (51)**, geüpload 2026-09-21 via de API (`419c7fc`): diepe link voor de e-mailbevestiging |
-| Oppo | nog op 1.0.39 (50) tot de update binnenkomt (had de e-mail-login); build 51 voegt de deep link toe |
+| Play closed testing (Alpha) | **1.0.38 (49)** — build 52 gaat hier pas heen na toestelgoedkeuring (release-route, `docs/RELEASE-ROUTE.md`) |
+| Play internal testing | **1.0.41 (52)**, geüpload 2026-09-21 via de API: actuele Supabase anon key; account aanmaken in 50/51 faalde met `401 Invalid API key` |
+| Oppo | update naar internal **1.0.41 (52)** staat klaar. Daarna verse e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
-| main | 1.0.40+51 lokaal, 8 commits voor op origin (waaronder 82f75f6 e-mail-login, 0c21822 route, 1efae0b/419c7fc releases) — niet gepusht |
+| main | 1.0.41+52 lokaal, releasecommit voor build 52 nog te maken; vóór deze taak 8 commits voor op origin — niet gepusht |
 | PWA live | **1.0.38 (49)** op `my-project-joost.web.app`; de web-login zit gebouwd maar de PWA is nog niet op 50/51 gezet |
-| Supabase dashboard | Site URL staat op `https://my-project-joost.web.app` (gebruiker, 2026-09-21); **Additional Redirect URLs moet `ridewindow://**` krijgen voordat de deep link werkt** |
-| Oppo | app uit Play op 49. **Het peloton-lint is op het toestel goedgekeurd** (Joost, 2026-09-21): leesbaar op de maat waarop het in de app staat. Zie OPEN.md punt 5: Agenda staat op "Not connected", app op Engels |
+| Supabase dashboard | Site URL staat op `https://my-project-joost.web.app`; Additional Redirect URLs bevat `ridewindow://**` (Joost, 2026-09-21). De actuele anon key zit in build 52; signup-probe komt voorbij key-validatie maar raakte daarna de mailrate-limit |
+| Oppo | build 52 via Play internal ophalen en de e-mailaccount-flow testen. **Het peloton-lint is op het toestel goedgekeurd** (Joost, 2026-09-21): leesbaar op de maat waarop het in de app staat. Zie OPEN.md punt 5: Agenda staat op "Not connected", app op Engels |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
 feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de backlog (#72).

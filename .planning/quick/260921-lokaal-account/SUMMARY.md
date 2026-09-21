@@ -112,3 +112,23 @@ aanmaken → mailtikken → de app opent vanzelf en je bent ingelogd.
 - Geen "werkelijk lokaal account" (pincode) — expliciet afgewezen door Joost:
   daarmee vervalt het nut van het account (cloudkopie, maatjes, meerdere
   toestellen).
+
+## Build 52: waarom account aanmaken in 50/51 niet werkte
+
+De eerste toestelproef na build 51 eindigde met de algemene melding
+"Account aanmaken is mislukt". Logcat bevatte geen bruikbare Dart-regel, dus
+dezelfde signup is rechtstreeks tegen `/auth/v1/signup` geprobed:
+
+- de anon key die in build 51 zat gaf onmiddellijk `401 Invalid API key`;
+- de actuele anon key uit het Supabase-dashboard heeft project-ref
+  `hcdrydlgqpnmumfupgcx` en rol `anon`, en verschilt aantoonbaar van de oude;
+- met de actuele key verdween de 401. Een volgende probe bereikte
+  `429 over_email_send_rate_limit`: de gateway accepteert de key, maar de
+  uitgaande bevestigingsmail-limiet van Supabase was door de proeven geraakt.
+
+De actuele publieke anon key is daarom opgenomen in **1.0.41+52**. De suite is
+groen, de AAB bouwde en build 52 staat op Play internal. Alpha blijft op 49 tot
+Joost op de Oppo controleert: account aanmaken, bevestigingsmail openen, app
+opent via `ridewindow://confirm`, sessie is ingelogd. Als Supabase nog 429
+teruggeeft, eerst de mailrate-limit laten verlopen; dat is geen nieuwe fout in
+build 52.

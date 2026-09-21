@@ -1,4 +1,4 @@
-De e-mailbevestiging brengt je nu terug naar de app.
+Een account aanmaken met een e-mailadres werkt weer na een aanpassing aan de
+authenticatieconfiguratie.
 
-Maak een account aan, tik de link in de bevestigingsmail en de app opent
-vanzelf. Je bent meteen ingelogd.
+De bevestigingslink brengt je nog steeds rechtstreeks terug naar de app.

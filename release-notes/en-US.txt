@@ -1,4 +1,4 @@
-The email confirmation now brings you back into the app.
+Creating an account with an email address works again after an authentication
+configuration update.
 
-After creating an account, tap the link in the confirmation email and the
-app opens by itself. You are signed in immediately.
+The confirmation link still brings you straight back into the app.

@@ -3,6 +3,22 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 52: 1.0.41+52
+
+**Datum:** 2026-09-21
+**Track:** Internal testing. De gesloten test blijft op build 49 tot Joost deze
+build op de Oppo heeft goedgekeurd
+
+**Inhoud**
+- Een e-mailaccount aanmaken werkte niet in build 50 en 51: de meegebakken
+  publieke Supabase anon key was niet meer geldig en elke signup eindigde
+  daardoor vóór e-mailvalidatie met `401 Invalid API key`
+- De actuele anon key uit hetzelfde Supabase-project is meegebakken. Een
+  rechtstreekse signup-probe komt nu voorbij de gateway; de resterende
+  `429 over_email_send_rate_limit` is de tijdelijke uitgaande-maillimiet van
+  Supabase en staat los van de app-build
+- De app-deep-link `ridewindow://confirm` uit build 51 blijft ongewijzigd
+
 ## Build 51: 1.0.40+51
 
 **Datum:** 2026-09-21
