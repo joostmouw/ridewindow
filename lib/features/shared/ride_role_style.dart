@@ -5,15 +5,21 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
-/// Hoe een rol eruitziet: één icoon, één kleur, één zin.
+/// Hoe een rol eruitziet: hooguit één icoon, één kleur, één zin.
 ///
 /// **Eén bron voor alle drie de plekken waar een rit staat** -- Home, de
 /// rittenlijst en het detailscherm. Tot 2026-09-08 droegen "jij organiseert"
 /// en "je gaat mee" allebei [AppIcons.usersThree] en verschilden ze alleen in
 /// de sectiekop waaronder ze toevallig stonden; wie de kop niet las, las het
-/// verschil niet (schets 008). Vier rollen, vier iconen, vier kleuren -- en op
-/// elk scherm dezelfde.
-({IconData icon, Color color, String label}) rideRoleStyle(
+/// verschil niet (schets 008).
+///
+/// **Herzien in schets 014 (2026-09-21).** Niet elke rol verdient een icoon.
+/// Dat een rit gedeeld is, zegt het merkteken links op de kaart al ([RideMark]);
+/// een tweede tekening in de regel eronder zei hetzelfde nog een keer. Er blijft
+/// één icoon over dat iets toevoegt -- de megafoon: *jij* bent de organisator.
+/// Meerijden is dan tekst, en dat is genoeg. De twee rollen die iets van jou
+/// vragen of iets doorstrepen houden hun icoon, want die moeten opvallen.
+({IconData? icon, Color color, String label}) rideRoleStyle(
   BuildContext context,
   RideEntry entry,
 ) {
@@ -28,18 +34,20 @@ import 'package:ridewindow/theme/app_theme.dart';
         color: rw.ridePending,
         label: s.rolePendingFrom(who),
       ),
+    // De megafoon van de roeicoach, niet langer een vlag: een vlag zegt
+    // "finish" en niet "ik heb dit georganiseerd" (Joost, schets 014).
     RideRole.organiser => (
-        icon: AppIcons.flag,
+        icon: AppIcons.megaphoneSimple,
         color: rw.rideOrganiser,
         label: s.roleOrganiser,
       ),
     RideRole.joined => (
-        icon: AppIcons.usersThree,
+        icon: null,
         color: rw.plannedRide,
         label: s.roleJoinedWith(who),
       ),
     RideRole.solo => (
-        icon: AppIcons.personSimpleBike,
+        icon: null,
         color: rw.textTertiary,
         label: s.roleSolo,
       ),
@@ -68,8 +76,12 @@ class RideRoleLine extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(style.icon, size: dense ? 14 : 15, color: style.color),
-        const SizedBox(width: 6),
+        // Geen icoon, geen lege ruimte: bij "je gaat mee" en "alleen jij"
+        // begint de zin gewoon links (schets 014).
+        if (style.icon case final icon?) ...[
+          Icon(icon, size: dense ? 14 : 15, color: style.color),
+          const SizedBox(width: 6),
+        ],
         Expanded(
           child: Text(
             style.label,
@@ -93,12 +105,17 @@ class RideRoleLine extends StatelessWidget {
   }
 }
 
-/// "2 gaan mee · 1 wacht nog" -- alleen voor de rit die jij organiseert.
+/// "2 gaan mee · 1 wacht nog" -- bij elke gedeelde rit.
 ///
-/// Bij andermans rit bewust niet: daar is "van wie is dit" de eerste vraag en
-/// niet "hoeveel man gaat er mee", en dat antwoord staat al in [RideRoleLine].
+/// **Tot schets 014 alleen bij je eigen rit.** De redenering was dat bij
+/// andermans rit "van wie is dit" de eerste vraag is; in de praktijk wilde je
+/// ook daar weten met hoeveel je rijdt en wie er nog moet antwoorden. De zin
+/// staat nu onder elke rit die een groep heeft -- zie [PelotonCounter], die hem
+/// samen met de fietsjes toont.
 String? pelotonSummary(BuildContext context, RideEntry entry) {
-  if (entry.role != RideRole.organiser) return null;
+  // Een afgezegde rit adverteert zijn groep niet: hij is te vinden, maar
+  // vraagt geen aandacht meer (zie [RideRole.declined]).
+  if (entry.group == null || entry.isDeclined) return null;
   final s = S.of(context);
   final parts = <String>[s.ridePelotonGoing(entry.acceptedCount)];
   if (entry.pendingCount > 0) {
