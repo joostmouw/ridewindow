@@ -1,6 +1,6 @@
 ---
 slug: consent-card-en-privacy-link
-status: awaiting_human_verify
+status: resolved
 trigger: "Tester Androidguju67 meldt twee bugs in 1.0.35+46. (1) De toestemmingskaart \"Help make the app better?\" sluit niet bij \"No thanks\" noch bij \"Yes, go ahead\"; na de app killen en herstarten is de vraag wel weg. (2) Privacy Policy in Profiel opent een \"free weather api\"-pagina in de in-app browser in plaats van het privacybeleid."
 created: 2026-09-21
 updated: 2026-09-21
@@ -349,3 +349,53 @@ sweep_resultaat: |
      hebben alle drie `https://joostmouw.github.io/ridewindow/privacy-policy.html`
      (`docs/CONSOLE-SETUP-CHECKLIST.md` regel 22 en 98). De pagina is live
      gecontroleerd op 2026-09-21: HTTP 200. Hier was dus niets te repareren.
+
+## Verificatie op het toestel (2026-09-21, orkestrator)
+
+De sessie stond op `awaiting_human_verify` omdat de debugger de APK bewust niet
+wilde sideloaden: dat kost op dit toestel de lokale database en de
+Calendar-grant. Die afweging is omzeild door via de Play-API te releasen, zodat
+het toestel de build als gewone update kreeg.
+
+**Eerst de bugs gereproduceerd op 1.0.35 (46)**, de build die op dat moment bij
+de testers stond. Dit ontbrak nog: tot dan toe rustte de diagnose op codelezing
+en tests, niet op waarneming van het uitgeleverde artefact.
+
+- Bug 1: tik op "Nee, liever niet" liet de kaart onveranderd staan. Na
+  `am force-stop` en opnieuw openen was de vraag weg, wat bevestigt dat de
+  schrijfactie wel landde en alleen de `pop()` niet.
+- Bug 2: tik op "Privacybeleid", daarna `dumpsys activity activities`. De
+  `topResumedActivity` was nog steeds
+  `ridewindow.joost.amsterdam/MainActivity`. Er opende geen browser. Dat is een
+  meting, geen interpretatie, en sluit de lezing uit waarin de rij wel opent
+  maar naar het verkeerde adres wijst.
+
+**Daarna 1.0.36 (47) geverifieerd**, geinstalleerd via de internal track.
+
+- Bug 2: Joost bevestigde dat het privacybeleid nu opent.
+- Bug 1: toestemming gereset via Profiel > 5x versienummer > "Reset
+  usage-statistics consent", daarna twee keer koud gestart (de vraag komt bij
+  de tweede start, `kAskAtOpenCount = 2`). Kaart verscheen, tik op "No thanks",
+  kaart sloot meteen.
+
+**Uitgerold:** 1.0.36 (47) via `tool/play_upload.dart` naar internal, daar
+geverifieerd, en als dezelfde bytes gepromoveerd naar alpha. Beide tracks staan
+op 47.
+
+## Wat deze sessie over het proces leert
+
+Beide bugs waren onzichtbaar voor code review en voor de testsuite, en beide
+hadden dezelfde vorm: **een tak die stil niets doet**. Een `if` zonder `else`,
+en een `pop()` achter een await die kon gooien. Geen van beide geeft een fout,
+een log of een melding; ze laten de gebruiker achter met een scherm dat niet
+reageert.
+
+De sweep vond er een derde van precies dezelfde soort in `onboarding_screen.dart`,
+op de plek waar een nieuwe gebruiker voor het eerst iets indrukt. Dat is geen
+toeval maar een patroon dat het waard is om actief op te zoeken bij elke
+volgende wijziging: waar staat er een navigatie of een sluitactie achter een
+await, en wat gebeurt er als die await gooit.
+
+En tot slot: dit is gevonden door een vreemde, niet door Joost. Joost weet waar
+hij moet drukken en wat er hoort te gebeuren. Dat is precies de blindheid die
+externe testers opheffen, en het argument om er meer te hebben.
