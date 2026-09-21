@@ -21,12 +21,14 @@ import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
+import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/theme/app_theme.dart';
@@ -85,9 +87,10 @@ class FakeCalendarService extends CalendarService {
 
   @override
   Future<void> addRideSlotToCalendar(
-    RideSlot slot,
-    List<HourlyForecast> forecasts,
-  ) async {
+    RideSlot slot, {
+    required String title,
+    required String description,
+  }) async {
     return _completer.future;
   }
 }
@@ -98,9 +101,10 @@ class FakeCalendarService extends CalendarService {
 class SuccessFakeCalendarService extends CalendarService {
   @override
   Future<void> addRideSlotToCalendar(
-    RideSlot slot,
-    List<HourlyForecast> forecasts,
-  ) async {
+    RideSlot slot, {
+    required String title,
+    required String description,
+  }) async {
     // Direct succes — geen OAuth, geen netwerk.
   }
 }
@@ -115,9 +119,10 @@ class ErrorFakeCalendarService extends CalendarService {
 
   @override
   Future<void> addRideSlotToCalendar(
-    RideSlot slot,
-    List<HourlyForecast> forecasts,
-  ) async {
+    RideSlot slot, {
+    required String title,
+    required String description,
+  }) async {
     throw Exception(message);
   }
 }
@@ -131,10 +136,31 @@ class TrackingFakeCalendarService extends CalendarService {
 
   @override
   Future<void> addRideSlotToCalendar(
-    RideSlot slot,
-    List<HourlyForecast> forecasts,
-  ) async {
+    RideSlot slot, {
+    required String title,
+    required String description,
+  }) async {
     wasCalled = true;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// CapturingFakeCalendarService: legt title/description vast in plaats van iets
+// te doen. Gebruikt om te bewijzen dat de agenda-knop en de deel-knop de
+// vertaalde, eenheid-bewuste tekst doorgeven (quick 260921-p3d).
+// ---------------------------------------------------------------------------
+class CapturingFakeCalendarService extends CalendarService {
+  String? capturedTitle;
+  String? capturedDescription;
+
+  @override
+  Future<void> addRideSlotToCalendar(
+    RideSlot slot, {
+    required String title,
+    required String description,
+  }) async {
+    capturedTitle = title;
+    capturedDescription = description;
   }
 }
 
@@ -177,7 +203,6 @@ List<HourlyForecast> makeForecasts() {
   ];
 }
 
-
 /// Profiel-stub. De daglichtbalk leest sinds 2026-09-19 het daglichtgewicht uit
 /// het profiel. Zonder deze override haalt `profileProvider` de echte
 /// Drift-database op en blijft er een timer hangen tot na de test.
@@ -206,6 +231,8 @@ Widget wrapInMaterial(
   Widget child, {
   List<HourlyForecast> forecasts = const [],
   List<HourlyScore> hours = const [],
+  Locale locale = const Locale('nl'),
+  UnitPrefs units = UnitPrefs.defaults,
 }) {
   return ProviderScope(
     overrides: [
@@ -214,10 +241,11 @@ Widget wrapInMaterial(
       weatherProvider.overrideWith(() => FakeWeatherNotifier(forecasts)),
       allHourlyScoresProvider.overrideWithValue(hours),
       plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+      unitsProvider.overrideWithValue(units),
     ],
     child: MaterialApp(
       home: child,
-      locale: const Locale('nl'),
+      locale: locale,
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: ThemeData(extensions: const [RideWindowTheme.light]),
@@ -363,6 +391,207 @@ void main() {
               'PERS-04: CalendarService.addRideSlotToCalendar mag niet worden '
               'aangeroepen zonder expliciete gebruikerstik — data verlaat het '
               'apparaat niet tenzij de gebruiker toestemming geeft.');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Regressiematrix (quick 260921-p3d): de agenda-knop bouwt title/description
+  // via S.of(context) en unitsProvider in plaats van CalendarService's oude,
+  // altijd-Nederlandse km/u-tekst. _shareSlot() roept dezelfde private
+  // _weatherSummaryText aan als de agenda-knop, dus deze matrix via de
+  // agenda-knop dekt beide aanroepers -- share_plus zelf is niet via DI
+  // vervangbaar en blijft daarom buiten deze testlaag.
+  // ---------------------------------------------------------------------------
+  group('RideDetailScreen agenda-tekst volgt taal en eenheden', () {
+    Future<void> tapAddToCalendar(WidgetTester tester, S s) async {
+      await tester.scrollUntilVisible(
+        find.text(s.addToGoogleCalendar),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text(s.addToGoogleCalendar));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+        'NL, standaardeenheden: titel "Fietsrit", omschrijving "droog" en "km/h" (niet "km/u")',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('nl'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+      final forecasts = makeForecasts();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: forecasts,
+            calendarServiceFactory: () => service,
+          ),
+          forecasts: forecasts,
+          hours: slot.hours,
+          locale: const Locale('nl'),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      expect(service.capturedTitle, contains('Fietsrit'));
+      expect(service.capturedDescription, contains('droog'));
+      expect(service.capturedDescription, contains('km/h'));
+      expect(service.capturedDescription, isNot(contains('km/u')));
+    });
+
+    testWidgets(
+        'EN, standaardeenheden: titel "Bike ride", omschrijving "dry" en "km/h"',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('en'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+      final forecasts = makeForecasts();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: forecasts,
+            calendarServiceFactory: () => service,
+          ),
+          forecasts: forecasts,
+          hours: slot.hours,
+          locale: const Locale('en'),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      expect(service.capturedTitle, contains('Bike ride'));
+      expect(service.capturedDescription, contains('dry'));
+      expect(service.capturedDescription, contains('km/h'));
+    });
+
+    testWidgets(
+        'WindUnit.mph: omschrijving bevat de omgerekende waarde en "mph"',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('nl'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+      final forecasts = makeForecasts();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: forecasts,
+            calendarServiceFactory: () => service,
+          ),
+          forecasts: forecasts,
+          hours: slot.hours,
+          units: const UnitPrefs(wind: WindUnit.mph),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      // 12km/u * 0.621371 = 7,46 -> afgerond 7 mph.
+      expect(service.capturedDescription, contains('7 mph'));
+    });
+
+    testWidgets(
+        'WindUnit.beaufort: omschrijving bevat de met beaufortFromKmh berekende windkracht en "Bft"',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('nl'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+      final forecasts = makeForecasts();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: forecasts,
+            calendarServiceFactory: () => service,
+          ),
+          forecasts: forecasts,
+          hours: slot.hours,
+          units: const UnitPrefs(wind: WindUnit.beaufort),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      // beaufortFromKmh(12) == 3 (grenzen 1, 6, 12, 20 ...).
+      expect(service.capturedDescription, contains('3 Bft'));
+    });
+
+    testWidgets(
+        'TempUnit.fahrenheit: omschrijving bevat de omgerekende temperatuur en "°F"',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('nl'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+      final forecasts = makeForecasts();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: forecasts,
+            calendarServiceFactory: () => service,
+          ),
+          forecasts: forecasts,
+          hours: slot.hours,
+          units: const UnitPrefs(temp: TempUnit.fahrenheit),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      // 18°C -> 18*9/5+32 = 64,4 -> afgerond 64°F.
+      expect(service.capturedDescription, contains('64°F'));
+    });
+
+    testWidgets(
+        'Lege forecast-lijst, NL: omschrijving is exact calendarNoWeatherData (NL)',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('nl'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: const [],
+            calendarServiceFactory: () => service,
+          ),
+          hours: slot.hours,
+          locale: const Locale('nl'),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      expect(service.capturedDescription, equals(s.calendarNoWeatherData));
+      expect(service.capturedDescription, equals('Geen weerdata beschikbaar'));
+    });
+
+    testWidgets(
+        'Lege forecast-lijst, EN: omschrijving is exact calendarNoWeatherData (EN)',
+        (tester) async {
+      final s = await S.delegate.load(const Locale('en'));
+      final service = CapturingFakeCalendarService();
+      final slot = makeSlot();
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(
+            slot: slot,
+            forecasts: const [],
+            calendarServiceFactory: () => service,
+          ),
+          hours: slot.hours,
+          locale: const Locale('en'),
+        ),
+      );
+      await tapAddToCalendar(tester, s);
+
+      expect(service.capturedDescription, equals(s.calendarNoWeatherData));
+      expect(service.capturedDescription, equals('No weather data available'));
     });
   });
 }
