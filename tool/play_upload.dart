@@ -56,6 +56,11 @@ Zonder te uploaden:
   --promote <code>   Zet een versionCode die al op Play staat op --track.
                      Geen upload, geen AAB nodig. Bijv.:
                        --promote 46 --track alpha
+  --set-notes <code> Vervangt alleen de release-notities van een build die al
+                     op --track staat. Geen upload, geen AAB nodig. Voor als
+                     de winkel een zin afkapt en de tekst rechtgezet moet
+                     worden. Bijv.:
+                       --set-notes 48 --track internal
   --list-tracks      Toont welke tracks er zijn en welke builds erop staan.
 ''';
 
@@ -94,27 +99,43 @@ Future<int> _run(List<String> args) async {
     return 64;
   }
 
-  // Twee routes die geen bundel nodig hebben. Ze staan bewust vóór de
-  // AAB-controles: promoveren gaat over een build die al op Play staat, en
-  // die hoeft hier niet meer op schijf te liggen.
+  // Drie routes die geen bundel nodig hebben. Ze staan bewust vóór de
+  // AAB-controles: promoveren en notities vervangen gaan over een build die
+  // al op Play staat, en die hoeft hier niet meer op schijf te liggen.
   final promoteCode = opts['promote'];
+  final setNotesCode = opts['set-notes'];
   final listTracks = flags.contains('list-tracks');
   if (promoteCode != null && int.tryParse(promoteCode) == null) {
     stderr.writeln('✗ --promote verwacht een versionCode, geen "$promoteCode".');
     return 64;
   }
+  if (setNotesCode != null && int.tryParse(setNotesCode) == null) {
+    stderr.writeln('✗ --set-notes verwacht een versionCode, '
+        'geen "$setNotesCode".');
+    return 64;
+  }
 
-  if (promoteCode != null || listTracks) {
+  if (promoteCode != null || setNotesCode != null || listTracks) {
     final api = await _connect(keyPath);
     if (api == null) return 66;
+    final notes = _readNotes(notesArgs);
     try {
       if (listTracks) return await _listTracks(api.$1);
-      return await _promote(
+      if (promoteCode != null) {
+        return await _promote(
+          api.$1,
+          track: track,
+          versionCode: promoteCode,
+          status: status,
+          releaseNotes: notes,
+          dryRun: dryRun,
+        );
+      }
+      return await _setNotes(
         api.$1,
         track: track,
-        versionCode: promoteCode!,
-        status: status,
-        releaseNotes: _readNotes(notesArgs),
+        versionCode: setNotesCode!,
+        releaseNotes: notes,
         dryRun: dryRun,
       );
     } finally {
@@ -334,6 +355,81 @@ Future<int> _promote(
   }
 }
 
+/// Vervangt alleen de release-notities van een build die al op een track
+/// staat.
+///
+/// Waarom dit bestaat (2026-09-21): notities die de 500-tekengrens van Play
+/// bijna raakten werden in de winkel zichtbaar afgekapt midden in een zin.
+/// De bundel stond al goed — alleen de tekst moest korter en volledig, en
+/// dat moet kunnen zonder de bundel opnieuw te uploaden of promoveren.
+Future<int> _setNotes(
+  play.AndroidPublisherApi api, {
+  required String track,
+  required String versionCode,
+  required List<play.LocalizedText> releaseNotes,
+  required bool dryRun,
+}) async {
+  if (releaseNotes.isEmpty) {
+    stderr.writeln('✗ --set-notes verwacht (minstens één) --notes.');
+    return 64;
+  }
+
+  stdout.writeln('\nNotities van versionCode $versionCode op "$track" '
+      'vervangen');
+  if (dryRun) {
+    stdout.writeln('— dry-run: er is niets naar Play geschreven.');
+    return 0;
+  }
+
+  final edit = await api.edits.insert(play.AppEdit(), _packageName);
+  final editId = edit.id!;
+  stdout.writeln('✓ Edit $editId geopend');
+  try {
+    final current = await api.edits.tracks.get(_packageName, editId, track);
+    final releases = current.releases ?? const <play.TrackRelease>[];
+    final index = releases.indexWhere(
+      (r) => (r.versionCodes ?? const []).contains(versionCode),
+    );
+    if (index == -1) {
+      throw StateError(
+        'Geen release met versionCode $versionCode op "$track".',
+      );
+    }
+    final release = releases[index];
+
+    // De rest van de release ongewijzigd laten — naam, status, targeting. Het
+    // rechtzetten van een tekst mag niets anders verschuiven.
+    final updated = play.TrackRelease(
+      name: release.name,
+      versionCodes: release.versionCodes,
+      status: release.status,
+      releaseNotes: releaseNotes,
+      userFraction: release.userFraction,
+      inAppUpdatePriority: release.inAppUpdatePriority,
+      countryTargeting: release.countryTargeting,
+    );
+    final newReleases = [...releases]..[index] = updated;
+
+    await api.edits.tracks.update(
+      play.Track(track: track, releases: newReleases),
+      _packageName,
+      editId,
+      track,
+    );
+    stdout.writeln('✓ Notities van $versionCode op "$track" vervangen');
+    await api.edits.commit(_packageName, editId);
+    stdout.writeln('✓ Edit doorgevoerd\n');
+    return 0;
+  } catch (e) {
+    stderr.writeln('\n✗ Mislukt: $e');
+    try {
+      await api.edits.delete(_packageName, editId);
+      stderr.writeln('  Edit $editId is opgeruimd.');
+    } catch (_) {}
+    return 70;
+  }
+}
+
 /// De edit-cyclus: insert → upload → track → commit. Alles binnen één edit;
 /// mislukt er iets halverwege, dan wordt de edit weggegooid zodat er geen
 /// halve release in de console blijft hangen.
@@ -491,12 +587,14 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
       throw FormatException('Geen release-notes op $path.');
     }
     final text = file.readAsStringSync().trim();
-    if (text.length > 500) {
-      // Play kapt af op 500 tekens; liever hier stoppen dan een halve zin op de
-      // winkelpagina.
+    if (text.length > 400) {
+      // Play kapt zichtbaar af ver onder de 500 tekens die de API toestaat:
+      // notities van 475 en 486 tekens kwamen op 2026-09-21 in de winkel
+      // midden in een zin afgekapt te staan. Houd notities kort en volledig;
+      // een afgekapte laatste zin is erger dan een kortere mededeling.
       throw FormatException(
         'Release-notes voor $language zijn ${text.length} tekens; '
-        'Play staat er 500 toe.',
+        'houd ze onder de 400, anders kapt de winkel de laatste zin af.',
       );
     }
     notes.add(play.LocalizedText(language: language, text: text));
@@ -508,7 +606,7 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
   final opts = <String, String>{};
   final notes = <String>[];
   final flags = <String>{};
-  const valueOptions = {'track', 'aab', 'key', 'status', 'promote'};
+  const valueOptions = {'track', 'aab', 'key', 'status', 'promote', 'set-notes'};
   const boolFlags = {'help', 'dry-run', 'force', 'list-tracks'};
 
   for (var i = 0; i < args.length; i++) {

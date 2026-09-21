@@ -135,6 +135,25 @@ je het kunt zien. De uitvoer toont meteen welke build op welke track staat:
 Let op: een promotie naar een gesloten of open track gaat langs de review van
 Google; internal niet. De testers zien de build dus niet meteen.
 
+## Notities achteraf rechtzetten
+
+Staat er een build al op een track en voldoet de tekst niet (bijv. de winkel
+kapt een zin af), vervang dan alleen de notities — de bundel blijft liggen:
+
+```bash
+dart run tool/play_upload.dart --set-notes 48 --track internal \
+  --notes en-US:release-notes/en-US.txt \
+  --notes nl-NL:release-notes/nl-NL.txt
+```
+
+## Notitielengte — waarom 400 en niet 500
+
+Play staat 500 tekens per taal toe, maar de winkel kapt zichtbaar af ver onder
+die grens: notities van 475 en 486 tekens stonden op 2026-09-21 in de store
+midden in een zin afgekapt. De tool weigert daarom notities boven 400 tekens.
+Houd notities kort en volledig: complete zinnen, geen halve mededeling die in
+de winkel als "…" eindigt.
+
 ## Opties
 
 | Optie | Standaard | |
@@ -143,7 +162,9 @@ Google; internal niet. De testers zien de build dus niet meteen.
 | `--status` | `completed` | `draft` als je in de console nog wilt kijken vóór uitrol |
 | `--aab` | `build/app/outputs/bundle/release/app-release.aab` | |
 | `--key` | `~/.config/ridewindow/play-service-account.json` | |
-| `--notes` | — | `taal:pad`, herhaalbaar. Play kapt af op 500 tekens; het script stopt eerder |
+| `--notes` | — | `taal:pad`, herhaalbaar. Het script stopt boven 400 tekens (zie de paragraaf over notitielengte) |
+| `--promote` | — | `--promote <versionCode>`: zet een bestaande build op `--track`, mét `--notes` |
+| `--set-notes` | — | `--set-notes <versionCode>`: vervangt alleen de notities van een bestaande release op `--track` |
 | `--dry-run` | — | Controleert alles en logt in, schrijft niets |
 | `--force` | — | Negeert de staleness-vangrail |
 

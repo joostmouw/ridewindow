@@ -1,11 +1,7 @@
-Dingen die stil faalden zeggen het nu. Dank voor je meldingen.
+Reparaties uit jullie meldingen. Dank voor het doorgeven.
 
-Een uitnodiging beantwoorden, een venster kiezen, maatjes uitnodigen, een
-link delen en een maatje verwijderen faalden stil bij een netwerkfout. Elke
-actie meldt het nu.
-
-Uitloggen meldt het als de server niet bereikbaar is. Zijn meldingen uit, dan
-legt een herinnering aanzetten dat uit en opent je instellingen.
-
-Nieuwe gebruikers lopen niet meer vast op het eerste scherm als een instelling
-niet opgeslagen kan worden.
+Dingen die stil faalden zeggen het nu: een uitnodiging beantwoorden, een
+venster kiezen, maatjes uitnodigen, een link delen, een maatje verwijderen
+en uitloggen. Een herinnering aanzetten terwijl meldingen uit staan wijst
+je naar je instellingen. Nieuwe gebruikers lopen niet meer vast op het
+eerste scherm.

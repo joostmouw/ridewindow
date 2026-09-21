@@ -1,11 +1,7 @@
-Things that failed quietly now say so. Thanks for your reports.
+Fixes from your reports. Thanks for sending them in.
 
-Answering an invite, choosing a window, inviting buddies, sharing an invite
-link and removing a buddy failed silently when the network failed. Each now
-shows a message.
-
-Signing out now says so when it cannot reach the server. If notifications are
-switched off, turning on a reminder explains this and opens your settings.
-
-New users can no longer get stuck on the first screen when a setting cannot
-be saved.
+Things that failed silently now say so: answering an invite, choosing a
+window, inviting buddies, sharing an invite link, removing a buddy, and
+signing out. Enabling a reminder while notifications are off now points
+you to your settings. New users can no longer get stuck on the first
+screen.
