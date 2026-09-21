@@ -1,7 +1,9 @@
-Fix: the app could quietly crash after you restarted your phone. It
-pointed at code that did not exist, and that is gone now. Feel free to
-reboot once.
+Fixes from the first tester reports. Thanks for sending them in.
 
-Otherwise the same as build 45: your day as one block on Home, shared
-rides with several windows to vote on, and the one-time question about
-anonymous usage statistics at the second start.
+The question about anonymous statistics would not close when you tapped
+either button. Your answer was saved, but the card stayed on screen. Both
+buttons work now.
+
+The Privacy Policy link in Profile did nothing, so a following tap landed
+on the weather data link instead. It now opens the real policy, and says
+so if it cannot.

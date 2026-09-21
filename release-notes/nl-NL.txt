@@ -1,7 +1,9 @@
-Fix: de app kon na het opnieuw opstarten van je telefoon stilletjes
-crashen. De oorzaak was een verwijzing naar code die niet bestond, en die
-is weg. Herstart je toestel gerust een keer.
+Reparaties uit de eerste testersmeldingen. Dank voor het doorgeven.
 
-Verder gelijk aan build 45: je dag als een blok op Home, gedeelde ritten
-met meerdere vensters om op te stemmen, en de eenmalige vraag om anonieme
-statistiek bij de tweede start.
+De vraag over anonieme statistiek ging niet dicht als je op een van de
+twee knoppen tikte. Je antwoord werd wel bewaard, maar de kaart bleef
+staan. Beide knoppen werken nu.
+
+De link naar het privacybeleid in Profiel deed niets. Daardoor kwam een
+volgende tik op de weerdata-link terecht. Hij opent nu het echte beleid,
+en zegt het als dat niet lukt.
