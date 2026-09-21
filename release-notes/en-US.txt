@@ -1,4 +1,4 @@
-Creating an account with an email address works again after an authentication
-configuration update.
+The welcome intro now has sound: you hear a bike get going and roll out, and
+the phone buzzes along with the wheel. Tapping still skips the intro.
 
-The confirmation link still brings you straight back into the app.
+Plus housekeeping on where the app's images and audio come from.
