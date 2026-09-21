@@ -1,4 +1,4 @@
-Sign in with any email address. A Google account is no longer required.
+The email confirmation now brings you back into the app.
 
-In your profile you can now create an account with an email address and a
-password. New accounts are confirmed by email first.
+After creating an account, tap the link in the confirmation email and the
+app opens by itself. You are signed in immediately.

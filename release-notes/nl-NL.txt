@@ -1,4 +1,4 @@
-Inloggen kan nu met elk e-mailadres. Een Google-account is niet meer nodig.
+De e-mailbevestiging brengt je nu terug naar de app.
 
-Maak in Profiel een account aan met een e-mailadres en een wachtwoord. Een
-nieuw account bevestig je eerst per e-mail.
+Maak een account aan, tik de link in de bevestigingsmail en de app opent
+vanzelf. Je bent meteen ingelogd.

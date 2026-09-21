@@ -3,6 +3,21 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 51: 1.0.40+51
+
+**Datum:** 2026-09-21
+**Track:** Internal testing. De gesloten test volgt pas na toestelgoedkeuring
+van Joost (release-route, `docs/RELEASE-ROUTE.md`)
+
+**Inhoud**
+- De bevestigingsmail van een nieuw e-mailaccount opent nu de app zelf, in
+  plaats van een dood internetadres (deep link `ridewindow://confirm`, OPEN.md
+  punt 11). Supabase stuurt de browser na het bevestigen naar de app; de
+  sessie wordt automatisch opgebouwd, dus je bent direct ingelogd
+- Daarvoor is een dashboardstap nodig geweest: in Supabase
+  (Authentication → URL Configuration → Additional Redirect URLs) staat
+  `ridewindow://**` sinds deze build
+
 ## Build 50: 1.0.39+50
 
 **Datum:** 2026-09-21
