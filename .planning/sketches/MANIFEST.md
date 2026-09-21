@@ -43,7 +43,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 009 | [nederlandse-teksten](009-nederlandse-teksten/) | Welk Nederlands spreekt deze app — en welk woord gebruikt hij voor zijn eigen kernbegrip? | **A — "fietsmoment"** (blok 2 beperkt, blok 4 afgewezen) | l10n, nederlands, toon, kleding, jargon |
 | 010 | [hoeveel-fiets](010-hoeveel-fiets/) | Hoeveel fietstaal verdraagt de app, en op welke plekken? | *nog te kiezen* | merk, toon, naamgeving, peloton, l10n |
 | 011 | [daglicht](011-daglicht/) | Hoe laat de app zien dat een venster in het donker valt, in zijn eigen vormtaal? | **A — vierde weerbalk, hele etmaal** | daglicht, weerbalken, scoring, profiel, fase-26 |
-| 014 | [peloton-rij](014-peloton-rij/) | Waar staat de rij fietsers die de groep telt, en wat vervangt het vlaggetje bij "Jij organiseert"? | *nog te kiezen* | peloton, iconografie, ritten, home, rollen |
+| 014 | [peloton-rij](014-peloton-rij/) | Waar staat de rij fietsers die de groep telt, en wat vervangt het vlaggetje bij "Jij organiseert"? | **Gekozen — lint links, megafoon in de regel, teller met wachters** | peloton, iconografie, ritten, home, rollen |
 
 ## Beslissingen die doorwerken
 
@@ -151,3 +151,6 @@ wat jij bent, in de regel staat wie er meerijdt* (D, E, F — D aanbevolen). Op 
 vandaag dubbel; dat verdwijnt in D. **Ronde 3** is het icoon zelf: Joost koos "drie fietsers in een lint",
 één teken in plaats van een rij. Dat teken is gemaakt uit de échte Phosphor-fietser, drie keer over
 elkaar, samengevoegd tot één pad (`icoon.html`) — bouwbaar als glyph, geen plaatje, geen extra pakket.
+**Gekozen (2026-09-21, `gekozen.html`):** links in het blauw het lint (groepsrit) of één fietser (alleen jij),
+op Home én in de rittenlijst; de megafoon alleen in de rolregel van je eigen rit; meerijden is tekst zonder
+icoon; en een teller van fietsjes waarvan de wachtenden doorzichtig zijn, met "3 gaan mee · 1 wacht nog".

@@ -2,7 +2,7 @@
 sketch: 014
 name: peloton-rij
 question: "Waar staat de rij fietsers die laat zien hoe groot een gedeelde rit is — en wat vervangt het vlaggetje bij 'Jij organiseert'?"
-winner: null
+winner: "Gekozen — zie gekozen.html"
 tags: [peloton, iconografie, ritten, home, rollen, detail]
 ---
 
@@ -52,6 +52,24 @@ te leggen met dezelfde uitsparing die Phosphor zelf gebruikt, en het resultaat s
 **één pad** — dus bouwbaar als glyph in een eigen icoonfont, zonder plaatje en zonder extra pakket.
 Afstelling: schaal 0,82 · afstand 420 · tussenruimte 86 · **halve** dikte-correctie (krimpen maakt de
 lijn dunner dan de buuriconen; volledig herstellen maakt hem te vet en loopt de wielen dicht).
+
+## Gekozen (2026-09-21) — `gekozen.html`
+Joost koos het lint én legde het systeem vast. Drie regels, de hele app door:
+
+1. **Links, in het blauw van een geplande rit, staat wat voor rit het is.** Het peloton-lint bij een
+   groepsrit, `person-simple-bike` als je alleen gaat. Op Home (20px) én in de rittenlijst (22px) —
+   die krijgt daarvoor een linkerkolom die hij vandaag niet heeft.
+2. **De megafoon staat in de rolregel en alleen daar**, en betekent: jíj organiseert. Ga je mee, dan
+   is de zin genoeg — "Je gaat mee met Bram" krijgt géén icoon meer (nu nog `usersThree`).
+3. **De teller laat zien wie al ja zei:** één fietsje per persoon, wachtenden op 32% dekking (45% in
+   donker), met "3 gaan mee · 1 wacht nog" ernaast. Ook bij andermans rit — vandaag krijg je die zin
+   alleen te zien als je zelf organiseert.
+
+Twee open vragen staan als knop in de pagina: **teller als fietsjes of als stippen** (naast het lint
+staan er anders veel fietsjes op één kaart), en **rittenlijst met of zonder die linkerkolom**.
+
+Bij het bouwen nog te beslissen: telt "3 gaan mee" jou mee, en hoeveel fietsjes tekenen we maximaal
+voordat het `+3` wordt.
 
 ## What to Look For
 - **Tel je de groep in één blik?** Gevuld = gaat mee, doorzichtig = wacht nog op antwoord.
