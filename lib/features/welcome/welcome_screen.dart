@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/features/welcome/spoke_track.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 
@@ -56,8 +57,22 @@ import 'package:ridewindow/theme/app_motion.dart';
 /// `router.dart`; wie die stap heeft gedaan ziet het nooit meer. Tikken slaat
 /// het wachten over — een intro die je niet kunt overslaan is geen intro maar
 /// een drempel.
+///
+/// **Geluid en trillingen (2026-09-21).** Onder de morph speelt een tijdlijn
+/// van spaaktikken met bij elke tik een korte trilling: een optrekkende rit,
+/// van zacht en traag zodra de fiets vorm krijgt tot vol tempo als de velgen
+/// dicht zijn. De wielen in het filmpje draaien zelf niet en de tikken zijn
+/// dus verzonnen, afgeleid uit de fasen van het filmpje (zie `spoke_track.dart`).
+/// Wie het wachten overslaat, breekt ook de rit af: geluid en trilling horen
+/// bij het beeld dat er nog staat.
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key});
+  const WelcomeScreen({super.key, this.spokeTrackPlayer});
+
+  /// Alleen voor tests: een opnamefake in plaats van de echte speler. Op
+  /// native wordt de echte gebruikt en op web en in de testomgeving juist
+  /// niets (zie `createSpokeTrackPlayer`).
+  @visibleForTesting
+  final SpokeTrackPlayer? spokeTrackPlayer;
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -77,10 +92,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   late final AnimationController _settle;
   Timer? _timer;
+  SpokeTrackPlayer? _spokes;
 
   @override
   void initState() {
     super.initState();
+    // De tijdlijn van de spaaktikken start op dezelfde klok als _settleAt
+    // hieronder: initState. Beide zijn relatief aan het begin van de intro.
+    _spokes = widget.spokeTrackPlayer ?? createSpokeTrackPlayer();
+    _spokes?.start();
     _settle = AnimationController(
       vsync: this,
       // Rustig. Op 900 ms schoot de renner het scherm in; over deze afstand
@@ -98,6 +118,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     }
   }
 
+  /// Tikken slaat het wachten over én breekt de rit af: het spaakgeluid en
+  /// de trillingen horen bij het beeld, en wie het beeld overslaat hoort
+  /// geen wiel meer dat er niet staat. De automatische afloop (de timer op
+  /// 972 ms) gebruikt bewust alleen `_startSettle`: zonder tik rolt de rit
+  /// door terwijl het geheel omhoog schuift, en dat is precies wat een
+  /// optrekkende rit op het eind hoort te doen.
+  void _skipIntro() {
+    _spokes?.stop();
+    _startSettle();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -113,6 +144,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void dispose() {
     _timer?.cancel();
+    _spokes?.stop();
     _settle.dispose();
     super.dispose();
   }
@@ -218,8 +250,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       // 2026-09-07. Deze twee schermen erven de achtergrond dus niet meer.
       backgroundColor: AppColors.brandLight,
       body: GestureDetector(
-        // Tikken slaat het wachten over.
-        onTap: _startSettle,
+        // Tikken slaat het wachten over, en breekt met _skipIntro ook de
+        // rit af (geluid en trilling stoppen mee).
+        onTap: _skipIntro,
         behavior: HitTestBehavior.opaque,
         child: SafeArea(
           child: AnimatedBuilder(

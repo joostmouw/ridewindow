@@ -81,6 +81,13 @@ dependencies:
 
   # Phase 19 — Supabase Auth
   supabase_flutter: ^2.16.0
+
+  # Welkomstintro — spaaktikken bij het fietsje (2026-09-21). Eerste en enige
+  # audiopakket: geen bestaande afhankelijkheid kan geluid afspelen. Speelt in
+  # lowLatency-stand (SoundPool op Android), bedoeld voor korte herhaalde
+  # geluiden. Op web bewust niet in gebruik: autoplay blokkeert daar een intro
+  # die zonder tik start.
+  audioplayers: ^6.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -136,3 +143,4 @@ flutter:
   assets:
     - assets/animations/
     - assets/fonts/OFL.txt
+    - assets/sounds/
