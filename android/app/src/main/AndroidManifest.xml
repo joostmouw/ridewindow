@@ -32,6 +32,24 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!--
+                Deep link voor de e-mailbevestiging (2026-09-21, OPEN.md punt 11).
+                Supabase stuurt de browser na het bevestigen van het account
+                door naar ridewindow://confirm?code=... . Dit filter zorgt dat
+                Android dan de app opent in plaats van een dood adres. De SDK
+                (SupabaseAuth) vangt de link zelf op via app_links en wisselt
+                de code om voor een sessie. De launchMode singleTop hierboven
+                is daarvoor nodig: zo komt een warme start binnen via
+                onNewIntent in plaats van een tweede MainActivity. Zonder deze
+                redirect vallen de auth-mails terug op de Site URL, en dat was
+                een localhost-dood adres.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="ridewindow"/>
+            </intent-filter>
         </activity>
         <!-- WorkManager achtergrondtaak service -->
         <service

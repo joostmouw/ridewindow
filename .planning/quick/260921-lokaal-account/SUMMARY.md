@@ -79,6 +79,31 @@ Validatie is client-zijde, vóór elke netwerk-aanroep: geen `@` of wachtwoord
   `https://my-project-joost.web.app`. Daarna eindigen alle auth-mails (ook
   toekomstig wachtwoord-herstel) op een pagina die laadt.
 
+## Roepje 2026-09-21: de bevestigingsmail komt terug naar de app (deep link)
+
+Joost vroeg waarom de mail niet terug kon naar de app: dat kon niet, want
+zonder intent-filter is er geen diep adres. Gebouwd in dezelfde taak:
+
+- **Android-manifest:** een tweede intent-filter op MainActivity voor het
+  schema `ridewindow` (VIEW + BROWSABLE + DEFAULT). `launchMode="singleTop"`
+  stond er al, precies wat app_links nodig heeft voor een warme start.
+- **`kEmailConfirmRedirect`** (`ridewindow://confirm`) in `supabase_config.dart`;
+  `signUp` stuurt het mee als `emailRedirectTo` op native. Op web bewust niet:
+  daar bestaat het schema niet en landt de browser- flow op de PWA.
+- **Geen eigen Dart-observer nodig:** supabase_flutter 2.16 draait zelf een
+  deep-link-observer (`SupabaseAuth`, `detectSessionInUri: true` standaard),
+  via de meegeleverde `app_links`. Die herkent `code` in de URL (PKCE-wissel)
+  en bouwt de sessie op: na het tikken van de mail ben je direct ingelogd.
+- **Twee tests:** de manifest-structuurtest declareert nu ook het
+  `ridewindow`-schema; `test/core/deep_link_config_test.dart` houdt de
+  constante in vorm. Suite 730/730.
+
+**Dashboardstap (Joost, na deze build):** Supabase → Authentication → URL
+Configuration → **Additional Redirect URLs** → `ridewindow://**` toevoegen.
+Zonder die whitelist valt de redirect van elke nieuwe bevestigingsmail terug
+op de Site URL. Pas daarna op de Oppo verifiëren met een vers account:
+aanmaken → mailtikken → de app opent vanzelf en je bent ingelogd.
+
 ## Bewust niet
 
 - Geen diep-link voor de bevestigingsmail (browser volstaat; een link naar de

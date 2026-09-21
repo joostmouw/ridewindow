@@ -90,4 +90,42 @@ void main() {
           'app opent dan mogelijk niets op Android 11+.',
     );
   });
+
+  test('AndroidManifest declareert het ridewindow-schema voor de '
+      'e-mailbevestiging', () {
+    // De bevestigingsmail van Supabase stuurt de browser door naar
+    // ridewindow://confirm?code=... (kEmailConfirmRedirect). Zonder dit
+    // intent-filter vangt niemand die URL op en eindigt de bevestiging op
+    // een dood adres. De SDK verwerkt de code zelf; dit filter is de enige
+    // Android-kant die de app zelf moet declareren.
+    final doc = XmlDocument.parse(
+      File(_manifests.first).readAsStringSync(),
+    );
+
+    final mainActivity = doc
+        .findAllElements('activity')
+        .firstWhere((a) => a.getAttribute('android:name') == '.MainActivity');
+
+    final heeftDeepLink = mainActivity
+        .findAllElements('intent-filter')
+        .any((filter) {
+      final view = filter
+          .findElements('action')
+          .any((a) => a.getAttribute('android:name') == 'android.intent.action.VIEW');
+      final browsable = filter
+          .findElements('category')
+          .any((c) => c.getAttribute('android:name') == 'android.intent.category.BROWSABLE');
+      final schema = filter
+          .findElements('data')
+          .any((d) => d.getAttribute('android:scheme') == 'ridewindow');
+      return view && browsable && schema;
+    });
+
+    expect(
+      heeftDeepLink,
+      isTrue,
+      reason: 'MainActivity mist het intent-filter voor het ridewindow-schema. '
+          'De e-mailbevestiging kan dan nooit terug naar de app.',
+    );
+  });
 }

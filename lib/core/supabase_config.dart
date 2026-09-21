@@ -12,4 +12,16 @@
 // anon key.
 const supabaseUrl = 'https://hcdrydlgqpnmumfupgcx.supabase.co';
 const supabaseAnonKey =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjZHJ5ZGxncXBubXVtZnVwZ2N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5ODkxNTUsImV4cCI6MjEwMDU2NTE1NX0.X2XcNbotlY0u_UV5R633FVRLnXvabFVNgisbGOZIifo';
+    '****************************************************************************************************************************************************************************************************************';
+
+/// Waarheen Supabase de browser stuurt na het bevestigen van een e-mailadres
+/// (open.md punt 11, 2026-09-21). Op Android opent dit schema de app; de SDK
+/// verwerkt de code in de URL zelf (SupabaseAuth, detectSessionInUri staat
+/// standaard aan). De URL moet in het dashboard staan bij Authentication,
+/// URL Configuration, Additional Redirect URLs (`ridewindow://**`), anders
+/// valt de bevestigingsmail terug op de Site URL: een dood localhost-adres
+/// op een toestel.
+///
+/// Op web wordt bewust géén emailRedirectTo meegegeven: een custom schema
+/// bestaat daar niet, dus de browser-flow (landen op de PWA) blijft staan.
+const kEmailConfirmRedirect = 'ridewindow://confirm';

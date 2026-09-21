@@ -10,12 +10,14 @@
 // aangeroepen (zie calendar_service.dart).
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
+import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/domain/services/account_switch_resolver.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -822,7 +824,14 @@ class _EmailSignInDialogState extends State<_EmailSignInDialog> {
       if (_creating) {
         // Bij bevestiging-aan komt er geen sessie terug: het account moet
         // eerst per mail bevestigd worden. De aanmelding zelf is geslaagd.
-        await auth.signUp(email: email, password: password);
+        // emailRedirectTo stuurt de bevestigingslink naar de app (deep link,
+        // kEmailConfirmRedirect); op web vervalt dat, want de browser-flow
+        // landt daar op de PWA.
+        await auth.signUp(
+          email: email,
+          password: password,
+          emailRedirectTo: kIsWeb ? null : kEmailConfirmRedirect,
+        );
         if (!mounted) return;
         setState(() {
           _submitting = false;

@@ -64,7 +64,12 @@ gebruiker een account kan aanmaken en inloggen zonder Google- of Gmail-account.
 
 ## Afbakening (bewust niet)
 
-- Geen diep-link naar de app voor de bevestigingsmail — browser volstaat nu.
+- ~~Geen diep-link naar de app voor de bevestigingsmail~~ — **komt er wél
+  (2026-09-21, na Joosts toestelronde):** de mail opende de app zelf via
+  `ridewindow://` (manifest intent-filter), `emailRedirectTo` bij signUp, en
+  de ingebouwde deep-link-observer van supabase_flutter wisselt de code om
+  voor een sessie. Zie SUMMARY. De enige resterende dashboardstap is de
+  whitelist `ridewindow://**` in Additional Redirect URLs.
 - Geen wachtwoord-vergeten-flow — Supabase's e-mail-bevestiging dekt het
   aanmaakpad; herstel van een vergeten wachtwoord is een vervolg (kan later
   met dezelfde mail-trigger van Supabase).
