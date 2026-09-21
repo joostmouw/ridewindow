@@ -9,7 +9,7 @@ er waar live staat.
 
 | Kanaal | Wanneer gebruik je het | Review van Google | Effect op het toestel |
 |---|---|---|---|
-| **Lokale APK** (`adb install`) | alleen voor verse-installatie-testen (o.a. de eerste-minuut-flow) | geen | vervangt de Play-installatie: lokale database en Calendar-grant gaan overboord. Over een Play-installatie heen is dat de prijs; noteer het in STATE.md als je het doet |
+| **Lokale APK** (`adb install`) | alleen voor verse-installatie-testen (o.a. de eerste-minuut-flow) | geen | vervangt de Play-installatie: lokale database en Calendar-grant gaan overboord, en Play kan daarna niet meer bijwerken tot je de sideload overal verwijdert (zie "Terug van een sideload naar Play"). Noteer het in STATE.md als je het doet |
 | **PWA** (`my-project-joost.web.app`) | op een releasemoment, vanaf dezelfde commit als de internal-build | geen | aparte webbundel, eigen cache: na een deploy hard herladen of `?v=<code>` meegeven |
 | **Internal testing** | élke release komt hier eerst; testers zien het onmiddellijk | geen | niets raakt het toestel: de Oppo haalt de build via Play-update op en houdt database en grants intact. Dé manier om op het toestel te testen |
 | **Alpha / closed testing** | de track die Google telt voor de productie-eis (12 testers, 14 dagen) | ja, bij élke promotie (duurt soms dagen) | alleen krijgen wat op internal is goedgekeurd; zichtbaar voor testers pas ná review |
@@ -41,12 +41,52 @@ er waar live staat.
    ononderbroken) én de developer-verificatie (deadline 30 september 2026
    volgens Play Console).
 
+## Terug van een sideload naar Play
+
+Vastgelegd op 2026-09-21, nadat de Oppo de update naar 1.0.42 (53) niet kon
+ophalen. Play meldt dan alleen dat downloaden niet lukt en zegt niet waarom.
+
+**Waarom het misgaat.** Play werkt alleen bij wat hij zelf heeft geplaatst
+(`installerPackageName`), en een lokaal gebouwde release-APK draagt de
+**upload**-sleutel terwijl de Play-versie met Google's **app-signing**-sleutel
+is ondertekend (`docs/CONSOLE-SETUP-CHECKLIST.md`). Een handtekening hoort bij
+het pakket en geldt toestelbreed, dus zolang de sideload ergens op het toestel
+staat, kan de Play-versie er niet naast.
+
+**De val: `adb install` raakt ook de kloonruimte.** De Oppo heeft naast de
+gewone gebruiker een `system_clone` (ColorOS, user 10). `adb install` zonder
+`--user` zet de APK in álle ruimtes. Verwijderen via het startscherm haalt
+alleen de eigen ruimte leeg; in de kloonruimte blijft hij staan en blokkeert
+Play, terwijl het toestel er schoon uitziet.
+
+**Zo controleer je het, in plaats van te gokken:**
+
+```bash
+ADB=~/Library/Android/sdk/platform-tools/adb
+$ADB shell dumpsys package ridewindow.joost.amsterdam | grep -E "User [0-9]+:|installerPackageName"
+```
+
+`installed=true` in welke ruimte dan ook betekent: nog niet weg.
+`installerPackageName=null` betekent: dit is een sideload, geen Play-installatie.
+
+**Opruimen per ruimte, niet via het startscherm:**
+
+```bash
+$ADB shell pm list users                                  # welke ruimtes bestaan er
+$ADB shell pm uninstall --user 10 ridewindow.joost.amsterdam
+$ADB shell pm list packages | grep ridewindow             # leeg = schoon
+```
+
+**Voorkomen is korter dan opruimen:** sideload met `adb install --user 0 -r
+<apk>`, dan blijft de kloonruimte erbuiten.
+
 ## Regels zodat versies niet afdrijven
 
 - **Nooit een release zonder versiebump.** Eén versionCode per release.
 - **Nooit sideloaden over een Play-installatie** als je echte data
   beoordeelt. Sideload is alleen voor verse-installatie-testen, en dan
-  genoteerd in STATE.md.
+  genoteerd in STATE.md. Een sideload is daarna geen Play-installatie meer:
+  hij moet eerst wég voordat Play weer werkt.
 - **De PWA deployt alleen op een releasemoment**, vanaf dezelfde commit als
   de internal-build — nooit tussendoor.
 - **Notities ≤ 400 tekens** met complete zinnen; de tool weigert erboven.
