@@ -42,7 +42,17 @@ class AnalyticsConsent extends _$AnalyticsConsent {
         // Statistiek mag nooit de reden zijn dat een antwoord niet landt.
       }
     }
-    ref.invalidateSelf();
+    // Alleen als er nog iets te verversen valt. Deze provider is auto-dispose
+    // en wordt op de toestemmingskaart uitsluitend met `read` benaderd, dus hij
+    // is er na de awaits hierboven meestal al niet meer. `invalidateSelf` gooit
+    // dan een `UnmountedRefException`, die door de `await` heen uit deze
+    // methode ontsnapt -- en in de kaart betekende dat: keuze opgeslagen, maar
+    // het venster ging nooit dicht. Gemeld door een tester op 1.0.35+46.
+    //
+    // Overslaan is hier geen noodgreep maar het juiste antwoord: is de provider
+    // weggegooid, dan luistert er niemand, en dan valt er niets in te lichten.
+    // De volgende lezer bouwt hem opnieuw op en leest de verse waarde uit prefs.
+    if (ref.mounted) ref.invalidateSelf();
   }
 }
 

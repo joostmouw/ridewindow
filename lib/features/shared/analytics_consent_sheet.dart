@@ -25,9 +25,39 @@ Future<void> showAnalyticsConsentSheet(BuildContext context, WidgetRef ref) {
       final s = S.of(sheetContext);
       final cs = Theme.of(sheetContext).colorScheme;
 
+      // Sluiten staat in een `finally` en niet achter de await.
+      //
+      // Het vastleggen van de keuze is de eerste handeling in `setConsent`;
+      // alles daarna is boekhouding. Gooide die boekhouding, dan bleef deze
+      // kaart staan terwijl de keuze allang geland was -- de gebruiker drukte
+      // op een knop die zichtbaar niets deed. Dat is precies wat een tester op
+      // 1.0.35+46 meldde. De oorzaak daarvan is weg (zie `setConsent`), maar de
+      // volgorde blijft fout zolang het dichtgaan van dit venster afhangt van
+      // of de regel ervoor slaagt.
+      //
+      // De fout wordt gemeld en niet doorgegooid. Doorgooien zou hem in de
+      // weggegooide Future van `onPressed` laten belanden, waar niemand hem
+      // ziet; `reportError` zet hem in dezelfde stroom als elke andere
+      // Flutter-fout, dus in logcat en in de tests. Weggooien van de vraag is
+      // niet erg: lukte het opslaan niet, dan blijft `consent` null, blijft
+      // `shouldAsk` true, en staat de vraag er bij de volgende start gewoon
+      // weer. Een kaart die blijft hangen herstelt zichzelf niet.
       Future<void> answer(bool granted) async {
-        await ref.read(analyticsConsentProvider.notifier).setConsent(granted);
-        if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+        try {
+          await ref.read(analyticsConsentProvider.notifier).setConsent(granted);
+        } catch (error, stack) {
+          FlutterError.reportError(
+            FlutterErrorDetails(
+              exception: error,
+              stack: stack,
+              library: 'ridewindow analytics consent',
+              context:
+                  ErrorDescription('bij het vastleggen van de toestemming'),
+            ),
+          );
+        } finally {
+          if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+        }
       }
 
       return SafeArea(
