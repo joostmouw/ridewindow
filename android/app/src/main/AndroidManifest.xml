@@ -96,7 +96,7 @@
             Wat het kostte: de rij "Privacy Policy" in Profiel stond achter een
             `if (await canLaunchUrl(...))` zonder else. Die gaf false, er
             gebeurde niets, en de tester tikte door naar de rij eronder. Dat is
-            de Open-Meteo-link, die geen guard had en dus wel opende -- met
+            de Open-Meteo-link, die geen guard had en dus wel opende, met
             "Free Weather API" bovenaan. Zo werd dit gemeld als "het
             privacybeleid opent een weer-API". Gevonden op 2026-09-21.
         -->

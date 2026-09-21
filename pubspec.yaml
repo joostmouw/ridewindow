@@ -87,6 +87,10 @@ dev_dependencies:
 
   # Phase 1 — code-gen + lint + test toolchain
   test: ^1.25.0
+  # Alleen voor test/structure/manifest_well_formed_test.dart. Kwam al mee als
+  # transitieve afhankelijkheid, maar daarop leunen betekent dat een test
+  # breekt zodra een ander pakket hem laat vallen.
+  xml: ^6.5.0
   freezed: ^3.2.5
   json_serializable: ^6.8.0
   build_runner: ^2.4.0
