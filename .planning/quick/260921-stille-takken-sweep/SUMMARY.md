@@ -79,3 +79,25 @@ de flow die nu bij twintig testers op de gesloten test draait:
   aanroepen in button-handlers. Bij elke nieuwe wijziging meenemen.
 - De notificatie-toggle op **web** staat er niet (bewust); de
   geweigerd-melding geldt alleen waar de schakelaars bestaan (native).
+
+## Addendum: de release (1.0.37+48) en de notities-reparatie
+
+De sweep-fixes zijn als build 48 op internal en alpha gezet (commit `9a44f98`);
+de uitrol wordt in `docs/testers/changelog.md` bijgehouden (backfill voor 47).
+
+Na de uitrol meldde Joost dat de "What's new"-tekst van 475/486 tekens in de
+winkel halverwege een zin werd afgekapt — terwijl Play 500 tekens toestaat.
+Blijkbaar kapt de winkel zichtbaar af ver onder die API-grens. Opgelost
+(commit `745dc08`):
+
+- Notities herschreven tot korte, volledige zinnen: 346 (EN) / 366 (NL) tekens.
+- `--set-notes <code>` in `tool/play_upload.dart`: vervangt alleen de notities
+  van een release die al op Play staat (edits.tracks.get → patch → update →
+  commit), zonder de bundel opnieuw te versturen. Toegepast op build 48 op
+  internal én alpha, en via de API geverifieerd dat beide talen volledig staan.
+- Het uploadscript weigert nu notities boven de 400 tekens — de gevonden grens
+  voor "afgekapte laatste zin", ruim onder de 500 die de API toestaat.
+  Gedocumenteerd in `tool/README-play-release.md`.
+- **Vervolg-wachtwoord:** nieuwe release-notities altijd onder de 400 tekens en
+  in complete zinnen; `--set-notes` is de manier om een tekst van een live
+  build recht te zetten zonder opnieuw te uploaden.
