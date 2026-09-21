@@ -68,6 +68,11 @@ abstract final class AppIcons {
   static const IconData linkBreak = IconData(0xe2e4, fontFamily: 'Phosphor');
   static const IconData lock = IconData(0xe2fa, fontFamily: 'Phosphor');
   static const IconData mapPin = IconData(0xe316, fontFamily: 'Phosphor');
+  /// De kale toeter van de roeicoach -- "jij organiseert" (schets 014). Bewust
+  /// `megaphone-simple` en niet `megaphone`: die heeft een greep en oogt drukker
+  /// op de 14px waarop deze regel meestal staat.
+  static const IconData megaphoneSimple =
+      IconData(0xe642, fontFamily: 'Phosphor');
   static const IconData minusCircle = IconData(0xe32c, fontFamily: 'Phosphor');
   static const IconData moonStars = IconData(0xe58e, fontFamily: 'Phosphor');
   static const IconData mountains = IconData(0xe7ae, fontFamily: 'Phosphor');
