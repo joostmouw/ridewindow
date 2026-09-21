@@ -105,10 +105,10 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
 
 | Waar | Stand |
 |---|---|
-| Oppo | sideload 1.0.41+52; wacht op de Play-update naar 53, die de installatie herstelt |
+| Oppo | leeg; sideload verwijderd uit beide ruimtes, installeren gaat weer via Play |
 | PWA | 1.0.42 (53), gedeployed vanaf dezelfde commit, live hash geverifieerd |
 | Internal | 1.0.42 (53) |
-| Alpha / closed | 1.0.38 (49); promoveren pas na toestelgoedkeuring van 53 (stap 6) |
+| Alpha / closed | 1.0.42 (53), gepromoveerd op verzoek, vooruitlopend op de toestelgoedkeuring |
 | main | 1.0.42+53 |
 
 **Wat 53 brengt:** het geluid en de trillingen onder de welkomstintro. Die
@@ -118,8 +118,10 @@ vastgelegd naast de asset). Elk asset in de app heeft sindsdien een
 herkomst die naast het bestand staat.
 
 **Volgende stap:** Joost bedient 53 op de Oppo (inloggen op beide manieren,
-agenda opnieuw koppelen, peloton). Daarna stap 6: promoveren naar alpha met
-`--promote 53 --track alpha`, dezelfde bytes.
+agenda opnieuw koppelen, peloton). De promotie naar alpha is op zijn verzoek
+al gedaan, dus die controle loopt nu achter de uitrol aan in plaats van
+ervoor: valt er iets op, dan is de correctie een nieuwe build en geen
+terugdraaiing.
 
 ## Stand 21 september 2026 (vastgelegd bij het opstellen)
 

@@ -23,9 +23,9 @@ punten in `HANDOFF.json`.
 
 | Waar | Stand |
 |---|---|
-| Play closed testing (Alpha) | **1.0.38 (49)** — build 52 gaat hier pas heen na toestelgoedkeuring (release-route, `docs/RELEASE-ROUTE.md`) |
-| Play internal testing | **1.0.42 (53)**, geüpload 2026-09-21 via de API: het intro-geluid, dat tot vandaag niet mee mocht omdat de licentie niet vaststond. Alpha blijft op 49 tot jij 53 op het toestel goedkeurt |
-| Oppo | **staat op de sideload van 1.0.41+52 en wacht op de Play-update naar 1.0.42 (53)**: die update herstelt de installatie en daarmee de normale Play-route. Na het bijwerken nog open: de agendakoppeling één keer opnieuw leggen (vervallen door de verse data van de sideload), en de e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
+| Play closed testing (Alpha) | **1.0.42 (53)**, gepromoveerd 2026-09-21 op Joosts verzoek, bewust vooruitlopend op de toestelgoedkeuring die de route normaal eist. Dezelfde bytes als internal; Google reviewt elke promotie |
+| Play internal testing | **1.0.42 (53)**, geüpload 2026-09-21 via de API: het intro-geluid, dat tot vandaag niet mee mocht omdat de licentie niet vaststond |
+| Oppo | **leeg: elke installatie is verwijderd, in beide ruimtes** (2026-09-21). De sideload blokkeerde Play doordat `adb install` hem ook in de ColorOS-kloonruimte zette; zie "Terug van een sideload naar Play" in de release-route. Installeren gaat nu weer via Play: die update herstelt de installatie en daarmee de normale Play-route. Na het bijwerken nog open: de agendakoppeling één keer opnieuw leggen (vervallen door de verse data van de sideload), en de e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
 | main | **1.0.42+53**, met de licentie van het intro-geluid (Pixabay) en de herkomst van de animatie (eigen werk, met AI) vastgelegd naast de assets |
 | PWA live | **1.0.42 (53)** op `my-project-joost.web.app`, gedeployed 2026-09-21 vanaf dezelfde commit als de internal-build; live hash geverifieerd (`72d7e96f`). Loopt daarmee weer gelijk, na vier builds achterstand |
