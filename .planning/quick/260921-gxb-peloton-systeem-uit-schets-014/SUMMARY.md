@@ -61,8 +61,9 @@ in `docs/testers/changelog.md`.
 
 ## Nog open
 
-- **Op glas bekijken.** Er hing geen toestel aan de Mac. Het lint bij 14 en 16 px op de Oppo
-  beoordelen staat nog; via Play komt de update daar vanzelf langs.
+- ~~Op glas bekijken.~~ **Gedaan (Joost, 2026-09-21):** het lint is op het toestel bekeken en
+  goedgekeurd -- het slibt niet dicht op de maat waarop het in de app staat. De afstelling
+  (schaal 0,82, afstand 420, tussenruimte 86, halve dikte-correctie) staat daarmee vast.
 - **Het detailscherm** is niet met eigen ogen gezien: tikken lukte niet in de browsersessie
   (muis-events liepen vast) en `/detail` is niet via een URL te bereiken -- die route krijgt
   zijn rit als `extra` mee.
