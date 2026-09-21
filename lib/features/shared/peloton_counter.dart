@@ -33,12 +33,12 @@ class PelotonCounter extends StatelessWidget {
   /// draagt de precieze aantallen.
   static const _maxDrawn = 5;
 
-  /// De korte lezing, voor de smalle kaartjes op Home.
+  /// De korte lezing, voor waar de lange niet past.
   ///
-  /// "Nog niemand geantwoord · 1 wacht nog" past daar niet: in het Engels werd
-  /// het "Nobody has answered yet · 1 still to a..." en viel het van de kaart
-  /// (gezien op het toestelformaat, 2026-09-21). Kort is hier ook eerlijker --
-  /// de fietsjes zeggen al wie er mee is en wie nog moet antwoorden, de tekst
+  /// "Nog niemand geantwoord · 1 wacht nog" past niet op een Home-kaartje: in
+  /// het Engels werd het "Nobody has answered yet · 1 still to a..." en viel
+  /// het van de kaart (Joost, 2026-09-21). Kort is daar ook eerlijker -- de
+  /// fietsjes zeggen al wie er mee is en wie nog moet antwoorden, de tekst
   /// hoeft dat alleen te tellen. Staat er nog niemand mee, dan is het
   /// wachtende deel het hele verhaal.
   String? _shortSummary(BuildContext context) {
@@ -58,9 +58,6 @@ class PelotonCounter extends StatelessWidget {
     // groep, of een afgezegde rit, betekent geen teller.
     final full = pelotonSummary(context, entry);
     if (full == null) return const SizedBox.shrink();
-    final summary = dense ? _shortSummary(context) : full;
-    if (summary == null) return const SizedBox.shrink();
-
     final rw = context.rw;
     final theme = Theme.of(context);
     final accepted = entry.acceptedCount;
@@ -75,6 +72,45 @@ class PelotonCounter extends StatelessWidget {
       alpha: theme.brightness == Brightness.dark ? 0.45 : 0.32,
     );
 
+    final textStyle = theme.textTheme.bodySmall?.copyWith(
+      fontSize: dense ? 11 : null,
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+
+    // **Meten in plaats van gokken.** Of de hele zin past hangt niet aan het
+    // scherm maar aan wat er overblijft: het merkteken en het scorepilletje
+    // eten van de breedte, het Engels is langer dan het Nederlands, en een
+    // grotere systeemletter kost nog eens ruimte. Past hij niet, dan is de
+    // korte lezing beter dan een afgekapte lange.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bikes = drawn * (size + 1) + (rest > 0 ? 22 : 0);
+        final room = constraints.maxWidth - bikes - 7;
+        final painter = TextPainter(
+          text: TextSpan(text: full, style: textStyle),
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+        )..layout();
+        final summary =
+            painter.width <= room ? full : (_shortSummary(context) ?? full);
+        return _line(context, summary, textStyle, drawn, accepted, rest,
+            size, waiting, rw);
+      },
+    );
+  }
+
+  Widget _line(
+    BuildContext context,
+    String summary,
+    TextStyle? textStyle,
+    int drawn,
+    int accepted,
+    int rest,
+    double size,
+    Color waiting,
+    RideWindowTheme rw,
+  ) {
+    final theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.only(top: dense ? 3 : 4),
       child: Row(
@@ -112,10 +148,7 @@ class PelotonCounter extends StatelessWidget {
               summary,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: dense ? 11 : null,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: textStyle,
             ),
           ),
         ],

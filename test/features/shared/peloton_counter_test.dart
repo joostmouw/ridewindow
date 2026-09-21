@@ -146,6 +146,22 @@ void main() {
         reason: 'naast de fietsjes en het scorepilletje is er weinig ruimte');
   });
 
+  testWidgets('ook in de rittenlijst wijkt hij uit als de kaart smal is',
+      (tester) async {
+    // Niet alleen Home: op een smalle telefoon met een lange Engelse zin
+    // paste "2 are coming · 1 still to answer" ook in de lijst niet meer.
+    // De teller meet zelf wat er overblijft in plaats van op `dense` af te
+    // gaan.
+    await _pump(
+      tester,
+      _entry(role: RideRole.organiser, accepted: 2, invited: 1),
+      locale: const Locale('en'),
+      width: 170,
+    );
+    expect(find.text('2 going · 1 waiting'), findsOneWidget);
+    expect(find.text('2 are coming · 1 still to answer'), findsNothing);
+  });
+
   testWidgets('en de lange lezing blijft staan waar hij wél past',
       (tester) async {
     await _pump(
