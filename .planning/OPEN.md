@@ -167,8 +167,17 @@ Stand 2026-09-21, 08:30.
 - **`e.j.heineke@gmail.com` staat op "bouncing"** in Google Groups. Die
   persoon is per mail niet te bereiken; via een ander kanaal benaderen.
 
+**Stand 2026-09-21, afgelezen in de Console:** de eerste twee criteria voor
+productietoegang staan **afgevinkt**, inclusief "Have at least 12 testers
+opted-in to your closed test". Wat nog loopt is het derde: **veertien dagen
+draaien met minstens twaalf testers**. De knop "Apply for production" is nog
+grijs. Let op het verschil tussen twee getallen die allebei in de Console
+staan: de app-lijst toont "Installed audience: 4" (installaties), en dat is
+iets anders dan het aantal aangemelde testers dat voor de eis telt.
+
 **Wat bewaakt moet worden:** de Console-teller, niet het ledenaantal van de
-groep. Lid zijn van de groep is niet hetzelfde als opt-in. Het verschil daartussen
+groep. En nu vooral: dat er niemand uitstapt, want dat breekt de reeks van
+veertien dagen. Lid zijn van de groep is niet hetzelfde als opt-in. Het verschil daartussen
 is precies waar de eigen kring op vastliep (D-10). De veertien dagen beginnen pas
 te tellen bij twaalf aangemelde testers, en wie tussentijds uitstapt breekt de
 reeks.
@@ -383,38 +392,34 @@ sleutel ook echt een aanroeper heeft.
 
 ---
 
-## 14. Developer-verificatie: 30 september, en dat is negen dagen
+## 14. Developer-verificatie: nagekeken in de Console op 2026-09-21, niets open
 
-**Dit is het enige punt in dit bestand met een externe datum, en het weegt het
-zwaarst.** Nagekeken bij Google op 2026-09-21.
+**Status: er staat geen actie open.** De deadline van 30 september is echt en
+de gevolgen ook (apps die niet geregistreerd zijn, worden wereldwijd van Google
+Play verwijderd, aldus de banner op de verificatiepagina zelf), maar voor dit
+account is allebei de helften al geregeld:
 
-**Wat er gebeurt als het niet gebeurt:** het ontwikkelaarsprofiel en de apps
-worden van Google Play verwijderd. Niet geblokkeerd voor nieuwe releases:
-verwijderd. Los daarvan geldt vanaf 30 september 2026 dat een app alleen nog
-installeerbaar is op gecertificeerde Android-toestellen in Brazilie, Indonesie,
-Singapore en Thailand als hij door een geverifieerde ontwikkelaar is
-geregistreerd, en Ridewindow staat in 177 landen.
+- **Pakketnaam geregistreerd.** Play Console > Android developer verification >
+  Package names: `ridewindow.joost.amsterdam`, status **Registered**, 2
+  sleutels, laatst bijgewerkt 17 juni 2026. Die twee sleutels zijn de
+  upload-sleutel en de app-signing-sleutel uit
+  `docs/CONSOLE-SETUP-CHECKLIST.md`.
+- **Identiteit ingevuld.** Tabblad Identity toont naam en adres, overgenomen
+  uit het ontwikkelaarsaccount. Geen knop, geen openstaande stap.
+- **Ontwikkelaarsmailadres geverifieerd** (`joostmouw@gmail.com`, met vinkje),
+  en dat is hetzelfde adres dat sinds vandaag in het privacybeleid en de
+  Console staat.
+- **Policy status: "No issues found with your developer account."**
 
-**Wat Joost bij de hand moet hebben** (persoonlijk account zonder geverifieerd
-Google Payments-profiel):
+**Wat hier te leren valt:** de deadline stond in de route als open punt en
+kreeg vanmiddag een eigen sectie, terwijl de Console al maanden zegt dat het
+geregeld is. De les is niet "kijk beter" maar: **een deadline die je uit een
+notitie kent, verifieer je in het systeem dat hem stelt, voordat je er werk op
+plant.** Dat kostte hier vijf minuten kijken.
 
-- een officieel identiteitsbewijs van de overheid;
-- een prive-mailadres en telefoonnummer, allebei te bevestigen met een
-  eenmalige code;
-- een mailadres dat publiek op Google Play komt te staan, als onderdeel van het
-  ontwikkelaarsprofiel. Let op de samenhang met punt 3: de app gebruikt
-  inmiddels overal `joostmouw@gmail.com`.
-
-**Waarom niet op de valreep:** Google beoordeelt de inzending en dat duurt naar
-eigen zeggen enkele dagen. Een inzending op 29 september is dus te laat, ook al
-is hij binnen de datum.
-
-**Waar:** Play Console Home toont de banner. Uitleg staat op
-<https://support.google.com/googleplay/android-developer/answer/10841920> en
-<https://developer.android.com/developer-verification>.
-
-**Dit kan Claude niet overnemen:** het raakt een identiteitscontrole op Joosts
-account, en dat is precies de categorie die in `AGENTS.md` bij hem blijft.
+**Wat nog wel geldt:** komt er ooit een tweede pakketnaam of een sleutel
+waarmee buiten Play om wordt ondertekend, dan moet die apart geregistreerd
+worden op diezelfde pagina.
 
 ---
 

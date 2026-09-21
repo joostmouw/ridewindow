@@ -23,7 +23,7 @@ punten in `HANDOFF.json`.
 
 | Waar | Stand |
 |---|---|
-| Play closed testing (Alpha) | **1.0.42 (53)**, gepromoveerd 2026-09-21 op Joosts verzoek, bewust vooruitlopend op de toestelgoedkeuring die de route normaal eist. Dezelfde bytes als internal; Google reviewt elke promotie |
+| Play closed testing (Alpha) | **1.0.42 (53) staat bij Google in review** (Publishing overview: "Closed testing - Alpha, 1.0.42 (53), start full rollout"); de track serveert zolang nog 49. Gepromoveerd op Joosts verzoek, vooruitlopend op de toestelgoedkeuring die de route normaal eist |
 | Play internal testing | **1.0.42 (53)**, geüpload 2026-09-21 via de API: het intro-geluid, dat tot vandaag niet mee mocht omdat de licentie niet vaststond |
 | Oppo | **leeg: elke installatie is verwijderd, in beide ruimtes** (2026-09-21). De sideload blokkeerde Play doordat `adb install` hem ook in de ColorOS-kloonruimte zette; zie "Terug van een sideload naar Play" in de release-route. Installeren gaat nu weer via Play: die update herstelt de installatie en daarmee de normale Play-route. Na het bijwerken nog open: de agendakoppeling één keer opnieuw leggen (vervallen door de verse data van de sideload), en de e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
 | Winkelpagina | gepubliceerd als **Ridewindow** in en-GB **en nl-NL**; dat nl-NL ontbrak was een notitie van 10 september die op 2026-09-21 is nagekeken en niet meer klopte. Uitleesbaar met `dart run tool/play_upload.dart --list-listings` |
@@ -31,6 +31,8 @@ punten in `HANDOFF.json`.
 | PWA live | **1.0.42 (53)** op `my-project-joost.web.app`, gedeployed 2026-09-21 vanaf dezelfde commit als de internal-build; live hash geverifieerd (`72d7e96f`). Loopt daarmee weer gelijk, na vier builds achterstand |
 | Supabase dashboard | Site URL staat op `https://my-project-joost.web.app`; Additional Redirect URLs bevat `ridewindow://**` (Joost, 2026-09-21). De actuele anon key zit in build 52; signup-probe komt voorbij key-validatie maar raakte daarna de mailrate-limit |
 | Oppo | **Het intro-geluid is op het toestel goedgekeurd** (Joost, 2026-09-21, ronde 3: echte fietsopname, uitrij loopt door tot de opname stopt) **en de licentie is rond**: Pixabay Content License, dus de clip mag mee in de eerstvolgende Play-upload (`assets/sounds/WELCOME_ROLL-LICENSE.txt`, OPEN.md punt 12). **Het peloton-lint is eerder op het toestel goedgekeurd**: leesbaar op de maat waarop het in de app staat. Agenda staat na de verse installatie op "Not connected", app op Engels (OPEN.md punt 5) |
+
+**Productietoegang, afgelezen in de Console op 2026-09-21:** criterium 1 (gesloten test gepubliceerd) en criterium 2 (**minstens twaalf aangemelde testers**) zijn afgevinkt; criterium 3 (veertien dagen draaien met die twaalf) loopt. De developer-verificatie is nagekeken en heeft geen openstaande actie: pakketnaam geregistreerd sinds 17 juni, identiteit ingevuld, mailadres geverifieerd, geen policy-issues. Zie OPEN.md punt 14.
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
 feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de backlog (#72).
