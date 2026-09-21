@@ -84,13 +84,39 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final weekStart = DateTime(now.year, now.month, now.day)
         .subtract(Duration(days: now.weekday - DateTime.monday));
     final preset = buildPreset(_selected!, weekStart);
-    await ref.read(availabilityProvider.notifier).seedPreset(preset);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_complete', true);
-    // De meting waar fase 29 op stuurt: haakt een nieuwe tester af in de eerste
-    // minuut? Zonder dit is alleen te zien dat iemand de app installeerde.
-    trackEvent(ref, kEvOnboardingDone, props: {'preset': _selected!.name});
-    if (mounted) context.go('/home');
+    // Doorlopen naar Home staat in een `finally`, en dat is geen slordigheid.
+    //
+    // Stond het achter de awaits, dan betekende elke fout in het wegschrijven
+    // van het schema dat "Volgende" zichtbaar niets deed en de nieuwe gebruiker
+    // op dit scherm vastzat -- geen melding, geen uitweg, op precies het scherm
+    // waar hij de app nog niet kent. Dezelfde vorm als de toestemmingskaart die
+    // niet dichtging (tester Androidguju67, 1.0.35+46); gevonden bij de
+    // consistentie-sweep daarop.
+    //
+    // Doorlopen is hier ook het veilige antwoord. Mislukt het preset, dan is
+    // `onboarding_complete` niet gezet en staat dit scherm er bij de volgende
+    // start gewoon weer. Een leeg schema is bovendien geen doodlopende weg: het
+    // is vanuit Profiel te vullen. Vastzitten op stap een is dat wel.
+    try {
+      await ref.read(availabilityProvider.notifier).seedPreset(preset);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_complete', true);
+      // De meting waar fase 29 op stuurt: haakt een nieuwe tester af in de
+      // eerste minuut? Zonder dit is alleen te zien dat iemand de app
+      // installeerde.
+      trackEvent(ref, kEvOnboardingDone, props: {'preset': _selected!.name});
+    } catch (error, stack) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'ridewindow onboarding',
+          context: ErrorDescription('bij het wegschrijven van het startschema'),
+        ),
+      );
+    } finally {
+      if (mounted) context.go('/home');
+    }
   }
 
   @override
