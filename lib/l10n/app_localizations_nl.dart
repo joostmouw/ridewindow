@@ -633,6 +633,59 @@ class SNl extends S {
   String get signInWithGoogle => 'Inloggen met Google';
 
   @override
+  String get signInWithEmail => 'Inloggen met e-mail';
+
+  @override
+  String get emailSignInTitle => 'Inloggen met e-mail';
+
+  @override
+  String get emailCreateTitle => 'Account aanmaken';
+
+  @override
+  String get emailFieldLabel => 'E-mailadres';
+
+  @override
+  String get passwordFieldLabel => 'Wachtwoord';
+
+  @override
+  String get emailSignInAction => 'Inloggen';
+
+  @override
+  String get emailCreateAction => 'Aanmaken';
+
+  @override
+  String get emailSwitchToCreate => 'Nog geen account? Maak er een aan.';
+
+  @override
+  String get emailSwitchToSignIn => 'Al een account? Log in.';
+
+  @override
+  String get emailInvalidError => 'Voer een geldig e-mailadres in.';
+
+  @override
+  String get passwordTooShortError => 'Wachtwoord van minstens 6 tekens.';
+
+  @override
+  String get emailConfirmSent =>
+      'Controleer je e-mail om je account te bevestigen, en log daarna in.';
+
+  @override
+  String get emailNotConfirmed =>
+      'Dit e-mailadres is nog niet bevestigd. Klik de link in je e-mail.';
+
+  @override
+  String get emailAlreadyExists =>
+      'Er bestaat al een account met dit e-mailadres.';
+
+  @override
+  String get accountEmailSignInFailed =>
+      'Inloggen met dit e-mailadres is mislukt. Probeer het opnieuw.';
+
+  @override
+  String get accountEmailCreateFailed =>
+      'Account aanmaken is mislukt. Probeer het opnieuw.';
+
+  @override
   String get accountSyncPromise =>
       'Je instellingen en geplande ritten, op al je apparaten.';
 

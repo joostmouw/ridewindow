@@ -1207,6 +1207,102 @@ abstract class S {
   /// **'Inloggen met Google'**
   String get signInWithGoogle;
 
+  /// No description provided for @signInWithEmail.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen met e-mail'**
+  String get signInWithEmail;
+
+  /// No description provided for @emailSignInTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen met e-mail'**
+  String get emailSignInTitle;
+
+  /// No description provided for @emailCreateTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Account aanmaken'**
+  String get emailCreateTitle;
+
+  /// No description provided for @emailFieldLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'E-mailadres'**
+  String get emailFieldLabel;
+
+  /// No description provided for @passwordFieldLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wachtwoord'**
+  String get passwordFieldLabel;
+
+  /// No description provided for @emailSignInAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen'**
+  String get emailSignInAction;
+
+  /// No description provided for @emailCreateAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aanmaken'**
+  String get emailCreateAction;
+
+  /// No description provided for @emailSwitchToCreate.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nog geen account? Maak er een aan.'**
+  String get emailSwitchToCreate;
+
+  /// No description provided for @emailSwitchToSignIn.
+  ///
+  /// In nl, this message translates to:
+  /// **'Al een account? Log in.'**
+  String get emailSwitchToSignIn;
+
+  /// No description provided for @emailInvalidError.
+  ///
+  /// In nl, this message translates to:
+  /// **'Voer een geldig e-mailadres in.'**
+  String get emailInvalidError;
+
+  /// No description provided for @passwordTooShortError.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wachtwoord van minstens 6 tekens.'**
+  String get passwordTooShortError;
+
+  /// No description provided for @emailConfirmSent.
+  ///
+  /// In nl, this message translates to:
+  /// **'Controleer je e-mail om je account te bevestigen, en log daarna in.'**
+  String get emailConfirmSent;
+
+  /// No description provided for @emailNotConfirmed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dit e-mailadres is nog niet bevestigd. Klik de link in je e-mail.'**
+  String get emailNotConfirmed;
+
+  /// No description provided for @emailAlreadyExists.
+  ///
+  /// In nl, this message translates to:
+  /// **'Er bestaat al een account met dit e-mailadres.'**
+  String get emailAlreadyExists;
+
+  /// No description provided for @accountEmailSignInFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Inloggen met dit e-mailadres is mislukt. Probeer het opnieuw.'**
+  String get accountEmailSignInFailed;
+
+  /// No description provided for @accountEmailCreateFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Account aanmaken is mislukt. Probeer het opnieuw.'**
+  String get accountEmailCreateFailed;
+
   /// No description provided for @accountSyncPromise.
   ///
   /// In nl, this message translates to:

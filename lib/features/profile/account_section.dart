@@ -451,6 +451,34 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     }
   }
 
+  /// E-mail + wachtwoord login (OPEN.md punt 11, 2026-09-21): alternatief
+  /// voor "Inloggen met Google" voor wie geen Google-account wil of heeft.
+  ///
+  /// De dialoog doet zelf de supabase-aanroep (signInWithPassword /
+  /// signUp) en geeft bij succes een `User` terug; dan volgt hier precies
+  /// dezelfde afronding als na een Google-login (accountwissel-check, sync,
+  /// naam-invulstap blijft leeg -- D-04). De naam komt bij een e-mailaccount
+  /// niet uit metadata, dus het profiel houdt de normale "voer je naam in"-
+  /// stap.
+  Future<void> _handleEmailSignIn(BuildContext context) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final user = await showDialog<User>(
+        context: context,
+        builder: (_) => const _EmailSignInDialog(),
+      );
+      if (user != null && mounted) {
+        // Zelfde code-pad als na een Google-login: accountwissel-check,
+        // sync en (lokaal) de laatste-uid-plek. `lastSyncedUid` wordt binnen
+        // _checkAccountSwitch gelezen, dus gewoon doorgeven.
+        await _checkAccountSwitch(user.id);
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _confirmAndSignOut(BuildContext context) async {
     final s = S.of(context);
     final confirmed = await showDialog<bool>(
@@ -586,11 +614,20 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
 
   Widget _buildSignedOutRow(BuildContext context, S s) {
     if (_supportsNativeAuthenticate) {
-      return ListTile(
-        leading: const Icon(AppIcons.signIn),
-        title: Text(s.signInWithGoogle),
-        subtitle: Text(s.accountSyncPromise),
-        onTap: _busy ? null : _handleAndroidSignIn,
+      return Column(
+        children: [
+          ListTile(
+            leading: const Icon(AppIcons.signIn),
+            title: Text(s.signInWithGoogle),
+            subtitle: Text(s.accountSyncPromise),
+            onTap: _busy ? null : _handleAndroidSignIn,
+          ),
+          ListTile(
+            leading: const Icon(AppIcons.lock),
+            title: Text(s.signInWithEmail),
+            onTap: _busy ? null : () => _handleEmailSignIn(context),
+          ),
+        ],
       );
     }
 
@@ -608,6 +645,12 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
           Text(s.accountSyncPromise),
           const SizedBox(height: 8),
           renderGoogleSignInButton(),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: _busy ? null : () => _handleEmailSignIn(context),
+            icon: const Icon(AppIcons.lock),
+            label: Text(s.signInWithEmail),
+          ),
         ],
       ),
     );
@@ -705,3 +748,207 @@ class _AccountAvatarState extends State<_AccountAvatar> {
 // `_SectionHeader`, want Dart-privacy is per bestand en er was geen gedeelde
 // plek. Die is er nu wel: `SectionCard` is publiek, dus het duplicaat kon
 // weg en beide schermen gebruiken dezelfde kop én hetzelfde vlak.
+
+/// Dialoog voor e-mail + wachtwoord login (OPEN.md punt 11, 2026-09-21),
+/// geopend vanuit de tweede optie in de uitgelogde account-rij.
+///
+/// Twee modi, wisselbaar onderin: inloggen (`signInWithPassword`) en account
+/// aanmaken (`signUp`). De supabase-aanroep zit bewust in de dialoog zelf:
+/// fouten horen zichtbaar te zijn op de plek waar de gebruiker ze oplost,
+/// niet pas als snackbar achteraf ("stille takken"-les). Bij een geslaagde
+/// inlog `Navigator.pop(gebruiker)`; de oproepende plek draait daarna
+/// dezelfde afronding als na een Google-login.
+///
+/// Let op de bevestigingsmail: op dit project staat e-mailbevestiging aan
+/// (`mailer_autoconfirm: false`, geverifieerd 2026-09-21). `signUp` levert
+/// dan geen sessie op -- de gebruiker moet eerst de link in de mail
+/// aanklikken en daarna (opnieuw) inloggen. De dialoog zegt dat letterlijk
+/// als de aanmelding gelukt is.
+class _EmailSignInDialog extends StatefulWidget {
+  const _EmailSignInDialog();
+
+  @override
+  State<_EmailSignInDialog> createState() => _EmailSignInDialogState();
+}
+
+class _EmailSignInDialogState extends State<_EmailSignInDialog> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  /// Wat de knop onderin doet: inloggen of een account aanmaken.
+  bool _creating = false;
+
+  /// Voorkomt een dubbele submit en toont progressie in de knop.
+  bool _submitting = false;
+
+  /// Actieve foutmelding in de dialoog (validatie of supabase-reactie).
+  String? _errorText;
+
+  /// Neutrale mededeling, bijv. "bevestigingsmail is onderweg".
+  String? _noticeText;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit(S s) async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    // Client-zijde validatie, vóór elke netwerk-aanroep (de klassieke
+    // "foute invoer moet niet als netwerkfout overkomen"-scheiding).
+    final emailOk = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+    if (!emailOk || password.length < 6) {
+      setState(() {
+        _errorText = !emailOk
+            ? s.emailInvalidError
+            : s.passwordTooShortError;
+        _noticeText = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _submitting = true;
+      _errorText = null;
+      _noticeText = null;
+    });
+
+    try {
+      final auth = Supabase.instance.client.auth;
+      if (_creating) {
+        // Bij bevestiging-aan komt er geen sessie terug: het account moet
+        // eerst per mail bevestigd worden. De aanmelding zelf is geslaagd.
+        await auth.signUp(email: email, password: password);
+        if (!mounted) return;
+        setState(() {
+          _submitting = false;
+          _noticeText = s.emailConfirmSent;
+        });
+      } else {
+        final response = await auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+        final user = response.user;
+        if (!mounted) return;
+        if (user == null) {
+          // Geen sessie en geen uitzondering: zeldzaam, maar dan is er ook
+          // niets ingelogd -- dat moet zichtbaar zijn, geen stille pop.
+          setState(() {
+            _submitting = false;
+            _errorText = s.accountEmailSignInFailed;
+          });
+          return;
+        }
+        Navigator.of(context).pop(user);
+      }
+    } on AuthException catch (e) {
+      // Bekende supabase-reacties (bevestiging, al-bestaand account,
+      // ongeldige combinatie) krijgen een eigen, gerichte tekst; de rest een
+      // algemene per modus. Nooit de ruwe API-melding tonen.
+      debugPrint('AccountSection: e-mail-login mislukt: $e');
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _errorText = _mapAuthError(s, e);
+      });
+    } catch (e) {
+      debugPrint('AccountSection: e-mail-login onverwacht mislukt: $e');
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _errorText =
+            _creating ? s.accountEmailCreateFailed : s.accountEmailSignInFailed;
+      });
+    }
+  }
+
+  String _mapAuthError(S s, AuthException e) {
+    final message = e.message.toLowerCase();
+    if (message.contains('not confirmed')) return s.emailNotConfirmed;
+    if (message.contains('already registered') ||
+        message.contains('already been registered')) {
+      return s.emailAlreadyExists;
+    }
+    if (message.contains('invalid login')) {
+      return s.accountEmailSignInFailed;
+    }
+    return _creating ? s.accountEmailCreateFailed : s.accountEmailSignInFailed;
+  }
+
+  void _switchMode() {
+    setState(() {
+      _creating = !_creating;
+      _errorText = null;
+      _noticeText = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final theme = Theme.of(context);
+
+    return AlertDialog(
+      title: Text(_creating ? s.emailCreateTitle : s.emailSignInTitle),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _emailController,
+              enabled: !_submitting,
+              keyboardType: TextInputType.emailAddress,
+              autofillHints: const [AutofillHints.email],
+              decoration: InputDecoration(labelText: s.emailFieldLabel),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _passwordController,
+              enabled: !_submitting,
+              obscureText: true,
+              autofillHints: const [AutofillHints.password],
+              onSubmitted: (_) {
+                if (!_submitting) _submit(s);
+              },
+              decoration: InputDecoration(labelText: s.passwordFieldLabel),
+            ),
+            if (_errorText != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _errorText!,
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+            ],
+            if (_noticeText != null) ...[
+              const SizedBox(height: 12),
+              Text(_noticeText!),
+            ],
+            const SizedBox(height: 4),
+            TextButton(
+              onPressed: _submitting ? null : _switchMode,
+              child: Text(
+                _creating ? s.emailSwitchToSignIn : s.emailSwitchToCreate,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(),
+          child: Text(s.cancel),
+        ),
+        FilledButton(
+          onPressed: _submitting ? null : () => _submit(s),
+          child: Text(_creating ? s.emailCreateAction : s.emailSignInAction),
+        ),
+      ],
+    );
+  }
+}

@@ -633,6 +633,59 @@ class SEn extends S {
   String get signInWithGoogle => 'Sign in with Google';
 
   @override
+  String get signInWithEmail => 'Sign in with email';
+
+  @override
+  String get emailSignInTitle => 'Sign in with email';
+
+  @override
+  String get emailCreateTitle => 'Create account';
+
+  @override
+  String get emailFieldLabel => 'Email address';
+
+  @override
+  String get passwordFieldLabel => 'Password';
+
+  @override
+  String get emailSignInAction => 'Sign in';
+
+  @override
+  String get emailCreateAction => 'Create';
+
+  @override
+  String get emailSwitchToCreate => 'No account yet? Create one.';
+
+  @override
+  String get emailSwitchToSignIn => 'Already have an account? Sign in.';
+
+  @override
+  String get emailInvalidError => 'Enter a valid email address.';
+
+  @override
+  String get passwordTooShortError => 'Password of at least 6 characters.';
+
+  @override
+  String get emailConfirmSent =>
+      'Check your email to confirm your account, then sign in.';
+
+  @override
+  String get emailNotConfirmed =>
+      'This email address is not confirmed yet. Click the link in your email.';
+
+  @override
+  String get emailAlreadyExists =>
+      'An account with this email address already exists.';
+
+  @override
+  String get accountEmailSignInFailed =>
+      'Signing in with this email address failed. Try again.';
+
+  @override
+  String get accountEmailCreateFailed =>
+      'Creating the account failed. Try again.';
+
+  @override
   String get accountSyncPromise =>
       'Your settings and planned rides, on all your devices.';
 

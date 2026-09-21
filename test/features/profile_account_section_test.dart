@@ -541,4 +541,167 @@ void main() {
     // vertelt, anders dan een stille mislukking.
     expect(find.text('Rider Test', skipOffstage: false), findsOneWidget);
   });
+
+  // ---------------------------------------------------------------------------
+  // E-mail + wachtwoord login (OPEN.md punt 11, 2026-09-21)
+  // ---------------------------------------------------------------------------
+
+  testWidgets(
+      'Test 14 — uitgelogd toont Inloggen met e-mail naast Inloggen met '
+      'Google (OPEN.md punt 11)',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    expect(find.text(s.signInWithGoogle, skipOffstage: false), findsOneWidget);
+    expect(find.text(s.signInWithEmail, skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 15 — tik op Inloggen met e-mail opent de dialoog met beide velden '
+      'en de inlogknop',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.signInWithEmail, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // "Inloggen met e-mail" staat op de rij én als dialoogtitel, dus de
+    // titel-assertie wordt gescoped op de dialoog zelf.
+    final dialog = find.byType(AlertDialog);
+    expect(
+      find.descendant(of: dialog, matching: find.text(s.emailSignInTitle)),
+      findsOneWidget,
+    );
+    expect(find.text(s.emailFieldLabel), findsOneWidget);
+    expect(find.text(s.passwordFieldLabel), findsOneWidget);
+    expect(find.text(s.emailSignInAction), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 16 — ongeldige invoer toont een validatiefout in de dialoog, '
+      'vóór elke netwerk-aanroep (geen crash op een ongeïnitialiseerde '
+      'client; de fout is dus geen netwerkfout)',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.signInWithEmail, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // Geen '@': de e-mail-validatie moet vangen, niet de netwerklaag.
+    await tester.enterText(find.byType(TextField).at(0), 'geen@adres');
+    await tester.enterText(find.byType(TextField).at(1), 'geheim123');
+    await tester.tap(find.text(s.emailSignInAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.emailInvalidError), findsOneWidget);
+
+    // Geldig adres, te kort wachtwoord: de wachtwoord-validatie vangt.
+    await tester.enterText(
+      find.byType(TextField).at(0),
+      'fietser@example.com',
+    );
+    await tester.enterText(find.byType(TextField).at(1), 'kort');
+    await tester.tap(find.text(s.emailSignInAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.passwordTooShortError), findsOneWidget);
+  });
+
+  testWidgets(
+      'Test 17 — geldige invoer op een ongeïnitialiseerde Supabase-client '
+      'toont de foutmelding in de dialoog en blijft open (zelfde truc als '
+      'Test 12/13; het succespad is niet los te faken zonder zware '
+      'SupabaseClient-mocking — zie Test 12)',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.signInWithEmail, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.enterText(
+      find.byType(TextField).at(0),
+      'fietser@example.com',
+    );
+    await tester.enterText(find.byType(TextField).at(1), 'geheim123');
+    await tester.tap(find.text(s.emailSignInAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountEmailSignInFailed), findsOneWidget);
+    // De dialoog blijft open — geen crash, geen zogenaamd geslaagde login.
+    // De titel-assertie is gescoped op de dialoog (dezelfde tekst staat op
+    // de rij erachter zodra de dialoog open is).
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text(s.emailSignInTitle),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+      'Test 18 — wisselen naar Account aanmaken wisselt titel en knoptekst; '
+      'een mislukte aanmelding toont de aanmaakfout, niet de inlogfout',
+      (tester) async {
+    await _pumpProfileScreen(tester, authStream: Stream<User?>.value(null));
+
+    final context = tester.element(find.byType(ProfileScreen));
+    final s = S.of(context);
+
+    await tester.tap(find.text(s.signInWithEmail, skipOffstage: false));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    final dialog = find.byType(AlertDialog);
+    expect(
+      find.descendant(of: dialog, matching: find.text(s.emailSignInTitle)),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(s.emailSwitchToCreate));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(
+      find.descendant(of: dialog, matching: find.text(s.emailCreateTitle)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: dialog, matching: find.text(s.emailCreateAction)),
+      findsOneWidget,
+    );
+
+    // Success-informatie "controleer je e-mail" kan zonder netwerk getest
+    // worden? Nee: signUp vereist Supabase. Het foutpad volstaat — zorg dat
+    // de fout de aanmaak-variant is, niet de inlog-variant.
+    await tester.enterText(
+      find.byType(TextField).at(0),
+      'nieuw@example.com',
+    );
+    await tester.enterText(find.byType(TextField).at(1), 'geheim123');
+    await tester.tap(find.text(s.emailCreateAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(s.accountEmailCreateFailed), findsOneWidget);
+    expect(find.text(s.accountEmailSignInFailed), findsNothing);
+  });
 }

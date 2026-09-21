@@ -252,10 +252,22 @@ stand aan gehouden worden in plaats van andersom.
 
 ## 11. Een Ridewindow-account zonder Gmail
 
-**Niet voor nu, wel bewaren voor later.** Naast Google-login moet een gebruiker
-ooit kunnen kiezen voor een Ridewindow-account dat lokaal op de telefoon wordt
-aangemaakt, zonder Google- of Gmail-account als voorwaarde.
+**Status: gebouwd (2026-09-21), toestelcontrole open.** E-mail + wachtwoord
+via Supabase' e-mail-authenticatie (elk geldig adres, geen Gmail nodig), als
+tweede optie in Profiel naast "Inloggen met Google". Na succesvolle inlog
+draait de app dezelfde afronding als na Google (accountwissel-check, sync,
+naam-invulstap). Bevestigingsmail staat aan (dashboard-instelling): een nieuw
+account moet eerst de mail aanklikken. Suite 727/727. Details en het
+toestel-vervolg: `.planning/quick/260921-lokaal-account/SUMMARY.md`.
 
+**Vervolg (later):** wachtwoord-vergeten-flow via Supabase's e-mail-trigger, en
+een diep-link zodat de bevestigingsmail terug naar de app leidt in plaats van
+naar de browser. Op dit project spel je die afwegingen door dezelfde checklist
+als hieronder.
+
+**Eerder onderzoek (oorspronkelijke notitie):** Naast Google-login moet een
+gebruiker ooit kunnen kiezen voor een Ridewindow-account dat lokaal op de
+telefoon wordt aangemaakt, zonder Google- of Gmail-account als voorwaarde.
 Bij het oppakken eerst onderzoeken hoe andere apps dit oplossen, met aandacht
 voor:
 
@@ -264,6 +276,10 @@ voor:
 - herstel bij een verloren telefoon of vergeten credential;
 - de verhouding tussen lokale brondata, Supabase-sync en accountwisselen;
 - privacy, abuse-preventie en de extra supportlast.
+
+**Beslissing 2026-09-21:** e-mail + wachtwoord via Supabase, géén
+lokaal-op-toestel-account (die keuze vervalt het nut: cloudkopie, maatjes,
+multi-device).
 
 De keuze mag accounts niet verplicht maken: signed-out gebruik en de bestaande
 Google-login blijven werken. Dit is eerst een product- en privacybeslissing,
