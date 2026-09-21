@@ -1,10 +1,10 @@
-/// Unit tests voor de tijdlijn van spaaktikken (`kSpokeTicks`).
+/// Unit tests voor de tijdlijn van het wielgeluid en de trillingen.
 ///
-/// De tijdlijn is een const lijst: wat hier bewaakt wordt zijn de
-/// onveranderlijkheden die "op de maat van het filmpje" betekenen, afgeleid
-/// uit de frameanalyse in PLAN 260921-welkomstwielen-geluid-en-trilling.
-/// De speler zelf draait op het toestel; zijn timing is precies deze lijst,
-/// dus de lijst testen is de synchronisatie testen.
+/// De tijdlijn is const: wat hier bewaakt wordt zijn de onveranderlijkheden
+/// van "opstarten en uitrijden", afgeleid uit de clipmeting van
+/// tool/rolling_intro_sound.py. De speler zelf draait op het toestel; zijn
+/// timing is precies deze constanten, dus die testen is de synchronisatie
+/// testen.
 
 library;
 
@@ -12,66 +12,88 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ridewindow/features/welcome/spoke_track.dart';
 
 void main() {
-  test('de eerste tik komt pas als de fiets vorm krijgt', () {
-    // De morph waait vanaf circa 1,0 s naar de fiets; een tik daarvóór
-    // hoort bij een wiel dat er nog niet is.
+  test('de clip begint pas als de fiets vorm krijgt', () {
+    // De morph waait vanaf circa 1,0 s naar de fiets; geluid daarvóór hoort
+    // bij een fiets die er nog niet is.
     expect(
-      kSpokeTicks.first.at,
+      kRollingClipStart,
       greaterThanOrEqualTo(const Duration(milliseconds: 1000)),
     );
   });
 
-  test('de laatste tik landt nog binnen het beeld', () {
-    // De intro is op 2472 ms afgelopen; de tijdlijn belooft dat hij
-    // uiterlijk op 2430 ms uitgetikt is.
+  test('de uitrij is voorbij voordat de titel er lang stil bij staat', () {
+    // De intro is op 2.472 ms afgelopen; de uitrij mag er nog een seconde
+    // achteraan (Joost wilde hem horen uitlopen), en daarna moet het stil
+    // zijn.
     expect(
-      kSpokeTicks.last.at,
-      lessThanOrEqualTo(const Duration(milliseconds: 2430)),
-    );
-    expect(
-      kSpokeTicks.last.at,
-      lessThan(const Duration(milliseconds: 2472)),
+      kRollingClipStart + kRollingClipDuration,
+      lessThanOrEqualTo(const Duration(milliseconds: 3600)),
     );
   });
 
-  test('het ritme versnelt monotoon: nooit een stap terug', () {
-    // De keuze van Joost: een optrekkende rit. Elke tussenpoos is hooguit
-    // zo lang als de vorige; één terugval maakt er een schokkerend geheel van.
-    for (var i = 1; i < kSpokeTicks.length; i++) {
-      final gap = kSpokeTicks[i].at - kSpokeTicks[i - 1].at;
-      final previousGap = i >= 2
-          ? kSpokeTicks[i - 1].at - kSpokeTicks[i - 2].at
-          : gap;
+  test('elke trillingspuls valt binnen de clip', () {
+    // Een puls buiten de clip is een trilling zonder geluid: precies het
+    // loszinnige gevoel dat ronde 1 op het toestel opleverde.
+    for (final pulse in kRollingHaptics) {
       expect(
-        gap,
-        lessThanOrEqualTo(previousGap),
-        reason: 'tussenpoos bij tik $i is teruggevallen naar $gap',
+        pulse,
+        greaterThanOrEqualTo(kRollingClipStart),
+        reason: 'puls op ${pulse.inMilliseconds} ms valt vóór de clip',
+      );
+      expect(
+        pulse,
+        lessThanOrEqualTo(kRollingClipStart + kRollingClipDuration),
+        reason: 'puls op ${pulse.inMilliseconds} ms valt ná de clip',
       );
     }
   });
 
-  test('tik en tock wisselen af', () {
-    // Twee dezelfde tikken achter elkaar klinken als een metronoom; de
-    // afwisseling is de onregelmaat die een rollend wiel geloofwaardig maakt.
-    for (var i = 1; i < kSpokeTicks.length; i++) {
+  test('de eerste puls volgt de in-grijpende klik meteen', () {
+    // De opname begint met het pedaal dat in-grijpt; die klik is het start-
+    // schot van de rit en moet dus voelbaar zijn zodra de clip begint.
+    expect(
+      kRollingHaptics.first - kRollingClipStart,
+      lessThanOrEqualTo(const Duration(milliseconds: 100)),
+    );
+  });
+
+  test('de tussenpozen van de pulsen blijven voelbaar gescheiden', () {
+    // Korter dan 70 ms voelt aan als één zoem in plaats van als een rit;
+    // de meetscript-vloer staat er dus ook in de code.
+    for (var i = 1; i < kRollingHaptics.length; i++) {
       expect(
-        kSpokeTicks[i].tock,
-        isNot(kSpokeTicks[i - 1].tock),
-        reason: 'tik $i herhaalt dezelfde klank als de vorige',
+        kRollingHaptics[i] - kRollingHaptics[i - 1],
+        greaterThanOrEqualTo(const Duration(milliseconds: 70)),
+        reason: 'puls $i zit te dicht op zijn voorganger',
       );
     }
   });
 
-  test('het volume loopt alleen maar omhoog', () {
-    // De rit trekt op; een tik die zachter terugkomt dan zijn voorganger
-    // voelt als terugvallen.
-    for (var i = 1; i < kSpokeTicks.length; i++) {
-      expect(
-        kSpokeTicks[i].volume,
-        greaterThanOrEqualTo(kSpokeTicks[i - 1].volume),
-        reason: 'volume bij tik $i zakt terug naar ${kSpokeTicks[i].volume}',
-      );
-    }
+  test('het ritme versnelt in het begin en dunt uit aan het eind', () {
+    // De optrekkende rit: de eerste tussenpoos is ruimer dan de kleinste,
+    // en de laatste (de uitrij) is dat ook. De kleinste tussenpoos hoort in
+    // de volle rammel thuis, niet aan de randen.
+    final gaps = <Duration>[
+      for (var i = 1; i < kRollingHaptics.length; i++)
+        kRollingHaptics[i] - kRollingHaptics[i - 1],
+    ];
+    final minGap = gaps.reduce((a, b) => a < b ? a : b);
+
+    expect(
+      gaps.first,
+      greaterThan(minGap),
+      reason: 'de rit begint al op volle snelheid: nergens een optrek',
+    );
+    expect(
+      gaps.last,
+      greaterThan(minGap),
+      reason: 'de uitrij dunt niet uit: de rit stopt in plaats van weg te '
+          'rijden',
+    );
+  });
+
+  test('er zit ritme in: minstens vijftien pulsen', () {
+    expect(kRollingHaptics.length, greaterThanOrEqualTo(15));
   });
 
   test('createSpokeTrackPlayer bestaat niet in de testomgeving', () {

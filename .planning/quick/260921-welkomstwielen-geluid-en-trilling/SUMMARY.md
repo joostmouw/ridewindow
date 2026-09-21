@@ -1,84 +1,100 @@
 # SUMMARY — welkomstwielen: spaakgeluid en trillingen bij de intro
 
 **Datum:** 2026-09-21 · **Plan:** `PLAN.md`
-**Suite:** 740/740 groen (10 nieuw), `flutter analyze` exact op de baseline
-van 200 info's, nul nieuwe issues uit de nieuwe bestanden.
+**Suite:** groen, `flutter analyze` exact op de baseline van 200 info's.
+**Toestel:** goedgekeurd door Joost op de Oppo (ronde 3), via de
+eerste-minuut-flow-uitzondering van de release-route: lokaal gesideload met
+verse data, genoteerd in `STATE.md`.
 
 ## Wat er nu in de app zit
 
-Bij de welkomstintro (eenmalig, vóór onboarding) tikken nu spaakjes onder de
-morph: zeven tikken in 1,4 s, zacht en traag zodra de fiets vorm krijgt
-(vanaf circa 1,0 s), sneller als de renner opstapt, vol tempo (8 tikken per
-seconde) als de velgen dicht zijn, en doorrollend tot het eind. Elke tik
-geeft een korte trilling op hetzelfde moment (`selectionClick`, hetzelfde
-klikje dat de app elders gebruikt). Wie tik om te overslaan breekt ook de
-rit af: geen beeld, geen wiel.
+Bij de welkomstintro (eenmalig, vóór onboarding) hoor je een echte fiets
+opstarten en uitrijden: het pedaal grijpt in zodra de morph de fiets vorm
+geeft (circa 1,0 s), de rammel trekt op met de renner die opstapt, en de
+uitrij loopt door tot de opname zelf uitsterft, ruim een seconde nadat het
+beeld is aangekomen. De trillingen volgen de hoorbaarheid van de clip:
+25 pulsen, dichter op elkaar waar het ratelt (minimale tussenpoes 70 ms) en
+uitdunnend in de uitrij (146, 189, 236 ms aan het eind). Wie tikt om te
+overslaan breekt de rit af.
 
-## De vondsten (het waardevolste deel)
+## Drie rondes, en waarom
 
-1. **De wielen draaien nergens in het filmpje.** Frame-naar-frame-analyse van
-   de WebP (206 frames van 12 ms) laat zien dat het een morph is: tekening
-   verschijnt 0,28-1,0 s, morph naar fiets 1,0-1,68 s, renner stapt op
-   1,68-2,0 s, en de velgen sluiten pas 2,0-2,16 s. In het eindbeeld zijn de
-   wielen lege cirkels zonder spaken (gemeten rond beide wielcentra:
-   papierluminantie, alleen de framebuis steekt erdoor). "Op de maat van het
-   filmpje" kon dus nooit letterlijk synchroniseren op een draaiend wiel;
-   het is een ontwerp aan de gemeten fasen geworden.
-2. **Het bronfilmpje (~/Downloads, 10 s) heeft muziek, geen spaakgeluiden.**
-   Audiospoor geanalyseerd: doorlopend muziekje, wegebt bij 8,2 s. Het geluid
-   is dus verzonnen en deterministisch gegenereerd met
-   `tool/spoke_tick_sound.py` (alleen Python-stdlib, vaste seed, licentievrij,
-   herdraaibaar).
-3. **Twee klanken, niet één.** Tik en tock wisselen af (2900 en 2300 Hz): acht
-   identieke tikken per seconde klinken als een metronoom, en de afwisseling
-   geeft de onregelmaat die een rollend wiel geloofwaardig maakt.
+**Ronde 1: verzonnen tikken** (commit `af54d81`). Zeven synthetische
+spaaktikken, op de gemeten fasen van het filmpje, met een generator-script
+dat ze reproduceerbaar maakte. Op de Oppo oordeelde Joost: trillen werkt,
+maar "het geluid slaat nergens op". Te veel piep, te weinig wiel.
 
-## De keuzes van Joost (2026-09-21)
+**Ronde 2: de echte opname.** Joost stuurde een echte fietsopname en zei
+wat hij wilde: "je hoort het opstarten en uitrijden, dus haal het
+middenstuk eruit". Analyse van de opname (10,4 s): na het in-grijpende
+pedaal trekt het geratel op (0,3-1,0 s), daarna 7 s gelijkmatig, en vanaf
+circa 8 s rijdt het geluid uit naar stilte. `tool/rolling_intro_sound.py`
+smeedt segment A (0,33-1,05 s) en segment B met een korte overvloeiing
+aan elkaar; het gelijkmatige midden vervalt.
 
-1. Optrekkende rit (niet letterlijk aan de velgsluiting vastgekluisterd).
-2. Elke tik geeft een korte trilling, hetzelfde ritme als het geluid.
+**Ronde 3: de uitrij verlengd.** Eerste proef op het toestel: klank goed,
+maar de uitrij mocht verder doorlopen ("dat je hem uit hoort te trappen").
+Segment B loopt nu van 8,50 s tot 10,35 s: tot de opname zelf stopt, dus
+de clip sterft op natuurlijke wijze uit in plaats van afgekapt te worden.
+Clip: 2,53 s. Joost: "ja is goed zo."
 
-## Hoe het gebouwd is
+## De vondsten
 
-- `lib/features/welcome/spoke_track.dart`: de tijdlijn is een const lijst
-  (`kSpokeTicks`) met per tik moment, klank en volume, afgeleid en
-  gedocumenteerd per fase. De speler eromheen bundelt geluid en trilling
-  achter één start/stop, zodat die twee nooit van elkaar kunnen afdriften.
-- Afspelen met **audioplayers 6.8.1** in `lowLatency`-stand (SoundPool), het
-  eerste en enige audiopakket van de app. Fouten in het afspelen worden één
-  keer gelogd en de intro loopt door: tooi die de rit niet mag breken.
-- **Alleen native.** Op web blokkeert de browser autoplay (de intro start
-  zonder tik van de gebruiker) en bestaan trillingen niet; zelfde kIsWeb-wacht
-  als `emailRedirectTo`. In de testomgeving bestaat de speler ook niet
-  (`FLUTTER_TEST`), waardoor de bestaande welkomtests onaangeroerd groen
-  bleven; nieuwe widget-tests injecteren een opnamefake via een
-  `@visibleForTesting`-parameter.
-- `kSpokeTrackStartDelay` (150 ms) compenseert het decoden van de eerste
-  frame tussen de initState-klok en het beeld.
+1. **Twee spelers betwisten elkaar de audioruimte.** Ronde 1 speelde tik
+   en tock op twee AudioPlayers, en de logcat van de Oppo liet bij elke
+   afspeling `onAudioFocusChange(-1)` zien: de tweede speler steelt de
+   focus van de eerste, wat het geluid kan dempen of afkappen. Ronde 2
+   gebruikt daarom één speler; in de log is de focusverlies-ruis volledig
+   weg. Les: short sound effects op Android met audioplayers gaan op één
+   speler, niet op een per klank.
+2. **De wielen draaien nergens in het filmpje.** Frame-naar-frame-analyse
+   van de WebP: het is een morph (tekening 0,28-1,0 s, werveling naar de
+   fiets 1,0-1,68 s, renner opstappen 1,68-2,0 s, velgen sluiten
+   2,0-2,16 s), en het eindbeeld heeft lege velgen zonder spaken. Het
+   bronfilmpje heeft muziek, geen wielgeluid. "Op de maat van het
+   filmpje" is dus altijd een ontwerpkeuze aan de fasen, geen
+   letterlijke synchronisatie.
+3. **Trillingen volgen de hoorbaarheid, niet tikken.** "Elke tik een
+   trilling" uit ronde 1 is bij een echte rammel onvertaalbaar (het is
+   quasi-continu), dus het meetscript levert pulsen per genormaliseerde
+   amplitude-som met een 70 ms-vloer. De reeks versnelt vanzelf met de
+   optrek en dunt vanzelf uit met de uitrij, en zit in één start/stop
+   met het geluid zodat de twee nooit van elkaar kunnen afdriften.
+4. **De nummers in de bestandsnaam van de opname kloppen niet.**
+   `freesound_community-bicycle-pedal-105846.mp3` wijst niet naar
+   freesound 105846 (dat is een synthesizer-kick van iemand anders) en
+   het bestand heeft geen metadata. De bron en licentie zijn dus nog
+   onbekend.
+
+## Open (blokkeert geen Play-build vanzelf, maar wel de intro meenemen)
+
+- **Licentie van de opname vastleggen.** Voor een release die de clip
+  bevat moet de downloadlink en -licentie zwart-op-wit staan (CC0 is
+  direct bruikbaar; CC-BY vraagt naamsvermelding; NC/ND zijn
+  waarschijnlijk een blokkade). Joost heeft de site nog niet genoemd.
+  Op de eigen Oppo testen mag, distribueren via Play nog niet zonder
+  dit.
+- **`kSpokeTrackStartDelay`** (150 ms) is een schatting van de decode-
+  vertraging van de WebP. Goedgekeurd zoals het staat; bijstellen kan
+  op het toestel als een toekomstige proef scheef aanvoelt.
+- **De Oppo staat op een locale sideload** met verse data; de
+  agendakoppeling moet opnieuw zodra hij weer echt met de app aan de
+  slag gaat. De eerstvolgende internal-release via Play herstelt de
+  Play-installatie vanzelf.
 
 ## Bewijs
 
-- 6 tijdlijn-tests (`spoke_track_test.dart`): begint niet vóór de
-  wervelfase, versnelt monotoon (nooit een stap terug), laatste tik binnen
-  het beeld (uiterlijk 2430 ms), tik/tock wisselen af, volume loopt alleen
-  omhoog, en de speler bestaat niet in de testomgeving.
-- 3 widget-tests (`welcome_spoke_test.dart`): het scherm start de tijdlijn,
-  tikken-om-te-overslaan stopt hem, en afbraak van het scherm stopt hem.
-- 1 structuurtest (`sound_assets_test.dart`): de wav's bestaan en zijn echt
-  (RIFF), staan in de pubspec-assets, en het generator-script is erbij. Dit
-  bewaakt het klassieke falingspad: een geluidsasset die vergeten wordt
-  geregistreerd faalt stíl, alleen op het toestel.
-
-## Open (op de Oppo, na de volgende internal-release)
-
-1. **Synchronisatie bijstellen.** `kSpokeTrackStartDelay` is een schatting
-   (150 ms). Val in het echt de eerste tik duidelijk vóór de werveling,
-   verhoog hem; valt hij er ver na, verlaag hem. De intro begint met 276 ms
-   stilstaand beeld, dus er is speelruimte.
-2. **De klank zelf beoordelen.** Vooraf beluisteren kan op de Mac:
-   `afplay assets/sounds/spoke_tick.wav` en `spoke_tock.wav`. Is de tik te
-   metalig of te zacht, dan zit de recipe in `tool/spoke_tick_sound.py`
-   (constanten onderaan), daarna opnieuw draaien; de tijdlijn verandert niet.
-3. **Release volgt de route** (`docs/RELEASE-ROUTE.md`) op Joosts sein;
-   versiebump hoort daarbij. Deze taak heeft bewust geen buildnummer
-   aangeraakt.
+- `spoke_track_test.dart`: clip begint niet vóór de wervelfase, uitrij
+  binnen het geluidsbudget (uiterlijk 3,6 s), elke puls binnen de clip,
+  eerste puls volgt de in-grijpende klik, tussenpozen altijd >= 70 ms,
+  het ritre versnelt in het begin en dunt uit aan het eind, en de speler
+  bestaat niet in de testomgeving.
+- `welcome_spoke_test.dart`: het scherm start de tijdlijn, tikken-om-te-
+  overslaan stopt hem, afbraak van het scherm stopt hem.
+- `sound_assets_test.dart`: de wav is echt (RIFF), geregistreerd in de
+  pubspec-assets, even lang als de Dart-constante zegt (drift tussen clip
+  en tijdlijn betekent trillingen die los van het geluid gaan), en het
+  smeed-script is erbij.
+- Op het toestel: clip speelt 2,1 s (ronde 2) / volledig (ronde 3) op
+  één audiospoor, volume 1,0, zonder focusverlies; drie widget-tests met
+  een opnamefake bewaken de koppeling.

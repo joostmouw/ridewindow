@@ -1,25 +1,42 @@
 // lib/features/welcome/spoke_track.dart
 //
-// Het spaakgeluid en de trillingen onder de welkomstintro (2026-09-21).
+// Het wielgeluid en de trillingen onder de welkomstintro (2026-09-21).
 //
 // **Wat er in het filmpje echt zit.** `welcome_ride.webp` is een morph: het
 // RW-monogram waait naar de fiets, de renner stapt op, en pas in de laatste
 // halve seconde sluiten de velgen. De wielen draaien nergens als wiel en
 // hebben in het eindbeeld geen spaken (gemeten 2026-09-21, zie PLAN
 // 260921-welkomstwielen-geluid-en-trilling); het bronfilmpje bevat alleen
-// muziek. Het spaakgeluid bestaat dus niet en is verzonnen, met een ritme
-// dat aan de gemeten fasen van het filmpje is afgeleid:
+// muziek. Het geluid bestaat dus niet in de bron en is eronder gezet.
 //
-//   0,00-0,28 s  stille start
-//   0,28-1,00 s  de tekening verschijnt
-//   1,00-1,68 s  de morph waait naar de fiets     <- tikken beginnen, zacht
-//   1,68-2,00 s  de renner stapt op               <- het wiel trekt op
-//   2,00-2,16 s  velgen sluiten                   <- vol tempo
-//   2,16-2,47 s  beeld stil, Flutter schuift omhoog <- doorrollen tot het eind
+// **Ronde 1: verzonnen tikken.** Zeven synthetische spaaktikken, op de
+// gemeten fasen van het filmpje. Op de Oppo oordeelde Joost het als "slaat
+// nergens op": te veel piep, te weinig wiel. De volledige ronde staat in de
+// git-geschiedenis (af54d81); de lessen die bleven staan zijn de fasen van
+// het filmpje en de koppeling van geluid en trilling aan één start/stop.
 //
-// De klanken zelf komen uit `tool/spoke_tick_sound.py` (deterministisch,
-// licentievrij, alleen Python-stdlib); wil je een andere klank, draai dat
-// script opnieuw en pas de constanten hieronder niet aan.
+// **Ronde 2: de echte opname.** Joosts keuze: je hoort de fiets **opstarten
+// en uitrijden**. Bron is een echte fietsopname waaruit `tool/
+// rolling_intro_sound.py` het in-grijpende pedaal en de optrekkende rammel
+// uit het begin haalt en de uitdunnende uitrij van het eind; de zeven
+// seconden gelijkmatig geratel in het midden vervallen (zijn woorden: "haal
+// het middenstuk eruit"). De clip duurt 2,03 s en begint op 1,0 s in de
+// intro: zodra de morph de fiets vorm geeft, grijpt het pedaal in, trekt
+// het geratel op met de renner die opstapt (1,68-2,0 s) en rijdt de uit de
+// intro uit terwijl het geheel omhoog schuift.
+//
+// **Trillingen.** Elke puls volgt de hoorbaarheid van de clip zelf: het
+// meetscript levert per puls een moment, dichter op elkaar waar het
+// ratelt, verder uit elkaar in de uitrit. Het zijn er twintig, van de
+// in-grijpende klik tot de laatste tok. Eén puls per tik was de keuze van
+// Joost; bij een echte rammel is de trouwste vertaling daarvan de densiteit
+// van het geluid volgen.
+//
+// **Eén speler, niet twee.** Ronde 1 speelde tik en tock op twee spelers,
+// en op de Oppel bleek uit de logcat dat die twee elkaar bij elke tik de
+// audioruimte betwistten (`onAudioFocusChange(-1)` rond elke afspeling):
+// de tweede speler steelt de focus van de eerste. Eén speler kan dat
+// zichzelf niet aandoen.
 
 import 'dart:async';
 import 'dart:io' show Platform;
@@ -28,78 +45,86 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-/// Eén spaaktik: wanneer hij valt (relatief aan het begin van de intro),
-/// welke klank en hoe hard.
-@immutable
-class SpokeTick {
-  const SpokeTick(this.at, {required this.tock, required this.volume});
+/// De intro-tijd waarop de clip begint. Afgeleid, niet gekozen: de morph
+/// waait vanaf circa 1,0 s naar de fiets, en het geluid hoort bij een fiets
+/// die bestaat. De in-grijpende klik van het pedaal valt daardoor op circa
+/// 1,06 s, vlak nadat de fiets vorm krijgt.
+const kRollingClipStart = Duration(milliseconds: 1000);
 
-  final Duration at;
+/// Hoe lang de clip duurt. Ook afgeleid: 2,53 s gemeten (ronde 3: Joost
+/// wilde de uitrij horen uitlopen "dat je hem uit hoort te trappen", dus het
+/// eindsegment loopt door tot de opname zelf stopt), beginnend op 1,0 s
+/// betekent dat de uitrij tot circa 3,5 s doorloopt. De intro zelf is op
+/// 2,47 s afgelopen; het geluid rijdt die seconde erachter nog uit, en
+/// daarna moet het stil zijn onder de titel.
+const kRollingClipDuration = Duration(milliseconds: 2525);
 
-  /// Tik en tock wisselen af. Acht dezelfde tikken per seconde klinken als
-  /// een metronoom; een wiel dat rolt is onregelmatiger dan dat, en twee
-  /// iets verschillende klanken geven die onregelmaat zonder het ritme te
-  /// verliezen.
-  final bool tock;
-
-  /// 0,4 is zacht (de fiets krijgt vorm), 0,8 is vol aan (de rit rolt).
-  final double volume;
-}
-
-/// De tijdlijn, afgeleid en niet gekozen (frameanalyse in het PLAN):
-///
-/// - fase 1, 1,0-1,68 s: interval 330 ms, volume 0,4. Tikken op 1000,
-///   1330 en 1660 ms. De vierde vertrekt nog met het fase-1-interval van
-///   zijn vertrekmoment (1660 + 330) en landt op 1990 ms.
-/// - fase 2, 1,68-2,1 s: het interval trekt op van 330 naar 125 ms, het
-///   volume van 0,4 naar 0,8. De tik van 1990 krijgt volume 0,7 (halverwege
-///   de ophelling), die van 2169 valt al in fase 3 en is vol aan.
-/// - fase 3, vanaf 2,1 s: interval 125 ms, volume 0,8. Tikken op 2294 en
-///   2419 ms, en dan is het genoeg.
-/// - na 2430 ms stopt de tijdlijn: de intro eindigt op 2472 ms en de laatste
-///   tik moet nog binnen het beeld landen.
-const kSpokeTicks = <SpokeTick>[
-  SpokeTick(Duration(milliseconds: 1000), tock: false, volume: 0.4),
-  SpokeTick(Duration(milliseconds: 1330), tock: true, volume: 0.4),
-  SpokeTick(Duration(milliseconds: 1660), tock: false, volume: 0.4),
-  SpokeTick(Duration(milliseconds: 1990), tock: true, volume: 0.7),
-  SpokeTick(Duration(milliseconds: 2169), tock: false, volume: 0.8),
-  SpokeTick(Duration(milliseconds: 2294), tock: true, volume: 0.8),
-  SpokeTick(Duration(milliseconds: 2419), tock: false, volume: 0.8),
+/// De trillingsmomenten, gemeten aan de clip zelf (tool/
+/// rolling_intro_sound.py): de som van de genormaliseerde amplitude bepaalt
+/// wanneer de volgende puls valt, met een minimale tussenpoes van 70 ms --
+/// korter voelt aan als één zoem in plaats van als een rit. De reeks
+/// versnelt van de in-grijpende klik (61 ms in de clip) via de volle rammel
+/// (pulsen op de 70 ms-vloer) naar de uitdunnende uitrij, die in ronde 3
+/// lang doorloopt: de laatste tussenpozen zijn 146, 189 en 236 ms.
+/// Intro-tijd = clip-tijd + 1000.
+const kRollingHaptics = <Duration>[
+  Duration(milliseconds: 1061),
+  Duration(milliseconds: 1152),
+  Duration(milliseconds: 1276),
+  Duration(milliseconds: 1346),
+  Duration(milliseconds: 1416),
+  Duration(milliseconds: 1486),
+  Duration(milliseconds: 1556),
+  Duration(milliseconds: 1626),
+  Duration(milliseconds: 1696),
+  Duration(milliseconds: 1766),
+  Duration(milliseconds: 1836),
+  Duration(milliseconds: 1906),
+  Duration(milliseconds: 1976),
+  Duration(milliseconds: 2046),
+  Duration(milliseconds: 2116),
+  Duration(milliseconds: 2186),
+  Duration(milliseconds: 2256),
+  Duration(milliseconds: 2326),
+  Duration(milliseconds: 2396),
+  Duration(milliseconds: 2466),
+  Duration(milliseconds: 2536),
+  Duration(milliseconds: 2606),
+  Duration(milliseconds: 2752),
+  Duration(milliseconds: 2941),
+  Duration(milliseconds: 3177),
 ];
 
 /// De klok van deze tijdlijn start in `initState`, samen met de
 /// settle-timer van het scherm; het beeld begint pas als de eerste frame van
-/// de WebP gedecodeerd is. Deze constante schuift de tikken evenver op als
+/// de WebP gedecodeerd is. Deze constante schuift het geluid evenver op als
 /// die decodering naar verwachting duurt. De intro begint met 276 ms
 /// stilstaand beeld, dus de schatting hoeft niet exact te zijn. Bijstellen
-/// doe je op het toestel: valt de eerste tik duidelijk vóór de werveling,
-/// verhoog dan; valt hij er ver na, verlaag dan.
+/// doe je op het toestel: valt de in-grijpende klik duidelijk vóór de
+/// werveling, verhoog dan; valt hij er ver na, verlaag dan.
 const kSpokeTrackStartDelay = Duration(milliseconds: 150);
 
-/// Speelt [kSpokeTicks]: geluid en een korte trilling per tik. Die twee
-/// zitten bewust samen achter één start/stop. "Elke tik geeft een korte
-/// trilling op hetzelfde ritme" was de keuze van Joost (2026-09-21), en
-/// samen in één object kunnen geluid en trilling nooit van elkaar
+/// Speelt de clip en de trillingen. Die twee zitten bewust samen achter één
+/// start/stop: ze delen één tijdlijn en kunnen zo nooit van elkaar
 /// afdriften.
 abstract class SpokeTrackPlayer {
-  /// Start de tijdlijn op de klok van nu. Twee keer starten hoort niet
-  /// voor te komen; het scherm start één keer en stopt bij overslaan of
+  /// Start de tijdlijn op de klok van nu. Twee keer starten hoort niet voor
+  /// te komen; het scherm start één keer en stopt bij overslaan of
   /// afbraak.
   void start();
 
-  /// Breekt de rit af: geen tik meer, geen trilling meer. Idempotent.
+  /// Breekt de rit af: geen geluid meer, geen trilling meer. Idempotent.
   void stop();
 }
 
-/// De echte speler: twee `AudioPlayer`s (tik en tock) in lowLatency-stand
-/// (SoundPool op Android, bedoeld voor korte snel herhaalde geluiden) en
-/// `HapticFeedback.selectionClick` per tik, het korte klikje dat de app ook
-/// elders voor kleine bevestigingen gebruikt.
+/// De echte speler: één `AudioPlayer` in lowLatency-stand (SoundPool op
+/// Android, bedoeld voor korte geluiden) voor de clip, en
+/// `HapticFeedback.selectionClick` per puls, het korte klikje dat de app
+/// ook elders voor kleine bevestigingen gebruikt.
 class AudioSpokeTrackPlayer implements SpokeTrackPlayer {
-  AudioSpokeTrackPlayer() : _players = [AudioPlayer(), AudioPlayer()];
+  AudioSpokeTrackPlayer() : _player = AudioPlayer();
 
-  final List<AudioPlayer> _players;
+  final AudioPlayer _player;
   final List<Timer> _timers = [];
   bool _stopped = false;
   bool _audioFailureLogged = false;
@@ -107,42 +132,56 @@ class AudioSpokeTrackPlayer implements SpokeTrackPlayer {
   @override
   void start() {
     if (_stopped) return;
-    // De speler opzetten kost een platform-kanaalronde; de eerste tik zit
-    // ruim een seconde verder, dus niet awaiten: de tijdlijn vertrekt op
-    // de klok van de intro, niet op die van de audiostack.
+    // De speler opzetten kost een platform-kanaalronde; de clip zit ruim
+    // een seconde verder, dus niet awaiten: de tijdlijn vertrekt op de
+    // klok van de intro, niet op die van de audiostack.
     unawaited(_prepare());
-    for (final tick in kSpokeTicks) {
-      _timers.add(Timer(kSpokeTrackStartDelay + tick.at, () => _tick(tick)));
+    _timers.add(
+      Timer(
+        kSpokeTrackStartDelay + kRollingClipStart,
+        _playClip,
+      ),
+    );
+    for (final pulse in kRollingHaptics) {
+      _timers.add(
+        Timer(
+          kSpokeTrackStartDelay + pulse,
+          _pulse,
+        ),
+      );
     }
   }
 
   Future<void> _prepare() async {
     try {
-      for (final player in _players) {
-        await player.setPlayerMode(PlayerMode.lowLatency);
-      }
+      await _player.setPlayerMode(PlayerMode.lowLatency);
     } catch (error) {
       _logBrokenAudio(error);
     }
   }
 
-  void _tick(SpokeTick tick) {
+  void _pulse() {
     if (_stopped) return;
-    // De trilling eerst: het trillingskanaal is er altijd, en de intro mag
-    // nooit afhangen van de audiostack.
+    // De trilling zonder bewaking van de audiostack: het trillingskanaal
+    // is er altijd, en de rit mag nooit afhangen van het geluid.
     HapticFeedback.selectionClick();
-    unawaited(_play(tick));
   }
 
-  Future<void> _play(SpokeTick tick) async {
-    try {
-      await _players[tick.tock ? 1 : 0].play(
-        AssetSource('sounds/spoke_${tick.tock ? 'tock' : 'tick'}.wav'),
-        volume: tick.volume,
-      );
-    } catch (error) {
-      _logBrokenAudio(error);
-    }
+  void _playClip() {
+    if (_stopped) return;
+    unawaited(() async {
+      try {
+        // De clip is door het meetscript op piek 0,75 genormaliseerd; op
+        // vol volume blijft hij onder de overstuur en draagt hij ver
+        // genoeg door op een telefoonspeaker.
+        await _player.play(
+          AssetSource('sounds/welcome_roll.wav'),
+          volume: 1.0,
+        );
+      } catch (error) {
+        _logBrokenAudio(error);
+      }
+    }());
   }
 
   @override
@@ -155,16 +194,14 @@ class AudioSpokeTrackPlayer implements SpokeTrackPlayer {
     _timers.clear();
     // lowLatency-spelers horen vrijgegeven te worden; audioplayers laat
     // ze anders op de SoundPool liggen.
-    for (final player in _players) {
-      unawaited(player.dispose());
-    }
+    unawaited(_player.dispose());
   }
 
   void _logBrokenAudio(Object error) {
-    // Eén keer melden, niet per tik: ontbreekt het audioplatform dan faalt
-    // elke tik op dezelfde manier. En dit is geen "stille tak" voor de
-    // gebruiker: op de intro valt niets op te lossen, en hij moet doorlopen,
-    // met of zonder wiel.
+    // Eén keer melden, niet per afspeling: ontbreekt het audioplatform dan
+    // faalt elke afspeling op dezelfde manier. En dit is geen "stille tak"
+    // voor de gebruiker: op de intro valt niets op te lossen, en hij moet
+    // doorlopen, met of zonder wiel.
     if (_audioFailureLogged) return;
     _audioFailureLogged = true;
     debugPrint('SpokeTrack: geluid afspelen mislukt, intro loopt door: $error');

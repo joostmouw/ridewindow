@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-21T16:45:00.000Z"
+last_updated: "2026-09-21T17:30:00.000Z"
 last_activity: 2026-09-21
 progress:
   total_phases: 12
@@ -25,12 +25,12 @@ punten in `HANDOFF.json`.
 |---|---|
 | Play closed testing (Alpha) | **1.0.38 (49)** — build 52 gaat hier pas heen na toestelgoedkeuring (release-route, `docs/RELEASE-ROUTE.md`) |
 | Play internal testing | **1.0.41 (52)**, geüpload 2026-09-21 via de API: actuele Supabase anon key; account aanmaken in 50/51 faalde met `401 Invalid API key` |
-| Oppo | update naar internal **1.0.41 (52)** staat klaar. Daarna verse e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
+| Oppo | **lokaal gesideload voor de eerste-minuut-flow** (release-route, 2026-09-21 genoteerd): APK 1.0.41+52 plus de intro-geluid-commits, verse data dus de agendakoppeling is vervallen en moet één keer opnieuw. Play biedt zolang dit een sideload is géén updates; de eerstvolgende internal-release via Play herstelt de installatie. Daarna nog steeds open: verse e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
-| main | 1.0.41+52 lokaal, releasecommit voor build 52 nog te maken; vóór deze taak 8 commits voor op origin — niet gepusht |
+| main | 1.0.41+52 lokaal plus de intro-geluidstaak (af54d81 synthetische tikken, daarna ronde 2/3 met de echte opname); niet gepusht — vóór deze taak 9 commits voor op origin |
 | PWA live | **1.0.38 (49)** op `my-project-joost.web.app`; de web-login zit gebouwd maar de PWA is nog niet op 50/51 gezet |
 | Supabase dashboard | Site URL staat op `https://my-project-joost.web.app`; Additional Redirect URLs bevat `ridewindow://**` (Joost, 2026-09-21). De actuele anon key zit in build 52; signup-probe komt voorbij key-validatie maar raakte daarna de mailrate-limit |
-| Oppo | build 52 via Play internal ophalen en de e-mailaccount-flow testen. **Het peloton-lint is op het toestel goedgekeurd** (Joost, 2026-09-21): leesbaar op de maat waarop het in de app staat. Zie OPEN.md punt 5: Agenda staat op "Not connected", app op Engels |
+| Oppo | **Het intro-geluid is op het toestel goedgekeurd** (Joost, 2026-09-21, ronde 3: echte fietsopname, uitrij loopt door tot de opname stopt). **Het peloton-lint is eerder op het toestel goedgekeurd**: leesbaar op de maat waarop het in de app staat. Agenda staat na de verse installatie op "Not connected", app op Engels (OPEN.md punt 5) |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
 feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de backlog (#72).
