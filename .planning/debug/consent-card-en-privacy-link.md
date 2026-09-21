@@ -293,9 +293,20 @@ verification: |
   bestanden levert geen nieuwe meldingen (7 bestaande in profile_screen, zowel
   voor als na).
 
-  Nog niet bewezen: de manifest-wijziging is alleen op een echt Android-toestel
-  te zien. Daarom staat de tweede laag van bug 2 er ook -- lukt openen toch
-  niet, dan zegt de app het nu in plaats van te zwijgen.
+  Op het toestel: de release-APK bouwt en `aapt2 dump xmltree` toont het
+  `VIEW`-intent met scheme `https` in de samengevoegde manifest van het
+  uiteindelijke artefact. De manifest-helft is daarmee tot aan het artefact
+  geverifieerd.
+
+  Niet gedaan, met opzet: de APK op de Oppo zetten. Daar staat een
+  Play-installatie, en van Play naar sideload vereist deinstalleren, wat de
+  lokale Drift-database en de Calendar-OAuth-grant wist. Dat is een keuze voor
+  Joost, geen bijwerking van een bugfix.
+
+  Wat alleen een mens kan bevestigen: dat de kaart op het toestel werkelijk
+  sluit bij een tik, en dat de privacy-rij een browser opent. Daarom staat de
+  tweede laag van bug 2 er ook: lukt openen toch niet, dan zegt de app het nu
+  in plaats van te zwijgen.
 
 files_changed:
   - lib/providers/analytics_provider.dart
@@ -324,6 +335,15 @@ sweep_resultaat: |
      synchrone pops). Het verborgen debugmenu in Profiel heeft dezelfde vorm
      (`await` dan `if (ctx.mounted) pop()`), maar is alleen bereikbaar via vijf
      tikken op het versienummer en raakt geen gebruiker; bewust gelaten.
+  4. Extra, niet gevraagd maar wel gevonden: de manifest-toelichting die bij
+     deze fix hoorde gebruikte `--` als gedachtestreepje, wat in XML binnen een
+     comment verboden is. De manifest was daarmee onparseerbaar en
+     `assembleRelease` viel om met alleen "Error parsing". Geen enkele test of
+     analyze-stap keek hiernaar. Er staat nu een structuurtest op
+     (`test/structure/manifest_well_formed_test.dart`) die parseert, apart op
+     `--` in comments controleert (het xml-pakket slikt dat, AGP niet) en het
+     queries-blok zelf bewaakt.
+
   3. De drie plekken met het privacy-adres lopen gelijk: de constante in
      `profile_screen.dart:57`, de Store-listing en het OAuth-toestemmingsscherm
      hebben alle drie `https://joostmouw.github.io/ridewindow/privacy-policy.html`
