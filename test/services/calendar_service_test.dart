@@ -10,15 +10,38 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/services/calendar_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
+  group('CalendarService.cachedCalendarAccountEmail', () {
+    test('leest de lokaal opgeslagen primaire Calendar-identiteit', () async {
+      SharedPreferences.setMockInitialValues({
+        CalendarService.calendarAccountEmailKey: 'calendar@example.com',
+      });
+
+      expect(
+        await CalendarService.cachedCalendarAccountEmail(),
+        equals('calendar@example.com'),
+      );
+    });
+
+    test('geeft null terug als er nog geen identiteit gecachet is', () async {
+      expect(await CalendarService.cachedCalendarAccountEmail(), isNull);
+    });
+  });
+
   group('CalendarService.buildWeatherSummary', () {
     // -------------------------------------------------------------------------
     // Test 1 (CAL-03 happy path): twee forecasts met geldige waarden.
     // Gem. temp = (16 + 20) / 2 = 18°C; precip = 0 + 0 = 0 (droog);
     // gem. wind = (10 + 14) / 2 = 12km/u.
     // -------------------------------------------------------------------------
-    test('CAL-03 happy path: geeft gemiddelde temp, "droog", gemiddelde wind', () {
+    test('CAL-03 happy path: geeft gemiddelde temp, "droog", gemiddelde wind',
+        () {
       final forecasts = [
         HourlyForecast(
           temperatureC: 16.0,
@@ -51,7 +74,8 @@ void main() {
     // Test 2 (CAL-03 neerslag): totale neerslag 0.5 + 1.5 = 2.0mm — "droog"
     // mag NIET voorkomen.
     // -------------------------------------------------------------------------
-    test('CAL-03 neerslag: toont totale neerslag in mm in plaats van "droog"', () {
+    test('CAL-03 neerslag: toont totale neerslag in mm in plaats van "droog"',
+        () {
       final forecasts = [
         HourlyForecast(
           temperatureC: 18.0,
@@ -93,7 +117,8 @@ void main() {
     // Test 4 (CAL-03 null-waarden): alle velden null — geen crash, geeft
     // een String terug (ofwel met "?" placeholders of "Geen weerdata").
     // -------------------------------------------------------------------------
-    test('CAL-03 null-waarden: geen crash bij volledig null HourlyForecast', () {
+    test('CAL-03 null-waarden: geen crash bij volledig null HourlyForecast',
+        () {
       final forecasts = [
         HourlyForecast(
           temperatureC: null,
@@ -107,7 +132,10 @@ void main() {
       ];
 
       // Mag niet crashen; retourneert een geldige String.
-      expect(() => CalendarService.buildWeatherSummary(forecasts), returnsNormally);
+      expect(
+        () => CalendarService.buildWeatherSummary(forecasts),
+        returnsNormally,
+      );
       final result = CalendarService.buildWeatherSummary(forecasts);
       expect(result, isA<String>());
       expect(result.isNotEmpty, isTrue);
@@ -119,7 +147,9 @@ void main() {
     // vereiste: data verlaat het apparaat niet tenzij de gebruiker expliciet
     // op de knop heeft getikt.
     // -------------------------------------------------------------------------
-    test('PERS-04: buildWeatherSummary retourneert String zonder GoogleSignIn aan te raken', () {
+    test(
+        'PERS-04: buildWeatherSummary retourneert String zonder GoogleSignIn aan te raken',
+        () {
       final forecasts = [
         HourlyForecast(
           temperatureC: 20.0,
@@ -224,7 +254,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 2: lege-string vector -- geverifieerd via `shasum -a 256` <<< ''.
     // -------------------------------------------------------------------------
-    test('hashNonce("") geeft de bekende SHA-256-hexvector van de lege string terug', () {
+    test(
+        'hashNonce("") geeft de bekende SHA-256-hexvector van de lege string terug',
+        () {
       final result = CalendarService.hashNonce('');
       expect(
         result,

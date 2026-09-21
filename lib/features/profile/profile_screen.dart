@@ -225,18 +225,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  /// AUTH-07: vergelijkt het Calendar-geautoriseerde Google-account met het
-  /// ingelogde Supabase-account (D-11: non-prompting, dus alleen aangeroepen
-  /// nadat [_calendarConnected] al `true` is via de eveneens niet-promptende
-  /// [CalendarService.isCalendarConnected]). Een eenmalige read van
-  /// `authStateProvider` op controlemoment is hier correct -- dit is een
-  /// passieve check, net als de bestaande Calendar-statuscontrole, geen
-  /// live-updatende vergelijking. Bij een fout (bv. geen platform-channel in
-  /// tests) degradeert dit stil naar "geen mismatch" in plaats van te
-  /// crashen -- dezelfde fail-safe stijl als [_checkCalendarConnection].
+  /// AUTH-07: vergelijkt de laatst lokaal bekende Calendar-identiteit met het
+  /// ingelogde Supabase-account. De cache wordt alleen gevuld na een expliciete
+  /// Calendar-actie, zodat Profiel-openen nooit een Google-authenticatie hoeft
+  /// te starten. Bij een fout degradeert dit stil naar "geen mismatch".
   Future<void> _checkCalendarMismatch() async {
     try {
-      final calendarEmail = await CalendarService().currentGoogleEmail();
+      final calendarEmail = await CalendarService.cachedCalendarAccountEmail();
       final signedInEmail = ref.read(authStateProvider).value?.email;
       final mismatch = calendarEmail != null &&
           signedInEmail != null &&

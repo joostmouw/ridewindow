@@ -37,77 +37,38 @@ en wat de volgende stap is.
 
 ## 1. Het ongevraagde Google-inlogvenster bij het openen van Profiel
 
-**Prioriteit: hoog.** Dit is het volgende ding dat een nieuwe tester raakt, en
-er zitten er nu twintig in de groep.
+**Status: code opgelost, toestelcontrole nog open.** De oorzaak en fix zijn
+vastgelegd in `.planning/debug/google-calendar-profile-prompt.md`.
 
-### Wat er gebeurt
+### Oorzaak
 
-Bij het openen van het Profiel-scherm verschijnt ongevraagd een Google
-account-kiezer: "Sign in to Ridewindow, Select sign-in information", met de
-accounts van het toestel erin (op de Oppo: `joost.oppo@gmail.com` en
-`joostmouw@gmail.com`). De gebruiker heeft nergens op gedrukt om in te loggen.
-Waargenomen op 2026-09-21 om 08:13 op de Oppo Find X9 Pro, build 1.0.35 (46),
-terwijl de gebruiker al ingelogd was.
+De keten liep via `ProfileScreen.initState()` naar
+`currentGoogleEmail()`, dat `attemptLightweightAuthentication()` aanriep.
+`google_sign_in_android` 7.2.15 voert bij die methode na een mislukte
+auto-select een tweede Credential Manager-flow uit. Die flow mag een
+accountkiezer tonen. De oude code veronderstelde ten onrechte dat deze methode
+altijd stil was.
 
-### Waarom dit erger is dan het lijkt
+### Fix
 
-Een inlogverzoek dat je niet hebt aangevraagd leest als "deze app wil bij mijn
-Google-account". Voor iemand die de app tien minuten kent en hem van een
-vreemde op Reddit heeft, is dat een reden om te stoppen. Het staat bovendien
-haaks op wat het privacybeleid belooft.
+- Profiel gebruikt geen lightweight Google-authenticatie meer.
+- De primaire Calendar-id wordt alleen na een expliciete Calendar-actie lokaal
+  gecachet.
+- De passieve mismatchcontrole leest die cache.
+- Een succesvolle Calendar-disconnect wist de cache.
+- Regressietests bewaken de cache en blokkeren de oude auth-route.
 
-### Wat al onderzocht is
+### Verificatie
 
-De aanroepketen is gevonden, de oorzaak niet.
+- Volledige suite: **710 tests groen**.
+- Gerichte tests en structuurtest: groen.
+- `flutter build apk --release`: groen.
+- `flutter analyze`: geen errors; 7 bestaande `info`-meldingen in
+  `profile_screen.dart`.
 
-- `profile_screen.dart:197` `initState()` roept `_checkCalendarConnection()`
-  aan, fire-and-forget.
-- `_checkCalendarConnection()` (regel 216) roept
-  `CalendarService().isCalendarConnected()` aan.
-- `calendar_service.dart:268` `isCalendarConnected()` doet
-  `await _ensureInitialized()` en daarna
-  `GoogleSignIn.instance.authorizationClient.authorizationForScopes([CalendarApi.calendarEventsScope])`.
-
-De code is expliciet ontworpen om **niet** te prompten. Backlog #36 en de
-commentaarregels bij regel 212 en 275 stellen allebei dat
-`authorizationForScopes` stilzwijgend `null` teruggeeft in plaats van een
-prompt te tonen. Op dit toestel gebeurt dat dus niet.
-
-### Hypothesen, in volgorde van waarschijnlijkheid
-
-1. **`authorizationForScopes` prompt wél in google_sign_in 7.x** wanneer er
-   geen geldige grant meer is en er meerdere accounts op het toestel staan. De
-   aanname in de code komt uit een eerdere versie van het pakket of uit de
-   documentatie, en is nooit op een toestel met twee accounts getoetst.
-2. **`_ensureInitialized()` is de dader, niet `authorizationForScopes`.** Die
-   deelt de gememoizede `_sharedInitialize()`-gate met Supabase-auth (AUTH-05).
-   Als Supabase-auth in dezelfde run iets triggert, kan de prompt daar vandaan
-   komen en alleen toevallig samenvallen met het openen van Profiel.
-3. **`_checkCalendarMismatch()`** (aangeroepen op regel 221 als `connected`
-   true is) doet `attemptLightweightAuthentication`. De commentaarregel zegt
-   dat die ook niet prompt. Zelfde soort aanname, zelfde twijfel.
-
-### Belangrijke context
-
-De Calendar-grant op de Oppo is op 2026-09-21 verdwenen: Profiel toont sindsdien
-"Not connected". Dat kwam door het uitloggen tijdens de screenshot-ronde. Dat is
-waarschijnlijk **precies de toestand waarin de bug zich voordoet**: er is een
-herinnerd account, maar geen geldige scope-grant meer. Dat maakt het goed
-reproduceerbaar, maar let op: het betekent ook dat je de bug mogelijk niet ziet
-zolang de grant intact is.
-
-### Volgende stap
-
-Open een debugsessie (`/gsd-debug` bij Claude, of handmatig een
-`.planning/debug/<slug>.md` bij Droid). Eerste experiment: zet in
-`_checkCalendarConnection()` tijdelijk logging rond `_ensureInitialized()` en
-rond `authorizationForScopes`, bouw een debug-APK, en kijk met
-`adb logcat` welke van de twee de prompt veroorzaakt. Dat onderscheidt
-hypothese 1 van 2 in één ronde.
-
-Daarna geldt dezelfde eis als bij de vorige twee bugs: een regressietest die
-faalt op de oude code. Een test die afdwingt dat het openen van Profiel geen
-enkele promptende auth-aanroep doet.
+De release-APK is bewust niet over de Play-installatie gezet, omdat sideloaden
+de lokale database en Calendar-grant kan raken. Resterend: op de Oppo via de
+normale Play-update bevestigen dat Profiel openen geen Google-venster meer toont.
 
 ---
 
@@ -284,6 +245,25 @@ Volgende GSD-commando bij Claude: `/gsd-plan-phase 28`.
 na build 43 worden ingezet. Dat is inmiddels ingehaald door de werkelijkheid,
 want de werving via Reddit loopt al. Fase 30 moet bij het plannen tegen die
 stand aan gehouden worden in plaats van andersom.
+
+## 11. Een Ridewindow-account zonder Gmail
+
+**Niet voor nu, wel bewaren voor later.** Naast Google-login moet een gebruiker
+ooit kunnen kiezen voor een Ridewindow-account dat lokaal op de telefoon wordt
+aangemaakt, zonder Google- of Gmail-account als voorwaarde.
+
+Bij het oppakken eerst onderzoeken hoe andere apps dit oplossen, met aandacht
+voor:
+
+- account aanmaken en inloggen zonder Google;
+- wachtwoordbeheer, passkeys of een andere lokale credential;
+- herstel bij een verloren telefoon of vergeten credential;
+- de verhouding tussen lokale brondata, Supabase-sync en accountwisselen;
+- privacy, abuse-preventie en de extra supportlast.
+
+De keuze mag accounts niet verplicht maken: signed-out gebruik en de bestaande
+Google-login blijven werken. Dit is eerst een product- en privacybeslissing,
+geen dependency- of UI-taak.
 
 ---
 

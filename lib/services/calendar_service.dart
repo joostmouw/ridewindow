@@ -35,8 +35,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarService {
+  /// Google Calendar's primary calendar id is normally the account e-mail.
+  /// This is written only after an explicit Calendar action, never on startup.
+  static const String calendarAccountEmailKey = 'calendar.googleAccountEmail';
+
   // Web OAuth client ID (AUTH-05, PITFALLS.md #3): Supabase's
   // signInWithIdToken verifieert de audience-claim ('aud') van het Google
   // ID-token tegen exact deze web-client-ID. Dit is dezelfde waarde die al
@@ -181,6 +186,7 @@ class CalendarService {
     try {
       // Stap 4: CalendarApi aanmaken.
       final calendarApi = CalendarApi(client);
+      await _cachePrimaryCalendarAccount(calendarApi);
 
       // Stap 5: Weersamenvatting opbouwen (CAL-03).
       final description = buildWeatherSummary(forecasts);
@@ -236,6 +242,7 @@ class CalendarService {
 
     try {
       final calendarApi = CalendarApi(client);
+      await _cachePrimaryCalendarAccount(calendarApi);
       final events = await calendarApi.events.list(
         'primary',
         timeMin: start.toUtc(),
@@ -272,21 +279,15 @@ class CalendarService {
     return authorization != null;
   }
 
-  /// Geeft het e-mailadres terug van het Google-account waaronder Calendar
-  /// momenteel is geautoriseerd, ZONDER ooit een OAuth-prompt/popup te tonen
-  /// (D-11, AUTH-07). Gebruikt [GoogleSignIn.instance.attemptLightweightAuthentication],
-  /// dat -- net als [isCalendarConnected]'s [authorizationForScopes] --
-  /// stilzwijgend `null` teruggeeft in plaats van te prompten wanneer er geen
-  /// eerder-geautoriseerde gebruiker herinnerd kan worden. Dit is de sibling-
-  /// check waarop AUTH-07's mismatch-waarschuwing in het Profielscherm is
-  /// gebouwd: het Profielscherm vergelijkt dit resultaat met
-  /// `authStateProvider`'s ingelogde e-mailadres om te signaleren wanneer de
-  /// Calendar-koppeling en de huidige Supabase-login uiteen zijn gelopen.
-  Future<String?> currentGoogleEmail() async {
-    await _ensureInitialized();
-    final account =
-        await GoogleSignIn.instance.attemptLightweightAuthentication();
-    return account?.email;
+  /// Leest de laatst bekende primaire Calendar-identiteit uit de lokale cache.
+  ///
+  /// Bewust geen Google-authenticatie: [attemptLightweightAuthentication] kan
+  /// op Android een accountkiezer tonen en mag dus niet aan Profiel-openen
+  /// hangen. Een bestaande koppeling van vóór deze cache heeft tijdelijk geen
+  /// mismatch-waarschuwing totdat de gebruiker Calendar opnieuw gebruikt.
+  static Future<String?> cachedCalendarAccountEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(calendarAccountEmailKey);
   }
 
   /// Trekt de Google Calendar-autorisatie van de gebruiker in (backlog #36).
@@ -294,6 +295,33 @@ class CalendarService {
   Future<void> disconnectCalendar() async {
     await _ensureInitialized();
     await GoogleSignIn.instance.disconnect();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(calendarAccountEmailKey);
+  }
+
+  /// Onthoudt de primaire Calendar-id na een expliciete Calendar-actie.
+  ///
+  /// De Calendar API geeft voor de primaire kalender normaal het
+  /// Google-account-e-mailadres terug als id. Als een provider geen
+  /// e-mailadres teruggeeft, blijft de bestaande cache staan en verandert de
+  /// Calendar-actie niet in een diagnostiekfout.
+  static Future<void> _cachePrimaryCalendarAccount(
+    CalendarApi calendarApi,
+  ) async {
+    try {
+      final primary = await calendarApi.calendarList.get(
+        'primary',
+        $fields: 'id,primary',
+      );
+      final accountEmail = primary.id;
+      if (accountEmail == null || !accountEmail.contains('@')) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(calendarAccountEmailKey, accountEmail);
+    } catch (_) {
+      // De cache is alleen voor de passieve mismatch-waarschuwing. Een
+      // mislukte cache-read mag een expliciete Calendar-actie niet breken.
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -320,10 +348,8 @@ class CalendarService {
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .toList();
-    final totalPrecip =
-        precips.isEmpty ? 0.0 : precips.reduce((a, b) => a + b);
-    final precipStr =
-        totalPrecip == 0.0 ? 'droog' : '${totalPrecip.round()}mm';
+    final totalPrecip = precips.isEmpty ? 0.0 : precips.reduce((a, b) => a + b);
+    final precipStr = totalPrecip == 0.0 ? 'droog' : '${totalPrecip.round()}mm';
 
     // Gemiddelde wind.
     final winds = forecasts
