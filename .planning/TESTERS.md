@@ -202,3 +202,56 @@ je eigen kanaal (rijker, maar onzichtbaar voor Google)?
 4. De changelog-administratie beginnen bij build 41, niet later.
 
 Pas daarna de wervingsronde. Eerst het huis op orde, dan mensen uitnodigen.
+
+## Stand na 2026-09-20 avond — de eerste echte wervingsdag
+
+Vastgelegd bij het sluiten van de sessie, zodat een volgende sessie dit niet opnieuw
+hoeft te onderzoeken.
+
+**Infrastructuur die vandaag is neergezet:**
+
+- De Google Group `ridewindow-testers` staat open (iedereen op het web kan zien en
+  joinen; conversaties, leden en e-mailadressen blijven members-only) en is gekoppeld
+  in Play Console: Closed testing > Alpha > Testers, in de lijst "First Testers
+  RideWindow" (tien losse adressen + het groepsadres).
+- De groep telt 20 leden (export `~/Downloads/ridewindow-testers_new_list.csv`,
+  ~18:05). Zeven plus drie zelf-joiners uit de wervingsteksten, de rest door Joost
+  handmatig toegevoegd.
+- Welkomsttekst voor de groep is geschreven (tweetalig, met de waarschuwing dat de
+  installatielink een kwartier tot een paar uur kan duren). Alleen voor wie zich ná
+  het instellen aanmeldt; de huidige twintig krijgen hem niet meer. Of Joost hem
+  heeft opgeslagen, is niet geverifieerd.
+
+**De vondst van vandaag: de groepsroute naar Play werkt niet, de handmatige wel.**
+Groepsleden kregen bij de opt-in-link "App not available … isn't available for this
+account", terwijl een handmatig toegevoegd adres direct werkte. Track, lijst en
+landen (o.a. Bahrain) zijn dus goed; Play leest groepslidmaatschap kennelijk op een
+eigen, trage of vastgelopen sync in. Werkpatroon tot dat herstelt: melding in de
+groep → adres handmatig in de Play-lijst → opslaan. Nog ongeprobeerd om de sync los
+te wrikken: het groepsadres uit de lijst halen en terugzetten, of een lid laten
+leaven en rejoinen. **Controleer dit bij de volgende sessie** via de teller in de
+Console: stijgt die terwijl niemand meer handmatig is toegevoegd, dan leeft de
+groepsroute.
+
+**Drie meldingen van testers, drie lessen:**
+
+1. "Unable to join the group" — de join-instelling stond te dicht; nu open.
+2. "App bestaat niet" bij de opt-in — dat was de nog-niet-werkende groepskoppeling
+   (hierboven), niet de landenlijst. De landenlijst geldt pas bij de winkellijst en
+   geeft een andere melding.
+3. "De app is niet meteen beschikbaar na opt-in" — normaal; Google heeft na "Word
+   tester" een kwartier tot een paar uur nodig. Dit staat nu in de welkomsttekst;
+   het staat nog **niet** in `27-TEKSTEN.md` (aanbod daarvoor ligt nog bij Joost).
+
+**Open bij het sluiten van de sessie:**
+
+- De eenmalige EN-mail aan de twintig leden ("your tester access is ready", met de
+  twee links, de account-check en de veertien-dagen-vraag) ligt als concept in de
+  sessie van 20 september en is **nog niet goedgekeurd en niet verstuurd**. Bij
+  hervatting: opnieuw opstellen uit de welkomsttekst (dezelfde inhoud), tonen aan
+  Joost, pas dan versturen. `e.j.heineke` bounct; `fajisfajar` en `hatshiljodhani`
+  hebben geen groepsmail-abonnement — die alleen rechtstreeks bereiken.
+- De opt-in-flow is nog niet end-to-end bewezen voor een groepslid (wel voor
+  handmatig toegevoegde adressen). Zie de vondst hierboven.
+- De Console-teller is vanaf nu het dagelijkse meetpunt (WERV-04: vijftien
+  aangemeld).
