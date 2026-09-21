@@ -250,6 +250,54 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // Agenda- en deel-tekst (quick 260921-p3d): één bron voor de agenda-knop en
+  // de deel-knop, zodat beide dezelfde vertaling en eenheden gebruiken in
+  // plaats van CalendarService's oude, altijd-Nederlandse tekstopbouw.
+  // ---------------------------------------------------------------------------
+
+  String _weatherSummaryText(BuildContext context) {
+    final s = S.of(context);
+    if (widget.forecasts.isEmpty) return s.calendarNoWeatherData;
+
+    final units = ref.read(unitsProvider);
+
+    final temps = widget.forecasts
+        .where((f) => f.temperatureC != null)
+        .map((f) => f.temperatureC!)
+        .toList();
+    final tempStr = temps.isEmpty
+        ? '?${units.temp.suffix}'
+        : '~${convertTemp(temps.reduce((a, b) => a + b) / temps.length, units.temp).round()}${units.temp.suffix}';
+
+    final precips = widget.forecasts
+        .where((f) => f.precipitationMm != null)
+        .map((f) => f.precipitationMm!)
+        .toList();
+    final totalPrecip = precips.isEmpty ? 0.0 : precips.reduce((a, b) => a + b);
+    final precipStr =
+        totalPrecip == 0.0 ? s.calendarDry : '${totalPrecip.round()}mm';
+
+    final winds = widget.forecasts
+        .where((f) => f.windspeedKmh != null)
+        .map((f) => f.windspeedKmh!)
+        .toList();
+    final windStr = winds.isEmpty
+        ? s.calendarWind('?')
+        : s.calendarWind(
+            '${convertWind(winds.reduce((a, b) => a + b) / winds.length, units.wind).round()} '
+            '${windSuffix(units.wind)}',
+          );
+
+    return '$tempStr, $precipStr, $windStr';
+  }
+
+  String _calendarEventTitle(BuildContext context) {
+    final timeRange =
+        '${_fmtTime(widget.slot.start)}–${_fmtTime(widget.slot.end)}';
+    return S.of(context).calendarEventTitle(timeRange);
+  }
+
+  // ---------------------------------------------------------------------------
   // Agenda-actie
   // ---------------------------------------------------------------------------
 
@@ -258,7 +306,8 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     try {
       await widget.calendarServiceFactory().addRideSlotToCalendar(
             widget.slot,
-            widget.forecasts,
+            title: _calendarEventTitle(context),
+            description: _weatherSummaryText(context),
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -864,7 +913,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       Acceptable() => s.tierAcceptable,
       Poor() => s.tierPoor,
     };
-    final summary = CalendarService.buildWeatherSummary(widget.forecasts);
+    final summary = _weatherSummaryText(context);
     final day = _dayName(context, widget.slot.start);
     final timeRange =
         '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
