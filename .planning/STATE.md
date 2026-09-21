@@ -24,11 +24,11 @@ punten in `HANDOFF.json`.
 | Waar | Stand |
 |---|---|
 | Play closed testing (Alpha) | **1.0.38 (49)** — build 52 gaat hier pas heen na toestelgoedkeuring (release-route, `docs/RELEASE-ROUTE.md`) |
-| Play internal testing | **1.0.41 (52)**, geüpload 2026-09-21 via de API: actuele Supabase anon key; account aanmaken in 50/51 faalde met `401 Invalid API key` |
-| Oppo | **lokaal gesideload voor de eerste-minuut-flow** (release-route, 2026-09-21 genoteerd): APK 1.0.41+52 plus de intro-geluid-commits, verse data dus de agendakoppeling is vervallen en moet één keer opnieuw. Play biedt zolang dit een sideload is géén updates; de eerstvolgende internal-release via Play herstelt de installatie. Daarna nog steeds open: verse e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
+| Play internal testing | **1.0.42 (53)**, geüpload 2026-09-21 via de API: het intro-geluid, dat tot vandaag niet mee mocht omdat de licentie niet vaststond. Alpha blijft op 49 tot jij 53 op het toestel goedkeurt |
+| Oppo | **staat op de sideload van 1.0.41+52 en wacht op de Play-update naar 1.0.42 (53)**: die update herstelt de installatie en daarmee de normale Play-route. Na het bijwerken nog open: de agendakoppeling één keer opnieuw leggen (vervallen door de verse data van de sideload), en de e-mailaccount-flow testen; Supabase-mail kan tijdelijk `429 over_email_send_rate_limit` geven |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
-| main | 1.0.41+52 lokaal plus de intro-geluidstaak (af54d81 synthetische tikken, daarna ronde 2/3 met de echte opname); niet gepusht — vóór deze taak 9 commits voor op origin |
-| PWA live | **1.0.38 (49)** op `my-project-joost.web.app`; de web-login zit gebouwd maar de PWA is nog niet op 50/51 gezet |
+| main | **1.0.42+53**, met de licentie van het intro-geluid (Pixabay) en de herkomst van de animatie (eigen werk, met AI) vastgelegd naast de assets |
+| PWA live | **1.0.42 (53)** op `my-project-joost.web.app`, gedeployed 2026-09-21 vanaf dezelfde commit als de internal-build; live hash geverifieerd (`72d7e96f`). Loopt daarmee weer gelijk, na vier builds achterstand |
 | Supabase dashboard | Site URL staat op `https://my-project-joost.web.app`; Additional Redirect URLs bevat `ridewindow://**` (Joost, 2026-09-21). De actuele anon key zit in build 52; signup-probe komt voorbij key-validatie maar raakte daarna de mailrate-limit |
 | Oppo | **Het intro-geluid is op het toestel goedgekeurd** (Joost, 2026-09-21, ronde 3: echte fietsopname, uitrij loopt door tot de opname stopt) **en de licentie is rond**: Pixabay Content License, dus de clip mag mee in de eerstvolgende Play-upload (`assets/sounds/WELCOME_ROLL-LICENSE.txt`, OPEN.md punt 12). **Het peloton-lint is eerder op het toestel goedgekeurd**: leesbaar op de maat waarop het in de app staat. Agenda staat na de verse installatie op "Not connected", app op Engels (OPEN.md punt 5) |
 

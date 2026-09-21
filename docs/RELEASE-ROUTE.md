@@ -61,6 +61,26 @@ er waar live staat.
   script; `docs/CONSOLE-SETUP-CHECKLIST.md` de eenmalige inrichting. Bij een
   wijziging aan de route werk je dit bestand bij, niet de andere twee los.
 
+## Stand 21 september 2026, na de release van 1.0.42 (53)
+
+| Waar | Stand |
+|---|---|
+| Oppo | sideload 1.0.41+52; wacht op de Play-update naar 53, die de installatie herstelt |
+| PWA | 1.0.42 (53), gedeployed vanaf dezelfde commit, live hash geverifieerd |
+| Internal | 1.0.42 (53) |
+| Alpha / closed | 1.0.38 (49); promoveren pas na toestelgoedkeuring van 53 (stap 6) |
+| main | 1.0.42+53 |
+
+**Wat 53 brengt:** het geluid en de trillingen onder de welkomstintro. Die
+clip lag klaar sinds 2026-09-21 maar mocht de route niet in zolang zijn
+licentie niet vaststond; dat is nu geregeld (Pixabay Content License,
+vastgelegd naast de asset). Elk asset in de app heeft sindsdien een
+herkomst die naast het bestand staat.
+
+**Volgende stap:** Joost bedient 53 op de Oppo (inloggen op beide manieren,
+agenda opnieuw koppelen, peloton). Daarna stap 6: promoveren naar alpha met
+`--promote 53 --track alpha`, dezelfde bytes.
+
 ## Stand 21 september 2026 (vastgelegd bij het opstellen)
 
 | Waar | Stand |
