@@ -152,5 +152,6 @@ vandaag dubbel; dat verdwijnt in D. **Ronde 3** is het icoon zelf: Joost koos "d
 één teken in plaats van een rij. Dat teken is gemaakt uit de échte Phosphor-fietser, drie keer over
 elkaar, samengevoegd tot één pad (`icoon.html`) — bouwbaar als glyph, geen plaatje, geen extra pakket.
 **Gekozen (2026-09-21, `gekozen.html`):** links in het blauw het lint (groepsrit) of één fietser (alleen jij),
-op Home én in de rittenlijst; de megafoon alleen in de rolregel van je eigen rit; meerijden is tekst zonder
-icoon; en een teller van fietsjes waarvan de wachtenden doorzichtig zijn, met "3 gaan mee · 1 wacht nog".
+**alleen op Home** (en in de kop van het detailscherm) — de rittenlijst houdt zijn volle breedte; de megafoon
+alleen in de rolregel van je eigen rit; meerijden is tekst zonder icoon; en een teller van fietsjes waarvan de
+wachtenden doorzichtig zijn, met "3 gaan mee · 1 wacht nog".

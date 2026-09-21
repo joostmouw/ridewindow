@@ -65,8 +65,11 @@ Joost koos het lint én legde het systeem vast. Drie regels, de hele app door:
    donker), met "3 gaan mee · 1 wacht nog" ernaast. Ook bij andermans rit — vandaag krijg je die zin
    alleen te zien als je zelf organiseert.
 
-Twee open vragen staan als knop in de pagina: **teller als fietsjes of als stippen** (naast het lint
-staan er anders veel fietsjes op één kaart), en **rittenlijst met of zonder die linkerkolom**.
+**Beslist (2026-09-21):** de **rittenlijst krijgt géén linkerkolom** — die houdt zijn volle breedte voor
+dag, tijd en plaats; dat een rit gedeeld is zegt daar de teller onderaan de kaart. Het lint links is dus
+alleen voor Home (en de kop van het detailscherm). De variant mét kolom staat nog als knop "Afgewezen"
+in de pagina. De **teller blijft fietsjes** met doorzichtige wachters, zoals gevraagd; de stippenversie
+staat ernaast als alternatief, niet gekozen.
 
 Bij het bouwen nog te beslissen: telt "3 gaan mee" jou mee, en hoeveel fietsjes tekenen we maximaal
 voordat het `+3` wordt.
