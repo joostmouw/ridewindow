@@ -1,0 +1,44 @@
+welcome_roll.wav
+================
+
+Het spaakgeluid onder de welkomstintro is een bewerking van een
+fietsopname van Pixabay.
+
+Bron:        https://pixabay.com/sound-effects/bicycle-pedal-105846/
+Bestand:     freesound_community-bicycle-pedal-105846.mp3 (10 s)
+Uploader:    freesound_community op Pixabay
+             (oorspronkelijke opname van gerfaut83, via Freesound)
+Licentie:    Pixabay Content License
+             https://pixabay.com/service/license-summary/
+Vastgesteld: 2026-09-21
+
+Wat de Pixabay Content License toestaat
+---------------------------------------
+- Commercieel gebruik, ook in een app die in een winkel staat.
+- Bewerken en verwerken in een nieuw werk.
+- Geen verplichte naamsvermelding. Deze vermelding staat er dus
+  vrijwillig, en om de herkomst naspeurbaar te houden.
+
+Wat zij verbiedt (en hier niet speelt)
+--------------------------------------
+- De opname op zichzelf doorverkopen of verspreiden, zonder dat er
+  eigen werk aan is toegevoegd. In Ridewindow zit de clip bewerkt en
+  ingebed in de intro, niet als los downloadbaar bestand.
+- Gebruik dat misleidend is, of dat de opname onderdeel maakt van een
+  merk- of handelsnaam.
+
+Hoe welcome_roll.wav uit de bron is gemaakt
+-------------------------------------------
+tool/rolling_intro_sound.py smeedt twee stukken van de opname aan
+elkaar met een korte overvloeiing: segment A (0,33-1,05 s, het pedaal
+dat ingrijpt en de rammel die optrekt) en segment B (8,50-10,35 s, de
+uitrij tot de opname zelf uitsterft). Het gelijkmatige middenstuk van
+zeven seconden vervalt. Resultaat: 2,53 s.
+
+Herkomst achterhaald via de download-metadata van macOS:
+
+    xattr -p com.apple.metadata:kMDItemWhereFroms <bestand>
+
+Die bewaart bij een browserdownload de bron-URL en de verwijzende
+pagina. De nummering in de bestandsnaam is daarvoor onbruikbaar:
+105846 is een Pixabay-id, geen Freesound-id.

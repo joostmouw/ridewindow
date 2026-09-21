@@ -60,20 +60,25 @@ Clip: 2,53 s. Joost: "ja is goed zo."
    amplitude-som met een 70 ms-vloer. De reeks versnelt vanzelf met de
    optrek en dunt vanzelf uit met de uitrij, en zit in één start/stop
    met het geluid zodat de twee nooit van elkaar kunnen afdriften.
-4. **De nummers in de bestandsnaam van de opname kloppen niet.**
-   `freesound_community-bicycle-pedal-105846.mp3` wijst niet naar
-   freesound 105846 (dat is een synthesizer-kick van iemand anders) en
-   het bestand heeft geen metadata. De bron en licentie zijn dus nog
-   onbekend.
+4. **De nummers in de bestandsnaam wezen naar de verkeerde site, de
+   metadata van het bestand wel naar de goede.**
+   `freesound_community-bicycle-pedal-105846.mp3` leek naar freesound
+   105846 te wijzen, maar dat is een synthesizer-kick van iemand anders.
+   105846 is een **Pixabay**-id. Opgelost op 2026-09-21 met de
+   download-metadata die macOS zelf bewaart:
+   `xattr -p com.apple.metadata:kMDItemWhereFroms <bestand>` gaf de
+   CDN-link en `https://pixabay.com/`. Bron:
+   <https://pixabay.com/sound-effects/bicycle-pedal-105846/>, 10 s, wat
+   klopt met de bronopname hierboven. Les: bij een asset met onbekende
+   herkomst is de metadata de eerste plek, niet de bestandsnaam.
 
 ## Open (blokkeert geen Play-build vanzelf, maar wel de intro meenemen)
 
-- **Licentie van de opname vastleggen.** Voor een release die de clip
-  bevat moet de downloadlink en -licentie zwart-op-wit staan (CC0 is
-  direct bruikbaar; CC-BY vraagt naamsvermelding; NC/ND zijn
-  waarschijnlijk een blokkade). Joost heeft de site nog niet genoemd.
-  Op de eigen Oppo testen mag, distribueren via Play nog niet zonder
-  dit.
+- ~~**Licentie van de opname vastleggen.**~~ **Rond op 2026-09-21.**
+  Pixabay Content License: commercieel gebruik en bewerken toegestaan,
+  naamsvermelding niet verplicht, alleen standalone doorverkoop
+  verboden (niet van toepassing). De clip mag mee in een Play-upload.
+  Vastgelegd in `assets/sounds/WELCOME_ROLL-LICENSE.txt`.
 - **`kSpokeTrackStartDelay`** (150 ms) is een schatting van de decode-
   vertraging van de WebP. Goedgekeurd zoals het staat; bijstellen kan
   op het toestel als een toekomstige proef scheef aanvoelt.

@@ -287,30 +287,57 @@ geen dependency- of UI-taak.
 
 ---
 
-## 12. De licentie van de intro-opname moet vaststaan vóór een Play-release
+## 12. De licentie van de intro-opname: opgelost op 2026-09-21
 
-**Status: geluid gebouwd én op het toestel goedgekeurd (2026-09-21),
-licentie open.** De welkomstintro speelt sinds commit `b6486c7` een echte
-fietsopname van Joost: opstart + uitrij, middenstuk eruit, details in
-`.planning/quick/260921-welkomstwielen-geluid-en-trilling/SUMMARY.md`.
+**Status: rond. De clip mag mee in een Play-upload.** De bron is
+**Pixabay**, niet freesound:
+<https://pixabay.com/sound-effects/bicycle-pedal-105846/>, geüpload door
+`freesound_community` (oorspronkelijke opname van gerfaut83), 10 seconden,
+wat klopt met de 10,4 s bronopname uit de taak. De licentie is de
+**Pixabay Content License**: commercieel gebruik toegestaan, bewerken
+toegestaan, naamsvermelding niet verplicht. Het enige verbod dat de
+licentie kent is de opname op zichzelf doorverkopen, en dat speelt hier
+niet: de clip zit bewerkt en ingebed in de intro.
 
-**Wat eraan scheelt:** de bron is `~/Downloads/
-freesound_community-bicycle-pedal-105846.mp3`, maar die nummering klopt
-níét met freesound (105846 daar is een synthesizer-kick van iemand anders)
-en het bestand heeft geen metadata. Van welke site de download komt en
-onder welke licentie, weet alleen Joost. CC0 is direct bruikbaar, CC-BY
-vraagt naamsvermelding in de app of de store-vermelding, en NC/ND zijn
-waarschijnlijk een blokkade.
+Vastgelegd in `assets/sounds/WELCOME_ROLL-LICENSE.txt`, naast de asset,
+zoals de fonts het ook doen. Geen credit-regel in de app nodig, geen
+vervangende opname nodig.
 
-**Volgende stap:** Joost de downloadsite laten noemen; de licentie
-verifiëren; dan óf de clip vrijgeven voor de eerstvolgende Play-build, óf
-een licentie-schone vervangende opname. Tot die tijd mag de clip op
-toestellen draaien maar niet mee in een upload.
+**Hoe de bron gevonden is, want dit werkt bij elke volgende asset
+waarvan de herkomst zoek is.** macOS bewaart bij een browserdownload de
+bron-URL en de verwijzende pagina in een extended attribute:
 
-**Meegeleverde randzaken bij het oppakken:** de Oppo staat op een locale
-sideload met verse data (agendakoppeling vervallen; eerstvolgende
+```bash
+xattr -p com.apple.metadata:kMDItemWhereFroms ~/Downloads/<bestand>
+```
+
+Dat gaf hier de CDN-link plus `https://pixabay.com/`. De nummering in de
+bestandsnaam was juist het dwaalspoor: 105846 is een **Pixabay**-id, geen
+Freesound-id, en daarom vond de vorige sessie op freesound.org een
+synthesizer-kick van iemand anders. Kijk dus eerst naar de metadata van
+het bestand en pas daarna naar de naam.
+
+**Randzaken die hier nog naast liggen:** de Oppo staat op een lokale
+sideload met verse data (agendakoppeling vervallen; de eerstvolgende
 internal-release herstelt de Play-installatie, zie `STATE.md`), en de
 e-mailaccount-flow van build 52 wacht nog op Supabase' maillimiet.
+
+---
+
+## 13. De intro-animatie heeft geen licentiebestand
+
+**Eén vraag aan Joost, geen onderzoek.** `assets/animations/welcome_ride.webp`
+is het enige overgebleven asset zonder vastgelegde herkomst. Commit
+`02328fd` zegt "Joost leverde een animatie aan (10 s, 1280x720)", en het
+bestand heeft geen download-metadata (de truc uit punt 12 levert hier
+niets op). In `~/Downloads` staat wel `kan_je_daar_een_video_animatie.mp4`
+van dezelfde dag, wat erop wijst dat de animatie zelf of met AI gemaakt is
+en dus van Joost.
+
+**Wat nodig is:** bevestiging dat de animatie eigen werk is. Dan een
+regel ernaast zoals bij het geluid, en alle assets hebben een herkomst.
+Is hij ergens vandaan gedownload, dan geldt dezelfde controle als bij
+punt 12.
 
 ---
 
