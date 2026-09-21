@@ -39,8 +39,31 @@ commits: [6a76c57, 0b6c735, 84e0240, 4801ab7]
   afgezegd of solo, en dat alleen de organisator nog een icoon draagt).
 - De rittenlijst tijdelijk op telefoonbreedte (392dp) gedraaid: geen overflow.
 
+## Wat de web-ronde opleverde (2026-09-21)
+
+Joost keek mee op `localhost:8123` (de web-client kreeg daarvoor `http://localhost:8123` als
+toegestane JavaScript-origin; alleen `:5000` stond er, en die poort is op de Mac bezet door
+AirPlay). Daar bleek de tellerzin op het Home-kaartje af te kappen: *"Nobody has answered yet ·
+1 still to a..."*. Twee commits verder:
+
+- Home krijgt een korte lezing (`1 wacht` / `3 mee · 1 wacht`), met twee nieuwe l10n-sleutels.
+- En belangrijker: de teller **meet zelf** hoeveel ruimte er over is en kiest pas dan. Het was
+  namelijk geen Home-probleem -- op een smalle telefoon viel dezelfde Engelse zin ook in de
+  rittenlijst buiten de kaart, en die is niet `dense`. Nu geldt overal: past de hele zin, dan
+  staat hij er; anders de korte. Ongeacht scherm, taal of ingestelde tekstgrootte.
+
+## Uitgerold
+
+`1.0.38+49` staat op **internal** en als dezelfde bytes op **alpha** (gaat daar langs Google's
+review). Release-notities 311 (nl) en 293 (en) tekens, ruim onder de grens waarboven de winkel
+een zin afkapt. Versie gebumpt in `pubspec.yaml` én `lib/core/app_version.dart`; blok 49 staat
+in `docs/testers/changelog.md`.
+
 ## Nog open
 
-- **Op glas bekijken.** Er hing geen toestel aan de Mac; het lint bij 14 en 16 px op de Oppo
-  beoordelen staat nog. Web-build draait op `http://localhost:8123`.
-- Home met een échte groepsrit is alleen ingelogd te zien; de losse widgets zijn wel getest.
+- **Op glas bekijken.** Er hing geen toestel aan de Mac. Het lint bij 14 en 16 px op de Oppo
+  beoordelen staat nog; via Play komt de update daar vanzelf langs.
+- **Het detailscherm** is niet met eigen ogen gezien: tikken lukte niet in de browsersessie
+  (muis-events liepen vast) en `/detail` is niet via een URL te bereiken -- die route krijgt
+  zijn rit als `extra` mee.
+- `main` loopt ver voor op `origin`; pushen wacht op Joosts sein.

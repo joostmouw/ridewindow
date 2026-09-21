@@ -6,7 +6,8 @@
 ## Build 49: 1.0.38+49
 
 **Datum:** 2026-09-21
-**Track:** Internal testing
+**Track:** Internal testing, daarna als dezelfde bytes gepromoveerd naar de
+gesloten test (`--promote 49 --track alpha`)
 
 **Inhoud**
 - Een gedeelde rit draagt nu een eigen teken: drie fietsers achter elkaar, en
