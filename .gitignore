@@ -92,3 +92,6 @@ photos/*.mp4
 # De Play-service-account-sleutel hoort in ~/.config/ridewindow/ te staan, niet
 # hier. Dit is de vangnetregel voor als hij toch een keer in de repo belandt.
 play-service-account*.json
+
+# Promotievideo: een kopie van photos/*.mp4, blijft net als het origineel buiten git.
+docs/promo/*/intro.mp4
