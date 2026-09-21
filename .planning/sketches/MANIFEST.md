@@ -145,3 +145,9 @@ zegt "finish", niet "met zijn vieren". Drie plekken voor een rij fietsers die de
 **megafoon** in plaats van de vlag bij "Jij organiseert". **Gemeten tijdens het tekenen:** fietsers
 met overlap smeren bij 16px tot één veeg — pas met 1px lucht ertussen zijn ze telbaar; vijf is de
 bovengrens op een 372px-kaart. *Nog te kiezen.*
+
+**Ronde 2** (zelfde map) trekt het door naar Home én het detailscherm, met één grammatica: *links staat
+wat jij bent, in de regel staat wie er meerijdt* (D, E, F — D aanbevolen). Op Home staat het rol-icoon
+vandaag dubbel; dat verdwijnt in D. **Ronde 3** is het icoon zelf: Joost koos "drie fietsers in een lint",
+één teken in plaats van een rij. Dat teken is gemaakt uit de échte Phosphor-fietser, drie keer over
+elkaar, samengevoegd tot één pad (`icoon.html`) — bouwbaar als glyph, geen plaatje, geen extra pakket.

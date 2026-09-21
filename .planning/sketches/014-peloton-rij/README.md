@@ -3,7 +3,7 @@ sketch: 014
 name: peloton-rij
 question: "Waar staat de rij fietsers die laat zien hoe groot een gedeelde rit is — en wat vervangt het vlaggetje bij 'Jij organiseert'?"
 winner: null
-tags: [peloton, iconografie, ritten, home, rollen]
+tags: [peloton, iconografie, ritten, home, rollen, detail]
 ---
 
 # Schets 014: Peloton in een rij
@@ -27,6 +27,32 @@ open http://localhost:8765/.planning/sketches/014-peloton-rij/index.html
 - **B: Megafoon voorop, peloton op de telregel** — rolregel houdt één icoon, de rij staat vóór "3 gaan mee · 1 wacht nog". Duidelijkst uit te leggen, kost op Home een derde regel per kaart.
 - **C: Peloton in de kop** — de rij naast de dagnaam. Hardst zichtbaar, maar de fietsers staan twee keer op dezelfde kaart en bij lange dagnamen wordt het krap.
 
+## Ronde 2 — hetzelfde op alle drie de schermen
+Joost: *"het gaat ook om het homescherm bij planned rides — verzin hier iets gezamenlijks voor."*
+Op Home staat het rol-icoon vandaag **twee keer**: groot links op de kaart (`rideRoleStyle().icon`,
+20px, in `plannedRide`-blauw) én klein in de `RideRoleLine` eronder. Daar valt de vlag het meest op.
+De gedeelde grammatica van ronde 2: **links staat wat jij bent, in de regel staat wie er meerijdt.**
+
+- **D: Rol links, peloton in de regel** *(aanbevolen)* — één merkteken links (megafoon / fietser /
+  zandloper), het peloton in de rolregel. Geen extra regel, en het dubbele icoon op Home verdwijnt.
+- **E: Peloton links, rol in de regel** — de groep neemt de icoonplek over, óók in de rittenlijst,
+  die daarvoor een linkerkolom krijgt die hij nu niet heeft.
+- **F: Peloton op de startlijst-regel** — het merkteken links zoals D, de fietsers onderaan mét de
+  telzin, op alle drie de schermen. Duidelijkst, en op Home een regel duurder per kaart.
+
+Elke variant toont Home, de rittenlijst én de peloton-kaart op het detailscherm naast elkaar.
+
+## Het peloton-teken (`icoon.html`)
+Joost: *"kan je niet één icoon maken zoals person-simple-bike, maar meer zoals users-three?"* —
+en na de eerste ronde: *"3, drie fietsers in een lint, vond ik het beste."* De knop **"Eén peloton-teken"**
+in `index.html` wisselt overal tussen de rij losse fietsers en dat ene teken.
+
+Gemaakt door de échte Phosphor-fietser (0xe734, uit `assets/fonts/Phosphor.ttf`) drie keer over elkaar
+te leggen met dezelfde uitsparing die Phosphor zelf gebruikt, en het resultaat samen te voegen tot
+**één pad** — dus bouwbaar als glyph in een eigen icoonfont, zonder plaatje en zonder extra pakket.
+Afstelling: schaal 0,82 · afstand 420 · tussenruimte 86 · **halve** dikte-correctie (krimpen maakt de
+lijn dunner dan de buuriconen; volledig herstellen maakt hem te vet en loopt de wielen dicht).
+
 ## What to Look For
 - **Tel je de groep in één blik?** Gevuld = gaat mee, doorzichtig = wacht nog op antwoord.
 - **Blijft de rolregel op één regel** bij vijf fietsers + megafoon + "Jij organiseert" (372px breed)?
@@ -39,3 +65,7 @@ open http://localhost:8765/.planning/sketches/014-peloton-rij/index.html
   telbaar met **1px lucht** ertussen. Dat is in het bestand zo gezet.
 - **Vijf is de bovengrens** op de rolregel van een 372px-kaart; daarboven hoort het `+3` te worden.
 - Op donker verdwijnt .38 dekking bijna; daar staat de wachtende fietser op .5.
+- **Het icoon telt niet meer.** Eén peloton-teken zegt "met meer mensen", niet "met z'n vieren" —
+  het aantal blijft dus in de tekstregel staan ("3 gaan mee · 1 wacht nog"). De rij losse fietsers
+  kon dat wel; dat is de afruil tussen de twee knoppen.
+- **Nog te meten op de telefoon:** of het teken bij 14 en 16 px nog verschilt van één fietser.
