@@ -1,0 +1,28 @@
+welcome_ride.webp
+=================
+
+De welkomstanimatie is eigen werk: met AI laten maken in opdracht van
+Joost, geen stockmateriaal en geen download van een derde. Er rust dus
+geen licentie van iemand anders op, en er hoeft niets vermeld te worden.
+
+Bron:        kan_je_daar_een_video_animatie.mp4 (1280x720, 10,005 s)
+             aangeleverd op 2026-09-08
+Herkomst:    met AI gemaakt, bevestigd door Joost op 2026-09-21
+Vastgelegd:  2026-09-21
+
+Hoe de mp4 en dit bestand samenhangen
+-------------------------------------
+Commit 02328fd sneed de telefoon-mockup en de regel "WELKOM BIJ DE FIETS
+ROUTE APP" weg en maakte er een geanimeerde WebP van. Het bestand dat er
+nu in zit is de vijfde export, niet de eerste:
+
+  02328fd  eerste uitsnede, 560 px breed, 12 fps
+  2c5cbaa  24 fps, en lucht rond de uitsnede
+  4554702  de hele fiets in beeld, 1:1 met de bron
+  18177e0  afspelen op 1,75x
+  059e352  ingekort tot 2,47 s
+
+Huidige vorm: 756x512, 206 frames.
+
+Het geluid eronder komt niet uit dit filmpje (de bron heeft muziek, geen
+wielgeluid); dat staat apart in assets/sounds/WELCOME_ROLL-LICENSE.txt.

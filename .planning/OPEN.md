@@ -324,32 +324,28 @@ e-mailaccount-flow van build 52 wacht nog op Supabase' maillimiet.
 
 ---
 
-## 13. De intro-animatie heeft geen licentiebestand
+## 13. De herkomst van de intro-animatie: opgelost op 2026-09-21
 
-**De bron is bekend, de maker nog niet.** `assets/animations/welcome_ride.webp`
-komt uit `~/Downloads/kan_je_daar_een_video_animatie.mp4`. Dat is nagemeten
-en niet aangenomen:
+**Status: rond. Alle assets in de app hebben nu een vastgelegde herkomst.**
+`assets/animations/welcome_ride.webp` is eigen werk: met AI laten maken in
+opdracht van Joost (bevestigd 2026-09-21), geen stockmateriaal. Er rust dus
+geen licentie van een derde op en er hoeft niets vermeld te worden.
+Vastgelegd in `assets/animations/WELCOME_RIDE-ORIGIN.txt`, naast de asset.
 
-- de mp4 is 1280x720 en 10,005 s, precies wat commit `02328fd` beschrijft;
-- de download staat op 8 september 09:32, de commit op 10:01, 29 minuten later;
-- een frame uit de mp4 toont dezelfde tekening in hetzelfde groen, op een
-  telefoon-mockup met de regel "WELKOM BIJ DE FIETS ROUTE APP" eronder: de
-  tekst die volgens die commit juist weggesneden moest worden.
+De keten is nagemeten en niet aangenomen: de bron is
+`kan_je_daar_een_video_animatie.mp4`, 1280x720 en 10,005 s, binnengekomen
+29 minuten voor commit `02328fd` die exact die maten noemt, en een frame
+eruit toont dezelfde tekening met de regel "WELKOM BIJ DE FIETS ROUTE APP"
+die de uitsnede wegliet. Het huidige bestand is de vijfde export (756x512,
+24 fps, 206 frames), niet de eerste; de vijf stappen staan in dat
+origin-bestand.
 
-Het huidige bestand is niet de eerste export maar de vijfde (756x512, 24 fps,
-206 frames): `2c5cbaa` gaf lucht rond de uitsnede, `4554702` haalde de hele
-fiets in beeld, en `18177e0` plus `059e352` maakten hem korter. Zelfde bron,
-vijf keer opnieuw uitgesneden.
-
-**Wat nog open staat, is één vraag aan Joost:** wie de mp4 gemaakt heeft.
-Joost noemt hem "eerder aangeleverd". De truc uit punt 12 helpt hier niet:
-het bestand draagt wel een quarantaine-merk van Chrome maar geen
-`kMDItemWhereFroms`, wat past bij een download uit een webapplicatie (een
-generator, een mailvenster) in plaats van een gewone bestandslink. Is de
-animatie eigen werk of in opdracht gemaakt, dan is er niets te regelen en
-volstaat een regel naast de asset zoals bij het geluid. Komt hij van een
-stockdienst of een generator met eigen voorwaarden, dan geldt dezelfde
-controle als bij punt 12.
+**Waarom dit uberhaupt een punt was:** het geluid liep hier op vast. Een
+asset waarvan de herkomst zoek is, blokkeert een Play-upload tot hij is
+uitgezocht, want een upload is verspreiding. Dat is meteen de staande
+regel die hieruit volgt: komt er een asset binnen, leg dan direct naast
+het bestand vast waar hij vandaan komt, zoals de fonts, het geluid en nu
+de animatie het doen.
 
 ---
 
