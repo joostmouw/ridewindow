@@ -287,6 +287,33 @@ geen dependency- of UI-taak.
 
 ---
 
+## 12. De licentie van de intro-opname moet vaststaan vóór een Play-release
+
+**Status: geluid gebouwd én op het toestel goedgekeurd (2026-09-21),
+licentie open.** De welkomstintro speelt sinds commit `b6486c7` een echte
+fietsopname van Joost: opstart + uitrij, middenstuk eruit, details in
+`.planning/quick/260921-welkomstwielen-geluid-en-trilling/SUMMARY.md`.
+
+**Wat eraan scheelt:** de bron is `~/Downloads/
+freesound_community-bicycle-pedal-105846.mp3`, maar die nummering klopt
+níét met freesound (105846 daar is een synthesizer-kick van iemand anders)
+en het bestand heeft geen metadata. Van welke site de download komt en
+onder welke licentie, weet alleen Joost. CC0 is direct bruikbaar, CC-BY
+vraagt naamsvermelding in de app of de store-vermelding, en NC/ND zijn
+waarschijnlijk een blokkade.
+
+**Volgende stap:** Joost de downloadsite laten noemen; de licentie
+verifiëren; dan óf de clip vrijgeven voor de eerstvolgende Play-build, óf
+een licentie-schone vervangende opname. Tot die tijd mag de clip op
+toestellen draaien maar niet mee in een upload.
+
+**Meegeleverde randzaken bij het oppakken:** de Oppo staat op een locale
+sideload met verse data (agendakoppeling vervallen; eerstvolgende
+internal-release herstelt de Play-installatie, zie `STATE.md`), en de
+e-mailaccount-flow van build 52 wacht nog op Supabase' maillimiet.
+
+---
+
 ## Openstaande punten (stand 2026-09-10)
 
 
