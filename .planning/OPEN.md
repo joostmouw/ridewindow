@@ -353,6 +353,36 @@ de animatie het doen.
 
 ---
 
+## 15. Twee resten van de agenda-taak, bewust blijven liggen
+
+Gevonden op 2026-09-21 bij het vertalen van de agenda-export
+(`.planning/quick/260921-p3d-.../SUMMARY.md`). Allebei buiten scope gehouden met
+reden, allebei echt werk:
+
+- **De homescreen-widget schrijft nog Nederlands.**
+  `lib/services/widget_update_service.dart` zet tier-labels, datum en
+  duur-achtervoegsel hardgecodeerd in het Nederlands, ongeacht de apptaal. Er
+  staat zelfs een commentaar dat dit bij #67 zou meeverhuizen, en dat is nooit
+  gebeurd. Het is een ander subsysteem: de widget wordt bijgewerkt vanuit de
+  WorkManager-isolate, waar geen `BuildContext` is. De weg is bekend
+  (`S.delegate.load(Locale(...))`, zoals `lib/main.dart:157`), maar het is een
+  eigen taak.
+- **Een uitzondering die de ene helft van de app wel vertaalt en de andere
+  niet.** `CalendarService` gooit `Exception('Aanmelden geannuleerd')` (regel
+  176 en 234). `availability_screen.dart` herkent die tekst en toont de
+  vertaalde variant; `ride_detail_screen.dart` doet die stap niet en laat de
+  Nederlandse string in de foutmelding staan. Dit is het soort asymmetrie dat
+  de consistentie-sweep hoort te vangen: dezelfde fout, twee schermen, één
+  behandeling.
+
+**Wat deze twee gemeen hebben met wat we vandaag vonden:** de vier ARB-sleutels
+voor de agenda-tekst bestónden al sinds #67, maar werden nergens aangeroepen.
+Een sleutel aanmaken is niet hetzelfde als hem aansluiten, en niets in de
+testsuite merkt het verschil. Loop bij een i18n-taak dus na of elke nieuwe
+sleutel ook echt een aanroeper heeft.
+
+---
+
 ## 14. Developer-verificatie: 30 september, en dat is negen dagen
 
 **Dit is het enige punt in dit bestand met een externe datum, en het weegt het
