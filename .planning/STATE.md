@@ -23,12 +23,12 @@ punten in `HANDOFF.json`.
 
 | Waar | Stand |
 |---|---|
-| Play closed testing (Alpha) | 41 live; **42 (1.0.31) in review** sinds ±23:15 — de track die Google telt; 2 testers aangemeld |
-| Play internal testing | **42 (1.0.31)**, live sinds 23:09 |
-| Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt |
-| main | 1.0.31+42, gepusht (c8e7e6b) |
-| PWA live | **1.0.31 (42)**, hash-geverifieerd 2026-09-10; privacybeleid op GitHub Pages zegt Ridewindow |
-| Oppo | sideload **1.0.31 (42)** via `adb install -r` (data behouden) + record in kloonprofiel user 10 |
+| Play closed testing (Alpha) | **1.0.37 (48)** in review sinds 2026-09-21 (promotie naar een gesloten track gaat langs Google); de track die Google telt |
+| Play internal testing | **1.0.37 (48)**, live sinds 2026-09-21 |
+| Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
+| main | 1.0.37+48, lokaal; c03f334 (sweep) + release-commit nog niet gepusht |
+| PWA live | niet aangeraakt in deze sessie; stand zie OPEN.md |
+| Oppo | app op **1.0.36 (47)** uit Play; 48 komt binnen als normale Play-update. Zie OPEN.md punt 5: Agenda staat op "Not connected", app op Engels |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
 feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de backlog (#72).

@@ -3,6 +3,62 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 48: 1.0.37+48
+
+**Datum:** 2026-09-21
+**Track:** Internal testing, geüpload op 2026-09-21 met `tool/play_upload.dart`,
+daarna als dezelfde bytes gepromoveerd naar de gesloten test (`--promote 48`).
+
+**Inhoud**
+- De vervolg-sweep "stille takken": tien acties die bij een fout zichtbaar
+  niets deden, zeggen het nu (zie de SUMMARY in
+  `.planning/quick/260921-stille-takken-sweep/`)
+  - Peloton: accepteren en afzeggen, en een venster kiezen, zowel op de
+    ritkaart als op het ritdetail
+  - Uitnodigen: het ophalen van je maatjes en het voorleggen van vensters
+    faalden stil
+  - Deel-link maken en een maatje verwijderen (Ritten, tab Maatjes)
+- Uitloggen zegt het nu als dat mislukt, in plaats van je ingelogd te laten
+  zonder enig signaal
+- Een herinnering aanzetten terwijl meldingen uit staan, legt dat uit en
+  verwijst naar de systeeminstellingen
+- Een succesmelding na een mislukking kan niet meer: "je doet niet meer mee"
+  zei je ook als het antwoord nooit aankwam
+- Welcome en de onboarding-knop kunnen een nieuwe tester niet meer vasthouden
+  als een instelling niet weg te schrijven is
+
+**Feedback opgelost:** geen nieuwe meldingen. De les uit Androidguju67's
+melding van 21 september (de eerste helft zat in 47) is over de hele app
+nagelopen; dit is de tweede helft.
+
+**Bewijs:** vier regressietests die op de vorige code falen; volle suite
+714/714, `flutter analyze` 0 errors.
+
+## Build 47: 1.0.36+47
+
+**Datum:** 2026-09-21
+**Track:** Internal testing, daarna als dezelfde bytes gepromoveerd naar de
+gesloten test (`--promote 47`). Stond op 21 september al bij de testers; dit
+blok hoorde er al bij te staan.
+
+**Inhoud**
+- De toestemmingskaart voor gebruiksstatistiek ging niet dicht bij beide
+  knoppen: je antwoord werd bewaard, maar de kaart bleef staan. Hij sluit nu
+  altijd (`2492dda`)
+- De privacy-link in Profiel deed niets, en een volgende tik kwam op de
+  weerdata-link terecht. Hij opent nu het echte beleid en zegt het als dat
+  niet lukt (`35000f5`)
+- "Volgende" in onboarding kan niet meer doodlopen op een schrijffout
+  (`eff2b7e`)
+- De Android-manifest was onparseerbaar door een verboden teken in een
+  comment; een structuurtest bewaakt dat nu (`b982362`)
+
+**Feedback opgelost:** Androidguju67 (de toestemmingskaart en de privacy-link).
+Zie `.planning/debug/consent-card-en-privacy-link.md`.
+
+**Geverifieerd op het toestel (2026-09-21):** privacybeleid opent, de kaart
+sluit bij een tik, via de internal track op de Oppo.
+
 ## Build 46: 1.0.35+46
 
 **Datum:** 2026-09-20

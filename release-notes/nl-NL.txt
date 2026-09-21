@@ -1,9 +1,11 @@
-Reparaties uit de eerste testersmeldingen. Dank voor het doorgeven.
+Dingen die stil faalden zeggen het nu. Dank voor je meldingen.
 
-De vraag over anonieme statistiek ging niet dicht als je op een van de
-twee knoppen tikte. Je antwoord werd wel bewaard, maar de kaart bleef
-staan. Beide knoppen werken nu.
+Een uitnodiging beantwoorden, een venster kiezen, maatjes uitnodigen, een
+link delen en een maatje verwijderen faalden stil bij een netwerkfout. Elke
+actie meldt het nu.
 
-De link naar het privacybeleid in Profiel deed niets. Daardoor kwam een
-volgende tik op de weerdata-link terecht. Hij opent nu het echte beleid,
-en zegt het als dat niet lukt.
+Uitloggen meldt het als de server niet bereikbaar is. Zijn meldingen uit, dan
+legt een herinnering aanzetten dat uit en opent je instellingen.
+
+Nieuwe gebruikers lopen niet meer vast op het eerste scherm als een instelling
+niet opgeslagen kan worden.

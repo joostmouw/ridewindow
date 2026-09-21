@@ -1,9 +1,11 @@
-Fixes from the first tester reports. Thanks for sending them in.
+Things that failed quietly now say so. Thanks for your reports.
 
-The question about anonymous statistics would not close when you tapped
-either button. Your answer was saved, but the card stayed on screen. Both
-buttons work now.
+Answering an invite, choosing a window, inviting buddies, sharing an invite
+link and removing a buddy failed silently when the network failed. Each now
+shows a message.
 
-The Privacy Policy link in Profile did nothing, so a following tap landed
-on the weather data link instead. It now opens the real policy, and says
-so if it cannot.
+Signing out now says so when it cannot reach the server. If notifications are
+switched off, turning on a reminder explains this and opens your settings.
+
+New users can no longer get stuck on the first screen when a setting cannot
+be saved.
