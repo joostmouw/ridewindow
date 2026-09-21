@@ -4,7 +4,7 @@ milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
 last_updated: "2026-09-20T13:38:40.000Z"
-last_activity: 2026-09-20
+last_activity: 2026-09-21
 progress:
   total_phases: 12
   completed_phases: 6
@@ -37,6 +37,7 @@ feedbackstroom als eigen fases · schets 013 stand A+B als nice to have op de ba
 
 | Datum | Taak | Resultaat |
 |---|---|---|
+| 2026-09-21 | [peloton-systeem](quick/260921-gxb-peloton-systeem-uit-schets-014/) | Schets 014 gebouwd: **links op de Home-kaart staat nu wat voor rit het is** -- het peloton-lint bij een groepsrit, één fietser als je alleen gaat -- en de rolregel zegt wat jij erin bent. De vlag is weg, de megafoon zegt dat jij organiseert, meerijden is tekst zonder icoon. Nieuw is de teller: een fietsje per persoon met de wachtenden doorzichtig, bij élke gedeelde rit en niet alleen bij die van jezelf. Het lint is de échte Phosphor-fietser drie keer over elkaar, samengevoegd tot één pad in Dart -- geen icoonfont, want `Icon` dwingt een vierkant af. 719 tests groen; **nog niet op glas gezien**. |
 | 2026-09-21 | [stille-takken-sweep](quick/260921-stille-takken-sweep/) | De sweep van 19 september is over heel `lib/` herhaald: **tien plekken zeiden nog stil niets, zes daarvan in de Peloton-flow die nu bij twintig testers draait** -- accepteren/afzeggen en kiezen (ritkaart én detail), maatjes ophalen en vensters voorleggen bij uitnodigen, deel-link en maatje verwijderen. Verder uitloggen, geweigerde notificatiepermissie, en twee navigaties achter een schrijffout. `_respondToRide` geeft nu `bool` terug zodat de succesmelding na een mislukking niet meer liegt. Vier regressietests, suite 714/714. |
 | 2026-09-20 | Play-installatie van 45, en wat die opleverde | **De app crashte na elke herstart, en dat stond er sinds 3 juni in.** `AndroidManifest.xml` noemde een workmanager-receiver die in 0.9 niet meer bestaat; Android maakt zo'n klasse pas aan als hij vuurt, dus alleen een reboot raakte hem (`7bb52c9`). Nieuwe structuurtest kijkt nu elke klassenaam in de manifest na. Ook: de winkelpagina en de testers-changelog vielen buiten de em-dash-regel (`c9b4627`). 1.0.35+46 staat op internal en is na een echte herstart op het toestel schoon bevonden. |
 | 2026-09-20 | [AGENTS.md voor Factory](quick/260920-d85-agents-md-als-gedeelde-projectinstructie/) | Claude op? Dan verder met `droid` in dezelfde repo. **Droid leest `AGENTS.md` en niet `CLAUDE.md`** -- bewezen met een exec zonder gereedschap. Veertien kennis-skills via symlinks in `~/.factory/skills` (de GSD-skills bewust niet: die orkestreren via Claude Codes eigen subagents). Droid 0.223, model op Factory Router, en een `ai`-switcher die openstaand werk eerst vastlegt -- de overdracht tussen agents is git, niet de prompt. |
