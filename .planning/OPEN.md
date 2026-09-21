@@ -352,6 +352,41 @@ de animatie het doen.
 
 ---
 
+## 14. Developer-verificatie: 30 september, en dat is negen dagen
+
+**Dit is het enige punt in dit bestand met een externe datum, en het weegt het
+zwaarst.** Nagekeken bij Google op 2026-09-21.
+
+**Wat er gebeurt als het niet gebeurt:** het ontwikkelaarsprofiel en de apps
+worden van Google Play verwijderd. Niet geblokkeerd voor nieuwe releases:
+verwijderd. Los daarvan geldt vanaf 30 september 2026 dat een app alleen nog
+installeerbaar is op gecertificeerde Android-toestellen in Brazilie, Indonesie,
+Singapore en Thailand als hij door een geverifieerde ontwikkelaar is
+geregistreerd, en Ridewindow staat in 177 landen.
+
+**Wat Joost bij de hand moet hebben** (persoonlijk account zonder geverifieerd
+Google Payments-profiel):
+
+- een officieel identiteitsbewijs van de overheid;
+- een prive-mailadres en telefoonnummer, allebei te bevestigen met een
+  eenmalige code;
+- een mailadres dat publiek op Google Play komt te staan, als onderdeel van het
+  ontwikkelaarsprofiel. Let op de samenhang met punt 3: de app gebruikt
+  inmiddels overal `joostmouw@gmail.com`.
+
+**Waarom niet op de valreep:** Google beoordeelt de inzending en dat duurt naar
+eigen zeggen enkele dagen. Een inzending op 29 september is dus te laat, ook al
+is hij binnen de datum.
+
+**Waar:** Play Console Home toont de banner. Uitleg staat op
+<https://support.google.com/googleplay/android-developer/answer/10841920> en
+<https://developer.android.com/developer-verification>.
+
+**Dit kan Claude niet overnemen:** het raakt een identiteitscontrole op Joosts
+account, en dat is precies de categorie die in `AGENTS.md` bij hem blijft.
+
+---
+
 ## Openstaande punten (stand 2026-09-10)
 
 
