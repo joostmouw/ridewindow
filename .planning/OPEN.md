@@ -1,5 +1,295 @@
 # Openstaande punten
 
+> **Stand 2026-09-21.** De secties vanaf "Openstaande punten (stand 2026-09-10)"
+> verderop zijn van 10 september en gedeeltelijk achterhaald: de Play Developer
+> API is inmiddels wél ingericht (punt I), de screenshots en de listing zijn
+> vervangen, en de bundel staat allang in de Console. Lees eerst wat hieronder
+> staat. Bij tegenspraak wint deze sectie.
+
+---
+
+## Hoe je dit oppakt, en met welke agent
+
+Dit project wordt door twee agents bediend: **Claude Code** (leest `CLAUDE.md`)
+en **Factory Droid** (leest `AGENTS.md`). Beide werken op dezelfde checkout.
+
+De overdracht tussen die twee is **git, niet de prompt**. Dat betekent
+praktisch:
+
+1. Voordat je wisselt: commit alles, ook half werk. Een `wip:`-commit is beter
+   dan een schone werkboom die de andere agent niet kan zien.
+2. Wat je weet en niet in een bestand staat, is bij de volgende agent weg. Zet
+   bevindingen in het bestand waar ze thuishoren (`.planning/debug/<slug>.md`
+   voor een onderzoek, `STATE.md` voor een afgeronde taak, dit bestand voor wat
+   blijft liggen), niet alleen in je antwoord.
+3. Claude Code werkt via GSD-commando's (`/gsd-quick`, `/gsd-debug`,
+   `/gsd-execute-phase`). Die schrijven hun eigen artefacten in `.planning/`.
+   Droid heeft die commando's niet; laat Droid de artefacten wél lezen en
+   bijwerken, anders lopen de twee uit elkaar.
+4. Er staat een `ai`-switcher klaar die openstaand werk eerst vastlegt. Gebruik
+   die in plaats van zomaar van terminal wisselen.
+
+Elk punt hieronder is zo opgeschreven dat een agent die deze sessie niet heeft
+meegemaakt er koud mee verder kan: wat er aan de hand is, wat al onderzocht is,
+en wat de volgende stap is.
+
+---
+
+## 1. Het ongevraagde Google-inlogvenster bij het openen van Profiel
+
+**Prioriteit: hoog.** Dit is het volgende ding dat een nieuwe tester raakt, en
+er zitten er nu twintig in de groep.
+
+### Wat er gebeurt
+
+Bij het openen van het Profiel-scherm verschijnt ongevraagd een Google
+account-kiezer: "Sign in to Ridewindow, Select sign-in information", met de
+accounts van het toestel erin (op de Oppo: `joost.oppo@gmail.com` en
+`joostmouw@gmail.com`). De gebruiker heeft nergens op gedrukt om in te loggen.
+Waargenomen op 2026-09-21 om 08:13 op de Oppo Find X9 Pro, build 1.0.35 (46),
+terwijl de gebruiker al ingelogd was.
+
+### Waarom dit erger is dan het lijkt
+
+Een inlogverzoek dat je niet hebt aangevraagd leest als "deze app wil bij mijn
+Google-account". Voor iemand die de app tien minuten kent en hem van een
+vreemde op Reddit heeft, is dat een reden om te stoppen. Het staat bovendien
+haaks op wat het privacybeleid belooft.
+
+### Wat al onderzocht is
+
+De aanroepketen is gevonden, de oorzaak niet.
+
+- `profile_screen.dart:197` `initState()` roept `_checkCalendarConnection()`
+  aan, fire-and-forget.
+- `_checkCalendarConnection()` (regel 216) roept
+  `CalendarService().isCalendarConnected()` aan.
+- `calendar_service.dart:268` `isCalendarConnected()` doet
+  `await _ensureInitialized()` en daarna
+  `GoogleSignIn.instance.authorizationClient.authorizationForScopes([CalendarApi.calendarEventsScope])`.
+
+De code is expliciet ontworpen om **niet** te prompten. Backlog #36 en de
+commentaarregels bij regel 212 en 275 stellen allebei dat
+`authorizationForScopes` stilzwijgend `null` teruggeeft in plaats van een
+prompt te tonen. Op dit toestel gebeurt dat dus niet.
+
+### Hypothesen, in volgorde van waarschijnlijkheid
+
+1. **`authorizationForScopes` prompt wél in google_sign_in 7.x** wanneer er
+   geen geldige grant meer is en er meerdere accounts op het toestel staan. De
+   aanname in de code komt uit een eerdere versie van het pakket of uit de
+   documentatie, en is nooit op een toestel met twee accounts getoetst.
+2. **`_ensureInitialized()` is de dader, niet `authorizationForScopes`.** Die
+   deelt de gememoizede `_sharedInitialize()`-gate met Supabase-auth (AUTH-05).
+   Als Supabase-auth in dezelfde run iets triggert, kan de prompt daar vandaan
+   komen en alleen toevallig samenvallen met het openen van Profiel.
+3. **`_checkCalendarMismatch()`** (aangeroepen op regel 221 als `connected`
+   true is) doet `attemptLightweightAuthentication`. De commentaarregel zegt
+   dat die ook niet prompt. Zelfde soort aanname, zelfde twijfel.
+
+### Belangrijke context
+
+De Calendar-grant op de Oppo is op 2026-09-21 verdwenen: Profiel toont sindsdien
+"Not connected". Dat kwam door het uitloggen tijdens de screenshot-ronde. Dat is
+waarschijnlijk **precies de toestand waarin de bug zich voordoet**: er is een
+herinnerd account, maar geen geldige scope-grant meer. Dat maakt het goed
+reproduceerbaar, maar let op: het betekent ook dat je de bug mogelijk niet ziet
+zolang de grant intact is.
+
+### Volgende stap
+
+Open een debugsessie (`/gsd-debug` bij Claude, of handmatig een
+`.planning/debug/<slug>.md` bij Droid). Eerste experiment: zet in
+`_checkCalendarConnection()` tijdelijk logging rond `_ensureInitialized()` en
+rond `authorizationForScopes`, bouw een debug-APK, en kijk met
+`adb logcat` welke van de twee de prompt veroorzaakt. Dat onderscheidt
+hypothese 1 van 2 in één ronde.
+
+Daarna geldt dezelfde eis als bij de vorige twee bugs: een regressietest die
+faalt op de oude code. Een test die afdwingt dat het openen van Profiel geen
+enkele promptende auth-aanroep doet.
+
+---
+
+## 2. Het patroon achter de bugs van 21 september: stille takken
+
+**Dit is geen taak maar een staande zoekopdracht.** Neem hem mee bij elke
+wijziging.
+
+Op 2026-09-21 zijn drie bugs gevonden die allemaal dezelfde vorm hadden: een
+tak die stil niets doet.
+
+- `profile_screen.dart`: `if (await canLaunchUrl(uri))` zonder `else`. Gaf
+  false, dus de privacy-link deed niets, zonder melding.
+- `analytics_consent_sheet.dart`: `Navigator.pop()` stond achter een `await`
+  die kon gooien. De kaart sloot nooit.
+- `onboarding_screen.dart`: `context.go('/home')` stond achter awaits die
+  konden gooien. Een nieuwe gebruiker kon vastlopen op het eerste scherm.
+
+Geen van de drie geeft een fout, een log of een melding. Ze laten de gebruiker
+achter met een scherm dat niet reageert, en ze zijn onzichtbaar in code review
+en in de testsuite.
+
+**Wat je zoekt:** elke navigatie- of sluitactie die achter een `await` staat, en
+elke `if` rond een platform-aanroep zonder `else`. Vraag bij elk: wat ziet de
+gebruiker als dit misgaat. Is het antwoord "niets", dan is het fout.
+
+Volledige uitwerking in `.planning/debug/consent-card-en-privacy-link.md`.
+
+---
+
+## 3. Feedbackadres in Play Console loopt niet gelijk met het privacybeleid
+
+**Prioriteit: middel, maar nu urgent geworden.** Er zitten twintig testers in de
+groep die straks iets willen melden.
+
+- Play Console, Closed testing > Alpha > Testers, veld "Feedback URL or email
+  address": `joostmouw@gmail.com`.
+- `docs/privacy-policy.html` publiceert op vier plekken (account-verwijdering en
+  Contact, in beide talen): `joost@fanalists.com`.
+
+Fase 26 plan 03 adviseerde deze twee gelijk te trekken, met als argument dat één
+adres voor de hele app minder fragmenteert dan drie. Dat advies is nooit
+uitgevoerd.
+
+**Beslissing die bij Joost ligt:** welk adres wint. Daarna aanpassen op de plek
+die verliest. Het is een veld in de Console plus eventueel een tekstwijziging in
+het privacybeleid.
+
+---
+
+## 4. De vastgeprikte "20 testers"-post op r/AndroidClosedTesting
+
+**Prioriteit: laag, kost één blik.**
+
+De vastgeprikte community-post van die subreddit heet "App testing requirements
+for new personal developer accounts, a minimum of 20 testers". De hele
+milestone-rekensom gaat uit van **twaalf**, wat is wat Play Console voor dit
+project toont.
+
+Vermoedelijk is de vastgeprikte post verouderd (Google verlaagde het aantal
+medio 2025), maar dat is een aanname. Play Console is leidend. Eén controle
+daar sluit het af. Als het tóch twintig is, verandert de rekensom in
+`.planning/phases/27-wervingsonderzoek/27-KANALEN.md` en het doel van fase 30.
+
+---
+
+## 5. De toestand van de Oppo na 21 september
+
+Twee dingen zijn veranderd door de screenshot-ronde en niet teruggezet, omdat
+ze inloggen vereisen en dat bij Joost blijft:
+
+- **Google Agenda staat op "Not connected".** Gevolg: de fietsmomenten zakten
+  van 30 naar 15, want de agenda-blokken zijn weg. Herverbinden in Profiel.
+- **De app staat op Engels.** Omzetten in Profiel, onderaan bij de taalkeuze.
+
+Relevant voor wie hier verder test: de app staat op **1.0.36 (47)**, binnengekomen
+als Play-update via de internal track. Dat pad behoudt de lokale database en de
+grants; sideloaden over een Play-installatie heen doet dat niet.
+
+---
+
+## 6. Werving loopt, en wat er nu bewaakt moet worden
+
+Stand 2026-09-21, 08:30.
+
+- **De Google Groep `ridewindow-testers` telt 20 leden plus Joost.** Negen
+  daarvan zijn de eigen kring (direct toegevoegd op 20 september), elf zijn
+  vreemden die zich vanaf 15:55 op 20 september zelf hebben aangemeld, vrijwel
+  zeker via r/AndroidClosedTesting.
+- **De groep is sinds 21 september gekoppeld** aan de test-track in Play
+  Console. Daarvoor stond de track op de e-maillijst, waardoor die elf
+  zelf-joiners geen toegang hadden. Dat is opgelost.
+- **Zeven persoonlijke mails** zijn op 20 september verstuurd naar de eigen
+  kring, en **elf Engelse mails** op 21 september naar de nieuwe leden.
+- **`e.j.heineke@gmail.com` staat op "bouncing"** in Google Groups. Die
+  persoon is per mail niet te bereiken; via een ander kanaal benaderen.
+
+**Wat bewaakt moet worden:** de Console-teller, niet het ledenaantal van de
+groep. Lid zijn van de groep is niet hetzelfde als opt-in. Het verschil daartussen
+is precies waar de eigen kring op vastliep (D-10). De veertien dagen beginnen pas
+te tellen bij twaalf aangemelde testers, en wie tussentijds uitstapt breekt de
+reeks.
+
+**Let op bij de eigen kring:** de tien adressen in de Play-lijst zijn zeven
+mensen. Twee mensen staan er met twee accounts in en één adres is Joost zelf.
+Zie `.planning/phases/27-wervingsonderzoek/27-KANALEN.md` voor de gecorrigeerde
+rekensom.
+
+---
+
+## 7. Fase 26 staat nog als open in de ROADMAP-checklist
+
+De checklistregel voor fase 26 is niet afgevinkt, terwijl alle vier de plannen
+een SUMMARY hebben en de meeste openstaande Console-punten op 20 en 21
+september zijn afgerond:
+
+- Landen/regio's staan op 177 van 177. **Gedaan.**
+- Feedbackadres is ingevuld. **Gedaan**, zie punt 3 voor de vraag welk adres.
+- Google Groep bestaat en is gekoppeld. **Gedaan op 21 september.**
+- Release-route via internal. **Gedaan**, `tool/play_upload.dart` werkt.
+
+Wat nog nagekeken moet worden voordat je de regel afvinkt: de **nl-NL
+winkelpagina** (die ontbrak nog op 10 september) en de **changelog vanaf build
+41**. Controleer die twee in de Console, vink dan af.
+
+---
+
+## 8. Promotiemateriaal: twee losse eindjes
+
+`docs/promo/` bevat nu schermafdrukken in beide talen, plus logo,
+feature-graphic en de intro-video. Zie `docs/promo/README.md`.
+
+- **De afdrukken verouderen.** Home toont de week van 21 tot en met 27
+  september en een geplande rit op maandag. Voor echte promotie wil je een week
+  met louter groene dagen; maak dan nieuwe.
+- **Er zijn drie varianten van de login-animatie** in `photos/`: gewoon, zonder
+  watermerk, en "special edition". In `docs/promo/` staat de versie zonder
+  watermerk. Joost heeft niet bevestigd dat dat de juiste is.
+
+---
+
+## 9. Oude debugsessie die nooit is afgerond
+
+`.planning/debug/test-binding-state-leakage.md` staat sinds 2026-07-17 op
+`awaiting_human_verify`. Het ging om 69 falende tests over 13 bestanden wanneer
+de volledige suite in één proces draait.
+
+**Dat symptoom bestaat niet meer:** op 2026-09-21 draait `flutter test` volledig
+groen met 707 tests. Of dat komt doordat de oorzaak onderweg is weggewerkt of
+doordat de tests zijn aangepast, is niet vastgesteld. Iemand moet die sessie
+lezen, vaststellen wat er van de oorspronkelijke hypothese klopt, en hem sluiten
+of heropenen. Een debugsessie die twee maanden op "wacht op verificatie" staat
+is ruis in elke volgende zoektocht.
+
+---
+
+## 10. Waar de milestone staat
+
+**v4.1 "Zo snel mogelijk live in de store"**, fases 26 tot en met 32.
+
+| Fase | Stand |
+|---|---|
+| 26 Console op orde | Feitelijk af, checklistregel nog open, zie punt 7 |
+| 27 Wervingsonderzoek | **Af** op 2026-09-20, beide plannen, `27-KANALEN.md` en `27-TEKSTEN.md` |
+| 28 Feedbackstroom | Nog niet gepland. Volgende fase. |
+| 29 Eerste minuut | Nog niet gepland |
+| 30 Werving | Deels al uitgevoerd buiten de fase om: de eigen kring en de elf van Reddit zijn gemaild |
+| 31 De veertien dagen | Loopt zodra de teller twaalf haalt |
+| 32 Aanvraag en productie | Sluitstuk |
+
+Volgende GSD-commando bij Claude: `/gsd-plan-phase 28`.
+
+**Let op de volgorde in fase 30:** die gaat ervan uit dat de gekozen kanalen pas
+na build 43 worden ingezet. Dat is inmiddels ingehaald door de werkelijkheid,
+want de werving via Reddit loopt al. Fase 30 moet bij het plannen tegen die
+stand aan gehouden worden in plaats van andersom.
+
+---
+
+## Openstaande punten (stand 2026-09-10)
+
+
 Opgemaakt 2026-09-10, bij het wissen van de context. Alles wat in de sessie van 8–10 september
 open is blijven staan, plus wat er al lag. Gesorteerd op wat je als eerste tegenkomt, niet op
 belang.

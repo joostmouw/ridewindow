@@ -103,8 +103,15 @@ expliciet ja op zegt.
 Het project draait op GSD. De planning staat in `.planning/`:
 
 - `.planning/STATE.md` — waar het project staat; lees dit eerst.
+- `.planning/OPEN.md` — wat er open ligt, met per punt wat al onderzocht is en
+  wat de volgende stap is. De bovenste sectie is de actuele; alles daaronder is
+  historie. Lees dit als tweede: het is geschreven voor een agent die de vorige
+  sessie niet heeft meegemaakt.
 - `.planning/ROADMAP.md` en `REQUIREMENTS.md` — de actieve milestone.
 - `.planning/quick/<id>-<slug>/` — losse taken, met PLAN.md en SUMMARY.md.
+- `.planning/debug/<slug>.md` — lopende en afgesloten bugonderzoeken. Staat er
+  een op `investigating` of `awaiting_human_verify`, kijk dan eerst of jouw
+  taak daarmee te maken heeft voordat je iets nieuws begint.
 
 Wat dat voor jou betekent, ook als je geen GSD-commando's hebt:
 
@@ -153,6 +160,13 @@ git add -A && git commit -m "wip: <waar je stond>"
 droid    # of: claude
 ```
 
-Begin in de nieuwe sessie met: lees `AGENTS.md`, lees `.planning/STATE.md`,
-bekijk `git log -5` en de laatste SUMMARY, en ga dan verder. Draai niets terug
-wat werkt zonder te zeggen waarom.
+Begin in de nieuwe sessie met: lees `AGENTS.md`, lees `.planning/STATE.md` en
+`.planning/OPEN.md`, bekijk `git log -5` en de laatste SUMMARY, en ga dan
+verder. Draai niets terug wat werkt zonder te zeggen waarom.
+
+**Wat je achterlaat is belangrijker dan wat je afmaakt.** Wissel je midden in
+een onderzoek, schrijf dan eerst op wat je al weet en wat je nog niet weet, in
+het bestand waar het thuishoort. Een hypothese die je in je hoofd had en niet
+opschreef, moet de volgende agent opnieuw bedenken; een uitgesloten hypothese
+die je wél opschreef, bespaart hem een ronde. Zet daarom ook op wat níét de
+oorzaak bleek, met de reden.
