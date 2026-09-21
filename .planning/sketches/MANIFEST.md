@@ -43,6 +43,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 009 | [nederlandse-teksten](009-nederlandse-teksten/) | Welk Nederlands spreekt deze app — en welk woord gebruikt hij voor zijn eigen kernbegrip? | **A — "fietsmoment"** (blok 2 beperkt, blok 4 afgewezen) | l10n, nederlands, toon, kleding, jargon |
 | 010 | [hoeveel-fiets](010-hoeveel-fiets/) | Hoeveel fietstaal verdraagt de app, en op welke plekken? | *nog te kiezen* | merk, toon, naamgeving, peloton, l10n |
 | 011 | [daglicht](011-daglicht/) | Hoe laat de app zien dat een venster in het donker valt, in zijn eigen vormtaal? | **A — vierde weerbalk, hele etmaal** | daglicht, weerbalken, scoring, profiel, fase-26 |
+| 014 | [peloton-rij](014-peloton-rij/) | Waar staat de rij fietsers die de groep telt, en wat vervangt het vlaggetje bij "Jij organiseert"? | *nog te kiezen* | peloton, iconografie, ritten, home, rollen |
 
 ## Beslissingen die doorwerken
 
@@ -135,3 +136,12 @@ plus de regel op de kaart en de vierde schuif in Profiel. **Gekozen: A**, met de
 en vervangt het laadrondje. Drie standen: nu (rondje), A (hij fietst binnen na loslaten), B
 (trekken is trappen). **Gemeten:** de intro bevat geen trapbeweging — de mockup tekent spaken
 over een stilstaand eindbeeld. **Gekozen: A+B** (Joost, 2026-09-10; eerst B, daarna A+B zodra bleek dat die even snel is) — geen vertraging; na de aanpassing zijn alle standen gemeten even snel terug als Nu (2,80 s in de demo). Op de backlog als #72 (nice to have).
+
+## 014 — Peloton in een rij
+
+`014-peloton-rij/` — Joosts punt: een gedeelde rit draagt een vlaggetje, en dat is gek — een vlag
+zegt "finish", niet "met zijn vieren". Drie plekken voor een rij fietsers die de groep telt
+(A: op de plek van het rol-icoon, B: op de telregel, C: in de kop), in alle drie met een
+**megafoon** in plaats van de vlag bij "Jij organiseert". **Gemeten tijdens het tekenen:** fietsers
+met overlap smeren bij 16px tot één veeg — pas met 1px lucht ertussen zijn ze telbaar; vijf is de
+bovengrens op een 372px-kaart. *Nog te kiezen.*

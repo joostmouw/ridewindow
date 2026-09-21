@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peloton in een rij — schets 014</title>
+<style>
+  @font-face { font-family:'Outfit'; src:url('../../../assets/fonts/Outfit.ttf') format('truetype'); font-weight:100 900; }
+  @font-face { font-family:'Phosphor'; src:url('../../../assets/fonts/Phosphor.ttf') format('truetype'); }
+
+  :root{
+    --brand-light:#C5D4B6; --brand-dark:#234934;
+    --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7;
+    --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#4C5C52;
+    --outline:#A9B79C; --outline-strong:#6B7663;
+    --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+    --great-fg:#006457;  --great-bg:#E0F2F1;
+    --accept-fg:#A42E0A; --accept-bg:#FFF3E0;
+    --organiser:#7B4B12;   /* lightRideOrganiser */
+    --joined:#1565C0;      /* lightPlannedRide   */
+    --solo:#4C5C52;        /* lightTextTertiary  */
+    --pending:#A42E0A;     /* lightRidePending   */
+    --shadow:rgba(35,73,52,.12);
+  }
+  body.dark{
+    --brand-light:#2C3B30; --brand-dark:#C5D4B6;
+    --paper:#1E1E1E; --paper-low:#141414; --paper-mid:#2C2C2C; --paper-high:#333;
+    --ink:#E0E0E0; --ink-2:#BDBDBD; --ink-3:#9E9E9E;
+    --outline:#424242; --outline-strong:#5A5A5A;
+    --perfect-fg:#66BB6A; --perfect-bg:#1E3320;
+    --great-fg:#80CBC4;  --great-bg:#16302D;
+    --accept-fg:#FFB74D; --accept-bg:#33270F;
+    --organiser:#D9A264;   /* darkRideOrganiser */
+    --joined:#42A5F5;      /* darkPlannedRide   */
+    --solo:#9E9E9E;
+    --pending:#F0865C;     /* darkRidePending   */
+    --shadow:rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;padding:30px 24px 90px;background:var(--paper-low);color:var(--ink);
+       font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1360px;margin:0 auto}
+  h1{font-size:31px;line-height:1.25;font-weight:500;margin:0 0 10px}
+  .lede{font-size:15.5px;line-height:1.6;color:var(--ink-2);max-width:78ch;margin:0}
+  .lede b{font-weight:600;color:var(--ink)}
+  .ph{font-family:'Phosphor';font-style:normal;line-height:1;display:inline-block}
+
+  /* ── bedieningsbalk ── */
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:26px 0 8px}
+  .bar button{font-family:inherit;font-size:14px;font-weight:500;padding:9px 17px;
+      border-radius:999px;cursor:pointer;border:1px solid var(--outline);
+      background:transparent;color:var(--ink-2)}
+  .bar button[aria-pressed="true"]{background:var(--brand-dark);color:var(--paper-low);border-color:var(--brand-dark)}
+  .bar .sep{flex:1}
+  .note{font-size:14.5px;line-height:1.6;color:var(--ink-3);margin:0 0 22px;max-width:82ch;min-height:44px}
+  .note b{color:var(--ink-2);font-weight:600}
+
+  .stage{display:none} .stage.on{display:block}
+  .row{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+
+  /* ── telefoon ── */
+  .phone{width:372px;flex:none;border-radius:32px;overflow:hidden;
+         border:1px solid var(--outline);background:var(--paper);box-shadow:0 14px 36px var(--shadow)}
+  .screen{height:706px;background:var(--paper-low);overflow-y:auto}
+  .screen::-webkit-scrollbar{width:0}
+  .cap{font-size:13px;color:var(--ink-3);margin:10px 2px 0;max-width:372px;line-height:1.55}
+  .cap b{color:var(--ink-2);font-weight:600}
+
+  .appbar{background:var(--brand-light);padding:15px 20px 0;position:sticky;top:0;z-index:3}
+  .appbar h2{margin:0;font-size:21px;font-weight:500;color:var(--brand-dark)}
+  .tabs{display:flex;margin-top:13px}
+  .tabs div{flex:1;text-align:center;padding:10px 0 9px;font-size:13.5px;font-weight:500;
+            color:var(--brand-dark);opacity:.6;border-bottom:2px solid transparent}
+  .tabs div.on{opacity:1;border-bottom-color:var(--brand-dark);font-weight:600}
+  .sectiontitle{font-size:11.5px;letter-spacing:1.3px;font-weight:600;color:var(--ink-3);
+                text-transform:uppercase;padding:16px 20px 6px}
+
+  /* ── ritkaart ── */
+  .list{padding:4px 16px 28px}
+  .card{background:var(--paper);border:1px solid var(--outline);border-radius:19px;
+        margin-bottom:10px;padding:12px 13px;display:flex;gap:10px;align-items:flex-start}
+  .card.dim{opacity:.55}
+  .body{flex:1;min-width:0}
+  .head{display:flex;align-items:center;gap:8px}
+  .day{font-size:15px;font-weight:600;line-height:1.3}
+  .time{font-size:13px;color:var(--ink-3);margin-top:1px;font-variant-numeric:tabular-nums}
+  .city{font-size:12px;color:var(--ink-3)}
+  .role{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12.5px;
+        font-weight:600;letter-spacing:.1px;line-height:1.25}
+  .role .ph{font-size:15px}
+  .role.solo{font-weight:500}
+  .count{font-size:12px;color:var(--ink-3);margin-top:3px;display:flex;align-items:center;gap:7px}
+  .daylight{font-size:11.5px;color:var(--ink-3);margin-top:2px;opacity:.9}
+
+  .rightcol{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:none}
+  .score{padding:5px 10px;border-radius:10px;font-size:12px;font-weight:700;white-space:nowrap}
+  .s-perfect{background:var(--perfect-bg);color:var(--perfect-fg)}
+  .s-great{background:var(--great-bg);color:var(--great-fg)}
+  .s-accept{background:var(--accept-bg);color:var(--accept-fg)}
+
+  /* ── de peloton-rij ── */
+  .pel{display:inline-flex;align-items:center;line-height:1}
+  .pel .ph{font-size:16px;margin-right:1px}   /* 1px lucht: overlap smeert ze bij 16px tot een veeg */
+  .pel .ph:last-child{margin-right:0}
+  .pel .wait{opacity:.38}                     /* wacht nog op antwoord */
+  body.dark .pel .wait{opacity:.5}            /* donker slikt lage dekking sneller op */
+  .pel .more{font-size:11px;font-weight:700;margin-left:4px;font-variant-numeric:tabular-nums}
+  .pel.sm .ph{font-size:14px;margin-right:1px}
+  .pel.lg .ph{font-size:18px;margin-right:1px}
+
+  .mega{font-size:16px;margin-right:2px}
+
+  /* ── icoonkeuze bovenaan ── */
+  .pickers{display:flex;gap:26px;flex-wrap:wrap;background:var(--paper);border:1px solid var(--outline);
+           border-radius:18px;padding:16px 20px;margin:0 0 24px}
+  .pick h3{margin:0 0 10px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;
+           color:var(--ink-3);font-weight:600}
+  .pick .opt{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:13px;color:var(--ink-2)}
+  .pick .opt .ph{font-size:22px;color:var(--organiser);width:26px;text-align:center}
+  .pick .opt code{font-size:11px;color:var(--ink-3);font-family:ui-monospace,monospace}
+
+  .legend{font-size:12.5px;color:var(--ink-3);display:flex;gap:18px;flex-wrap:wrap;margin:14px 2px 0}
+  .legend span{display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Peloton in een rij</h1>
+<p class="lede">
+  Een gedeelde rit draagt nu een <b>vlaggetje</b> — en een vlag zegt "finish", niet "met zijn vieren".
+  De vraag van deze schets: <b>waar komt de rij fietsers te staan</b> die laat zien hoe groot de groep is,
+  en <b>hoe ver gaat dat</b> — is het de plek van het rol-icoon, een eigen telregel, of de kop van de kaart?
+  De megafoon vervangt in alle drie de varianten het vlaggetje bij "Jij organiseert".
+  Gevulde fietsers gaan mee, doorzichtige wachten nog op antwoord.
+</p>
+
+<div class="pickers">
+  <div class="pick">
+    <h3>Welke megafoon</h3>
+    <div class="opt"><i class="ph" style="font-style:normal">&#xe324;</i> <span>megaphone — met greep, klassiek</span> <code>0xe324</code></div>
+    <div class="opt"><i class="ph" style="font-style:normal">&#xe642;</i> <span>megaphone-simple — kale toeter (roeicoach)</span> <code>0xe642</code></div>
+  </div>
+  <div class="pick">
+    <h3>Welke fietser</h3>
+    <div class="opt"><span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i></span> <span>person-simple-bike — al in gebruik voor "Alleen jij"</span> <code>0xe734</code></div>
+    <div class="opt"><span class="pel"><i class="ph">&#xe0d6;</i><i class="ph">&#xe0d6;</i><i class="ph">&#xe0d6;</i></span> <span>bicycle — fiets zonder mens</span> <code>0xe0d6</code></div>
+  </div>
+  <div class="pick">
+    <h3>Wat er nu staat</h3>
+    <div class="opt"><i class="ph">&#xe244;</i> <span>flag — "Jij organiseert"</span> <code>0xe244</code></div>
+    <div class="opt"><i class="ph" style="color:var(--joined)">&#xe68e;</i> <span>users-three — "Je gaat mee met …"</span> <code>0xe68e</code></div>
+  </div>
+</div>
+
+<div class="bar">
+  <button data-v="nu"  aria-pressed="false">Nu</button>
+  <button data-v="a"   aria-pressed="true">A — Peloton ís het icoon</button>
+  <button data-v="b"   aria-pressed="false">B — Megafoon voorop, peloton op de telregel</button>
+  <button data-v="c"   aria-pressed="false">C — Peloton in de kop</button>
+  <span class="sep"></span>
+  <button id="theme" aria-pressed="false">Donker</button>
+</div>
+<p class="note" id="note"></p>
+
+<!-- ══════════════════ NU ══════════════════ -->
+<div class="stage" data-s="nu">
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="appbar"><h2>Ritten</h2>
+          <div class="tabs"><div class="on">Gepland</div><div>Peloton</div><div>Geweest</div></div></div>
+        <div class="list" style="padding-top:14px">
+
+          <div class="card">
+            <div class="body">
+              <div class="day">zaterdag 27 sep</div>
+              <div class="time">09:00 – 13:00  (4u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--organiser)"><i class="ph">&#xe244;</i> Jij organiseert</div>
+              <div class="daylight">Licht tot 19:42</div>
+              <div class="count">3 gaan mee · 1 wacht nog</div>
+            </div>
+            <div class="rightcol"><div class="score s-perfect">82 Perfect</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">zondag 28 sep</div>
+              <div class="time">10:00 – 12:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--joined)"><i class="ph">&#xe68e;</i> Je gaat mee met Bram</div>
+              <div class="daylight">Licht tot 19:39</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">71 Prima</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">dinsdag 30 sep</div>
+              <div class="time">17:00 – 18:30  (1,5u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role solo" style="color:var(--solo)"><i class="ph">&#xe734;</i> Alleen jij</div>
+              <div class="daylight">Zon onder om 19:34</div>
+            </div>
+            <div class="rightcol"><div class="score s-accept">64 Redelijk</div></div>
+          </div>
+
+        </div>
+      </div></div>
+      <p class="cap"><b>Zoals het nu is.</b> Twee gedeelde ritten, twee iconen die geen van beide over een
+        groep gaan: een vlag en drie koppen. Hoe groot de groep is staat alleen in de tekstregel eronder,
+        en alleen bij de rit die jij organiseert.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ A ══════════════════ -->
+<div class="stage on" data-s="a">
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="appbar"><h2>Ritten</h2>
+          <div class="tabs"><div class="on">Gepland</div><div>Peloton</div><div>Geweest</div></div></div>
+        <div class="list" style="padding-top:14px">
+
+          <div class="card">
+            <div class="body">
+              <div class="day">zaterdag 27 sep</div>
+              <div class="time">09:00 – 13:00  (4u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--organiser)">
+                <i class="ph mega">&#xe642;</i>
+                <span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+                Jij organiseert</div>
+              <div class="daylight">Licht tot 19:42</div>
+              <div class="count">3 gaan mee · 1 wacht nog</div>
+            </div>
+            <div class="rightcol"><div class="score s-perfect">82 Perfect</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">zondag 28 sep</div>
+              <div class="time">10:00 – 12:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--joined)">
+                <span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i></span>
+                Je gaat mee met Bram</div>
+              <div class="daylight">Licht tot 19:39</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">71 Prima</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">dinsdag 30 sep</div>
+              <div class="time">17:00 – 18:30  (1,5u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role solo" style="color:var(--solo)">
+                <span class="pel"><i class="ph">&#xe734;</i></span> Alleen jij</div>
+              <div class="daylight">Zon onder om 19:34</div>
+            </div>
+            <div class="rightcol"><div class="score s-accept">64 Redelijk</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">woensdag 1 okt</div>
+              <div class="time">18:00 – 20:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--pending)">
+                <i class="ph">&#xe2b2;</i>
+                <span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+                Sanne vraagt of je meegaat</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">74 Prima</div></div>
+          </div>
+
+          <div class="card dim">
+            <div class="body">
+              <div class="day">donderdag 2 okt</div>
+              <div class="time">19:00 – 20:30  (1,5u)</div>
+              <div class="role" style="color:var(--solo)"><i class="ph">&#xe3de;</i> Je zei nee tegen Tim</div>
+            </div>
+            <div class="rightcol"><div class="score s-accept">61 Redelijk</div></div>
+          </div>
+
+        </div>
+      </div></div>
+      <p class="cap"><b>A — de rij fietsers staat op de plek van het icoon.</b> Eén blik telt de groep:
+        vier gaan mee, één moet nog antwoorden. "Alleen jij" is dezelfde tekening, maar dan één keer —
+        solo en peloton liggen op dezelfde lat. De megafoon staat alleen vóór de rij als jíj hem organiseert.</p>
+    </div>
+
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="appbar"><h2>Ridewindow</h2>
+          <div class="tabs"><div class="on">Home</div><div>Ritten</div><div>Profiel</div></div></div>
+        <div class="sectiontitle">Gepland</div>
+        <div class="list">
+          <div class="card">
+            <div class="body">
+              <div class="day">zaterdag 27 sep</div>
+              <div class="time">09:00 – 13:00  (4u)</div>
+              <div class="role" style="color:var(--organiser);font-size:12px">
+                <i class="ph mega" style="font-size:14px">&#xe642;</i>
+                <span class="pel sm"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+                Jij organiseert</div>
+            </div>
+            <div class="rightcol"><div class="score s-perfect">82 Perfect</div></div>
+          </div>
+          <div class="card">
+            <div class="body">
+              <div class="day">zondag 28 sep</div>
+              <div class="time">10:00 – 12:00  (2u)</div>
+              <div class="role" style="color:var(--joined);font-size:12px">
+                <span class="pel sm"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i></span>
+                Je gaat mee met Bram</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">71 Prima</div></div>
+          </div>
+        </div>
+      </div></div>
+      <p class="cap">Dezelfde regel op Home, één maat kleiner (<code>dense</code>). De rij blijft leesbaar
+        omdat hij niet meer dan vijf fietsers toont; daarboven wordt het <span class="pel sm"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><span class="more">+3</span></span>.</p>
+    </div>
+  </div>
+  <div class="legend">
+    <span><span class="pel"><i class="ph">&#xe734;</i></span> gaat mee</span>
+    <span><span class="pel"><i class="ph wait">&#xe734;</i></span> wacht nog op antwoord</span>
+    <span><i class="ph mega" style="color:var(--organiser)">&#xe642;</i> jij organiseert</span>
+  </div>
+</div>
+
+<!-- ══════════════════ B ══════════════════ -->
+<div class="stage" data-s="b">
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="appbar"><h2>Ritten</h2>
+          <div class="tabs"><div class="on">Gepland</div><div>Peloton</div><div>Geweest</div></div></div>
+        <div class="list" style="padding-top:14px">
+
+          <div class="card">
+            <div class="body">
+              <div class="day">zaterdag 27 sep</div>
+              <div class="time">09:00 – 13:00  (4u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--organiser)"><i class="ph">&#xe642;</i> Jij organiseert</div>
+              <div class="daylight">Licht tot 19:42</div>
+              <div class="count">
+                <span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+                3 gaan mee · 1 wacht nog</div>
+            </div>
+            <div class="rightcol"><div class="score s-perfect">82 Perfect</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">zondag 28 sep</div>
+              <div class="time">10:00 – 12:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--joined)"><i class="ph">&#xe734;</i> Je gaat mee met Bram</div>
+              <div class="daylight">Licht tot 19:39</div>
+              <div class="count">
+                <span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i></span>
+                jij en 2 anderen</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">71 Prima</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">dinsdag 30 sep</div>
+              <div class="time">17:00 – 18:30  (1,5u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role solo" style="color:var(--solo)"><i class="ph">&#xe734;</i> Alleen jij</div>
+              <div class="daylight">Zon onder om 19:34</div>
+            </div>
+            <div class="rightcol"><div class="score s-accept">64 Redelijk</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="day">woensdag 1 okt</div>
+              <div class="time">18:00 – 20:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--pending)"><i class="ph">&#xe2b2;</i> Sanne vraagt of je meegaat</div>
+              <div class="count">
+                <span class="pel"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+                2 gaan mee · 2 wachten nog</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">74 Prima</div></div>
+          </div>
+
+          <div class="card dim">
+            <div class="body">
+              <div class="day">donderdag 2 okt</div>
+              <div class="time">19:00 – 20:30  (1,5u)</div>
+              <div class="role" style="color:var(--solo)"><i class="ph">&#xe3de;</i> Je zei nee tegen Tim</div>
+            </div>
+            <div class="rightcol"><div class="score s-accept">61 Redelijk</div></div>
+          </div>
+
+        </div>
+      </div></div>
+      <p class="cap"><b>B — de rolregel houdt één icoon, de rij verhuist naar de telregel.</b>
+        De megafoon draagt "jij organiseert" alleen; de fietsers staan vóór de zin die ze telt,
+        zodat plaatje en getal elkaar uitleggen. En de telregel verschijnt nu óók bij andermans rit —
+        vandaag krijg je die alleen te zien als je zelf organiseert.</p>
+    </div>
+
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="appbar"><h2>Ridewindow</h2>
+          <div class="tabs"><div class="on">Home</div><div>Ritten</div><div>Profiel</div></div></div>
+        <div class="sectiontitle">Gepland</div>
+        <div class="list">
+          <div class="card">
+            <div class="body">
+              <div class="day">zaterdag 27 sep</div>
+              <div class="time">09:00 – 13:00  (4u)</div>
+              <div class="role" style="color:var(--organiser);font-size:12px"><i class="ph" style="font-size:14px">&#xe642;</i> Jij organiseert</div>
+              <div class="count" style="font-size:11.5px">
+                <span class="pel sm"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+                3 gaan mee · 1 wacht nog</div>
+            </div>
+            <div class="rightcol"><div class="score s-perfect">82 Perfect</div></div>
+          </div>
+          <div class="card">
+            <div class="body">
+              <div class="day">zondag 28 sep</div>
+              <div class="time">10:00 – 12:00  (2u)</div>
+              <div class="role" style="color:var(--joined);font-size:12px"><i class="ph" style="font-size:14px">&#xe734;</i> Je gaat mee met Bram</div>
+              <div class="count" style="font-size:11.5px">
+                <span class="pel sm"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i></span>
+                jij en 2 anderen</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">71 Prima</div></div>
+          </div>
+        </div>
+      </div></div>
+      <p class="cap">Op Home kost dit een <b>derde regel</b> per kaart. Dat is de prijs van B:
+        de kaarten worden hoger, en op Home telt iedere millimeter.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ C ══════════════════ -->
+<div class="stage" data-s="c">
+  <div class="row">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="appbar"><h2>Ritten</h2>
+          <div class="tabs"><div class="on">Gepland</div><div>Peloton</div><div>Geweest</div></div></div>
+        <div class="list" style="padding-top:14px">
+
+          <div class="card">
+            <div class="body">
+              <div class="head">
+                <div class="day">zaterdag 27 sep</div>
+                <span class="pel lg" style="color:var(--organiser)"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+              </div>
+              <div class="time">09:00 – 13:00  (4u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--organiser)"><i class="ph">&#xe642;</i> Jij organiseert</div>
+              <div class="daylight">Licht tot 19:42</div>
+              <div class="count">3 gaan mee · 1 wacht nog</div>
+            </div>
+            <div class="rightcol"><div class="score s-perfect">82 Perfect</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="head">
+                <div class="day">zondag 28 sep</div>
+                <span class="pel lg" style="color:var(--joined)"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i></span>
+              </div>
+              <div class="time">10:00 – 12:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--joined)"><i class="ph">&#xe68e;</i> Je gaat mee met Bram</div>
+              <div class="daylight">Licht tot 19:39</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">71 Prima</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="head"><div class="day">dinsdag 30 sep</div></div>
+              <div class="time">17:00 – 18:30  (1,5u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role solo" style="color:var(--solo)"><i class="ph">&#xe734;</i> Alleen jij</div>
+              <div class="daylight">Zon onder om 19:34</div>
+            </div>
+            <div class="rightcol"><div class="score s-accept">64 Redelijk</div></div>
+          </div>
+
+          <div class="card">
+            <div class="body">
+              <div class="head">
+                <div class="day">woensdag 1 okt</div>
+                <span class="pel lg" style="color:var(--pending)"><i class="ph">&#xe734;</i><i class="ph">&#xe734;</i><i class="ph wait">&#xe734;</i><i class="ph wait">&#xe734;</i></span>
+              </div>
+              <div class="time">18:00 – 20:00  (2u)</div>
+              <div class="city">Utrecht</div>
+              <div class="role" style="color:var(--pending)"><i class="ph">&#xe2b2;</i> Sanne vraagt of je meegaat</div>
+            </div>
+            <div class="rightcol"><div class="score s-great">74 Prima</div></div>
+          </div>
+
+        </div>
+      </div></div>
+      <p class="cap"><b>C — de rij staat in de kop, naast de dag.</b> De groep is het eerste wat je ziet,
+        nog vóór de tijd. Prijs: de rij duwt tegen de dagnaam aan, en bij een lange dagnaam
+        ("woensdag 1 oktober") wordt het krap. De rolregel houdt zijn eigen icoon, dus
+        fietsers staan twee keer op dezelfde kaart.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const notes = {
+    nu: 'Referentie — zoals de app het vandaag tekent. Let op: het vlaggetje bij "Jij organiseert", en dat de groepsgrootte alleen als tekst bestaat.',
+    a:  '<b>A</b> — de rij fietsers neemt de plek van het rol-icoon in. Compactst van de drie: geen extra regel, en solo (één fietser) en peloton (vijf) worden hetzelfde gebaar. De megafoon komt ervóór als jij de rit organiseert.',
+    b:  '<b>B</b> — het rol-icoon blijft één icoon (megafoon of fietser) en de rij gaat naar de telregel, direct vóór "3 gaan mee · 1 wacht nog". Duidelijkst uit te leggen, maar kost op Home een derde regel per kaart.',
+    c:  '<b>C</b> — de rij in de kop naast de dagnaam. Het hardst zichtbaar, maar de fietsers staan dan twee keer op dezelfde kaart en bij lange dagnamen wordt het krap.'
+  };
+  const setNote = v => document.getElementById('note').innerHTML = notes[v];
+  document.querySelectorAll('.bar button[data-v]').forEach(b => b.onclick = () => {
+    const v = b.dataset.v;
+    document.querySelectorAll('.bar button[data-v]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    document.querySelectorAll('.stage').forEach(s => s.classList.toggle('on', s.dataset.s === v));
+    setNote(v);
+  });
+  const t = document.getElementById('theme');
+  t.onclick = () => {
+    const on = document.body.classList.toggle('dark');
+    t.setAttribute('aria-pressed', on);
+    t.textContent = on ? 'Licht' : 'Donker';
+  };
+  setNote('a');
+</script>
+</body>
+</html>
