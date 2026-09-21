@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-21T11:20:00.000Z"
+last_updated: "2026-09-21T14:45:00.000Z"
 last_activity: 2026-09-21
 progress:
   total_phases: 12
@@ -23,11 +23,12 @@ punten in `HANDOFF.json`.
 
 | Waar | Stand |
 |---|---|
-| Play closed testing (Alpha) | **1.0.38 (49)** gepromoveerd op 2026-09-21, gaat langs Google review; de track die Google telt |
-| Play internal testing | **1.0.38 (49)**, live sinds 2026-09-21 |
+| Play closed testing (Alpha) | **1.0.38 (49)** — build 50 gaat hier pas heen na toestelgoedkeuring (release-route, `docs/RELEASE-ROUTE.md`) |
+| Play internal testing | **1.0.39 (50)**, geüpload 2026-09-21 via de API (`1efae0b`); de Oppo haalt het op als Play-update |
+| Oppo | staat nog op 1.0.38 (49) tot de update binnenkomt; database en Calendar-grant blijven intact (Play-update, geen sideload) |
 | Winkelpagina | gepubliceerd als **Ridewindow**, en-GB; nl-NL ontbreekt (fase 26, OPEN.md punt 7) |
-| main | 1.0.38+49, lokaal; alles vanaf c03f334 nog niet gepusht |
-| PWA live | **1.0.38 (49)** op `my-project-joost.web.app`, gedeployd 2026-09-21 (`firebase deploy --only hosting`); stond drie builds achter op 46 |
+| main | 1.0.39+50 lokaal, 3 commits voor op origin (82f75f6 e-mail-login, 0c21822 route, 1efae0b release 50) — niet gepusht |
+| PWA live | **1.0.38 (49)** op `my-project-joost.web.app`; de web-tak van de e-mail-login zit gebouwd, maar de PWA is nog niet op 50 gezet |
 | Oppo | app uit Play op 49. **Het peloton-lint is op het toestel goedgekeurd** (Joost, 2026-09-21): leesbaar op de maat waarop het in de app staat. Zie OPEN.md punt 5: Agenda staat op "Not connected", app op Engels |
 
 **Keuzes van vandaag:** naam Ridewindow · elke build via internal naar closed · wervingsonderzoek en
