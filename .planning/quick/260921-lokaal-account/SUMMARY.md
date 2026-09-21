@@ -65,6 +65,20 @@ Validatie is client-zijde, vóór elke netwerk-aanroep: geen `@` of wachtwoord
 3. Inloggen met dat adres + wachtwoord: naam is leeg (invulstap), avatar is het
   generieke icoon, sync en maatjes werken.
 
+## Toestel-ronde 2026-09-21: gevonden
+
+- De e-mail-login werkt; de **bevestigingslink van Supabase wijst naar
+  `http://localhost:3000`**, wat op een toestel een dood adres is. Oorzaak:
+  een nieuw Supabase-project heeft als standaard "Site URL" localhost:3000 en
+  díe staat in elke bevestigingsmail. De bevestiging zelf wordt óók verwerkt
+  als je de link opent (het token wordt opgemaakt op Supabase's eigen
+  redirect-pagina, alleen de laatste doorverwijzing naar localhost faalt), dus
+  **daarna gewoon inloggen** werkt al.
+- **Fix (dashboardsetting, door Joost):** Supabase-dashboard →
+  Authentication → URL Configuration → Site URL →
+  `https://my-project-joost.web.app`. Daarna eindigen alle auth-mails (ook
+  toekomstig wachtwoord-herstel) op een pagina die laadt.
+
 ## Bewust niet
 
 - Geen diep-link voor de bevestigingsmail (browser volstaat; een link naar de
