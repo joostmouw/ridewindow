@@ -19,6 +19,7 @@ import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
+import 'package:ridewindow/features/shared/peloton_counter.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
@@ -44,6 +45,7 @@ import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
+import 'package:ridewindow/theme/ride_mark.dart';
 
 const _pi = math.pi;
 final _sin = math.sin;
@@ -471,20 +473,38 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(style.icon, size: 16, color: style.color),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    style.label.toUpperCase(),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: style.color,
-                          letterSpacing: 0.8,
-                        ),
-                  ),
+                Row(
+                  children: [
+                    // Hetzelfde merkteken als links op de Home-kaart, zodat je
+                    // op alle drie de schermen aan dezelfde tekening ziet dat
+                    // dit een gedeelde rit is (schets 014).
+                    RideMark(
+                      kind: RideMarkKind.peloton,
+                      size: 18,
+                      color: rw.plannedRide,
+                    ),
+                    const SizedBox(width: 10),
+                    if (style.icon case final icon?) ...[
+                      Icon(icon, size: 16, color: style.color),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: Text(
+                        style.label.toUpperCase(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: style.color,
+                              letterSpacing: 0.8,
+                            ),
+                      ),
+                    ),
+                  ],
                 ),
+                // Eerst het overzicht, dan de namen eronder.
+                PelotonCounter(entry: entry),
               ],
             ),
           ),

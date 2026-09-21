@@ -18,6 +18,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/peloton/buddies_tab.dart';
 import 'package:ridewindow/features/shared/daylight_note.dart';
+import 'package:ridewindow/features/shared/peloton_counter.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -827,8 +828,6 @@ class RideCard extends StatelessWidget {
       avgWindDir = (math.atan2(sinSum, cosSum) * 180 / math.pi + 360) % 360;
     }
 
-    final summary = pelotonSummary(context, entry);
-
     final card = ClipRRect(
       borderRadius: BorderRadius.circular(_cardRadius),
       child: Card(
@@ -880,15 +879,13 @@ class RideCard extends StatelessWidget {
                               longitude: loc.lon,
                               dense: true,
                             ),
-                          if (summary != null) ...[
-                            const SizedBox(height: 3),
-                            Text(
-                              summary,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                          // De fietsjes bij de zin: even breed als de kaart
+                          // toelaat, en bij elke gedeelde rit -- niet alleen
+                          // bij de rit die jij organiseert (schets 014). De
+                          // kaart krijgt bewust géén kolom links zoals Home:
+                          // hier blijft de volle breedte voor dag, tijd en
+                          // plaats (Joost, 2026-09-21).
+                          PelotonCounter(entry: entry),
                         ],
                       ),
                     ),

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/theme/app_shapes.dart';
+import 'package:ridewindow/theme/ride_mark.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -17,6 +18,7 @@ import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
+import 'package:ridewindow/features/shared/peloton_counter.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
@@ -950,8 +952,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final rw = context.rw;
     final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
-    final summary = pelotonSummary(context, entry);
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
@@ -981,8 +981,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(
-                  rideRoleStyle(context, entry).icon,
+                // Wat voor rit dit is, in het blauw van een geplande rit: het
+                // peloton als er een groep bij hoort, anders één fietser. Tot
+                // schets 014 stond hier het rol-icoon, en dus twee keer
+                // hetzelfde op één kaart -- groot hier en klein in de regel
+                // eronder. Nu zegt links "wat voor rit" en de regel "wat jij
+                // erin bent".
+                RideMark(
+                  kind: entry.group == null
+                      ? RideMarkKind.solo
+                      : RideMarkKind.peloton,
                   size: 20,
                   color: rw.plannedRide,
                 ),
@@ -1006,14 +1014,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                       if (entry.role != RideRole.solo)
                         RideRoleLine(entry: entry, dense: true),
-                      if (summary != null)
-                        Text(
-                          summary,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                        ),
+                      PelotonCounter(entry: entry, dense: true),
                     ],
                   ),
                 ),
