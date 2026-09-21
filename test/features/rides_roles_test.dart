@@ -29,6 +29,7 @@ import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/peloton_gateway.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 const _me = 'uid-me';
@@ -166,6 +167,34 @@ void main() {
     // En bij de rit die jij organiseert staat hoe het ervoor staat, niet
     // alleen dát je hem organiseert.
     expect(find.text('1 gaat mee · 1 wacht nog'), findsOneWidget);
+
+    // Schets 014: de teller staat nu óók onder andermans rit. "Je gaat mee
+    // met Peter" telt jezelf mee, want jij staat wél in zijn deelnemerslijst.
+    expect(find.text('1 gaat mee'), findsOneWidget);
+  });
+
+  testWidgets('alleen de organisator draagt een icoon: de megafoon',
+      (tester) async {
+    await _pump(
+      tester,
+      planned: [
+        PlannedRide(start: _day(5, 7), end: _day(5, 9), plannedScore: 61),
+      ],
+      rides: [
+        _ride(id: 'mine', ownerId: _me, dayOffset: 2),
+        _ride(id: 'theirs', ownerId: _other, dayOffset: 3, participants: const [
+          RideParticipant(userId: _me, status: ParticipantStatus.accepted),
+        ]),
+      ],
+    );
+
+    // De megafoon van de roeicoach hoort bij precies één rit: die van jou.
+    expect(find.byIcon(AppIcons.megaphoneSimple), findsOneWidget);
+
+    // En de twee iconen die er tot schets 014 stonden zijn weg: de vlag zei
+    // "finish" en de drie koppen zeiden nog een keer wat de zin al zegt.
+    expect(find.byIcon(AppIcons.flag), findsNothing);
+    expect(find.byIcon(AppIcons.usersThree), findsNothing);
   });
 
   testWidgets('een gedeelde rit van een ander gaat door naar het detailscherm',
