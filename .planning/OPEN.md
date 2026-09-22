@@ -392,6 +392,74 @@ sleutel ook echt een aanroeper heeft.
 
 ---
 
+## 16. Wat er na de veertien dagen nog komt, en waar het kan stuklopen
+
+Nagekeken in de Console en bij Google op 2026-09-22. De veertien dagen zijn
+**niet** het laatste station.
+
+**De teller.** Het dashboard zegt letterlijk: *"12 testers have currently been
+opted in for 1 day."* De reeks begon dus op 21 september. Vroegst mogelijke
+aanvraag: **rond 5 oktober**, en alleen als er niemand tussentijds uitstapt.
+Stapt iemand uit, dan begint de reeks opnieuw, niet waar hij was.
+
+**Daarna komt een aanvraag, geen knop.** "Apply for production" opent een
+formulier in drie delen: over je gesloten test, over je app, en over je
+productiegereedheid. Je moet daarin **de ontvangen testfeedback samenvatten**.
+Google beoordeelt die aanvraag; dat duurt naar eigen zeggen zeven dagen of
+minder, soms langer. Realistisch komt productie dus **halverwege oktober** in
+beeld, niet begin oktober.
+
+**De twee afwijsredenen die Google zelf noemt:** minder dan twaalf aangemelde
+testers op het moment van aanvragen, en **onvoldoende betrokkenheid van de
+testers tijdens de testperiode**. Dat tweede is hier het risico, zie punt 17.
+
+**Wat níét meer hoeft:** de app-setup is af (zonder dat kan een gesloten test
+niet draaien), de developer-verificatie is rond (punt 14), en de winkelpagina
+staat in beide talen (punt 7).
+
+**Testcredentials:** Google vraagt werkende inloggegevens als een app
+authenticatie vereist. Ridewindow werkt volledig uitgelogd, dus dit is
+waarschijnlijk niet nodig. Wordt de aanvraag afgewezen met iets over
+onbereikbare functionaliteit, dan is dit het eerste om alsnog te leveren, want
+Peloton is uitgelogd niet te zien.
+
+---
+
+## 17. De testfeedback in de Console: twee stuks, en een die niet over deze app gaat
+
+Er staat testfeedback in Play Console die nog nooit iemand heeft gelezen
+(Monitor and improve > Ratings and reviews > Testing feedback). Twee stuks, op
+2026-09-22:
+
+- **David, 20 september, Pixel 9, Frans, vijf sterren.** "Heel praktisch, en
+  het heeft ook de weersverwachting." Kort maar geloofwaardig: het gaat over
+  wat de app doet.
+- **Rahul, 21 september, OnePlus 8 Pro, vijf sterren, build 49.** Een lange,
+  lovende tekst over **carpoolen**: "social ride pooling", woon-werkritten
+  delen met buren en collega's, integratie met professionele netwerken. Dat is
+  een andere app. Ridewindow deelt fietsvensters met maatjes, kent geen
+  autoritten, geen buren en geen netwerkintegratie.
+
+**Waarom dit telt en niet alleen irritant is.** De aanvraag voor productie
+vraagt om een samenvatting van de testfeedback, en een van de twee
+afwijsredenen die Google noemt is onvoldoende betrokkenheid van testers. Een
+review die de app beschrijft die hij niet is, is precies wat een beoordelaar
+als niet-echt herkent. Elf van de twintig testers komen van
+r/AndroidClosedTesting, waar wederzijds testen gebruikelijk is; dit lijkt daar
+een product van.
+
+**Wat dit betekent voor de planning:** twaalf aangemelde testers hebben is niet
+hetzelfde als twaalf testers die de app gebruiken. Tussen nu en 5 oktober is de
+vraag niet of de teller blijft staan, maar of er **echte** feedback bijkomt
+waarmee een geloofwaardige samenvatting te schrijven is. Dat is werk voor fase
+28 (feedbackstroom), en het is urgenter geworden dan het in de roadmap staat.
+
+**Niet gedaan, bewust:** op beide stukken feedback is nog niet gereageerd.
+Reageren kan in de Console en is zichtbaar voor de tester. Dat is een keuze van
+Joost, geen technische stap.
+
+---
+
 ## 14. Developer-verificatie: nagekeken in de Console op 2026-09-21, niets open
 
 **Status: er staat geen actie open.** De deadline van 30 september is echt en
