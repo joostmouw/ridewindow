@@ -19,6 +19,52 @@ ontbreken, dan is dat een aparte, verantwoorde migratie 0013 met een checkpoint 
 </domain>
 
 <decisions>
+
+## HERZIENING 2026-09-23 (Joost, ná de schets) — gaat vóór alles hieronder
+
+### Aanvragen en goedkeuring (CLUB-02, CLUB-03 herzien; CLUB-27 nieuw)
+- **Ieder lid** mag mensen aandragen; **alleen beheerders** maken iemand daadwerkelijk lid.
+- **Groepslink:** ieder lid mag hem delen (niet meer alleen beheerders). Wie de link opent en
+  inlogt, wordt **geen lid** maar dient een **aanvraag** in en ziet op de landing / het groepsscherm
+  "Je aanvraag ligt bij de beheerders".
+- **Maatje voordragen:** ieder lid kan een maatje van zichzelf voordragen → aanvraag. Draagt een
+  **beheerder** een maatje voor, dan wordt dat maatje **direct lid** (geen tweede goedkeuring).
+- **Beheerder** ziet op het groepsscherm een sectie "Aanvragen" (bovenaan, alleen voor beheerders)
+  met naam, "via link" of "voorgedragen door X", en per aanvraag **Accepteren** / **Afwijzen**.
+  Accepteren respecteert de 30-grens en de 10-groepengrens van de aanvrager (bestaande triggers
+  op `group_members`).
+- **Dit vraagt een migratie `0013_group_join_requests.sql`** (schema in 33 kent dit niet):
+  tabel `group_join_requests` (group_id, user_id, proposed_by null=via link, display_name,
+  created_at; uniek (group_id, user_id)); `redeem_group_invite` maakt voortaan een aanvraag i.p.v.
+  een lidmaatschap (en geeft terug dat het een aanvraag is; al lid → gewoon lid-status);
+  insert-policy: lid mag een aanvraag doen voor een eigen maatje; beheerder die voordraagt → direct
+  `group_members` (bestaande policy); rpc `accept_group_request(p_request_id)` (security definer:
+  alleen beheerder van die groep; insert member + delete request in één transactie — nodig omdat de
+  aanvrager geen maatje van de beheerder hoeft te zijn); afwijzen = delete door beheerder;
+  aanvrager mag zijn eigen aanvraag zien en intrekken; voordrager ziet zijn voordrachten.
+  Grens op openstaande aanvragen per groep (bv. 30) tegen spam. Wijzig de insert-policy op
+  `group_members` niet anders dan nodig. **De functietelling wordt twaalf** (accept_group_request);
+  bijwerken in CLAUDE.md/AGENTS.md. **Deny-test uitbreiden** (`clubs_deny_test.sql` of een nieuwe
+  `clubs_requests_deny_test.sql`): gewoon lid kan niemand lid maken, niet accepteren/afwijzen,
+  buitenstaander ziet geen aanvragen, link maakt aanvraag i.p.v. lid, accept respecteert grenzen.
+  Checkpoint voor Joost: 0013 + test in de SQL Editor, vóór de UI tegen echte data draait.
+
+### Info-knop met de groepsregels (CLUB-28)
+- Een info-knop (zelfde patroon en icoon als de bestaande info-knoppen in de app — zie
+  `planned_rides_screen.dart`, `profile_screen.dart`, `ride_detail_screen.dart`) in de sectiekop
+  "Groepen" op de Peloton-tab én op het groepsscherm. Opent een uitleg met de regels:
+  ieder lid draagt voor, beheerders accepteren of wijzen af; max 30 leden per groep, max 10
+  groepen per persoon; leden zien elkaars naam en antwoorden op groepsritten, niet je rooster of
+  instellingen; groepsritten zien alle huidige leden, wie vertrekt niet meer; verlaten; de laatste
+  beheerder (langst zittende lid neemt over); opheffen (ritten met antwoorden blijven zonder label).
+  NL + EN.
+
+### Wat daardoor verandert t.o.v. de tekst hieronder
+- "Alleen beheerders zien de knop Deel de groepslink" → **ieder lid** ziet hem.
+- "+ Maatje toevoegen" (alleen beheerders) → **"+ Maatje voordragen"** voor ieder lid; bij een
+  beheerder heet het "+ Maatje toevoegen" en is het direct.
+- Een gewoon lid ziet nog steeds geen ⋮ per lid en geen Aanvragen-sectie.
+
 ## Implementation Decisions (locked)
 
 ### Plek — schets 015, vraag 1, variant A

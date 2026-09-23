@@ -44,7 +44,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 
 **Goal**: Een ingelogde gebruiker maakt een groep aan, deelt hem, beheert leden en beheerders, en ziet zijn groepen terug op de Peloton-tab — de hele levenscyclus van een groep, los van groepsritten.
 **Depends on**: Phase 33
-**Requirements**: CLUB-01, CLUB-02, CLUB-03, CLUB-04, CLUB-05, CLUB-06, CLUB-07, CLUB-08, CLUB-09, CLUB-11
+**Requirements**: CLUB-01, CLUB-02, CLUB-03, CLUB-04, CLUB-05, CLUB-06, CLUB-07, CLUB-08, CLUB-09, CLUB-11, CLUB-27, CLUB-28
 **Success Criteria** (what must be TRUE):
 
   1. Een ingelogde gebruiker maakt een groep met een naam aan en is daarmee meteen lid en beheerder; de groep verschijnt op de Peloton-tab met naam en aantal leden (CLUB-01, CLUB-04)
