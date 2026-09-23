@@ -441,3 +441,331 @@ begin
   perform pg_temp.expect('3.14 verwijderd lid D ziet G niet meer', '0',
     pg_temp.try_value($q$select count(*) from public.groups where id = 'c2000000-0000-0000-0000-000000000001'$q$));
 end $$;
+
+-- ---------------------------------------------------------------------------
+-- 4. Inwisselen via de link, en het ex-lid (CLUB-17, CLUB-13)
+-- ---------------------------------------------------------------------------
+
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000c","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('4.1 verlopen link wordt geweigerd', 'invite_invalid',
+    pg_temp.try_value($q$select group_name from public.redeem_group_invite('GRPXPRD2')$q$));
+  -- Kleine letters en spaties: een geplakte code is zelden netjes.
+  perform pg_temp.expect('4.2 C wisselt ''  grptesta  '' in en krijgt de groepsnaam', 'Testgroep 2',
+    pg_temp.try_value($q$select group_name from public.redeem_group_invite('  grptesta  ')$q$));
+  perform pg_temp.expect('4.3 nieuw lid C ziet G', '1',
+    pg_temp.try_value($q$select count(*) from public.groups where id = 'c2000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.4 nieuw lid C ziet een rit van voor zijn lidmaatschap', '1',
+    pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.5 C wisselt dezelfde link nog eens in', 'ok',
+    pg_temp.try_exec($q$select * from public.redeem_group_invite('GRPTESTA')$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('4.5b C staat daarna een keer in G, niet twee keer', '1',
+    pg_temp.try_value($q$select count(*) from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000001'
+        and user_id  = 'c1000000-0000-0000-0000-00000000000c'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000e","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('4.6 E verlaat G (rijen)', '1',
+    pg_temp.try_rows($q$delete from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000001'
+        and user_id  = 'c1000000-0000-0000-0000-00000000000e'$q$));
+  -- E heeft nog zijn participant-rij op R0, maar die geeft op een groepsrit
+  -- geen toegang meer (keuze f in 0012).
+  perform pg_temp.expect('4.7 ex-lid E ziet G niet meer', '0',
+    pg_temp.try_value($q$select count(*) from public.groups where id = 'c2000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.8 ex-lid E ziet ledenlijst G niet meer', '0',
+    pg_temp.try_value($q$select count(*) from public.group_members where group_id = 'c2000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.9 ex-lid E ziet R0 niet meer, ondanks zijn participant-rij', '0',
+    pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.10 ex-lid E ziet deelnemers R0 niet meer, ook zijn eigen rij niet', '0',
+    pg_temp.try_value($q$select count(*) from public.group_ride_participants where ride_id = 'c3000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.11 ex-lid E ziet opties R0 niet meer', '0',
+    pg_temp.try_value($q$select count(*) from public.group_ride_options where ride_id = 'c3000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.12 ex-lid E ziet stemmen O0 niet meer', '0',
+    pg_temp.try_value($q$select count(*) from public.group_ride_option_votes where option_id = 'c4000000-0000-0000-0000-000000000001'$q$));
+  perform pg_temp.expect('4.13 ex-lid E antwoordt niet op groepsrit R1', '42501',
+    pg_temp.try_exec($q$insert into public.group_ride_participants (ride_id, user_id, status)
+      values ('c3000000-0000-0000-0000-000000000003', 'c1000000-0000-0000-0000-00000000000e', 'accepted')$q$));
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- 5. Grenzen: 30 leden, 10 groepen, atomisch aanmaken (CLUB-18)
+-- ---------------------------------------------------------------------------
+
+reset role;
+
+-- Seed onder replica: de guard mag hier NIET lopen, anders kunnen we geen
+-- volle groep neerzetten. De opvulleden hebben geen auth.users-rij; replica
+-- schakelt ook de FK-controle uit.
+set local session_replication_role = replica;
+
+insert into public.groups (id, name, created_by) values
+  ('c2000000-0000-0000-0000-000000000003', 'Volle groep', null);
+
+insert into public.group_members (group_id, user_id, role, display_name, joined_at)
+select 'c2000000-0000-0000-0000-000000000003',
+       gen_random_uuid(),
+       case when i = 1 then 'admin' else 'member' end,
+       'Vuller ' || i,
+       now() - make_interval(days => 40 - i)
+from generate_series(1, 30) as i;
+
+insert into public.group_invites (code, group_id, created_by, created_at, expires_at) values
+  ('GRPFZZZ3', 'c2000000-0000-0000-0000-000000000003', null, now(), now() + interval '7 days');
+
+-- B zit al in G; met deze negen erbij zit hij in tien groepen.
+insert into public.groups (id, name, created_by)
+select ('c2000000-0000-0000-0000-' || lpad(i::text, 12, '0'))::uuid,
+       'Vulgroep ' || i,
+       'c1000000-0000-0000-0000-00000000000b'
+from generate_series(10, 18) as i;
+
+insert into public.group_members (group_id, user_id, role, display_name, joined_at)
+select ('c2000000-0000-0000-0000-' || lpad(i::text, 12, '0'))::uuid,
+       'c1000000-0000-0000-0000-00000000000b',
+       'admin', 'B', now() - interval '1 day'
+from generate_series(10, 18) as i;
+
+reset session_replication_role;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000c","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('5.1 lid 31 komt er niet in', 'group_full',
+    pg_temp.try_value($q$select group_name from public.redeem_group_invite('GRPFZZZ3')$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('5.2 volle groep heeft nog steeds 30 leden', '30',
+    pg_temp.try_value($q$select count(*) from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000003'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000b","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('5.3 elfde groep wordt geweigerd', 'too_many_groups',
+    pg_temp.try_value($q$select public.create_group('Elfde')::text$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('5.4 geweigerde create_group laat geen groep achter', '0',
+    pg_temp.try_value($q$select count(*) from public.groups where name = 'Elfde'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000c","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('5.5 C maakt groep ''  Clubtest  ''', 'ok',
+    pg_temp.try_exec($q$select public.create_group('  Clubtest  ')$q$));
+  -- Als C zelf, via de select-policy: precies wat de app na create_group doet.
+  perform pg_temp.expect('5.6 C is beheerder van de nieuwe groep, naam getrimd (rol|naam)', 'admin|Clubtest',
+    pg_temp.try_value($q$select string_agg(m.role || '|' || g.name, ',')
+      from public.groups g
+      join public.group_members m on m.group_id = g.id
+      where g.created_by = 'c1000000-0000-0000-0000-00000000000c'$q$));
+  perform pg_temp.expect('5.7 lege naam wordt geweigerd', 'group_name_invalid',
+    pg_temp.try_value($q$select public.create_group('   ')::text$q$));
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- 6. Opvolging, en account verwijderen via het echte pad (CLUB-10, CLUB-19)
+--
+-- Groep S: P beheerder (-3d), Q lid (-2d), R lid (-1d).
+-- ---------------------------------------------------------------------------
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-000000000001","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('6.1 beheerder P verlaat S (rijen)', '1',
+    pg_temp.try_rows($q$delete from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000002'
+        and user_id  = 'c1000000-0000-0000-0000-000000000001'$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('6.2 langst zittende Q is nu beheerder van S', 'admin',
+    pg_temp.try_value($q$select role from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000002'
+        and user_id  = 'c1000000-0000-0000-0000-000000000002'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-000000000001","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('6.3 ex-lid P ziet RS niet meer, ondanks zijn participant-rij', '0',
+    pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000002'$q$));
+end $$;
+
+-- Q verwijdert zijn account zoals de app dat doet: als Q, via de rpc. De
+-- FK-cascade haalt zijn lidmaatschap weg en de after-delete-trigger moet dan
+-- R beheerder maken; groups.created_by gaat naar null.
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-000000000002","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('6.4 Q verwijdert zijn account met delete_own_account()', 'ok',
+    pg_temp.try_exec($q$select public.delete_own_account()$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('6.5 auth.users-rij van Q is weg', '0',
+    pg_temp.try_value($q$select count(*) from auth.users where id = 'c1000000-0000-0000-0000-000000000002'$q$));
+  perform pg_temp.expect('6.6 R is nu beheerder van S', 'admin',
+    pg_temp.try_value($q$select role from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000002'
+        and user_id  = 'c1000000-0000-0000-0000-000000000003'$q$));
+  perform pg_temp.expect('6.7 S bestaat nog en created_by is null', 'true',
+    pg_temp.try_value($q$select (count(*) = 1 and bool_and(created_by is null))::text
+      from public.groups where id = 'c2000000-0000-0000-0000-000000000002'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-000000000003","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('6.8 enige beheerder R degradeert zichzelf niet', 'last_admin',
+    pg_temp.try_rows($q$update public.group_members set role = 'member'
+      where group_id = 'c2000000-0000-0000-0000-000000000002'
+        and user_id  = 'c1000000-0000-0000-0000-000000000003'$q$));
+  perform pg_temp.expect('6.9 laatste lid R verlaat S (rijen)', '1',
+    pg_temp.try_rows($q$delete from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000002'
+        and user_id  = 'c1000000-0000-0000-0000-000000000003'$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('6.10 lege groep S is verdwenen', '0',
+    pg_temp.try_value($q$select count(*) from public.groups where id = 'c2000000-0000-0000-0000-000000000002'$q$));
+  perform pg_temp.expect('6.11 RS bestaat nog, met group_id null', 'true',
+    pg_temp.try_value($q$select (count(*) = 1 and bool_and(group_id is null))::text
+      from public.group_rides where id = 'c3000000-0000-0000-0000-000000000002'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-000000000001","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('6.12 P ziet RS weer als gewone gedeelde rit', '1',
+    pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000002'$q$));
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- 7. Beheerder heft de groep op (CLUB-11)
+-- ---------------------------------------------------------------------------
+
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000a","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('7.1 beheerder A heft G op (rijen)', '1',
+    pg_temp.try_rows($q$delete from public.groups where id = 'c2000000-0000-0000-0000-000000000001'$q$));
+end $$;
+
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('7.2 leden en links van G zijn weg (leden|links)', '0|0',
+    pg_temp.try_value($q$select
+        (select count(*) from public.group_members where group_id = 'c2000000-0000-0000-0000-000000000001')
+        || '|' ||
+        (select count(*) from public.group_invites where group_id = 'c2000000-0000-0000-0000-000000000001')$q$));
+  perform pg_temp.expect('7.3 R0 en R1 bestaan nog, met group_id null', '2',
+    pg_temp.try_value($q$select count(*) from public.group_rides
+      where id in ('c3000000-0000-0000-0000-000000000001', 'c3000000-0000-0000-0000-000000000003')
+        and group_id is null$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000b","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('7.4 B antwoordde in 2.15 en ziet R0 nog', '1',
+    pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000001'$q$));
+end $$;
+
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000c","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('7.5 C was lid maar antwoordde niet, en ziet R0 niet meer', '0',
+    pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000001'$q$));
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Eindcontrole
+--
+-- Eén mislukte check is genoeg om te stoppen, met de namen erbij. Het tweede
+-- slot vangt een check die om welke reden dan ook nooit geschreven werd.
+-- ---------------------------------------------------------------------------
+
+reset role;
+
+do $$
+declare
+  v_failed text;
+  v_total  integer;
+begin
+  select string_agg(format('%s (want %s, got %s)', check_name,
+                           coalesce(want, 'null'), coalesce(got, 'null')),
+                    '; ' order by seq)
+    into v_failed
+  from pg_temp.club_test_results
+  where not ok;
+
+  if v_failed is not null then
+    raise exception 'CLUBS DENY-TEST FAILED: %', v_failed;
+  end if;
+
+  select count(*) into v_total from pg_temp.club_test_results;
+  if v_total <> 81 then
+    raise exception 'CLUBS DENY-TEST FAILED: % checks geschreven, 81 verwacht', v_total;
+  end if;
+end $$;
+
+select seq, check_name, want, got, ok from club_test_results order by seq;
+
+rollback;
