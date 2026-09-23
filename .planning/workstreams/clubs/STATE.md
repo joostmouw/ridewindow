@@ -2,13 +2,15 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-status: planning
-last_updated: "2026-09-23T00:00:00.000Z"
-last_activity: 2026-09-23
+current_plan: N/A
+status: executing
+stopped_at: Roadmap aangemaakt, klaar voor `/gsd-plan-phase 33`
+last_updated: "2026-09-23T18:05:57.282Z"
+last_activity: 2026-09-23 -- Phase 33 planning complete
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 3
   completed_plans: 0
   percent: 0
 ---
@@ -19,8 +21,8 @@ progress:
 
 Phase: 33 - Datamodel en rechten
 Plan: —
-Status: Not started
-Last activity: 2026-09-23 — Roadmap voor v4.2 Clubs vastgesteld (fases 33–36)
+Status: Ready to execute
+Last activity: 2026-09-23 -- Phase 33 planning complete
 
 ## Progress
 
