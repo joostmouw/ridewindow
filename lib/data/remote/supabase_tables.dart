@@ -26,3 +26,13 @@ const kGroupRideOptionsTable = 'group_ride_options';
 const kGroupRideOptionVotesTable = 'group_ride_option_votes';
 const kRedeemFriendInviteRpc = 'redeem_friend_invite';
 const kFriendProfilesRpc = 'friend_profiles';
+
+// Clubs (v4.2), migraties 0012 en 0013.
+const kGroupsTable = 'groups';
+const kGroupMembersTable = 'group_members';
+const kGroupInvitesTable = 'group_invites';
+const kGroupJoinRequestsTable = 'group_join_requests';
+const kCreateGroupRpc = 'create_group';
+const kRedeemGroupInviteRpc = 'redeem_group_invite';
+const kProposeGroupMemberRpc = 'propose_group_member';
+const kAcceptGroupRequestRpc = 'accept_group_request';

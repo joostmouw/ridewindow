@@ -2,7 +2,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/services/invite_code.dart';
+
+/// Hoe lang een nieuwe groepslink geldig is.
+///
+/// Langer dan de 14 dagen van een maatjeslink: een clublink staat een tijd in
+/// een WhatsApp-groep. Intrekken kan altijd via
+/// [PelotonGateway.replaceGroupInvite].
+const kGroupInviteValidity = Duration(days: 30);
+
+/// Een bestaande groepslink wordt hergebruikt zolang hij nog minstens zo lang
+/// geldig is; anders komt er een nieuwe. Zo deelt niet elk lid een eigen code,
+/// en werkt een net gedeelde link niet morgen al niet meer.
+const kGroupInviteMinRemaining = Duration(days: 7);
 
 /// De cloudkant van epic "Peloton", als vervangbare poort.
 ///
@@ -75,6 +88,76 @@ abstract class PelotonGateway {
     required String rideId,
     required RideOption option,
   });
+
+  // --- Clubs (v4.2), migraties 0012 en 0013 -------------------------------
+  //
+  // Elke groepsmethode gooit bij een bekende databasefout een
+  // [GroupException]; de UI maakt daar met `groupErrorTextOf` een zin van.
+
+  /// Alle groepen die je mag zien: waar je lid bent, en waar je een open
+  /// aanvraag hebt (0013, keuze c). Leden en aanvragen alleen zoals RLS ze
+  /// levert; expliciete kolommen, nooit `*` (CLUB-05).
+  Future<List<PelotonGroup>> listGroups();
+
+  /// Rpc `create_group`: maakt de groep en jou beheerder, geeft het id terug.
+  /// Er is geen client-insert op `groups`.
+  Future<String> createGroup(String name);
+
+  /// Alleen beheerders; de kolomgrant staat alleen `name` toe. Een ongeldige
+  /// naam geeft een check violation (23514).
+  Future<void> renameGroup({required String groupId, required String name});
+
+  /// Alleen beheerders. Ritten met antwoorden blijven bestaan zonder label.
+  Future<void> deleteGroup(String groupId);
+
+  /// Alleen beheerders; de kolomgrant staat alleen `role` toe. De enige
+  /// beheerder die zichzelf degradeert krijgt `last_admin`.
+  Future<void> setGroupMemberRole({
+    required String groupId,
+    required String userId,
+    required GroupRole role,
+  });
+
+  /// Een beheerder haalt iemand eruit. Is dat de laatste beheerder, dan wordt
+  /// het langst zittende lid beheerder (`ensure_group_admin`).
+  Future<void> removeGroupMember({
+    required String groupId,
+    required String userId,
+  });
+
+  /// Jezelf verwijderen; opvolging zoals bij [removeGroupMember].
+  Future<void> leaveGroup(String groupId);
+
+  /// Rpc `propose_group_member`: een lid draagt een eigen maatje voor (een
+  /// aanvraag), een beheerder maakt hem direct lid (0013, keuze e). Dit is
+  /// het enige pad om iemand toe te voegen: de app doet geen client-insert in
+  /// `group_members`.
+  Future<GroupJoinStatus> proposeGroupMember({
+    required String groupId,
+    required String userId,
+  });
+
+  /// Rpc `accept_group_request`: alleen een beheerder van de groep. Een
+  /// verdwenen aanvraag geeft `not_allowed`.
+  Future<void> acceptGroupRequest(String requestId);
+
+  /// Afwijzen (beheerder) of intrekken (aanvrager of voordrager). RLS beslist
+  /// wie; er is geen status-kolom, de rij verdwijnt.
+  Future<void> deleteGroupRequest(String requestId);
+
+  /// De groepslink van deze groep: een bestaande die nog minstens
+  /// [kGroupInviteMinRemaining] geldig is, anders een nieuwe van
+  /// [kGroupInviteValidity]. Ieder lid mag dit (0013, keuze d).
+  Future<String> groupInviteCode(String groupId);
+
+  /// Trekt alle links van de groep in en maakt een nieuwe. Intrekken is
+  /// beheerderswerk (RLS op delete).
+  Future<String> replaceGroupInvite(String groupId);
+
+  /// Rpc `redeem_group_invite`: wie al lid is krijgt `member`, anders wordt
+  /// het een aanvraag (`requested`).
+  Future<({String groupId, String? groupName, GroupJoinStatus status})>
+      redeemGroupInvite(String code);
 }
 
 class SupabasePelotonGateway implements PelotonGateway {
@@ -318,4 +401,200 @@ class SupabasePelotonGateway implements PelotonGateway {
         .eq('id', rideId);
     await _client.from(kGroupRideOptionsTable).delete().eq('ride_id', rideId);
   }
+
+  // --- Clubs (v4.2), migraties 0012 en 0013 -------------------------------
+
+  /// Vertaalt een bekende databasefout naar een [GroupException]. Onbekende
+  /// fouten gaan ongewijzigd door: die horen in de log, niet vermomd als een
+  /// nette melding.
+  Future<T> _guard<T>(Future<T> Function() body) async {
+    try {
+      return await body();
+    } on PostgrestException catch (e) {
+      final error = GroupError.fromPostgres(code: e.code, message: e.message);
+      if (error == GroupError.unknown) rethrow;
+      throw GroupException(error);
+    }
+  }
+
+  @override
+  Future<List<PelotonGroup>> listGroups() => _guard(() async {
+        // Drie vaste rondgangen, geen lus per groep: RLS levert alleen wat je
+        // mag zien. Expliciete kolommen (CLUB-05).
+        final groupRows = (await _client
+                .from(kGroupsTable)
+                .select('id, name, created_at') as List)
+            .cast<Map<String, dynamic>>();
+        if (groupRows.isEmpty) return const <PelotonGroup>[];
+
+        final memberRows = (await _client
+                    .from(kGroupMembersTable)
+                    .select('group_id, user_id, role, display_name, joined_at')
+                as List)
+            .cast<Map<String, dynamic>>();
+        final requestRows = (await _client.from(kGroupJoinRequestsTable).select(
+                  'id, group_id, user_id, proposed_by, display_name, '
+                  'proposed_by_name, created_at',
+                ) as List)
+            .cast<Map<String, dynamic>>();
+
+        final membersByGroup = <String, List<Map<String, dynamic>>>{};
+        for (final row in memberRows) {
+          (membersByGroup[row['group_id'] as String] ??= []).add(row);
+        }
+        final requestsByGroup = <String, List<Map<String, dynamic>>>{};
+        for (final row in requestRows) {
+          (requestsByGroup[row['group_id'] as String] ??= []).add(row);
+        }
+
+        return groupRows
+            .map(
+              (g) => PelotonGroup.fromRows(
+                g,
+                membersByGroup[g['id'] as String] ?? const [],
+                requestsByGroup[g['id'] as String] ?? const [],
+              ),
+            )
+            .toList();
+      });
+
+  @override
+  Future<String> createGroup(String name) => _guard(() async {
+        final id = await _client.rpc(
+          kCreateGroupRpc,
+          params: {'p_name': name.trim()},
+        );
+        return id as String;
+      });
+
+  @override
+  Future<void> renameGroup({required String groupId, required String name}) =>
+      _guard(() async {
+        await _client
+            .from(kGroupsTable)
+            .update({'name': name.trim()}).eq('id', groupId);
+      });
+
+  @override
+  Future<void> deleteGroup(String groupId) => _guard(() async {
+        await _client.from(kGroupsTable).delete().eq('id', groupId);
+      });
+
+  @override
+  Future<void> setGroupMemberRole({
+    required String groupId,
+    required String userId,
+    required GroupRole role,
+  }) =>
+      _guard(() async {
+        await _client
+            .from(kGroupMembersTable)
+            .update({'role': role.row})
+            .eq('group_id', groupId)
+            .eq('user_id', userId);
+      });
+
+  @override
+  Future<void> removeGroupMember({
+    required String groupId,
+    required String userId,
+  }) =>
+      _guard(() async {
+        await _client
+            .from(kGroupMembersTable)
+            .delete()
+            .eq('group_id', groupId)
+            .eq('user_id', userId);
+      });
+
+  @override
+  Future<void> leaveGroup(String groupId) =>
+      removeGroupMember(groupId: groupId, userId: _uid);
+
+  @override
+  Future<GroupJoinStatus> proposeGroupMember({
+    required String groupId,
+    required String userId,
+  }) =>
+      _guard(() async {
+        final status = await _client.rpc(
+          kProposeGroupMemberRpc,
+          params: {'p_group_id': groupId, 'p_user_id': userId},
+        );
+        return GroupJoinStatus.fromRow(status as String?);
+      });
+
+  @override
+  Future<void> acceptGroupRequest(String requestId) => _guard(() async {
+        await _client.rpc(
+          kAcceptGroupRequestRpc,
+          params: {'p_request_id': requestId},
+        );
+      });
+
+  @override
+  Future<void> deleteGroupRequest(String requestId) => _guard(() async {
+        await _client
+            .from(kGroupJoinRequestsTable)
+            .delete()
+            .eq('id', requestId);
+      });
+
+  @override
+  Future<String> groupInviteCode(String groupId) => _guard(() async {
+        // Expliciet UTC (les 21-13).
+        final threshold = DateTime.now()
+            .toUtc()
+            .add(kGroupInviteMinRemaining)
+            .toIso8601String();
+        final rows = (await _client
+                .from(kGroupInvitesTable)
+                .select('code, expires_at')
+                .eq('group_id', groupId)
+                .gt('expires_at', threshold)
+                .order('expires_at', ascending: false)
+                .limit(1) as List)
+            .cast<Map<String, dynamic>>();
+        if (rows.isNotEmpty) return rows.first['code'] as String;
+        return _insertGroupInvite(groupId);
+      });
+
+  @override
+  Future<String> replaceGroupInvite(String groupId) => _guard(() async {
+        await _client.from(kGroupInvitesTable).delete().eq('group_id', groupId);
+        return _insertGroupInvite(groupId);
+      });
+
+  /// Zonder `.select()`: insert-returning loopt tegen de select-policy aan
+  /// (valkuil uit 0003, zie PELOTON.md). De code kennen we zelf al.
+  Future<String> _insertGroupInvite(String groupId) async {
+    final code = generateInviteCode();
+    await _client.from(kGroupInvitesTable).insert({
+      'code': code,
+      'group_id': groupId,
+      'created_by': _uid,
+      'expires_at':
+          DateTime.now().toUtc().add(kGroupInviteValidity).toIso8601String(),
+    });
+    return code;
+  }
+
+  @override
+  Future<({String groupId, String? groupName, GroupJoinStatus status})>
+      redeemGroupInvite(String code) => _guard(() async {
+            final rows = await _client.rpc(
+              kRedeemGroupInviteRpc,
+              params: {'p_code': normalizeInviteCode(code)},
+            );
+            final list = (rows as List).cast<Map<String, dynamic>>();
+            if (list.isEmpty) {
+              throw const GroupException(GroupError.inviteInvalid);
+            }
+            final row = list.first;
+            return (
+              groupId: row['group_id'] as String,
+              groupName: row['group_name'] as String?,
+              status: GroupJoinStatus.fromRow(row['status'] as String?),
+            );
+          });
 }
