@@ -25,13 +25,14 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 - [ ] **CLUB-10**: Een groep heeft altijd minstens één beheerder: vertrekt de laatste beheerder (verlaten of account verwijderd), dan wordt het langst zittende lid beheerder; vertrekt het laatste lid, dan verdwijnt de groep
 - [ ] **CLUB-11**: Een beheerder kan de groep opheffen; groepsritten die er al antwoorden op hebben blijven bestaan voor de eigenaar en wie geantwoord heeft, zonder groepslabel
 
-### Groepsritten (CLUB-12 … 16)
+### Groepsritten (CLUB-12 … 16, 25)
 
 - [ ] **CLUB-12**: Ieder lid kan een rit voor de hele groep uitzetten vanuit het bestaande uitnodigscherm, waar groepen boven de losse maatjes staan — met één venster of met meerdere vensters om op te stemmen
 - [ ] **CLUB-13**: Een groepsrit is zichtbaar voor ieder huidig lid, ook wie na het uitzetten lid werd; wie de groep verlaat of eruit gehaald wordt, ziet de rit niet meer (tenzij hij zelf eigenaar is)
 - [ ] **CLUB-14**: Ieder lid kan op een groepsrit antwoorden (ga / kan niet) en op de vensters stemmen, net als bij een gewone gedeelde rit
 - [ ] **CLUB-15**: Per groepsrit ziet ieder lid wie komt, wie niet komt, wie nog niet geantwoord heeft, en wie op welk venster kan
 - [ ] **CLUB-16**: Een groepsrit draagt de groepsnaam als label op Home, de Peloton-tab en het ritdetail
+- [ ] **CLUB-25**: De Peloton-tab toont een teller met het aantal ritten waarop je nog niet geantwoord hebt (losse uitnodigingen én groepsritten), zodat een uitnodiging opvalt zonder dat je de tab opent — optie A uit backlog #77, gekozen door Joost op 2026-09-23
 
 ### Veiligheid en grenzen (CLUB-17 … 20)
 
@@ -92,3 +93,4 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 | CLUB-22 | Phase 36 | Pending |
 | CLUB-23 | Phase 36 | Pending |
 | CLUB-24 | Phase 36 | Pending |
+| CLUB-25 | Phase 35 | Pending |

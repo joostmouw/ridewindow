@@ -483,7 +483,7 @@ Echte push betekent dus altijd íéts buiten de database.
 | **C** | **Echte push**: tabel met device-tokens, trigger op `group_ride_participants`/groepsritten, één Edge Function die FCM aanroept | €0 binnen de vrije laag (500.000 aanroepen/maand, [Supabase pricing](https://supabase.com/docs/guides/functions/pricing)); FCM is gratis | **"Geen Edge Functions"** uit `CLAUDE.md` — een bewuste herziening, zoals v3.0 dat met "No backend" deed. Privacybeleid: device-token wordt opgeslagen (Google/Firebase is al sub-processor via Hosting) | Android direct; iPhone-PWA alleen als hij op het beginscherm staat (iOS 16.4+) — en of dat in de EU nog werkt moet op een toestel bewezen worden, bronnen spreken elkaar tegen |
 | **D** | Externe pushdienst (OneSignal, Entrig) | Gratis tier | Nieuwe **derde** sub-processor, en data buiten de EU | Breed |
 
-**Advies.** A en B nu: samen dekken ze "je mist een uitnodiging" voor de Android-testers zonder
+**Besluit Joost (2026-09-23): A wordt CLUB-25 in fase 35 van Clubs; B komt ná Clubs samen met #74.** Oorspronkelijk advies: A en B nu: samen dekken ze "je mist een uitnodiging" voor de Android-testers zonder
 één constraint te raken, en A helpt ook op de PWA. C pas als Clubs gebruikt wordt en drie uur
 vertraging in de praktijk te traag blijkt — dan is het een bewuste herziening van "geen Edge
 Functions" met één functie die precies één ding doet. D afwijzen.

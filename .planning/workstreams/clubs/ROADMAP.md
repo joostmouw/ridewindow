@@ -57,7 +57,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 
 **Goal**: Een lid zet een rit uit voor de hele groep in plaats van losse maatjes, en ieder lid ziet en beantwoordt die rit net als een gewone gedeelde rit — met de groep zichtbaar als label waar de rit ook verschijnt.
 **Depends on**: Phase 34
-**Requirements**: CLUB-12, CLUB-13, CLUB-14, CLUB-15, CLUB-16
+**Requirements**: CLUB-12, CLUB-13, CLUB-14, CLUB-15, CLUB-16, CLUB-25
 **Success Criteria** (what must be TRUE):
 
   1. Ieder lid zet vanuit het bestaande uitnodigscherm een rit uit voor de hele groep — groepen staan daar boven de losse maatjes — met één venster of meerdere vensters om op te stemmen (CLUB-12)
@@ -65,6 +65,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
   3. Ieder lid antwoordt op de groepsrit (ga / kan niet) en stemt op de vensters, net als bij een gewone gedeelde rit (CLUB-14)
   4. Per groepsrit ziet ieder lid wie komt, wie niet komt, wie nog niet geantwoord heeft, en wie op welk venster kan (CLUB-15)
   5. De groepsrit draagt de groepsnaam als label op Home, de Peloton-tab en het ritdetail (CLUB-16)
+  6. De Peloton-tab toont een teller met het aantal ritten waarop je nog niet geantwoord hebt, losse uitnodigingen én groepsritten samen (CLUB-25)
 
 **Plans**: TBD
 **UI hint**: yes
