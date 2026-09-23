@@ -373,3 +373,235 @@ final class DeclinedGroupRidesProvider extends $FunctionalProvider<
 
 String _$declinedGroupRidesHash() =>
     r'6cd2c714d39367fe525e4e47cee03efb8cb3fc36';
+
+/// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
+/// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder
+/// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
+///
+/// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+
+@ProviderFor(visibleGroups)
+final visibleGroupsProvider = VisibleGroupsProvider._();
+
+/// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
+/// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder
+/// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
+///
+/// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+
+final class VisibleGroupsProvider extends $FunctionalProvider<
+        AsyncValue<List<PelotonGroup>>,
+        List<PelotonGroup>,
+        FutureOr<List<PelotonGroup>>>
+    with
+        $FutureModifier<List<PelotonGroup>>,
+        $FutureProvider<List<PelotonGroup>> {
+  /// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
+  /// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder
+  /// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
+  ///
+  /// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+  VisibleGroupsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'visibleGroupsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$visibleGroupsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<PelotonGroup>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PelotonGroup>> create(Ref ref) {
+    return visibleGroups(ref);
+  }
+}
+
+String _$visibleGroupsHash() => r'63c971fb03be7c32ad6882ddb74d336355950649';
+
+/// Groepen waar jij lid van bent (de sectie "Groepen" op de Peloton-tab).
+
+@ProviderFor(myGroups)
+final myGroupsProvider = MyGroupsProvider._();
+
+/// Groepen waar jij lid van bent (de sectie "Groepen" op de Peloton-tab).
+
+final class MyGroupsProvider extends $FunctionalProvider<
+        AsyncValue<List<PelotonGroup>>,
+        List<PelotonGroup>,
+        FutureOr<List<PelotonGroup>>>
+    with
+        $FutureModifier<List<PelotonGroup>>,
+        $FutureProvider<List<PelotonGroup>> {
+  /// Groepen waar jij lid van bent (de sectie "Groepen" op de Peloton-tab).
+  MyGroupsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'myGroupsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$myGroupsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<PelotonGroup>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PelotonGroup>> create(Ref ref) {
+    return myGroups(ref);
+  }
+}
+
+String _$myGroupsHash() => r'5c5d25a0c7e5989d188baef22cb21dfec2ccec3b';
+
+/// Groepen waar jouw aanvraag bij de beheerders ligt (0013): via de link of
+/// voorgedragen door een lid. Je ziet alleen de naam, geen leden.
+
+@ProviderFor(myPendingGroups)
+final myPendingGroupsProvider = MyPendingGroupsProvider._();
+
+/// Groepen waar jouw aanvraag bij de beheerders ligt (0013): via de link of
+/// voorgedragen door een lid. Je ziet alleen de naam, geen leden.
+
+final class MyPendingGroupsProvider extends $FunctionalProvider<
+        AsyncValue<List<PelotonGroup>>,
+        List<PelotonGroup>,
+        FutureOr<List<PelotonGroup>>>
+    with
+        $FutureModifier<List<PelotonGroup>>,
+        $FutureProvider<List<PelotonGroup>> {
+  /// Groepen waar jouw aanvraag bij de beheerders ligt (0013): via de link of
+  /// voorgedragen door een lid. Je ziet alleen de naam, geen leden.
+  MyPendingGroupsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'myPendingGroupsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$myPendingGroupsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<PelotonGroup>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PelotonGroup>> create(Ref ref) {
+    return myPendingGroups(ref);
+  }
+}
+
+String _$myPendingGroupsHash() => r'3dd6cb6a2907381261fba50df40a4bbfff490f68';
+
+/// Eén groep op id, voor het groepsscherm. Afgeleid uit [visibleGroups], dus
+/// geen tweede netwerkronde; null als de groep niet (meer) zichtbaar is.
+
+@ProviderFor(pelotonGroup)
+final pelotonGroupProvider = PelotonGroupFamily._();
+
+/// Eén groep op id, voor het groepsscherm. Afgeleid uit [visibleGroups], dus
+/// geen tweede netwerkronde; null als de groep niet (meer) zichtbaar is.
+
+final class PelotonGroupProvider extends $FunctionalProvider<
+        AsyncValue<PelotonGroup?>, PelotonGroup?, FutureOr<PelotonGroup?>>
+    with $FutureModifier<PelotonGroup?>, $FutureProvider<PelotonGroup?> {
+  /// Eén groep op id, voor het groepsscherm. Afgeleid uit [visibleGroups], dus
+  /// geen tweede netwerkronde; null als de groep niet (meer) zichtbaar is.
+  PelotonGroupProvider._(
+      {required PelotonGroupFamily super.from, required String super.argument})
+      : super(
+          retry: null,
+          name: r'pelotonGroupProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pelotonGroupHash();
+
+  @override
+  String toString() {
+    return r'pelotonGroupProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<PelotonGroup?> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PelotonGroup?> create(Ref ref) {
+    final argument = this.argument as String;
+    return pelotonGroup(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PelotonGroupProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$pelotonGroupHash() => r'9907119cfe775fbde493e85ee2900cd32259ce52';
+
+/// Eén groep op id, voor het groepsscherm. Afgeleid uit [visibleGroups], dus
+/// geen tweede netwerkronde; null als de groep niet (meer) zichtbaar is.
+
+final class PelotonGroupFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<PelotonGroup?>, String> {
+  PelotonGroupFamily._()
+      : super(
+          retry: null,
+          name: r'pelotonGroupProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Eén groep op id, voor het groepsscherm. Afgeleid uit [visibleGroups], dus
+  /// geen tweede netwerkronde; null als de groep niet (meer) zichtbaar is.
+
+  PelotonGroupProvider call(
+    String groupId,
+  ) =>
+      PelotonGroupProvider._(argument: groupId, from: this);
+
+  @override
+  String toString() => r'pelotonGroupProvider';
+}

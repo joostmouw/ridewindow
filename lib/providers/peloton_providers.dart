@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/services/peloton_gateway.dart';
 
@@ -106,4 +107,50 @@ Future<List<GroupRide>> declinedGroupRides(Ref ref) async {
             r.statusFor(userId) == ParticipantStatus.declined,
       )
       .toList();
+}
+
+// --- Clubs (v4.2), fase 34 ---------------------------------------------------
+
+/// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
+/// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder
+/// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
+///
+/// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+@riverpod
+Future<List<PelotonGroup>> visibleGroups(Ref ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const [];
+  final groups = await ref.watch(pelotonGatewayProvider).listGroups();
+  return [...groups]
+    ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+}
+
+/// Groepen waar jij lid van bent (de sectie "Groepen" op de Peloton-tab).
+@riverpod
+Future<List<PelotonGroup>> myGroups(Ref ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const [];
+  final groups = await ref.watch(visibleGroupsProvider.future);
+  return groups.where((g) => g.isMember(userId)).toList();
+}
+
+/// Groepen waar jouw aanvraag bij de beheerders ligt (0013): via de link of
+/// voorgedragen door een lid. Je ziet alleen de naam, geen leden.
+@riverpod
+Future<List<PelotonGroup>> myPendingGroups(Ref ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return const [];
+  final groups = await ref.watch(visibleGroupsProvider.future);
+  return groups.where((g) => g.isPendingFor(userId)).toList();
+}
+
+/// Eén groep op id, voor het groepsscherm. Afgeleid uit [visibleGroups], dus
+/// geen tweede netwerkronde; null als de groep niet (meer) zichtbaar is.
+@riverpod
+Future<PelotonGroup?> pelotonGroup(Ref ref, String groupId) async {
+  final groups = await ref.watch(visibleGroupsProvider.future);
+  for (final g in groups) {
+    if (g.id == groupId) return g;
+  }
+  return null;
 }

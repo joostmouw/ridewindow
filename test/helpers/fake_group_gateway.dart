@@ -298,7 +298,7 @@ class FakeGroupGateway implements PelotonGateway {
         g,
         members: [
           ...g.members,
-          _newMember(groupId, userId, _friendName(userId))
+          _newMember(groupId, userId, _friendName(userId)),
         ],
         requests: g.requests.where((r) => r.userId != userId).toList(),
       );

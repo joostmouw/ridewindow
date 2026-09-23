@@ -90,7 +90,7 @@ void main() {
     final gateway = _gateway();
     final c = _container(gateway);
     // Houdt de gedeelde bron vast, zoals een scherm dat doet.
-    c.listen(visibleGroupsProvider, (_, _) {});
+    c.listen(visibleGroupsProvider, (_, __) {});
 
     expect(
       (await c.read(pelotonGroupProvider('g1').future))?.name,
