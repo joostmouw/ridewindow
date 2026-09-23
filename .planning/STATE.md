@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-21T17:30:00.000Z"
-last_activity: 2026-09-21
+last_updated: "2026-09-23T08:00:00.000Z"
+last_activity: 2026-09-23
 progress:
   total_phases: 12
   completed_phases: 6
@@ -15,7 +15,41 @@ progress:
 
 # Project State
 
-## Stand na 2026-09-10 avond — lees dit eerst
+## Stand na 2026-09-22 -- lees dit eerst
+
+**Het kritieke pad is wachten, en dat wachten is begonnen.** Play Console zei op
+22 september: *"12 testers have currently been opted in for 1 day."* De reeks
+van veertien dagen loopt sinds 21 september, dus de aanvraag voor productie kan
+**op zijn vroegst rond 5 oktober**, en alleen als niemand uitstapt. Daarna is
+het geen knop maar een formulier in drie delen dat Google beoordeelt in zeven
+dagen of minder. Productie komt dus halverwege oktober in beeld.
+
+**Wat daarbij het echte risico is, staat in OPEN.md punt 17.** Er ligt
+testfeedback in de Console die niemand had gelezen, en een van de twee stukken
+beschrijft carpoolen met buren en collega's: een andere app. Google noemt
+"onvoldoende betrokkenheid van testers" als afwijsreden en vraagt in de
+aanvraag om een samenvatting van die feedback. Twaalf aangemelde testers is dus
+niet hetzelfde als twaalf gebruikende testers. **Fase 28 (feedbackstroom) is
+daarmee urgenter dan de roadmap hem heeft staan; dat is het eerstvolgende werk**
+(`/gsd-plan-phase 28`).
+
+**Wat níét meer hoeft, en waar eerder wel op gepland is:** de
+developer-verificatie is rond (pakketnaam geregistreerd sinds 17 juni,
+identiteit ingevuld, geen policy-issues; OPEN.md punt 14), de nl-NL
+winkelpagina bestaat wel (punt 7), en de testerseis is twaalf en niet twintig
+(punt 4). Alle drie zijn op 21 en 22 september in het systeem zelf nagekeken in
+plaats van uit een notitie overgenomen. Dat is meteen de les van die ronde: een
+deadline of eis die je uit een notitie kent, verifieer je in het systeem dat hem
+stelt voordat je er werk op plant.
+
+**Waar 1.0.42 (53) staat:** internal en de PWA draaien hem, alpha kreeg hem
+gepromoveerd en stond op 21 september bij Google in review. De Oppo is leeg:
+elke installatie is verwijderd, in beide ruimtes, omdat een sideload Play
+blokkeerde (release-route, "Terug van een sideload naar Play"). **Openstaande
+toestelcontrole:** 53 via Play installeren en bedienen, inloggen op beide
+manieren, agenda opnieuw koppelen.
+
+## Stand na 2026-09-10 avond
 
 **Milestone v4.1 "Zo snel mogelijk live in de store"** is opgezet in GSD: fases 26–32, 26 requirements
 (`REQUIREMENTS.md`, `ROADMAP.md`). Eerstvolgende commando: **`/gsd-plan-phase 26`**. Details en open
