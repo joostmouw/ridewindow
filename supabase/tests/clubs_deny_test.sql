@@ -21,9 +21,23 @@
 --            wie op zo'n rit geantwoord had ziet hem weer als gewone gedeelde
 --            rit.
 --
+-- BIJGEWERKT VOOR 0013 (fase 34)
+--   0013 wijzigt twee dingen bewust; alleen daar zijn verwachtingen aangepast,
+--   de rest van het fase-33-bewijs staat ongewijzigd:
+--   - Ieder lid ziet en maakt groepslinks (intrekken blijft beheerderswerk):
+--     2.5 (lid ziet de links: 2) en 2.6 (lid maakt GRPMBRA2: ok) zijn
+--     omgedraaid; 2.7 (lid trekt niet in) blijft. Daardoor ziet A in 3.1 drie
+--     links in plaats van twee.
+--   - Inwisselen van de link maakt een aanvraag, geen lid: nieuw zijn 4.2b
+--     (C is na inwisselen nog geen lid) en 4.2c (beheerder A accepteert de
+--     aanvraag van C), zodat alle latere checks die C als lid veronderstellen
+--     blijven kloppen.
+--   Het bewijs voor de nieuwe rechten zelf staat in
+--   clubs_requests_deny_test.sql.
+--
 -- HOE TE DRAAIEN
 --   Supabase Dashboard -> SQL Editor -> New query. Plak dit hele bestand en
---   draai het in één keer, NA 0012_groups.sql. Alles zit in één transactie
+--   draai het in één keer, NA 0012_groups.sql en 0013_group_join_requests.sql. Alles zit in één transactie
 --   die met `rollback` eindigt, geslaagd of niet: er blijft niets achter in de
 --   live database -- geen testgebruikers, geen groepen, geen ritten. Veilig om
 --   zo vaak te draaien als je wilt.
@@ -34,8 +48,9 @@
 --
 --     seq | check_name | want | got | ok
 --
---   Verwacht: 81 rijen, en in elke rij ok = true. Het getal 81 is precies het
---   aantal aanroepen van pg_temp.expect hieronder.
+--   Verwacht: 83 rijen, en in elke rij ok = true. Het getal 83 is precies het
+--   aantal aanroepen van pg_temp.expect hieronder (alle fase-33-checks, plus 4.2b
+--   en 4.2c voor 0013).
 --
 --   Mislukt er één check, dan zie je de tabel niet maar een fout:
 --     CLUBS DENY-TEST FAILED: 2.8 ... (want 42501, got ok); ...
@@ -83,7 +98,7 @@
 --                        R1 ..03 eigenaar B, groep G (maakt B zelf in 2.14)
 --   Optie (c4...):       O0 ..01 op R0
 --   Links:               GRPTESTA (G, geldig)   GRPXPRD2 (G, verlopen)
---                        GRPNEWA2 (maakt A in 3.2)   GRPMBRA2 (probeert B in 2.6)
+--                        GRPNEWA2 (maakt A in 3.2)   GRPMBRA2 (maakt lid B in 2.6)
 --                        GRPFZZZ3 (GF)
 -- ---------------------------------------------------------------------------
 
@@ -303,9 +318,10 @@ begin
     pg_temp.try_value($q$select count(*) from public.group_rides where id = 'c3000000-0000-0000-0000-000000000001'$q$));
   perform pg_temp.expect('2.4 lid ziet stemmen op O0', '1',
     pg_temp.try_value($q$select count(*) from public.group_ride_option_votes where option_id = 'c4000000-0000-0000-0000-000000000001'$q$));
-  perform pg_temp.expect('2.5 lid ziet links van G niet', '0',
+  -- 0013: ieder lid ziet en maakt groepslinks (GRPTESTA en de verlopen GRPXPRD2).
+  perform pg_temp.expect('2.5 lid ziet de links van G (0013: ieder lid)', '2',
     pg_temp.try_value($q$select count(*) from public.group_invites where group_id = 'c2000000-0000-0000-0000-000000000001'$q$));
-  perform pg_temp.expect('2.6 lid maakt geen link', '42501',
+  perform pg_temp.expect('2.6 lid maakt link GRPMBRA2 (0013: ieder lid)', 'ok',
     pg_temp.try_exec($q$insert into public.group_invites (code, group_id, created_by, expires_at)
       values ('GRPMBRA2', 'c2000000-0000-0000-0000-000000000001',
               'c1000000-0000-0000-0000-00000000000b', now() + interval '7 days')$q$));
@@ -370,7 +386,10 @@ set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000a","r
 
 do $$
 begin
-  perform pg_temp.expect('3.1 beheerder ziet beide links van G', '2',
+  -- Keuze: GRPMBRA2 van B uit 2.6 blijft bestaan (opruimen zou alleen een
+  -- postgres-delete zijn); hij telt hier dus mee, en in 7.2 verdwijnt hij met
+  -- de groep. Geen andere check telt links van G.
+  perform pg_temp.expect('3.1 beheerder ziet alle drie links van G (ook die van B uit 2.6)', '3',
     pg_temp.try_value($q$select count(*) from public.group_invites where group_id = 'c2000000-0000-0000-0000-000000000001'$q$));
   perform pg_temp.expect('3.2 beheerder maakt link GRPNEWA2', 'ok',
     pg_temp.try_exec($q$insert into public.group_invites (code, group_id, created_by, expires_at)
@@ -455,6 +474,37 @@ begin
   -- Kleine letters en spaties: een geplakte code is zelden netjes.
   perform pg_temp.expect('4.2 C wisselt ''  grptesta  '' in en krijgt de groepsnaam', 'Testgroep 2',
     pg_temp.try_value($q$select group_name from public.redeem_group_invite('  grptesta  ')$q$));
+end $$;
+
+-- 0013: de link levert een aanvraag op, geen lid. Als postgres vaststellen
+-- dat C nog geen lid is, dan laat beheerder A hem toe, en daarna gaat het
+-- verder als C.
+reset role;
+
+do $$
+begin
+  perform pg_temp.expect('4.2b C is na inwisselen nog geen lid van G (0013: aanvraag)', '0',
+    pg_temp.try_value($q$select count(*) from public.group_members
+      where group_id = 'c2000000-0000-0000-0000-000000000001'
+        and user_id  = 'c1000000-0000-0000-0000-00000000000c'$q$));
+end $$;
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000a","role":"authenticated"}';
+
+do $$
+begin
+  perform pg_temp.expect('4.2c beheerder A accepteert de aanvraag van C', 'ok',
+    pg_temp.try_exec($q$select public.accept_group_request((
+      select r.id from public.group_join_requests r
+      where r.group_id = 'c2000000-0000-0000-0000-000000000001'
+        and r.user_id  = 'c1000000-0000-0000-0000-00000000000c'))$q$));
+end $$;
+
+set local request.jwt.claims = '{"sub":"c1000000-0000-0000-0000-00000000000c","role":"authenticated"}';
+
+do $$
+begin
   perform pg_temp.expect('4.3 nieuw lid C ziet G', '1',
     pg_temp.try_value($q$select count(*) from public.groups where id = 'c2000000-0000-0000-0000-000000000001'$q$));
   perform pg_temp.expect('4.4 nieuw lid C ziet een rit van voor zijn lidmaatschap', '1',
@@ -761,8 +811,8 @@ begin
   end if;
 
   select count(*) into v_total from pg_temp.club_test_results;
-  if v_total <> 81 then
-    raise exception 'CLUBS DENY-TEST FAILED: % checks geschreven, 81 verwacht', v_total;
+  if v_total <> 83 then
+    raise exception 'CLUBS DENY-TEST FAILED: % checks geschreven, 83 verwacht', v_total;
   end if;
 end $$;
 
