@@ -2104,4 +2104,53 @@ class SEn extends S {
   String daylightLightShort(String from, String to) {
     return 'light $from–$to';
   }
+
+  @override
+  String get groupErrorFull =>
+      'This group already has 30 members, the maximum. An admin can remove someone first.';
+
+  @override
+  String groupErrorFullNamed(String group) {
+    return '$group already has 30 members, the maximum. Remove someone first.';
+  }
+
+  @override
+  String get groupErrorTooManyGroupsSelf =>
+      'You\'re already in 10 groups, the maximum. Leave another group first.';
+
+  @override
+  String groupErrorTooManyGroupsOther(String name) {
+    return '$name is already in 10 groups, the maximum.';
+  }
+
+  @override
+  String get groupErrorInviteInvalid =>
+      'This group link no longer works. Ask someone in the group for a new one.';
+
+  @override
+  String get groupErrorLastAdmin =>
+      'You\'re the only admin. Make someone else admin first, then you can hand this over.';
+
+  @override
+  String get groupErrorNameInvalid =>
+      'Give the group a name of 1 to 40 characters.';
+
+  @override
+  String get groupErrorSignedOut => 'Sign in first to use groups.';
+
+  @override
+  String get groupErrorNotMember => 'You\'re no longer a member of this group.';
+
+  @override
+  String get groupErrorNotFriend => 'You can only propose your own buddies.';
+
+  @override
+  String get groupErrorNotAllowed => 'Only a group admin can do this.';
+
+  @override
+  String get groupErrorTooManyRequests =>
+      'There are already 30 requests waiting for the admins. Try again later.';
+
+  @override
+  String get groupErrorGeneric => 'That didn\'t work. Please try again.';
 }

@@ -670,5 +670,20 @@
   "linkCopyAction": "Adres kopiëren",
   "linkCopied": "Adres gekopieerd",
   "daylightLightShort": "licht {from}\u2013{to}",
-  "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
+  "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "groupErrorFull": "Deze groep heeft al 30 leden, het maximum. Een beheerder kan eerst iemand uit de groep halen.",
+  "groupErrorFullNamed": "{group} heeft al 30 leden, het maximum. Haal eerst iemand uit de groep.",
+  "@groupErrorFullNamed": {"placeholders": {"group": {"type": "String"}}},
+  "groupErrorTooManyGroupsSelf": "Je zit al in 10 groepen, het maximum. Verlaat eerst een andere groep.",
+  "groupErrorTooManyGroupsOther": "{name} zit al in 10 groepen, het maximum.",
+  "@groupErrorTooManyGroupsOther": {"placeholders": {"name": {"type": "String"}}},
+  "groupErrorInviteInvalid": "Deze groepslink werkt niet meer. Vraag iemand uit de groep om een nieuwe.",
+  "groupErrorLastAdmin": "Je bent de enige beheerder. Maak eerst iemand anders beheerder, dan kun je dit afgeven.",
+  "groupErrorNameInvalid": "Geef de groep een naam van 1 tot 40 tekens.",
+  "groupErrorSignedOut": "Log eerst in om met groepen te werken.",
+  "groupErrorNotMember": "Je bent geen lid meer van deze groep.",
+  "groupErrorNotFriend": "Je kunt alleen je eigen maatjes voordragen.",
+  "groupErrorNotAllowed": "Alleen een beheerder van de groep kan dit doen.",
+  "groupErrorTooManyRequests": "Er liggen al 30 aanvragen bij de beheerders. Probeer het later opnieuw.",
+  "groupErrorGeneric": "Dat is niet gelukt. Probeer het opnieuw."
 }

@@ -3720,6 +3720,84 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'licht {from}–{to}'**
   String daylightLightShort(String from, String to);
+
+  /// No description provided for @groupErrorFull.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deze groep heeft al 30 leden, het maximum. Een beheerder kan eerst iemand uit de groep halen.'**
+  String get groupErrorFull;
+
+  /// No description provided for @groupErrorFullNamed.
+  ///
+  /// In nl, this message translates to:
+  /// **'{group} heeft al 30 leden, het maximum. Haal eerst iemand uit de groep.'**
+  String groupErrorFullNamed(String group);
+
+  /// No description provided for @groupErrorTooManyGroupsSelf.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je zit al in 10 groepen, het maximum. Verlaat eerst een andere groep.'**
+  String get groupErrorTooManyGroupsSelf;
+
+  /// No description provided for @groupErrorTooManyGroupsOther.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} zit al in 10 groepen, het maximum.'**
+  String groupErrorTooManyGroupsOther(String name);
+
+  /// No description provided for @groupErrorInviteInvalid.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deze groepslink werkt niet meer. Vraag iemand uit de groep om een nieuwe.'**
+  String get groupErrorInviteInvalid;
+
+  /// No description provided for @groupErrorLastAdmin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent de enige beheerder. Maak eerst iemand anders beheerder, dan kun je dit afgeven.'**
+  String get groupErrorLastAdmin;
+
+  /// No description provided for @groupErrorNameInvalid.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geef de groep een naam van 1 tot 40 tekens.'**
+  String get groupErrorNameInvalid;
+
+  /// No description provided for @groupErrorSignedOut.
+  ///
+  /// In nl, this message translates to:
+  /// **'Log eerst in om met groepen te werken.'**
+  String get groupErrorSignedOut;
+
+  /// No description provided for @groupErrorNotMember.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent geen lid meer van deze groep.'**
+  String get groupErrorNotMember;
+
+  /// No description provided for @groupErrorNotFriend.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je kunt alleen je eigen maatjes voordragen.'**
+  String get groupErrorNotFriend;
+
+  /// No description provided for @groupErrorNotAllowed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Alleen een beheerder van de groep kan dit doen.'**
+  String get groupErrorNotAllowed;
+
+  /// No description provided for @groupErrorTooManyRequests.
+  ///
+  /// In nl, this message translates to:
+  /// **'Er liggen al 30 aanvragen bij de beheerders. Probeer het later opnieuw.'**
+  String get groupErrorTooManyRequests;
+
+  /// No description provided for @groupErrorGeneric.
+  ///
+  /// In nl, this message translates to:
+  /// **'Dat is niet gelukt. Probeer het opnieuw.'**
+  String get groupErrorGeneric;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

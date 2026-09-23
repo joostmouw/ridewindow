@@ -2111,4 +2111,55 @@ class SNl extends S {
   String daylightLightShort(String from, String to) {
     return 'licht $from–$to';
   }
+
+  @override
+  String get groupErrorFull =>
+      'Deze groep heeft al 30 leden, het maximum. Een beheerder kan eerst iemand uit de groep halen.';
+
+  @override
+  String groupErrorFullNamed(String group) {
+    return '$group heeft al 30 leden, het maximum. Haal eerst iemand uit de groep.';
+  }
+
+  @override
+  String get groupErrorTooManyGroupsSelf =>
+      'Je zit al in 10 groepen, het maximum. Verlaat eerst een andere groep.';
+
+  @override
+  String groupErrorTooManyGroupsOther(String name) {
+    return '$name zit al in 10 groepen, het maximum.';
+  }
+
+  @override
+  String get groupErrorInviteInvalid =>
+      'Deze groepslink werkt niet meer. Vraag iemand uit de groep om een nieuwe.';
+
+  @override
+  String get groupErrorLastAdmin =>
+      'Je bent de enige beheerder. Maak eerst iemand anders beheerder, dan kun je dit afgeven.';
+
+  @override
+  String get groupErrorNameInvalid =>
+      'Geef de groep een naam van 1 tot 40 tekens.';
+
+  @override
+  String get groupErrorSignedOut => 'Log eerst in om met groepen te werken.';
+
+  @override
+  String get groupErrorNotMember => 'Je bent geen lid meer van deze groep.';
+
+  @override
+  String get groupErrorNotFriend =>
+      'Je kunt alleen je eigen maatjes voordragen.';
+
+  @override
+  String get groupErrorNotAllowed =>
+      'Alleen een beheerder van de groep kan dit doen.';
+
+  @override
+  String get groupErrorTooManyRequests =>
+      'Er liggen al 30 aanvragen bij de beheerders. Probeer het later opnieuw.';
+
+  @override
+  String get groupErrorGeneric => 'Dat is niet gelukt. Probeer het opnieuw.';
 }

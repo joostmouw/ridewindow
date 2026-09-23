@@ -638,5 +638,20 @@
   "linkCopyAction": "Copy address",
   "linkCopied": "Address copied",
   "daylightLightShort": "light {from}\u2013{to}",
-  "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}}
+  "@daylightLightShort": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "groupErrorFull": "This group already has 30 members, the maximum. An admin can remove someone first.",
+  "groupErrorFullNamed": "{group} already has 30 members, the maximum. Remove someone first.",
+  "@groupErrorFullNamed": {"placeholders": {"group": {"type": "String"}}},
+  "groupErrorTooManyGroupsSelf": "You're already in 10 groups, the maximum. Leave another group first.",
+  "groupErrorTooManyGroupsOther": "{name} is already in 10 groups, the maximum.",
+  "@groupErrorTooManyGroupsOther": {"placeholders": {"name": {"type": "String"}}},
+  "groupErrorInviteInvalid": "This group link no longer works. Ask someone in the group for a new one.",
+  "groupErrorLastAdmin": "You're the only admin. Make someone else admin first, then you can hand this over.",
+  "groupErrorNameInvalid": "Give the group a name of 1 to 40 characters.",
+  "groupErrorSignedOut": "Sign in first to use groups.",
+  "groupErrorNotMember": "You're no longer a member of this group.",
+  "groupErrorNotFriend": "You can only propose your own buddies.",
+  "groupErrorNotAllowed": "Only a group admin can do this.",
+  "groupErrorTooManyRequests": "There are already 30 requests waiting for the admins. Try again later.",
+  "groupErrorGeneric": "That didn't work. Please try again."
 }
