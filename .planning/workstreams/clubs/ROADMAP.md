@@ -35,7 +35,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
   5. `delete_own_account` ruimt lidmaatschappen op zonder een groep zonder beheerder achter te laten, en de twee nieuwe functies zijn in de migratie verantwoord met `CLAUDE.md`/`AGENTS.md` bijgewerkt naar acht server-functies (CLUB-19, CLUB-20)
 
 **Plans**: 3 plans
-- [ ] 33-01-PLAN.md — migratie 0012_groups.sql: tabellen, RLS, grants, vijf nieuwe functies (grenzen, opvolging, create_group, redeem_group_invite, is_group_member)
+- [x] 33-01-PLAN.md — migratie 0012_groups.sql: tabellen, RLS, grants, vijf nieuwe functies (grenzen, opvolging, create_group, redeem_group_invite, is_group_member)
 - [ ] 33-02-PLAN.md — deny-test supabase/tests/clubs_deny_test.sql (buitenstaander, lid, beheerder, ex-lid, 30/10, opvolging, account weg, opheffen)
 - [ ] 33-03-PLAN.md — functietelling in CLAUDE.md/AGENTS.md + [BLOCKING] Joost draait 0012 en de deny-test live
 **Manual steps**: migratie 0012 moet door Joost op de live database worden toegepast (checkpoint, criterium 1) voordat fase 34 tegen echte data kan draaien.
@@ -94,7 +94,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 33. Datamodel en rechten | 0/3 | Not started | - |
+| 33. Datamodel en rechten | 1/3 | In Progress|  |
 | 34. Groep maken en beheren | 0/TBD | Not started | - |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |
