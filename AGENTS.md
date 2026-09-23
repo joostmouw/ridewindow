@@ -93,8 +93,12 @@ expliciet ja op zegt.
 
 - **EUR 0/maand vanaf v3.0.** Open-Meteo, Firebase Hosting free tier, Supabase
   free tier. Een dienst toevoegen die geld kost is een productbeslissing.
-- **Geen server-side code behalve `plpgsql`-functies.** Elf vandaag, elk
-  verantwoord in de migratie die hem toevoegt. Geen Edge Functions.
+- **Geen server-side code behalve `plpgsql`-functies.** Dertien vandaag (rpc: `migrate_account_data`,
+  `delete_own_account`, `friend_profiles`, `redeem_friend_invite`,
+  `create_group`, `redeem_group_invite`, `propose_group_member`,
+  `accept_group_request`; helpers: `is_ride_member`, `is_group_member`;
+  triggers: `set_updated_at`, `guard_group_member_insert`,
+  `ensure_group_admin`), elk verantwoord in de migratie die hem toevoegt. Geen Edge Functions.
 - **Privacy.** Uitgelogd verlaat er niets het toestel. Gebruiksstatistiek gaat
   alleen mee na een expliciete ja, gevraagd bij de tweede start. Een
   gebeurtenis draagt nooit een locatie, nooit vrije tekst, nooit een
