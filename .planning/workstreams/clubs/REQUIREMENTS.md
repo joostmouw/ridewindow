@@ -68,3 +68,27 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| CLUB-01 | Phase 34 | Pending |
+| CLUB-02 | Phase 34 | Pending |
+| CLUB-03 | Phase 34 | Pending |
+| CLUB-04 | Phase 34 | Pending |
+| CLUB-05 | Phase 34 | Pending |
+| CLUB-06 | Phase 34 | Pending |
+| CLUB-07 | Phase 34 | Pending |
+| CLUB-08 | Phase 34 | Pending |
+| CLUB-09 | Phase 34 | Pending |
+| CLUB-10 | Phase 33 | Pending |
+| CLUB-11 | Phase 34 | Pending |
+| CLUB-12 | Phase 35 | Pending |
+| CLUB-13 | Phase 35 | Pending |
+| CLUB-14 | Phase 35 | Pending |
+| CLUB-15 | Phase 35 | Pending |
+| CLUB-16 | Phase 35 | Pending |
+| CLUB-17 | Phase 33 | Pending |
+| CLUB-18 | Phase 33 | Pending |
+| CLUB-19 | Phase 33 | Pending |
+| CLUB-20 | Phase 33 | Pending |
+| CLUB-21 | Phase 36 | Pending |
+| CLUB-22 | Phase 36 | Pending |
+| CLUB-23 | Phase 36 | Pending |
+| CLUB-24 | Phase 36 | Pending |
