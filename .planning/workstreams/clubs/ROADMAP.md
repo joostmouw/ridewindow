@@ -58,7 +58,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 **Plans**: 8 plans
 - [x] 34-01-PLAN.md — migratie 0013_group_join_requests.sql (aanvragen, voordragen, accepteren, links voor leden) + functietelling naar dertien
 - [x] 34-02-PLAN.md — deny-tests (nieuw + 0012-test bijgewerkt) + [BLOCKING] Joost past 0013 toe en draait beide live
-- [ ] 34-03-PLAN.md — datalaag: modellen, gateway, providers, foutsleutels als gewone zinnen
+- [x] 34-03-PLAN.md — datalaag: modellen, gateway, providers, foutsleutels als gewone zinnen
 - [ ] 34-04-PLAN.md — Groepen op de Peloton-tab, groep maken, groepsscherm (leesstand, aanvraagstaat), regelsheet
 - [ ] 34-05-PLAN.md — ⋮ per lid, eruit halen met ongedaan maken, aanvragen accepteren/afwijzen, maatje voordragen
 - [ ] 34-06-PLAN.md — groepslink delen, appbar-menu: naam, link vervangen, verlaten, opheffen
@@ -107,6 +107,6 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
-| 34. Groep maken en beheren | 2/8 | In Progress|  |
+| 34. Groep maken en beheren | 3/8 | In Progress|  |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |

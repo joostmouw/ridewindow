@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 34-02
+current_plan: 34-03
 status: executing
-stopped_at: 34-02 klaar (0013 live, 62/62 + 83/83), volgende 34-03
-last_updated: "2026-09-23T20:00:00.000Z"
-last_activity: 2026-09-23 -- 34-01 migratie 0013 geschreven
+stopped_at: 34-03 klaar (datalaag groepen, 776 tests), volgende 34-04
+last_updated: "2026-09-23T21:00:00.000Z"
+last_activity: 2026-09-23 -- 34-03 datalaag groepen en aanvragen
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 11
-  completed_plans: 5
-  percent: 36
+  completed_plans: 6
+  percent: 55
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 34
-Plan: 3 of 8
-Status: 0013 live, tests groen; volgende 34-03 datalaag
-Last activity: 2026-09-23 -- 34-01 migratie 0013 geschreven
+Plan: 4 of 8
+Status: datalaag groepen staat; volgende 34-04 UI
+Last activity: 2026-09-23 -- 34-03 datalaag groepen en aanvragen
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 34-02
+**Current Plan:** 34-04
 
 ## Decisions
 
@@ -39,6 +39,9 @@ Last activity: 2026-09-23 -- 34-01 migratie 0013 geschreven
 - 34-01: aanvragen alleen via definer-rpc's; client heeft op group_join_requests alleen select/delete
 - 34-01: functietelling na 0013 is dertien, niet twaalf (voordragen vraagt definer voor de namen)
 - 34-01: lockvolgorde overal groep -> aanvraag -> persoon; accept op verdwenen aanvraag = not_allowed
+- 34-03: groupInitials op runes, geen package:characters (alleen transitief)
+- 34-03: groepslink hergebruiken als hij nog 7 dagen geldig is, anders nieuw voor 30 dagen
+- 34-03: onbekende databasefout gaat door (_guard rethrow); UI toont groupErrorGeneric
 
 ## Performance Metrics
 
@@ -47,8 +50,9 @@ Last activity: 2026-09-23 -- 34-01 migratie 0013 geschreven
 | 33-01 | 20min | 2 | 1 |
 | 33-02 | 25min | 2 | 1 |
 | 34-01 | 15min | 2 | 4 |
+| 34-03 | 25min | 3 | 15 |
 
 ## Session Continuity
 
-**Stopped At:** 34-01 klaar (0013), volgende 34-02 deny-tests
+**Stopped At:** 34-03 klaar (datalaag groepen), volgende 34-04
 **Resume File:** None
