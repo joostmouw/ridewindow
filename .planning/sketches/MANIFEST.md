@@ -44,6 +44,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 010 | [hoeveel-fiets](010-hoeveel-fiets/) | Hoeveel fietstaal verdraagt de app, en op welke plekken? | *nog te kiezen* | merk, toon, naamgeving, peloton, l10n |
 | 011 | [daglicht](011-daglicht/) | Hoe laat de app zien dat een venster in het donker valt, in zijn eigen vormtaal? | **A — vierde weerbalk, hele etmaal** | daglicht, weerbalken, scoring, profiel, fase-26 |
 | 014 | [peloton-rij](014-peloton-rij/) | Waar staat de rij fietsers die de groep telt, en wat vervangt het vlaggetje bij "Jij organiseert"? | **Gekozen — lint links, megafoon in de regel, teller met wachters** | peloton, iconografie, ritten, home, rollen |
+| 015 | [clubs-groepen](015-clubs-groepen/) | Waar staan je groepen in Peloton, en hoe beheer je een groep? | *open* | peloton, clubs, groepen, beheer, fase-34 |
 
 ## Beslissingen die doorwerken
 
@@ -155,4 +156,3 @@ elkaar, samengevoegd tot één pad (`icoon.html`) — bouwbaar als glyph, geen p
 **alleen op Home** (en in de kop van het detailscherm) — de rittenlijst houdt zijn volle breedte; de megafoon
 alleen in de rolregel van je eigen rit; meerijden is tekst zonder icoon; en een teller van fietsjes waarvan de
 wachtenden doorzichtig zijn, met "3 gaan mee · 1 wacht nog".
-| 015 | [clubs-groepen](015-clubs-groepen/) | Waar staan je groepen in Peloton, en hoe beheer je een groep? | *open* | peloton, clubs, groepen, beheer, fase-34 |
