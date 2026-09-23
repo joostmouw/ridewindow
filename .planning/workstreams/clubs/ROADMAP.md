@@ -48,12 +48,23 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 **Success Criteria** (what must be TRUE):
 
   1. Een ingelogde gebruiker maakt een groep met een naam aan en is daarmee meteen lid en beheerder; de groep verschijnt op de Peloton-tab met naam en aantal leden (CLUB-01, CLUB-04)
-  2. Een beheerder deelt een groepslink via het bestaande deelmenu; wie de link opent (`/group/:code`) en inlogt wordt lid, en ziet daarna de ledenlijst met naam en wie beheerder is — en verder niets van een ander lid (CLUB-02, CLUB-05)
-  3. Een beheerder voegt een bestaand maatje rechtstreeks aan de groep toe, zonder link (CLUB-03)
+  2. Ieder lid deelt een groepslink via het bestaande deelmenu; wie de link opent (`/group/:code`) en inlogt dient een aanvraag in en ziet dat die bij de beheerders ligt; na acceptatie ziet hij de ledenlijst met naam en wie beheerder is, en verder niets van een ander lid (CLUB-02, CLUB-05) (bijgesteld 2026-09-23 per 34-CONTEXT HERZIENING)
+  3. Ieder lid draagt een bestaand maatje voor; een beheerder die voordraagt maakt hem direct lid (CLUB-03) (bijgesteld 2026-09-23 per 34-CONTEXT HERZIENING)
   4. Een lid verlaat de groep zelf; een beheerder maakt een ander lid beheerder of neemt die rol weer af, en kan een lid uit de groep verwijderen (CLUB-06, CLUB-07, CLUB-08)
   5. Een beheerder wijzigt de groepsnaam, trekt de groepslink in voor een nieuwe, of heft de groep op — groepsritten die al antwoorden hebben blijven bestaan voor de eigenaar en wie geantwoord heeft, maar zonder groepslabel (CLUB-09, CLUB-11)
+  6. Een beheerder ziet de open aanvragen (via link of voorgedragen door wie) en accepteert of wijst af; een gewoon lid kan niemand lid maken, afgedwongen door migratie 0013 en bewezen met deny-tests die Joost live draait (CLUB-27)
+  7. Een info-knop bij Groepen op de Peloton-tab en op het groepsscherm legt de groepsregels uit in NL en EN (CLUB-28)
 
-**Plans**: TBD
+**Plans**: 8 plans
+- [ ] 34-01-PLAN.md — migratie 0013_group_join_requests.sql (aanvragen, voordragen, accepteren, links voor leden) + functietelling naar dertien
+- [ ] 34-02-PLAN.md — deny-tests (nieuw + 0012-test bijgewerkt) + [BLOCKING] Joost past 0013 toe en draait beide live
+- [ ] 34-03-PLAN.md — datalaag: modellen, gateway, providers, foutsleutels als gewone zinnen
+- [ ] 34-04-PLAN.md — Groepen op de Peloton-tab, groep maken, groepsscherm (leesstand, aanvraagstaat), regelsheet
+- [ ] 34-05-PLAN.md — ⋮ per lid, eruit halen met ongedaan maken, aanvragen accepteren/afwijzen, maatje voordragen
+- [ ] 34-06-PLAN.md — groepslink delen, appbar-menu: naam, link vervangen, verlaten, opheffen
+- [ ] 34-07-PLAN.md — landing /group/:code, code bewaren tot na inloggen en onboarding, code in het codeveld
+- [ ] 34-08-PLAN.md — toestel + web met twee accounts (keuze testroute, checkpoint Joost)
+**Manual steps**: 0013 en de deny-tests draait Joost in de SQL Editor (34-02); de doorloop met twee accounts doet Joost (34-08).
 **UI hint**: yes
 
 ### Phase 35: Groepsritten
@@ -96,6 +107,6 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
-| 34. Groep maken en beheren | 0/TBD | Not started | - |
+| 34. Groep maken en beheren | 0/8 | Planned | - |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |
