@@ -4,14 +4,14 @@ milestone: v4.2
 milestone_name: Clubs
 current_plan: 34-02
 status: executing
-stopped_at: 34-01 klaar (0013), volgende 34-02 deny-tests
+stopped_at: 34-02 klaar (0013 live, 62/62 + 83/83), volgende 34-03
 last_updated: "2026-09-23T20:00:00.000Z"
 last_activity: 2026-09-23 -- 34-01 migratie 0013 geschreven
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 11
-  completed_plans: 4
+  completed_plans: 5
   percent: 36
 ---
 
@@ -20,8 +20,8 @@ progress:
 ## Current Position
 
 Phase: 34
-Plan: 2 of 8
-Status: 34-01 klaar; volgende 34-02 deny-tests + toepassen
+Plan: 3 of 8
+Status: 0013 live, tests groen; volgende 34-03 datalaag
 Last activity: 2026-09-23 -- 34-01 migratie 0013 geschreven
 
 ## Progress
