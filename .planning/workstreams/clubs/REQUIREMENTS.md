@@ -22,7 +22,7 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 - [ ] **CLUB-07**: Een beheerder kan een ander lid beheerder maken, en een beheerder die rol weer afnemen
 - [ ] **CLUB-08**: Een beheerder kan een lid uit de groep halen
 - [ ] **CLUB-09**: Een beheerder kan de groepsnaam wijzigen, en de groepslink intrekken en vervangen door een nieuwe
-- [ ] **CLUB-10**: Een groep heeft altijd minstens één beheerder: vertrekt de laatste beheerder (verlaten of account verwijderd), dan wordt het langst zittende lid beheerder; vertrekt het laatste lid, dan verdwijnt de groep
+- [x] **CLUB-10**: Een groep heeft altijd minstens één beheerder: vertrekt de laatste beheerder (verlaten of account verwijderd), dan wordt het langst zittende lid beheerder; vertrekt het laatste lid, dan verdwijnt de groep
 - [ ] **CLUB-11**: Een beheerder kan de groep opheffen; groepsritten die er al antwoorden op hebben blijven bestaan voor de eigenaar en wie geantwoord heeft, zonder groepslabel
 
 ### Groepsritten (CLUB-12 … 16, 25)
@@ -36,10 +36,10 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 
 ### Veiligheid en grenzen (CLUB-17 … 20)
 
-- [ ] **CLUB-17**: Alle rechten hierboven worden in de database afgedwongen (RLS + plpgsql), niet alleen in de app; deny-tests bewijzen dat een buitenstaander en een ex-lid geen groep, ledenlijst of groepsrit kunnen lezen, en dat een gewoon lid geen beheerdershandeling kan doen
-- [ ] **CLUB-18**: Een groep heeft maximaal 30 leden en een account zit in maximaal 10 groepen, afgedwongen in de database; de app zegt in gewone taal waarom toetreden of toevoegen niet lukt
-- [ ] **CLUB-19**: Een account verwijderen (`delete_own_account`) ruimt het lidmaatschap op en laat CLUB-10 gelden, zonder dat een groep zonder beheerder achterblijft
-- [ ] **CLUB-20**: De twee nieuwe server-functies (`redeem_group_invite`, `is_group_member`) zijn in hun migratie verantwoord, en de "No backend"-constraint in `CLAUDE.md` en `AGENTS.md` telt er acht (bijgesteld 2026-09-23 per 33-CONTEXT 'De telling volgt het schema': 0012 voegt vijf functies toe — ook create_group en de triggerfuncties guard_group_member_insert en ensure_group_admin — en de telling wordt elf; zie de kop van 0012)
+- [x] **CLUB-17**: Alle rechten hierboven worden in de database afgedwongen (RLS + plpgsql), niet alleen in de app; deny-tests bewijzen dat een buitenstaander en een ex-lid geen groep, ledenlijst of groepsrit kunnen lezen, en dat een gewoon lid geen beheerdershandeling kan doen
+- [x] **CLUB-18**: Een groep heeft maximaal 30 leden en een account zit in maximaal 10 groepen, afgedwongen in de database; de app zegt in gewone taal waarom toetreden of toevoegen niet lukt
+- [x] **CLUB-19**: Een account verwijderen (`delete_own_account`) ruimt het lidmaatschap op en laat CLUB-10 gelden, zonder dat een groep zonder beheerder achterblijft
+- [x] **CLUB-20**: De twee nieuwe server-functies (`redeem_group_invite`, `is_group_member`) zijn in hun migratie verantwoord, en de "No backend"-constraint in `CLAUDE.md` en `AGENTS.md` telt er acht (bijgesteld 2026-09-23 per 33-CONTEXT 'De telling volgt het schema': 0012 voegt vijf functies toe — ook create_group en de triggerfuncties guard_group_member_insert en ensure_group_admin — en de telling wordt elf; zie de kop van 0012)
 
 ### Afronding (CLUB-21 … 24)
 
@@ -78,17 +78,17 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 | CLUB-07 | Phase 34 | Pending |
 | CLUB-08 | Phase 34 | Pending |
 | CLUB-09 | Phase 34 | Pending |
-| CLUB-10 | Phase 33 | Pending |
+| CLUB-10 | Phase 33 | Complete |
 | CLUB-11 | Phase 34 | Pending |
 | CLUB-12 | Phase 35 | Pending |
 | CLUB-13 | Phase 35 | Pending |
 | CLUB-14 | Phase 35 | Pending |
 | CLUB-15 | Phase 35 | Pending |
 | CLUB-16 | Phase 35 | Pending |
-| CLUB-17 | Phase 33 | Pending |
-| CLUB-18 | Phase 33 | Pending |
-| CLUB-19 | Phase 33 | Pending |
-| CLUB-20 | Phase 33 | Pending |
+| CLUB-17 | Phase 33 | Complete |
+| CLUB-18 | Phase 33 | Complete |
+| CLUB-19 | Phase 33 | Complete |
+| CLUB-20 | Phase 33 | Complete |
 | CLUB-21 | Phase 36 | Pending |
 | CLUB-22 | Phase 36 | Pending |
 | CLUB-23 | Phase 36 | Pending |

@@ -14,7 +14,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 
 **Phase Numbering:** Gaat door na v4.1 fase 32; deze workstream gebruikt 33–36.
 
-- [ ] **Phase 33: Datamodel en rechten** - Migratie 0012 legt groepen, lidmaatschap en rechten vast in de database, afgedwongen door RLS en twee nieuwe functies — niets hoeft de app zelf te controleren
+- [x] **Phase 33: Datamodel en rechten** - Migratie 0012 legt groepen, lidmaatschap en rechten vast in de database, afgedwongen door RLS en twee nieuwe functies — niets hoeft de app zelf te controleren (completed 2026-09-23)
 - [ ] **Phase 34: Groep maken en beheren** - Een ingelogde gebruiker maakt een groep, deelt de link, beheert leden en beheerders, en ziet zijn groepen op de Peloton-tab
 - [ ] **Phase 35: Groepsritten** - Een lid zet een rit uit voor de hele groep; ieder lid ziet en beantwoordt hem, met een groepslabel overal waar de rit verschijnt
 - [ ] **Phase 36: Afronden** - Privacybeleid, NL/EN, regressie en een tweeaccountstest op toestel en PWA voordat de build bij de testers staat
@@ -37,7 +37,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 **Plans**: 3 plans
 - [x] 33-01-PLAN.md — migratie 0012_groups.sql: tabellen, RLS, grants, vijf nieuwe functies (grenzen, opvolging, create_group, redeem_group_invite, is_group_member)
 - [x] 33-02-PLAN.md — deny-test supabase/tests/clubs_deny_test.sql (buitenstaander, lid, beheerder, ex-lid, 30/10, opvolging, account weg, opheffen)
-- [ ] 33-03-PLAN.md — functietelling in CLAUDE.md/AGENTS.md + [BLOCKING] Joost draait 0012 en de deny-test live
+- [x] 33-03-PLAN.md — functietelling in CLAUDE.md/AGENTS.md + [BLOCKING] Joost draait 0012 en de deny-test live
 **Manual steps**: migratie 0012 moet door Joost op de live database worden toegepast (checkpoint, criterium 1) voordat fase 34 tegen echte data kan draaien.
 
 ### Phase 34: Groep maken en beheren
@@ -94,7 +94,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 33. Datamodel en rechten | 2/3 | In Progress|  |
+| 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
 | 34. Groep maken en beheren | 0/TBD | Not started | - |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |
