@@ -436,4 +436,352 @@ grant insert (code, group_id, created_by, expires_at)
 grant select on public.groups        to service_role;
 grant select on public.group_members to service_role;
 
+-- ---------------------------------------------------------------------------
+-- Foutmeldingen in de functies hieronder
+--
+-- Altijd `errcode = 'P0001'` met een vaste Engelse sleutel als message, zodat
+-- fase 34 ze kan herkennen en naar een nette NL/EN-melding kan vertalen:
+--   not_authenticated, group_name_invalid, invite_invalid, group_full,
+--   too_many_groups, last_admin
+--
+-- Triggerfuncties krijgen geen execute-grant: Postgres controleert EXECUTE bij
+-- het aanmaken van de trigger (door de eigenaar van deze migratie), niet bij
+-- het afgaan. Een client die ze direct aanroept krijgt dus niets.
+-- ---------------------------------------------------------------------------
+
+-- ---------------------------------------------------------------------------
+-- 9. guard_group_member_insert() -- grenzen (CLUB-18), naam en joined_at
+--
+-- Vuurt voor elk nieuw lidmaatschap, langs welke weg dan ook: create_group,
+-- redeem_group_invite of een beheerder die een maatje toevoegt.
+--
+-- Security definer, om twee redenen. De aanroeper -- bijvoorbeeld een beheerder
+-- die een maatje toevoegt -- ziet de andere lidmaatschappen van dat maatje niet
+-- (RLS), dus zonder definer valt de 10-telling te laag uit en is de grens een
+-- zeef. En de naam komt uit `profiles`, die voor iedereen dicht is (keuze b).
+--
+-- Race: twee mensen die tegelijk op plek 30 binnenkomen zien allebei 29 leden.
+-- De rijlock op de groep serialiseert ze; de tweede telt pas als de eerste
+-- klaar is, en ziet dan 30. Hetzelfde gat bestaat per persoon over groepen
+-- heen (twee joins van één account in twee groepen tegelijk op plek 10) --
+-- daar is geen gedeelde rij om te locken, dus een advisory lock per user_id.
+-- Beide locks gelden tot het einde van de transactie. De volgorde is altijd
+-- groep -> persoon, dus twee joins kunnen elkaar niet in een deadlock houden.
+-- ---------------------------------------------------------------------------
+
+create or replace function public.guard_group_member_insert()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_count integer;
+begin
+  -- (1) Serialiseer joins op dezelfde groep.
+  perform 1 from public.groups g where g.id = new.group_id for update;
+
+  -- (2) Serialiseer joins van dezelfde persoon, over groepen heen.
+  perform pg_advisory_xact_lock(hashtext(new.user_id::text));
+
+  -- (3) Max 30 leden per groep (CLUB-18).
+  select count(*) into v_count
+  from public.group_members m
+  where m.group_id = new.group_id;
+
+  if v_count >= 30 then
+    raise exception using errcode = 'P0001', message = 'group_full';
+  end if;
+
+  -- (4) Max 10 groepen per account -- lidmaatschappen, niet alleen gemaakte
+  -- groepen (CLUB-18).
+  select count(*) into v_count
+  from public.group_members m
+  where m.user_id = new.user_id;
+
+  if v_count >= 10 then
+    raise exception using errcode = 'P0001', message = 'too_many_groups';
+  end if;
+
+  -- (5) De naam komt uit het profiel, niet van de client (keuze b). Kan null
+  -- zijn als iemand nog geen naam heeft ingevuld; de app toont dan een
+  -- terugvaltekst.
+  new.display_name := (
+    select p.user_name from public.profiles p where p.user_id = new.user_id
+  );
+
+  -- (6) Opvolging draait op joined_at, dus die mag nooit van de client komen.
+  -- Dubbel slot naast de kolomgrant uit sectie 8.
+  new.joined_at := now();
+
+  return new;
+end;
+$$;
+
+revoke all on function public.guard_group_member_insert() from public, anon, authenticated;
+
+drop trigger if exists group_members_guard_insert on public.group_members;
+create trigger group_members_guard_insert
+  before insert on public.group_members
+  for each row execute function public.guard_group_member_insert();
+
+-- ---------------------------------------------------------------------------
+-- 10. ensure_group_admin() -- altijd een beheerder, lege groep weg (CLUB-10)
+--
+-- Dekt alle manieren waarop een groep een beheerder of een lid kwijtraakt:
+-- verlaten, verwijderd worden door een beheerder, en het account dat
+-- verdwijnt. Dat laatste is CLUB-19: `delete_own_account` verwijdert de rij in
+-- auth.users, de FK-cascade op group_members.user_id verwijdert het
+-- lidmaatschap, en een after-delete-trigger vuurt in Postgres ook voor rijen
+-- die door een cascade verdwijnen -- per rij.
+--
+-- Security definer, want wie vertrekt heeft geen recht een ander te
+-- promoveren, en na een account-cascade is er niemand meer die dat recht heeft.
+--
+-- De rijlock op de groep voorkomt dat twee beheerders die tegelijk vertrekken
+-- (of elkaar tegelijk degraderen) elk de ander nog als beheerder zien.
+--
+-- De promotie hieronder is zelf een update van role en vuurt deze trigger
+-- opnieuw -- maar met old.role = 'member', en dan doet hij niets.
+-- ---------------------------------------------------------------------------
+
+create or replace function public.ensure_group_admin()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_group uuid := old.group_id;
+begin
+  -- (1) Lock de groep. Is hij er niet meer, dan wordt hij net opgeheven en
+  -- ruimt de cascade zijn leden op; dan valt er niets te bewaken.
+  perform 1 from public.groups g where g.id = v_group for update;
+  if not found then
+    return null;
+  end if;
+
+  -- (2) Degraderen: de laatste beheerder mag zichzelf (of een beheerder een
+  -- andere laatste beheerder) niet degraderen -- keuze e in de kop. Opvolging
+  -- zou hier vaak dezelfde persoon terugzetten en de degradatie stil
+  -- ongedaan maken.
+  if tg_op = 'UPDATE' then
+    if old.role = 'admin'
+       and new.role <> 'admin'
+       and not exists (
+         select 1 from public.group_members m
+         where m.group_id = v_group and m.role = 'admin'
+       )
+    then
+      raise exception using errcode = 'P0001', message = 'last_admin';
+    end if;
+    return null;
+  end if;
+
+  -- (3) Verwijderd lidmaatschap. Geen lid meer: de groep verdwijnt. Links
+  -- cascaden mee; groepsritten blijven bestaan met group_id = null (CLUB-11).
+  if not exists (
+    select 1 from public.group_members m where m.group_id = v_group
+  ) then
+    delete from public.groups g where g.id = v_group;
+    return null;
+  end if;
+
+  -- Wel leden maar geen beheerder meer: het langst zittende lid wordt het.
+  -- Bij gelijke joined_at beslist user_id, zodat de uitkomst vastligt.
+  if not exists (
+    select 1 from public.group_members m
+    where m.group_id = v_group and m.role = 'admin'
+  ) then
+    update public.group_members m
+       set role = 'admin'
+     where m.group_id = v_group
+       and m.user_id = (
+         select m2.user_id
+         from public.group_members m2
+         where m2.group_id = v_group
+         order by m2.joined_at, m2.user_id
+         limit 1
+       );
+  end if;
+
+  return null;
+end;
+$$;
+
+revoke all on function public.ensure_group_admin() from public, anon, authenticated;
+
+drop trigger if exists group_members_ensure_admin on public.group_members;
+create trigger group_members_ensure_admin
+  after delete or update of role on public.group_members
+  for each row execute function public.ensure_group_admin();
+
+-- ---------------------------------------------------------------------------
+-- 11. create_group(p_name) -- groep + eerste beheerder, atomisch (keuze d)
+--
+-- Eén aanroep is één transactie. De guard-trigger telt mee bij het
+-- lidmaatschap, dus een 11e groep faalt met too_many_groups en de groepsrij
+-- rolt mee terug -- er blijft nooit een groep zonder beheerder achter
+-- (CLUB-01, CLUB-18). De app krijgt alleen het id terug en leest de groep
+-- daarna gewoon via de select-policy; dan bestaat het lidmaatschap al.
+-- ---------------------------------------------------------------------------
+
+create or replace function public.create_group(p_name text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_me   uuid := auth.uid();
+  v_name text := btrim(p_name);
+  v_id   uuid;
+begin
+  if v_me is null then
+    raise exception using errcode = 'P0001', message = 'not_authenticated';
+  end if;
+
+  -- Dezelfde grens als de check op groups.name, maar met een melding die de
+  -- app kan vertalen in plaats van een kale check-violation.
+  if v_name is null or char_length(v_name) < 1 or char_length(v_name) > 60 then
+    raise exception using errcode = 'P0001', message = 'group_name_invalid';
+  end if;
+
+  insert into public.groups (name, created_by)
+  values (v_name, v_me)
+  returning id into v_id;
+
+  insert into public.group_members (group_id, user_id, role)
+  values (v_id, v_me, 'admin');
+
+  return v_id;
+end;
+$$;
+
+revoke all on function public.create_group(text) from public, anon;
+grant execute on function public.create_group(text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 12. redeem_group_invite(p_code) -- binnenkomen via de groepslink (keuze a)
+--
+-- Security definer, want de genodigde kan de groep en de link nog niet lezen
+-- (keuze 1 uit 0002). Rate limiting op het raden van codes hoort bij epic #75,
+-- net als bij redeem_friend_invite -- bewust nog niet hier.
+--
+-- Wie al lid is, wordt niet opnieuw ingevoegd, en dat is een expliciete check
+-- en geen "on conflict do nothing": een before-insert-trigger vuurt ook bij een
+-- insert die daarna op een conflict stukloopt, en zou een bestaand lid dat
+-- zijn link nog eens opent in een volle groep dan group_full geven. De
+-- exception-tak vangt alleen het smalle geval dat hetzelfde account de link
+-- twee keer tegelijk inwisselt: dan is het tweede resultaat gewoon "je bent
+-- lid".
+--
+-- `#variable_conflict use_column`: de out-kolom group_id heet hetzelfde als
+-- group_members.group_id. Alle kolommen zijn daarom ook met een alias
+-- gekwalificeerd.
+-- ---------------------------------------------------------------------------
+
+create or replace function public.redeem_group_invite(p_code text)
+returns table (group_id uuid, group_name text)
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+#variable_conflict use_column
+declare
+  v_me    uuid := auth.uid();
+  v_code  text := upper(btrim(p_code));
+  v_group uuid;
+  v_name  text;
+begin
+  if v_me is null then
+    raise exception using errcode = 'P0001', message = 'not_authenticated';
+  end if;
+
+  select i.group_id into v_group
+  from public.group_invites i
+  where i.code = v_code and i.expires_at > now();
+
+  if not found then
+    raise exception using errcode = 'P0001', message = 'invite_invalid';
+  end if;
+
+  if not exists (
+    select 1 from public.group_members m
+    where m.group_id = v_group and m.user_id = v_me
+  ) then
+    begin
+      insert into public.group_members (group_id, user_id, role)
+      values (v_group, v_me, 'member');
+    exception
+      when unique_violation then
+        null;  -- tegelijk al ingewisseld door hetzelfde account: al lid.
+    end;
+  end if;
+
+  select g.name into v_name
+  from public.groups g
+  where g.id = v_group;
+
+  return query select v_group, v_name;
+end;
+$$;
+
+revoke all on function public.redeem_group_invite(text) from public, anon;
+grant execute on function public.redeem_group_invite(text) to authenticated;
+
 commit;
+
+-- ---------------------------------------------------------------------------
+-- Controle
+-- ---------------------------------------------------------------------------
+-- select tablename, rowsecurity from pg_tables
+--  where schemaname = 'public'
+--    and tablename in ('groups', 'group_members', 'group_invites');
+--
+-- Verwacht: drie rijen, rowsecurity = true.
+--
+-- select tablename, count(*) from pg_policies
+--  where schemaname = 'public'
+--    and tablename in ('groups', 'group_members', 'group_invites',
+--                      'group_rides', 'group_ride_participants')
+--  group by tablename order by tablename;
+--
+-- Verwacht: groups 3, group_members 4, group_invites 3, group_rides 4
+-- (select uit 0003, insert/update uit deze migratie, delete uit 0002),
+-- group_ride_participants 5 (0002's vier plus insert_self_group).
+--
+-- select table_name, grantee, privilege_type
+--   from information_schema.role_table_grants
+--  where table_schema = 'public'
+--    and table_name in ('groups', 'group_members', 'group_invites')
+--  order by table_name, grantee, privilege_type;
+--
+-- select table_name, column_name, grantee, privilege_type
+--   from information_schema.column_privileges
+--  where table_schema = 'public'
+--    and table_name in ('groups', 'group_members', 'group_invites')
+--    and grantee in ('anon', 'authenticated')
+--  order by table_name, privilege_type, column_name;
+--
+-- Verwacht: anon nergens. authenticated op tabelniveau alleen SELECT/DELETE;
+-- op kolomniveau UPDATE(name) op groups, INSERT(group_id, user_id) en
+-- UPDATE(role) op group_members, INSERT(code, group_id, created_by,
+-- expires_at) op group_invites. service_role SELECT op groups en
+-- group_members, niet op group_invites.
+--
+-- select proname from pg_proc
+--  where pronamespace = 'public'::regnamespace
+--    and proname in ('migrate_account_data', 'delete_own_account',
+--                    'friend_profiles', 'redeem_friend_invite', 'create_group',
+--                    'redeem_group_invite', 'is_ride_member', 'is_group_member',
+--                    'set_updated_at', 'guard_group_member_insert',
+--                    'ensure_group_admin')
+--  order by proname;
+--
+-- Verwacht: 11 rijen -- de telling uit de kop (keuze g).
+--
+-- Deze queries bewijzen alleen dat alles bestaat. Het echte bewijs dat een
+-- buitenstaander niets ziet en een gewoon lid niets mag, is
+-- supabase/tests/clubs_deny_test.sql.
+-- ---------------------------------------------------------------------------
