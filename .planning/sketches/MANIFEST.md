@@ -155,3 +155,4 @@ elkaar, samengevoegd tot één pad (`icoon.html`) — bouwbaar als glyph, geen p
 **alleen op Home** (en in de kop van het detailscherm) — de rittenlijst houdt zijn volle breedte; de megafoon
 alleen in de rolregel van je eigen rit; meerijden is tekst zonder icoon; en een teller van fietsjes waarvan de
 wachtenden doorzichtig zijn, met "3 gaan mee · 1 wacht nog".
+| 015 | [clubs-groepen](015-clubs-groepen/) | Waar staan je groepen in Peloton, en hoe beheer je een groep? | *open* | peloton, clubs, groepen, beheer, fase-34 |

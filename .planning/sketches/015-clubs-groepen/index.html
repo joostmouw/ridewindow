@@ -1,0 +1,482 @@
+<title>Clubs schets</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --brand-light:#C5D4B6; --brand-dark:#234934;
+  --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7; --paper-top:#DAE2CC;
+  --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#4C5C52;
+  --outline:#A9B79C; --outline-strong:#6B7663;
+  --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+  --organiser:#7B4B12; --joined:#1565C0; --pending:#A42E0A; --error:#B3261E; --error-bg:#FCE8E6;
+  --shadow:rgba(35,73,52,.14); --scrim:rgba(20,30,24,.45);
+  --page:#E9EEE0;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --brand-light:#2C3B30; --brand-dark:#C5D4B6;
+    --paper:#1E1E1E; --paper-low:#141414; --paper-mid:#2A2A2A; --paper-high:#333; --paper-top:#3A3A3A;
+    --ink:#E3E6E0; --ink-2:#BDC3BA; --ink-3:#9AA39A;
+    --outline:#444; --outline-strong:#666;
+    --perfect-fg:#66BB6A; --perfect-bg:#1E3320;
+    --organiser:#D9A264; --joined:#42A5F5; --pending:#F0865C; --error:#F2B8B5; --error-bg:#3A1F1D;
+    --shadow:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.6); --page:#0E0F0E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --brand-light:#2C3B30; --brand-dark:#C5D4B6;
+  --paper:#1E1E1E; --paper-low:#141414; --paper-mid:#2A2A2A; --paper-high:#333; --paper-top:#3A3A3A;
+  --ink:#E3E6E0; --ink-2:#BDC3BA; --ink-3:#9AA39A;
+  --outline:#444; --outline-strong:#666;
+  --perfect-fg:#66BB6A; --perfect-bg:#1E3320;
+  --organiser:#D9A264; --joined:#42A5F5; --pending:#F0865C; --error:#F2B8B5; --error-bg:#3A1F1D;
+  --shadow:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.6); --page:#0E0F0E;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'Outfit',system-ui,-apple-system,sans-serif;
+     -webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:28px 80px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:30px;font-weight:500;margin:0 0 8px;text-wrap:balance}
+h2{font-size:22px;font-weight:500;margin:0 0 6px;text-wrap:balance}
+.lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:72ch;margin:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+section.q{margin-top:44px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px}
+.bar button{font-family:inherit;font-size:14px;font-weight:500;padding:9px 16px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--outline);background:transparent;color:var(--ink-2)}
+.bar button[aria-pressed="true"]{background:var(--brand-dark);color:var(--paper-low);border-color:var(--brand-dark)}
+.bar button:focus-visible{outline:2px solid var(--joined);outline-offset:2px}
+.note{font-size:15px;line-height:1.55;color:var(--ink-2);max-width:74ch;margin:6px 0 20px;min-height:48px}
+.note b{color:var(--ink);font-weight:600}
+.stage{display:none}.stage.on{display:block}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:13px;color:var(--ink-3);margin:10px 4px 0;max-width:340px;line-height:1.45}
+
+/* telefoon */
+.phone{width:340px;max-width:100%;height:680px;background:var(--paper-low);border-radius:34px;overflow:hidden;
+  box-shadow:0 10px 40px var(--shadow),0 0 0 8px var(--ink);position:relative;display:flex;flex-direction:column;flex:none}
+.status{height:26px;flex:none}
+.appbar{padding:6px 16px 0;display:flex;align-items:center;gap:10px;flex:none}
+.appbar .t{font-size:22px;font-weight:500;flex:1}
+.ic{width:22px;height:22px;display:inline-block;flex:none}
+.ic svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs{display:flex;border-bottom:1px solid var(--outline);margin-top:8px;flex:none}
+.tabs div{flex:1;text-align:center;font-size:14px;font-weight:500;padding:12px 0 10px;color:var(--ink-3);position:relative}
+.tabs div.on{color:var(--brand-dark)}
+.tabs div.on:after{content:"";position:absolute;left:25%;right:25%;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--brand-dark)}
+.body{flex:1;overflow:auto;padding:14px 14px 24px}
+.nav{height:64px;flex:none;background:var(--paper-mid);display:flex;justify-content:space-around;align-items:center;font-size:11px;color:var(--ink-3)}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav .on{color:var(--ink);font-weight:600}
+.nav .on .pill{background:var(--brand-light)}
+.nav .pill{padding:3px 18px;border-radius:999px;display:flex}
+.sec{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:14px 4px 8px;display:flex;align-items:center}
+.sec span{flex:1}
+.sec a{font-size:13px;letter-spacing:0;text-transform:none;color:var(--brand-dark);font-weight:600;text-decoration:none}
+
+.card{background:var(--paper);border-radius:20px;padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.card .n{font-size:16px;font-weight:500}
+.card .m{font-size:13px;color:var(--ink-3);margin-top:2px}
+.grow{flex:1;min-width:0}
+.crest{width:42px;height:42px;border-radius:14px;background:var(--brand-light);color:var(--brand-dark);display:grid;place-items:center;font-weight:600;font-size:15px;flex:none}
+.av{width:36px;height:36px;border-radius:50%;background:var(--paper-top);display:grid;place-items:center;font-weight:600;font-size:14px;color:var(--ink-2);flex:none}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--brand-light);color:var(--brand-dark)}
+.chip.admin{background:transparent;border:1px solid var(--outline-strong);color:var(--ink-2)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:11px 16px;border:0;cursor:pointer}
+.btn.tonal{background:var(--brand-light);color:var(--brand-dark)}
+.btn.filled{background:var(--brand-dark);color:var(--paper-low)}
+.btn.text{background:transparent;color:var(--brand-dark);padding:8px 10px}
+.btn.danger{background:transparent;color:var(--error)}
+.btn.full{width:100%}
+.stack{display:flex;flex-direction:column;gap:8px}
+.list{background:var(--paper);border-radius:20px;overflow:hidden}
+.li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--paper-mid)}
+.li:last-child{border-bottom:0}
+.li .n{font-size:15px}
+.li .m{font-size:12px;color:var(--ink-3)}
+.dots{color:var(--ink-3)}
+.seg{display:flex;background:var(--paper-mid);border-radius:999px;padding:3px;margin-bottom:12px}
+.seg div{flex:1;text-align:center;font-size:14px;font-weight:500;padding:8px 0;border-radius:999px;color:var(--ink-3)}
+.seg .on{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px var(--shadow)}
+.hscroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}
+.gchip{flex:none;display:flex;align-items:center;gap:8px;background:var(--paper);border-radius:999px;padding:6px 12px 6px 6px;font-size:14px;font-weight:500}
+.gchip .crest{width:28px;height:28px;border-radius:10px;font-size:12px}
+.gchip.add{border:1px dashed var(--outline-strong);background:transparent;color:var(--ink-2);padding:6px 12px}
+.ride{background:var(--paper);border-radius:20px;padding:12px 14px;margin-bottom:8px}
+.ride .d{font-size:15px;font-weight:500}
+.ride .w{font-size:13px;color:var(--ink-3);margin-top:2px}
+.tier{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--perfect-bg);color:var(--perfect-fg)}
+.muted{color:var(--ink-3);font-size:13px;line-height:1.45}
+.hero{background:var(--paper);border-radius:24px;padding:18px;text-align:center;margin-bottom:12px}
+.hero .crest{width:64px;height:64px;border-radius:20px;font-size:22px;margin:0 auto 10px}
+.hero .n{font-size:22px;font-weight:500}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper);border-radius:28px 28px 0 0;padding:10px 18px 22px;box-shadow:0 -6px 24px var(--shadow)}
+.sheet .grab{width:36px;height:4px;border-radius:4px;background:var(--outline);margin:0 auto 14px}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet .h{font-size:18px;font-weight:500;margin-bottom:4px}
+.act{display:flex;align-items:center;gap:14px;padding:12px 4px;font-size:15px}
+.act.red{color:var(--error)}
+.field{border:1px solid var(--outline-strong);border-radius:12px;padding:8px 12px;margin:12px 0 4px}
+.field small{font-size:11px;color:var(--brand-dark);font-weight:600}
+.field div{font-size:16px}
+.counter{font-size:11px;color:var(--ink-3);text-align:right}
+.menu{position:absolute;right:18px;background:var(--paper);border-radius:12px;box-shadow:0 6px 24px var(--shadow);padding:6px 0;min-width:210px;z-index:2}
+.menu div{padding:10px 16px;font-size:14px}
+.menu .red{color:var(--error)}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--paper-mid);border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:14px;font-weight:500}
+.sw{width:40px;height:24px;border-radius:999px;background:var(--brand-dark);position:relative}
+.sw:after{content:"";position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--paper)}
+.mini{font-family:inherit;font-size:12px;font-weight:600;border-radius:999px;padding:5px 10px;border:1px solid var(--outline-strong);background:transparent;color:var(--ink-2)}
+.mini.red{border-color:var(--error);color:var(--error)}
+.banner{background:var(--error-bg);color:var(--error);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.4;margin-bottom:10px}
+.snack{position:absolute;left:12px;right:12px;bottom:76px;background:var(--ink);color:var(--paper-low);border-radius:10px;padding:12px 14px;font-size:14px}
+.states{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;margin-top:10px}
+.states .phone{height:600px}
+.decide{background:var(--paper);border-radius:20px;padding:18px 20px;margin-top:40px;max-width:760px}
+.decide ul{margin:8px 0 0;padding-left:20px;line-height:1.6;color:var(--ink-2)}
+@media (prefers-reduced-motion:no-preference){.stage.on{animation:fade .18s ease-out}@keyframes fade{from{opacity:.4}to{opacity:1}}}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 002 2h10a2 2 0 002-2v-5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></symbol>
+  <symbol id="i-userplus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M3 21c1.3-4 4-6 7-6 1.5 0 3 .4 4 1.2M19 14v6M16 17h6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l-5-5 5-5M5 12h11"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9l2 7M13 6h3"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
+</svg>
+
+<div class="wrap">
+  <div class="eyebrow">Schets 015 · v4.2 Clubs · fase 34</div>
+  <h1>Groepen in Peloton</h1>
+  <p class="lead lede">Twee vragen, elk met drie antwoorden. Alles staat in de huidige look van de app: Outfit, de merkgroenen, en het scherm <b>Mijn Ritten</b> met de tabs <b>Ritten</b> en <b>Peloton</b>. Onderaan staan de vaste schermen die in elke variant hetzelfde zijn. Kies per vraag een letter.</p>
+
+  <!-- ─────────── VRAAG 1 ─────────── -->
+  <section class="q" id="plek">
+    <div class="eyebrow">Vraag 1</div>
+    <h2>Waar staan je groepen?</h2>
+    <div class="bar" role="group" aria-label="Variant vraag 1">
+      <button id="q1a" aria-pressed="true" data-q="1" data-v="a">A · Bovenaan de Peloton-tab</button>
+      <button id="q1b" aria-pressed="false" data-q="1" data-v="b">B · Eigen tab Groepen</button>
+      <button id="q1c" aria-pressed="false" data-q="1" data-v="c">C · Groepen als filter op Ritten</button>
+    </div>
+    <p class="note" id="n1"></p>
+
+    <div class="stage on" data-s="1a"><div class="row">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="t">Mijn Ritten</span></div>
+          <div class="tabs"><div>Ritten</div><div class="on">Peloton</div></div>
+          <div class="body">
+            <div class="sec"><span>Groepen</span><a href="#plek">+ Nieuwe groep</a></div>
+            <div class="card"><div class="crest">DC</div><div class="grow"><div class="n">Dinsdagclub</div><div class="m">9 leden · za 09:00 staat open</div></div><span class="chip admin">beheerder</span></div>
+            <div class="card"><div class="crest">BU</div><div class="grow"><div class="n">Buren</div><div class="m">3 leden</div></div></div>
+            <div class="sec"><span>Maatjes</span></div>
+            <div class="list">
+              <div class="li"><div class="av">I</div><div class="grow n">Ingrid</div><span class="ic dots"><svg><use href="#i-trash"/></svg></span></div>
+              <div class="li"><div class="av">J</div><div class="grow n">Jacco</div><span class="ic dots"><svg><use href="#i-trash"/></svg></span></div>
+            </div>
+            <div style="margin-top:12px" class="stack">
+              <button class="btn tonal full"><span class="ic"><svg><use href="#i-userplus"/></svg></span>Nodig een maatje uit</button>
+            </div>
+          </div>
+          <div class="nav"><div><span class="pill"><span class="ic"><svg><use href="#i-home"/></svg></span></span>Home</div><div class="on"><span class="pill"><span class="ic"><svg><use href="#i-bike"/></svg></span></span>Ritten</div><div><span class="pill"><span class="ic"><svg><use href="#i-cal"/></svg></span></span>Agenda</div><div><span class="pill"><span class="ic"><svg><use href="#i-user"/></svg></span></span>Profiel</div></div>
+        </div>
+        <p class="cap">Groepen en maatjes staan onder elkaar op dezelfde tab. De groepen komen eerst, want daar gebeurt het meest.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="t">Mijn Ritten</span></div>
+          <div class="tabs"><div>Ritten</div><div class="on">Peloton</div></div>
+          <div class="body">
+            <div class="sec"><span>Groepen</span></div>
+            <div class="card" style="flex-direction:column;align-items:stretch;text-align:center;padding:18px">
+              <div class="crest" style="margin:0 auto 8px"><span class="ic"><svg><use href="#i-bike"/></svg></span></div>
+              <div class="n">Fiets je met een vaste club?</div>
+              <div class="muted" style="margin:4px 0 12px">Maak een groep. Dan zet je een rit in één keer uit voor iedereen.</div>
+              <button class="btn filled">Groep maken</button>
+            </div>
+            <div class="sec"><span>Maatjes</span></div>
+            <div class="list"><div class="li"><div class="av">I</div><div class="grow n">Ingrid</div></div></div>
+          </div>
+          <div class="nav"><div><span class="pill"><span class="ic"><svg><use href="#i-home"/></svg></span></span>Home</div><div class="on"><span class="pill"><span class="ic"><svg><use href="#i-bike"/></svg></span></span>Ritten</div><div><span class="pill"><span class="ic"><svg><use href="#i-cal"/></svg></span></span>Agenda</div><div><span class="pill"><span class="ic"><svg><use href="#i-user"/></svg></span></span>Profiel</div></div>
+        </div>
+        <p class="cap">Zo ziet het eruit als je nog geen groep hebt: één uitnodigende kaart in plaats van een lege kop.</p>
+      </div>
+    </div></div>
+
+    <div class="stage" data-s="1b"><div class="row">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="t">Mijn Ritten</span></div>
+          <div class="tabs"><div>Ritten</div><div class="on">Groepen</div><div>Maatjes</div></div>
+          <div class="body">
+            <div class="card"><div class="crest">DC</div><div class="grow"><div class="n">Dinsdagclub</div><div class="m">9 leden · jij bent beheerder</div></div></div>
+            <div class="card"><div class="crest">BU</div><div class="grow"><div class="n">Buren</div><div class="m">3 leden</div></div></div>
+            <button class="btn tonal full" style="margin-top:6px"><span class="ic"><svg><use href="#i-plus"/></svg></span>Nieuwe groep</button>
+          </div>
+          <div class="nav"><div><span class="pill"><span class="ic"><svg><use href="#i-home"/></svg></span></span>Home</div><div class="on"><span class="pill"><span class="ic"><svg><use href="#i-bike"/></svg></span></span>Ritten</div><div><span class="pill"><span class="ic"><svg><use href="#i-cal"/></svg></span></span>Agenda</div><div><span class="pill"><span class="ic"><svg><use href="#i-user"/></svg></span></span>Profiel</div></div>
+        </div>
+        <p class="cap">Drie tabs. "Peloton" wordt "Maatjes", en Groepen krijgt de ruimte.</p>
+      </div>
+    </div></div>
+
+    <div class="stage" data-s="1c"><div class="row">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="t">Mijn Ritten</span></div>
+          <div class="tabs"><div class="on">Ritten</div><div>Peloton</div></div>
+          <div class="body">
+            <div class="hscroll">
+              <div class="gchip" style="background:var(--brand-dark);color:var(--paper-low);padding-left:12px">Alles</div>
+              <div class="gchip"><div class="crest">DC</div>Dinsdagclub</div>
+              <div class="gchip"><div class="crest">BU</div>Buren</div>
+              <div class="gchip add">+ Groep</div>
+            </div>
+            <div class="ride"><div style="display:flex;gap:8px;align-items:center"><span class="chip">Dinsdagclub</span><span class="grow"></span><span class="tier">Toprit</span></div><div class="d" style="margin-top:6px">Zaterdag 09:00–13:00</div><div class="w">Anna organiseert · 4 gaan mee · 5 nog niet</div></div>
+            <div class="ride"><div style="display:flex;gap:8px;align-items:center"><span class="grow"></span><span class="tier">Fijne rit</span></div><div class="d" style="margin-top:6px">Zondag 10:00–12:00</div><div class="w">Jij gaat solo</div></div>
+          </div>
+          <div class="nav"><div><span class="pill"><span class="ic"><svg><use href="#i-home"/></svg></span></span>Home</div><div class="on"><span class="pill"><span class="ic"><svg><use href="#i-bike"/></svg></span></span>Ritten</div><div><span class="pill"><span class="ic"><svg><use href="#i-cal"/></svg></span></span>Agenda</div><div><span class="pill"><span class="ic"><svg><use href="#i-user"/></svg></span></span>Profiel</div></div>
+        </div>
+        <p class="cap">De groepen staan als rij bovenaan je ritten. Tik je er een aan, dan zie je alleen die ritten. Lang indrukken opent de groep.</p>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ─────────── VRAAG 2 ─────────── -->
+  <section class="q" id="beheer">
+    <div class="eyebrow">Vraag 2</div>
+    <h2>Hoe beheer je een groep?</h2>
+    <div class="bar" role="group" aria-label="Variant vraag 2">
+      <button id="q2a" aria-pressed="true" data-q="2" data-v="a">A · Menu per lid</button>
+      <button id="q2b" aria-pressed="false" data-q="2" data-v="b">B · Knop "Beheren"</button>
+      <button id="q2c" aria-pressed="false" data-q="2" data-v="c">C · Tik op een lid</button>
+    </div>
+    <p class="note" id="n2"></p>
+
+    <div class="stage on" data-s="2a"><div class="row">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Dinsdagclub</span><span class="ic"><svg><use href="#i-more"/></svg></span></div>
+          <div class="body">
+            <div class="hero"><div class="crest">DC</div><div class="n">Dinsdagclub</div><div class="muted">9 leden · sinds 23 sep</div>
+              <button class="btn tonal full" style="margin-top:12px"><span class="ic"><svg><use href="#i-share"/></svg></span>Deel de groepslink</button></div>
+            <div class="sec"><span>Leden</span><a href="#beheer">+ Maatje toevoegen</a></div>
+            <div class="list">
+              <div class="li"><div class="av">J</div><div class="grow"><div class="n">Joost (jij)</div></div><span class="chip admin">beheerder</span></div>
+              <div class="li"><div class="av">A</div><div class="grow"><div class="n">Anna</div></div><span class="chip admin">beheerder</span><span class="ic dots"><svg><use href="#i-more"/></svg></span></div>
+              <div class="li"><div class="av">I</div><div class="grow"><div class="n">Ingrid</div></div><span class="ic dots"><svg><use href="#i-more"/></svg></span></div>
+              <div class="li"><div class="av">M</div><div class="grow"><div class="n">Mark</div></div><span class="ic dots"><svg><use href="#i-more"/></svg></span></div>
+            </div>
+          </div>
+          <div class="menu" style="top:392px"><div>Beheerder maken</div><div class="red">Uit de groep halen</div></div>
+        </div>
+        <p class="cap">Een beheerder ziet ⋮ achter elk lid. Het menu rechtsboven heeft: naam wijzigen, link vervangen, groep verlaten en groep opheffen. Een gewoon lid ziet geen ⋮.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Dinsdagclub</span><span class="ic"><svg><use href="#i-more"/></svg></span></div>
+          <div class="body">
+            <div class="hero"><div class="crest">DC</div><div class="n">Dinsdagclub</div><div class="muted">9 leden</div></div>
+            <div class="sec"><span>Leden</span></div>
+            <div class="list">
+              <div class="li"><div class="av">A</div><div class="grow"><div class="n">Anna</div></div><span class="chip admin">beheerder</span></div>
+              <div class="li"><div class="av">I</div><div class="grow"><div class="n">Ingrid (jij)</div></div></div>
+              <div class="li"><div class="av">M</div><div class="grow"><div class="n">Mark</div></div></div>
+            </div>
+          </div>
+          <div class="menu" style="top:40px"><div>Groep verlaten</div></div>
+        </div>
+        <p class="cap">Dezelfde groep bekeken door een gewoon lid: geen link en geen ⋮. In het menu staat alleen "Groep verlaten".</p>
+      </div>
+    </div></div>
+
+    <div class="stage" data-s="2b"><div class="row">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Dinsdagclub</span><button class="btn text">Beheren</button></div>
+          <div class="body">
+            <div class="hero"><div class="crest">DC</div><div class="n">Dinsdagclub</div><div class="muted">9 leden</div>
+              <button class="btn tonal full" style="margin-top:12px"><span class="ic"><svg><use href="#i-share"/></svg></span>Deel de groepslink</button></div>
+            <div class="list">
+              <div class="li"><div class="av">J</div><div class="grow n">Joost (jij)</div><span class="chip admin">beheerder</span></div>
+              <div class="li"><div class="av">A</div><div class="grow n">Anna</div><span class="chip admin">beheerder</span></div>
+              <div class="li"><div class="av">I</div><div class="grow n">Ingrid</div></div>
+            </div>
+            <button class="btn danger full" style="margin-top:10px"><span class="ic"><svg><use href="#i-out"/></svg></span>Groep verlaten</button>
+          </div>
+        </div>
+        <p class="cap">Gewone stand: rustig, de leden onder elkaar. Een beheerder ziet rechtsboven "Beheren".</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Beheren</span><button class="btn text">Klaar</button></div>
+          <div class="body">
+            <div class="field" style="margin-top:0"><small>Groepsnaam</small><div>Dinsdagclub</div></div>
+            <div class="sec"><span>Leden</span><a href="#beheer">+ Maatje</a></div>
+            <div class="list">
+              <div class="li"><div class="av">A</div><div class="grow n">Anna</div><button class="mini">Lid maken</button></div>
+              <div class="li"><div class="av">I</div><div class="grow n">Ingrid</div><button class="mini">Beheerder</button><button class="mini red">Eruit</button></div>
+              <div class="li"><div class="av">M</div><div class="grow n">Mark</div><button class="mini">Beheerder</button><button class="mini red">Eruit</button></div>
+            </div>
+            <div class="sec"><span>Groepslink</span></div>
+            <div class="list"><div class="li"><span class="ic"><svg><use href="#i-link"/></svg></span><div class="grow n">Link vervangen</div></div></div>
+            <button class="btn danger full" style="margin-top:12px"><span class="ic"><svg><use href="#i-trash"/></svg></span>Groep opheffen</button>
+          </div>
+        </div>
+        <p class="cap">De beheerstand toont alles tegelijk. Je ziet meteen wat er kan, maar het is een tweede scherm dat je moet vinden.</p>
+      </div>
+    </div></div>
+
+    <div class="stage" data-s="2c"><div class="row">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Dinsdagclub</span><span class="ic"><svg><use href="#i-pen"/></svg></span></div>
+          <div class="body">
+            <div class="hero"><div class="crest">DC</div><div class="n">Dinsdagclub</div><div class="muted">9 leden</div>
+              <div style="display:flex;gap:8px;margin-top:12px"><button class="btn tonal" style="flex:1"><span class="ic"><svg><use href="#i-share"/></svg></span>Link</button><button class="btn tonal" style="flex:1"><span class="ic"><svg><use href="#i-userplus"/></svg></span>Maatje</button></div></div>
+            <div class="list">
+              <div class="li"><div class="av">A</div><div class="grow n">Anna</div><span class="chip admin">beheerder</span></div>
+              <div class="li"><div class="av">I</div><div class="grow n">Ingrid</div></div>
+              <div class="li"><div class="av">M</div><div class="grow n">Mark</div></div>
+            </div>
+          </div>
+          <div class="scrim"></div>
+          <div class="sheet"><div class="grab"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><div class="av">I</div><div><div class="h">Ingrid</div><div class="muted">Lid sinds 23 sep</div></div></div>
+            <div class="act"><span class="ic"><svg><use href="#i-shield"/></svg></span>Beheerder maken</div>
+            <div class="act red"><span class="ic"><svg><use href="#i-out"/></svg></span>Uit de groep halen</div>
+          </div>
+        </div>
+        <p class="cap">Tik op een lid en er schuift een blad omhoog met wat je met die persoon kunt. Het potlood rechtsboven is voor de naam. Opheffen en verlaten staan onderaan de ledenlijst.</p>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ─────────── VASTE SCHERMEN ─────────── -->
+  <section class="q" id="vast">
+    <div class="eyebrow">In elke variant hetzelfde</div>
+    <h2>Aanmaken, de link openen, en de grenzen</h2>
+    <p class="note">Deze schermen hoeven geen keuze. Ze staan hier zodat je de hele weg van begin tot eind ziet.</p>
+    <div class="states">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="t">Mijn Ritten</span></div>
+          <div class="body"></div>
+          <div class="scrim"></div>
+          <div class="sheet"><div class="grab"></div>
+            <div class="h">Nieuwe groep</div>
+            <div class="muted">Geef hem een naam die je club herkent. Je kunt hem later wijzigen.</div>
+            <div class="field"><small>Naam</small><div>Dinsdagclub|</div></div>
+            <div class="counter">11/40</div>
+            <button class="btn filled full" style="margin-top:12px">Groep maken</button>
+          </div>
+        </div>
+        <p class="cap"><b>Groep maken (CLUB-01).</b> Jij bent daarna meteen lid en beheerder. De volgende stap is de link delen.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="body" style="display:flex;flex-direction:column;justify-content:center;text-align:center;padding:28px">
+            <div class="crest" style="width:72px;height:72px;border-radius:22px;font-size:24px;margin:0 auto 14px">DC</div>
+            <div class="muted">Joost nodigt je uit voor</div>
+            <div style="font-size:26px;font-weight:500;margin:4px 0 6px">Dinsdagclub</div>
+            <div class="muted" style="margin-bottom:22px">9 fietsers plannen hier samen hun ritten, op de beste momenten van de week.</div>
+            <button class="btn filled full">Log in en doe mee</button>
+            <button class="btn text" style="margin:8px auto 0">Niet nu</button>
+          </div>
+        </div>
+        <p class="cap"><b>De groepslink openen (CLUB-02).</b> Eerst inloggen, net als bij de maatjescode. Daarna ben je lid en sta je op het groepsscherm.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Maatje toevoegen</span></div>
+          <div class="body">
+            <div class="banner">De Dinsdagclub heeft al 30 leden, het maximum. Haal eerst iemand uit de groep.</div>
+            <div class="list">
+              <div class="li"><div class="av">I</div><div class="grow n">Ingrid</div><span class="muted">al lid</span></div>
+              <div class="li"><div class="av">J</div><div class="grow n">Jacco</div><button class="mini">Toevoegen</button></div>
+            </div>
+          </div>
+          <div class="snack">Jacco zit al in 10 groepen, het maximum.</div>
+        </div>
+        <p class="cap"><b>Grenzen (CLUB-18).</b> Je krijgt een gewone zin met wat je kunt doen, geen foutcode. Maatjes die al lid zijn staan erbij, maar zijn niet aan te tikken.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="body"></div>
+          <div class="scrim"></div>
+          <div class="sheet"><div class="grab"></div>
+            <div class="h">Dinsdagclub opheffen?</div>
+            <div class="muted" style="margin:6px 0 14px;line-height:1.5">De groep en de link verdwijnen voor alle 9 leden. Ritten waarop iemand al geantwoord heeft blijven staan, zonder groepslabel. Dit kun je niet terugdraaien.</div>
+            <button class="btn full" style="background:var(--error);color:var(--paper)">Opheffen</button>
+            <button class="btn text full">Annuleren</button>
+          </div>
+        </div>
+        <p class="cap"><b>Opheffen (CLUB-11).</b> De enige handeling zonder ongedaan maken, dus de enige met een bevestiging. Verlaten en iemand eruit halen krijgen een snackbar met "Ongedaan maken", net als afzeggen nu.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Dinsdagclub</span></div>
+          <div class="body">
+            <div class="list">
+              <div class="li"><div class="av">J</div><div class="grow n">Joost (jij)</div><span class="chip admin">beheerder</span></div>
+              <div class="li"><div class="av">I</div><div class="grow n">Ingrid</div></div>
+            </div>
+          </div>
+          <div class="snack">Je bent de enige beheerder. Maak eerst iemand anders beheerder, dan kun je dit afgeven.</div>
+        </div>
+        <p class="cap"><b>De laatste beheerder (CLUB-10).</b> Wie zichzelf als enige beheerder wil degraderen, krijgt deze uitleg. Verlaten mag wel: dan wordt het langst zittende lid beheerder, en dat zegt de bevestiging er vooraf bij.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="decide">
+    <h2>Wat ik adviseer</h2>
+    <ul>
+      <li><b>Vraag 1: A.</b> Groepen bovenaan de Peloton-tab. Er komt geen nieuwe tab bij, en maatjes en groepen staan waar je ze al zoekt. C is slim, maar de groep zelf wordt dan moeilijk te vinden. B maakt van het woord "Peloton" iets anders dan nu.</li>
+      <li><b>Vraag 2: A.</b> Een ⋮ per lid is het gewone Android-patroon, en een gewoon lid ziet een rustig scherm. B verbergt het beheer achter een knop. C is prettig voor één lid, maar verlaten en opheffen staan dan ver weg onderaan.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const notes={
+  '1a':'<b>A. Bovenaan de Peloton-tab.</b> Er komt geen nieuwe tab bij. Groepen staan boven de maatjes, met "+ Nieuwe groep" in de kop. Zonder groep zie je een uitnodigende kaart.',
+  '1b':'<b>B. Eigen tab.</b> Drie tabs: Ritten, Groepen, Maatjes. Groepen krijgen het meeste ruimte, maar de tab "Peloton" verdwijnt dan en er komt een tik bij.',
+  '1c':'<b>C. Groepen als filter.</b> De groepen staan als chips boven je ritten. Dat is handig als je in twee clubs rijdt, maar het groepsscherm zelf zit dan verstopt achter lang indrukken.',
+  '2a':'<b>A. Menu per lid.</b> Een beheerder ziet ⋮ achter elk lid. Wat voor de hele groep geldt, staat in het menu rechtsboven. Dat is het gewone Android-patroon.',
+  '2b':'<b>B. Knop "Beheren".</b> Een gewoon scherm, en een aparte beheerstand waarin alle knoppen tegelijk zichtbaar zijn. Overzichtelijk, maar een extra laag.',
+  '2c':'<b>C. Tik op een lid.</b> Er schuift een blad omhoog met de acties voor die persoon. Het voelt licht, maar acties die de hele groep raken staan losser.'
+};
+function show(q,v){
+  document.querySelectorAll('[data-q="'+q+'"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+  document.querySelectorAll('.stage[data-s^="'+q+'"]').forEach(s=>s.classList.toggle('on',s.dataset.s===q+v));
+  document.getElementById('n'+q).innerHTML=notes[q+v];
+}
+document.querySelectorAll('.bar button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.q,b.dataset.v)));
+show('1','a');show('2','a');
+</script>
