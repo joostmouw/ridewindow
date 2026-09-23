@@ -458,6 +458,40 @@ ontwerp. Wie ze eruit haalt, kan praten met de REST-API als `anon`. Daarmee is d
 - **Eerst het gat dat al bestaat, niet het gat dat ooit kan ontstaan.** A en B zijn er vandaag; D
   wordt pas echt bij slice 5 van [[65]].
 
+## 77 — Melding bij een uitnodiging: wat er kan binnen €0 en "alleen plpgsql"
+
+Input verzameld op 2026-09-23, op verzoek van Joost, naar aanleiding van tester-feedback
+(*"misschien notificaties toevoegen als je een melding van een uitnodiging krijgt"*). Nog geen
+besluit; dit is de stand van de opties.
+
+**Wat er nu is.** Lokale meldingen (`notification_service.dart`: avond ervoor, ochtend van,
+weekoverzicht) en een WorkManager-taak die elke drie uur draait (`main.dart:80`,
+`background_task.dart`) en alleen weer ophaalt. Uitnodigingen zie je via
+`pendingRideInvitesProvider` — maar pas als je de app opent, en er is **geen badge** op de
+Peloton-tab (`scaffold_with_nav.dart`), dus ook ín de app valt een uitnodiging niet op.
+
+**De harde grens.** Postgres kan FCM niet zelf aanroepen: FCM HTTP v1 vraagt een OAuth-token
+dat met een service-account (RS256) ondertekend is, en dat kan geen plpgsql-functie. Supabase
+zelf schrijft het zo voor: trigger → webhook (pg_net) → Edge Function → FCM
+([Supabase docs](https://supabase.com/docs/guides/functions/examples/push-notifications)).
+Echte push betekent dus altijd íéts buiten de database.
+
+| | Route | Kosten | Wat het breekt | Bereik |
+|---|---|---|---|---|
+| **A** | **Badge op de Peloton-tab** met het aantal open uitnodigingen | €0 | Niets | Iedereen die de app opent (Android + PWA) |
+| **B** | **Achtergrondtaak kijkt mee**: de bestaande drie-uurs-taak haalt ook open uitnodigingen op en toont een lokale melding voor nieuwe | €0 | Niets aan de constraints. Wel: Supabase-sessie in de isolate opbouwen, en de tijdzone-kwestie van [[74]] | Alleen Android; vertraging tot ~3 uur (Android mag het nog verder uitstellen) |
+| **C** | **Echte push**: tabel met device-tokens, trigger op `group_ride_participants`/groepsritten, één Edge Function die FCM aanroept | €0 binnen de vrije laag (500.000 aanroepen/maand, [Supabase pricing](https://supabase.com/docs/guides/functions/pricing)); FCM is gratis | **"Geen Edge Functions"** uit `CLAUDE.md` — een bewuste herziening, zoals v3.0 dat met "No backend" deed. Privacybeleid: device-token wordt opgeslagen (Google/Firebase is al sub-processor via Hosting) | Android direct; iPhone-PWA alleen als hij op het beginscherm staat (iOS 16.4+) — en of dat in de EU nog werkt moet op een toestel bewezen worden, bronnen spreken elkaar tegen |
+| **D** | Externe pushdienst (OneSignal, Entrig) | Gratis tier | Nieuwe **derde** sub-processor, en data buiten de EU | Breed |
+
+**Advies.** A en B nu: samen dekken ze "je mist een uitnodiging" voor de Android-testers zonder
+één constraint te raken, en A helpt ook op de PWA. C pas als Clubs gebruikt wordt en drie uur
+vertraging in de praktijk te traag blijkt — dan is het een bewuste herziening van "geen Edge
+Functions" met één functie die precies één ding doet. D afwijzen.
+
+**Samenhang.** B deelt zijn fundament met [[74]] (tijdzone en plugin-registratie in de isolate) —
+die twee horen in één fase. A past natuurlijk in fase 35 van Clubs (groepsritten), omdat daar de
+uitnodigingen per groep bijkomen.
+
 ## 74 — Meldingen bij laten werken zonder dat de app geopend wordt
 
 De drie meldingsschakelaars werken sinds 2026-09-19, maar alleen vanuit de voorgrond: de
