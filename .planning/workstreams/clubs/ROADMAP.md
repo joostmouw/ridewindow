@@ -56,7 +56,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
   7. Een info-knop bij Groepen op de Peloton-tab en op het groepsscherm legt de groepsregels uit in NL en EN (CLUB-28)
 
 **Plans**: 8 plans
-- [ ] 34-01-PLAN.md — migratie 0013_group_join_requests.sql (aanvragen, voordragen, accepteren, links voor leden) + functietelling naar dertien
+- [x] 34-01-PLAN.md — migratie 0013_group_join_requests.sql (aanvragen, voordragen, accepteren, links voor leden) + functietelling naar dertien
 - [ ] 34-02-PLAN.md — deny-tests (nieuw + 0012-test bijgewerkt) + [BLOCKING] Joost past 0013 toe en draait beide live
 - [ ] 34-03-PLAN.md — datalaag: modellen, gateway, providers, foutsleutels als gewone zinnen
 - [ ] 34-04-PLAN.md — Groepen op de Peloton-tab, groep maken, groepsscherm (leesstand, aanvraagstaat), regelsheet
@@ -107,6 +107,6 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
-| 34. Groep maken en beheren | 0/8 | Planned | - |
+| 34. Groep maken en beheren | 1/8 | In Progress|  |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |
