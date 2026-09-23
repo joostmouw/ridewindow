@@ -261,6 +261,9 @@ void main() {
     test('grafeem-veilig: een emoji blijft heel', () {
       expect(groupInitials('🚴 Club'), '🚴C');
       expect(groupInitials('🚴‍♀️'), '🚴‍♀️');
+      expect(groupInitials('🇳🇱🇧🇪'), '🇳🇱🇧🇪');
+      expect(groupInitials('e\u0301cole'), 'E\u0301C');
+      expect(groupInitials('Ötztal'), 'ÖT');
     });
   });
 
