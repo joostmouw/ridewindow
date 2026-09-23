@@ -2,7 +2,7 @@
 sketch: 015
 name: clubs-groepen
 question: "Waar staan je groepen in Peloton, en hoe beheer je een groep?"
-winner: null
+winner: "Vraag 1: A + C (C alleen als je groepen hebt) · Vraag 2: A"
 tags: [peloton, clubs, groepen, beheer, fase-34]
 ---
 
@@ -29,3 +29,11 @@ Verlaten en eruit halen krijgen een snackbar met ongedaan maken.
 ## How to View
 Open het artifact, of `python3 -m http.server 8765` vanuit de repo-root en ga naar
 `/.planning/sketches/015-clubs-groepen/index.html`.
+
+## Gekozen (Joost, 2026-09-23)
+- **Vraag 1: A én C.** Groepen staan bovenaan de Peloton-tab (A). Daarnaast krijgt de Ritten-tab
+  de rij groepschips als filter (C) — **alleen als je in minstens één groep zit**; zonder groepen
+  staat daar niets, ook geen "+ Groep"-chip. Het filter hoort bij groepsritten en landt dus in
+  fase 35 (CLUB-26); lang indrukken op een chip opent de groep.
+- **Vraag 2: A.** ⋮ per lid voor beheerders; naam wijzigen, link vervangen, verlaten en opheffen in
+  het appbar-menu. Een gewoon lid ziet geen ⋮ en alleen "Groep verlaten".
