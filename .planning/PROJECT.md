@@ -41,6 +41,20 @@ Ridewindow is an app for casual cyclists who want to know — at a glance — th
 
 **Key context:** Het kritieke pad is de klok: die start pas als er twaalf testers aangemeld staan, en pauzeert of reset als het aantal daaronder zakt. Alles wat de werving vervroegt gaat vóór. De eigen kring stapt direct in (zij verdragen een lege eerste minuut); de kanalen met onbekenden pas ná de build met de eerste-minuut-fixes. Neemt epic #71 "Twaalf testers" (`.planning/TESTERS.md`) op. Realistisch vroegste productiemoment: begin tot half oktober 2026.
 
+## Parallel Milestone: v4.2 Clubs (workstream `clubs`)
+
+**Goal:** Een fietsclub of vast groepje krijgt in Peloton een naam, leden en beheerders, en plant ritten als groep: ieder lid ziet de groepsritten en per rit wie komt en wie welk venster kan.
+
+**Target features:**
+- Groep maken; lid worden via een groepslink of doordat een beheerder een bestaand maatje toevoegt
+- Meerdere beheerders: de maker is de eerste, beheerders maken anderen beheerder, beheren leden en naam; er is altijd minstens één beheerder
+- Ieder lid zet een rit uit voor de groep; de rit hoort bij de groep (geen momentopname), dus ook latere leden zien hem en vertrokken leden niet meer
+- Alles open binnen de groep: ledenlijst en per rit de antwoorden en stemmen op vensters
+- Grenzen in de database: max 30 leden per groep, 10 groepen per account
+- Afronding: privacybeleid, NL/EN, regressie, build naar de testers, test met twee echte accounts
+
+**Key context:** Slice 7 ("clubs") van epic #65 Peloton v2, besloten door Joost op 2026-09-23 (ontwerp: https://claude.ai/artifact/VLK7ktJhi4a75SALjRMN7W). Loopt als GSD-workstream `clubs` naast v4.1, die op de veertien-dagenklok wacht; fase 28 schuift daarvoor op. Fasenummering gaat verder na 32. Groepen hebben slice 3 (gedeelde beschikbaarheid) niet nodig: ze bouwen op het stemmen uit 0010. Het beschikbaarheidsrooster uit Profiel blijft privé. Twee nieuwe plpgsql-functies (`redeem_group_invite`, `is_group_member`) brengen het totaal van zes naar acht; de "No backend"-constraint in `CLAUDE.md` en `AGENTS.md` wordt daarop bijgewerkt. Bekende valkuilen uit `.planning/PELOTON.md` gelden hier dubbel: policy-recursie (security definer-helper nodig) en `insert ... returning` dat op de select-policy stukloopt.
+
 <details>
 <summary>v3.0 Accounts & Sociaal (archived — shipped 2026-09-07) en v4.0 Eigen gezicht (afgerond 2026-09-08)</summary>
 
@@ -114,6 +128,8 @@ Three constraints below ("No backend", "Budget", "Privacy") are broken by this m
 - Feedback (FEED) — gestructureerde intake, feedbackmoment in de app, beoordelingsronde naar de backlog, terugkoppeling
 - Vensters (WIN) — Ingrids #69 en #70
 - Bewijs (PROOF) — changelog, builds tijdens de veertien dagen, aanvraag, productie
+
+**v4.2 — Clubs (parallel, workstream `clubs`).** Requirements in `.planning/workstreams/clubs/REQUIREMENTS.md`, prefix CLUB.
 
 ### Out of Scope
 
@@ -199,4 +215,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-10 — v4.1 (Zo snel mogelijk live in de store) milestone started; merknaam wordt Ridewindow*
+*Last updated: 2026-09-23 — v4.2 Clubs gestart als parallelle workstream naast v4.1*
