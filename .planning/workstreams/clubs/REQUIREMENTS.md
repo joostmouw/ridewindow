@@ -39,7 +39,7 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 - [ ] **CLUB-17**: Alle rechten hierboven worden in de database afgedwongen (RLS + plpgsql), niet alleen in de app; deny-tests bewijzen dat een buitenstaander en een ex-lid geen groep, ledenlijst of groepsrit kunnen lezen, en dat een gewoon lid geen beheerdershandeling kan doen
 - [ ] **CLUB-18**: Een groep heeft maximaal 30 leden en een account zit in maximaal 10 groepen, afgedwongen in de database; de app zegt in gewone taal waarom toetreden of toevoegen niet lukt
 - [ ] **CLUB-19**: Een account verwijderen (`delete_own_account`) ruimt het lidmaatschap op en laat CLUB-10 gelden, zonder dat een groep zonder beheerder achterblijft
-- [ ] **CLUB-20**: De twee nieuwe server-functies (`redeem_group_invite`, `is_group_member`) zijn in hun migratie verantwoord, en de "No backend"-constraint in `CLAUDE.md` en `AGENTS.md` telt er acht
+- [ ] **CLUB-20**: De twee nieuwe server-functies (`redeem_group_invite`, `is_group_member`) zijn in hun migratie verantwoord, en de "No backend"-constraint in `CLAUDE.md` en `AGENTS.md` telt er acht (bijgesteld 2026-09-23 per 33-CONTEXT 'De telling volgt het schema': 0012 voegt vijf functies toe — ook create_group en de triggerfuncties guard_group_member_insert en ensure_group_admin — en de telling wordt elf; zie de kop van 0012)
 
 ### Afronding (CLUB-21 … 24)
 

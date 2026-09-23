@@ -93,7 +93,7 @@ expliciet ja op zegt.
 
 - **EUR 0/maand vanaf v3.0.** Open-Meteo, Firebase Hosting free tier, Supabase
   free tier. Een dienst toevoegen die geld kost is een productbeslissing.
-- **Geen server-side code behalve `plpgsql`-functies.** Zes vandaag, elk
+- **Geen server-side code behalve `plpgsql`-functies.** Elf vandaag, elk
   verantwoord in de migratie die hem toevoegt. Geen Edge Functions.
 - **Privacy.** Uitgelogd verlaat er niets het toestel. Gebruiksstatistiek gaat
   alleen mee na een expliciete ja, gevraagd bij de tweede start. Een

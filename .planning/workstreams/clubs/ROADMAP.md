@@ -32,7 +32,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
   2. Geautomatiseerde deny-tests bewijzen dat een buitenstaander en een ex-lid geen groep, ledenlijst of groepsrit kunnen lezen, en dat een gewoon lid geen beheerdershandeling kan uitvoeren (CLUB-17)
   3. De database weigert een 31e lid in een groep en een 11e groep voor een account, met een foutmelding die de app in gewone taal kan tonen (CLUB-18)
   4. Verliest een groep zijn laatste beheerder (verlaten, verwijderd of account weg), dan wordt automatisch het langst zittende lid beheerder; verliest een groep zijn laatste lid, dan verdwijnt de groep (CLUB-10)
-  5. `delete_own_account` ruimt lidmaatschappen op zonder een groep zonder beheerder achter te laten, en de twee nieuwe functies zijn in de migratie verantwoord met `CLAUDE.md`/`AGENTS.md` bijgewerkt naar acht server-functies (CLUB-19, CLUB-20)
+  5. `delete_own_account` ruimt lidmaatschappen op zonder een groep zonder beheerder achter te laten, en de twee nieuwe functies zijn in de migratie verantwoord met `CLAUDE.md`/`AGENTS.md` bijgewerkt naar acht server-functies (CLUB-19, CLUB-20) (bijgesteld 2026-09-23 per 33-CONTEXT 'De telling volgt het schema': 0012 voegt vijf functies toe — ook create_group en de triggerfuncties guard_group_member_insert en ensure_group_admin — en de telling wordt elf; zie de kop van 0012)
 
 **Plans**: 3 plans
 - [x] 33-01-PLAN.md — migratie 0012_groups.sql: tabellen, RLS, grants, vijf nieuwe functies (grenzen, opvolging, create_group, redeem_group_invite, is_group_member)
