@@ -1,1 +1,1 @@
-Interne testbuild: groepsritten. Zet vanuit het uitnodigscherm een rit uit voor je hele groep, antwoord op de kaart en zie per lid wie er komt. Ritten toont hoeveel ritten op je antwoord wachten, en chips boven de lijst filteren per groep.
+Interne testbuild: groepsritten, plus drie verbeteringen uit testerfeedback. Terug brengt je eerst naar Home voordat de app sluit, de Peloton-tab heeft een inlogknop als je uitgelogd bent, en ritkaarten tonen de duur in jouw taal.

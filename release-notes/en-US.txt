@@ -1,1 +1,1 @@
-Internal test build: group rides. Plan a ride for your whole group from the invite screen, answer on the card, and see per member who is coming. Rides shows a count of rides waiting for your answer, and chips above the list filter by group.
+Internal test build: group rides, plus three fixes from tester feedback. Back now returns to Home before closing the app, the Peloton tab has a sign-in button when you are signed out, and ride cards show durations in your language.
