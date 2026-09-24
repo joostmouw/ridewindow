@@ -1,4 +1,3 @@
-The welcome intro now has sound: you hear a bike get going and roll out, and
-the phone buzzes along with the wheel. Tapping still skips the intro.
-
-Plus housekeeping on where the app's images and audio come from.
+Internal test build: groups on the Peloton tab. Create a group, share its
+link, handle join requests, make members admin, and leave or disband a
+group. Not yet for the wider test group.

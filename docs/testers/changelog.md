@@ -3,6 +3,20 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+## Build 54: 1.0.43+54
+
+**Datum:** 2026-09-24
+**Track:** Alleen internal testing, voor Joosts eigen toesteltest van Clubs fase 34
+(plan 34-08, optie b). Niet naar de gesloten test: Clubs gaat pas in fase 36 naar
+testers, als het privacybeleid (CLUB-21) is bijgewerkt
+
+**Inhoud**
+- Groepen op de Peloton-tab: een groep maken, het groepsscherm met leden en
+  beheerders, aanvragen via de groepslink of een voordracht, beheer per lid,
+  en een groep verlaten of opheffen
+- De groepslink (/#/group/<code>) opent een landingsscherm; de code overleeft
+  inloggen en wordt daarna een aanvraag
+
 ## Build 53: 1.0.42+53
 
 **Datum:** 2026-09-21

@@ -1,5 +1,3 @@
-De welkomstintro heeft geluid gekregen: je hoort een fiets opstarten en
-uitrijden, en de telefoon trilt mee op het ritme van het wiel. Tikken slaat
-de intro nog steeds over.
-
-Verder onderhoud aan de herkomst van het beeld- en geluidsmateriaal.
+Interne testbuild: groepen op de Peloton-tab. Maak een groep, deel de
+groepslink, handel aanvragen af, maak leden beheerder, en verlaat of hef
+een groep op. Nog niet voor de bredere testgroep.
