@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 34-05
+current_plan: 34-06
 status: executing
-stopped_at: 34-04 klaar (groepen-UI leesstand, 798 tests), volgende 34-05
-last_updated: "2026-09-24T12:00:00.000Z"
-last_activity: 2026-09-24 -- 34-04 groepen op Peloton en groepsscherm
+stopped_at: 34-05 klaar (ledenbeheer en aanvragen, 825 tests), volgende 34-06
+last_updated: "2026-09-24T14:00:00.000Z"
+last_activity: 2026-09-24 -- 34-05 ledenbeheer, aanvragen, voordragen
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 11
-  completed_plans: 7
-  percent: 64
+  completed_plans: 8
+  percent: 73
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 34
-Plan: 5 of 8
-Status: groepen zichtbaar, scherm leest; volgende 34-05 beheer
-Last activity: 2026-09-24 -- 34-04 groepen op Peloton en groepsscherm
+Plan: 6 of 8
+Status: ledenbeheer en aanvragen staan; volgende 34-06 link en menu
+Last activity: 2026-09-24 -- 34-05 ledenbeheer, aanvragen, voordragen
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 34-05
+**Current Plan:** 34-06
 
 ## Decisions
 
@@ -44,6 +44,9 @@ Last activity: 2026-09-24 -- 34-04 groepen op Peloton en groepsscherm
 - 34-03: onbekende databasefout gaat door (_guard rethrow); UI toont groupErrorGeneric
 - 34-04: 10-groepengrens al in de UI vóór de sheet; database toetst daarna nog
 - 34-04: GroupAdminChip gedeeld in group_crest.dart; scherm sorteert leden niet opnieuw
+- 34-05: lid eruit halen pas na sluiten snackbar; ongedaan maken verstuurt niets
+- 34-05: aanvraagknoppen onder de naam (Wrap), past op 360 dp
+- 34-05: na geslaagd accepteren/afwijzen blijft het aanvraag-id bezet
 
 ## Performance Metrics
 
@@ -54,8 +57,9 @@ Last activity: 2026-09-24 -- 34-04 groepen op Peloton en groepsscherm
 | 34-01 | 15min | 2 | 4 |
 | 34-03 | 25min | 3 | 15 |
 | 34-04 | 35min | 3 | 17 |
+| 34-05 | 30min | 2 | 10 |
 
 ## Session Continuity
 
-**Stopped At:** 34-04 klaar (groepen-UI leesstand), volgende 34-05
+**Stopped At:** 34-05 klaar (ledenbeheer en aanvragen), volgende 34-06
 **Resume File:** None
