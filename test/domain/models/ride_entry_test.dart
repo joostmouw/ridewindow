@@ -14,6 +14,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/planned_ride.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 
@@ -29,10 +30,12 @@ GroupRide _group({
   int startHour = 9,
   int endHour = 13,
   List<RideParticipant> participants = const [],
+  String? groupId,
 }) =>
     GroupRide(
       id: id,
       ownerId: ownerId,
+      groupId: groupId,
       start: _at(day, startHour),
       end: _at(day, endHour),
       plannedScore: 80,
@@ -346,6 +349,248 @@ void main() {
       // De voorrang bij ontdubbeling leunt op deze volgorde.
       expect(RideRole.values.last, RideRole.declined);
       expect(RideRole.declined.index, greaterThan(RideRole.solo.index));
+    });
+  });
+
+  // ── Groepsritten (fase 35, CLUB-13/14/15) ──
+  //
+  // Een groepsrit heeft geen participant-rij per lid (geen momentopname), dus
+  // wie er meegaat, wie niet en wie nog niet antwoordde volgt uit de huidige
+  // leden, niet uit de rijen alleen.
+  group('groepsritten', () {
+    PelotonGroup clubWith(List<String> uids) => PelotonGroup(
+          id: 'club1',
+          name: 'On the Roll',
+          createdAt: DateTime(2026, 9, 1),
+          members: [
+            for (final u in uids)
+              GroupMember(
+                groupId: 'club1',
+                userId: u,
+                role: GroupRole.member,
+                joinedAt: DateTime(2026, 9, 1),
+              ),
+          ],
+        );
+
+    test('GroupRide.fromRow leest group_id', () {
+      final row = {
+        'id': 'r1',
+        'owner_id': _other,
+        'start_at': '2026-09-14T07:00:00Z',
+        'end_at': '2026-09-14T11:00:00Z',
+        'planned_score': 80,
+      };
+      final plain = GroupRide.fromRow(row);
+      expect(plain.groupId, isNull);
+      expect(plain.isGroupRide, isFalse);
+
+      final nulled = GroupRide.fromRow({...row, 'group_id': null});
+      expect(nulled.groupId, isNull);
+      expect(nulled.isGroupRide, isFalse);
+
+      final club = GroupRide.fromRow({...row, 'group_id': 'g1'});
+      expect(club.groupId, 'g1');
+      expect(club.isGroupRide, isTrue);
+    });
+
+    test(
+        'twee verschillende gedeelde ritten op hetzelfde tijdvak blijven '
+        'allebei staan', () {
+      // Een groepsrit van Jacco en jouw eigen rit met Bram, allebei op het
+      // beste venster van de week. Vroeger won er één en verdween de ander.
+      final entries = buildRideEntries(
+        planned: const [],
+        owned: [_group(id: 'r1', ownerId: _me, day: 14)],
+        joined: const [],
+        invites: [
+          _group(id: 'r2', ownerId: _other, day: 14, groupId: 'club1'),
+        ],
+      );
+
+      expect(entries, hasLength(2));
+      expect(entries.map((e) => e.role).toSet(),
+          {RideRole.organiser, RideRole.pending});
+      expect(entries[0].key, isNot(entries[1].key));
+    });
+
+    test('dezelfde rit in joined en declined blijft één regel', () {
+      final entries = buildRideEntries(
+        planned: const [],
+        owned: const [],
+        joined: [_group(id: 'r1', ownerId: _other, day: 14)],
+        invites: const [],
+        declined: [_group(id: 'r1', ownerId: _other, day: 14)],
+      );
+      expect(entries, hasLength(1));
+      expect(entries.single.role, RideRole.joined);
+    });
+
+    test(
+        'een persoonlijke rit hangt aan de rit die jij organiseert als twee '
+        'gedeelde ritten op dat tijdvak staan', () {
+      final entries = buildRideEntries(
+        planned: [_planned(14)],
+        owned: [_group(id: 'r1', ownerId: _me, day: 14)],
+        joined: const [],
+        invites: [
+          _group(id: 'r2', ownerId: _other, day: 14, groupId: 'club1'),
+        ],
+      );
+
+      expect(entries, hasLength(2), reason: 'geen losse solo-regel erbij');
+      final organiser =
+          entries.firstWhere((e) => e.role == RideRole.organiser);
+      final pending = entries.firstWhere((e) => e.role == RideRole.pending);
+      expect(organiser.planned, isNotNull);
+      expect(pending.planned, isNull);
+    });
+
+    test(
+        'zonder eigen rit op het tijdvak hangt de persoonlijke rij aan de '
+        'regel met de hoogste voorrang', () {
+      final entries = buildRideEntries(
+        planned: [_planned(14)],
+        owned: const [],
+        joined: [_group(id: 'r1', ownerId: _other, day: 14)],
+        invites: [
+          _group(id: 'r2', ownerId: _other, day: 14, groupId: 'club1'),
+        ],
+      );
+
+      expect(entries, hasLength(2));
+      expect(entries.firstWhere((e) => e.role == RideRole.pending).planned,
+          isNotNull);
+      expect(entries.firstWhere((e) => e.role == RideRole.joined).planned,
+          isNull);
+    });
+
+    test(
+        'afgezegd + eigen plan wordt solo, ook naast een andere gedeelde rit '
+        'als die lager in voorrang staat', () {
+      final entries = buildRideEntries(
+        planned: [_planned(14)],
+        owned: const [],
+        joined: const [],
+        invites: const [],
+        declined: [_group(id: 'r1', ownerId: _other, day: 14)],
+      );
+      expect(entries.single.role, RideRole.solo);
+      expect(entries.single.planned, isNotNull);
+    });
+
+    test('telt over de huidige leden, met de organisator als "gaat mee"', () {
+      final entry = buildRideEntries(
+        planned: const [],
+        owned: const [],
+        joined: const [],
+        invites: [
+          _group(
+            id: 'r1',
+            ownerId: 'owner',
+            day: 14,
+            groupId: 'club1',
+            participants: const [
+              RideParticipant(userId: 'a', status: ParticipantStatus.accepted),
+              RideParticipant(userId: 'b', status: ParticipantStatus.declined),
+            ],
+          ),
+        ],
+        groups: {'club1': clubWith(['owner', 'a', 'b', 'c', 'd'])},
+      ).single;
+
+      expect(entry.isGroupRide, isTrue);
+      expect(entry.groupName, 'On the Roll');
+      expect(entry.pelotonGroup?.id, 'club1');
+      expect(entry.acceptedCount, 2, reason: 'organisator + a');
+      expect(entry.declinedCount, 1);
+      expect(entry.pendingCount, 2, reason: 'c en d zonder rij');
+    });
+
+    test(
+        'een lid met een rij invited telt als nog niet, een ex-lid telt '
+        'nergens mee', () {
+      final entry = buildRideEntries(
+        planned: const [],
+        owned: const [],
+        joined: const [],
+        invites: [
+          _group(
+            id: 'r1',
+            ownerId: 'owner',
+            day: 14,
+            groupId: 'club1',
+            participants: const [
+              RideParticipant(userId: 'a', status: ParticipantStatus.invited),
+              RideParticipant(userId: 'ex', status: ParticipantStatus.accepted),
+              RideParticipant(userId: 'ex2', status: ParticipantStatus.declined),
+            ],
+          ),
+        ],
+        groups: {'club1': clubWith(['owner', 'a'])},
+      ).single;
+
+      expect(entry.acceptedCount, 1, reason: 'alleen de organisator');
+      expect(entry.declinedCount, 0);
+      expect(entry.pendingCount, 1);
+    });
+
+    test(
+        'groepsrit zonder bekende groep valt terug op de rijen, zonder '
+        'groepsnaam', () {
+      final entry = buildRideEntries(
+        planned: const [],
+        owned: const [],
+        joined: const [],
+        invites: [
+          _group(
+            id: 'r1',
+            ownerId: 'owner',
+            day: 14,
+            groupId: 'club1',
+            participants: const [
+              RideParticipant(userId: 'a', status: ParticipantStatus.accepted),
+              RideParticipant(userId: 'b', status: ParticipantStatus.declined),
+              RideParticipant(userId: 'c', status: ParticipantStatus.invited),
+            ],
+          ),
+        ],
+      ).single;
+
+      expect(entry.isGroupRide, isTrue);
+      expect(entry.groupName, isNull);
+      expect(entry.pelotonGroup, isNull);
+      expect(entry.acceptedCount, 1);
+      expect(entry.declinedCount, 1);
+      expect(entry.pendingCount, 1);
+    });
+
+    test('een gewone gedeelde rit telt zoals altijd', () {
+      final entry = buildRideEntries(
+        planned: const [],
+        owned: [
+          _group(
+            id: 'r1',
+            ownerId: _me,
+            day: 14,
+            participants: const [
+              RideParticipant(userId: 'a', status: ParticipantStatus.accepted),
+              RideParticipant(userId: 'b', status: ParticipantStatus.declined),
+              RideParticipant(userId: 'c', status: ParticipantStatus.declined),
+              RideParticipant(userId: 'd', status: ParticipantStatus.invited),
+            ],
+          ),
+        ],
+        joined: const [],
+        invites: const [],
+        groups: {'club1': clubWith([_me, 'a'])},
+      ).single;
+
+      expect(entry.isGroupRide, isFalse);
+      expect(entry.groupName, isNull);
+      expect(entry.acceptedCount, 1, reason: 'organisator niet meegeteld');
+      expect(entry.declinedCount, 2);
+      expect(entry.pendingCount, 1);
     });
   });
 }
