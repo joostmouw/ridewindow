@@ -72,7 +72,8 @@ void main() {
     await expectLater(
       redeemPendingGroupCode(gateway),
       throwsA(
-        isA<GroupException>().having((e) => e.error, 'error', GroupError.groupFull),
+        isA<GroupException>()
+            .having((e) => e.error, 'error', GroupError.groupFull),
       ),
     );
     expect(await PendingInviteStore.readGroup(), isNull);

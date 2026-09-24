@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/services/invite_code.dart';
+import 'package:ridewindow/features/peloton/group_error_text.dart';
 import 'package:ridewindow/features/peloton/groups_section.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
@@ -108,15 +111,56 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
             ),
           );
         } catch (_) {
-          // Elke fout van de RPC betekent voor de gebruiker hetzelfde: deze
-          // code doet het niet. Het onderscheid tussen "bestaat niet" en
-          // "verlopen" prijsgeven zou verklappen welke codes wél bestaan.
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(s.pelotonCodeInvalid)),
-          );
+          // Geen maatjescode: misschien een groepscode. De gedeelde groepstekst
+          // zegt "vul code in onder Ritten, tab Peloton", en op Android opent
+          // de link de PWA en niet de app -- wie de app al heeft, typt de code
+          // hier over. Eén veld voor beide, zodat niemand hoeft te weten welke
+          // soort code hij heeft.
+          await _redeemGroupCode(raw);
         }
       });
+
+  Future<void> _redeemGroupCode(String raw) async {
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final result =
+          await ref.read(pelotonGatewayProvider).redeemGroupInvite(raw);
+      _codeController.clear();
+      _invalidateAll();
+      trackEvent(ref, kEvPelotonInvite, props: {'kind': 'group_redeemed_code'});
+      if (!mounted) return;
+      if (result.status == GroupJoinStatus.member) {
+        context.push('/peloton/group/${result.groupId}');
+        return;
+      }
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            s.groupJoinRequested(result.groupName ?? s.groupUnnamed),
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Peloton: code inwisselen mislukt: $error');
+      if (!mounted) return;
+      // Elke andere fout betekent voor de gebruiker hetzelfde: deze code doet
+      // het niet. Het onderscheid tussen "bestaat niet", "verlopen" en "soort
+      // code" prijsgeven zou verklappen welke codes wél bestaan. Alleen een
+      // volle groep of tien groepen krijgt een eigen zin: dan was de code
+      // aantoonbaar een geldige groepscode, en "werkt niet" zou liegen.
+      final ownSentence = error is GroupException &&
+          (error.error == GroupError.groupFull ||
+              error.error == GroupError.tooManyGroups);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            ownSentence ? groupErrorTextOf(s, error) : s.pelotonCodeInvalid,
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,8 +220,8 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
                                           if (!mounted) return;
                                           messenger.showSnackBar(
                                             SnackBar(
-                                              content: Text(
-                                                  s.pelotonRemoveFailed),
+                                              content:
+                                                  Text(s.pelotonRemoveFailed),
                                             ),
                                           );
                                         }

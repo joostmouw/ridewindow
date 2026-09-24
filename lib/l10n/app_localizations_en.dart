@@ -2452,4 +2452,30 @@ class SEn extends S {
 
   @override
   String get groupUnnamed => 'the group';
+
+  @override
+  String get groupJoinTitle => 'Group invitation';
+
+  @override
+  String get groupJoinSignedOutTitle => 'You\'ve been invited to a group';
+
+  @override
+  String get groupJoinSignedOutBody =>
+      'Sign in and your request goes to the group\'s admins.';
+
+  @override
+  String get groupJoinSignIn => 'Sign in and join';
+
+  @override
+  String get groupNotNow => 'Not now';
+
+  @override
+  String get groupJoining => 'Sending your request…';
+
+  @override
+  String get groupJoinRequestedHint =>
+      'Once an admin accepts you, the group shows up on your Peloton tab.';
+
+  @override
+  String get groupOpenGroup => 'Go to the group';
 }

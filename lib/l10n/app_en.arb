@@ -748,5 +748,13 @@
   "groupJoinRequested": "Your request to join {group} is with the admins",
   "@groupJoinRequested": {"placeholders": {"group": {"type": "String"}}},
   "groupOpen": "View",
-  "groupUnnamed": "the group"
+  "groupUnnamed": "the group",
+  "groupJoinTitle": "Group invitation",
+  "groupJoinSignedOutTitle": "You've been invited to a group",
+  "groupJoinSignedOutBody": "Sign in and your request goes to the group's admins.",
+  "groupJoinSignIn": "Sign in and join",
+  "groupNotNow": "Not now",
+  "groupJoining": "Sending your request…",
+  "groupJoinRequestedHint": "Once an admin accepts you, the group shows up on your Peloton tab.",
+  "groupOpenGroup": "Go to the group"
 }

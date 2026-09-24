@@ -97,10 +97,13 @@ void main() {
     final gateway = _gateway();
     await _pumpAndRedeem(tester, gateway, 'GROUP123');
 
-    expect(gateway.calls, containsAllInOrder([
-      'redeemFriendInvite:GROUP123',
-      'redeemGroupInvite:GROUP123',
-    ]));
+    expect(
+      gateway.calls,
+      containsAllInOrder([
+        'redeemFriendInvite:GROUP123',
+        'redeemGroupInvite:GROUP123',
+      ]),
+    );
     expect(
       find.text('Je aanvraag voor Dinsdagclub ligt bij de beheerders'),
       findsOneWidget,
@@ -118,8 +121,10 @@ void main() {
     final gateway = _gateway();
     await _pumpAndRedeem(tester, gateway, 'NOPE2345');
 
-    expect(find.text('Die code werkt niet. Hij kan verlopen zijn.'),
-        findsOneWidget);
+    expect(
+      find.text('Die code werkt niet. Hij kan verlopen zijn.'),
+      findsOneWidget,
+    );
     // Niet de groepszin: die zou verklappen welke soort code bestaat.
     expect(
       find.textContaining('groepslink werkt niet meer'),

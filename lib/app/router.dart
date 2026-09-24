@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/app/scaffold_with_nav.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
+import 'package:ridewindow/features/peloton/group_landing_screen.dart';
 import 'package:ridewindow/features/peloton/group_screen.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
@@ -178,6 +179,17 @@ GoRouter router(Ref ref) {
         pageBuilder: (context, state) => _fadeTransition(
           state,
           InviteLandingScreen(code: state.pathParameters['code'] ?? ''),
+        ),
+      ),
+      // Clubs (CLUB-02): de gedeelde groepslink, naar het model van
+      // /invite/:code hierboven. Opent een aanvraag, of het groepsscherm als
+      // je al lid bent. De Firebase-rewrite "**" en de hash-routing (/#/group)
+      // dekken dit pad al; firebase.json hoeft niet mee.
+      GoRoute(
+        path: '/group/:code',
+        pageBuilder: (context, state) => _fadeTransition(
+          state,
+          GroupLandingScreen(code: state.pathParameters['code'] ?? ''),
         ),
       ),
       // Het groepsscherm staat buiten de shell: een eigen scherm met terugknop,

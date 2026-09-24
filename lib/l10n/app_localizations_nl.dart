@@ -2461,4 +2461,30 @@ class SNl extends S {
 
   @override
   String get groupUnnamed => 'de groep';
+
+  @override
+  String get groupJoinTitle => 'Uitnodiging voor een groep';
+
+  @override
+  String get groupJoinSignedOutTitle => 'Je bent uitgenodigd voor een groep';
+
+  @override
+  String get groupJoinSignedOutBody =>
+      'Log in, dan gaat je aanvraag naar de beheerders van de groep.';
+
+  @override
+  String get groupJoinSignIn => 'Log in en doe mee';
+
+  @override
+  String get groupNotNow => 'Niet nu';
+
+  @override
+  String get groupJoining => 'Je aanvraag wordt verstuurd…';
+
+  @override
+  String get groupJoinRequestedHint =>
+      'Zodra een beheerder je accepteert, staat de groep op je Peloton-tab.';
+
+  @override
+  String get groupOpenGroup => 'Naar de groep';
 }

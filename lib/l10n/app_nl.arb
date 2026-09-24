@@ -780,5 +780,13 @@
   "groupJoinRequested": "Je aanvraag voor {group} ligt bij de beheerders",
   "@groupJoinRequested": {"placeholders": {"group": {"type": "String"}}},
   "groupOpen": "Bekijk",
-  "groupUnnamed": "de groep"
+  "groupUnnamed": "de groep",
+  "groupJoinTitle": "Uitnodiging voor een groep",
+  "groupJoinSignedOutTitle": "Je bent uitgenodigd voor een groep",
+  "groupJoinSignedOutBody": "Log in, dan gaat je aanvraag naar de beheerders van de groep.",
+  "groupJoinSignIn": "Log in en doe mee",
+  "groupNotNow": "Niet nu",
+  "groupJoining": "Je aanvraag wordt verstuurd…",
+  "groupJoinRequestedHint": "Zodra een beheerder je accepteert, staat de groep op je Peloton-tab.",
+  "groupOpenGroup": "Naar de groep"
 }

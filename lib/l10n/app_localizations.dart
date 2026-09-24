@@ -4248,6 +4248,54 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'de groep'**
   String get groupUnnamed;
+
+  /// No description provided for @groupJoinTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uitnodiging voor een groep'**
+  String get groupJoinTitle;
+
+  /// No description provided for @groupJoinSignedOutTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent uitgenodigd voor een groep'**
+  String get groupJoinSignedOutTitle;
+
+  /// No description provided for @groupJoinSignedOutBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Log in, dan gaat je aanvraag naar de beheerders van de groep.'**
+  String get groupJoinSignedOutBody;
+
+  /// No description provided for @groupJoinSignIn.
+  ///
+  /// In nl, this message translates to:
+  /// **'Log in en doe mee'**
+  String get groupJoinSignIn;
+
+  /// No description provided for @groupNotNow.
+  ///
+  /// In nl, this message translates to:
+  /// **'Niet nu'**
+  String get groupNotNow;
+
+  /// No description provided for @groupJoining.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je aanvraag wordt verstuurd…'**
+  String get groupJoining;
+
+  /// No description provided for @groupJoinRequestedHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zodra een beheerder je accepteert, staat de groep op je Peloton-tab.'**
+  String get groupJoinRequestedHint;
+
+  /// No description provided for @groupOpenGroup.
+  ///
+  /// In nl, this message translates to:
+  /// **'Naar de groep'**
+  String get groupOpenGroup;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

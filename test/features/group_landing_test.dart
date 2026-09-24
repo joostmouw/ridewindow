@@ -91,7 +91,8 @@ Future<GoRouter> _pump(
 }
 
 void main() {
-  testWidgets('uitgelogd: uitnodiging, Log in en doe mee, Niet nu, code bewaard',
+  testWidgets(
+      'uitgelogd: uitnodiging, Log in en doe mee, Niet nu, code bewaard',
       (tester) async {
     final gateway = _gateway();
     await _pump(tester, gateway, userId: null);
@@ -99,7 +100,9 @@ void main() {
     expect(find.text('Uitnodiging voor een groep'), findsOneWidget);
     expect(find.text('Je bent uitgenodigd voor een groep'), findsOneWidget);
     expect(
-      find.text('Log in, dan gaat je aanvraag naar de beheerders van de groep.'),
+      find.text(
+        'Log in, dan gaat je aanvraag naar de beheerders van de groep.',
+      ),
       findsOneWidget,
     );
     expect(find.text('Log in en doe mee'), findsOneWidget);
@@ -172,7 +175,8 @@ void main() {
   });
 
   testWidgets('volle groep en 10 groepen geven hun eigen zin', (tester) async {
-    final full = _gateway()..failWith['redeemGroupInvite'] = GroupError.groupFull;
+    final full = _gateway()
+      ..failWith['redeemGroupInvite'] = GroupError.groupFull;
     await _pump(tester, full);
     expect(
       find.text(
