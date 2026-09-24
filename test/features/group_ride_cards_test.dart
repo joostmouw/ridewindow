@@ -106,8 +106,11 @@ class _Host implements RideCardHost {
   void removePlanned(RideEntry entry) {}
 
   @override
-  Future<void> voteOnOption(RideEntry entry, RideOption option,
-      {required bool canRide}) async {}
+  Future<void> voteOnOption(
+    RideEntry entry,
+    RideOption option, {
+    required bool canRide,
+  }) async {}
 
   @override
   Future<void> chooseOption(RideEntry entry, RideOption option) async {}
@@ -151,11 +154,13 @@ void main() {
       await _pumpAt360(
         tester,
         SizedBox(
-            width: 328, child: RideRoleLine(entry: _groupEntry(_shortName))),
+          width: 328,
+          child: RideRoleLine(entry: _groupEntry(_shortName)),
+        ),
       );
 
       expect(find.text(_shortName), findsOneWidget);
-      expect(find.text(' · '), findsOneWidget);
+      expect(find.text('·'), findsOneWidget);
       expect(find.text('Anna vraagt of je meegaat'), findsOneWidget);
 
       final nameBox = tester.getRect(find.text(_shortName));
@@ -172,7 +177,7 @@ void main() {
       );
 
       expect(find.text('Anna vraagt of je meegaat'), findsOneWidget);
-      expect(find.text(' · '), findsNothing);
+      expect(find.text('·'), findsNothing);
       expect(
         find.descendant(
           of: find.byType(RideRoleLine),
@@ -236,14 +241,26 @@ void main() {
 
             expect(tester.takeException(), isNull);
 
-            // De rolzin begint zichtbaar: hij krijgt minstens de helft van
-            // de regel, hoe lang de groepsnaam ook is.
+            // De rolzin begint zichtbaar: de naam neemt hooguit 45 procent,
+            // de rol krijgt de rest na het icoon en het scheidingsteken.
             final role = find.descendant(
               of: find.byKey(withKey),
               matching: find.textContaining('Anna vraagt'),
             );
             expect(role, findsOneWidget);
-            expect(tester.getSize(role).width, greaterThan(width * 0.5));
+            final line = tester.getRect(find.byKey(withKey));
+            final icon = tester.getRect(find.byIcon(AppIcons.hourglass).first);
+            final dot = tester.getRect(find.text('·'));
+            final roleRect = tester.getRect(role);
+            // Vóór de rol: icoon + 6, de naam (hooguit 45 procent) en het
+            // scheidingsteken (punt + 2 x 4 lucht). Meer niet.
+            final iconSpace = icon.right + 6 - line.left;
+            expect(
+              roleRect.left - line.left,
+              lessThanOrEqualTo(iconSpace + width * 0.45 + dot.width + 8 + 0.5),
+            );
+            expect(roleRect.width, greaterThan(0));
+            expect(roleRect.right, closeTo(line.right, 0.5));
 
             // De naam is afgekapt, niet uitgerekt.
             final name = find.text(_longName);
@@ -263,7 +280,9 @@ void main() {
       await _pumpAt360(
         tester,
         SizedBox(
-            width: 328, child: RideRoleLine(entry: _groupEntry(_shortName))),
+          width: 328,
+          child: RideRoleLine(entry: _groupEntry(_shortName)),
+        ),
       );
       expect(
         find.bySemanticsLabel('$_shortName, Anna vraagt of je meegaat'),
@@ -311,6 +330,13 @@ void main() {
 
           expect(tester.takeException(), isNull);
           expect(find.text(_longName), findsOneWidget);
+          // De antwoordknoppen staan rechts, ook als ze onder elkaar vallen.
+          final accept = tester
+              .getRect(find.widgetWithText(FilledButton, 'Ik ga mee').first);
+          expect(
+            accept.center.dx,
+            greaterThan(tester.getRect(find.byKey(groupKey)).center.dx),
+          );
           expect(
             tester.getSize(find.byKey(groupKey)).height,
             tester.getSize(find.byKey(sharedKey)).height,

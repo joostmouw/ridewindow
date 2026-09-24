@@ -62,6 +62,20 @@ import 'package:ridewindow/theme/app_theme.dart';
 }
 
 /// De regel onder de tijd die zegt wat jouw rol is.
+///
+/// **Bij een groepsrit staat de groepsnaam vooraan**: "On the Roll · Anna
+/// vraagt of je meegaat" (CLUB-16, schets 016 vraag 2 B). Niet als chip en niet
+/// op een eigen regel: Joost koos erop dat de kaart nooit hoger wordt dan nu,
+/// ook niet op 360 dp -- "Het moet passen op het scherm, dat is het
+/// belangrijkste." Een chip of een extra regel kost hoogte op elke kaart; in de
+/// rolregel kost de naam alleen breedte, en die regel was er al.
+///
+/// **De naam krijgt hooguit 45 procent van de regel.** De rolzin is wat iets
+/// van je vraagt ("Anna vraagt of je meegaat"), de groepsnaam is context. Een
+/// lange groepsnaam kapt dus af met een ellips en laat de rol altijd de rest:
+/// 55 procent min het icoon en de punt, ook op het smalle Home-kaartje (circa
+/// 180 dp) en met grote tekstschaal. Een korte naam neemt alleen zijn eigen
+/// breedte.
 class RideRoleLine extends StatelessWidget {
   const RideRoleLine({super.key, required this.entry, this.dense = false});
 
@@ -70,37 +84,78 @@ class RideRoleLine extends StatelessWidget {
   /// Compacter, voor de kaartjes onder PLANNED op Home.
   final bool dense;
 
+  /// Deel van de regelbreedte dat de groepsnaam hooguit krijgt.
+  static const _groupNameShare = 0.45;
+
   @override
   Widget build(BuildContext context) {
     final style = rideRoleStyle(context, entry);
     final theme = Theme.of(context);
-    return Row(
-      children: [
-        // Geen icoon, geen lege ruimte: bij "je gaat mee" en "alleen jij"
-        // begint de zin gewoon links (schets 014).
-        if (style.icon case final icon?) ...[
-          Icon(icon, size: dense ? 14 : 15, color: style.color),
-          const SizedBox(width: 6),
-        ],
-        Expanded(
-          child: Text(
-            style.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: (dense
-                    ? theme.textTheme.bodySmall
-                    : theme.textTheme.labelMedium)
-                ?.copyWith(
-              color: style.color,
-              // Solo is de rustige rol: hij krijgt geen vet mee, anders schreeuwt
-              // "Alleen jij" net zo hard als een uitnodiging die op antwoord wacht.
-              fontWeight: entry.role == RideRole.solo
-                  ? FontWeight.w500
-                  : FontWeight.w600,
-            ),
-          ),
-        ),
+    final textStyle =
+        (dense ? theme.textTheme.bodySmall : theme.textTheme.labelMedium)
+            ?.copyWith(
+      color: style.color,
+      // Solo is de rustige rol: hij krijgt geen vet mee, anders schreeuwt
+      // "Alleen jij" net zo hard als een uitnodiging die op antwoord wacht.
+      fontWeight:
+          entry.role == RideRole.solo ? FontWeight.w500 : FontWeight.w600,
+    );
+
+    // Geen icoon, geen lege ruimte: bij "je gaat mee" en "alleen jij"
+    // begint de zin gewoon links (schets 014).
+    final icon = [
+      if (style.icon case final icon?) ...[
+        Icon(icon, size: dense ? 14 : 15, color: style.color),
+        const SizedBox(width: 6),
       ],
+    ];
+    final label = Expanded(
+      child: Text(
+        style.label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: textStyle,
+      ),
+    );
+
+    final groupName = entry.groupName?.trim();
+    if (groupName == null || groupName.isEmpty) {
+      return Row(children: [...icon, label]);
+    }
+
+    return Semantics(
+      label: '$groupName, ${style.label}',
+      excludeSemantics: true,
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          children: [
+            ...icon,
+            // Geen Flexible eromheen: een niet-flexibel kind krijgt precies
+            // zijn eigen breedte (tot de grens), en de rolzin in [Expanded]
+            // krijgt de rest. Met Flexible zou de rij de ruimte eerlijk
+            // verdelen en kreeg de rol bij een korte naam ook maar de helft.
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: constraints.maxWidth * _groupNameShare,
+              ),
+              child: Text(
+                groupName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: textStyle?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ),
+            // Een punt met vaste lucht eromheen in plaats van " · ": spaties
+            // groeien mee met de tekstschaal, de lucht hoeft dat niet.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text('·', maxLines: 1, style: textStyle),
+            ),
+            label,
+          ],
+        ),
+      ),
     );
   }
 }

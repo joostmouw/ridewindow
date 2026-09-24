@@ -961,23 +961,35 @@ class RideCard extends StatelessWidget {
                 // wil hem beantwoorden, niet eerst ergens anders heen.
                 if (entry.role == RideRole.pending) ...[
                   const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: host.busy
-                            ? null
-                            : () => host.respond(entry, accepted: false),
-                        child: Text(s.pelotonDecline),
-                      ),
-                      const SizedBox(width: 8),
-                      FilledButton(
-                        onPressed: host.busy
-                            ? null
-                            : () => host.respond(entry, accepted: true),
-                        child: Text(s.pelotonAccept),
-                      ),
-                    ],
+                  // Een Wrap en geen Row: op 360 dp met grote tekstschaal
+                  // passen "Kan niet" en "Ik ga mee" niet naast elkaar, en
+                  // een Row liep dan van de kaart af (gevonden bij de
+                  // 360 dp-tests van fase 35). Past het wel, dan staan ze
+                  // precies zoals eerst rechts naast elkaar.
+                  // Volle breedte, anders krimpt de Wrap om zijn knoppen en
+                  // staan ze links in plaats van rechts.
+                  SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        TextButton(
+                          onPressed: host.busy
+                              ? null
+                              : () => host.respond(entry, accepted: false),
+                          child: Text(s.pelotonDecline),
+                        ),
+                        FilledButton(
+                          onPressed: host.busy
+                              ? null
+                              : () => host.respond(entry, accepted: true),
+                          child: Text(s.pelotonAccept),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
                 // Slice 2 van epic #65: meerdere vensters voorgelegd, de

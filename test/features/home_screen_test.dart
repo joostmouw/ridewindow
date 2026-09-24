@@ -497,8 +497,11 @@ void main() {
         'g1',
         'Tour de Waterland Zondagochtend Clubrit',
         members: [
-          FakeGroupGateway.member('uid-anna',
-              role: GroupRole.admin, name: 'Anna'),
+          FakeGroupGateway.member(
+            'uid-anna',
+            role: GroupRole.admin,
+            name: 'Anna',
+          ),
           FakeGroupGateway.member('uid-me', name: 'Ik', joinedDay: 1),
         ],
       ),
@@ -520,7 +523,9 @@ void main() {
           availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
           plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
           slotsProvider.overrideWith(
-            () => FakeStaticSlotsNotifier(SlotsLoaded(const [], reason: null)),
+            () => FakeStaticSlotsNotifier(
+              const SlotsLoaded([], reason: null),
+            ),
           ),
           rideEntriesProvider.overrideWith((ref) => [entry]),
         ],
