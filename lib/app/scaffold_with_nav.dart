@@ -21,6 +21,10 @@ class ScaffoldWithNav extends ConsumerWidget {
     // sluit terug de app (#80) -- het gewone Android-gedrag bij een onderbalk.
     // Geen "nog eens drukken om af te sluiten" op Home: dat breekt het
     // voorspellende terug-gebaar van Android 13+.
+    //
+    // Deze PopScope alleen is niet genoeg, zie [BackToHome]. Hij blijft nodig
+    // voor de melding aan Android na een tabwissel en na het sluiten van een
+    // scherm boven de shell (ritdetail, groep): dan meldt de hoofdnavigator.
     final onHome = navigationShell.currentIndex == 0;
     return PopScope(
       canPop: onHome,
@@ -100,3 +104,31 @@ class _UnansweredBadge extends StatelessWidget {
 /// Het getal in het bolletje: boven 9 wordt het "9+", zodat het bolletje
 /// klein blijft. Gedeeld met de tab Peloton in Mijn Ritten.
 String unansweredBadgeLabel(int count) => count > 9 ? '9+' : '$count';
+
+/// Zet om een tab die niet Home is: terug gaat dan naar Home (#80).
+///
+/// **Waarom dit naast de PopScope op de shell staat.** Met voorspellend terug
+/// (standaard vanaf targetSdk 36) vraagt Android vóóraf of Flutter terug zelf
+/// afhandelt. Dat antwoord komt uit `NavigationNotification`s, en elke tab
+/// heeft een eigen navigator. Opent een tab voor het eerst, dan meldt die
+/// navigator "ik kan niet terug", de hoofdnavigator geeft dat ongewijzigd door
+/// (hij kan zelf ook niet terug), en die melding overschrijft die van de
+/// shell. Android sloot de app dan zonder Flutter iets te vragen -- zo stond
+/// het in build 56. Met een PopScope *binnen* de tabnavigator meldt die
+/// navigator zelf "ik handel het af".
+class BackToHome extends StatelessWidget {
+  const BackToHome({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) context.go('/home');
+      },
+      child: child,
+    );
+  }
+}

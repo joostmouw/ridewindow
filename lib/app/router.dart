@@ -146,7 +146,10 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: '/agenda',
                 pageBuilder: (context, state) =>
-                    _fadeTransition(state, const WeekAgendaScreen()),
+                    _fadeTransition(
+                      state,
+                      const BackToHome(child: WeekAgendaScreen()),
+                    ),
               ),
             ],
           ),
@@ -155,7 +158,10 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: '/rides',
                 pageBuilder: (context, state) =>
-                    _fadeTransition(state, const PlannedRidesScreen()),
+                    _fadeTransition(
+                      state,
+                      const BackToHome(child: PlannedRidesScreen()),
+                    ),
               ),
             ],
           ),
@@ -164,7 +170,10 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: '/profile',
                 pageBuilder: (context, state) =>
-                    _fadeTransition(state, const ProfileScreen()),
+                    _fadeTransition(
+                      state,
+                      const BackToHome(child: ProfileScreen()),
+                    ),
               ),
             ],
           ),

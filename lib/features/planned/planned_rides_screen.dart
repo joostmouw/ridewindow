@@ -1033,7 +1033,7 @@ class RideCard extends StatelessWidget {
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            '${_fmtTime(entry.start)} – ${_fmtTime(entry.end)}  (${entry.durationHours}u)',
+                            '${_fmtTime(entry.start)} – ${_fmtTime(entry.end)} · ${S.of(context).durationHours(entry.durationHours)}',
                             style: theme.textTheme.bodyMedium,
                           ),
                           if (cityName.isNotEmpty)
