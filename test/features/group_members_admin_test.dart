@@ -116,7 +116,11 @@ void main() {
   testWidgets('gewoon lid: geen ⋮ in de ledenlijst', (tester) async {
     await _open(tester, _gateway(meMember: true));
     expect(find.text('Ingrid'), findsOneWidget);
-    expect(find.byIcon(AppIcons.dotsThreeVertical), findsNothing);
+    // Het appbar-⋮ (Groep verlaten, plan 06) heeft ieder lid; per lid niet.
+    expect(find.byTooltip('Opties voor dit lid'), findsNothing);
+    for (final uid in [_me, 'uid-a', 'uid-i']) {
+      expect(_menuOf(uid), findsNothing);
+    }
   });
 
   testWidgets('beheerder: een ⋮ achter elk lid, ook achter jezelf',

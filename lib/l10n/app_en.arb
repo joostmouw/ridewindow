@@ -717,5 +717,12 @@
   "@groupFriendProposed": {"placeholders": {"name": {"type": "String"}}},
   "groupNoFriendsToPropose": "You don't have any buddies yet. Invite one under Buddies on the Peloton tab.",
   "groupOpenRequests": "{count, plural, =1{1 request} other{{count} requests}}",
-  "@groupOpenRequests": {"placeholders": {"count": {"type": "int"}}}
+  "@groupOpenRequests": {"placeholders": {"count": {"type": "int"}}},
+  "groupShareLink": "Share the group link",
+  "groupShareText": "Ride with {group} on Ridewindow: {link}\n\nNo app yet? The link works in your browser. Or enter code {code} under Rides, tab Peloton. An admin of the group lets you in.",
+  "@groupShareText": {"placeholders": {"group": {"type": "String"}, "link": {"type": "String"}, "code": {"type": "String"}}},
+  "groupMenuTooltip": "Group options",
+  "groupReplaceLink": "Replace link",
+  "groupLinkReplaced": "New link created. The old one no longer works.",
+  "groupShareAction": "Share"
 }

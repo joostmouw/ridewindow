@@ -2367,4 +2367,25 @@ class SNl extends S {
     );
     return '$_temp0';
   }
+
+  @override
+  String get groupShareLink => 'Deel de groepslink';
+
+  @override
+  String groupShareText(String group, String link, String code) {
+    return 'Fiets mee met $group in Ridewindow: $link\n\nNog geen app? De link werkt gewoon in je browser. Of vul code $code in onder Ritten, tab Peloton. Een beheerder van de groep laat je erin.';
+  }
+
+  @override
+  String get groupMenuTooltip => 'Groepsopties';
+
+  @override
+  String get groupReplaceLink => 'Link vervangen';
+
+  @override
+  String get groupLinkReplaced =>
+      'Nieuwe link gemaakt. De oude werkt niet meer.';
+
+  @override
+  String get groupShareAction => 'Delen';
 }

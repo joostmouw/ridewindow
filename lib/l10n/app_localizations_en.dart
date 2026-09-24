@@ -2358,4 +2358,25 @@ class SEn extends S {
     );
     return '$_temp0';
   }
+
+  @override
+  String get groupShareLink => 'Share the group link';
+
+  @override
+  String groupShareText(String group, String link, String code) {
+    return 'Ride with $group on Ridewindow: $link\n\nNo app yet? The link works in your browser. Or enter code $code under Rides, tab Peloton. An admin of the group lets you in.';
+  }
+
+  @override
+  String get groupMenuTooltip => 'Group options';
+
+  @override
+  String get groupReplaceLink => 'Replace link';
+
+  @override
+  String get groupLinkReplaced =>
+      'New link created. The old one no longer works.';
+
+  @override
+  String get groupShareAction => 'Share';
 }

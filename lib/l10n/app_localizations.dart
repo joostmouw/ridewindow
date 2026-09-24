@@ -4110,6 +4110,42 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'{count, plural, =1{1 aanvraag} other{{count} aanvragen}}'**
   String groupOpenRequests(int count);
+
+  /// No description provided for @groupShareLink.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deel de groepslink'**
+  String get groupShareLink;
+
+  /// No description provided for @groupShareText.
+  ///
+  /// In nl, this message translates to:
+  /// **'Fiets mee met {group} in Ridewindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton. Een beheerder van de groep laat je erin.'**
+  String groupShareText(String group, String link, String code);
+
+  /// No description provided for @groupMenuTooltip.
+  ///
+  /// In nl, this message translates to:
+  /// **'Groepsopties'**
+  String get groupMenuTooltip;
+
+  /// No description provided for @groupReplaceLink.
+  ///
+  /// In nl, this message translates to:
+  /// **'Link vervangen'**
+  String get groupReplaceLink;
+
+  /// No description provided for @groupLinkReplaced.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nieuwe link gemaakt. De oude werkt niet meer.'**
+  String get groupLinkReplaced;
+
+  /// No description provided for @groupShareAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Delen'**
+  String get groupShareAction;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -19,7 +19,6 @@ import 'package:ridewindow/features/peloton/group_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
-import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 import '../helpers/fake_group_gateway.dart';
@@ -160,8 +159,7 @@ void main() {
       expect(find.text('Deel de groepslink'), findsNothing);
     });
 
-    testWidgets('tik deelt tekst met groepsnaam, link en code',
-        (tester) async {
+    testWidgets('tik deelt tekst met groepsnaam, link en code', (tester) async {
       final gateway = _gateway(meMember: true);
       await _open(tester, gateway);
 

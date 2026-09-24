@@ -9,22 +9,30 @@
 // Alleen een beheerder ziet ⋮ achter de leden (beheerder maken of afnemen,
 // uit de groep halen) en bovenaan de open aanvragen met Accepteren/Afwijzen
 // (CLUB-27). Ieder lid kan een maatje voordragen; bij een beheerder heet dat
-// "Maatje toevoegen" en is het meteen lidmaatschap. Het appbar-menu en de
-// groepslink komen in plan 06.
+// "Maatje toevoegen" en is het meteen lidmaatschap.
+//
+// Ieder lid deelt de groepslink vanuit de hero (HERZIENING 34-CONTEXT); wie
+// hem opent, doet een aanvraag. Het appbar-menu (plan 06) heeft voor een
+// beheerder Naam wijzigen, Link vervangen, Groep verlaten en Groep opheffen,
+// voor een gewoon lid alleen Groep verlaten.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
+import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/features/peloton/group_crest.dart';
 import 'package:ridewindow/features/peloton/group_error_text.dart';
+import 'package:ridewindow/features/peloton/group_link.dart';
 import 'package:ridewindow/features/peloton/group_propose_sheet.dart';
 import 'package:ridewindow/features/peloton/group_rules_sheet.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -39,6 +47,8 @@ class GroupScreen extends ConsumerStatefulWidget {
 }
 
 enum _MemberAction { promote, demote, remove }
+
+enum _GroupAction { replaceLink }
 
 class _GroupScreenState extends ConsumerState<GroupScreen> {
   bool _busy = false;
@@ -247,6 +257,120 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
+  /// Ieder lid mag de groepslink delen (HERZIENING); wie hem opent, doet een
+  /// aanvraag die een beheerder beslist.
+  Future<void> _shareLink(PelotonGroup group) async {
+    if (_busy) return;
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final gateway = ref.read(pelotonGatewayProvider);
+    setState(() => _busy = true);
+    try {
+      final code = await gateway.groupInviteCode(group.id);
+      if (!mounted) return;
+      // Alleen het soort gebeurtenis: nooit de code, de naam of het id.
+      trackEvent(ref, kEvPelotonInvite, props: {'kind': 'group_link_created'});
+      // De code staat ook in de tekst: de link opent de PWA, wie de app al
+      // heeft typt hem sneller over.
+      await Share.share(
+        s.groupShareText(group.name, groupLinkFor(code), code),
+      );
+    } catch (error) {
+      debugPrint('Peloton: groepslink delen mislukt: $error');
+      messenger.showSnackBar(
+        SnackBar(content: Text(groupErrorTextOf(s, error))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Link vervangen (beheerder): alle oude codes vervallen, en de snackbar
+  /// biedt meteen Delen voor de nieuwe.
+  Future<void> _replaceLink(PelotonGroup group) async {
+    if (_busy) return;
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final gateway = ref.read(pelotonGatewayProvider);
+    setState(() => _busy = true);
+    try {
+      final code = await gateway.replaceGroupInvite(group.id);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(s.groupLinkReplaced),
+          action: SnackBarAction(
+            label: s.groupShareAction,
+            onPressed: () async {
+              try {
+                await Share.share(
+                  s.groupShareText(group.name, groupLinkFor(code), code),
+                );
+              } catch (error) {
+                debugPrint('Peloton: nieuwe groepslink delen mislukt: $error');
+                messenger.showSnackBar(
+                  SnackBar(content: Text(groupErrorTextOf(s, error))),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Peloton: groepslink vervangen mislukt: $error');
+      messenger.showSnackBar(
+        SnackBar(content: Text(groupErrorTextOf(s, error))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Het ⋮-menu in de appbar. Alleen voor leden; een aanvrager heeft
+  /// intrekken al op het scherm.
+  Widget _groupMenu(PelotonGroup group, String? me) {
+    final s = S.of(context);
+    final isAdmin = group.isAdmin(me);
+    return PopupMenuButton<_GroupAction>(
+      icon: const Icon(AppIcons.dotsThreeVertical),
+      tooltip: s.groupMenuTooltip,
+      enabled: !_busy,
+      onSelected: (action) => switch (action) {
+        _GroupAction.replaceLink => _replaceLink(group),
+      },
+      itemBuilder: (_) => [
+        if (isAdmin)
+          _menuItem(
+            _GroupAction.replaceLink,
+            AppIcons.arrowsCounterClockwise,
+            s.groupReplaceLink,
+          ),
+      ],
+    );
+  }
+
+  PopupMenuItem<_GroupAction> _menuItem(
+    _GroupAction value,
+    IconData icon,
+    String label, {
+    Color? color,
+  }) =>
+      PopupMenuItem(
+        value: value,
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: color),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(
+                label,
+                style: color == null ? null : TextStyle(color: color),
+              ),
+            ),
+          ],
+        ),
+      );
+
   Future<void> _withdraw(GroupJoinRequest request) async {
     if (_busy) return;
     final s = S.of(context);
@@ -280,6 +404,8 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     final s = S.of(context);
     final me = ref.watch(currentUserIdProvider);
     final group = ref.watch(pelotonGroupProvider(widget.groupId));
+    final loaded = group.value;
+    final showMenu = loaded != null && loaded.isMember(me);
 
     return Scaffold(
       appBar: AppBar(
@@ -287,7 +413,10 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
         // iPhone-webapp heeft geen terugveeg.
         leading: const SafeBackButton(fallbackRoute: '/rides'),
         title: Text(group.value?.name ?? ''),
-        actions: const [GroupRulesButton()],
+        actions: [
+          const GroupRulesButton(),
+          if (showMenu) _groupMenu(loaded, me),
+        ],
       ),
       body: group.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -341,7 +470,11 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
             child: ListView(
               padding: const EdgeInsets.only(bottom: 24),
               children: [
-                _GroupHero(group: shown, showCount: true),
+                _GroupHero(
+                  group: shown,
+                  showCount: true,
+                  onShare: _busy ? null : () => _shareLink(g),
+                ),
                 if (isAdmin && g.openRequests(me).isNotEmpty)
                   SectionCard(
                     title: s.groupRequestsSection,
@@ -386,10 +519,17 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
 }
 
 class _GroupHero extends StatelessWidget {
-  const _GroupHero({required this.group, required this.showCount});
+  const _GroupHero({
+    required this.group,
+    required this.showCount,
+    this.onShare,
+  });
 
   final PelotonGroup group;
   final bool showCount;
+
+  /// Deel de groepslink; alleen voor leden, niet in de aanvraagstaat.
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -425,6 +565,15 @@ class _GroupHero extends StatelessWidget {
                 style: muted,
               ),
             ],
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.tonalIcon(
+                onPressed: onShare,
+                icon: const Icon(AppIcons.shareNetwork),
+                label: Text(s.groupShareLink),
+              ),
+            ),
           ],
         ],
       ),

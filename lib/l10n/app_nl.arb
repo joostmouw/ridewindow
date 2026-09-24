@@ -749,5 +749,12 @@
   "@groupFriendProposed": {"placeholders": {"name": {"type": "String"}}},
   "groupNoFriendsToPropose": "Je hebt nog geen maatjes. Nodig er een uit onder Maatjes op de Peloton-tab.",
   "groupOpenRequests": "{count, plural, =1{1 aanvraag} other{{count} aanvragen}}",
-  "@groupOpenRequests": {"placeholders": {"count": {"type": "int"}}}
+  "@groupOpenRequests": {"placeholders": {"count": {"type": "int"}}},
+  "groupShareLink": "Deel de groepslink",
+  "groupShareText": "Fiets mee met {group} in Ridewindow: {link}\n\nNog geen app? De link werkt gewoon in je browser. Of vul code {code} in onder Ritten, tab Peloton. Een beheerder van de groep laat je erin.",
+  "@groupShareText": {"placeholders": {"group": {"type": "String"}, "link": {"type": "String"}, "code": {"type": "String"}}},
+  "groupMenuTooltip": "Groepsopties",
+  "groupReplaceLink": "Link vervangen",
+  "groupLinkReplaced": "Nieuwe link gemaakt. De oude werkt niet meer.",
+  "groupShareAction": "Delen"
 }
