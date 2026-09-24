@@ -10,6 +10,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +28,12 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+
+import '../helpers/fake_group_gateway.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
+import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 
@@ -462,5 +468,94 @@ void main() {
       85.0,
       reason: 'de vroegste rit staat bovenaan, ook al scoort hij het laagst',
     );
+  });
+
+  // ── Groepsritten onder PLANNED (fase 35, CLUB-16) ──
+  //
+  // De groepsnaam staat vooraan in de rolregel, niet op een eigen regel.
+  // Joost: "Het moet passen op het scherm" -- dus op 360 dp.
+  testWidgets('een groepsrit onder PLANNED past op 360 dp met groepsnaam',
+      (tester) async {
+    tester.view.physicalSize = const Size(360 * 3, 800 * 3);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({'hint_seen_home': true});
+
+    final ride = FakeGroupGateway.groupRide(
+      'r1',
+      ownerId: 'uid-anna',
+      ownerName: 'Anna',
+      groupId: 'g1',
+    );
+    final entry = RideEntry(
+      start: ride.start,
+      end: ride.end,
+      plannedScore: ride.plannedScore,
+      role: RideRole.pending,
+      group: ride,
+      pelotonGroup: FakeGroupGateway.group(
+        'g1',
+        'Tour de Waterland Zondagochtend Clubrit',
+        members: [
+          FakeGroupGateway.member('uid-anna',
+              role: GroupRole.admin, name: 'Anna'),
+          FakeGroupGateway.member('uid-me', name: 'Ik', joinedDay: 1),
+        ],
+      ),
+    );
+
+    // De testletter is vierkant: elke letter een volle em breed. Daarmee
+    // loopt de weergaverij bovenaan ("Vensters Blok ... Beste eerst Op tijd")
+    // op 360 dp over, wat met een echte letter niet gebeurt en niets met
+    // ritkaarten te maken heeft. Die ene fout laten we door; elke andere
+    // (en zeker een in de ritkaart) laat de test falen.
+    final errors = <FlutterErrorDetails>[];
+    final previousOnError = FlutterError.onError;
+    FlutterError.onError = errors.add;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          weatherProvider.overrideWith(() => FakeWeatherReady()),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+          slotsProvider.overrideWith(
+            () => FakeStaticSlotsNotifier(SlotsLoaded(const [], reason: null)),
+          ),
+          rideEntriesProvider.overrideWith((ref) => [entry]),
+        ],
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    FlutterError.onError = previousOnError;
+
+    final viewRow = tester.renderObject(
+      find.ancestor(of: find.text('Vensters'), matching: find.byType(Row)).first,
+    );
+    RenderObject? overflowing(FlutterErrorDetails d) {
+      for (final n in d.informationCollector?.call() ?? <DiagnosticsNode>[]) {
+        if (n.value is RenderFlex) return n.value as RenderFlex;
+      }
+      return null;
+    }
+
+    final unexpected = errors
+        .where((d) => overflowing(d) != viewRow)
+        .map((d) => d.toString())
+        .toList();
+    expect(unexpected, isEmpty, reason: unexpected.join('\n\n'));
+    expect(
+      find.text('Tour de Waterland Zondagochtend Clubrit'),
+      findsOneWidget,
+    );
+    expect(find.text('Anna vraagt of je meegaat'), findsOneWidget);
   });
 }
