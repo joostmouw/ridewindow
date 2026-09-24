@@ -284,29 +284,51 @@ class _SignedOutState extends StatelessWidget {
   final S s;
   final ThemeData theme;
 
+  // Een tester tikte op "Log in om samen te fietsen" en er gebeurde niets
+  // (#81): deze staat zei "log in" zonder een manier om dat te doen. Nu gaat
+  // zowel de knop als een tik ergens op de staat naar Profiel, waar Account
+  // bovenaan staat -- hetzelfde doel als op de uitnodigings- en groepspagina.
   @override
   Widget build(BuildContext context) {
+    void signIn() => context.go('/profile');
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              AppIcons.usersThree,
-              size: 48,
-              color: theme.colorScheme.onSurfaceVariant,
+        padding: const EdgeInsets.all(16),
+        child: InkWell(
+          onTap: signIn,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  AppIcons.usersThree,
+                  size: 48,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  s.pelotonSignedOut,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  s.pelotonSignedOutHint,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: signIn,
+                  icon: const Icon(AppIcons.signIn),
+                  label: Text(s.pelotonSignInAction),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(s.pelotonSignedOut, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Text(
-              s.pelotonSignedOutHint,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ],
+          ),
         ),
       ),
     );

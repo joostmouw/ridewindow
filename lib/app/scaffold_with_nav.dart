@@ -17,42 +17,53 @@ class ScaffoldWithNav extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unanswered = ref.watch(unansweredRideCountProvider);
 
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (i) => navigationShell.goBranch(
-          i,
-          initialLocation: i == navigationShell.currentIndex,
+    // Terug vanuit Agenda, Ritten of Profiel gaat eerst naar Home, pas daar
+    // sluit terug de app (#80) -- het gewone Android-gedrag bij een onderbalk.
+    // Geen "nog eens drukken om af te sluiten" op Home: dat breekt het
+    // voorspellende terug-gebaar van Android 13+.
+    final onHome = navigationShell.currentIndex == 0;
+    return PopScope(
+      canPop: onHome,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) navigationShell.goBranch(0);
+      },
+      child: Scaffold(
+        body: navigationShell,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: (i) => navigationShell.goBranch(
+            i,
+            initialLocation: i == navigationShell.currentIndex,
+          ),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(AppIcons.house),
+              selectedIcon: const Icon(AppIconsFill.house),
+              label: S.of(context).navHome,
+            ),
+            NavigationDestination(
+              icon: const Icon(AppIcons.calendarDots),
+              selectedIcon: const Icon(AppIconsFill.calendarDots),
+              label: S.of(context).navAgenda,
+            ),
+            NavigationDestination(
+              icon: _UnansweredBadge(
+                count: unanswered,
+                child: const Icon(AppIcons.bicycle),
+              ),
+              selectedIcon: _UnansweredBadge(
+                count: unanswered,
+                child: const Icon(AppIconsFill.bicycle),
+              ),
+              label: S.of(context).navRides,
+            ),
+            NavigationDestination(
+              icon: const Icon(AppIcons.user),
+              selectedIcon: const Icon(AppIconsFill.user),
+              label: S.of(context).navProfile,
+            ),
+          ],
         ),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(AppIcons.house),
-            selectedIcon: const Icon(AppIconsFill.house),
-            label: S.of(context).navHome,
-          ),
-          NavigationDestination(
-            icon: const Icon(AppIcons.calendarDots),
-            selectedIcon: const Icon(AppIconsFill.calendarDots),
-            label: S.of(context).navAgenda,
-          ),
-          NavigationDestination(
-            icon: _UnansweredBadge(
-              count: unanswered,
-              child: const Icon(AppIcons.bicycle),
-            ),
-            selectedIcon: _UnansweredBadge(
-              count: unanswered,
-              child: const Icon(AppIconsFill.bicycle),
-            ),
-            label: S.of(context).navRides,
-          ),
-          NavigationDestination(
-            icon: const Icon(AppIcons.user),
-            selectedIcon: const Icon(AppIconsFill.user),
-            label: S.of(context).navProfile,
-          ),
-        ],
       ),
     );
   }
