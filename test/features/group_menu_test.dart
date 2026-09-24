@@ -219,4 +219,178 @@ void main() {
       expect(gateway.calls, isNot(contains('groupInviteCode:g1')));
     });
   });
+
+  group('appbar-menu', () {
+    List<String> itemsShown(WidgetTester tester) => [
+          for (final item in tester.widgetList<PopupMenuItem<Object?>>(
+            find.byWidgetPredicate((w) => w is PopupMenuItem),
+          ))
+            tester
+                .widgetList<Text>(
+                  find.descendant(
+                    of: find.byWidget(item),
+                    matching: find.byType(Text),
+                  ),
+                )
+                .single
+                .data!,
+        ];
+
+    testWidgets('gewoon lid ziet alleen Groep verlaten', (tester) async {
+      await _open(tester, _gateway(meMember: true));
+      await _openMenu(tester);
+      expect(itemsShown(tester), ['Groep verlaten']);
+    });
+
+    testWidgets('beheerder ziet vier items in vaste volgorde', (tester) async {
+      await _open(tester, _gateway());
+      await _openMenu(tester);
+      expect(itemsShown(tester), [
+        'Naam wijzigen',
+        'Link vervangen',
+        'Groep verlaten',
+        'Groep opheffen',
+      ]);
+    });
+
+    testWidgets('aanvrager heeft geen menu', (tester) async {
+      await _open(tester, _gateway(pending: true));
+      expect(_menuButton, findsNothing);
+    });
+  });
+
+  group('naam wijzigen', () {
+    testWidgets('sheet met de huidige naam; opslaan hernoemt', (tester) async {
+      final gateway = _gateway();
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Naam wijzigen');
+      final field = find.byType(TextField);
+      expect(tester.widget<TextField>(field).controller!.text, 'Dinsdagclub');
+
+      await tester.enterText(field, 'Nieuw');
+      await tester.tap(find.widgetWithText(FilledButton, 'Opslaan'));
+      await tester.pumpAndSettle();
+
+      expect(gateway.calls, contains('renameGroup:g1:Nieuw'));
+      expect(
+        find.descendant(of: find.byType(AppBar), matching: find.text('Nieuw')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('dezelfde naam opslaan doet niets', (tester) async {
+      final gateway = _gateway();
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Naam wijzigen');
+      await tester.tap(find.widgetWithText(FilledButton, 'Opslaan'));
+      await tester.pumpAndSettle();
+
+      expect(gateway.calls.where((c) => c.startsWith('renameGroup')), isEmpty);
+    });
+  });
+
+  group('verlaten', () {
+    testWidgets('gewoon lid: bevestiging; Annuleren doet niets',
+        (tester) async {
+      final gateway = _gateway(meMember: true);
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Groep verlaten');
+      expect(find.text('Dinsdagclub verlaten?'), findsOneWidget);
+      expect(find.textContaining('nieuwe aanvraag'), findsOneWidget);
+
+      await tester.tap(find.text('Annuleren'));
+      await tester.pumpAndSettle();
+      expect(gateway.calls.where((c) => c.startsWith('leaveGroup')), isEmpty);
+      expect(find.byType(GroupScreen), findsOneWidget);
+    });
+
+    testWidgets('Verlaten: gateway, terug en een snackbar', (tester) async {
+      final gateway = _gateway(meMember: true);
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Groep verlaten');
+      await tester.tap(find.widgetWithText(TextButton, 'Verlaten'));
+      await tester.pumpAndSettle();
+
+      expect(gateway.calls, contains('leaveGroup:g1'));
+      expect(find.byType(GroupScreen), findsNothing);
+      expect(find.text('peloton'), findsOneWidget);
+      expect(find.text('Dinsdagclub verlaten'), findsOneWidget);
+    });
+
+    testWidgets('enige beheerder: de dialoog noemt de opvolger',
+        (tester) async {
+      await _open(tester, _gateway(soleAdmin: true));
+
+      await _choose(tester, 'Groep verlaten');
+      expect(
+        find.textContaining(
+          'Anna zit er het langst in en wordt dan beheerder',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('laatste lid: de groep en de link verdwijnen', (tester) async {
+      await _open(tester, _gateway(alone: true));
+
+      await _choose(tester, 'Groep verlaten');
+      expect(
+        find.text(
+            'Je bent het laatste lid. De groep en de link verdwijnen dan.'),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('opheffen', () {
+    testWidgets('bevestiging noemt leden, ritten en onomkeerbaar; Annuleren',
+        (tester) async {
+      final gateway = _gateway();
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Groep opheffen');
+      expect(find.text('Dinsdagclub opheffen?'), findsOneWidget);
+      final body = find.textContaining('3 leden');
+      expect(body, findsOneWidget);
+      final text = tester.widget<Text>(body).data!;
+      expect(text, contains('zonder groepslabel'));
+      expect(text, contains('niet terugdraaien'));
+
+      await tester.tap(find.text('Annuleren'));
+      await tester.pumpAndSettle();
+      expect(gateway.calls.where((c) => c.startsWith('deleteGroup')), isEmpty);
+      expect(find.byType(GroupScreen), findsOneWidget);
+    });
+
+    testWidgets('Opheffen: gateway, terug en een snackbar', (tester) async {
+      final gateway = _gateway();
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Groep opheffen');
+      await tester.tap(find.widgetWithText(TextButton, 'Opheffen'));
+      await tester.pumpAndSettle();
+
+      expect(gateway.calls, contains('deleteGroup:g1'));
+      expect(find.byType(GroupScreen), findsNothing);
+      expect(find.text('peloton'), findsOneWidget);
+      expect(find.text('Dinsdagclub is opgeheven'), findsOneWidget);
+    });
+
+    testWidgets('mislukt opheffen: foutzin en het scherm blijft',
+        (tester) async {
+      final gateway = _gateway()..failWith['deleteGroup'] = GroupError.unknown;
+      await _open(tester, gateway);
+
+      await _choose(tester, 'Groep opheffen');
+      await tester.tap(find.widgetWithText(TextButton, 'Opheffen'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(_generic), findsOneWidget);
+      expect(find.byType(GroupScreen), findsOneWidget);
+    });
+  });
 }
