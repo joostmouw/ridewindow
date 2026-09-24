@@ -101,6 +101,20 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
   script; `docs/CONSOLE-SETUP-CHECKLIST.md` de eenmalige inrichting. Bij een
   wijziging aan de route werk je dit bestand bij, niet de andere twee los.
 
+## Stand 24 september 2026, na de release van 1.0.44 (55)
+
+| Waar | Stand |
+|---|---|
+| Oppo | nog niet bijgewerkt naar 55: toestel was niet via adb bereikbaar |
+| PWA | 1.0.44 (55), gedeployed met `scripts/deploy_web.sh`, live hash geverifieerd |
+| Internal | 1.0.44 (55) |
+| Alpha / closed | 1.0.42 (53), ongewijzigd; promotie van 55 wacht op de toestelcheck |
+| main | 1.0.44+55 |
+
+**Wat 55 brengt:** groepsritten (fase 35). Een rit uitzetten voor een hele
+groep, antwoorden op kaart en detail, wie er komt per lid, de teller op
+Ritten en bij Peloton, en groepschips boven de rittenlijst.
+
 ## Stand 21 september 2026, na de release van 1.0.42 (53)
 
 | Waar | Stand |
