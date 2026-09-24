@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 5
+current_plan: 6
 status: executing
-stopped_at: 35-04 klaar (wie komt op detail), volgende 35-05
-last_updated: "2026-09-24T12:00:00.000Z"
-last_activity: 2026-09-24 -- 35-04 wie komt op het ritdetail klaar
+stopped_at: 35-05 klaar (teller en groepschips), volgende 35-06
+last_updated: "2026-09-24T14:00:00.000Z"
+last_activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
   percent: 50
 ---
 
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 35
-Plan: 5 of 6
-Status: 35-04 klaar, volgende 35-05
-Last activity: 2026-09-24 -- 35-04 wie komt op het ritdetail klaar
+Plan: 6 of 6
+Status: 35-05 klaar, volgende 35-06
+Last activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 35-05
+**Current Plan:** 35-06
 
 ## Decisions
 
@@ -62,6 +62,9 @@ Last activity: 2026-09-24 -- 35-04 wie komt op het ritdetail klaar
 - 35-04: detail zoekt eerst op rit-id, anders op tijdvak
 - 35-04: ledenlijst uit de groep, ex-leden niet getoond
 - 35-04: naam en status in een Wrap, knoppen in een Wrap
+- 35-05: bolletje en tab delen provider en label (9+)
+- 35-05: groepschips in scrollende Row, geen ListView
+- 35-05: lang indrukken zonder Tooltip; hint via Semantics
 
 ## Performance Metrics
 
@@ -79,8 +82,9 @@ Last activity: 2026-09-24 -- 35-04 wie komt op het ritdetail klaar
 | 35-02 | 15min | 2 | 9 |
 | 35-03 | 35min | 2 | 4 |
 | 35-04 | 30min | 2 | 11 |
+| 35-05 | 35min | 2 | 10 |
 
 ## Session Continuity
 
-**Stopped At:** 35-04 klaar (wie komt op detail), volgende 35-05
+**Stopped At:** 35-05 klaar (teller en groepschips), volgende 35-06
 **Resume File:** None
