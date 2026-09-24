@@ -2293,4 +2293,78 @@ class SNl extends S {
   String groupMemberRemoved(String name) {
     return '$name is uit de groep gehaald';
   }
+
+  @override
+  String get groupRequestsSection => 'Aanvragen';
+
+  @override
+  String get groupRequestViaLink => 'via de groepslink';
+
+  @override
+  String groupRequestProposedBy(String name) {
+    return 'voorgedragen door $name';
+  }
+
+  @override
+  String get groupAccept => 'Accepteren';
+
+  @override
+  String get groupReject => 'Afwijzen';
+
+  @override
+  String groupRequestAccepted(String name) {
+    return '$name is nu lid';
+  }
+
+  @override
+  String groupRequestRejected(String name) {
+    return 'Aanvraag van $name afgewezen';
+  }
+
+  @override
+  String get groupAddFriend => 'Maatje toevoegen';
+
+  @override
+  String get groupProposeFriend => 'Maatje voordragen';
+
+  @override
+  String get groupAddFriendHint => 'Wie je toevoegt is meteen lid.';
+
+  @override
+  String get groupProposeFriendHint =>
+      'Een beheerder beslist of je maatje lid wordt.';
+
+  @override
+  String get groupAlreadyMember => 'al lid';
+
+  @override
+  String get groupAddAction => 'Toevoegen';
+
+  @override
+  String get groupProposeAction => 'Voordragen';
+
+  @override
+  String groupFriendAddedMember(String name) {
+    return '$name is nu lid';
+  }
+
+  @override
+  String groupFriendProposed(String name) {
+    return '$name is voorgedragen. Een beheerder beslist.';
+  }
+
+  @override
+  String get groupNoFriendsToPropose =>
+      'Je hebt nog geen maatjes. Nodig er een uit onder Maatjes op de Peloton-tab.';
+
+  @override
+  String groupOpenRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aanvragen',
+      one: '1 aanvraag',
+    );
+    return '$_temp0';
+  }
 }

@@ -99,9 +99,13 @@ Widget _app(FakeGroupGateway gateway, GoRouter router) => ProviderScope(
       ),
     );
 
-Future<void> _open(WidgetTester tester, FakeGroupGateway gateway) async {
+Future<void> _open(
+  WidgetTester tester,
+  FakeGroupGateway gateway, {
+  double width = 1080,
+}) async {
   SharedPreferences.setMockInitialValues({});
-  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.physicalSize = Size(width, 2400);
   tester.view.devicePixelRatio = 2.5;
   addTearDown(tester.view.reset);
   final router = GoRouter(
@@ -286,7 +290,9 @@ void main() {
     );
     expect(
       find.descendant(
-          of: _friendRow('uid-i'), matching: find.byType(ButtonStyleButton)),
+        of: _friendRow('uid-i'),
+        matching: find.byType(ButtonStyleButton),
+      ),
       findsNothing,
     );
     expect(
@@ -298,7 +304,9 @@ void main() {
     );
     expect(
       find.descendant(
-          of: _friendRow('uid-m'), matching: find.byType(ButtonStyleButton)),
+        of: _friendRow('uid-m'),
+        matching: find.byType(ButtonStyleButton),
+      ),
       findsNothing,
     );
     expect(
@@ -318,7 +326,9 @@ void main() {
 
     await tester.tap(
       find.descendant(
-          of: _friendRow('uid-j'), matching: find.text('Voordragen')),
+        of: _friendRow('uid-j'),
+        matching: find.text('Voordragen'),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -344,7 +354,9 @@ void main() {
     expect(find.text('Wie je toevoegt is meteen lid.'), findsOneWidget);
     await tester.tap(
       find.descendant(
-          of: _friendRow('uid-j'), matching: find.text('Toevoegen')),
+        of: _friendRow('uid-j'),
+        matching: find.text('Toevoegen'),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -366,7 +378,9 @@ void main() {
 
     await tester.tap(
       find.descendant(
-          of: _friendRow('uid-j'), matching: find.text('Voordragen')),
+        of: _friendRow('uid-j'),
+        matching: find.text('Voordragen'),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -430,5 +444,14 @@ void main() {
     expect(find.text('2 aanvragen'), findsOneWidget);
     // Bij Buren ben je gewoon lid: daar geen teller.
     expect(find.text('1 aanvraag'), findsNothing);
+  });
+
+  testWidgets('smal toestel (360 dp): aanvragen en sheet passen',
+      (tester) async {
+    await _open(tester, _gateway(), width: 900);
+    expect(find.text('AANVRAGEN'), findsOneWidget);
+    await _openSheet(tester, 'Maatje toevoegen');
+    expect(find.text('Toevoegen'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

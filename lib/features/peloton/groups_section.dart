@@ -110,7 +110,9 @@ class _GroupsSectionState extends ConsumerState<GroupsSection> {
             _GroupTile(
               group: g,
               subtitle: s.groupMemberCount(g.memberCount),
-              trailing: g.isAdmin(me) ? const GroupAdminChip() : null,
+              trailing: g.isAdmin(me)
+                  ? _AdminTrailing(openRequests: g.openRequests(me).length)
+                  : null,
             ),
           for (final g in pendingList)
             _GroupTile(group: g, subtitle: s.groupRequestPendingShort),
@@ -156,6 +158,43 @@ class _GroupTile extends StatelessWidget {
       subtitle: Text(subtitle),
       trailing: trailing,
       onTap: () => context.push('/peloton/group/${group.id}'),
+    );
+  }
+}
+
+/// De chip "beheerder" en, als er aanvragen openstaan, hoeveel. Er zijn geen
+/// pushmeldingen (REQUIREMENTS, Out of Scope): zo ziet een beheerder de
+/// aanvragen zonder de groep te openen.
+class _AdminTrailing extends StatelessWidget {
+  const _AdminTrailing({required this.openRequests});
+
+  final int openRequests;
+
+  @override
+  Widget build(BuildContext context) {
+    if (openRequests == 0) return const GroupAdminChip();
+    final s = S.of(context);
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const GroupAdminChip(),
+        const SizedBox(width: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.tertiaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            s.groupOpenRequests(openRequests),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onTertiaryContainer,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

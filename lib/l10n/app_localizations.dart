@@ -4002,6 +4002,114 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'{name} is uit de groep gehaald'**
   String groupMemberRemoved(String name);
+
+  /// No description provided for @groupRequestsSection.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aanvragen'**
+  String get groupRequestsSection;
+
+  /// No description provided for @groupRequestViaLink.
+  ///
+  /// In nl, this message translates to:
+  /// **'via de groepslink'**
+  String get groupRequestViaLink;
+
+  /// No description provided for @groupRequestProposedBy.
+  ///
+  /// In nl, this message translates to:
+  /// **'voorgedragen door {name}'**
+  String groupRequestProposedBy(String name);
+
+  /// No description provided for @groupAccept.
+  ///
+  /// In nl, this message translates to:
+  /// **'Accepteren'**
+  String get groupAccept;
+
+  /// No description provided for @groupReject.
+  ///
+  /// In nl, this message translates to:
+  /// **'Afwijzen'**
+  String get groupReject;
+
+  /// No description provided for @groupRequestAccepted.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is nu lid'**
+  String groupRequestAccepted(String name);
+
+  /// No description provided for @groupRequestRejected.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aanvraag van {name} afgewezen'**
+  String groupRequestRejected(String name);
+
+  /// No description provided for @groupAddFriend.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maatje toevoegen'**
+  String get groupAddFriend;
+
+  /// No description provided for @groupProposeFriend.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maatje voordragen'**
+  String get groupProposeFriend;
+
+  /// No description provided for @groupAddFriendHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wie je toevoegt is meteen lid.'**
+  String get groupAddFriendHint;
+
+  /// No description provided for @groupProposeFriendHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Een beheerder beslist of je maatje lid wordt.'**
+  String get groupProposeFriendHint;
+
+  /// No description provided for @groupAlreadyMember.
+  ///
+  /// In nl, this message translates to:
+  /// **'al lid'**
+  String get groupAlreadyMember;
+
+  /// No description provided for @groupAddAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Toevoegen'**
+  String get groupAddAction;
+
+  /// No description provided for @groupProposeAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Voordragen'**
+  String get groupProposeAction;
+
+  /// No description provided for @groupFriendAddedMember.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is nu lid'**
+  String groupFriendAddedMember(String name);
+
+  /// No description provided for @groupFriendProposed.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is voorgedragen. Een beheerder beslist.'**
+  String groupFriendProposed(String name);
+
+  /// No description provided for @groupNoFriendsToPropose.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je hebt nog geen maatjes. Nodig er een uit onder Maatjes op de Peloton-tab.'**
+  String get groupNoFriendsToPropose;
+
+  /// No description provided for @groupOpenRequests.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 aanvraag} other{{count} aanvragen}}'**
+  String groupOpenRequests(int count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -2284,4 +2284,78 @@ class SEn extends S {
   String groupMemberRemoved(String name) {
     return '$name was removed from the group';
   }
+
+  @override
+  String get groupRequestsSection => 'Requests';
+
+  @override
+  String get groupRequestViaLink => 'via the group link';
+
+  @override
+  String groupRequestProposedBy(String name) {
+    return 'proposed by $name';
+  }
+
+  @override
+  String get groupAccept => 'Accept';
+
+  @override
+  String get groupReject => 'Decline';
+
+  @override
+  String groupRequestAccepted(String name) {
+    return '$name is now a member';
+  }
+
+  @override
+  String groupRequestRejected(String name) {
+    return 'Declined $name\'s request';
+  }
+
+  @override
+  String get groupAddFriend => 'Add a buddy';
+
+  @override
+  String get groupProposeFriend => 'Propose a buddy';
+
+  @override
+  String get groupAddFriendHint => 'Anyone you add is a member right away.';
+
+  @override
+  String get groupProposeFriendHint =>
+      'An admin decides whether your buddy joins.';
+
+  @override
+  String get groupAlreadyMember => 'already a member';
+
+  @override
+  String get groupAddAction => 'Add';
+
+  @override
+  String get groupProposeAction => 'Propose';
+
+  @override
+  String groupFriendAddedMember(String name) {
+    return '$name is now a member';
+  }
+
+  @override
+  String groupFriendProposed(String name) {
+    return '$name has been proposed. An admin decides.';
+  }
+
+  @override
+  String get groupNoFriendsToPropose =>
+      'You don\'t have any buddies yet. Invite one under Buddies on the Peloton tab.';
+
+  @override
+  String groupOpenRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count requests',
+      one: '1 request',
+    );
+    return '$_temp0';
+  }
 }

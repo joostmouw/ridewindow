@@ -7,8 +7,10 @@
 // de beheerders ligt en kan hem intrekken.
 //
 // Alleen een beheerder ziet ⋮ achter de leden (beheerder maken of afnemen,
-// uit de groep halen). Een gewoon lid ziet een rustig scherm. Het appbar-menu
-// en de groepslink komen in plan 06.
+// uit de groep halen) en bovenaan de open aanvragen met Accepteren/Afwijzen
+// (CLUB-27). Ieder lid kan een maatje voordragen; bij een beheerder heet dat
+// "Maatje toevoegen" en is het meteen lidmaatschap. Het appbar-menu en de
+// groepslink komen in plan 06.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +21,7 @@ import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/features/peloton/group_crest.dart';
 import 'package:ridewindow/features/peloton/group_error_text.dart';
+import 'package:ridewindow/features/peloton/group_propose_sheet.dart';
 import 'package:ridewindow/features/peloton/group_rules_sheet.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -155,6 +158,59 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     });
   }
 
+  /// Aanvragen die nu onderweg zijn (accepteren of afwijzen). Een veld en
+  /// geen knopstaat: twee tikken vóór de volgende frame mogen ook niets
+  /// dubbel doen.
+  final Set<String> _busyRequests = {};
+
+  Future<void> _decide(
+    PelotonGroup group,
+    GroupJoinRequest request, {
+    required bool accept,
+  }) async {
+    if (_busyRequests.contains(request.id)) return;
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final container = ProviderScope.containerOf(context, listen: false);
+    final gateway = ref.read(pelotonGatewayProvider);
+    final name = request.label(s.pelotonUnnamedFriend);
+    setState(() => _busyRequests.add(request.id));
+    try {
+      if (accept) {
+        await gateway.acceptGroupRequest(request.id);
+      } else {
+        await gateway.deleteGroupRequest(request.id);
+      }
+      container.invalidate(visibleGroupsProvider);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            accept
+                ? s.groupRequestAccepted(name)
+                : s.groupRequestRejected(name),
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Peloton: aanvraag afhandelen mislukt: $error');
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            groupErrorTextOf(
+              s,
+              error,
+              groupName: group.name,
+              personName: name,
+            ),
+          ),
+        ),
+      );
+      // Alleen bij een fout vrijgeven: na succes is de aanvraag weg, en een
+      // tweede tik op de oude knop mag niets meer doen.
+      if (mounted) setState(() => _busyRequests.remove(request.id));
+    }
+  }
+
   Widget _memberMenu(PelotonGroup group, GroupMember member, String? me) {
     final s = S.of(context);
     final theme = Theme.of(context);
@@ -286,8 +342,30 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
               padding: const EdgeInsets.only(bottom: 24),
               children: [
                 _GroupHero(group: shown, showCount: true),
+                if (isAdmin && g.openRequests(me).isNotEmpty)
+                  SectionCard(
+                    title: s.groupRequestsSection,
+                    children: [
+                      for (final r in g.openRequests(me))
+                        _RequestRow(
+                          key: ValueKey('group-request-${r.id}'),
+                          request: r,
+                          busy: _busyRequests.contains(r.id),
+                          onAccept: () => _decide(g, r, accept: true),
+                          onReject: () => _decide(g, r, accept: false),
+                        ),
+                    ],
+                  ),
                 SectionCard(
                   title: s.groupMembersSection,
+                  action: TextButton.icon(
+                    onPressed: () =>
+                        showGroupProposeSheet(context, groupId: g.id),
+                    icon: const Icon(AppIcons.userPlus, size: 18),
+                    label: Text(
+                      isAdmin ? s.groupAddFriend : s.groupProposeFriend,
+                    ),
+                  ),
                   children: [
                     for (final m in shown.members)
                       _MemberRow(
@@ -430,6 +508,84 @@ class _MemberRow extends StatelessWidget {
                 if (trailingAction != null) trailingAction!,
               ],
             ),
+    );
+  }
+}
+
+/// Eén open aanvraag: naam, herkomst ("via de groepslink" of "voorgedragen
+/// door X") en Accepteren/Afwijzen. Alleen voor beheerders.
+class _RequestRow extends StatelessWidget {
+  const _RequestRow({
+    super.key,
+    required this.request,
+    required this.busy,
+    required this.onAccept,
+    required this.onReject,
+  });
+
+  final GroupJoinRequest request;
+  final bool busy;
+  final VoidCallback onAccept;
+  final VoidCallback onReject;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final theme = Theme.of(context);
+    final label = request.label(s.pelotonUnnamedFriend);
+    final origin = request.isViaLink
+        ? s.groupRequestViaLink
+        : s.groupRequestProposedBy(
+            request.proposedByName ?? s.pelotonUnnamedFriend,
+          );
+
+    // Naam boven, knoppen eronder: naast elkaar past het niet op een smal
+    // toestel (360 dp) met twee knoppen en een lange naam.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                child: Text(label.characters.first.toUpperCase()),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: theme.textTheme.bodyLarge),
+                    Text(
+                      origin,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          // Wrap: bij grote tekst of een smal scherm gaan de knoppen onder
+          // elkaar in plaats van over de rand.
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: busy ? null : onReject,
+                child: Text(s.groupReject),
+              ),
+              FilledButton.tonal(
+                onPressed: busy ? null : onAccept,
+                child: Text(s.groupAccept),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
