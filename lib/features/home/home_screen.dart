@@ -1082,6 +1082,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       extra: DetailArgs(
         slot: matchingSlot,
         forecasts: slotForecasts,
+        groupRideId: ride.group?.id,
       ),
     );
   }

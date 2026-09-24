@@ -246,15 +246,19 @@ class _FakeProfile extends ProfileNotifier {
       );
 }
 
-List<Override> _overrides(FakeGroupGateway fake) => [
-      pelotonGatewayProvider.overrideWithValue(fake),
-      currentUserIdProvider.overrideWithValue(_me),
-      locationProvider.overrideWith(_FakeLocation.new),
-      profileProvider.overrideWith(_FakeProfile.new),
-      weatherProvider.overrideWith(_FakeWeather.new),
-      allHourlyScoresProvider.overrideWithValue(const []),
-      plannedRidesProvider.overrideWith(_FakePlannedRides.new),
-    ];
+Widget _scope(FakeGroupGateway fake, Widget child) => ProviderScope(
+      overrides: [
+        pelotonGatewayProvider.overrideWithValue(fake),
+        currentUserIdProvider.overrideWithValue(_me),
+        locationProvider.overrideWith(_FakeLocation.new),
+        profileProvider.overrideWith(_FakeProfile.new),
+        weatherProvider.overrideWith(_FakeWeather.new),
+        allHourlyScoresProvider.overrideWithValue(const []),
+        plannedRidesProvider.overrideWith(_FakePlannedRides.new),
+      ],
+      retry: (_, __) => null,
+      child: child,
+    );
 
 /// Het detail in een GoRouter, zodat een tik op de groepschip ergens heen kan.
 /// [width] en [scale] voor de pastests op 360 dp.
@@ -299,10 +303,9 @@ Future<List<String>> _pumpDetail(
     ],
   );
   await tester.pumpWidget(
-    ProviderScope(
-      overrides: _overrides(fake),
-      retry: (_, __) => null,
-      child: MaterialApp.router(
+    _scope(
+      fake,
+      MaterialApp.router(
         routerConfig: router,
         locale: const Locale('nl'),
         localizationsDelegates: S.localizationsDelegates,
@@ -342,10 +345,9 @@ Future<void> _pumpRidesTab(
     ],
   );
   await tester.pumpWidget(
-    ProviderScope(
-      overrides: _overrides(fake),
-      retry: (_, __) => null,
-      child: MaterialApp.router(
+    _scope(
+      fake,
+      MaterialApp.router(
         routerConfig: router,
         locale: const Locale('nl'),
         localizationsDelegates: S.localizationsDelegates,

@@ -233,6 +233,7 @@ GoRouter router(Ref ref) {
             RideDetailScreen(
               slot: args.slot,
               forecasts: args.forecasts,
+              groupRideId: args.groupRideId,
             ),
           );
         },

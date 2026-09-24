@@ -11,5 +11,15 @@ class DetailArgs {
   /// List of HourlyForecast filtered to the slot's time window [start, end).
   final List<HourlyForecast> forecasts;
 
-  const DetailArgs({required this.slot, required this.forecasts});
+  /// Welke gedeelde rit je aantikte, of `null` als je niet vanaf een rit kwam
+  /// (een tijdvak op Home, de agenda). Nodig sinds 35-01 twee gedeelde ritten
+  /// op hetzelfde tijdvak naast elkaar laat staan: op tijdvak zoeken zou dan
+  /// altijd de eerste openen, ook als je op de tweede tikte.
+  final String? groupRideId;
+
+  const DetailArgs({
+    required this.slot,
+    required this.forecasts,
+    this.groupRideId,
+  });
 }

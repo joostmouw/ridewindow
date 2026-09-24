@@ -16,6 +16,7 @@ import 'package:ridewindow/domain/services/slot_generator.dart'
     show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
 import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
+import 'package:ridewindow/features/peloton/ride_response.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
@@ -77,10 +78,15 @@ class RideDetailScreen extends ConsumerStatefulWidget {
   /// Optionele factory voor testinjectie. Default maakt een echte NotificationService.
   final NotificationServiceFactory notificationServiceFactory;
 
+  /// De gedeelde rit die je aantikte (zie [DetailArgs.groupRideId]). `null`
+  /// of een rit die er niet meer is: dan de eerste gedeelde rit op het tijdvak.
+  final String? groupRideId;
+
   const RideDetailScreen({
     super.key,
     required this.slot,
     required this.forecasts,
+    this.groupRideId,
     this.calendarServiceFactory = _defaultCalendarServiceFactory,
     this.notificationServiceFactory = _defaultNotificationServiceFactory,
   });
@@ -425,9 +431,21 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   /// vergeet stilzwijgend een leeg scherm opleveren. Opzoeken op tijdvak
   /// betekent bovendien dat het blok meteen klopt na accepteren of afzeggen,
   /// zonder dat er iets doorgegeven hoeft te worden.
+  ///
+  /// **Uitzondering: het rit-id.** Sinds 35-01 kunnen twee gedeelde ritten op
+  /// hetzelfde tijdvak staan (een groepsrit en je eigen rit met een maatje).
+  /// Het tijdvak alleen wijst dan niet aan welke je aantikte; het id wel. Is
+  /// die rit er niet (meer), dan geldt het tijdvak zoals altijd.
   RideEntry? get _pelotonEntry {
+    final entries = ref.watch(rideEntriesProvider);
+    final wanted = widget.groupRideId;
+    if (wanted != null) {
+      for (final entry in entries) {
+        if (entry.isShared && entry.group?.id == wanted) return entry;
+      }
+    }
     final slot = _effectiveSlot;
-    for (final entry in ref.watch(rideEntriesProvider)) {
+    for (final entry in entries) {
       if (entry.isShared &&
           entry.start.isAtSameMomentAs(slot.start) &&
           entry.end.isAtSameMomentAs(slot.end)) {
@@ -442,11 +460,19 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   Future<bool> _respondToRide(RideEntry entry, {required bool accepted}) async {
     final group = entry.group;
     if (group == null || _isLoading) return false;
+    // Vóór de await ophalen: na het antwoord kan dit scherm al weg zijn.
+    final gateway = ref.read(pelotonGatewayProvider);
+    final myName = ref.read(profileProvider).value?.userName;
     setState(() => _isLoading = true);
     try {
-      await ref
-          .read(pelotonGatewayProvider)
-          .respondToRide(rideId: group.id, accepted: accepted);
+      // Een groepsrit heeft meestal nog geen rij van jou; een update zou dan
+      // stil niets doen. respondToSharedRide kiest update of upsert (35-01).
+      await respondToSharedRide(
+        gateway,
+        group,
+        accepted: accepted,
+        myName: myName,
+      );
       ref.invalidate(groupRidesProvider);
       return true;
     } catch (error) {

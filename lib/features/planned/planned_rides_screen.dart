@@ -791,7 +791,11 @@ class RideCard extends StatelessWidget {
     );
     context.push(
       '/detail',
-      extra: DetailArgs(slot: slot, forecasts: rideForecasts),
+      extra: DetailArgs(
+        slot: slot,
+        forecasts: rideForecasts,
+        groupRideId: entry.group?.id,
+      ),
     );
   }
 
