@@ -26,8 +26,10 @@ import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/features/peloton/group_crest.dart';
+import 'package:ridewindow/features/peloton/group_dialogs.dart';
 import 'package:ridewindow/features/peloton/group_error_text.dart';
 import 'package:ridewindow/features/peloton/group_link.dart';
+import 'package:ridewindow/features/peloton/group_name_sheet.dart';
 import 'package:ridewindow/features/peloton/group_propose_sheet.dart';
 import 'package:ridewindow/features/peloton/group_rules_sheet.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
@@ -48,7 +50,7 @@ class GroupScreen extends ConsumerStatefulWidget {
 
 enum _MemberAction { promote, demote, remove }
 
-enum _GroupAction { replaceLink }
+enum _GroupAction { rename, replaceLink, leave, disband }
 
 class _GroupScreenState extends ConsumerState<GroupScreen> {
   bool _busy = false;
@@ -326,6 +328,89 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     }
   }
 
+  /// Naam wijzigen (beheerder) met dezelfde sheet als maken. Dezelfde naam
+  /// opslaan verstuurt niets.
+  Future<void> _rename(PelotonGroup group) async {
+    if (_busy) return;
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final container = ProviderScope.containerOf(context, listen: false);
+    final gateway = ref.read(pelotonGatewayProvider);
+    final name = await showGroupNameSheet(
+      context,
+      initialName: group.name,
+      title: s.groupRename,
+      actionLabel: s.groupSave,
+    );
+    if (name == null || name == group.name || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await gateway.renameGroup(groupId: group.id, name: name);
+      container.invalidate(visibleGroupsProvider);
+    } catch (error) {
+      debugPrint('Peloton: groep hernoemen mislukt: $error');
+      messenger.showSnackBar(
+        SnackBar(content: Text(groupErrorTextOf(s, error))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Verlaten of opheffen: eerst de bevestiging, dan de gateway, dan terug
+  /// met een snackbar. Messenger, router en container worden vóór de eerste
+  /// await gepakt: na de pop is deze context weg.
+  Future<void> _leaveOrDisband(
+    PelotonGroup group,
+    String? me, {
+    required bool disband,
+  }) async {
+    if (_busy) return;
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final container = ProviderScope.containerOf(context, listen: false);
+    final gateway = ref.read(pelotonGatewayProvider);
+    final confirmed = disband
+        ? await showDisbandGroupDialog(context, group: group)
+        : await showLeaveGroupDialog(context, group: group, me: me);
+    if (!confirmed || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      if (disband) {
+        await gateway.deleteGroup(group.id);
+      } else {
+        // last_admin kan hier niet: bij vertrek regelt de database de
+        // opvolging (ensure_group_admin, 0012).
+        await gateway.leaveGroup(group.id);
+      }
+      container
+        ..invalidate(visibleGroupsProvider)
+        ..invalidate(groupRidesProvider);
+      if (router.canPop()) {
+        router.pop();
+      } else {
+        router.go('/rides');
+      }
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            disband ? s.groupDisbanded(group.name) : s.groupLeft(group.name),
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint(
+        'Peloton: groep ${disband ? 'opheffen' : 'verlaten'} mislukt: $error',
+      );
+      messenger.showSnackBar(
+        SnackBar(content: Text(groupErrorTextOf(s, error))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   /// Het ⋮-menu in de appbar. Alleen voor leden; een aanvrager heeft
   /// intrekken al op het scherm.
   Widget _groupMenu(PelotonGroup group, String? me) {
@@ -336,14 +421,33 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
       tooltip: s.groupMenuTooltip,
       enabled: !_busy,
       onSelected: (action) => switch (action) {
+        _GroupAction.rename => _rename(group),
         _GroupAction.replaceLink => _replaceLink(group),
+        _GroupAction.leave => _leaveOrDisband(group, me, disband: false),
+        _GroupAction.disband => _leaveOrDisband(group, me, disband: true),
       },
+      // Beheerder: naam, link, verlaten, opheffen. Gewoon lid: alleen
+      // verlaten. De database weigert de rest ook (RLS, 0012).
       itemBuilder: (_) => [
-        if (isAdmin)
+        if (isAdmin) ...[
+          _menuItem(
+            _GroupAction.rename,
+            AppIcons.pencilSimple,
+            s.groupRename,
+          ),
           _menuItem(
             _GroupAction.replaceLink,
             AppIcons.arrowsCounterClockwise,
             s.groupReplaceLink,
+          ),
+        ],
+        _menuItem(_GroupAction.leave, AppIcons.signOut, s.groupLeave),
+        if (isAdmin)
+          _menuItem(
+            _GroupAction.disband,
+            AppIcons.trash,
+            s.groupDisband,
+            color: Theme.of(context).colorScheme.error,
           ),
       ],
     );

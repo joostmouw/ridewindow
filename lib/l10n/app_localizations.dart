@@ -4146,6 +4146,90 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Delen'**
   String get groupShareAction;
+
+  /// No description provided for @groupRename.
+  ///
+  /// In nl, this message translates to:
+  /// **'Naam wijzigen'**
+  String get groupRename;
+
+  /// No description provided for @groupSave.
+  ///
+  /// In nl, this message translates to:
+  /// **'Opslaan'**
+  String get groupSave;
+
+  /// No description provided for @groupLeave.
+  ///
+  /// In nl, this message translates to:
+  /// **'Groep verlaten'**
+  String get groupLeave;
+
+  /// No description provided for @groupLeaveTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'{group} verlaten?'**
+  String groupLeaveTitle(String group);
+
+  /// No description provided for @groupLeaveBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je ziet de groep en zijn ritten dan niet meer. Terugkomen gaat met een nieuwe aanvraag.'**
+  String get groupLeaveBody;
+
+  /// No description provided for @groupLeaveBodySuccessor.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent de enige beheerder. {name} zit er het langst in en wordt dan beheerder. Terugkomen gaat met een nieuwe aanvraag.'**
+  String groupLeaveBodySuccessor(String name);
+
+  /// No description provided for @groupLeaveBodyLast.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent het laatste lid. De groep en de link verdwijnen dan.'**
+  String get groupLeaveBodyLast;
+
+  /// No description provided for @groupLeaveAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verlaten'**
+  String get groupLeaveAction;
+
+  /// No description provided for @groupLeft.
+  ///
+  /// In nl, this message translates to:
+  /// **'{group} verlaten'**
+  String groupLeft(String group);
+
+  /// No description provided for @groupDisband.
+  ///
+  /// In nl, this message translates to:
+  /// **'Groep opheffen'**
+  String get groupDisband;
+
+  /// No description provided for @groupDisbandTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'{group} opheffen?'**
+  String groupDisbandTitle(String group);
+
+  /// No description provided for @groupDisbandBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{De groep en de link verdwijnen voor het enige lid.} other{De groep en de link verdwijnen voor alle {count} leden.}} Ritten waarop iemand al geantwoord heeft blijven staan, zonder groepslabel. Dit kun je niet terugdraaien.'**
+  String groupDisbandBody(int count);
+
+  /// No description provided for @groupDisbandAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Opheffen'**
+  String get groupDisbandAction;
+
+  /// No description provided for @groupDisbanded.
+  ///
+  /// In nl, this message translates to:
+  /// **'{group} is opgeheven'**
+  String groupDisbanded(String group);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

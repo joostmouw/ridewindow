@@ -2388,4 +2388,66 @@ class SNl extends S {
 
   @override
   String get groupShareAction => 'Delen';
+
+  @override
+  String get groupRename => 'Naam wijzigen';
+
+  @override
+  String get groupSave => 'Opslaan';
+
+  @override
+  String get groupLeave => 'Groep verlaten';
+
+  @override
+  String groupLeaveTitle(String group) {
+    return '$group verlaten?';
+  }
+
+  @override
+  String get groupLeaveBody =>
+      'Je ziet de groep en zijn ritten dan niet meer. Terugkomen gaat met een nieuwe aanvraag.';
+
+  @override
+  String groupLeaveBodySuccessor(String name) {
+    return 'Je bent de enige beheerder. $name zit er het langst in en wordt dan beheerder. Terugkomen gaat met een nieuwe aanvraag.';
+  }
+
+  @override
+  String get groupLeaveBodyLast =>
+      'Je bent het laatste lid. De groep en de link verdwijnen dan.';
+
+  @override
+  String get groupLeaveAction => 'Verlaten';
+
+  @override
+  String groupLeft(String group) {
+    return '$group verlaten';
+  }
+
+  @override
+  String get groupDisband => 'Groep opheffen';
+
+  @override
+  String groupDisbandTitle(String group) {
+    return '$group opheffen?';
+  }
+
+  @override
+  String groupDisbandBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'De groep en de link verdwijnen voor alle $count leden.',
+      one: 'De groep en de link verdwijnen voor het enige lid.',
+    );
+    return '$_temp0 Ritten waarop iemand al geantwoord heeft blijven staan, zonder groepslabel. Dit kun je niet terugdraaien.';
+  }
+
+  @override
+  String get groupDisbandAction => 'Opheffen';
+
+  @override
+  String groupDisbanded(String group) {
+    return '$group is opgeheven';
+  }
 }

@@ -2379,4 +2379,66 @@ class SEn extends S {
 
   @override
   String get groupShareAction => 'Share';
+
+  @override
+  String get groupRename => 'Rename';
+
+  @override
+  String get groupSave => 'Save';
+
+  @override
+  String get groupLeave => 'Leave group';
+
+  @override
+  String groupLeaveTitle(String group) {
+    return 'Leave $group?';
+  }
+
+  @override
+  String get groupLeaveBody =>
+      'You will no longer see the group or its rides. Coming back takes a new request.';
+
+  @override
+  String groupLeaveBodySuccessor(String name) {
+    return 'You are the only admin. $name has been in the group longest and becomes admin. Coming back takes a new request.';
+  }
+
+  @override
+  String get groupLeaveBodyLast =>
+      'You are the last member. The group and its link will be gone.';
+
+  @override
+  String get groupLeaveAction => 'Leave';
+
+  @override
+  String groupLeft(String group) {
+    return 'You left $group';
+  }
+
+  @override
+  String get groupDisband => 'Disband group';
+
+  @override
+  String groupDisbandTitle(String group) {
+    return 'Disband $group?';
+  }
+
+  @override
+  String groupDisbandBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'The group and its link will be gone for all $count members.',
+      one: 'The group and its link will be gone for its only member.',
+    );
+    return '$_temp0 Rides someone has already answered stay, without a group label. This cannot be undone.';
+  }
+
+  @override
+  String get groupDisbandAction => 'Disband';
+
+  @override
+  String groupDisbanded(String group) {
+    return '$group has been disbanded';
+  }
 }

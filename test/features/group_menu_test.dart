@@ -340,7 +340,8 @@ void main() {
       await _choose(tester, 'Groep verlaten');
       expect(
         find.text(
-            'Je bent het laatste lid. De groep en de link verdwijnen dan.'),
+          'Je bent het laatste lid. De groep en de link verdwijnen dan.',
+        ),
         findsOneWidget,
       );
     });
@@ -354,7 +355,10 @@ void main() {
 
       await _choose(tester, 'Groep opheffen');
       expect(find.text('Dinsdagclub opheffen?'), findsOneWidget);
-      final body = find.textContaining('3 leden');
+      final body = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.textContaining('3 leden'),
+      );
       expect(body, findsOneWidget);
       final text = tester.widget<Text>(body).data!;
       expect(text, contains('zonder groepslabel'));
