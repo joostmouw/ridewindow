@@ -10,7 +10,18 @@
 // een gewone gedeelde rit.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
+import 'package:ridewindow/domain/models/weather_tolerances.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
@@ -345,4 +356,224 @@ void main() {
       }
     }
   });
+
+  group('antwoorden op een groepsrit vanaf de kaart (CLUB-14)', () {
+    testWidgets('"Ik ga mee" voegt je eigen rij in, met je naam',
+        (tester) async {
+      final fake = await _pumpRidesTab(tester);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Ik ga mee'));
+      await tester.pumpAndSettle();
+
+      expect(_responses(fake), ['respondToGroupRide:gr1:true']);
+      final mine =
+          fake.rides.single.participants.singleWhere((p) => p.userId == _me);
+      expect(mine.status, ParticipantStatus.accepted);
+      expect(mine.displayName, 'Joost');
+
+      // Eén keer in de lijst, met de nieuwe rol en de groepsnaam.
+      expect(find.byType(RideCard), findsOneWidget);
+      expect(find.text('Je gaat mee met Anna'), findsOneWidget);
+      expect(find.text(_shortName), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Ik ga mee'), findsNothing);
+    });
+
+    testWidgets('"Kan niet" zet hem onder Afgezegd', (tester) async {
+      final fake = await _pumpRidesTab(tester, withSoloRide: true);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Kan niet'));
+      await tester.pumpAndSettle();
+
+      expect(_responses(fake), ['respondToGroupRide:gr1:false']);
+      // Uit de gewone lijst: alleen de eigen rit staat er nog.
+      expect(find.text(_shortName), findsNothing);
+      expect(find.byType(RideCard), findsOneWidget);
+
+      await tester.tap(find.text('Afgezegd'));
+      await tester.pumpAndSettle();
+      expect(find.text(_shortName), findsOneWidget);
+      expect(find.text('Je zei nee tegen Anna'), findsOneWidget);
+    });
+
+    testWidgets('afzeggen na "Ik ga mee" en ongedaan maken', (tester) async {
+      final fake = await _pumpRidesTab(tester);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Ik ga mee'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Toch niet'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Je doet niet meer mee aan deze rit'), findsOneWidget);
+      expect(find.text('Je gaat mee met Anna'), findsNothing);
+
+      await tester.tap(find.text('Ongedaan maken'));
+      await tester.pumpAndSettle();
+
+      expect(_responses(fake), [
+        'respondToGroupRide:gr1:true',
+        'respondToGroupRide:gr1:false',
+        'respondToGroupRide:gr1:true',
+      ]);
+      expect(find.text('Je gaat mee met Anna'), findsOneWidget);
+      expect(find.byType(RideCard), findsOneWidget);
+    });
+
+    testWidgets('een gewone uitnodiging gaat nog via respondToRide',
+        (tester) async {
+      final fake = await _pumpRidesTab(
+        tester,
+        rides: [
+          FakeGroupGateway.groupRide(
+            'r2',
+            ownerId: _anna,
+            ownerName: 'Anna',
+            participants: const [
+              RideParticipant(userId: _me, status: ParticipantStatus.invited),
+            ],
+          ),
+        ],
+      );
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Ik ga mee'));
+      await tester.pumpAndSettle();
+
+      expect(_responses(fake), ['respondToRide:r2:true']);
+      expect(find.text('Je gaat mee met Anna'), findsOneWidget);
+    });
+
+    testWidgets('twee snelle tikken geven één antwoord', (tester) async {
+      final fake = await _pumpRidesTab(tester);
+
+      final accept = find.widgetWithText(FilledButton, 'Ik ga mee');
+      await tester.tap(accept);
+      await tester.tap(accept, warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(_responses(fake), ['respondToGroupRide:gr1:true']);
+    });
+
+    testWidgets('wie de groep verlaat, ziet de groepsrit niet meer (CLUB-13)',
+        (tester) async {
+      final fake = await _pumpRidesTab(tester, withSoloRide: true);
+      expect(find.text('Anna vraagt of je meegaat'), findsOneWidget);
+
+      await fake.leaveGroup('g1');
+      ProviderScope.containerOf(tester.element(find.byType(RidesTab)))
+          .invalidate(groupRidesProvider);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Anna vraagt of je meegaat'), findsNothing);
+      expect(find.text(_shortName), findsNothing);
+    });
+  });
+}
+
+// --- RidesTab met FakeGroupGateway -------------------------------------------
+
+List<String> _responses(FakeGroupGateway fake) =>
+    fake.calls.where((c) => c.startsWith('respondTo')).toList();
+
+class _FakePlannedRides extends PlannedRidesNotifier {
+  _FakePlannedRides(this._rides);
+  final List<PlannedRide> _rides;
+
+  @override
+  Future<List<PlannedRide>> build() async => _rides;
+}
+
+class _FakeWeather extends WeatherNotifier {
+  @override
+  Future<List<HourlyForecast>> build() async => const [];
+}
+
+class _FakeProfile extends ProfileNotifier {
+  @override
+  Future<UserProfile> build() async => const UserProfile(
+        tolerances: WeatherTolerances(
+          tempMinIdealC: 10.0,
+          tempMaxIdealC: 30.0,
+          windMaxIdealKmh: 25.0,
+          rainMaxIdealMm: 1.0,
+        ),
+        allowedDurations: [2, 3],
+        theme: 'system',
+        userName: 'Joost',
+        notifEveningBefore: false,
+        notifMorningOf: false,
+        notifWeeklyDigest: false,
+      );
+}
+
+/// De Ritten-tab met groep g1 (Anna en jij) en standaard één groepsrit van
+/// Anna waarop jij nog niet antwoordde.
+Future<FakeGroupGateway> _pumpRidesTab(
+  WidgetTester tester, {
+  List<GroupRide>? rides,
+  bool withSoloRide = false,
+}) async {
+  SharedPreferences.setMockInitialValues({});
+  final fake = FakeGroupGateway(
+    groups: {
+      'g1': FakeGroupGateway.group(
+        'g1',
+        _shortName,
+        members: [
+          FakeGroupGateway.member(_anna, role: GroupRole.admin, name: 'Anna'),
+          FakeGroupGateway.member(_me, name: 'Joost', joinedDay: 1),
+        ],
+      ),
+    },
+  );
+  fake.rides.addAll(
+    rides ??
+        [
+          FakeGroupGateway.groupRide(
+            'gr1',
+            ownerId: _anna,
+            ownerName: 'Anna',
+            groupId: 'g1',
+          ),
+        ],
+  );
+  final soon = DateTime.now().add(const Duration(days: 4));
+  final planned = [
+    if (withSoloRide)
+      PlannedRide(
+        start: DateTime(soon.year, soon.month, soon.day, 7),
+        end: DateTime(soon.year, soon.month, soon.day, 9),
+        plannedScore: 61,
+      ),
+  ];
+  final router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (_, __) => const Scaffold(body: RidesTab()),
+      ),
+      GoRoute(
+        path: '/detail',
+        builder: (_, __) => const Scaffold(body: Text('detail')),
+      ),
+    ],
+  );
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        pelotonGatewayProvider.overrideWithValue(fake),
+        currentUserIdProvider.overrideWithValue(_me),
+        plannedRidesProvider.overrideWith(() => _FakePlannedRides(planned)),
+        weatherProvider.overrideWith(_FakeWeather.new),
+        profileProvider.overrideWith(_FakeProfile.new),
+      ],
+      child: MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('nl'),
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        theme: buildAppTheme(Brightness.light),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  return fake;
 }
