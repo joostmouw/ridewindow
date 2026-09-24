@@ -61,7 +61,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 - [x] 34-03-PLAN.md — datalaag: modellen, gateway, providers, foutsleutels als gewone zinnen
 - [x] 34-04-PLAN.md — Groepen op de Peloton-tab, groep maken, groepsscherm (leesstand, aanvraagstaat), regelsheet
 - [x] 34-05-PLAN.md — ⋮ per lid, eruit halen met ongedaan maken, aanvragen accepteren/afwijzen, maatje voordragen
-- [ ] 34-06-PLAN.md — groepslink delen, appbar-menu: naam, link vervangen, verlaten, opheffen
+- [x] 34-06-PLAN.md — groepslink delen, appbar-menu: naam, link vervangen, verlaten, opheffen
 - [ ] 34-07-PLAN.md — landing /group/:code, code bewaren tot na inloggen en onboarding, code in het codeveld
 - [ ] 34-08-PLAN.md — toestel + web met twee accounts (keuze testroute, checkpoint Joost)
 **Manual steps**: 0013 en de deny-tests draait Joost in de SQL Editor (34-02); de doorloop met twee accounts doet Joost (34-08).
@@ -107,6 +107,6 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
-| 34. Groep maken en beheren | 5/8 | In Progress|  |
+| 34. Groep maken en beheren | 6/8 | In Progress|  |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |

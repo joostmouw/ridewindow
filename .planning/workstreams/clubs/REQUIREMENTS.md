@@ -15,7 +15,7 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 - [x] **CLUB-03**: Ieder lid kan een bestaand maatje **voordragen**; een beheerder die een maatje voordraagt, maakt hem direct lid *(herzien 2026-09-23: was "een beheerder voegt direct toe")*
 - [x] **CLUB-04**: Ieder lid ziet de groepen waar hij in zit op de Peloton-tab, met naam en aantal leden
 - [x] **CLUB-05**: Ieder lid ziet de ledenlijst van de groep, met naam en wie beheerder is — en niets anders van een ander lid (geen e-mail, instellingen of rooster)
-- [ ] **CLUB-06**: Een lid kan de groep zelf verlaten
+- [x] **CLUB-06**: Een lid kan de groep zelf verlaten
 
 ### Beheer (CLUB-07 … 11, 27, 28)
 
@@ -23,9 +23,9 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 - [x] **CLUB-28**: Bij de groepen staat een info-knop, zoals de bestaande info-knoppen in de app, die de regels van een groep uitlegt: wie mag voordragen en wie accepteert, maximaal 30 leden per groep en 10 groepen per persoon, wat leden van elkaar zien, wie groepsritten ziet, wat er gebeurt bij verlaten en bij de laatste beheerder, en opheffen (besluit Joost 2026-09-23)
 - [x] **CLUB-07**: Een beheerder kan een ander lid beheerder maken, en een beheerder die rol weer afnemen
 - [x] **CLUB-08**: Een beheerder kan een lid uit de groep halen
-- [ ] **CLUB-09**: Een beheerder kan de groepsnaam wijzigen, en de groepslink intrekken en vervangen door een nieuwe
+- [x] **CLUB-09**: Een beheerder kan de groepsnaam wijzigen, en de groepslink intrekken en vervangen door een nieuwe
 - [x] **CLUB-10**: Een groep heeft altijd minstens één beheerder: vertrekt de laatste beheerder (verlaten of account verwijderd), dan wordt het langst zittende lid beheerder; vertrekt het laatste lid, dan verdwijnt de groep
-- [ ] **CLUB-11**: Een beheerder kan de groep opheffen; groepsritten die er al antwoorden op hebben blijven bestaan voor de eigenaar en wie geantwoord heeft, zonder groepslabel
+- [x] **CLUB-11**: Een beheerder kan de groep opheffen; groepsritten die er al antwoorden op hebben blijven bestaan voor de eigenaar en wie geantwoord heeft, zonder groepslabel
 
 ### Groepsritten (CLUB-12 … 16, 25, 26)
 
@@ -77,12 +77,12 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 | CLUB-03 | Phase 34 | Complete |
 | CLUB-04 | Phase 34 | Complete |
 | CLUB-05 | Phase 34 | Complete |
-| CLUB-06 | Phase 34 | Pending |
+| CLUB-06 | Phase 34 | Complete |
 | CLUB-07 | Phase 34 | Complete |
 | CLUB-08 | Phase 34 | Complete |
-| CLUB-09 | Phase 34 | Pending |
+| CLUB-09 | Phase 34 | Complete |
 | CLUB-10 | Phase 33 | Complete |
-| CLUB-11 | Phase 34 | Pending |
+| CLUB-11 | Phase 34 | Complete |
 | CLUB-12 | Phase 35 | Pending |
 | CLUB-13 | Phase 35 | Pending |
 | CLUB-14 | Phase 35 | Pending |

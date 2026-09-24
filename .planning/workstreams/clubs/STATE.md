@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 34-06
+current_plan: 34-07
 status: executing
-stopped_at: 34-05 klaar (ledenbeheer en aanvragen, 825 tests), volgende 34-06
-last_updated: "2026-09-24T14:00:00.000Z"
-last_activity: 2026-09-24 -- 34-05 ledenbeheer, aanvragen, voordragen
+stopped_at: 34-06 klaar (groepslink en appbar-menu, 841 tests), volgende 34-07
+last_updated: "2026-09-24T15:00:00.000Z"
+last_activity: 2026-09-24 -- 34-06 groepslink, naam, verlaten, opheffen
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
-  percent: 73
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 34
-Plan: 6 of 8
-Status: ledenbeheer en aanvragen staan; volgende 34-06 link en menu
-Last activity: 2026-09-24 -- 34-05 ledenbeheer, aanvragen, voordragen
+Plan: 7 of 8
+Status: link en appbar-menu staan; volgende 34-07 landing
+Last activity: 2026-09-24 -- 34-06 groepslink, naam, verlaten, opheffen
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 34-06
+**Current Plan:** 34-07
 
 ## Decisions
 
@@ -47,6 +47,8 @@ Last activity: 2026-09-24 -- 34-05 ledenbeheer, aanvragen, voordragen
 - 34-05: lid eruit halen pas na sluiten snackbar; ongedaan maken verstuurt niets
 - 34-05: aanvraagknoppen onder de naam (Wrap), past op 360 dp
 - 34-05: na geslaagd accepteren/afwijzen blijft het aanvraag-id bezet
+- 34-06: verlaten = bevestiging zonder ongedaan maken; terugkomen is een nieuwe aanvraag
+- 34-06: dezelfde naam opslaan verstuurt niets; aanvrager krijgt geen appbar-menu
 
 ## Performance Metrics
 
@@ -58,8 +60,9 @@ Last activity: 2026-09-24 -- 34-05 ledenbeheer, aanvragen, voordragen
 | 34-03 | 25min | 3 | 15 |
 | 34-04 | 35min | 3 | 17 |
 | 34-05 | 30min | 2 | 10 |
+| 34-06 | 25min | 2 | 10 |
 
 ## Session Continuity
 
-**Stopped At:** 34-05 klaar (ledenbeheer en aanvragen), volgende 34-06
+**Stopped At:** 34-06 klaar (groepslink en appbar-menu), volgende 34-07
 **Resume File:** None
