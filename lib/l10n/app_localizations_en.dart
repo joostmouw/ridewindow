@@ -2478,4 +2478,29 @@ class SEn extends S {
 
   @override
   String get groupOpenGroup => 'Go to the group';
+
+  @override
+  String get groupRidePickTitle => 'Who are you riding with?';
+
+  @override
+  String get groupRideSectionGroup => 'A group';
+
+  @override
+  String get groupRideSectionFriends => 'Or individual buddies';
+
+  @override
+  String get groupRideEveryMemberSees => 'every member sees the ride';
+
+  @override
+  String get groupRideNextWindows => 'Next: pick windows';
+
+  @override
+  String groupRideSent(String group) {
+    return 'Ride sent to $group';
+  }
+
+  @override
+  String groupRideAlreadyExists(String group) {
+    return '$group already has a ride at this time';
+  }
 }

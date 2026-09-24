@@ -788,5 +788,14 @@
   "groupNotNow": "Niet nu",
   "groupJoining": "Je aanvraag wordt verstuurd…",
   "groupJoinRequestedHint": "Zodra een beheerder je accepteert, staat de groep op je Peloton-tab.",
-  "groupOpenGroup": "Naar de groep"
+  "groupOpenGroup": "Naar de groep",
+  "groupRidePickTitle": "Met wie rijd je?",
+  "groupRideSectionGroup": "Een groep",
+  "groupRideSectionFriends": "Of losse maatjes",
+  "groupRideEveryMemberSees": "ieder lid ziet de rit",
+  "groupRideNextWindows": "Verder: kies vensters",
+  "groupRideSent": "Rit uitgezet voor {group}",
+  "@groupRideSent": {"placeholders": {"group": {"type": "String"}}},
+  "groupRideAlreadyExists": "Er staat al een groepsrit van {group} op dit tijdstip",
+  "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}}
 }

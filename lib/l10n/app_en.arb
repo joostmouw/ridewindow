@@ -756,5 +756,14 @@
   "groupNotNow": "Not now",
   "groupJoining": "Sending your request…",
   "groupJoinRequestedHint": "Once an admin accepts you, the group shows up on your Peloton tab.",
-  "groupOpenGroup": "Go to the group"
+  "groupOpenGroup": "Go to the group",
+  "groupRidePickTitle": "Who are you riding with?",
+  "groupRideSectionGroup": "A group",
+  "groupRideSectionFriends": "Or individual buddies",
+  "groupRideEveryMemberSees": "every member sees the ride",
+  "groupRideNextWindows": "Next: pick windows",
+  "groupRideSent": "Ride sent to {group}",
+  "@groupRideSent": {"placeholders": {"group": {"type": "String"}}},
+  "groupRideAlreadyExists": "{group} already has a ride at this time",
+  "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}}
 }

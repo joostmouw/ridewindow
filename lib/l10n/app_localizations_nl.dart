@@ -2487,4 +2487,29 @@ class SNl extends S {
 
   @override
   String get groupOpenGroup => 'Naar de groep';
+
+  @override
+  String get groupRidePickTitle => 'Met wie rijd je?';
+
+  @override
+  String get groupRideSectionGroup => 'Een groep';
+
+  @override
+  String get groupRideSectionFriends => 'Of losse maatjes';
+
+  @override
+  String get groupRideEveryMemberSees => 'ieder lid ziet de rit';
+
+  @override
+  String get groupRideNextWindows => 'Verder: kies vensters';
+
+  @override
+  String groupRideSent(String group) {
+    return 'Rit uitgezet voor $group';
+  }
+
+  @override
+  String groupRideAlreadyExists(String group) {
+    return 'Er staat al een groepsrit van $group op dit tijdstip';
+  }
 }

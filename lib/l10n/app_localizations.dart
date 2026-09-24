@@ -4296,6 +4296,48 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Naar de groep'**
   String get groupOpenGroup;
+
+  /// No description provided for @groupRidePickTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Met wie rijd je?'**
+  String get groupRidePickTitle;
+
+  /// No description provided for @groupRideSectionGroup.
+  ///
+  /// In nl, this message translates to:
+  /// **'Een groep'**
+  String get groupRideSectionGroup;
+
+  /// No description provided for @groupRideSectionFriends.
+  ///
+  /// In nl, this message translates to:
+  /// **'Of losse maatjes'**
+  String get groupRideSectionFriends;
+
+  /// No description provided for @groupRideEveryMemberSees.
+  ///
+  /// In nl, this message translates to:
+  /// **'ieder lid ziet de rit'**
+  String get groupRideEveryMemberSees;
+
+  /// No description provided for @groupRideNextWindows.
+  ///
+  /// In nl, this message translates to:
+  /// **'Verder: kies vensters'**
+  String get groupRideNextWindows;
+
+  /// No description provided for @groupRideSent.
+  ///
+  /// In nl, this message translates to:
+  /// **'Rit uitgezet voor {group}'**
+  String groupRideSent(String group);
+
+  /// No description provided for @groupRideAlreadyExists.
+  ///
+  /// In nl, this message translates to:
+  /// **'Er staat al een groepsrit van {group} op dit tijdstip'**
+  String groupRideAlreadyExists(String group);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
