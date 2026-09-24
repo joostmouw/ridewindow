@@ -1,3 +1,1 @@
-Internal test build: groups on the Peloton tab. Create a group, share its
-link, handle join requests, make members admin, and leave or disband a
-group. Not yet for the wider test group.
+Internal test build: group rides. Plan a ride for your whole group from the invite screen, answer on the card, and see per member who is coming. Rides shows a count of rides waiting for your answer, and chips above the list filter by group.

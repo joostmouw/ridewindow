@@ -1,3 +1,1 @@
-Interne testbuild: groepen op de Peloton-tab. Maak een groep, deel de
-groepslink, handel aanvragen af, maak leden beheerder, en verlaat of hef
-een groep op. Nog niet voor de bredere testgroep.
+Interne testbuild: groepsritten. Zet vanuit het uitnodigscherm een rit uit voor je hele groep, antwoord op de kaart en zie per lid wie er komt. Ritten toont hoeveel ritten op je antwoord wachten, en chips boven de lijst filteren per groep.
