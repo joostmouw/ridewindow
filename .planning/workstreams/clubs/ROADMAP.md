@@ -15,7 +15,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 **Phase Numbering:** Gaat door na v4.1 fase 32; deze workstream gebruikt 33–36.
 
 - [x] **Phase 33: Datamodel en rechten** - Migratie 0012 legt groepen, lidmaatschap en rechten vast in de database, afgedwongen door RLS en twee nieuwe functies — niets hoeft de app zelf te controleren (completed 2026-09-23)
-- [ ] **Phase 34: Groep maken en beheren** - Een ingelogde gebruiker maakt een groep, deelt de link, beheert leden en beheerders, en ziet zijn groepen op de Peloton-tab
+- [x] **Phase 34: Groep maken en beheren** - Een ingelogde gebruiker maakt een groep, deelt de link, beheert leden en beheerders, en ziet zijn groepen op de Peloton-tab (completed 2026-09-24)
 - [ ] **Phase 35: Groepsritten** - Een lid zet een rit uit voor de hele groep; ieder lid ziet en beantwoordt hem, met een groepslabel overal waar de rit verschijnt
 - [ ] **Phase 36: Afronden** - Privacybeleid, NL/EN, regressie en een tweeaccountstest op toestel en PWA voordat de build bij de testers staat
 
@@ -63,7 +63,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 - [x] 34-05-PLAN.md — ⋮ per lid, eruit halen met ongedaan maken, aanvragen accepteren/afwijzen, maatje voordragen
 - [x] 34-06-PLAN.md — groepslink delen, appbar-menu: naam, link vervangen, verlaten, opheffen
 - [x] 34-07-PLAN.md — landing /group/:code, code bewaren tot na inloggen en onboarding, code in het codeveld
-- [ ] 34-08-PLAN.md — toestel + web met twee accounts (keuze testroute, checkpoint Joost)
+- [x] 34-08-PLAN.md — toestel + web met twee accounts (keuze testroute, checkpoint Joost)
 **Manual steps**: 0013 en de deny-tests draait Joost in de SQL Editor (34-02); de doorloop met twee accounts doet Joost (34-08).
 **UI hint**: yes
 
@@ -107,6 +107,6 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
-| 34. Groep maken en beheren | 7/8 | In Progress|  |
+| 34. Groep maken en beheren | 8/8 | Complete    | 2026-09-24 |
 | 35. Groepsritten | 0/TBD | Not started | - |
 | 36. Afronden | 0/TBD | Not started | - |
