@@ -4374,6 +4374,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Nog niemand'**
   String get groupRideNobodyYet;
+
+  /// Voorleestekst bij het rode bolletje op Ritten in de onderbalk en bij de tab Peloton.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 wacht op je antwoord} other{{count} wachten op je antwoord}}'**
+  String navRidesUnanswered(int count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

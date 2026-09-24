@@ -2,17 +2,21 @@
 // Shell widget voor StatefulShellRoute: persistente NavigationBar over Home en Profiel tabs.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
-class ScaffoldWithNav extends StatelessWidget {
+class ScaffoldWithNav extends ConsumerWidget {
   const ScaffoldWithNav({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unanswered = ref.watch(unansweredRideCountProvider);
+
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
@@ -33,8 +37,14 @@ class ScaffoldWithNav extends StatelessWidget {
             label: S.of(context).navAgenda,
           ),
           NavigationDestination(
-            icon: const Icon(AppIcons.bicycle),
-            selectedIcon: const Icon(AppIconsFill.bicycle),
+            icon: _UnansweredBadge(
+              count: unanswered,
+              child: const Icon(AppIcons.bicycle),
+            ),
+            selectedIcon: _UnansweredBadge(
+              count: unanswered,
+              child: const Icon(AppIconsFill.bicycle),
+            ),
             label: S.of(context).navRides,
           ),
           NavigationDestination(
@@ -47,3 +57,35 @@ class ScaffoldWithNav extends StatelessWidget {
     );
   }
 }
+
+/// Het rode bolletje met het aantal ritten dat op jouw antwoord wacht
+/// (CLUB-25, schets 016 vraag 1 A).
+///
+/// **Onderbalk en de tab Peloton lezen allebei [unansweredRideCountProvider]**
+/// en tonen het getal met [unansweredBadgeLabel], zodat ze nooit iets anders
+/// zeggen. Bij 0 is er geen bolletje: een leeg rood rondje zou "er is iets"
+/// zeggen terwijl er niets is.
+///
+/// Geen eigen kleuren: de M3-standaard is `colorScheme.error` met `onError`,
+/// in licht en donker uit het thema.
+class _UnansweredBadge extends StatelessWidget {
+  const _UnansweredBadge({required this.count, required this.child});
+
+  final int count;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (count <= 0) return child;
+    return Semantics(
+      label: S.of(context).navRidesUnanswered(count),
+      child: ExcludeSemantics(
+        child: Badge(label: Text(unansweredBadgeLabel(count)), child: child),
+      ),
+    );
+  }
+}
+
+/// Het getal in het bolletje: boven 9 wordt het "9+", zodat het bolletje
+/// klein blijft. Gedeeld met de tab Peloton in Mijn Ritten.
+String unansweredBadgeLabel(int count) => count > 9 ? '9+' : '$count';

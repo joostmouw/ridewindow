@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:ridewindow/app/scaffold_with_nav.dart'
+    show unansweredBadgeLabel;
 import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
@@ -163,6 +165,9 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
         .watch(rideEntriesProvider)
         .where((e) => !e.isDeclined)
         .toList();
+    // Hetzelfde getal als het bolletje op Ritten in de onderbalk: dezelfde
+    // provider, dus ze kunnen niet uit elkaar lopen (CLUB-25).
+    final unanswered = ref.watch(unansweredRideCountProvider);
 
     return Stack(
       children: [
@@ -180,7 +185,31 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
               controller: _tabController,
               tabs: [
                 Tab(text: S.of(context).ridesTabRides),
-                Tab(text: S.of(context).ridesTabBuddies),
+                Tab(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          S.of(context).ridesTabBuddies,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (unanswered > 0) ...[
+                        const SizedBox(width: 6),
+                        Semantics(
+                          label: S.of(context).navRidesUnanswered(unanswered),
+                          child: ExcludeSemantics(
+                            child: Badge(
+                              label: Text(unansweredBadgeLabel(unanswered)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

@@ -808,5 +808,7 @@
   "groupRideOpenGroup": "Groep openen",
   "@groupRideOpenGroup": {"description": "Tooltip van de groepschip op het ritdetail."},
   "groupRideNobodyYet": "Nog niemand",
-  "@groupRideNobodyYet": {"description": "Onder een venster op het ritdetail als nog niemand heeft gezegd dat hij kan."}
+  "@groupRideNobodyYet": {"description": "Onder een venster op het ritdetail als nog niemand heeft gezegd dat hij kan."},
+  "navRidesUnanswered": "{count, plural, =1{1 wacht op je antwoord} other{{count} wachten op je antwoord}}",
+  "@navRidesUnanswered": {"description": "Voorleestekst bij het rode bolletje op Ritten in de onderbalk en bij de tab Peloton.", "placeholders": {"count": {"type": "int"}}}
 }

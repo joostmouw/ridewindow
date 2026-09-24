@@ -14,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/app/scaffold_with_nav.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
-import 'package:ridewindow/domain/models/planned_ride.dart';
 import 'package:ridewindow/features/planned/planned_rides_screen.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';

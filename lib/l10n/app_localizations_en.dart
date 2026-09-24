@@ -2533,4 +2533,15 @@ class SEn extends S {
 
   @override
   String get groupRideNobodyYet => 'Nobody yet';
+
+  @override
+  String navRidesUnanswered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count waiting for your answer',
+      one: '1 waiting for your answer',
+    );
+    return '$_temp0';
+  }
 }

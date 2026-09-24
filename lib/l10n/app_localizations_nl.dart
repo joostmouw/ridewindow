@@ -2542,4 +2542,15 @@ class SNl extends S {
 
   @override
   String get groupRideNobodyYet => 'Nog niemand';
+
+  @override
+  String navRidesUnanswered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count wachten op je antwoord',
+      one: '1 wacht op je antwoord',
+    );
+    return '$_temp0';
+  }
 }

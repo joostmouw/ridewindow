@@ -777,5 +777,7 @@
   "groupRideOpenGroup": "Open group",
   "@groupRideOpenGroup": {"description": "Tooltip of the group chip on the ride detail."},
   "groupRideNobodyYet": "Nobody yet",
-  "@groupRideNobodyYet": {"description": "Under a window on the ride detail when nobody has said they can ride yet."}
+  "@groupRideNobodyYet": {"description": "Under a window on the ride detail when nobody has said they can ride yet."},
+  "navRidesUnanswered": "{count, plural, =1{1 waiting for your answer} other{{count} waiting for your answer}}",
+  "@navRidesUnanswered": {"description": "Screen reader text for the red dot on Rides in the bottom bar and on the Peloton tab.", "placeholders": {"count": {"type": "int"}}}
 }
