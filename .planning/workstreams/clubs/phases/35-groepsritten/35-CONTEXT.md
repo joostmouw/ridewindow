@@ -24,6 +24,13 @@ regressielijst en tweeaccountstest (fase 36).
 </domain>
 
 <decisions>
+
+### Bevestigd door Joost na het plannen (2026-09-24)
+1. Op een groepsrit telt de organisator mee in "gaan mee" ("2 gaan mee" = jij + Jacco).
+2. Het ritdetail toont per venster de namen van wie kan (niet alleen "3 kunnen").
+3. De rode teller telt alleen ritten waarop je nog moet antwoorden; open lidmaatschapsaanvragen
+   tellen niet mee (die staan op de groepskaart).
+
 ## Implementation Decisions (locked)
 
 ### Uitnodigen (CLUB-12) — schets 016, vast
