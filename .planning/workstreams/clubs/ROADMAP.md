@@ -85,7 +85,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 **Plans**: 6 plans
 - [x] 35-01-PLAN.md — datalaag: GroupRide.groupId, onbeantwoorde groepsrit = wacht op jou, ontdubbelen per rit, respondToGroupRide (upsert), tellerprovider, fake
 - [x] 35-02-PLAN.md — uitnodigscherm: "Een groep" boven losse maatjes, groepsrit aanmaken, geen dubbele groepsrit op hetzelfde tijdvak
-- [ ] 35-03-PLAN.md — groepsnaam vooraan in de rolregel (past op 360 dp, kaart niet hoger), antwoorden vanaf de kaart
+- [x] 35-03-PLAN.md — groepsnaam vooraan in de rolregel (past op 360 dp, kaart niet hoger), antwoorden vanaf de kaart
 - [ ] 35-04-PLAN.md — ritdetail: groepschip, per lid gaat mee / kan niet / nog geen antwoord, telregel, rit-id naar het detail
 - [ ] 35-05-PLAN.md — teller op Ritten in de onderbalk en bij tab Peloton, groepschips in de Ritten-tab
 - [ ] 35-06-PLAN.md — 1.0.44 (55), akkoord Joost voor internal + web, adb licht/donker, echte groepsrit met Jacco
@@ -114,5 +114,5 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
 | 34. Groep maken en beheren | 8/8 | Complete    | 2026-09-24 |
-| 35. Groepsritten | 2/6 | In Progress|  |
+| 35. Groepsritten | 3/6 | In Progress|  |
 | 36. Afronden | 0/TBD | Not started | - |

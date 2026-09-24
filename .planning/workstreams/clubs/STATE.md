@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 3
+current_plan: 4
 status: executing
-stopped_at: 35-02 klaar (groep uitnodigen), volgende 35-03
-last_updated: "2026-09-24T08:00:00.000Z"
-last_activity: 2026-09-24 -- 35-02 groep uitnodigen klaar
+stopped_at: 35-03 klaar (groepsnaam op kaart), volgende 35-04
+last_updated: "2026-09-24T10:00:00.000Z"
+last_activity: 2026-09-24 -- 35-03 groepsnaam op kaart klaar
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 17
-  completed_plans: 13
+  completed_plans: 14
   percent: 50
 ---
 
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 35
-Plan: 3 of 6
-Status: 35-02 klaar, volgende 35-03
-Last activity: 2026-09-24 -- 35-02 groep uitnodigen klaar
+Plan: 4 of 6
+Status: 35-03 klaar, volgende 35-04
+Last activity: 2026-09-24 -- 35-03 groepsnaam op kaart klaar
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 35-03
+**Current Plan:** 35-04
 
 ## Decisions
 
@@ -57,6 +57,8 @@ Last activity: 2026-09-24 -- 35-02 groep uitnodigen klaar
 - 35-02: dubbelcheck groepsrit vóór het vensterscherm, niet erna
 - 35-02: maatjespad hergebruikt alleen eigen rit zonder group_id
 - 35-02: groepenfout bij openen = oud scherm, geen melding
+- 35-03: groepsnaam hooguit 45% van de rolregel, zonder Flexible
+- 35-03: antwoordknoppen op de ritkaart in een Wrap, rechts
 
 ## Performance Metrics
 
@@ -72,8 +74,9 @@ Last activity: 2026-09-24 -- 35-02 groep uitnodigen klaar
 | 34-07 | 30min | 2 | 15 |
 | 35-01 | 25min | 2 | 11 |
 | 35-02 | 15min | 2 | 9 |
+| 35-03 | 35min | 2 | 4 |
 
 ## Session Continuity
 
-**Stopped At:** 35-02 klaar (groep uitnodigen), volgende 35-03
+**Stopped At:** 35-03 klaar (groepsnaam op kaart), volgende 35-04
 **Resume File:** None
