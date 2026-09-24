@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 2
+current_plan: 3
 status: executing
-stopped_at: 35-01 klaar (datalaag groepsritten), volgende 35-02
-last_updated: "2026-09-24T07:30:00.000Z"
-last_activity: 2026-09-24 -- 35-01 datalaag groepsritten klaar
+stopped_at: 35-02 klaar (groep uitnodigen), volgende 35-03
+last_updated: "2026-09-24T08:00:00.000Z"
+last_activity: 2026-09-24 -- 35-02 groep uitnodigen klaar
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 17
-  completed_plans: 12
+  completed_plans: 13
   percent: 50
 ---
 
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 35
-Plan: 2 of 6
-Status: 35-01 klaar, volgende 35-02
-Last activity: 2026-09-24 -- 35-01 datalaag groepsritten klaar
+Plan: 3 of 6
+Status: 35-02 klaar, volgende 35-03
+Last activity: 2026-09-24 -- 35-02 groep uitnodigen klaar
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 35-02
+**Current Plan:** 35-03
 
 ## Decisions
 
@@ -54,6 +54,9 @@ Last activity: 2026-09-24 -- 35-01 datalaag groepsritten klaar
 - 35-01: gedeelde ritten ontdubbelen per rit-id; RideEntry.key = ride_<id>
 - 35-01: groepsrit telt over huidige leden; organisator telt als 'gaat mee'
 - 35-01: respondToGroupRide = upsert zonder select; respondToSharedRide kiest
+- 35-02: dubbelcheck groepsrit vóór het vensterscherm, niet erna
+- 35-02: maatjespad hergebruikt alleen eigen rit zonder group_id
+- 35-02: groepenfout bij openen = oud scherm, geen melding
 
 ## Performance Metrics
 
@@ -68,8 +71,9 @@ Last activity: 2026-09-24 -- 35-01 datalaag groepsritten klaar
 | 34-06 | 25min | 2 | 10 |
 | 34-07 | 30min | 2 | 15 |
 | 35-01 | 25min | 2 | 11 |
+| 35-02 | 15min | 2 | 9 |
 
 ## Session Continuity
 
-**Stopped At:** 35-01 klaar (datalaag groepsritten), volgende 35-02
+**Stopped At:** 35-02 klaar (groep uitnodigen), volgende 35-03
 **Resume File:** None
