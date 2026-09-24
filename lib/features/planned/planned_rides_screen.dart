@@ -17,6 +17,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/peloton/buddies_tab.dart';
+import 'package:ridewindow/features/peloton/ride_response.dart';
 import 'package:ridewindow/features/shared/daylight_note.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
@@ -27,6 +28,7 @@ import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
+import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -271,13 +273,23 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
   Future<void> respond(RideEntry entry, {required bool accepted}) async {
     final s = S.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    // Vóór de await gepakt: na het antwoord kan de kaart al weg zijn.
+    final gateway = ref.read(pelotonGatewayProvider);
+    final myName = ref.read(profileProvider).value?.userName;
     try {
       await _run(() async {
         final group = entry.group;
         if (group == null) return;
-        await ref
-            .read(pelotonGatewayProvider)
-            .respondToRide(rideId: group.id, accepted: accepted);
+        // Niet rechtstreeks respondToRide: dat is een update, en op een
+        // groepsrit heb je meestal nog geen eigen rij -- dan veranderde er
+        // stil niets. respondToSharedRide kiest op een groepsrit de upsert
+        // (fase 35, CLUB-14); een gewone rit gaat zoals altijd.
+        await respondToSharedRide(
+          gateway,
+          group,
+          accepted: accepted,
+          myName: myName,
+        );
         _invalidatePeloton();
       });
     } catch (error) {

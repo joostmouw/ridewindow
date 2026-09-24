@@ -9,6 +9,8 @@
 // en een kaart met een groepsrit is precies even hoog als dezelfde kaart met
 // een gewone gedeelde rit.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -442,14 +444,18 @@ void main() {
     });
 
     testWidgets('twee snelle tikken geven één antwoord', (tester) async {
-      final fake = await _pumpRidesTab(tester);
+      // Het antwoord blijft onderweg tot de test het loslaat, zoals op een
+      // traag netwerk. Zonder die rem is de fake al klaar voor de tweede tik.
+      final slow = _SlowGateway();
+      await _pumpRidesTab(tester, fake: slow);
 
       final accept = find.widgetWithText(FilledButton, 'Ik ga mee');
       await tester.tap(accept);
       await tester.tap(accept, warnIfMissed: false);
+      slow.gate.complete();
       await tester.pumpAndSettle();
 
-      expect(_responses(fake), ['respondToGroupRide:gr1:true']);
+      expect(_responses(slow), ['respondToGroupRide:gr1:true']);
     });
 
     testWidgets('wie de groep verlaat, ziet de groepsrit niet meer (CLUB-13)',
@@ -469,6 +475,24 @@ void main() {
 }
 
 // --- RidesTab met FakeGroupGateway -------------------------------------------
+
+class _SlowGateway extends FakeGroupGateway {
+  final gate = Completer<void>();
+
+  @override
+  Future<void> respondToGroupRide({
+    required String rideId,
+    required bool accepted,
+    String? displayName,
+  }) async {
+    await gate.future;
+    return super.respondToGroupRide(
+      rideId: rideId,
+      accepted: accepted,
+      displayName: displayName,
+    );
+  }
+}
 
 List<String> _responses(FakeGroupGateway fake) =>
     fake.calls.where((c) => c.startsWith('respondTo')).toList();
@@ -510,19 +534,17 @@ Future<FakeGroupGateway> _pumpRidesTab(
   WidgetTester tester, {
   List<GroupRide>? rides,
   bool withSoloRide = false,
+  FakeGroupGateway? fake,
 }) async {
   SharedPreferences.setMockInitialValues({});
-  final fake = FakeGroupGateway(
-    groups: {
-      'g1': FakeGroupGateway.group(
-        'g1',
-        _shortName,
-        members: [
-          FakeGroupGateway.member(_anna, role: GroupRole.admin, name: 'Anna'),
-          FakeGroupGateway.member(_me, name: 'Joost', joinedDay: 1),
-        ],
-      ),
-    },
+  fake ??= FakeGroupGateway();
+  fake.groups['g1'] = FakeGroupGateway.group(
+    'g1',
+    _shortName,
+    members: [
+      FakeGroupGateway.member(_anna, role: GroupRole.admin, name: 'Anna'),
+      FakeGroupGateway.member(_me, name: 'Joost', joinedDay: 1),
+    ],
   );
   fake.rides.addAll(
     rides ??
