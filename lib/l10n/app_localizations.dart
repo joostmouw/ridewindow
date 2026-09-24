@@ -4338,6 +4338,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Er staat al een groepsrit van {group} op dit tijdstip'**
   String groupRideAlreadyExists(String group);
+
+  /// No description provided for @groupRideInviteButton.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nodig je groep of maatjes uit'**
+  String get groupRideInviteButton;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

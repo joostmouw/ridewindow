@@ -2512,4 +2512,7 @@ class SNl extends S {
   String groupRideAlreadyExists(String group) {
     return 'Er staat al een groepsrit van $group op dit tijdstip';
   }
+
+  @override
+  String get groupRideInviteButton => 'Nodig je groep of maatjes uit';
 }

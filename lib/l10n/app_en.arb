@@ -765,5 +765,7 @@
   "groupRideSent": "Ride sent to {group}",
   "@groupRideSent": {"placeholders": {"group": {"type": "String"}}},
   "groupRideAlreadyExists": "{group} already has a ride at this time",
-  "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}}
+  "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}},
+  "groupRideInviteButton": "Invite your group or buddies",
+  "@groupRideInviteButton": {"description": "Label of the invite button on the ride detail when the user is in at least one group."}
 }

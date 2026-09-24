@@ -15,18 +15,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
+import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/features/peloton/group_crest.dart';
 import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
+import 'package:ridewindow/providers/hourly_scores_provider.dart';
+import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
+import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 import '../helpers/fake_group_gateway.dart';
@@ -401,4 +407,78 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('op het detail', () {
+    testWidgets('met een groep heet de knop "Nodig je groep of maatjes uit"',
+        (tester) async {
+      await _pumpDetail(tester, _gateway());
+      expect(find.text('Nodig je groep of maatjes uit'), findsOneWidget);
+      expect(find.text('Nodig een maatje uit'), findsNothing);
+    });
+
+    testWidgets('zonder groep blijft het "Nodig een maatje uit"',
+        (tester) async {
+      await _pumpDetail(tester, _gateway(withGroup: false));
+      expect(find.text('Nodig een maatje uit'), findsOneWidget);
+      expect(find.text('Nodig je groep of maatjes uit'), findsNothing);
+    });
+  });
+}
+
+// --- harnas voor het detail (naar ride_detail_screen_test.dart) -------------
+
+class _FakeLocation extends LocationNotifier {
+  @override
+  Future<LocationData> build() async => const LocationData(
+        lat: 52.3676,
+        lon: 4.9041,
+        city: 'Amsterdam',
+        source: LocationSource.override,
+      );
+}
+
+class _FakeWeather extends WeatherNotifier {
+  @override
+  Future<List<HourlyForecast>> build() async => const [];
+}
+
+class _FakePlannedRides extends PlannedRidesNotifier {
+  @override
+  Future<List<PlannedRide>> build() async => const [];
+}
+
+Future<void> _pumpDetail(WidgetTester tester, FakeGroupGateway gateway) async {
+  tester.view.physicalSize = const Size(800, 3000);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+
+  final slot = RideSlot(
+    start: _start,
+    end: _end,
+    overallScore: 80,
+    tier: rideTierFromScore(80),
+    hours: const [],
+  );
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        pelotonGatewayProvider.overrideWithValue(gateway),
+        currentUserIdProvider.overrideWithValue(_me),
+        locationProvider.overrideWith(_FakeLocation.new),
+        profileProvider.overrideWith(_FakeProfile.new),
+        weatherProvider.overrideWith(_FakeWeather.new),
+        allHourlyScoresProvider.overrideWithValue(const []),
+        plannedRidesProvider.overrideWith(_FakePlannedRides.new),
+      ],
+      retry: (_, __) => null,
+      child: MaterialApp(
+        locale: const Locale('nl'),
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        home: RideDetailScreen(slot: slot, forecasts: const []),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
 }

@@ -797,5 +797,6 @@
   "groupRideSent": "Rit uitgezet voor {group}",
   "@groupRideSent": {"placeholders": {"group": {"type": "String"}}},
   "groupRideAlreadyExists": "Er staat al een groepsrit van {group} op dit tijdstip",
-  "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}}
+  "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}},
+  "groupRideInviteButton": "Nodig je groep of maatjes uit"
 }

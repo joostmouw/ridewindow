@@ -2503,4 +2503,7 @@ class SEn extends S {
   String groupRideAlreadyExists(String group) {
     return '$group already has a ride at this time';
   }
+
+  @override
+  String get groupRideInviteButton => 'Invite your group or buddies';
 }

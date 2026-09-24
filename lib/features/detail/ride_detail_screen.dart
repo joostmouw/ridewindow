@@ -1255,7 +1255,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         plannedScore: widget.slot.overallScore,
                       ),
               icon: const Icon(AppIcons.userPlus, size: 18),
-              label: Text(S.of(context).pelotonInviteToRide),
+              // Met een groep is "een maatje" te smal: de knop opent dan ook
+              // de groepskeuze (CLUB-12).
+              label: Text(
+                (ref.watch(myGroupsProvider).value ?? const []).isNotEmpty
+                    ? S.of(context).groupRideInviteButton
+                    : S.of(context).pelotonInviteToRide,
+              ),
             ),
             const SizedBox(height: 10),
           ],
