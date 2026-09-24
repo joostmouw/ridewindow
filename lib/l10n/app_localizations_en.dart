@@ -2227,4 +2227,34 @@ class SEn extends S {
 
   @override
   String get groupRequestPendingShort => 'request pending';
+
+  @override
+  String groupHeroSubtitle(String count, String date) {
+    return '$count · since $date';
+  }
+
+  @override
+  String get groupMembersSection => 'Members';
+
+  @override
+  String groupYou(String name) {
+    return '$name (you)';
+  }
+
+  @override
+  String get groupOnlyYouHint =>
+      'It\'s just you so far. Share the group link or propose a buddy.';
+
+  @override
+  String get groupNotFound =>
+      'This group no longer exists, or you\'re no longer a member.';
+
+  @override
+  String get groupRequestPending => 'Your request is with the admins';
+
+  @override
+  String get groupWithdrawRequest => 'Withdraw request';
+
+  @override
+  String get groupRequestWithdrawn => 'Request withdrawn';
 }

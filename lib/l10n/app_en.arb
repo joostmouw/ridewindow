@@ -673,5 +673,15 @@
   "groupMemberCount": "{count, plural, =1{1 member} other{{count} members}}",
   "@groupMemberCount": {"placeholders": {"count": {"type": "int"}}},
   "groupAdminChip": "admin",
-  "groupRequestPendingShort": "request pending"
+  "groupRequestPendingShort": "request pending",
+  "groupHeroSubtitle": "{count} · since {date}",
+  "@groupHeroSubtitle": {"placeholders": {"count": {"type": "String"}, "date": {"type": "String"}}},
+  "groupMembersSection": "Members",
+  "groupYou": "{name} (you)",
+  "@groupYou": {"placeholders": {"name": {"type": "String"}}},
+  "groupOnlyYouHint": "It's just you so far. Share the group link or propose a buddy.",
+  "groupNotFound": "This group no longer exists, or you're no longer a member.",
+  "groupRequestPending": "Your request is with the admins",
+  "groupWithdrawRequest": "Withdraw request",
+  "groupRequestWithdrawn": "Request withdrawn"
 }

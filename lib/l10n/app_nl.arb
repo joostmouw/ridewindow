@@ -705,5 +705,15 @@
   "groupMemberCount": "{count, plural, =1{1 lid} other{{count} leden}}",
   "@groupMemberCount": {"placeholders": {"count": {"type": "int"}}},
   "groupAdminChip": "beheerder",
-  "groupRequestPendingShort": "aanvraag loopt"
+  "groupRequestPendingShort": "aanvraag loopt",
+  "groupHeroSubtitle": "{count} · sinds {date}",
+  "@groupHeroSubtitle": {"placeholders": {"count": {"type": "String"}, "date": {"type": "String"}}},
+  "groupMembersSection": "Leden",
+  "groupYou": "{name} (jij)",
+  "@groupYou": {"placeholders": {"name": {"type": "String"}}},
+  "groupOnlyYouHint": "Je bent nog alleen. Deel de groepslink of draag een maatje voor.",
+  "groupNotFound": "Deze groep bestaat niet meer, of je bent er geen lid meer van.",
+  "groupRequestPending": "Je aanvraag ligt bij de beheerders",
+  "groupWithdrawRequest": "Aanvraag intrekken",
+  "groupRequestWithdrawn": "Aanvraag ingetrokken"
 }

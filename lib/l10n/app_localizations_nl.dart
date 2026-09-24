@@ -2236,4 +2236,34 @@ class SNl extends S {
 
   @override
   String get groupRequestPendingShort => 'aanvraag loopt';
+
+  @override
+  String groupHeroSubtitle(String count, String date) {
+    return '$count · sinds $date';
+  }
+
+  @override
+  String get groupMembersSection => 'Leden';
+
+  @override
+  String groupYou(String name) {
+    return '$name (jij)';
+  }
+
+  @override
+  String get groupOnlyYouHint =>
+      'Je bent nog alleen. Deel de groepslink of draag een maatje voor.';
+
+  @override
+  String get groupNotFound =>
+      'Deze groep bestaat niet meer, of je bent er geen lid meer van.';
+
+  @override
+  String get groupRequestPending => 'Je aanvraag ligt bij de beheerders';
+
+  @override
+  String get groupWithdrawRequest => 'Aanvraag intrekken';
+
+  @override
+  String get groupRequestWithdrawn => 'Aanvraag ingetrokken';
 }

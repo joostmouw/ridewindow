@@ -3912,6 +3912,54 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'aanvraag loopt'**
   String get groupRequestPendingShort;
+
+  /// No description provided for @groupHeroSubtitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count} · sinds {date}'**
+  String groupHeroSubtitle(String count, String date);
+
+  /// No description provided for @groupMembersSection.
+  ///
+  /// In nl, this message translates to:
+  /// **'Leden'**
+  String get groupMembersSection;
+
+  /// No description provided for @groupYou.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} (jij)'**
+  String groupYou(String name);
+
+  /// No description provided for @groupOnlyYouHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je bent nog alleen. Deel de groepslink of draag een maatje voor.'**
+  String get groupOnlyYouHint;
+
+  /// No description provided for @groupNotFound.
+  ///
+  /// In nl, this message translates to:
+  /// **'Deze groep bestaat niet meer, of je bent er geen lid meer van.'**
+  String get groupNotFound;
+
+  /// No description provided for @groupRequestPending.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je aanvraag ligt bij de beheerders'**
+  String get groupRequestPending;
+
+  /// No description provided for @groupWithdrawRequest.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aanvraag intrekken'**
+  String get groupWithdrawRequest;
+
+  /// No description provided for @groupRequestWithdrawn.
+  ///
+  /// In nl, this message translates to:
+  /// **'Aanvraag ingetrokken'**
+  String get groupRequestWithdrawn;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

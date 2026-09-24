@@ -172,7 +172,8 @@ void main() {
     expect(rows, findsOneWidget);
     final texts = tester
         .widgetList<Text>(
-            find.descendant(of: rows, matching: find.byType(Text)))
+          find.descendant(of: rows, matching: find.byType(Text)),
+        )
         .map((t) => t.data)
         .where((d) => d != 'F')
         .toList();

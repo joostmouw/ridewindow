@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/app/scaffold_with_nav.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
+import 'package:ridewindow/features/peloton/group_screen.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/welcome/welcome_screen.dart';
 import 'package:ridewindow/features/onboarding/onboarding_screen.dart';
@@ -161,6 +162,15 @@ GoRouter router(Ref ref) {
         pageBuilder: (context, state) => _fadeTransition(
           state,
           InviteLandingScreen(code: state.pathParameters['code'] ?? ''),
+        ),
+      ),
+      // Het groepsscherm staat buiten de shell: een eigen scherm met terugknop,
+      // net als het ritdetail, en de onderbalk hoort er niet onder.
+      GoRoute(
+        path: '/peloton/group/:groupId',
+        pageBuilder: (context, state) => _slideUpTransition(
+          state,
+          GroupScreen(groupId: state.pathParameters['groupId'] ?? ''),
         ),
       ),
       GoRoute(
