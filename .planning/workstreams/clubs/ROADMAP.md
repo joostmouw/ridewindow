@@ -95,7 +95,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 
 **Goal**: Clubs is juridisch, taalkundig en functioneel af — het privacybeleid klopt, alle teksten bestaan in twee talen, de bestaande Peloton-stromen zijn aantoonbaar ongebroken, en twee echte accounts hebben de hele keten doorlopen — voordat de build bij de testers staat.
 **Depends on**: Phase 35
-**Requirements**: CLUB-21, CLUB-22, CLUB-23, CLUB-24
+**Requirements**: CLUB-21, CLUB-22, CLUB-23, CLUB-24, CLUB-29, CLUB-30
 **Success Criteria** (what must be TRUE):
 
   1. Het privacybeleid vermeldt in NL en EN dat groepsleden elkaars naam en hun antwoord op groepsritten zien (CLUB-21)

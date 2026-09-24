@@ -44,8 +44,10 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 - [x] **CLUB-19**: Een account verwijderen (`delete_own_account`) ruimt het lidmaatschap op en laat CLUB-10 gelden, zonder dat een groep zonder beheerder achterblijft
 - [x] **CLUB-20**: De twee nieuwe server-functies (`redeem_group_invite`, `is_group_member`) zijn in hun migratie verantwoord, en de "No backend"-constraint in `CLAUDE.md` en `AGENTS.md` telt er acht (bijgesteld 2026-09-23 per 33-CONTEXT 'De telling volgt het schema': 0012 voegt vijf functies toe — ook create_group en de triggerfuncties guard_group_member_insert en ensure_group_admin — en de telling wordt elf; zie de kop van 0012)
 
-### Afronding (CLUB-21 … 24)
+### Afronding (CLUB-21 … 24, 29, 30)
 
+- [ ] **CLUB-29**: Verandert iemand zijn profielnaam, dan verandert zijn naam ook overal waar hij als kopie staat — in groepen (`group_members.display_name`), aanvragen (`group_join_requests.display_name`/`proposed_by_name`), ritdeelnemers (`group_ride_participants.display_name`) en als organisator (`group_rides.owner_name`) — zodat niemand blijvend "Fietser/Rider" heet; afgedwongen in de database, bewezen met een test (besluit Joost 2026-09-24)
+- [ ] **CLUB-30**: Wie zonder profielnaam lid wordt van een groep, een aanvraag doet, of op een (groeps)rit antwoordt, krijgt eerst één vraag "Welke naam zien anderen?" en kan dan pas verder; wie al een naam heeft, merkt niets (besluit Joost 2026-09-24)
 - [ ] **CLUB-21**: Het privacybeleid vermeldt dat groepsleden elkaars naam en elkaars antwoord op groepsritten zien
 - [ ] **CLUB-22**: Alle nieuwe teksten bestaan in NL en EN
 - [ ] **CLUB-23**: De bestaande Peloton-stromen (maatje worden via code, losse gedeelde rit, stemmen) werken ongewijzigd — vastgelegd in een regressielijst, volledige suite groen
@@ -100,3 +102,5 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 | CLUB-26 | Phase 35 | Pending |
 | CLUB-27 | Phase 34 | Complete |
 | CLUB-28 | Phase 34 | Complete |
+| CLUB-29 | Phase 36 | Pending |
+| CLUB-30 | Phase 36 | Pending |
