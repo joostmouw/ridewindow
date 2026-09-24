@@ -767,5 +767,15 @@
   "groupRideAlreadyExists": "{group} already has a ride at this time",
   "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}},
   "groupRideInviteButton": "Invite your group or buddies",
-  "@groupRideInviteButton": {"description": "Label of the invite button on the ride detail when the user is in at least one group."}
+  "@groupRideInviteButton": {"description": "Label of the invite button on the ride detail when the user is in at least one group."},
+  "groupRideTallyGoing": "{count, plural, =1{1 going} other{{count} going}}",
+  "@groupRideTallyGoing": {"description": "Tally line on the detail of a group ride; the organiser counts as going.", "placeholders": {"count": {"type": "int"}}},
+  "groupRideTallyDeclined": "{count} can't",
+  "@groupRideTallyDeclined": {"placeholders": {"count": {"type": "int"}}},
+  "groupRideTallyWaiting": "{count} not yet",
+  "@groupRideTallyWaiting": {"placeholders": {"count": {"type": "int"}}},
+  "groupRideOpenGroup": "Open group",
+  "@groupRideOpenGroup": {"description": "Tooltip of the group chip on the ride detail."},
+  "groupRideNobodyYet": "Nobody yet",
+  "@groupRideNobodyYet": {"description": "Under a window on the ride detail when nobody has said they can ride yet."}
 }

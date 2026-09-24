@@ -4344,6 +4344,36 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Nodig je groep of maatjes uit'**
   String get groupRideInviteButton;
+
+  /// Telregel op het ritdetail van een groepsrit; de organisator telt mee.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 gaat mee} other{{count} gaan mee}}'**
+  String groupRideTallyGoing(int count);
+
+  /// No description provided for @groupRideTallyDeclined.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count} kan niet'**
+  String groupRideTallyDeclined(int count);
+
+  /// No description provided for @groupRideTallyWaiting.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count} nog niet'**
+  String groupRideTallyWaiting(int count);
+
+  /// Tooltip van de groepschip op het ritdetail.
+  ///
+  /// In nl, this message translates to:
+  /// **'Groep openen'**
+  String get groupRideOpenGroup;
+
+  /// Onder een venster op het ritdetail als nog niemand heeft gezegd dat hij kan.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nog niemand'**
+  String get groupRideNobodyYet;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -2515,4 +2515,31 @@ class SNl extends S {
 
   @override
   String get groupRideInviteButton => 'Nodig je groep of maatjes uit';
+
+  @override
+  String groupRideTallyGoing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gaan mee',
+      one: '1 gaat mee',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupRideTallyDeclined(int count) {
+    return '$count kan niet';
+  }
+
+  @override
+  String groupRideTallyWaiting(int count) {
+    return '$count nog niet';
+  }
+
+  @override
+  String get groupRideOpenGroup => 'Groep openen';
+
+  @override
+  String get groupRideNobodyYet => 'Nog niemand';
 }

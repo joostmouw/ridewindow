@@ -6,6 +6,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
@@ -15,9 +17,11 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart'
     show windVariabilityPenalty;
 import 'package:ridewindow/features/detail/insights_sheet.dart';
+import 'package:ridewindow/features/peloton/group_crest.dart';
 import 'package:ridewindow/features/peloton/invite_buddies_sheet.dart';
 import 'package:ridewindow/features/peloton/ride_response.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
@@ -534,14 +538,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final rw = context.rw;
     final style = rideRoleStyle(context, entry);
     final participants = entry.group?.participants ?? const <RideParticipant>[];
-
-    String statusLabel(ParticipantStatus status) => switch (status) {
-          ParticipantStatus.accepted => s.pelotonStatusGoing,
-          ParticipantStatus.declined => s.pelotonStatusDeclined,
-          ParticipantStatus.invited => s.pelotonStatusWaiting,
-        };
+    // Alleen een groepsrit waarvan de groep bij jouw groepen hoort. Verliet de
+    // organisator de groep, dan is die onbekend en blijft de kaart zoals bij
+    // een gewone gedeelde rit (zie [RideEntry.pelotonGroup]).
+    final pelotonGroup = entry.pelotonGroup;
 
     return Card.outlined(
+      key: const ValueKey('peloton-card'),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,6 +554,14 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // De groep als chip (CLUB-16, schets 016). Op de ritkaart
+                // staat de naam in de rolregel omdat daar geen ruimte is;
+                // hier wel, en een tik brengt je naar de groep.
+                if (pelotonGroup != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _buildGroupChip(context, pelotonGroup),
+                  ),
                 Row(
                   children: [
                     // Hetzelfde merkteken als links op de Home-kaart, zodat je
@@ -580,10 +591,23 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                 ),
                 // Eerst het overzicht, dan de namen eronder.
                 PelotonCounter(entry: entry),
+                if (pelotonGroup != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      _groupTally(s, entry),
+                      key: const ValueKey('group-ride-tally'),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ),
               ],
             ),
           ),
-          if (participants.isEmpty)
+          if (pelotonGroup != null)
+            ..._buildGroupMemberRows(context, entry, pelotonGroup)
+          else if (participants.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 2, 16, 14),
               child: Text(
@@ -596,64 +620,44 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             )
           else
             for (final p in participants)
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(top: BorderSide(color: rw.borderDim)),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 14,
-                      child: Text(
-                        (p.displayName?.trim().isNotEmpty ?? false)
-                            ? p.displayName!.trim()[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        p.displayName?.trim().isNotEmpty ?? false
-                            ? p.displayName!
-                            : s.pelotonUnnamedFriend,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                    Text(
-                      statusLabel(p.status),
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: rw.textTertiary),
-                    ),
-                  ],
-                ),
+              _buildPersonRow(
+                context,
+                key: ValueKey('member-row-${p.userId}'),
+                name: p.displayName?.trim().isNotEmpty ?? false
+                    ? p.displayName!
+                    : s.pelotonUnnamedFriend,
+                status: p.status,
               ),
+          if (entry.group case final ride? when ride.hasOpenChoice)
+            _buildOptionVoters(context, entry, ride),
           // De handeling die bij jouw rol hoort staat op de kaart zelf, want
           // hier is waar je hem zoekt zodra je de rit openslaat.
           if (entry.role == RideRole.pending)
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => _respondToRide(entry, accepted: false),
-                    child: Text(s.pelotonDecline),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => _respondToRide(entry, accepted: true),
-                    child: Text(s.pelotonAccept),
-                  ),
-                ],
+              // Een Wrap en geen Row: op 360 dp met grote tekst liepen de
+              // twee knoppen naast elkaar van de kaart (les uit 35-03). Past
+              // het niet, dan komt de tweede eronder, ook rechts.
+              child: SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  children: [
+                    TextButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () => _respondToRide(entry, accepted: false),
+                      child: Text(s.pelotonDecline),
+                    ),
+                    FilledButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () => _respondToRide(entry, accepted: true),
+                      child: Text(s.pelotonAccept),
+                    ),
+                  ],
+                ),
               ),
             ),
           if (entry.role == RideRole.joined)
@@ -679,6 +683,243 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                   onPressed: _isLoading ? null : () => _rejoinRide(entry),
                   child: Text(s.rideRejoin),
                 ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// De groepschip bovenaan de pelotonkaart. De naam wordt afgekapt in plaats
+  /// van de kaart op te rekken: een groepsnaam mag 40 tekens zijn.
+  Widget _buildGroupChip(BuildContext context, PelotonGroup group) {
+    return LayoutBuilder(
+      builder: (context, constraints) => ActionChip(
+        avatar: GroupCrest(name: group.name, size: 20),
+        tooltip: S.of(context).groupRideOpenGroup,
+        label: ConstrainedBox(
+          // Ruimte voor het kenteken en de binnenmarges van de chip.
+          constraints: BoxConstraints(
+            maxWidth: math.max(0, constraints.maxWidth - 48),
+          ),
+          child: Text(
+            group.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        onPressed: () => context.push('/peloton/group/${group.id}'),
+      ),
+    );
+  }
+
+  /// "2 gaan mee · 1 kan niet · 2 nog niet". "Gaan mee" staat er altijd (de
+  /// organisator telt mee, dus het is nooit nul); de andere twee alleen als
+  /// ze iets zeggen.
+  String _groupTally(S s, RideEntry entry) {
+    final parts = [s.groupRideTallyGoing(entry.acceptedCount)];
+    if (entry.declinedCount > 0) {
+      parts.add(s.groupRideTallyDeclined(entry.declinedCount));
+    }
+    if (entry.pendingCount > 0) {
+      parts.add(s.groupRideTallyWaiting(entry.pendingCount));
+    }
+    return parts.join(' · ');
+  }
+
+  /// Eén rij per huidig lid van de groep (CLUB-15).
+  ///
+  /// **Uit de ledenlijst, niet uit de deelnemers.** Op een groepsrit wordt er
+  /// geen rij per lid aangemaakt; "nog geen antwoord" is precies het lid
+  /// zonder rij. De deelnemers alleen zouden die mensen weglaten. Omgekeerd
+  /// tonen we rijen van ex-leden niet (T-35-10): wie de groep verliet, hoort
+  /// hier niet meer, en telt in [RideEntry.acceptedCount] ook niet mee.
+  ///
+  /// Volgorde: de organisator (telt als "gaat mee", bevestigd door Joost
+  /// 2026-09-24), dan gaat mee, kan niet, nog geen antwoord; binnen elke
+  /// groep de volgorde van de ledenlijst.
+  List<Widget> _buildGroupMemberRows(
+    BuildContext context,
+    RideEntry entry,
+    PelotonGroup group,
+  ) {
+    final s = S.of(context);
+    final ride = entry.group!;
+    final me = ref.watch(currentUserIdProvider);
+
+    ParticipantStatus statusOf(GroupMember m) => m.userId == ride.ownerId
+        ? ParticipantStatus.accepted
+        : ride.statusFor(m.userId) ?? ParticipantStatus.invited;
+
+    int rank(GroupMember m) {
+      if (m.userId == ride.ownerId) return 0;
+      return switch (statusOf(m)) {
+        ParticipantStatus.accepted => 1,
+        ParticipantStatus.declined => 2,
+        ParticipantStatus.invited => 3,
+      };
+    }
+
+    final indexed = group.members.indexed.toList()
+      ..sort((a, b) {
+        final byRank = rank(a.$2).compareTo(rank(b.$2));
+        return byRank != 0 ? byRank : a.$1.compareTo(b.$1);
+      });
+
+    return [
+      for (final (_, m) in indexed)
+        _buildPersonRow(
+          context,
+          key: ValueKey('member-row-${m.userId}'),
+          name: m.userId == me
+              ? s.groupYou(m.label(s.pelotonUnnamedFriend))
+              : m.label(s.pelotonUnnamedFriend),
+          status: statusOf(m),
+        ),
+    ];
+  }
+
+  /// Eén persoon op de pelotonkaart: avatar, naam, antwoord. Dezelfde rij voor
+  /// gewone en groepsritten, zodat ze er hetzelfde uitzien (consistentie-sweep).
+  ///
+  /// Naam en antwoord staan in een [Wrap]: past het, dan staat het antwoord
+  /// rechts zoals altijd; past het niet (smal toestel, grote tekst), dan komt
+  /// het onder de naam in plaats van van de kaart te lopen.
+  Widget _buildPersonRow(
+    BuildContext context, {
+    required Key key,
+    required String name,
+    required ParticipantStatus status,
+  }) {
+    final s = S.of(context);
+    final rw = context.rw;
+    final theme = Theme.of(context);
+    // Schets 016: gaat mee groen, kan niet rood, nog niet gedempt.
+    final (label, color) = switch (status) {
+      ParticipantStatus.accepted => (s.pelotonStatusGoing, rw.scorePerfect),
+      ParticipantStatus.declined => (
+          s.pelotonStatusDeclined,
+          theme.colorScheme.error,
+        ),
+      ParticipantStatus.invited => (s.pelotonStatusWaiting, rw.textTertiary),
+    };
+    final initial = name.trim().isEmpty
+        ? '?'
+        : name.trim().characters.first.toUpperCase();
+
+    return Container(
+      key: key,
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: rw.borderDim)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 14,
+            child: Text(initial, style: const TextStyle(fontSize: 12)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(color: color),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Per venster wie kan, met namen (CLUB-15, bevestigd door Joost
+  /// 2026-09-24). De ritkaart toont alleen een aantal en de stemknoppen; hier
+  /// is ruimte om te zien wíe er kan. Stemmen zelf blijft op de ritkaart.
+  ///
+  /// Namen komen uit de ledenlijst (groepsrit) of de deelnemers (gewone rit),
+  /// met de organisator erbij. Onbekend = "Fietser".
+  Widget _buildOptionVoters(
+    BuildContext context,
+    RideEntry entry,
+    GroupRide ride,
+  ) {
+    final s = S.of(context);
+    final rw = context.rw;
+    final theme = Theme.of(context);
+    final me = ref.watch(currentUserIdProvider);
+    final locale = Localizations.localeOf(context).languageCode;
+    final dayFormat =
+        DateFormat('EEE d MMM', locale == 'en' ? 'en_US' : 'nl_NL');
+
+    String nameOf(String userId) {
+      String? raw;
+      final member = entry.pelotonGroup?.memberFor(userId);
+      if (member != null) {
+        raw = member.displayName;
+      } else if (userId == ride.ownerId) {
+        raw = ride.ownerName;
+      } else {
+        for (final p in ride.participants) {
+          if (p.userId == userId) raw = p.displayName;
+        }
+      }
+      final name = (raw == null || raw.trim().isEmpty)
+          ? s.pelotonUnnamedFriend
+          : raw.trim();
+      return userId == me ? s.groupYou(name) : name;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: rw.borderDim)),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final option in ride.options)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${dayFormat.format(option.start)}  '
+                    '${_fmtTime(option.start)} – ${_fmtTime(option.end)}',
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  Builder(
+                    builder: (context) {
+                      final names = [
+                        for (final v in option.votes)
+                          if (v.canRide) nameOf(v.userId),
+                      ];
+                      return Text(
+                        names.isEmpty ? s.groupRideNobodyYet : names.join(', '),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: names.isEmpty
+                              ? rw.textTertiary
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
         ],

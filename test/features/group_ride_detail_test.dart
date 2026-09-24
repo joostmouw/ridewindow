@@ -13,7 +13,6 @@
 // - bij meerdere vensters staat per venster wie kan, met namen;
 // - alles past op 360 dp met tekstschaal 1.3 en 2.0.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -318,10 +317,12 @@ void main() {
         final rw = context.rw;
         final cs = Theme.of(context).colorScheme;
         Color? colorIn(String uid, String label) => tester
-            .widget<Text>(find.descendant(
-              of: find.byKey(ValueKey('member-row-$uid')),
-              matching: find.text(label),
-            ))
+            .widget<Text>(
+              find.descendant(
+                of: find.byKey(ValueKey('member-row-$uid')),
+                matching: find.text(label),
+              ),
+            )
             .style
             ?.color;
         expect(colorIn(_anna, 'gaat mee'), rw.scorePerfect);

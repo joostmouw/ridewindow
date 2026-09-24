@@ -2506,4 +2506,31 @@ class SEn extends S {
 
   @override
   String get groupRideInviteButton => 'Invite your group or buddies';
+
+  @override
+  String groupRideTallyGoing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count going',
+      one: '1 going',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupRideTallyDeclined(int count) {
+    return '$count can\'t';
+  }
+
+  @override
+  String groupRideTallyWaiting(int count) {
+    return '$count not yet';
+  }
+
+  @override
+  String get groupRideOpenGroup => 'Open group';
+
+  @override
+  String get groupRideNobodyYet => 'Nobody yet';
 }

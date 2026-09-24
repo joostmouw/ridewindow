@@ -798,5 +798,15 @@
   "@groupRideSent": {"placeholders": {"group": {"type": "String"}}},
   "groupRideAlreadyExists": "Er staat al een groepsrit van {group} op dit tijdstip",
   "@groupRideAlreadyExists": {"placeholders": {"group": {"type": "String"}}},
-  "groupRideInviteButton": "Nodig je groep of maatjes uit"
+  "groupRideInviteButton": "Nodig je groep of maatjes uit",
+  "groupRideTallyGoing": "{count, plural, =1{1 gaat mee} other{{count} gaan mee}}",
+  "@groupRideTallyGoing": {"description": "Telregel op het ritdetail van een groepsrit; de organisator telt mee.", "placeholders": {"count": {"type": "int"}}},
+  "groupRideTallyDeclined": "{count} kan niet",
+  "@groupRideTallyDeclined": {"placeholders": {"count": {"type": "int"}}},
+  "groupRideTallyWaiting": "{count} nog niet",
+  "@groupRideTallyWaiting": {"placeholders": {"count": {"type": "int"}}},
+  "groupRideOpenGroup": "Groep openen",
+  "@groupRideOpenGroup": {"description": "Tooltip van de groepschip op het ritdetail."},
+  "groupRideNobodyYet": "Nog niemand",
+  "@groupRideNobodyYet": {"description": "Onder een venster op het ritdetail als nog niemand heeft gezegd dat hij kan."}
 }
