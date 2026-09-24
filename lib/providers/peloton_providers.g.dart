@@ -144,26 +144,47 @@ final class GroupRidesProvider extends $FunctionalProvider<
 
 String _$groupRidesHash() => r'7189bfe90716c5387435e56d79ac55aa40d52cf9';
 
-/// Ritten waarvoor jij bent uitgenodigd en nog niet hebt geantwoord.
+/// Ritten die op jouw antwoord wachten: losse uitnodigingen (status
+/// `invited`) en groepsritten van anderen waarop jij nog geen rij hebt.
 ///
 /// Afgeleid in plaats van apart opgehaald: één bron van waarheid, en het
 /// scheelt een tweede netwerkrondgang die toch dezelfde rijen zou leveren.
+///
+/// **Groepsritten (fase 35).** Op een groepsrit krijgt niet ieder lid een rij;
+/// RLS levert alleen groepsritten van groepen waar je nu lid van bent (0012,
+/// `is_ride_member`). "Geen rij" betekent daar dus "nog niet geantwoord", en
+/// zonder deze tak viel zo'n rit tussen alle providers door -- dezelfde vorm
+/// als de fout van 2026-09-07 (zie [joinedGroupRides]).
 
 @ProviderFor(pendingRideInvites)
 final pendingRideInvitesProvider = PendingRideInvitesProvider._();
 
-/// Ritten waarvoor jij bent uitgenodigd en nog niet hebt geantwoord.
+/// Ritten die op jouw antwoord wachten: losse uitnodigingen (status
+/// `invited`) en groepsritten van anderen waarop jij nog geen rij hebt.
 ///
 /// Afgeleid in plaats van apart opgehaald: één bron van waarheid, en het
 /// scheelt een tweede netwerkrondgang die toch dezelfde rijen zou leveren.
+///
+/// **Groepsritten (fase 35).** Op een groepsrit krijgt niet ieder lid een rij;
+/// RLS levert alleen groepsritten van groepen waar je nu lid van bent (0012,
+/// `is_ride_member`). "Geen rij" betekent daar dus "nog niet geantwoord", en
+/// zonder deze tak viel zo'n rit tussen alle providers door -- dezelfde vorm
+/// als de fout van 2026-09-07 (zie [joinedGroupRides]).
 
 final class PendingRideInvitesProvider extends $FunctionalProvider<
         AsyncValue<List<GroupRide>>, List<GroupRide>, FutureOr<List<GroupRide>>>
     with $FutureModifier<List<GroupRide>>, $FutureProvider<List<GroupRide>> {
-  /// Ritten waarvoor jij bent uitgenodigd en nog niet hebt geantwoord.
+  /// Ritten die op jouw antwoord wachten: losse uitnodigingen (status
+  /// `invited`) en groepsritten van anderen waarop jij nog geen rij hebt.
   ///
   /// Afgeleid in plaats van apart opgehaald: één bron van waarheid, en het
   /// scheelt een tweede netwerkrondgang die toch dezelfde rijen zou leveren.
+  ///
+  /// **Groepsritten (fase 35).** Op een groepsrit krijgt niet ieder lid een rij;
+  /// RLS levert alleen groepsritten van groepen waar je nu lid van bent (0012,
+  /// `is_ride_member`). "Geen rij" betekent daar dus "nog niet geantwoord", en
+  /// zonder deze tak viel zo'n rit tussen alle providers door -- dezelfde vorm
+  /// als de fout van 2026-09-07 (zie [joinedGroupRides]).
   PendingRideInvitesProvider._()
       : super(
           from: null,
@@ -191,7 +212,7 @@ final class PendingRideInvitesProvider extends $FunctionalProvider<
 }
 
 String _$pendingRideInvitesHash() =>
-    r'a7c269166923f1d0060fa9dcba85c8f97eb29d90';
+    r'14b4db95aebe817762cd3de72390afbf6c493392';
 
 /// Gedeelde ritten die jij organiseert.
 

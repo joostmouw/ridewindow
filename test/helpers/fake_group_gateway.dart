@@ -8,6 +8,11 @@
 //
 // Elke aanroep komt als leesbare regel in [FakeGroupGateway.calls], zodat een
 // widgettest kan toetsen wat er gebeurde zonder de staat na te rekenen.
+//
+// Sinds fase 35 ook groepsritten: [FakeGroupGateway.rides] is de tabel
+// group_rides, en [FakeGroupGateway.listGroupRides] filtert zoals
+// is_ride_member (0012) dat doet. Wie de groep verlaat, ziet de rit dus niet
+// meer (CLUB-13).
 
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
@@ -41,6 +46,9 @@ class FakeGroupGateway implements PelotonGateway {
 
   /// Code -> groeps-id. [groupInviteCode] vult dit; een test mag het ook.
   final Map<String, String> inviteCodes = {};
+
+  /// De in-memory tabel group_rides, met participanten en opties erin.
+  final List<GroupRide> rides = [];
 
   var _seq = 0;
 
@@ -95,6 +103,34 @@ class FakeGroupGateway implements PelotonGateway {
         members: members,
         requests: requests,
       );
+
+  /// Een groepsrit (of gewone gedeelde rit zonder [groupId]). Standaard
+  /// morgen 09:00-13:00, relatief aan nu: de lijst snijdt weg wat voorbij is,
+  /// dus een vaste datum maakt een test na die datum stil leeg.
+  static GroupRide groupRide(
+    String id, {
+    required String ownerId,
+    String? groupId,
+    DateTime? start,
+    DateTime? end,
+    String? ownerName,
+    List<RideParticipant> participants = const [],
+    List<RideOption> options = const [],
+  }) {
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    final s = start ?? DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
+    return GroupRide(
+      id: id,
+      ownerId: ownerId,
+      start: s,
+      end: end ?? s.add(const Duration(hours: 4)),
+      plannedScore: 80,
+      ownerName: ownerName ?? ownerId,
+      groupId: groupId,
+      participants: participants,
+      options: options,
+    );
+  }
 
   // --- intern --------------------------------------------------------------
 
@@ -164,6 +200,38 @@ class FakeGroupGateway implements PelotonGateway {
         joinedAt: m.joinedAt,
       );
 
+  GroupRide _copyRide(
+    GroupRide r, {
+    List<RideParticipant>? participants,
+    List<RideOption>? options,
+  }) =>
+      GroupRide(
+        id: r.id,
+        ownerId: r.ownerId,
+        start: r.start,
+        end: r.end,
+        plannedScore: r.plannedScore,
+        ownerName: r.ownerName,
+        note: r.note,
+        groupId: r.groupId,
+        participants: participants ?? r.participants,
+        options: options ?? r.options,
+      );
+
+  int _rideIndex(String rideId) {
+    final i = rides.indexWhere((r) => r.id == rideId);
+    if (i < 0) throw const GroupException(GroupError.notAllowed);
+    return i;
+  }
+
+  /// Spiegel van is_ride_member (0012): eigenaar; gewone rit met eigen rij;
+  /// groepsrit van een groep waar je nu lid bent.
+  bool _canSee(GroupRide r) {
+    if (r.ownerId == me) return true;
+    if (r.groupId == null) return r.statusFor(me) != null;
+    return groups[r.groupId]?.isMember(me) ?? false;
+  }
+
   String? _friendName(String userId) {
     for (final f in friends) {
       if (f.userId == userId) return f.displayName;
@@ -177,7 +245,156 @@ class FakeGroupGateway implements PelotonGateway {
   Future<List<Friend>> listFriends() async => friends;
 
   @override
-  Future<List<GroupRide>> listGroupRides() async => const [];
+  Future<List<GroupRide>> listGroupRides() async {
+    calls.add('listGroupRides');
+    _maybeFail('listGroupRides');
+    return rides.where(_canSee).toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
+  }
+
+  @override
+  Future<GroupRide> createGroupRide({
+    required DateTime start,
+    required DateTime end,
+    required double plannedScore,
+    String? ownerName,
+    String? note,
+    String? groupId,
+  }) async {
+    calls.add('createGroupRide:${groupId ?? '-'}');
+    _maybeFail('createGroupRide');
+    // group_rides_insert_own (0012): alleen voor een groep waar je lid bent.
+    if (groupId != null && !(groups[groupId]?.isMember(me) ?? false)) {
+      throw const GroupException(GroupError.notAllowed);
+    }
+    final ride = GroupRide(
+      id: 'ride-new-${++_seq}',
+      ownerId: me,
+      start: start,
+      end: end,
+      plannedScore: plannedScore,
+      ownerName: ownerName,
+      note: note,
+      groupId: groupId,
+    );
+    rides.add(ride);
+    return ride;
+  }
+
+  @override
+  Future<void> respondToGroupRide({
+    required String rideId,
+    required bool accepted,
+    String? displayName,
+  }) async {
+    calls.add('respondToGroupRide:$rideId:$accepted');
+    _maybeFail('respondToGroupRide');
+    final i = _rideIndex(rideId);
+    final r = rides[i];
+    // insert_self_group (0012): alleen op een groepsrit van jouw groep.
+    if (r.groupId == null || !(groups[r.groupId]?.isMember(me) ?? false)) {
+      throw const GroupException(GroupError.notAllowed);
+    }
+    final mine = RideParticipant(
+      userId: me,
+      status:
+          accepted ? ParticipantStatus.accepted : ParticipantStatus.declined,
+      displayName: displayName,
+    );
+    rides[i] = _copyRide(
+      r,
+      participants: [
+        ...r.participants.where((p) => p.userId != me),
+        mine,
+      ],
+    );
+  }
+
+  @override
+  Future<void> respondToRide({
+    required String rideId,
+    required bool accepted,
+  }) async {
+    calls.add('respondToRide:$rideId:$accepted');
+    _maybeFail('respondToRide');
+    final i = rides.indexWhere((r) => r.id == rideId);
+    if (i < 0) return;
+    final r = rides[i];
+    // Net als de echte update: zonder eigen rij verandert er niets.
+    if (r.statusFor(me) == null) return;
+    rides[i] = _copyRide(
+      r,
+      participants: [
+        for (final p in r.participants)
+          p.userId == me
+              ? RideParticipant(
+                  userId: me,
+                  status: accepted
+                      ? ParticipantStatus.accepted
+                      : ParticipantStatus.declined,
+                  displayName: p.displayName,
+                )
+              : p,
+      ],
+    );
+  }
+
+  @override
+  Future<List<RideOption>> proposeOptions({
+    required String rideId,
+    required List<({DateTime start, DateTime end, double plannedScore})>
+        windows,
+  }) async {
+    calls.add('proposeOptions:$rideId:${windows.length}');
+    _maybeFail('proposeOptions');
+    final i = _rideIndex(rideId);
+    final options = [
+      for (final w in windows)
+        RideOption(
+          id: 'opt-new-${++_seq}',
+          rideId: rideId,
+          start: w.start,
+          end: w.end,
+          plannedScore: w.plannedScore,
+        ),
+    ];
+    rides[i] = _copyRide(rides[i], options: options);
+    return options;
+  }
+
+  @override
+  Future<void> voteOnOption({
+    required String optionId,
+    required bool canRide,
+  }) async {
+    calls.add('voteOnOption:$optionId:$canRide');
+    _maybeFail('voteOnOption');
+    for (var i = 0; i < rides.length; i++) {
+      final r = rides[i];
+      if (!r.options.any((o) => o.id == optionId)) continue;
+      rides[i] = _copyRide(
+        r,
+        options: [
+          for (final o in r.options)
+            o.id == optionId
+                ? RideOption(
+                    id: o.id,
+                    rideId: o.rideId,
+                    start: o.start,
+                    end: o.end,
+                    plannedScore: o.plannedScore,
+                    votes: [
+                      ...o.votes.where((v) => v.userId != me),
+                      OptionVote(optionId: o.id, userId: me, canRide: canRide),
+                    ],
+                  )
+                : o,
+        ],
+      );
+      return;
+    }
+    throw const GroupException(GroupError.notAllowed);
+  }
 
   @override
   Future<List<PelotonGroup>> listGroups() async {

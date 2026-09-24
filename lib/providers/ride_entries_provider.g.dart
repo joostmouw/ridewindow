@@ -90,4 +90,68 @@ final class RideEntriesProvider extends $FunctionalProvider<List<RideEntry>,
   }
 }
 
-String _$rideEntriesHash() => r'456a448c4a310cc7af1b031bc8de193ae15ff20d';
+String _$rideEntriesHash() => r'f31a206e0eb523606fa0e5986f8439e72bb65b9f';
+
+/// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
+/// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
+///
+/// CLUB-25 optie A (schets 016): de onderbalk en de Peloton-tab lezen allebei
+/// dit getal, zodat ze nooit iets anders zeggen. Open groepsaanvragen voor
+/// beheerders tellen bewust niet mee; die staan op de groepskaart (34-05,
+/// bevestigd door Joost 2026-09-24).
+
+@ProviderFor(unansweredRideCount)
+final unansweredRideCountProvider = UnansweredRideCountProvider._();
+
+/// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
+/// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
+///
+/// CLUB-25 optie A (schets 016): de onderbalk en de Peloton-tab lezen allebei
+/// dit getal, zodat ze nooit iets anders zeggen. Open groepsaanvragen voor
+/// beheerders tellen bewust niet mee; die staan op de groepskaart (34-05,
+/// bevestigd door Joost 2026-09-24).
+
+final class UnansweredRideCountProvider
+    extends $FunctionalProvider<int, int, int> with $Provider<int> {
+  /// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
+  /// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
+  ///
+  /// CLUB-25 optie A (schets 016): de onderbalk en de Peloton-tab lezen allebei
+  /// dit getal, zodat ze nooit iets anders zeggen. Open groepsaanvragen voor
+  /// beheerders tellen bewust niet mee; die staan op de groepskaart (34-05,
+  /// bevestigd door Joost 2026-09-24).
+  UnansweredRideCountProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'unansweredRideCountProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$unansweredRideCountHash();
+
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int create(Ref ref) {
+    return unansweredRideCount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$unansweredRideCountHash() =>
+    r'7e8a77d5ea14db69746e6fee609224d90c026df6';

@@ -41,12 +41,16 @@ abstract class PelotonGateway {
   /// precies de bedoeling.
   Future<List<GroupRide>> listGroupRides();
 
+  /// Met [groupId] wordt het een groepsrit (fase 35): ieder huidig lid ziet
+  /// hem, zonder participant-rij per lid. De database eist dat jij lid bent
+  /// van die groep (`group_rides_insert_own`, 0012).
   Future<GroupRide> createGroupRide({
     required DateTime start,
     required DateTime end,
     required double plannedScore,
     String? ownerName,
     String? note,
+    String? groupId,
   });
 
   Future<void> inviteToRide({
@@ -60,6 +64,19 @@ abstract class PelotonGateway {
   Future<void> respondToRide({
     required String rideId,
     required bool accepted,
+  });
+
+  /// Antwoorden op een groepsrit, waar je vaak nog geen rij hebt (fase 35).
+  ///
+  /// Een upsert en geen update: het eerste antwoord maakt de rij aan (policy
+  /// `group_ride_participants_insert_self_group`, 0012), daarna werkt hij hem
+  /// bij (`update_own`). Twee snelle tikken geven zo geen PK-fout.
+  /// [displayName] is hier je eigen naam, niet die de eigenaar voor je koos
+  /// zoals bij [inviteToRide].
+  Future<void> respondToGroupRide({
+    required String rideId,
+    required bool accepted,
+    String? displayName,
   });
 
   Future<void> deleteGroupRide(String rideId);
@@ -286,6 +303,7 @@ class SupabasePelotonGateway implements PelotonGateway {
     required double plannedScore,
     String? ownerName,
     String? note,
+    String? groupId,
   }) async {
     // Expliciet UTC (de les van plan 21-13): een offsetloze string leest
     // Postgres in de sessiezone, waardoor een rit van 20:00 lokaal als 20:00
@@ -299,6 +317,9 @@ class SupabasePelotonGateway implements PelotonGateway {
           'planned_score': plannedScore,
           'owner_name': ownerName,
           'note': note,
+          // Alleen meesturen als hij gezet is: een gewone rit stuurt precies
+          // wat hij voor fase 35 stuurde.
+          if (groupId != null) 'group_id': groupId,
         })
         .select()
         .single();
@@ -334,6 +355,28 @@ class SupabasePelotonGateway implements PelotonGateway {
         })
         .eq('ride_id', rideId)
         .eq('user_id', _uid);
+  }
+
+  @override
+  Future<void> respondToGroupRide({
+    required String rideId,
+    required bool accepted,
+    String? displayName,
+  }) async {
+    // Bewust zonder select erachter: insert...returning loopt tegen de
+    // select-policy aan (0003, PELOTON.md). De lijst ververst daarna zelf.
+    await _client.from(kGroupRideParticipantsTable).upsert(
+      {
+        'ride_id': rideId,
+        'user_id': _uid,
+        'status': accepted
+            ? ParticipantStatus.accepted.row
+            : ParticipantStatus.declined.row,
+        'responded_at': DateTime.now().toUtc().toIso8601String(),
+        'display_name': displayName,
+      },
+      onConflict: 'ride_id,user_id',
+    );
   }
 
   @override

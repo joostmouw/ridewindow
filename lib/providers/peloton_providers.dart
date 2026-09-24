@@ -31,10 +31,17 @@ Future<List<GroupRide>> groupRides(Ref ref) async {
   return ref.watch(pelotonGatewayProvider).listGroupRides();
 }
 
-/// Ritten waarvoor jij bent uitgenodigd en nog niet hebt geantwoord.
+/// Ritten die op jouw antwoord wachten: losse uitnodigingen (status
+/// `invited`) en groepsritten van anderen waarop jij nog geen rij hebt.
 ///
 /// Afgeleid in plaats van apart opgehaald: één bron van waarheid, en het
 /// scheelt een tweede netwerkrondgang die toch dezelfde rijen zou leveren.
+///
+/// **Groepsritten (fase 35).** Op een groepsrit krijgt niet ieder lid een rij;
+/// RLS levert alleen groepsritten van groepen waar je nu lid van bent (0012,
+/// `is_ride_member`). "Geen rij" betekent daar dus "nog niet geantwoord", en
+/// zonder deze tak viel zo'n rit tussen alle providers door -- dezelfde vorm
+/// als de fout van 2026-09-07 (zie [joinedGroupRides]).
 @riverpod
 Future<List<GroupRide>> pendingRideInvites(Ref ref) async {
   final userId = ref.watch(currentUserIdProvider);
@@ -44,7 +51,8 @@ Future<List<GroupRide>> pendingRideInvites(Ref ref) async {
       .where(
         (r) =>
             !r.isOwnedBy(userId) &&
-            r.statusFor(userId) == ParticipantStatus.invited,
+            (r.statusFor(userId) == ParticipantStatus.invited ||
+                (r.groupId != null && r.statusFor(userId) == null)),
       )
       .toList();
 }

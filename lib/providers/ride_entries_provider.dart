@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -32,6 +33,9 @@ List<RideEntry> rideEntries(Ref ref) {
       ref.watch(pendingRideInvitesProvider).value ?? const <GroupRide>[];
   final declined =
       ref.watch(declinedGroupRidesProvider).value ?? const <GroupRide>[];
+  // Zelfde reden als hierboven: een falende groepenlijst mag de ritten niet
+  // wegnemen. Dan ontbreekt alleen de groepsnaam en tellen de rijen.
+  final groups = ref.watch(myGroupsProvider).value ?? const <PelotonGroup>[];
 
   final now = DateTime.now();
   return buildRideEntries(
@@ -40,9 +44,26 @@ List<RideEntry> rideEntries(Ref ref) {
     joined: joined,
     invites: invites,
     declined: declined,
+    groups: {for (final g in groups) g.id: g},
     // Vanaf het begin van vandaag, niet vanaf dit moment: een rit die vanochtend
     // om 07:00 begon en om 09:00 eindigde hoort de rest van de dag nog zichtbaar
     // te zijn. Dezelfde grens die "Mijn ritten" al hanteerde.
     notBefore: DateTime(now.year, now.month, now.day),
   );
+}
+
+/// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
+/// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
+///
+/// CLUB-25 optie A (schets 016): de onderbalk en de Peloton-tab lezen allebei
+/// dit getal, zodat ze nooit iets anders zeggen. Open groepsaanvragen voor
+/// beheerders tellen bewust niet mee; die staan op de groepskaart (34-05,
+/// bevestigd door Joost 2026-09-24).
+@riverpod
+int unansweredRideCount(Ref ref) {
+  final now = DateTime.now();
+  return ref
+      .watch(rideEntriesProvider)
+      .where((e) => e.role == RideRole.pending && e.end.isAfter(now))
+      .length;
 }

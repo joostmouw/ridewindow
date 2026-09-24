@@ -409,8 +409,10 @@ void main() {
       );
 
       expect(entries, hasLength(2));
-      expect(entries.map((e) => e.role).toSet(),
-          {RideRole.organiser, RideRole.pending});
+      expect(
+        entries.map((e) => e.role).toSet(),
+        {RideRole.organiser, RideRole.pending},
+      );
       expect(entries[0].key, isNot(entries[1].key));
     });
 
@@ -458,10 +460,14 @@ void main() {
       );
 
       expect(entries, hasLength(2));
-      expect(entries.firstWhere((e) => e.role == RideRole.pending).planned,
-          isNotNull);
       expect(
-          entries.firstWhere((e) => e.role == RideRole.joined).planned, isNull);
+        entries.firstWhere((e) => e.role == RideRole.pending).planned,
+        isNotNull,
+      );
+      expect(
+        entries.firstWhere((e) => e.role == RideRole.joined).planned,
+        isNull,
+      );
     });
 
     test(
@@ -496,7 +502,7 @@ void main() {
           ),
         ],
         groups: {
-          'club1': clubWith(['owner', 'a', 'b', 'c', 'd'])
+          'club1': clubWith(['owner', 'a', 'b', 'c', 'd']),
         },
       ).single;
 
@@ -525,12 +531,14 @@ void main() {
               RideParticipant(userId: 'a', status: ParticipantStatus.invited),
               RideParticipant(userId: 'ex', status: ParticipantStatus.accepted),
               RideParticipant(
-                  userId: 'ex2', status: ParticipantStatus.declined),
+                userId: 'ex2',
+                status: ParticipantStatus.declined,
+              ),
             ],
           ),
         ],
         groups: {
-          'club1': clubWith(['owner', 'a'])
+          'club1': clubWith(['owner', 'a']),
         },
       ).single;
 
@@ -588,7 +596,7 @@ void main() {
         joined: const [],
         invites: const [],
         groups: {
-          'club1': clubWith([_me, 'a'])
+          'club1': clubWith([_me, 'a']),
         },
       ).single;
 
