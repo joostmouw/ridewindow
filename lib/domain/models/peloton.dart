@@ -150,6 +150,7 @@ class GroupRide {
     this.note,
     this.participants = const [],
     this.options = const [],
+    this.groupId,
   });
 
   final String id;
@@ -164,6 +165,16 @@ class GroupRide {
   /// De vensters die nog voorliggen (slice 2). Leeg is de gewone toestand: dan
   /// is er niets te kiezen en geldt gewoon [start]/[end].
   final List<RideOption> options;
+
+  /// De groep waarvoor deze rit is uitgezet (fase 35), of `null` bij een
+  /// gewone gedeelde rit met losse maatjes.
+  final String? groupId;
+
+  /// Een rit voor een hele groep. Daar werkt toegang anders dan bij een
+  /// gewone gedeelde rit (0012, `is_ride_member`): een participant-rij geeft
+  /// op een groepsrit geen toegang, het huidige lidmaatschap wel. Er is dus
+  /// ook geen rij per lid; "geen rij" betekent "nog niet geantwoord".
+  bool get isGroupRide => groupId != null;
 
   /// `.toLocal()` is niet cosmetisch (dezelfde les als plan 21-13): de UI drukt
   /// de velden van de `DateTime` rechtstreeks af, dus zonder omzetting staat
@@ -183,6 +194,7 @@ class GroupRide {
         note: row['note'] as String?,
         participants: participants,
         options: options,
+        groupId: row['group_id'] as String?,
       );
 
   bool isOwnedBy(String? userId) => userId != null && userId == ownerId;

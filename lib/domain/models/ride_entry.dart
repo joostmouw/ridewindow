@@ -1,4 +1,5 @@
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/planned_ride.dart';
 
 /// Jouw rol in een rit.
@@ -52,6 +53,7 @@ class RideEntry {
     required this.role,
     this.group,
     this.planned,
+    this.pelotonGroup,
   });
 
   final DateTime start;
@@ -81,16 +83,73 @@ class RideEntry {
   /// Wie de rit organiseert. `null` als jij dat zelf bent of als de rit solo is.
   String? get ownerName => role == RideRole.organiser ? null : group?.ownerName;
 
-  /// Hoeveel maatjes er meegaan (de organisator niet meegerekend -- die staat
-  /// niet in zijn eigen deelnemerslijst).
-  int get acceptedCount => group?.accepted.length ?? 0;
+  /// De groep van een groepsrit, of `null` bij een gewone rit. Ook `null` als
+  /// de groep niet bij jouw groepen hoort, bijvoorbeeld een organisator die de
+  /// groep inmiddels verliet: dan valt de naam weg en tellen de rijen zoals bij
+  /// een gewone gedeelde rit.
+  final PelotonGroup? pelotonGroup;
+
+  /// De naam voor de rolregel en de chip op het detail (CLUB-16).
+  String? get groupName => pelotonGroup?.name;
+
+  bool get isGroupRide => group?.isGroupRide ?? false;
+
+  /// Tellen we over de leden van de groep in plaats van over de rijen?
+  bool get _countsMembers =>
+      pelotonGroup != null && group?.groupId == pelotonGroup!.id;
+
+  /// Status per huidig lid, de organisator niet meegerekend. Geen rij (of een
+  /// rij `invited`) is "nog niet geantwoord". Rijen van ex-leden vallen
+  /// hierbuiten: wie de groep verliet, telt niet meer mee.
+  Iterable<ParticipantStatus> get _memberStatuses sync* {
+    final g = group!;
+    for (final m in pelotonGroup!.members) {
+      if (m.userId == g.ownerId) continue;
+      yield g.statusFor(m.userId) ?? ParticipantStatus.invited;
+    }
+  }
+
+  /// Hoeveel er meegaan.
+  ///
+  /// Bij een gewone gedeelde rit de maatjes, de organisator niet meegerekend
+  /// (die staat niet in zijn eigen deelnemerslijst), zoals het altijd was.
+  /// Bij een groepsrit telt de organisator wel mee (schets 016, bevestigd door
+  /// Joost 2026-09-24: "2 gaan mee" is jij + Jacco). Daar staat de telling
+  /// naast "kan niet" en "nog niet" van dezelfde ledenlijst, en de kaart en het
+  /// detail tonen dan hetzelfde getal als de lijst per lid.
+  int get acceptedCount {
+    if (_countsMembers) {
+      return 1 +
+          _memberStatuses.where((s) => s == ParticipantStatus.accepted).length;
+    }
+    return group?.accepted.length ?? 0;
+  }
 
   /// Hoeveel er nog moeten antwoorden.
-  int get pendingCount =>
-      group?.participants
-          .where((p) => p.status == ParticipantStatus.invited)
-          .length ??
-      0;
+  int get pendingCount {
+    if (_countsMembers) {
+      return _memberStatuses
+          .where((s) => s == ParticipantStatus.invited)
+          .length;
+    }
+    return group?.participants
+            .where((p) => p.status == ParticipantStatus.invited)
+            .length ??
+        0;
+  }
+
+  /// Hoeveel er nee hebben gezegd.
+  int get declinedCount {
+    if (_countsMembers) {
+      return _memberStatuses
+          .where((s) => s == ParticipantStatus.declined)
+          .length;
+    }
+    return group?.participants
+            .where((p) => p.status == ParticipantStatus.declined)
+            .length ??
+        0;
+  }
 
   /// Of deze rit met een veeg weg te halen is. Alleen waar jij als enige over
   /// gaat: een solo-rit, of een rit die jij organiseert (die zegt dan de hele
@@ -107,18 +166,36 @@ class RideEntry {
   static String slotKey(DateTime start, DateTime end) =>
       '${start.toUtc().millisecondsSinceEpoch}_${end.toUtc().millisecondsSinceEpoch}';
 
-  String get key => slotKey(start, end);
+  /// Sleutel van deze regel in een lijst: per rit-id bij een gedeelde rit,
+  /// per tijdvak bij een solo-rit.
+  ///
+  /// Twee verschillende gedeelde ritten op hetzelfde tijdvak (bijvoorbeeld een
+  /// groepsrit van Jacco en jouw eigen rit met Bram, allebei op het beste
+  /// venster van de week) moeten allebei zichtbaar blijven. Op tijdvak
+  /// ontdubbelen liet er één winnen en de ander verdwijnen: dezelfde fout als
+  /// 2026-09-07, een rit die bestond maar nergens stond.
+  String get key => group != null ? 'ride_${group!.id}' : slotKey(start, end);
 }
 
-/// Voegt de vier bronnen samen tot één chronologische lijst.
+/// Voegt de bronnen samen tot één chronologische lijst.
 ///
-/// **Waarom ontdubbelen nodig is.** Uitnodigen begint bij een rit die je al
-/// bekijkt (zie `invite_buddies_sheet.dart`), dus wie maatjes uitnodigt heeft
-/// dat tijdvak meestal al als persoonlijke rit staan. Zonder deze stap zou
-/// diezelfde rit twee keer in de lijst komen -- één keer als "Alleen jij" en
-/// één keer als "Jij organiseert" -- en dat is precies de tegenspraak die dit
-/// scherm moest opheffen. De gedeelde rit wint, want die draagt meer: wie er
-/// meegaat en wie nog moet antwoorden.
+/// **Gedeelde ritten ontdubbelen per rit-id.** Staat dezelfde rit in twee
+/// bronnen (kan in theorie niet, maar de cloud is geen bewijs), dan wint de
+/// lagere rolindex. Twee *verschillende* gedeelde ritten op hetzelfde tijdvak
+/// blijven allebei staan; zie [RideEntry.key].
+///
+/// **Persoonlijke ritten hangen aan een gedeelde rit op hetzelfde tijdvak.**
+/// Uitnodigen begint bij een rit die je al bekijkt (zie
+/// `invite_buddies_sheet.dart`), dus wie maatjes uitnodigt heeft dat tijdvak
+/// meestal al als persoonlijke rit staan. Zonder deze stap zou diezelfde rit
+/// twee keer in de lijst komen -- één keer als "Alleen jij" en één keer als
+/// "Jij organiseert". De gedeelde rit wint, want die draagt meer. Staan er op
+/// het tijdvak meerdere gedeelde ritten, dan gaat de persoonlijke rij naar de
+/// rit die jij organiseert (die is het meest waarschijnlijk uit jouw plan
+/// ontstaan), anders naar de regel met de hoogste voorrang.
+///
+/// [groups] zijn jouw groepen op id; een groepsrit krijgt zo zijn
+/// [RideEntry.pelotonGroup] mee voor de naam en de tellingen per lid.
 ///
 /// [notBefore] snijdt ritten weg die al voorbij zijn. Geef `null` om alles te
 /// houden.
@@ -128,27 +205,26 @@ List<RideEntry> buildRideEntries({
   required List<GroupRide> joined,
   required List<GroupRide> invites,
   List<GroupRide> declined = const [],
+  Map<String, PelotonGroup> groups = const {},
   DateTime? notBefore,
 }) {
-  final byKey = <String, RideEntry>{};
+  // Invoegvolgorde bewaard (LinkedHashMap), zodat een gelijkspel bij het
+  // kiezen van de regel voor een persoonlijke rit voorspelbaar uitvalt.
+  final byRide = <String, RideEntry>{};
 
-  void put(RideEntry entry) {
-    final existing = byKey[entry.key];
-    // Lagere index in de enum wint (pending < organiser < joined < solo).
-    if (existing == null || entry.role.index < existing.role.index) {
-      byKey[entry.key] = entry;
-    }
+  void putGroup(GroupRide g, RideRole role) {
+    final existing = byRide[g.id];
+    // Lagere index in de enum wint (pending < organiser < joined < ...).
+    if (existing != null && existing.role.index <= role.index) return;
+    byRide[g.id] = RideEntry(
+      start: g.start,
+      end: g.end,
+      plannedScore: g.plannedScore,
+      role: role,
+      group: g,
+      pelotonGroup: g.groupId == null ? null : groups[g.groupId],
+    );
   }
-
-  void putGroup(GroupRide g, RideRole role) => put(
-        RideEntry(
-          start: g.start,
-          end: g.end,
-          plannedScore: g.plannedScore,
-          role: role,
-          group: g,
-        ),
-      );
 
   for (final g in invites) {
     putGroup(g, RideRole.pending);
@@ -162,10 +238,28 @@ List<RideEntry> buildRideEntries({
   for (final g in declined) {
     putGroup(g, RideRole.declined);
   }
+
+  final sharedBySlot = <String, List<String>>{};
+  for (final e in byRide.values) {
+    sharedBySlot.putIfAbsent(RideEntry.slotKey(e.start, e.end), () => []).add(
+          e.group!.id,
+        );
+  }
+
+  final solo = <String, RideEntry>{};
   for (final p in planned) {
     final key = RideEntry.slotKey(p.start, p.end);
-    final existing = byKey[key];
-    if (existing != null) {
+    final rideIds = sharedBySlot[key];
+    if (rideIds != null && rideIds.isNotEmpty) {
+      final candidates = [for (final id in rideIds) byRide[id]!];
+      // Jouw eigen gedeelde rit eerst, ook als er een openstaande
+      // uitnodiging (lagere index) op hetzelfde tijdvak staat.
+      var target = candidates.firstWhere(
+        (c) => c.role == RideRole.organiser,
+        orElse: () => candidates.reduce(
+          (a, b) => b.role.index < a.role.index ? b : a,
+        ),
+      );
       // De gedeelde rit blijft staan, maar onthoudt wél de persoonlijke rij
       // eronder -- anders is die na het afzeggen van de groepsrit niet meer
       // op te ruimen en blijft er een wees achter in `planned_rides`.
@@ -174,19 +268,18 @@ List<RideEntry> buildRideEntries({
       // meetrekken naar de verborgen hoek. Zeg je nee tegen andermans rit maar
       // stond datzelfde tijdvak al als jouw eigen plan, dan is het gewoon jouw
       // rit -- die hoort op Home te blijven staan.
-      byKey[key] = RideEntry(
-        start: existing.start,
-        end: existing.end,
-        plannedScore: existing.plannedScore,
-        role: existing.role == RideRole.declined
-            ? RideRole.solo
-            : existing.role,
-        group: existing.group,
+      byRide[target.group!.id] = RideEntry(
+        start: target.start,
+        end: target.end,
+        plannedScore: target.plannedScore,
+        role: target.role == RideRole.declined ? RideRole.solo : target.role,
+        group: target.group,
         planned: p,
+        pelotonGroup: target.pelotonGroup,
       );
       continue;
     }
-    byKey[key] = RideEntry(
+    solo[key] = RideEntry(
       start: p.start,
       end: p.end,
       plannedScore: p.plannedScore,
@@ -195,7 +288,7 @@ List<RideEntry> buildRideEntries({
     );
   }
 
-  final result = byKey.values
+  final result = [...byRide.values, ...solo.values]
       .where((e) => notBefore == null || e.end.isAfter(notBefore))
       .toList()
     ..sort((a, b) => a.start.compareTo(b.start));

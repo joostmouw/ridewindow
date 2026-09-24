@@ -439,8 +439,7 @@ void main() {
       );
 
       expect(entries, hasLength(2), reason: 'geen losse solo-regel erbij');
-      final organiser =
-          entries.firstWhere((e) => e.role == RideRole.organiser);
+      final organiser = entries.firstWhere((e) => e.role == RideRole.organiser);
       final pending = entries.firstWhere((e) => e.role == RideRole.pending);
       expect(organiser.planned, isNotNull);
       expect(pending.planned, isNull);
@@ -461,8 +460,8 @@ void main() {
       expect(entries, hasLength(2));
       expect(entries.firstWhere((e) => e.role == RideRole.pending).planned,
           isNotNull);
-      expect(entries.firstWhere((e) => e.role == RideRole.joined).planned,
-          isNull);
+      expect(
+          entries.firstWhere((e) => e.role == RideRole.joined).planned, isNull);
     });
 
     test(
@@ -496,7 +495,9 @@ void main() {
             ],
           ),
         ],
-        groups: {'club1': clubWith(['owner', 'a', 'b', 'c', 'd'])},
+        groups: {
+          'club1': clubWith(['owner', 'a', 'b', 'c', 'd'])
+        },
       ).single;
 
       expect(entry.isGroupRide, isTrue);
@@ -523,11 +524,14 @@ void main() {
             participants: const [
               RideParticipant(userId: 'a', status: ParticipantStatus.invited),
               RideParticipant(userId: 'ex', status: ParticipantStatus.accepted),
-              RideParticipant(userId: 'ex2', status: ParticipantStatus.declined),
+              RideParticipant(
+                  userId: 'ex2', status: ParticipantStatus.declined),
             ],
           ),
         ],
-        groups: {'club1': clubWith(['owner', 'a'])},
+        groups: {
+          'club1': clubWith(['owner', 'a'])
+        },
       ).single;
 
       expect(entry.acceptedCount, 1, reason: 'alleen de organisator');
@@ -583,7 +587,9 @@ void main() {
         ],
         joined: const [],
         invites: const [],
-        groups: {'club1': clubWith([_me, 'a'])},
+        groups: {
+          'club1': clubWith([_me, 'a'])
+        },
       ).single;
 
       expect(entry.isGroupRide, isFalse);
