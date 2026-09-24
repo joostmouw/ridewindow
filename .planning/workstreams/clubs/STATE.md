@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: Not started
+current_plan: 2
 status: executing
-stopped_at: 34-07 klaar (groepslanding en bewaarde code), volgende 34-08
-last_updated: "2026-09-24T06:07:21.840Z"
-last_activity: 2026-09-24 -- Phase 35 planning complete
+stopped_at: 35-01 klaar (datalaag groepsritten), volgende 35-02
+last_updated: "2026-09-24T07:30:00.000Z"
+last_activity: 2026-09-24 -- 35-01 datalaag groepsritten klaar
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 17
-  completed_plans: 11
+  completed_plans: 12
   percent: 50
 ---
 
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 35
-Plan: 8 of 8
-Status: Ready to execute
-Last activity: 2026-09-24 -- Phase 35 planning complete
+Plan: 2 of 6
+Status: 35-01 klaar, volgende 35-02
+Last activity: 2026-09-24 -- 35-01 datalaag groepsritten klaar
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** Not started
+**Current Plan:** 35-02
 
 ## Decisions
 
@@ -51,6 +51,9 @@ Last activity: 2026-09-24 -- Phase 35 planning complete
 - 34-06: dezelfde naam opslaan verstuurt niets; aanvrager krijgt geen appbar-menu
 - 34-07: groepscode eigen sleutel naast maatjescode; redirect bewaart beide
 - 34-07: codeveld verklapt soort code niet; alleen vol/10 groepen eigen zin
+- 35-01: gedeelde ritten ontdubbelen per rit-id; RideEntry.key = ride_<id>
+- 35-01: groepsrit telt over huidige leden; organisator telt als 'gaat mee'
+- 35-01: respondToGroupRide = upsert zonder select; respondToSharedRide kiest
 
 ## Performance Metrics
 
@@ -64,8 +67,9 @@ Last activity: 2026-09-24 -- Phase 35 planning complete
 | 34-05 | 30min | 2 | 10 |
 | 34-06 | 25min | 2 | 10 |
 | 34-07 | 30min | 2 | 15 |
+| 35-01 | 25min | 2 | 11 |
 
 ## Session Continuity
 
-**Stopped At:** 34-07 klaar (groepslanding en bewaarde code), volgende 34-08
+**Stopped At:** 35-01 klaar (datalaag groepsritten), volgende 35-02
 **Resume File:** None

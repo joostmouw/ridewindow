@@ -83,7 +83,7 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
   7. Wie in een groep zit, filtert de Ritten-tab met groepschips; zonder groepen staat die rij er niet (CLUB-26)
 
 **Plans**: 6 plans
-- [ ] 35-01-PLAN.md — datalaag: GroupRide.groupId, onbeantwoorde groepsrit = wacht op jou, ontdubbelen per rit, respondToGroupRide (upsert), tellerprovider, fake
+- [x] 35-01-PLAN.md — datalaag: GroupRide.groupId, onbeantwoorde groepsrit = wacht op jou, ontdubbelen per rit, respondToGroupRide (upsert), tellerprovider, fake
 - [ ] 35-02-PLAN.md — uitnodigscherm: "Een groep" boven losse maatjes, groepsrit aanmaken, geen dubbele groepsrit op hetzelfde tijdvak
 - [ ] 35-03-PLAN.md — groepsnaam vooraan in de rolregel (past op 360 dp, kaart niet hoger), antwoorden vanaf de kaart
 - [ ] 35-04-PLAN.md — ritdetail: groepschip, per lid gaat mee / kan niet / nog geen antwoord, telregel, rit-id naar het detail
@@ -114,5 +114,5 @@ Deze workstream loopt **parallel** aan v4.1 ("Zo snel mogelijk live in de store"
 |-------|----------------|--------|-----------|
 | 33. Datamodel en rechten | 3/3 | Complete    | 2026-09-23 |
 | 34. Groep maken en beheren | 8/8 | Complete    | 2026-09-24 |
-| 35. Groepsritten | 0/6 | Planned | - |
+| 35. Groepsritten | 1/6 | In Progress|  |
 | 36. Afronden | 0/TBD | Not started | - |
