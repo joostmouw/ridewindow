@@ -7,9 +7,15 @@
 //   hetzelfde tijdvak staan (35-01 laat ze allebei staan);
 // - "Ik ga mee" / "Kan niet", afzeggen en alsnog meegaan werken op een
 //   groepsrit, via respondToSharedRide (een upsert, want er is nog geen rij);
-// - Home en de Ritten-tab geven het rit-id mee.
+// - Home en de Ritten-tab geven het rit-id mee;
+// - een groepsrit toont de groep als chip, een rij per huidig lid met gaat
+//   mee / kan niet / nog geen antwoord, en een telregel (schets 016);
+// - bij meerdere vensters staat per venster wie kan, met namen;
+// - alles past op 360 dp met tekstschaal 1.3 en 2.0.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -204,6 +210,374 @@ void main() {
       expect(pushed!.groupRideId, 'r2');
     });
   });
+
+  group('wie komt er op een groepsrit (CLUB-15, CLUB-16)', () {
+    testWidgets('chip, een rij per lid met drie statussen en de telregel',
+        (tester) async {
+      await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3');
+
+      // Chip met de groepsnaam bovenaan de kaart.
+      expect(find.widgetWithText(ActionChip, 'On the Roll'), findsOneWidget);
+
+      _expectRow(tester, _me, 'Joost (jij)', 'gaat mee');
+      _expectRow(tester, _anna, 'Anna', 'gaat mee');
+      _expectRow(tester, _mark, 'Mark', 'kan niet');
+      _expectRow(tester, _jacco, 'Jacco', 'nog geen antwoord');
+      _expectRow(tester, _ingrid, 'Ingrid', 'nog geen antwoord');
+
+      expect(
+        tester.widget<Text>(find.byKey(const ValueKey('group-ride-tally'))).data,
+        '2 gaan mee · 1 kan niet · 2 nog niet',
+      );
+    });
+
+    testWidgets('volgorde: organisator, gaat mee, kan niet, nog niet',
+        (tester) async {
+      await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3');
+
+      double y(String uid) =>
+          tester.getTopLeft(find.byKey(ValueKey('member-row-$uid'))).dy;
+      expect(y(_me), lessThan(y(_anna)));
+      expect(y(_anna), lessThan(y(_mark)));
+      expect(y(_mark), lessThan(y(_jacco)));
+      expect(y(_jacco), lessThan(y(_ingrid)));
+    });
+
+    testWidgets('antwoorden van ex-leden staan er niet (T-35-10)',
+        (tester) async {
+      await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3');
+
+      expect(find.text('Ex-lid'), findsNothing);
+      expect(find.byKey(const ValueKey('member-row-uid-ex')), findsNothing);
+    });
+
+    testWidgets('niet de organisator: jouw rij met "(jij)" en jouw antwoord',
+        (tester) async {
+      final fake = _twoOnOneSlot(
+        r2Participants: const [
+          RideParticipant(userId: _me, status: ParticipantStatus.declined),
+        ],
+      );
+      await _pumpDetail(tester, fake, groupRideId: 'r2');
+
+      _expectRow(tester, _anna, 'Anna', 'gaat mee');
+      _expectRow(tester, _me, 'Joost (jij)', 'kan niet');
+      expect(
+        tester.getTopLeft(find.byKey(const ValueKey('member-row-$_anna'))).dy,
+        lessThan(
+          tester.getTopLeft(find.byKey(const ValueKey('member-row-$_me'))).dy,
+        ),
+      );
+    });
+
+    testWidgets('telregel laat nullen weg, "gaan mee" staat er altijd',
+        (tester) async {
+      final fake = FakeGroupGateway(myName: 'Joost');
+      fake.groups['g1'] = FakeGroupGateway.group(
+        'g1',
+        'On the Roll',
+        members: [
+          FakeGroupGateway.member(_anna, role: GroupRole.admin, name: 'Anna'),
+          FakeGroupGateway.member(_me, name: 'Joost', joinedDay: 1),
+        ],
+      );
+      fake.rides.add(
+        FakeGroupGateway.groupRide(
+          'r4',
+          ownerId: _anna,
+          ownerName: 'Anna',
+          groupId: 'g1',
+          participants: const [
+            RideParticipant(userId: _me, status: ParticipantStatus.accepted),
+          ],
+        ),
+      );
+      await _pumpDetail(tester, fake, groupRideId: 'r4');
+
+      expect(
+        tester.widget<Text>(find.byKey(const ValueKey('group-ride-tally'))).data,
+        '2 gaan mee',
+      );
+    });
+
+    testWidgets('tik op de chip opent het groepsscherm', (tester) async {
+      final visited =
+          await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3');
+
+      await tester.tap(find.widgetWithText(ActionChip, 'On the Roll'));
+      await tester.pumpAndSettle();
+
+      expect(visited, ['/peloton/group/g1']);
+      expect(find.text('groepsscherm'), findsOneWidget);
+    });
+
+    testWidgets('statuskleuren uit de tokens, licht en donker', (tester) async {
+      for (final dark in [false, true]) {
+        await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3', dark: dark);
+        final context = tester.element(find.byType(RideDetailScreen));
+        final rw = context.rw;
+        final cs = Theme.of(context).colorScheme;
+        Color? colorIn(String uid, String label) => tester
+            .widget<Text>(find.descendant(
+              of: find.byKey(ValueKey('member-row-$uid')),
+              matching: find.text(label),
+            ))
+            .style
+            ?.color;
+        expect(colorIn(_anna, 'gaat mee'), rw.scorePerfect);
+        expect(colorIn(_mark, 'kan niet'), cs.error);
+        expect(colorIn(_jacco, 'nog geen antwoord'), rw.textTertiary);
+      }
+    });
+
+    testWidgets('gewone gedeelde rit: geen chip, deelnemers, geen telregel',
+        (tester) async {
+      await _pumpDetail(tester, _twoOnOneSlot(), groupRideId: 'r1');
+
+      expect(find.byType(ActionChip), findsNothing);
+      expect(find.byKey(const ValueKey('group-ride-tally')), findsNothing);
+      expect(find.text('Bram'), findsOneWidget);
+      expect(find.text('nog geen antwoord'), findsOneWidget);
+    });
+
+    testWidgets('groep niet (meer) bekend: deelnemerslijst zonder chip',
+        (tester) async {
+      final fake = FakeGroupGateway(myName: 'Joost');
+      fake.rides.add(
+        FakeGroupGateway.groupRide(
+          'r5',
+          ownerId: _me,
+          ownerName: 'Joost',
+          groupId: 'g-verlaten',
+          participants: const [
+            RideParticipant(
+              userId: _anna,
+              status: ParticipantStatus.accepted,
+              displayName: 'Anna',
+            ),
+          ],
+        ),
+      );
+      await _pumpDetail(tester, fake, groupRideId: 'r5');
+
+      expect(find.byType(ActionChip), findsNothing);
+      expect(find.byKey(const ValueKey('group-ride-tally')), findsNothing);
+      expect(find.text('Anna'), findsOneWidget);
+      expect(find.text('gaat mee'), findsOneWidget);
+    });
+  });
+
+  group('per venster wie kan (CLUB-15)', () {
+    testWidgets('groepsrit met twee vensters: namen per venster',
+        (tester) async {
+      await _pumpDetail(tester, _withOptions(groupId: 'g1'), groupRideId: 'r6');
+
+      expect(find.text('Anna, Joost (jij)'), findsOneWidget);
+      expect(find.text('Nog niemand'), findsOneWidget);
+      // Venster 1 staat boven venster 2.
+      expect(
+        tester.getTopLeft(find.text('Anna, Joost (jij)')).dy,
+        lessThan(tester.getTopLeft(find.text('Nog niemand')).dy),
+      );
+    });
+
+    testWidgets('gewone rit met twee vensters: zelfde blok', (tester) async {
+      await _pumpDetail(tester, _withOptions(), groupRideId: 'r6');
+
+      expect(find.text('Anna, Joost (jij)'), findsOneWidget);
+      expect(find.text('Nog niemand'), findsOneWidget);
+    });
+  });
+
+  group('past op 360 dp', () {
+    // De testletter geeft elke letter een volle em breedte. Daardoor lopen
+    // rijen elders op het detail (de tijdkop, de tijdschuivers, de
+    // daglichtbalk) op 360 dp over, wat met een echte letter niet gebeurt en
+    // niets met deze kaart te maken heeft. Die fouten laten we door; elke
+    // fout binnen de pelotonkaart laat de test falen (les uit 35-03).
+    for (final (scale, dark, rideId) in [
+      (1.0, true, 'r3'),
+      (1.3, false, 'r3'),
+      (2.0, false, 'r3'),
+      (1.3, false, 'r2'),
+      (2.0, false, 'r2'),
+    ]) {
+      testWidgets(
+          'lange namen, rit $rideId, tekstschaal $scale${dark ? ', donker' : ''}',
+          (tester) async {
+        final fake = _myGroupRide(
+          groupName: 'Tour de Waterland Zondagochtend Clubrit',
+          longMember: 'Maximiliaan van Oldenbarnevelt',
+        );
+        // r2: een groepsrit van Anna waarop je nog moet antwoorden, zodat de
+        // knoppen "Kan niet" / "Ik ga mee" ook op de kaart staan.
+        fake.rides.add(
+          FakeGroupGateway.groupRide(
+            'r2',
+            ownerId: _anna,
+            ownerName: 'Anna',
+            groupId: 'g1',
+            start: _at(3, 9),
+          ),
+        );
+        final errors = <FlutterErrorDetails>[];
+        final previous = FlutterError.onError;
+        FlutterError.onError = errors.add;
+        try {
+          await _pumpDetail(
+            tester,
+            fake,
+            groupRideId: rideId,
+            width: 360,
+            scale: scale,
+            dark: dark,
+          );
+        } finally {
+          FlutterError.onError = previous;
+        }
+
+        expect(find.byType(ActionChip), findsOneWidget);
+        if (rideId == 'r2') expect(find.text('Ik ga mee'), findsOneWidget);
+        final card =
+            tester.renderObject(find.byKey(const ValueKey('peloton-card')));
+        bool insideCard(RenderObject? node) {
+          for (var n = node; n != null; n = n.parent) {
+            if (identical(n, card)) return true;
+          }
+          return false;
+        }
+
+        RenderObject? overflowing(FlutterErrorDetails d) {
+          for (final n in d.informationCollector?.call() ?? <DiagnosticsNode>[]) {
+            if (n.value is RenderFlex) return n.value as RenderFlex;
+          }
+          return null;
+        }
+
+        final unexpected = errors
+            .where((d) {
+              final flex = overflowing(d);
+              return flex == null || insideCard(flex);
+            })
+            .map((d) => d.toString())
+            .toList();
+        expect(unexpected, isEmpty, reason: unexpected.join('\n\n'));
+      });
+    }
+  });
+}
+
+/// Jouw groepsrit in On the Roll: Anna gaat mee, Mark kan niet, Jacco en
+/// Ingrid hebben geen rij. Plus een rij van een ex-lid die niet mag tellen.
+FakeGroupGateway _myGroupRide({
+  String groupName = 'On the Roll',
+  String? longMember,
+}) {
+  final fake = FakeGroupGateway(myName: 'Joost');
+  fake.groups['g1'] = FakeGroupGateway.group(
+    'g1',
+    groupName,
+    members: [
+      FakeGroupGateway.member(_anna, role: GroupRole.admin, name: 'Anna'),
+      FakeGroupGateway.member(_me, name: 'Joost', joinedDay: 1),
+      FakeGroupGateway.member(_mark, name: 'Mark', joinedDay: 2),
+      FakeGroupGateway.member(_jacco, name: longMember ?? 'Jacco', joinedDay: 3),
+      FakeGroupGateway.member(_ingrid, name: 'Ingrid', joinedDay: 4),
+    ],
+  );
+  fake.rides.add(
+    FakeGroupGateway.groupRide(
+      'r3',
+      ownerId: _me,
+      ownerName: 'Joost',
+      groupId: 'g1',
+      participants: const [
+        RideParticipant(
+          userId: _mark,
+          status: ParticipantStatus.declined,
+          displayName: 'Mark',
+        ),
+        RideParticipant(
+          userId: _anna,
+          status: ParticipantStatus.accepted,
+          displayName: 'Anna',
+        ),
+        RideParticipant(
+          userId: 'uid-ex',
+          status: ParticipantStatus.accepted,
+          displayName: 'Ex-lid',
+        ),
+      ],
+    ),
+  );
+  return fake;
+}
+
+/// Anna's rit met twee vensters; Anna en jij kunnen op venster 1, niemand op
+/// venster 2. Met [groupId] een groepsrit, anders een gewone rit.
+FakeGroupGateway _withOptions({String? groupId}) {
+  final fake = FakeGroupGateway(myName: 'Joost');
+  fake.groups['g1'] = _onTheRoll();
+  final o1 = RideOption(
+    id: 'o1',
+    rideId: 'r6',
+    start: _start,
+    end: _end,
+    plannedScore: 80,
+    votes: const [
+      OptionVote(optionId: 'o1', userId: _anna, canRide: true),
+      OptionVote(optionId: 'o1', userId: _me, canRide: true),
+      OptionVote(optionId: 'o1', userId: _mark, canRide: false),
+    ],
+  );
+  final o2 = RideOption(
+    id: 'o2',
+    rideId: 'r6',
+    start: _at(2, 9),
+    end: _at(2, 13),
+    plannedScore: 70,
+    votes: const [
+      OptionVote(optionId: 'o2', userId: _mark, canRide: false),
+    ],
+  );
+  fake.rides.add(
+    FakeGroupGateway.groupRide(
+      'r6',
+      ownerId: _anna,
+      ownerName: 'Anna',
+      groupId: groupId,
+      participants: [
+        const RideParticipant(
+          userId: _me,
+          status: ParticipantStatus.accepted,
+          displayName: 'Joost',
+        ),
+        if (groupId == null)
+          const RideParticipant(
+            userId: _mark,
+            status: ParticipantStatus.invited,
+            displayName: 'Mark',
+          ),
+      ],
+      options: [o1, o2],
+    ),
+  );
+  return fake;
+}
+
+void _expectRow(WidgetTester tester, String uid, String name, String status) {
+  final row = find.byKey(ValueKey('member-row-$uid'));
+  expect(row, findsOneWidget, reason: 'rij voor $uid');
+  expect(
+    find.descendant(of: row, matching: find.text(name)),
+    findsOneWidget,
+    reason: 'naam $name',
+  );
+  expect(
+    find.descendant(of: row, matching: find.text(status)),
+    findsOneWidget,
+    reason: '$name: $status',
+  );
 }
 
 // --- harnas ------------------------------------------------------------------
