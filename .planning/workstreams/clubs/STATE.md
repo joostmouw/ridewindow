@@ -4,7 +4,7 @@ milestone: v4.2
 milestone_name: Clubs
 current_plan: 6
 status: executing
-stopped_at: 35-05 klaar (teller en groepschips), volgende 35-06
+stopped_at: 35-06 wacht op Joost+Jacco groepsrit-test (build 55 overal live)
 last_updated: "2026-09-24T14:00:00.000Z"
 last_activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 progress:
@@ -21,7 +21,7 @@ progress:
 
 Phase: 35
 Plan: 6 of 6
-Status: 35-05 klaar, volgende 35-06
+Status: 35-06 checkpoint: wacht op groepsrit-test met Jacco
 Last activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 
 ## Progress
@@ -88,3 +88,14 @@ Last activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 
 **Stopped At:** 35-05 klaar (teller en groepschips), volgende 35-06
 **Resume File:** None
+
+## Hervatten (2026-09-24 avond)
+
+- Build **1.0.44 (55)** staat op Play internal, alpha én de live webapp. adb-check op de Oppo in
+  licht/donker gedaan (`phases/35-groepsritten/screens/`), niets blokkerends.
+- **Open:** Joost + Jacco (iPhone-webapp) testen een echte groepsrit op "On the Roll": uitnodigen
+  met 2 vensters → rood bolletje bij Jacco → "Ik ga mee" → Joost ziet Jacco als "gaat mee".
+  Bij "approved": 35-06-SUMMARY schrijven, CLUB-12..16, 25, 26 aanvinken, fase 35 afsluiten
+  (`GSD_WORKSTREAM=clubs gsd-sdk query phase.complete 35`, daarna frontmatter-tellers met de hand).
+- Daarna fase 36 (afronden + CLUB-29 namen bijwerken, CLUB-30 naam vragen; 0014 + checkpoint).
+- Parallel: worktree `~/ridewindow-meldingen` (branch `meldingen`) werkt aan #77B/#74; mergen ná 35.
