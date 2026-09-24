@@ -105,11 +105,11 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
 
 | Waar | Stand |
 |---|---|
-| Oppo | nog niet bijgewerkt naar 55: toestel was niet via adb bereikbaar |
-| PWA | 1.0.44 (55), gedeployed met `scripts/deploy_web.sh`, live hash geverifieerd |
-| Internal | 1.0.44 (55) |
-| Alpha / closed | 1.0.42 (53), ongewijzigd; promotie van 55 wacht op de toestelcheck |
-| main | 1.0.44+55 |
+| Oppo | 1.0.46 (57) via Play; #80 en #83 op het toestel geverifieerd |
+| PWA | 1.0.46 (57), gedeployed met `scripts/deploy_web.sh`, live hash geverifieerd |
+| Internal | 1.0.46 (57) |
+| Alpha / closed | 1.0.44 (55); promotie van 57 wacht op de groepsrit-test |
+| main | 1.0.46+57 |
 
 **Wat 55 brengt:** groepsritten (fase 35). Een rit uitzetten voor een hele
 groep, antwoorden op kaart en detail, wie er komt per lid, de teller op

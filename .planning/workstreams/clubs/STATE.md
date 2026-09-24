@@ -4,7 +4,7 @@ milestone: v4.2
 milestone_name: Clubs
 current_plan: 6
 status: executing
-stopped_at: 35-06 wacht op Joost+Jacco groepsrit-test (build 55 overal live)
+stopped_at: 35-06 wacht op groepsrit-test Joost+Jacco (build 57 live)
 last_updated: "2026-09-24T14:00:00.000Z"
 last_activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 progress:
@@ -91,7 +91,8 @@ Last activity: 2026-09-24 -- 35-05 teller en groepschips klaar
 
 ## Hervatten (2026-09-24 avond)
 
-- Build **1.0.44 (55)** staat op Play internal, alpha én de live webapp. adb-check op de Oppo in
+- Build **1.0.46 (57)** staat op internal en de live webapp (alpha nog 55); bevat de testerfixes #80/#81/#83.
+- Build 1.0.44 (55) stond eerder op internal, alpha én de webapp. adb-check op de Oppo in
   licht/donker gedaan (`phases/35-groepsritten/screens/`), niets blokkerends.
 - **Open:** Joost + Jacco (iPhone-webapp) testen een echte groepsrit op "On the Roll": uitnodigen
   met 2 vensters → rood bolletje bij Jacco → "Ik ga mee" → Joost ziet Jacco als "gaat mee".
