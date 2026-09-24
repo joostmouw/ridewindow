@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 34-07
+current_plan: 34-08
 status: executing
-stopped_at: 34-06 klaar (groepslink en appbar-menu, 841 tests), volgende 34-07
-last_updated: "2026-09-24T15:00:00.000Z"
-last_activity: 2026-09-24 -- 34-06 groepslink, naam, verlaten, opheffen
+stopped_at: 34-07 klaar (groepslanding en bewaarde code, 864 tests), volgende 34-08
+last_updated: "2026-09-24T17:00:00.000Z"
+last_activity: 2026-09-24 -- 34-07 groepslanding, code bewaren, codeveld
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 10
+  percent: 91
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 34
-Plan: 7 of 8
-Status: link en appbar-menu staan; volgende 34-07 landing
-Last activity: 2026-09-24 -- 34-06 groepslink, naam, verlaten, opheffen
+Plan: 8 of 8
+Status: groepslink werkt tot aanvraag; volgende 34-08 doorloop
+Last activity: 2026-09-24 -- 34-07 groepslanding, code bewaren, codeveld
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 34-07
+**Current Plan:** 34-08
 
 ## Decisions
 
@@ -49,6 +49,8 @@ Last activity: 2026-09-24 -- 34-06 groepslink, naam, verlaten, opheffen
 - 34-05: na geslaagd accepteren/afwijzen blijft het aanvraag-id bezet
 - 34-06: verlaten = bevestiging zonder ongedaan maken; terugkomen is een nieuwe aanvraag
 - 34-06: dezelfde naam opslaan verstuurt niets; aanvrager krijgt geen appbar-menu
+- 34-07: groepscode eigen sleutel naast maatjescode; redirect bewaart beide
+- 34-07: codeveld verklapt soort code niet; alleen vol/10 groepen eigen zin
 
 ## Performance Metrics
 
@@ -61,8 +63,9 @@ Last activity: 2026-09-24 -- 34-06 groepslink, naam, verlaten, opheffen
 | 34-04 | 35min | 3 | 17 |
 | 34-05 | 30min | 2 | 10 |
 | 34-06 | 25min | 2 | 10 |
+| 34-07 | 30min | 2 | 15 |
 
 ## Session Continuity
 
-**Stopped At:** 34-06 klaar (groepslink en appbar-menu), volgende 34-07
+**Stopped At:** 34-07 klaar (groepslanding en bewaarde code), volgende 34-08
 **Resume File:** None

@@ -11,7 +11,7 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 ### Groep en lidmaatschap (CLUB-01 … 06)
 
 - [x] **CLUB-01**: Een ingelogde gebruiker kan een groep aanmaken met een naam, en is daarmee lid én beheerder
-- [ ] **CLUB-02**: Ieder lid kan de groepslink delen (tekst + link via het deelmenu); wie de link opent en inlogt, dient daarmee een **aanvraag** in en ziet "wacht op goedkeuring" tot een beheerder beslist *(herzien 2026-09-23: was "een beheerder deelt, wie opent wordt lid")*
+- [x] **CLUB-02**: Ieder lid kan de groepslink delen (tekst + link via het deelmenu); wie de link opent en inlogt, dient daarmee een **aanvraag** in en ziet "wacht op goedkeuring" tot een beheerder beslist *(herzien 2026-09-23: was "een beheerder deelt, wie opent wordt lid")*
 - [x] **CLUB-03**: Ieder lid kan een bestaand maatje **voordragen**; een beheerder die een maatje voordraagt, maakt hem direct lid *(herzien 2026-09-23: was "een beheerder voegt direct toe")*
 - [x] **CLUB-04**: Ieder lid ziet de groepen waar hij in zit op de Peloton-tab, met naam en aantal leden
 - [x] **CLUB-05**: Ieder lid ziet de ledenlijst van de groep, met naam en wie beheerder is — en niets anders van een ander lid (geen e-mail, instellingen of rooster)
@@ -73,7 +73,7 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CLUB-01 | Phase 34 | Complete |
-| CLUB-02 | Phase 34 | Pending |
+| CLUB-02 | Phase 34 | Complete |
 | CLUB-03 | Phase 34 | Complete |
 | CLUB-04 | Phase 34 | Complete |
 | CLUB-05 | Phase 34 | Complete |
