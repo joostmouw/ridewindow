@@ -281,6 +281,40 @@ class FakeGroupGateway implements PelotonGateway {
     return ride;
   }
 
+  /// Een maatje aan een rit hangen (participant-rij `invited`). Alleen op een
+  /// eigen rit, net als de insert-policy op group_ride_participants.
+  @override
+  Future<void> inviteToRide({
+    required String rideId,
+    required String friendId,
+    String? displayName,
+  }) async {
+    calls.add('inviteToRide:$rideId:$friendId');
+    _maybeFail('inviteToRide');
+    final i = _rideIndex(rideId);
+    final r = rides[i];
+    if (r.ownerId != me) throw const GroupException(GroupError.notAllowed);
+    rides[i] = GroupRide(
+      id: r.id,
+      ownerId: r.ownerId,
+      start: r.start,
+      end: r.end,
+      plannedScore: r.plannedScore,
+      ownerName: r.ownerName,
+      note: r.note,
+      groupId: r.groupId,
+      participants: [
+        ...r.participants,
+        RideParticipant(
+          userId: friendId,
+          status: ParticipantStatus.invited,
+          displayName: displayName,
+        ),
+      ],
+      options: r.options,
+    );
+  }
+
   @override
   Future<void> respondToGroupRide({
     required String rideId,
