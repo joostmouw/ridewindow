@@ -2257,4 +2257,31 @@ class SEn extends S {
 
   @override
   String get groupRequestWithdrawn => 'Request withdrawn';
+
+  @override
+  String get groupMemberMenuTooltip => 'Options for this member';
+
+  @override
+  String get groupMakeAdmin => 'Make admin';
+
+  @override
+  String get groupRemoveAdmin => 'Remove as admin';
+
+  @override
+  String get groupRemoveMember => 'Remove from group';
+
+  @override
+  String groupMadeAdmin(String name) {
+    return '$name is now an admin';
+  }
+
+  @override
+  String groupAdminRemoved(String name) {
+    return '$name is no longer an admin';
+  }
+
+  @override
+  String groupMemberRemoved(String name) {
+    return '$name was removed from the group';
+  }
 }

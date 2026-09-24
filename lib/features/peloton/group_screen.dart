@@ -1,12 +1,14 @@
 // lib/features/peloton/group_screen.dart
-// Het groepsscherm (schets 015, vraag 2, variant A), hier nog in leesstand.
+// Het groepsscherm (schets 015, vraag 2, variant A).
 //
 // Kop met kenteken, naam en "N leden · sinds <datum>", daaronder de leden met
 // "(jij)" bij jezelf en de chip "beheerder". Van een lid staat er niets anders
 // dan naam en rol (CLUB-05). Wie alleen een aanvraag heeft, ziet dat die bij
-// de beheerders ligt en kan hem intrekken. De beheerknoppen (⋮ per lid,
-// aanvragen, maatje voordragen) komen in plan 05; het appbar-menu en de
-// groepslink in plan 06.
+// de beheerders ligt en kan hem intrekken.
+//
+// Alleen een beheerder ziet ⋮ achter de leden (beheerder maken of afnemen,
+// uit de groep halen). Een gewoon lid ziet een rustig scherm. Het appbar-menu
+// en de groepslink komen in plan 06.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,8 +35,161 @@ class GroupScreen extends ConsumerStatefulWidget {
   ConsumerState<GroupScreen> createState() => _GroupScreenState();
 }
 
+enum _MemberAction { promote, demote, remove }
+
 class _GroupScreenState extends ConsumerState<GroupScreen> {
   bool _busy = false;
+
+  /// Leden die een beheerder eruit haalt terwijl de snackbar met "Ongedaan
+  /// maken" nog staat. Ze zijn al uit de lijst en het ledental, maar de
+  /// database weet nog van niets.
+  ///
+  /// Waarom uitgesteld: opnieuw toevoegen na een verwijdering kan alleen voor
+  /// maatjes van de beheerder, en zet `joined_at` en de rol opnieuw (en
+  /// daarmee de opvolgvolgorde). Echt ongedaan maken kan dus alleen door de
+  /// verwijdering nog niet te versturen.
+  final Set<String> _pendingRemovals = {};
+
+  Future<void> _setRole(
+    PelotonGroup group,
+    GroupMember member,
+    GroupRole role,
+  ) async {
+    if (_busy) return;
+    final s = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final me = ref.read(currentUserIdProvider);
+    final name = member.label(s.pelotonUnnamedFriend);
+
+    // Voorcontrole voor een duidelijke zin; de database weigert het ook
+    // (last_admin), en die fout geeft via groupErrorTextOf dezelfde zin.
+    if (role == GroupRole.member &&
+        member.userId == me &&
+        group.adminCount == 1) {
+      messenger.showSnackBar(SnackBar(content: Text(s.groupErrorLastAdmin)));
+      return;
+    }
+
+    // Container vooraf: na de await kan het scherm al dicht zijn.
+    final container = ProviderScope.containerOf(context, listen: false);
+    setState(() => _busy = true);
+    try {
+      await ref.read(pelotonGatewayProvider).setGroupMemberRole(
+            groupId: group.id,
+            userId: member.userId,
+            role: role,
+          );
+      container.invalidate(visibleGroupsProvider);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            role == GroupRole.admin
+                ? s.groupMadeAdmin(name)
+                : s.groupAdminRemoved(name),
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Peloton: rol wijzigen mislukt: $error');
+      messenger.showSnackBar(
+        SnackBar(content: Text(groupErrorTextOf(s, error))),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Uit de groep halen, uitgesteld tot de snackbar sluit (zie
+  /// [_pendingRemovals]). Gateway, container en messenger worden vooraf
+  /// gepakt, zodat de verwijdering ook doorgaat als het scherm intussen
+  /// gesloten is.
+  void _remove(PelotonGroup group, GroupMember member) {
+    final s = S.of(context);
+    final gateway = ref.read(pelotonGatewayProvider);
+    final container = ProviderScope.containerOf(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    final userId = member.userId;
+    final name = member.label(s.pelotonUnnamedFriend);
+
+    void release() {
+      if (!_pendingRemovals.contains(userId)) return;
+      if (mounted) {
+        setState(() => _pendingRemovals.remove(userId));
+      } else {
+        _pendingRemovals.remove(userId);
+      }
+    }
+
+    setState(() => _pendingRemovals.add(userId));
+    messenger.hideCurrentSnackBar();
+    final controller = messenger.showSnackBar(
+      SnackBar(
+        content: Text(s.groupMemberRemoved(name)),
+        action: SnackBarAction(label: s.pelotonUndo, onPressed: () {}),
+      ),
+    );
+    controller.closed.then((reason) async {
+      if (reason == SnackBarClosedReason.action) {
+        release();
+        return;
+      }
+      try {
+        await gateway.removeGroupMember(groupId: group.id, userId: userId);
+        container.invalidate(visibleGroupsProvider);
+        // Pas vrijgeven als de verse lijst er is, anders knippert het lid
+        // nog even terug.
+        try {
+          await container.read(visibleGroupsProvider.future);
+        } catch (_) {
+          // De lijst zelf toont zijn eigen fout-staat.
+        }
+        release();
+      } catch (error) {
+        debugPrint('Peloton: lid verwijderen mislukt: $error');
+        release();
+        container.invalidate(visibleGroupsProvider);
+        messenger.showSnackBar(
+          SnackBar(content: Text(groupErrorTextOf(s, error))),
+        );
+      }
+    });
+  }
+
+  Widget _memberMenu(PelotonGroup group, GroupMember member, String? me) {
+    final s = S.of(context);
+    final theme = Theme.of(context);
+    final isMe = member.userId == me;
+    return PopupMenuButton<_MemberAction>(
+      icon: const Icon(AppIcons.dotsThreeVertical),
+      tooltip: s.groupMemberMenuTooltip,
+      enabled: !_busy,
+      onSelected: (action) => switch (action) {
+        _MemberAction.promote => _setRole(group, member, GroupRole.admin),
+        _MemberAction.demote => _setRole(group, member, GroupRole.member),
+        _MemberAction.remove => _remove(group, member),
+      },
+      itemBuilder: (_) => [
+        if (member.isAdmin)
+          PopupMenuItem(
+            value: _MemberAction.demote,
+            child: Text(s.groupRemoveAdmin),
+          )
+        else
+          PopupMenuItem(
+            value: _MemberAction.promote,
+            child: Text(s.groupMakeAdmin),
+          ),
+        if (!isMe)
+          PopupMenuItem(
+            value: _MemberAction.remove,
+            child: Text(
+              s.groupRemoveMember,
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
+          ),
+      ],
+    );
+  }
 
   Future<void> _withdraw(GroupJoinRequest request) async {
     if (_busy) return;
@@ -111,20 +266,35 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
               ],
             );
           }
+          final isAdmin = g.isAdmin(me);
+          // Wie net is weggehaald (snackbar staat nog) is al uit beeld.
+          final shown = _pendingRemovals.isEmpty
+              ? g
+              : PelotonGroup(
+                  id: g.id,
+                  name: g.name,
+                  createdAt: g.createdAt,
+                  members: [
+                    for (final m in g.members)
+                      if (!_pendingRemovals.contains(m.userId)) m,
+                  ],
+                  requests: g.requests,
+                );
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(visibleGroupsProvider),
             child: ListView(
               padding: const EdgeInsets.only(bottom: 24),
               children: [
-                _GroupHero(group: g, showCount: true),
+                _GroupHero(group: shown, showCount: true),
                 SectionCard(
                   title: s.groupMembersSection,
                   children: [
-                    for (final m in g.members)
+                    for (final m in shown.members)
                       _MemberRow(
                         key: ValueKey('group-member-${m.userId}'),
                         member: m,
                         isMe: m.userId == me,
+                        trailingAction: isAdmin ? _memberMenu(g, m, me) : null,
                       ),
                   ],
                 ),
@@ -226,14 +396,13 @@ class _PendingCard extends StatelessWidget {
 }
 
 /// Eén lid: avatar met de eerste letter, de naam (met "(jij)" bij jezelf) en
-/// de chip "beheerder". Meer niet (CLUB-05). [trailingAction] is de plek voor
-/// het ⋮-menu van plan 05; nu altijd leeg.
+/// de chip "beheerder". Meer niet (CLUB-05). [trailingAction] is het ⋮-menu,
+/// alleen voor beheerders.
 class _MemberRow extends StatelessWidget {
   const _MemberRow({
     super.key,
     required this.member,
     required this.isMe,
-    // ignore: unused_element_parameter
     this.trailingAction,
   });
 

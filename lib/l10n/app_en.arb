@@ -683,5 +683,15 @@
   "groupNotFound": "This group no longer exists, or you're no longer a member.",
   "groupRequestPending": "Your request is with the admins",
   "groupWithdrawRequest": "Withdraw request",
-  "groupRequestWithdrawn": "Request withdrawn"
+  "groupRequestWithdrawn": "Request withdrawn",
+  "groupMemberMenuTooltip": "Options for this member",
+  "groupMakeAdmin": "Make admin",
+  "groupRemoveAdmin": "Remove as admin",
+  "groupRemoveMember": "Remove from group",
+  "groupMadeAdmin": "{name} is now an admin",
+  "@groupMadeAdmin": {"placeholders": {"name": {"type": "String"}}},
+  "groupAdminRemoved": "{name} is no longer an admin",
+  "@groupAdminRemoved": {"placeholders": {"name": {"type": "String"}}},
+  "groupMemberRemoved": "{name} was removed from the group",
+  "@groupMemberRemoved": {"placeholders": {"name": {"type": "String"}}}
 }

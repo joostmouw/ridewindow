@@ -3960,6 +3960,48 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Aanvraag ingetrokken'**
   String get groupRequestWithdrawn;
+
+  /// No description provided for @groupMemberMenuTooltip.
+  ///
+  /// In nl, this message translates to:
+  /// **'Opties voor dit lid'**
+  String get groupMemberMenuTooltip;
+
+  /// No description provided for @groupMakeAdmin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Beheerder maken'**
+  String get groupMakeAdmin;
+
+  /// No description provided for @groupRemoveAdmin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Beheerder af'**
+  String get groupRemoveAdmin;
+
+  /// No description provided for @groupRemoveMember.
+  ///
+  /// In nl, this message translates to:
+  /// **'Uit de groep halen'**
+  String get groupRemoveMember;
+
+  /// No description provided for @groupMadeAdmin.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is nu beheerder'**
+  String groupMadeAdmin(String name);
+
+  /// No description provided for @groupAdminRemoved.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is geen beheerder meer'**
+  String groupAdminRemoved(String name);
+
+  /// No description provided for @groupMemberRemoved.
+  ///
+  /// In nl, this message translates to:
+  /// **'{name} is uit de groep gehaald'**
+  String groupMemberRemoved(String name);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -715,5 +715,15 @@
   "groupNotFound": "Deze groep bestaat niet meer, of je bent er geen lid meer van.",
   "groupRequestPending": "Je aanvraag ligt bij de beheerders",
   "groupWithdrawRequest": "Aanvraag intrekken",
-  "groupRequestWithdrawn": "Aanvraag ingetrokken"
+  "groupRequestWithdrawn": "Aanvraag ingetrokken",
+  "groupMemberMenuTooltip": "Opties voor dit lid",
+  "groupMakeAdmin": "Beheerder maken",
+  "groupRemoveAdmin": "Beheerder af",
+  "groupRemoveMember": "Uit de groep halen",
+  "groupMadeAdmin": "{name} is nu beheerder",
+  "@groupMadeAdmin": {"placeholders": {"name": {"type": "String"}}},
+  "groupAdminRemoved": "{name} is geen beheerder meer",
+  "@groupAdminRemoved": {"placeholders": {"name": {"type": "String"}}},
+  "groupMemberRemoved": "{name} is uit de groep gehaald",
+  "@groupMemberRemoved": {"placeholders": {"name": {"type": "String"}}}
 }

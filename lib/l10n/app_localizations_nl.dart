@@ -2266,4 +2266,31 @@ class SNl extends S {
 
   @override
   String get groupRequestWithdrawn => 'Aanvraag ingetrokken';
+
+  @override
+  String get groupMemberMenuTooltip => 'Opties voor dit lid';
+
+  @override
+  String get groupMakeAdmin => 'Beheerder maken';
+
+  @override
+  String get groupRemoveAdmin => 'Beheerder af';
+
+  @override
+  String get groupRemoveMember => 'Uit de groep halen';
+
+  @override
+  String groupMadeAdmin(String name) {
+    return '$name is nu beheerder';
+  }
+
+  @override
+  String groupAdminRemoved(String name) {
+    return '$name is geen beheerder meer';
+  }
+
+  @override
+  String groupMemberRemoved(String name) {
+    return '$name is uit de groep gehaald';
+  }
 }

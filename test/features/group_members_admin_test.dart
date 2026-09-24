@@ -270,6 +270,9 @@ void main() {
 
     expect(gateway.calls, contains('removeGroupMember:g1:uid-i'));
     expect(_row('uid-i'), findsOneWidget);
-    expect(find.text('Dat is niet gelukt. Probeer het opnieuw.'), findsOneWidget);
+    expect(
+      find.text('Dat is niet gelukt. Probeer het opnieuw.'),
+      findsOneWidget,
+    );
   });
 }
