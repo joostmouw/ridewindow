@@ -2441,4 +2441,15 @@ class SEn extends S {
   String groupDisbanded(String group) {
     return '$group has been disbanded';
   }
+
+  @override
+  String groupJoinRequested(String group) {
+    return 'Your request to join $group is with the admins';
+  }
+
+  @override
+  String get groupOpen => 'View';
+
+  @override
+  String get groupUnnamed => 'the group';
 }

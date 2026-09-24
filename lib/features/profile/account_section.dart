@@ -12,13 +12,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/core/supabase_config.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/services/account_switch_resolver.dart';
+import 'package:ridewindow/features/peloton/group_error_text.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -26,6 +29,7 @@ import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
+import 'package:ridewindow/services/pending_group_join.dart';
 import 'package:ridewindow/services/pending_invite_store.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/services/account_sync_service.dart';
@@ -264,6 +268,9 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
     // Rides → Peloton en de code overtypen die de app allang kende. Zie
     // PendingInviteStore.
     await _redeemPendingInvite();
+    // Hetzelfde voor een groepslink (plan 34-07): de code lag klaar sinds de
+    // landing of de onboarding-redirect, en wordt nu een aanvraag.
+    await _redeemPendingGroupInvite();
   }
 
   /// Zorgt dat er hoe dan ook een rij in `public.profiles` staat.
@@ -324,6 +331,49 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
       );
     } catch (error) {
       debugPrint('Peloton: klaargelegde code verzilveren mislukt: $error');
+    }
+  }
+
+  /// Wisselt een groepscode in die vóór het inloggen is klaargelegd.
+  ///
+  /// Anders dan bij de maatjescode níet stil bij een fout: een volle groep of
+  /// tien groepen is iets wat de gebruiker moet horen, anders denkt hij dat
+  /// zijn aanvraag gewoon loopt. Het inloggen zelf blijft wel geslaagd.
+  /// Ben je al lid, dan sta je meteen op het groepsscherm; anders een melding
+  /// dat de aanvraag bij de beheerders ligt, met een knop naar de groep.
+  Future<void> _redeemPendingGroupInvite() async {
+    // Vóór de eerste await: daarna kan de context van dit scherm weg zijn.
+    final router = GoRouter.maybeOf(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final s = S.of(context);
+    try {
+      final result =
+          await redeemPendingGroupCode(ref.read(pelotonGatewayProvider));
+      if (result == null) return;
+      ref.invalidate(visibleGroupsProvider);
+      final path = '/peloton/group/${result.groupId}';
+      if (result.status == GroupJoinStatus.member) {
+        router?.push(path);
+        return;
+      }
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(
+            s.groupJoinRequested(result.groupName ?? s.groupUnnamed),
+          ),
+          action: router == null
+              ? null
+              : SnackBarAction(
+                  label: s.groupOpen,
+                  onPressed: () => router.push(path),
+                ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Groep: klaargelegde code inwisselen mislukt: $error');
+      messenger?.showSnackBar(
+        SnackBar(content: Text(groupErrorTextOf(s, error))),
+      );
     }
   }
 

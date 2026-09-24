@@ -744,5 +744,9 @@
   "@groupDisbandBody": {"placeholders": {"count": {"type": "int"}}},
   "groupDisbandAction": "Disband",
   "groupDisbanded": "{group} has been disbanded",
-  "@groupDisbanded": {"placeholders": {"group": {"type": "String"}}}
+  "@groupDisbanded": {"placeholders": {"group": {"type": "String"}}},
+  "groupJoinRequested": "Your request to join {group} is with the admins",
+  "@groupJoinRequested": {"placeholders": {"group": {"type": "String"}}},
+  "groupOpen": "View",
+  "groupUnnamed": "the group"
 }

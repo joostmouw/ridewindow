@@ -17,8 +17,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Bewust in SharedPreferences en niet in geheugen: inloggen kan het scherm
 /// verlaten (de knop staat in Profiel) en op het web kan de pagina er zelfs
 /// door herladen.
+///
+/// **Groepslinks (`/group/:code`, plan 34-07) hebben een eigen sleutel.**
+/// Iemand kan een maatjeslink en een groepslink tegelijk hebben openstaan --
+/// bijvoorbeeld Joost stuurt allebei in één appje -- en de ene mag de andere
+/// niet overschrijven. Beide worden na het inloggen los van elkaar ingewisseld.
 abstract final class PendingInviteStore {
-  static const _key = 'peloton.pendingInviteCode';
+  /// Sleutel van de maatjescode. Dezelfde waarde als vóór de groepslinks, zodat
+  /// een al klaargelegde code na een update nog gevonden wordt. Publiek omdat
+  /// de router hem synchroon wegschrijft (zie de onboarding-redirect).
+  static const friendKey = 'peloton.pendingInviteCode';
+
+  /// Sleutel van de groepscode.
+  static const groupKey = 'peloton.pendingGroupCode';
+
+  static const _key = friendKey;
 
   /// Legt een code klaar. Overschrijft een eerdere: wie twee links opent,
   /// bedoelt de laatste.
@@ -41,5 +54,25 @@ abstract final class PendingInviteStore {
   static Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_key);
+  }
+
+  /// Legt een groepscode klaar. Zelfde regels als [save]: de laatste link wint.
+  static Future<void> saveGroup(String code) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(groupKey, code);
+  }
+
+  /// De klaargelegde groepscode, of `null`.
+  static Future<String?> readGroup() async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getString(groupKey);
+    return (value == null || value.isEmpty) ? null : value;
+  }
+
+  /// Wist de groepscode. Zelfde reden als bij [clear]: ook na een mislukte
+  /// poging, anders komt dezelfde fout bij elke login terug.
+  static Future<void> clearGroup() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(groupKey);
   }
 }

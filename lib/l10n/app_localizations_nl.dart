@@ -2450,4 +2450,15 @@ class SNl extends S {
   String groupDisbanded(String group) {
     return '$group is opgeheven';
   }
+
+  @override
+  String groupJoinRequested(String group) {
+    return 'Je aanvraag voor $group ligt bij de beheerders';
+  }
+
+  @override
+  String get groupOpen => 'Bekijk';
+
+  @override
+  String get groupUnnamed => 'de groep';
 }

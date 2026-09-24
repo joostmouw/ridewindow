@@ -4230,6 +4230,24 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'{group} is opgeheven'**
   String groupDisbanded(String group);
+
+  /// No description provided for @groupJoinRequested.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je aanvraag voor {group} ligt bij de beheerders'**
+  String groupJoinRequested(String group);
+
+  /// No description provided for @groupOpen.
+  ///
+  /// In nl, this message translates to:
+  /// **'Bekijk'**
+  String get groupOpen;
+
+  /// No description provided for @groupUnnamed.
+  ///
+  /// In nl, this message translates to:
+  /// **'de groep'**
+  String get groupUnnamed;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

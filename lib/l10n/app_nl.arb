@@ -776,5 +776,9 @@
   "@groupDisbandBody": {"placeholders": {"count": {"type": "int"}}},
   "groupDisbandAction": "Opheffen",
   "groupDisbanded": "{group} is opgeheven",
-  "@groupDisbanded": {"placeholders": {"group": {"type": "String"}}}
+  "@groupDisbanded": {"placeholders": {"group": {"type": "String"}}},
+  "groupJoinRequested": "Je aanvraag voor {group} ligt bij de beheerders",
+  "@groupJoinRequested": {"placeholders": {"group": {"type": "String"}}},
+  "groupOpen": "Bekijk",
+  "groupUnnamed": "de groep"
 }

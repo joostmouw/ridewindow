@@ -21,6 +21,7 @@ import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/features/profile/profile_screen.dart';
+import 'package:ridewindow/services/pending_invite_store.dart';
 import 'package:ridewindow/features/agenda/week_agenda_screen.dart';
 import 'package:ridewindow/features/planned/planned_rides_screen.dart';
 
@@ -93,6 +94,21 @@ GoRouter router(Ref ref) {
           loc != '/welcome' &&
           loc != '/onboard' &&
           loc != '/availability') {
+        // Een nieuwe gebruiker die via een groeps- of maatjeslink binnenkomt,
+        // moet eerst door de welkomstschermen -- en juist hij opent zo'n link
+        // het vaakst. Zonder dit verdween de code in deze redirect en moest hij
+        // na het inloggen zelf de weg terug vinden (zie PendingInviteStore).
+        // Synchroon via de al geladen prefs: de redirect wacht niet. Na het
+        // inloggen wisselt account_section de code vanzelf in.
+        final segments = state.uri.pathSegments;
+        if (segments.length == 2 && segments.last.isNotEmpty) {
+          final key = switch (segments.first) {
+            'group' => PendingInviteStore.groupKey,
+            'invite' => PendingInviteStore.friendKey,
+            _ => null,
+          };
+          if (key != null) prefs.setString(key, segments.last);
+        }
         return '/welcome';
       }
       return null;
