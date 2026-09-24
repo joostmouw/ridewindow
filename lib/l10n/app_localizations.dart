@@ -3870,6 +3870,48 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Een beheerder kan de groep opheffen. Ritten waarop al iemand geantwoord heeft, blijven staan zonder groepslabel.'**
   String get groupRuleDisband;
+
+  /// No description provided for @groupsSection.
+  ///
+  /// In nl, this message translates to:
+  /// **'Groepen'**
+  String get groupsSection;
+
+  /// No description provided for @groupsNew.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nieuwe groep'**
+  String get groupsNew;
+
+  /// No description provided for @groupsEmptyTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Fiets je met een vaste club?'**
+  String get groupsEmptyTitle;
+
+  /// No description provided for @groupsEmptyHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Maak een groep. Dan zet je een rit in één keer uit voor iedereen.'**
+  String get groupsEmptyHint;
+
+  /// No description provided for @groupMemberCount.
+  ///
+  /// In nl, this message translates to:
+  /// **'{count, plural, =1{1 lid} other{{count} leden}}'**
+  String groupMemberCount(int count);
+
+  /// No description provided for @groupAdminChip.
+  ///
+  /// In nl, this message translates to:
+  /// **'beheerder'**
+  String get groupAdminChip;
+
+  /// No description provided for @groupRequestPendingShort.
+  ///
+  /// In nl, this message translates to:
+  /// **'aanvraag loopt'**
+  String get groupRequestPendingShort;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

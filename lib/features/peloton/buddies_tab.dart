@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/services/invite_code.dart';
+import 'package:ridewindow/features/peloton/groups_section.dart';
 import 'package:ridewindow/features/peloton/invite_landing_screen.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -45,6 +46,7 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
   void _invalidateAll() {
     ref.invalidate(friendsProvider);
     ref.invalidate(groupRidesProvider);
+    ref.invalidate(visibleGroupsProvider);
   }
 
   Future<void> _run(Future<void> Function() action) async {
@@ -131,6 +133,8 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
       child: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
+          // Groepen boven Maatjes (schets 015, vraag 1, variant A).
+          const GroupsSection(),
           SectionCard(
             title: s.pelotonFriends,
             children: [

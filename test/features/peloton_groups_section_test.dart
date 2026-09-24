@@ -84,9 +84,6 @@ FakeGroupGateway _twoGroups() => FakeGroupGateway(
       },
     );
 
-String _uri(GoRouter router) =>
-    router.routerDelegate.currentConfiguration.uri.toString();
-
 void main() {
   testWidgets('uitgelogd: geen groepen, de uitgelogde staat blijft',
       (tester) async {
@@ -160,27 +157,26 @@ void main() {
   });
 
   testWidgets('tik op een kaart opent het groepsscherm', (tester) async {
-    final router = await _pump(tester, _twoGroups());
+    await _pump(tester, _twoGroups());
     await tester.tap(find.text('Buren'));
     await tester.pumpAndSettle();
-    expect(_uri(router), '/peloton/group/g2');
+    expect(find.text('groep-g2'), findsOneWidget);
   });
 
   testWidgets('groep maken: sheet, naam, en door naar het groepsscherm',
       (tester) async {
     final gateway = FakeGroupGateway(me: _me);
-    final router = await _pump(tester, gateway);
+    await _pump(tester, gateway);
 
     await tester.tap(find.text('Groep maken'));
     await tester.pumpAndSettle();
     expect(find.text('Nieuwe groep'), findsOneWidget);
     await tester.enterText(find.byType(TextField).last, 'Dinsdagclub');
     await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, 'Groep maken'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Groep maken').last);
     await tester.pumpAndSettle();
 
     expect(gateway.calls, contains('createGroup:Dinsdagclub'));
-    expect(_uri(router), '/peloton/group/g-new-1');
     expect(find.text('groep-g-new-1'), findsOneWidget);
   });
 
@@ -222,7 +218,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, 'Dinsdagclub');
     await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, 'Groep maken'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Groep maken').last);
     await tester.pumpAndSettle();
 
     expect(

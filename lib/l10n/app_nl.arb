@@ -697,5 +697,13 @@
   "groupRuleRides": "Een groepsrit zien alle huidige leden, ook wie later lid werd. Wie de groep verlaat, ziet de groepsritten niet meer.",
   "groupRuleLeaving": "Je kunt een groep altijd zelf verlaten. Terugkomen gaat met een nieuwe aanvraag.",
   "groupRuleLastAdmin": "Vertrekt de laatste beheerder, dan wordt het lid dat er het langst in zit beheerder. Vertrekt het laatste lid, dan verdwijnt de groep.",
-  "groupRuleDisband": "Een beheerder kan de groep opheffen. Ritten waarop al iemand geantwoord heeft, blijven staan zonder groepslabel."
+  "groupRuleDisband": "Een beheerder kan de groep opheffen. Ritten waarop al iemand geantwoord heeft, blijven staan zonder groepslabel.",
+  "groupsSection": "Groepen",
+  "groupsNew": "Nieuwe groep",
+  "groupsEmptyTitle": "Fiets je met een vaste club?",
+  "groupsEmptyHint": "Maak een groep. Dan zet je een rit in één keer uit voor iedereen.",
+  "groupMemberCount": "{count, plural, =1{1 lid} other{{count} leden}}",
+  "@groupMemberCount": {"placeholders": {"count": {"type": "int"}}},
+  "groupAdminChip": "beheerder",
+  "groupRequestPendingShort": "aanvraag loopt"
 }

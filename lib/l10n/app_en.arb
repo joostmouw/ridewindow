@@ -665,5 +665,13 @@
   "groupRuleRides": "All current members see a group ride, including people who joined later. Once you leave the group, you no longer see its rides.",
   "groupRuleLeaving": "You can always leave a group yourself. Coming back takes a new request.",
   "groupRuleLastAdmin": "If the last admin leaves, the longest-standing member becomes admin. If the last member leaves, the group disappears.",
-  "groupRuleDisband": "An admin can disband the group. Rides someone has already replied to stay, without a group label."
+  "groupRuleDisband": "An admin can disband the group. Rides someone has already replied to stay, without a group label.",
+  "groupsSection": "Groups",
+  "groupsNew": "New group",
+  "groupsEmptyTitle": "Do you ride with a regular club?",
+  "groupsEmptyHint": "Create a group. Then you can put out a ride to everyone at once.",
+  "groupMemberCount": "{count, plural, =1{1 member} other{{count} members}}",
+  "@groupMemberCount": {"placeholders": {"count": {"type": "int"}}},
+  "groupAdminChip": "admin",
+  "groupRequestPendingShort": "request pending"
 }

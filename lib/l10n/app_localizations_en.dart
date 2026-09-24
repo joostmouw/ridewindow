@@ -2197,4 +2197,34 @@ class SEn extends S {
   @override
   String get groupRuleDisband =>
       'An admin can disband the group. Rides someone has already replied to stay, without a group label.';
+
+  @override
+  String get groupsSection => 'Groups';
+
+  @override
+  String get groupsNew => 'New group';
+
+  @override
+  String get groupsEmptyTitle => 'Do you ride with a regular club?';
+
+  @override
+  String get groupsEmptyHint =>
+      'Create a group. Then you can put out a ride to everyone at once.';
+
+  @override
+  String groupMemberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get groupAdminChip => 'admin';
+
+  @override
+  String get groupRequestPendingShort => 'request pending';
 }

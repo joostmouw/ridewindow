@@ -2206,4 +2206,34 @@ class SNl extends S {
   @override
   String get groupRuleDisband =>
       'Een beheerder kan de groep opheffen. Ritten waarop al iemand geantwoord heeft, blijven staan zonder groepslabel.';
+
+  @override
+  String get groupsSection => 'Groepen';
+
+  @override
+  String get groupsNew => 'Nieuwe groep';
+
+  @override
+  String get groupsEmptyTitle => 'Fiets je met een vaste club?';
+
+  @override
+  String get groupsEmptyHint =>
+      'Maak een groep. Dan zet je een rit in één keer uit voor iedereen.';
+
+  @override
+  String groupMemberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count leden',
+      one: '1 lid',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get groupAdminChip => 'beheerder';
+
+  @override
+  String get groupRequestPendingShort => 'aanvraag loopt';
 }
