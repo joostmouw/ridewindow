@@ -653,5 +653,17 @@
   "groupErrorNotFriend": "You can only propose your own buddies.",
   "groupErrorNotAllowed": "Only a group admin can do this.",
   "groupErrorTooManyRequests": "There are already 30 requests waiting for the admins. Try again later.",
-  "groupErrorGeneric": "That didn't work. Please try again."
+  "groupErrorGeneric": "That didn't work. Please try again.",
+  "groupNameLabel": "Name",
+  "groupCreateTitle": "New group",
+  "groupCreateHint": "Give it a name your club will recognise. You can change it later.",
+  "groupsCreateAction": "Create group",
+  "groupRulesTitle": "How groups work",
+  "groupRuleProposing": "Any member can propose people: with the group link or by proposing a buddy. An admin decides who becomes a member. When an admin proposes someone, they're in straight away.",
+  "groupRuleLimits": "A group has at most 30 members, and you can be in at most 10 groups.",
+  "groupRuleVisibility": "Members see each other's names, who the admins are and each other's replies to group rides. They don't see your schedule, your settings or your email address.",
+  "groupRuleRides": "All current members see a group ride, including people who joined later. Once you leave the group, you no longer see its rides.",
+  "groupRuleLeaving": "You can always leave a group yourself. Coming back takes a new request.",
+  "groupRuleLastAdmin": "If the last admin leaves, the longest-standing member becomes admin. If the last member leaves, the group disappears.",
+  "groupRuleDisband": "An admin can disband the group. Rides someone has already replied to stay, without a group label."
 }

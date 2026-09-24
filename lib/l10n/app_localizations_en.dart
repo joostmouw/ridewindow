@@ -2153,4 +2153,48 @@ class SEn extends S {
 
   @override
   String get groupErrorGeneric => 'That didn\'t work. Please try again.';
+
+  @override
+  String get groupNameLabel => 'Name';
+
+  @override
+  String get groupCreateTitle => 'New group';
+
+  @override
+  String get groupCreateHint =>
+      'Give it a name your club will recognise. You can change it later.';
+
+  @override
+  String get groupsCreateAction => 'Create group';
+
+  @override
+  String get groupRulesTitle => 'How groups work';
+
+  @override
+  String get groupRuleProposing =>
+      'Any member can propose people: with the group link or by proposing a buddy. An admin decides who becomes a member. When an admin proposes someone, they\'re in straight away.';
+
+  @override
+  String get groupRuleLimits =>
+      'A group has at most 30 members, and you can be in at most 10 groups.';
+
+  @override
+  String get groupRuleVisibility =>
+      'Members see each other\'s names, who the admins are and each other\'s replies to group rides. They don\'t see your schedule, your settings or your email address.';
+
+  @override
+  String get groupRuleRides =>
+      'All current members see a group ride, including people who joined later. Once you leave the group, you no longer see its rides.';
+
+  @override
+  String get groupRuleLeaving =>
+      'You can always leave a group yourself. Coming back takes a new request.';
+
+  @override
+  String get groupRuleLastAdmin =>
+      'If the last admin leaves, the longest-standing member becomes admin. If the last member leaves, the group disappears.';
+
+  @override
+  String get groupRuleDisband =>
+      'An admin can disband the group. Rides someone has already replied to stay, without a group label.';
 }

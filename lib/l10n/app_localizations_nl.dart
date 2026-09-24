@@ -2162,4 +2162,48 @@ class SNl extends S {
 
   @override
   String get groupErrorGeneric => 'Dat is niet gelukt. Probeer het opnieuw.';
+
+  @override
+  String get groupNameLabel => 'Naam';
+
+  @override
+  String get groupCreateTitle => 'Nieuwe groep';
+
+  @override
+  String get groupCreateHint =>
+      'Geef hem een naam die je club herkent. Je kunt hem later wijzigen.';
+
+  @override
+  String get groupsCreateAction => 'Groep maken';
+
+  @override
+  String get groupRulesTitle => 'Zo werken groepen';
+
+  @override
+  String get groupRuleProposing =>
+      'Ieder lid kan mensen voordragen: met de groepslink of door een maatje voor te dragen. Een beheerder beslist wie er lid wordt. Draagt een beheerder iemand voor, dan is die meteen lid.';
+
+  @override
+  String get groupRuleLimits =>
+      'Een groep heeft maximaal 30 leden, en je zit in maximaal 10 groepen.';
+
+  @override
+  String get groupRuleVisibility =>
+      'Leden zien elkaars naam, wie beheerder is en elkaars antwoord op groepsritten. Je rooster, je instellingen en je e-mailadres zien ze niet.';
+
+  @override
+  String get groupRuleRides =>
+      'Een groepsrit zien alle huidige leden, ook wie later lid werd. Wie de groep verlaat, ziet de groepsritten niet meer.';
+
+  @override
+  String get groupRuleLeaving =>
+      'Je kunt een groep altijd zelf verlaten. Terugkomen gaat met een nieuwe aanvraag.';
+
+  @override
+  String get groupRuleLastAdmin =>
+      'Vertrekt de laatste beheerder, dan wordt het lid dat er het langst in zit beheerder. Vertrekt het laatste lid, dan verdwijnt de groep.';
+
+  @override
+  String get groupRuleDisband =>
+      'Een beheerder kan de groep opheffen. Ritten waarop al iemand geantwoord heeft, blijven staan zonder groepslabel.';
 }

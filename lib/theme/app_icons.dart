@@ -32,6 +32,8 @@ abstract final class AppIcons {
       IconData(0xe5de, fontFamily: 'Phosphor');
   static const IconData arrowsClockwise =
       IconData(0xe094, fontFamily: 'Phosphor');
+  static const IconData arrowsCounterClockwise =
+      IconData(0xe096, fontFamily: 'Phosphor');
   static const IconData barbell = IconData(0xe0b6, fontFamily: 'Phosphor');
   static const IconData bell = IconData(0xe0ce, fontFamily: 'Phosphor');
   static const IconData bicycle = IconData(0xe0d6, fontFamily: 'Phosphor');
@@ -56,6 +58,9 @@ abstract final class AppIcons {
   static const IconData cloudSun = IconData(0xe540, fontFamily: 'Phosphor');
   static const IconData copy = IconData(0xe1ca, fontFamily: 'Phosphor');
   static const IconData crosshair = IconData(0xe1d6, fontFamily: 'Phosphor');
+  static const IconData crown = IconData(0xe614, fontFamily: 'Phosphor');
+  static const IconData dotsThreeVertical =
+      IconData(0xe208, fontFamily: 'Phosphor');
   static const IconData drop = IconData(0xe210, fontFamily: 'Phosphor');
   static const IconData export = IconData(0xeaf0, fontFamily: 'Phosphor');
   static const IconData flag = IconData(0xe244, fontFamily: 'Phosphor');
@@ -66,6 +71,7 @@ abstract final class AppIcons {
   static const IconData house = IconData(0xe2c2, fontFamily: 'Phosphor');
   static const IconData info = IconData(0xe2ce, fontFamily: 'Phosphor');
   static const IconData linkBreak = IconData(0xe2e4, fontFamily: 'Phosphor');
+  static const IconData linkSimple = IconData(0xe2e6, fontFamily: 'Phosphor');
   static const IconData lock = IconData(0xe2fa, fontFamily: 'Phosphor');
   static const IconData mapPin = IconData(0xe316, fontFamily: 'Phosphor');
   /// De kale toeter van de roeicoach -- "jij organiseert" (schets 014). Bewust
@@ -80,6 +86,7 @@ abstract final class AppIcons {
       IconData(0xeade, fontFamily: 'Phosphor');
   static const IconData paperPlaneTilt =
       IconData(0xe398, fontFamily: 'Phosphor');
+  static const IconData pencilSimple = IconData(0xe3b4, fontFamily: 'Phosphor');
   static const IconData personSimpleBike =
       IconData(0xe734, fontFamily: 'Phosphor');
   static const IconData plus = IconData(0xe3d4, fontFamily: 'Phosphor');
@@ -87,6 +94,7 @@ abstract final class AppIcons {
   static const IconData prohibit = IconData(0xe3de, fontFamily: 'Phosphor');
   static const IconData shareNetwork = IconData(0xe408, fontFamily: 'Phosphor');
   static const IconData signIn = IconData(0xe428, fontFamily: 'Phosphor');
+  static const IconData signOut = IconData(0xe42a, fontFamily: 'Phosphor');
   static const IconData slidersHorizontal =
       IconData(0xe434, fontFamily: 'Phosphor');
   static const IconData star = IconData(0xe46a, fontFamily: 'Phosphor');

@@ -20,19 +20,42 @@ import 'package:flutter/material.dart';
 
 import 'package:ridewindow/theme/app_shapes.dart';
 
+/// Een sectie met een kop in hoofdletters boven een kaart.
+///
+/// [action] staat rechts in de kopregel (sinds fase 34: de info-knop en
+/// "+ Nieuwe groep" bij Groepen). Zonder action is de kop precies wat hij was;
+/// bestaande schermen veranderen dus niet.
 class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
     required this.title,
     required this.children,
+    this.action,
   });
 
   final String title;
   final List<Widget> children;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+
+    final heading = Text(
+      // De kop wordt hier gekapitaliseerd, niet in de vertaling. Acht
+      // van de negen `section*`-strings stonden al in kapitalen in de
+      // `.arb` en `sectionAccount` niet -- die viel er zichtbaar uit
+      // zodra de secties kaarten werden. Kapitalisatie is een
+      // presentatiekeuze en hoort dus hier; op een string die al
+      // schreeuwt verandert dit niets, dus de vertalingen konden met
+      // rust blijven.
+      title.toUpperCase(),
+      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: cs.primary,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.6,
+          ),
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
@@ -45,21 +68,14 @@ class SectionCard extends StatelessWidget {
           // met rust.
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-            child: Text(
-              // De kop wordt hier gekapitaliseerd, niet in de vertaling. Acht
-              // van de negen `section*`-strings stonden al in kapitalen in de
-              // `.arb` en `sectionAccount` niet -- die viel er zichtbaar uit
-              // zodra de secties kaarten werden. Kapitalisatie is een
-              // presentatiekeuze en hoort dus hier; op een string die al
-              // schreeuwt verandert dit niets, dus de vertalingen konden met
-              // rust blijven.
-              title.toUpperCase(),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: cs.primary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.6,
+            child: action == null
+                ? heading
+                : Row(
+                    children: [
+                      Expanded(child: heading),
+                      action!,
+                    ],
                   ),
-            ),
           ),
           _CardSurface(children: children),
         ],

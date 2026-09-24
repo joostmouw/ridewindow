@@ -45,8 +45,11 @@ class _Opener extends StatelessWidget {
       );
 }
 
-Future<void> _open(WidgetTester tester, {String? initialName,
-    required void Function(String?) onResult}) async {
+Future<void> _open(
+  WidgetTester tester, {
+  String? initialName,
+  required void Function(String?) onResult,
+}) async {
   await tester.pumpWidget(
     _app(_Opener(onResult: onResult, initialName: initialName)),
   );
@@ -111,12 +114,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Zo werken groepen'), findsOneWidget);
-      expect(find.byKey(const ValueKey('group-rule')), findsNWidgets(7));
+      final rules = find.byWidgetPredicate(
+        (w) =>
+            w.key is ValueKey<String> &&
+            (w.key! as ValueKey<String>).value.startsWith('group-rule-'),
+      );
+      expect(rules, findsNWidgets(7));
       final all = tester
-          .widgetList<Text>(find.descendant(
-            of: find.byKey(const ValueKey('group-rule')),
-            matching: find.byType(Text),
-          ))
+          .widgetList<Text>(
+            find.descendant(of: rules, matching: find.byType(Text)),
+          )
           .map((t) => t.data ?? '')
           .join(' ');
       expect(all, contains('30'));

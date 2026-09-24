@@ -3798,6 +3798,78 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'Dat is niet gelukt. Probeer het opnieuw.'**
   String get groupErrorGeneric;
+
+  /// No description provided for @groupNameLabel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Naam'**
+  String get groupNameLabel;
+
+  /// No description provided for @groupCreateTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nieuwe groep'**
+  String get groupCreateTitle;
+
+  /// No description provided for @groupCreateHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geef hem een naam die je club herkent. Je kunt hem later wijzigen.'**
+  String get groupCreateHint;
+
+  /// No description provided for @groupsCreateAction.
+  ///
+  /// In nl, this message translates to:
+  /// **'Groep maken'**
+  String get groupsCreateAction;
+
+  /// No description provided for @groupRulesTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zo werken groepen'**
+  String get groupRulesTitle;
+
+  /// No description provided for @groupRuleProposing.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ieder lid kan mensen voordragen: met de groepslink of door een maatje voor te dragen. Een beheerder beslist wie er lid wordt. Draagt een beheerder iemand voor, dan is die meteen lid.'**
+  String get groupRuleProposing;
+
+  /// No description provided for @groupRuleLimits.
+  ///
+  /// In nl, this message translates to:
+  /// **'Een groep heeft maximaal 30 leden, en je zit in maximaal 10 groepen.'**
+  String get groupRuleLimits;
+
+  /// No description provided for @groupRuleVisibility.
+  ///
+  /// In nl, this message translates to:
+  /// **'Leden zien elkaars naam, wie beheerder is en elkaars antwoord op groepsritten. Je rooster, je instellingen en je e-mailadres zien ze niet.'**
+  String get groupRuleVisibility;
+
+  /// No description provided for @groupRuleRides.
+  ///
+  /// In nl, this message translates to:
+  /// **'Een groepsrit zien alle huidige leden, ook wie later lid werd. Wie de groep verlaat, ziet de groepsritten niet meer.'**
+  String get groupRuleRides;
+
+  /// No description provided for @groupRuleLeaving.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je kunt een groep altijd zelf verlaten. Terugkomen gaat met een nieuwe aanvraag.'**
+  String get groupRuleLeaving;
+
+  /// No description provided for @groupRuleLastAdmin.
+  ///
+  /// In nl, this message translates to:
+  /// **'Vertrekt de laatste beheerder, dan wordt het lid dat er het langst in zit beheerder. Vertrekt het laatste lid, dan verdwijnt de groep.'**
+  String get groupRuleLastAdmin;
+
+  /// No description provided for @groupRuleDisband.
+  ///
+  /// In nl, this message translates to:
+  /// **'Een beheerder kan de groep opheffen. Ritten waarop al iemand geantwoord heeft, blijven staan zonder groepslabel.'**
+  String get groupRuleDisband;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
