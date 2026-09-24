@@ -2544,4 +2544,9 @@ class SEn extends S {
     );
     return '$_temp0';
   }
+
+  @override
+  String groupFilterEmpty(String group) {
+    return 'No rides from $group yet';
+  }
 }

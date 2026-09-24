@@ -4380,6 +4380,12 @@ abstract class S {
   /// In nl, this message translates to:
   /// **'{count, plural, =1{1 wacht op je antwoord} other{{count} wachten op je antwoord}}'**
   String navRidesUnanswered(int count);
+
+  /// Lege lijst op de Ritten-tab als op een groep gefilterd is die nog geen ritten heeft.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nog geen ritten van {group}'**
+  String groupFilterEmpty(String group);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

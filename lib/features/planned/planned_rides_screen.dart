@@ -13,12 +13,14 @@ import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
+import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/peloton/buddies_tab.dart';
+import 'package:ridewindow/features/peloton/group_crest.dart';
 import 'package:ridewindow/features/peloton/ride_response.dart';
 import 'package:ridewindow/features/shared/daylight_note.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
@@ -281,6 +283,10 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
   /// `null` = alles. Geen aparte enum: "alles" is de afwezigheid van een rol.
   RideRole? _filter;
 
+  /// Groeps-id waarop de lijst gefilterd staat; `null` = alle ritten
+  /// (CLUB-26). Staat los van [_filter]: de rolchips tellen binnen de groep.
+  String? _groupFilter;
+
   bool _busy = false;
 
   @override
@@ -489,13 +495,16 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
     final s = S.of(context);
     final theme = Theme.of(context);
 
-    final entries = ref.watch(rideEntriesProvider);
+    final allEntries = ref.watch(rideEntriesProvider);
+    // Een falende groepenlijst betekent geen chips, niet een fout: de ritten
+    // zelf komen er niet van af (zelfde regel als in rideEntriesProvider).
+    final groups = ref.watch(myGroupsProvider).value ?? const <PelotonGroup>[];
     final allScores = ref.watch(allHourlyScoresProvider);
     final forecasts = ref.watch(weatherProvider).value ?? <HourlyForecast>[];
     final location = ref.watch(locationProvider).value;
     final cityName = location?.city ?? '';
 
-    if (entries.isEmpty) {
+    if (allEntries.isEmpty) {
       return _EmptyState(
         icon: AppIcons.bicycle,
         title: s.ridesEmpty,
@@ -503,6 +512,18 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
         theme: theme,
       );
     }
+
+    // Verliet je de groep waarop gefilterd stond, dan valt het filter terug op
+    // alles in plaats van op een lijst die nooit meer iets toont.
+    PelotonGroup? group;
+    for (final g in groups) {
+      if (g.id == _groupFilter) group = g;
+    }
+    // Eerst op groep, dan pas tellen: zo zeggen de rolchips hoeveel ritten er
+    // binnen de gekozen groep in die rol staan.
+    final entries = group == null
+        ? allEntries
+        : allEntries.where((e) => e.group?.groupId == group!.id).toList();
 
     // Afgezegde ritten horen niet in de gewone lijst: wie nee zegt, wil er niet
     // aan herinnerd worden. Ze blijven wel te vinden via hun eigen filter --
@@ -527,6 +548,12 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
 
     return Column(
       children: [
+        if (groups.isNotEmpty)
+          _GroupFilterRow(
+            groups: groups,
+            selected: group?.id,
+            onSelect: (id) => setState(() => _groupFilter = id),
+          ),
         _FilterRow(
           total: actief.length,
           counts: counts,
@@ -534,24 +561,119 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
           selected: filter,
           onSelect: (role) => setState(() => _filter = role),
         ),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.only(top: 4, bottom: 12),
-            itemCount: shown.length,
-            itemBuilder: (context, i) => RideCard(
-              key: i == 0 ? widget.firstRideKey : null,
-              entry: shown[i],
-              host: this,
-              units: ref.watch(unitsProvider),
-              myUserId: ref.watch(currentUserIdProvider),
-              allScores: allScores,
-              forecasts: forecasts,
-              cityName: cityName,
-              location: location,
+        if (group != null && shown.isEmpty)
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  s.groupFilterEmpty(group.name),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          )
+        else
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 4, bottom: 12),
+              itemCount: shown.length,
+              itemBuilder: (context, i) => RideCard(
+                key: i == 0 ? widget.firstRideKey : null,
+                entry: shown[i],
+                host: this,
+                units: ref.watch(unitsProvider),
+                myUserId: ref.watch(currentUserIdProvider),
+                allScores: allScores,
+                forecasts: forecasts,
+                cityName: cityName,
+                location: location,
+              ),
             ),
           ),
-        ),
       ],
+    );
+  }
+}
+
+/// De groepschips boven de rittenlijst (CLUB-26, schets 015 variant C):
+/// "Alles" en per groep het kenteken met de naam.
+///
+/// Alleen wie in minstens een groep zit, ziet deze rij; de aanroeper laat hem
+/// anders weg. Horizontaal scrollend in plaats van een Wrap: met drie groepen
+/// en grote tekst zou een Wrap twee of drie regels boven de lijst kosten.
+///
+/// **Lang indrukken opent het groepsscherm.** Geen `Tooltip` eromheen: die
+/// luistert zelf naar lang indrukken en zou met de navigatie om hetzelfde
+/// gebaar strijden. De hint staat daarom in de Semantics (`onLongPressHint`),
+/// zodat een schermlezer hem voorleest.
+class _GroupFilterRow extends StatelessWidget {
+  const _GroupFilterRow({
+    required this.groups,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  final List<PelotonGroup> groups;
+  final String? selected;
+  final ValueChanged<String?> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    // Een chip is 48 hoog (tiktarget); met grote tekst groeit het label mee,
+    // en dan moet de rij meegroeien in plaats van de chip af te kappen.
+    final height = math.max(
+      48.0,
+      MediaQuery.textScalerOf(context).scale(20) + 28,
+    );
+
+    // Een scrollende Row en geen ListView: hooguit elf chips (tien groepen
+    // plus Alles), en zo bestaan ze allemaal, ook voor een schermlezer die
+    // de rij afloopt.
+    return SizedBox(
+      height: height,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            ChoiceChip(
+              label: Text(s.ridesFilterAll),
+              selected: selected == null,
+              onSelected: (_) => onSelect(null),
+            ),
+            for (final g in groups) ...[
+              const SizedBox(width: 8),
+              Semantics(
+                onLongPressHint: s.groupRideOpenGroup,
+                child: GestureDetector(
+                  onLongPress: () => context.push('/peloton/group/${g.id}'),
+                  child: ChoiceChip(
+                    avatar: GroupCrest(name: g.name, size: 24),
+                    label: ConstrainedBox(
+                      // 120 en niet meer: met het kenteken en de chipmarge die
+                      // met de tekst meegroeit blijft de chip zo rond 180 dp
+                      // bij tekstschaal 1.3, en past de volgende nog half.
+                      constraints: const BoxConstraints(maxWidth: 120),
+                      child: Text(
+                        g.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    selected: selected == g.id,
+                    onSelected: (on) => onSelect(on ? g.id : null),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
@@ -594,8 +716,10 @@ class _FilterRow extends StatelessWidget {
     // dat scheelt een regel ruis boven de lijst.
     if (roles.length < 2) return const SizedBox.shrink();
 
+    // 46 hoog bij gewone tekst; met grote tekst groeit de rij mee met het
+    // label, anders liep hij bij tekstschaal 2.0 acht pixels over.
     return SizedBox(
-      height: 46,
+      height: math.max(46.0, MediaQuery.textScalerOf(context).scale(20) + 26),
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),

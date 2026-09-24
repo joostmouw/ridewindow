@@ -2553,4 +2553,9 @@ class SNl extends S {
     );
     return '$_temp0';
   }
+
+  @override
+  String groupFilterEmpty(String group) {
+    return 'Nog geen ritten van $group';
+  }
 }

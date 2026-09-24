@@ -86,7 +86,12 @@ DateTime _day(int offset, int hour) {
   return DateTime(d.year, d.month, d.day, hour);
 }
 
-GroupRide _ride(String id, String groupId, int dayOffset, {bool mine = false}) =>
+GroupRide _ride(
+  String id,
+  String groupId,
+  int dayOffset, {
+  bool mine = false,
+}) =>
     FakeGroupGateway.groupRide(
       id,
       ownerId: mine ? _me : _anna,
@@ -103,6 +108,7 @@ Future<FakeGroupGateway> _pump(
   List<GroupRide>? rides,
   double scale = 1.0,
   Brightness brightness = Brightness.light,
+  bool failGroups = false,
 }) async {
   SharedPreferences.setMockInitialValues({});
   tester.view.physicalSize = const Size(360 * 3, 800 * 3);
@@ -110,6 +116,7 @@ Future<FakeGroupGateway> _pump(
   addTearDown(tester.view.reset);
 
   final fake = FakeGroupGateway();
+  if (failGroups) fake.failWith['listGroups'] = GroupError.notAllowed;
   fake.groups.addAll(
     groups ??
         {
@@ -206,6 +213,15 @@ List<String> _shownRides(WidgetTester tester) => [
         c.entry.group?.id ?? 'solo',
     ];
 
+/// Scrolt de chip eerst in beeld: op 360 dp staat de laatste chip half
+/// buiten de rij, en daar hoort de rij juist te scrollen.
+Future<void> _tapChip(WidgetTester tester, String label) async {
+  await tester.ensureVisible(_chip(label));
+  await tester.pumpAndSettle();
+  await tester.tap(_chip(label));
+  await tester.pumpAndSettle();
+}
+
 bool _chipSelected(WidgetTester tester, String label) =>
     tester.widget<ChoiceChip>(_chip(label)).selected;
 
@@ -232,14 +248,7 @@ void main() {
 
   testWidgets('zonder groepen door een fout ook geen groepschips',
       (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final fake = await _pump(tester, rides: const []);
-    fake.failWith['listGroups'] = GroupError.notAllowed;
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(RidesTab)),
-    );
-    container.invalidate(visibleGroupsProvider);
-    await tester.pumpAndSettle();
+    await _pump(tester, rides: const [], failGroups: true);
 
     expect(_chips(), findsNothing);
     expect(_shownRides(tester), ['solo']);
@@ -268,15 +277,13 @@ void main() {
       (tester) async {
     await _pump(tester);
 
-    await tester.tap(_chip('On the Roll'));
-    await tester.pumpAndSettle();
+    await _tapChip(tester, 'On the Roll');
 
     expect(_chipSelected(tester, 'On the Roll'), isTrue);
     expect(_chipSelected(tester, 'Alles'), isFalse);
     expect(_shownRides(tester), ['r-roll-anna', 'r-roll-mine']);
 
-    await tester.tap(_chip('Alles'));
-    await tester.pumpAndSettle();
+    await _tapChip(tester, 'Alles');
     expect(
       _shownRides(tester),
       ['r-dinsdag', 'r-roll-anna', 'r-roll-mine', 'solo'],
@@ -290,8 +297,7 @@ void main() {
     expect(find.text('Wacht op jou'), findsOneWidget);
     expect(find.text('4'), findsOneWidget);
 
-    await tester.tap(_chip('On the Roll'));
-    await tester.pumpAndSettle();
+    await _tapChip(tester, 'On the Roll');
 
     // Binnen On the Roll: 2 in totaal, 1 wacht, 1 organiseer je.
     expect(find.text('4'), findsNothing);
@@ -304,8 +310,7 @@ void main() {
   testWidgets('een verdwenen groep valt terug op Alles', (tester) async {
     final fake = await _pump(tester);
 
-    await tester.tap(_chip('On the Roll'));
-    await tester.pumpAndSettle();
+    await _tapChip(tester, 'On the Roll');
     expect(_shownRides(tester), ['r-roll-anna', 'r-roll-mine']);
 
     // Je verlaat On the Roll: de groep en zijn ritten zijn weg.
@@ -333,8 +338,7 @@ void main() {
       rides: [_ride('r-dinsdag', 'g1', 1)],
     );
 
-    await tester.tap(_chip('On the Roll'));
-    await tester.pumpAndSettle();
+    await _tapChip(tester, 'On the Roll');
 
     expect(_shownRides(tester), isEmpty);
     expect(find.text('Nog geen ritten van On the Roll'), findsOneWidget);
@@ -346,6 +350,8 @@ void main() {
       (tester) async {
     await _pump(tester);
 
+    await tester.ensureVisible(_chip('On the Roll'));
+    await tester.pumpAndSettle();
     await tester.longPress(_chip('On the Roll'));
     await tester.pumpAndSettle();
 
@@ -369,20 +375,24 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(_chips(), findsNWidgets(4));
 
-      // De rij is een horizontale lijst, geen Wrap.
-      final list = find.ancestor(
+      // De rij scrollt horizontaal, geen Wrap: de laatste chip is te bereiken.
+      final row = find.ancestor(
         of: _chip('Dinsdagclub'),
-        matching: find.byType(ListView),
+        matching: find.byType(Scrollable),
       );
       expect(
-        tester.widget<ListView>(list.first).scrollDirection,
-        Axis.horizontal,
+        tester.widget<Scrollable>(row.first).axisDirection,
+        AxisDirection.right,
       );
+      await tester.ensureVisible(_chip(_longName));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(_chip(_longName)).right, lessThanOrEqualTo(360));
 
-      // Elke chip hooguit ~180 dp: de lange naam krijgt een ellips.
+      // Elke chip hooguit ~180 dp (bij 2.0 iets meer, de chipmarge groeit mee):
+      // de lange naam krijgt een ellips.
       for (final e in _chips().evaluate()) {
         final box = e.renderObject! as RenderBox;
-        expect(box.size.width, lessThanOrEqualTo(200));
+        expect(box.size.width, lessThanOrEqualTo(scale < 2 ? 180 : 190));
       }
       final longText = tester.widget<Text>(find.text(_longName));
       expect(longText.maxLines, 1);
@@ -394,8 +404,7 @@ void main() {
     testWidgets('gekozen chip in de M3-standaardkleur (${brightness.name})',
         (tester) async {
       await _pump(tester, brightness: brightness);
-      await tester.tap(_chip('Dinsdagclub'));
-      await tester.pumpAndSettle();
+      await _tapChip(tester, 'Dinsdagclub');
 
       final chip = tester.widget<ChoiceChip>(_chip('Dinsdagclub'));
       // Geen eigen kleuren: dan geldt secondaryContainer uit het thema.

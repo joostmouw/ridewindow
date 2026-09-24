@@ -160,6 +160,11 @@ Future<void> _pumpAt360(
   await tester.pump();
 }
 
+/// Tekst op een ritkaart. Sinds 35-05 staat de groepsnaam ook als chip boven
+/// de lijst (CLUB-26); deze tests gaan over de kaart.
+Finder _onCard(String text) =>
+    find.descendant(of: find.byType(RideCard), matching: find.text(text));
+
 void main() {
   group('RideRoleLine met groepsnaam', () {
     testWidgets('groepsnaam vooraan, dan de rolzin, op één regel',
@@ -376,7 +381,7 @@ void main() {
       // Eén keer in de lijst, met de nieuwe rol en de groepsnaam.
       expect(find.byType(RideCard), findsOneWidget);
       expect(find.text('Je gaat mee met Anna'), findsOneWidget);
-      expect(find.text(_shortName), findsOneWidget);
+      expect(_onCard(_shortName), findsOneWidget);
       expect(find.widgetWithText(FilledButton, 'Ik ga mee'), findsNothing);
     });
 
@@ -388,12 +393,12 @@ void main() {
 
       expect(_responses(fake), ['respondToGroupRide:gr1:false']);
       // Uit de gewone lijst: alleen de eigen rit staat er nog.
-      expect(find.text(_shortName), findsNothing);
+      expect(_onCard(_shortName), findsNothing);
       expect(find.byType(RideCard), findsOneWidget);
 
       await tester.tap(find.text('Afgezegd'));
       await tester.pumpAndSettle();
-      expect(find.text(_shortName), findsOneWidget);
+      expect(_onCard(_shortName), findsOneWidget);
       expect(find.text('Je zei nee tegen Anna'), findsOneWidget);
     });
 
@@ -469,7 +474,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Anna vraagt of je meegaat'), findsNothing);
-      expect(find.text(_shortName), findsNothing);
+      expect(_onCard(_shortName), findsNothing);
     });
   });
 }
