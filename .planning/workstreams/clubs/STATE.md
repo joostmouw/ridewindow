@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 4
+current_plan: 5
 status: executing
-stopped_at: 35-03 klaar (groepsnaam op kaart), volgende 35-04
-last_updated: "2026-09-24T10:00:00.000Z"
-last_activity: 2026-09-24 -- 35-03 groepsnaam op kaart klaar
+stopped_at: 35-04 klaar (wie komt op detail), volgende 35-05
+last_updated: "2026-09-24T12:00:00.000Z"
+last_activity: 2026-09-24 -- 35-04 wie komt op het ritdetail klaar
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 17
-  completed_plans: 14
+  completed_plans: 15
   percent: 50
 ---
 
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 35
-Plan: 4 of 6
-Status: 35-03 klaar, volgende 35-04
-Last activity: 2026-09-24 -- 35-03 groepsnaam op kaart klaar
+Plan: 5 of 6
+Status: 35-04 klaar, volgende 35-05
+Last activity: 2026-09-24 -- 35-04 wie komt op het ritdetail klaar
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 35-04
+**Current Plan:** 35-05
 
 ## Decisions
 
@@ -59,6 +59,9 @@ Last activity: 2026-09-24 -- 35-03 groepsnaam op kaart klaar
 - 35-02: groepenfout bij openen = oud scherm, geen melding
 - 35-03: groepsnaam hooguit 45% van de rolregel, zonder Flexible
 - 35-03: antwoordknoppen op de ritkaart in een Wrap, rechts
+- 35-04: detail zoekt eerst op rit-id, anders op tijdvak
+- 35-04: ledenlijst uit de groep, ex-leden niet getoond
+- 35-04: naam en status in een Wrap, knoppen in een Wrap
 
 ## Performance Metrics
 
@@ -75,8 +78,9 @@ Last activity: 2026-09-24 -- 35-03 groepsnaam op kaart klaar
 | 35-01 | 25min | 2 | 11 |
 | 35-02 | 15min | 2 | 9 |
 | 35-03 | 35min | 2 | 4 |
+| 35-04 | 30min | 2 | 11 |
 
 ## Session Continuity
 
-**Stopped At:** 35-03 klaar (groepsnaam op kaart), volgende 35-04
+**Stopped At:** 35-04 klaar (wie komt op detail), volgende 35-05
 **Resume File:** None
