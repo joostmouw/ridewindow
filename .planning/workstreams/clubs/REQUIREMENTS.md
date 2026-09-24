@@ -10,17 +10,17 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 
 ### Groep en lidmaatschap (CLUB-01 … 06)
 
-- [ ] **CLUB-01**: Een ingelogde gebruiker kan een groep aanmaken met een naam, en is daarmee lid én beheerder
+- [x] **CLUB-01**: Een ingelogde gebruiker kan een groep aanmaken met een naam, en is daarmee lid én beheerder
 - [ ] **CLUB-02**: Ieder lid kan de groepslink delen (tekst + link via het deelmenu); wie de link opent en inlogt, dient daarmee een **aanvraag** in en ziet "wacht op goedkeuring" tot een beheerder beslist *(herzien 2026-09-23: was "een beheerder deelt, wie opent wordt lid")*
 - [ ] **CLUB-03**: Ieder lid kan een bestaand maatje **voordragen**; een beheerder die een maatje voordraagt, maakt hem direct lid *(herzien 2026-09-23: was "een beheerder voegt direct toe")*
-- [ ] **CLUB-04**: Ieder lid ziet de groepen waar hij in zit op de Peloton-tab, met naam en aantal leden
-- [ ] **CLUB-05**: Ieder lid ziet de ledenlijst van de groep, met naam en wie beheerder is — en niets anders van een ander lid (geen e-mail, instellingen of rooster)
+- [x] **CLUB-04**: Ieder lid ziet de groepen waar hij in zit op de Peloton-tab, met naam en aantal leden
+- [x] **CLUB-05**: Ieder lid ziet de ledenlijst van de groep, met naam en wie beheerder is — en niets anders van een ander lid (geen e-mail, instellingen of rooster)
 - [ ] **CLUB-06**: Een lid kan de groep zelf verlaten
 
 ### Beheer (CLUB-07 … 11, 27, 28)
 
 - [ ] **CLUB-27**: Een beheerder ziet de openstaande aanvragen van zijn groep (via link of voorgedragen, met wie voordroeg) en kan elke aanvraag **accepteren** (wordt lid, binnen de grens van 30) of **afwijzen**; een gewoon lid kan niemand zelf lid maken — afgedwongen in de database, bewezen met deny-tests (besluit Joost 2026-09-23)
-- [ ] **CLUB-28**: Bij de groepen staat een info-knop, zoals de bestaande info-knoppen in de app, die de regels van een groep uitlegt: wie mag voordragen en wie accepteert, maximaal 30 leden per groep en 10 groepen per persoon, wat leden van elkaar zien, wie groepsritten ziet, wat er gebeurt bij verlaten en bij de laatste beheerder, en opheffen (besluit Joost 2026-09-23)
+- [x] **CLUB-28**: Bij de groepen staat een info-knop, zoals de bestaande info-knoppen in de app, die de regels van een groep uitlegt: wie mag voordragen en wie accepteert, maximaal 30 leden per groep en 10 groepen per persoon, wat leden van elkaar zien, wie groepsritten ziet, wat er gebeurt bij verlaten en bij de laatste beheerder, en opheffen (besluit Joost 2026-09-23)
 - [ ] **CLUB-07**: Een beheerder kan een ander lid beheerder maken, en een beheerder die rol weer afnemen
 - [ ] **CLUB-08**: Een beheerder kan een lid uit de groep halen
 - [ ] **CLUB-09**: Een beheerder kan de groepsnaam wijzigen, en de groepslink intrekken en vervangen door een nieuwe
@@ -72,11 +72,11 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLUB-01 | Phase 34 | Pending |
+| CLUB-01 | Phase 34 | Complete |
 | CLUB-02 | Phase 34 | Pending |
 | CLUB-03 | Phase 34 | Pending |
-| CLUB-04 | Phase 34 | Pending |
-| CLUB-05 | Phase 34 | Pending |
+| CLUB-04 | Phase 34 | Complete |
+| CLUB-05 | Phase 34 | Complete |
 | CLUB-06 | Phase 34 | Pending |
 | CLUB-07 | Phase 34 | Pending |
 | CLUB-08 | Phase 34 | Pending |
@@ -99,4 +99,4 @@ Groepen zijn, net als de rest van Peloton, alleen voor ingelogde gebruikers. Uit
 | CLUB-25 | Phase 35 | Pending |
 | CLUB-26 | Phase 35 | Pending |
 | CLUB-27 | Phase 34 | Pending |
-| CLUB-28 | Phase 34 | Pending |
+| CLUB-28 | Phase 34 | Complete |

@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v4.2
 milestone_name: Clubs
-current_plan: 34-03
+current_plan: 34-05
 status: executing
-stopped_at: 34-03 klaar (datalaag groepen, 776 tests), volgende 34-04
-last_updated: "2026-09-23T21:00:00.000Z"
-last_activity: 2026-09-23 -- 34-03 datalaag groepen en aanvragen
+stopped_at: 34-04 klaar (groepen-UI leesstand, 798 tests), volgende 34-05
+last_updated: "2026-09-24T12:00:00.000Z"
+last_activity: 2026-09-24 -- 34-04 groepen op Peloton en groepsscherm
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 11
-  completed_plans: 6
-  percent: 55
+  completed_plans: 7
+  percent: 64
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 ## Current Position
 
 Phase: 34
-Plan: 4 of 8
-Status: datalaag groepen staat; volgende 34-04 UI
-Last activity: 2026-09-23 -- 34-03 datalaag groepen en aanvragen
+Plan: 5 of 8
+Status: groepen zichtbaar, scherm leest; volgende 34-05 beheer
+Last activity: 2026-09-24 -- 34-04 groepen op Peloton en groepsscherm
 
 ## Progress
 
 **Phases Complete:** 1/4
-**Current Plan:** 34-04
+**Current Plan:** 34-05
 
 ## Decisions
 
@@ -42,6 +42,8 @@ Last activity: 2026-09-23 -- 34-03 datalaag groepen en aanvragen
 - 34-03: groupInitials op runes, geen package:characters (alleen transitief)
 - 34-03: groepslink hergebruiken als hij nog 7 dagen geldig is, anders nieuw voor 30 dagen
 - 34-03: onbekende databasefout gaat door (_guard rethrow); UI toont groupErrorGeneric
+- 34-04: 10-groepengrens al in de UI vóór de sheet; database toetst daarna nog
+- 34-04: GroupAdminChip gedeeld in group_crest.dart; scherm sorteert leden niet opnieuw
 
 ## Performance Metrics
 
@@ -51,8 +53,9 @@ Last activity: 2026-09-23 -- 34-03 datalaag groepen en aanvragen
 | 33-02 | 25min | 2 | 1 |
 | 34-01 | 15min | 2 | 4 |
 | 34-03 | 25min | 3 | 15 |
+| 34-04 | 35min | 3 | 17 |
 
 ## Session Continuity
 
-**Stopped At:** 34-03 klaar (datalaag groepen), volgende 34-04
+**Stopped At:** 34-04 klaar (groepen-UI leesstand), volgende 34-05
 **Resume File:** None
