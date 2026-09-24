@@ -1,0 +1,281 @@
+<title>Groepsritten schets</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --brand-light:#C5D4B6; --brand-dark:#234934;
+  --paper:#FCFDF8; --paper-low:#F4F7EC; --paper-mid:#EDF1E2; --paper-high:#E4EAD7; --paper-top:#DAE2CC;
+  --ink:#1A2A20; --ink-2:#3A4A40; --ink-3:#4C5C52;
+  --outline:#A9B79C; --outline-strong:#6B7663;
+  --perfect-fg:#1B5E20; --perfect-bg:#E8F5E9;
+  --organiser:#7B4B12; --joined:#1565C0; --pending:#A42E0A; --error:#B3261E; --error-bg:#FCE8E6;
+  --shadow:rgba(35,73,52,.14); --scrim:rgba(20,30,24,.45);
+  --page:#E9EEE0;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --brand-light:#2C3B30; --brand-dark:#C5D4B6;
+    --paper:#1E1E1E; --paper-low:#141414; --paper-mid:#2A2A2A; --paper-high:#333; --paper-top:#3A3A3A;
+    --ink:#E3E6E0; --ink-2:#BDC3BA; --ink-3:#9AA39A;
+    --outline:#444; --outline-strong:#666;
+    --perfect-fg:#66BB6A; --perfect-bg:#1E3320;
+    --organiser:#D9A264; --joined:#42A5F5; --pending:#F0865C; --error:#F2B8B5; --error-bg:#3A1F1D;
+    --shadow:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.6); --page:#0E0F0E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --brand-light:#2C3B30; --brand-dark:#C5D4B6;
+  --paper:#1E1E1E; --paper-low:#141414; --paper-mid:#2A2A2A; --paper-high:#333; --paper-top:#3A3A3A;
+  --ink:#E3E6E0; --ink-2:#BDC3BA; --ink-3:#9AA39A;
+  --outline:#444; --outline-strong:#666;
+  --perfect-fg:#66BB6A; --perfect-bg:#1E3320;
+  --organiser:#D9A264; --joined:#42A5F5; --pending:#F0865C; --error:#F2B8B5; --error-bg:#3A1F1D;
+  --shadow:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.6); --page:#0E0F0E;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:'Outfit',system-ui,-apple-system,sans-serif;
+     -webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:28px 80px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:30px;font-weight:500;margin:0 0 8px;text-wrap:balance}
+h2{font-size:22px;font-weight:500;margin:0 0 6px;text-wrap:balance}
+.lede{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:72ch;margin:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+section.q{margin-top:44px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px}
+.bar button{font-family:inherit;font-size:14px;font-weight:500;padding:9px 16px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--outline);background:transparent;color:var(--ink-2)}
+.bar button[aria-pressed="true"]{background:var(--brand-dark);color:var(--paper-low);border-color:var(--brand-dark)}
+.bar button:focus-visible{outline:2px solid var(--joined);outline-offset:2px}
+.note{font-size:15px;line-height:1.55;color:var(--ink-2);max-width:74ch;margin:6px 0 20px;min-height:48px}
+.note b{color:var(--ink);font-weight:600}
+.stage{display:none}.stage.on{display:block}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:13px;color:var(--ink-3);margin:10px 4px 0;max-width:340px;line-height:1.45}
+
+/* telefoon */
+.phone{width:340px;max-width:100%;height:680px;background:var(--paper-low);border-radius:34px;overflow:hidden;
+  box-shadow:0 10px 40px var(--shadow),0 0 0 8px var(--ink);position:relative;display:flex;flex-direction:column;flex:none}
+.status{height:26px;flex:none}
+.appbar{padding:6px 16px 0;display:flex;align-items:center;gap:10px;flex:none}
+.appbar .t{font-size:22px;font-weight:500;flex:1}
+.ic{width:22px;height:22px;display:inline-block;flex:none}
+.ic svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs{display:flex;border-bottom:1px solid var(--outline);margin-top:8px;flex:none}
+.tabs div{flex:1;text-align:center;font-size:14px;font-weight:500;padding:12px 0 10px;color:var(--ink-3);position:relative}
+.tabs div.on{color:var(--brand-dark)}
+.tabs div.on:after{content:"";position:absolute;left:25%;right:25%;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--brand-dark)}
+.body{flex:1;overflow:auto;padding:14px 14px 24px}
+.nav{height:64px;flex:none;background:var(--paper-mid);display:flex;justify-content:space-around;align-items:center;font-size:11px;color:var(--ink-3)}
+.nav div{display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav .on{color:var(--ink);font-weight:600}
+.nav .on .pill{background:var(--brand-light)}
+.nav .pill{padding:3px 18px;border-radius:999px;display:flex}
+.sec{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:14px 4px 8px;display:flex;align-items:center}
+.sec span{flex:1}
+.sec a{font-size:13px;letter-spacing:0;text-transform:none;color:var(--brand-dark);font-weight:600;text-decoration:none}
+
+.card{background:var(--paper);border-radius:20px;padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.card .n{font-size:16px;font-weight:500}
+.card .m{font-size:13px;color:var(--ink-3);margin-top:2px}
+.grow{flex:1;min-width:0}
+.crest{width:42px;height:42px;border-radius:14px;background:var(--brand-light);color:var(--brand-dark);display:grid;place-items:center;font-weight:600;font-size:15px;flex:none}
+.av{width:36px;height:36px;border-radius:50%;background:var(--paper-top);display:grid;place-items:center;font-weight:600;font-size:14px;color:var(--ink-2);flex:none}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--brand-light);color:var(--brand-dark)}
+.chip.admin{background:transparent;border:1px solid var(--outline-strong);color:var(--ink-2)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:11px 16px;border:0;cursor:pointer}
+.btn.tonal{background:var(--brand-light);color:var(--brand-dark)}
+.btn.filled{background:var(--brand-dark);color:var(--paper-low)}
+.btn.text{background:transparent;color:var(--brand-dark);padding:8px 10px}
+.btn.danger{background:transparent;color:var(--error)}
+.btn.full{width:100%}
+.stack{display:flex;flex-direction:column;gap:8px}
+.list{background:var(--paper);border-radius:20px;overflow:hidden}
+.li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--paper-mid)}
+.li:last-child{border-bottom:0}
+.li .n{font-size:15px}
+.li .m{font-size:12px;color:var(--ink-3)}
+.dots{color:var(--ink-3)}
+.seg{display:flex;background:var(--paper-mid);border-radius:999px;padding:3px;margin-bottom:12px}
+.seg div{flex:1;text-align:center;font-size:14px;font-weight:500;padding:8px 0;border-radius:999px;color:var(--ink-3)}
+.seg .on{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px var(--shadow)}
+.hscroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}
+.gchip{flex:none;display:flex;align-items:center;gap:8px;background:var(--paper);border-radius:999px;padding:6px 12px 6px 6px;font-size:14px;font-weight:500}
+.gchip .crest{width:28px;height:28px;border-radius:10px;font-size:12px}
+.gchip.add{border:1px dashed var(--outline-strong);background:transparent;color:var(--ink-2);padding:6px 12px}
+.ride{background:var(--paper);border-radius:20px;padding:12px 14px;margin-bottom:8px}
+.ride .d{font-size:15px;font-weight:500}
+.ride .w{font-size:13px;color:var(--ink-3);margin-top:2px}
+.tier{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--perfect-bg);color:var(--perfect-fg)}
+.muted{color:var(--ink-3);font-size:13px;line-height:1.45}
+.hero{background:var(--paper);border-radius:24px;padding:18px;text-align:center;margin-bottom:12px}
+.hero .crest{width:64px;height:64px;border-radius:20px;font-size:22px;margin:0 auto 10px}
+.hero .n{font-size:22px;font-weight:500}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper);border-radius:28px 28px 0 0;padding:10px 18px 22px;box-shadow:0 -6px 24px var(--shadow)}
+.sheet .grab{width:36px;height:4px;border-radius:4px;background:var(--outline);margin:0 auto 14px}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet .h{font-size:18px;font-weight:500;margin-bottom:4px}
+.act{display:flex;align-items:center;gap:14px;padding:12px 4px;font-size:15px}
+.act.red{color:var(--error)}
+.field{border:1px solid var(--outline-strong);border-radius:12px;padding:8px 12px;margin:12px 0 4px}
+.field small{font-size:11px;color:var(--brand-dark);font-weight:600}
+.field div{font-size:16px}
+.counter{font-size:11px;color:var(--ink-3);text-align:right}
+.menu{position:absolute;right:18px;background:var(--paper);border-radius:12px;box-shadow:0 6px 24px var(--shadow);padding:6px 0;min-width:210px;z-index:2}
+.menu div{padding:10px 16px;font-size:14px}
+.menu .red{color:var(--error)}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--paper-mid);border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:14px;font-weight:500}
+.sw{width:40px;height:24px;border-radius:999px;background:var(--brand-dark);position:relative}
+.sw:after{content:"";position:absolute;right:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--paper)}
+.mini{font-family:inherit;font-size:12px;font-weight:600;border-radius:999px;padding:5px 10px;border:1px solid var(--outline-strong);background:transparent;color:var(--ink-2)}
+.mini.red{border-color:var(--error);color:var(--error)}
+.banner{background:var(--error-bg);color:var(--error);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.4;margin-bottom:10px}
+.snack{position:absolute;left:12px;right:12px;bottom:76px;background:var(--ink);color:var(--paper-low);border-radius:10px;padding:12px 14px;font-size:14px}
+.states{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;margin-top:10px}
+.states .phone{height:600px}
+.decide{background:var(--paper);border-radius:20px;padding:18px 20px;margin-top:40px;max-width:760px}
+.decide ul{margin:8px 0 0;padding-left:20px;line-height:1.6;color:var(--ink-2)}
+@media (prefers-reduced-motion:no-preference){.stage.on{animation:fade .18s ease-out}@keyframes fade{from{opacity:.4}to{opacity:1}}}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 002 2h10a2 2 0 002-2v-5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></symbol>
+  <symbol id="i-userplus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="4"/><path d="M3 21c1.3-4 4-6 7-6 1.5 0 3 .4 4 1.2M19 14v6M16 17h6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l-5-5 5-5M5 12h11"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9l2 7M13 6h3"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
+</svg>
+
+<style>
+.badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--error);color:#fff;font-size:11px;font-weight:700;display:inline-grid;place-items:center;margin-left:6px}
+.nav .bwrap{position:relative}
+.nav .bwrap .badge{position:absolute;top:-4px;right:6px;margin:0}
+.resp{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--paper-mid);font-size:14px}
+.resp:last-child{border-bottom:0}
+.st{margin-left:auto;font-size:12px;font-weight:600}
+.st.go{color:var(--perfect-fg)} .st.no{color:var(--error)} .st.wait{color:var(--ink-3)}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--outline-strong);flex:none}
+.radio.on{border-color:var(--brand-dark);box-shadow:inset 0 0 0 4px var(--paper),inset 0 0 0 10px var(--brand-dark)}
+.cb{width:20px;height:20px;border-radius:5px;border:2px solid var(--outline-strong);flex:none;opacity:.4}
+.dim{opacity:.45}
+.vote{display:flex;gap:6px;margin-top:10px}
+.vote .btn{flex:1;padding:8px}
+</style>
+<div class="wrap">
+  <div class="eyebrow">Schets 016 · v4.2 Clubs · fase 35</div>
+  <h1>Groepsritten</h1>
+  <p class="lede">Een rit voor de hele groep. Vier schermen liggen vast (ze volgen de bestaande Peloton-schermen en jouw eerdere keuzes); twee dingen zijn een keuze. Kies per vraag een letter.</p>
+
+  <section class="q">
+    <div class="eyebrow">Vast</div>
+    <h2>Uitnodigen, de rit, en antwoorden</h2>
+    <div class="states">
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="body"></div>
+          <div class="scrim"></div>
+          <div class="sheet" style="max-height:78%;overflow:auto"><div class="grab"></div>
+            <div class="h">Met wie rijd je?</div>
+            <div class="sec"><span>Een groep</span></div>
+            <div class="list">
+              <div class="li"><div class="radio on"></div><div class="crest" style="width:32px;height:32px;border-radius:10px;font-size:12px">OT</div><div class="grow"><div class="n">On the Roll</div><div class="m">2 leden · ieder lid ziet de rit</div></div></div>
+              <div class="li"><div class="radio"></div><div class="crest" style="width:32px;height:32px;border-radius:10px;font-size:12px">DC</div><div class="grow"><div class="n">Dinsdagclub</div><div class="m">9 leden</div></div></div>
+            </div>
+            <div class="sec"><span>Of losse maatjes</span></div>
+            <div class="list dim">
+              <div class="li"><div class="cb"></div><div class="grow n">Rider</div></div>
+              <div class="li"><div class="cb"></div><div class="grow n">Richard Mouw</div></div>
+            </div>
+            <button class="btn filled full" style="margin-top:12px">Verder: kies vensters</button>
+          </div>
+        </div>
+        <p class="cap"><b>Uitnodigen (CLUB-12).</b> Groepen staan boven de maatjes. Kies je een groep, dan vallen de losse maatjes weg: een groepsrit is voor de groep, en de database laat buitenstaanders er bewust niet bij. Daarna het bekende scherm met één of meer vensters.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="ic"><svg><use href="#i-back"/></svg></span><span class="t">Zaterdag</span></div>
+          <div class="body">
+            <div class="ride" style="padding:16px"><div style="display:flex;gap:8px;align-items:center"><span class="chip">On the Roll</span><span class="grow"></span><span class="tier">Toprit</span></div><div class="d" style="margin-top:8px;font-size:18px">Zaterdag 11:00–13:00</div><div class="w">Joost organiseert</div></div>
+            <div class="sec"><span>Wie gaat er mee</span></div>
+            <div class="list">
+              <div class="resp"><div class="av">J</div>Joost (jij)<span class="st go">gaat mee</span></div>
+              <div class="resp"><div class="av">A</div>Anna<span class="st go">gaat mee</span></div>
+              <div class="resp"><div class="av">M</div>Mark<span class="st no">kan niet</span></div>
+              <div class="resp"><div class="av">J</div>Jacco<span class="st wait">nog niet geantwoord</span></div>
+              <div class="resp"><div class="av">I</div>Ingrid<span class="st wait">nog niet geantwoord</span></div>
+            </div>
+            <p class="muted" style="margin:8px 4px">2 gaan mee · 1 kan niet · 2 nog niet</p>
+          </div>
+        </div>
+        <p class="cap"><b>Wie komt (CLUB-15).</b> Zoals nu bij een gedeelde rit, met één regel erbij: wie van de groep nog niet geantwoord heeft. Bij meerdere vensters staat per venster wie kan, zoals nu al bij stemmen.</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="appbar"><span class="t">Mijn Ritten</span></div>
+          <div class="tabs"><div class="on">Ritten</div><div>Peloton<span class="badge">1</span></div></div>
+          <div class="body">
+            <div class="hscroll">
+              <div class="gchip" style="background:var(--brand-dark);color:var(--paper-low);padding-left:12px">Alles</div>
+              <div class="gchip"><div class="crest">OT</div>On the Roll</div>
+              <div class="gchip"><div class="crest">DC</div>Dinsdagclub</div>
+            </div>
+            <div class="ride"><div style="display:flex;gap:8px;align-items:center"><span class="chip">On the Roll</span><span class="grow"></span><span class="tier">Toprit</span></div><div class="d" style="margin-top:6px">Zaterdag 11:00–13:00</div><div class="w">Anna organiseert · wacht op jou</div>
+              <div class="vote"><button class="btn filled">Ik ga mee</button><button class="btn tonal">Kan niet</button></div></div>
+            <div class="ride"><div style="display:flex;gap:8px;align-items:center"><span class="grow"></span><span class="tier">Fijne rit</span></div><div class="d" style="margin-top:6px">Zondag 10:00–12:00</div><div class="w">Jij gaat solo</div></div>
+          </div>
+          <div class="nav"><div><span class="pill"><span class="ic"><svg><use href="#i-home"/></svg></span></span>Home</div><div class="on bwrap"><span class="pill"><span class="ic"><svg><use href="#i-bike"/></svg></span></span>Ritten<span class="badge">1</span></div><div><span class="pill"><span class="ic"><svg><use href="#i-cal"/></svg></span></span>Agenda</div><div><span class="pill"><span class="ic"><svg><use href="#i-user"/></svg></span></span>Profiel</div></div>
+        </div>
+        <p class="cap"><b>Filter (CLUB-26) en antwoorden (CLUB-14).</b> De groepschips staan er alleen als je in een groep zit. Een groepsrit waarop je nog niet antwoordde, heeft dezelfde knoppen als een uitnodiging nu.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="q" id="teller">
+    <div class="eyebrow">Vraag 1</div>
+    <h2>Waar staat de teller "nog niet geantwoord"?</h2>
+    <div class="bar" role="group"><button data-q="1" data-v="a" aria-pressed="true">A · Onderbalk én tab</button><button data-q="1" data-v="b" aria-pressed="false">B · Alleen de tab</button></div>
+    <p class="note" id="n1"></p>
+    <div class="stage on" data-s="1a"><div class="row"><div>
+      <div class="phone" style="height:300px"><div class="status"></div><div class="appbar"><span class="t">Goedemorgen, Joost</span></div><div class="body"></div><div class="nav"><div><span class="pill"><span class="ic"><svg><use href="#i-home"/></svg></span></span>Home</div><div class="on bwrap"><span class="pill"><span class="ic"><svg><use href="#i-bike"/></svg></span></span>Ritten<span class="badge">2</span></div><div><span class="pill"><span class="ic"><svg><use href="#i-cal"/></svg></span></span>Agenda</div><div><span class="pill"><span class="ic"><svg><use href="#i-user"/></svg></span></span>Profiel</div></div></div>
+      <p class="cap">Op Home zie je al dat er iets op je wacht: een rood bolletje op "Ritten". Binnen Mijn Ritten staat het getal nog eens bij de tab waar het om gaat.</p></div></div></div>
+    <div class="stage" data-s="1b"><div class="row"><div>
+      <div class="phone" style="height:300px"><div class="status"></div><div class="appbar"><span class="t">Mijn Ritten</span></div><div class="tabs"><div>Ritten</div><div class="on">Peloton<span class="badge">2</span></div></div><div class="body"></div></div>
+      <p class="cap">Rustiger: de onderbalk blijft kaal. Maar je ziet het pas als je Mijn Ritten al open hebt.</p></div></div></div>
+  </section>
+
+  <section class="q" id="label">
+    <div class="eyebrow">Vraag 2</div>
+    <h2>Hoe staat de groepsnaam op een ritkaart?</h2>
+    <div class="bar" role="group"><button data-q="2" data-v="a" aria-pressed="true">A · Chip bovenaan</button><button data-q="2" data-v="b" aria-pressed="false">B · In de regel eronder</button></div>
+    <p class="note" id="n2"></p>
+    <div class="stage on" data-s="2a"><div class="row"><div style="width:340px;max-width:100%">
+      <div class="ride"><div style="display:flex;gap:8px;align-items:center"><span class="chip">On the Roll</span><span class="grow"></span><span class="tier">Toprit</span></div><div class="d" style="margin-top:6px">Zaterdag 11:00–13:00 · 2u</div><div class="w">Anna organiseert · 2 gaan mee · 2 nog niet</div></div>
+      <p class="cap">De groep als eerste wat je leest. Kost een regel extra per kaart, ook op Home.</p></div></div></div>
+    <div class="stage" data-s="2b"><div class="row"><div style="width:340px;max-width:100%">
+      <div class="ride"><div style="display:flex;gap:8px;align-items:center"><div class="d">Zaterdag 11:00–13:00 · 2u</div><span class="grow"></span><span class="tier">Toprit</span></div><div class="w"><b style="color:var(--brand-dark)">On the Roll</b> · Anna organiseert · 2 gaan mee</div></div>
+      <p class="cap">Past in de bestaande rolregel (schets 014). Even hoog als nu, maar de groep valt minder op.</p></div></div></div>
+  </section>
+
+  <div class="decide"><h2>Wat ik adviseer</h2><ul>
+    <li><b>Vraag 1: A.</b> Zonder pushmeldingen is Home de plek waar je ziet dat er iets wacht. Alleen de tab is te laat.</li>
+    <li><b>Vraag 2: B.</b> De kaarten op Home blijven even hoog, en de rolregel is al de plek waar staat met wie je rijdt. Op het ritdetail staat de chip wél bovenaan.</li>
+  </ul></div>
+</div>
+<script>
+const notes={'1a':'<b>A.</b> Rood bolletje op "Ritten" in de onderbalk, en het getal bij de tab Peloton.','1b':'<b>B.</b> Alleen het getal bij de tab Peloton.','2a':'<b>A.</b> Chip met de groepsnaam bovenaan de kaart.','2b':'<b>B.</b> De groepsnaam vooraan in de regel onder de tijd.'};
+function show(q,v){document.querySelectorAll('[data-q="'+q+'"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));document.querySelectorAll('.stage[data-s^="'+q+'"]').forEach(s=>s.classList.toggle('on',s.dataset.s===q+v));document.getElementById('n'+q).innerHTML=notes[q+v];}
+document.querySelectorAll('.bar button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.q,b.dataset.v)));show('1','a');show('2','a');
+</script>

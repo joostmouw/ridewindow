@@ -45,6 +45,7 @@ python3 -m http.server 8765     # vanuit de repo-root, anders laadt het letterty
 | 011 | [daglicht](011-daglicht/) | Hoe laat de app zien dat een venster in het donker valt, in zijn eigen vormtaal? | **A — vierde weerbalk, hele etmaal** | daglicht, weerbalken, scoring, profiel, fase-26 |
 | 014 | [peloton-rij](014-peloton-rij/) | Waar staat de rij fietsers die de groep telt, en wat vervangt het vlaggetje bij "Jij organiseert"? | **Gekozen — lint links, megafoon in de regel, teller met wachters** | peloton, iconografie, ritten, home, rollen |
 | 015 | [clubs-groepen](015-clubs-groepen/) | Waar staan je groepen in Peloton, en hoe beheer je een groep? | **1: A + C · 2: A** | peloton, clubs, groepen, beheer, fase-34 |
+| 016 | [groepsritten](016-groepsritten/) | Waar staat de teller, en hoe staat de groepsnaam op een ritkaart? | **1: A · 2: B** | peloton, clubs, groepsritten, fase-35 |
 
 ## Beslissingen die doorwerken
 
