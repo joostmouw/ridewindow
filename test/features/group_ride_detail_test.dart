@@ -8,8 +8,9 @@
 // - "Ik ga mee" / "Kan niet", afzeggen en alsnog meegaan werken op een
 //   groepsrit, via respondToSharedRide (een upsert, want er is nog geen rij);
 // - Home en de Ritten-tab geven het rit-id mee;
-// - een groepsrit toont de groep als chip, een rij per huidig lid met gaat
-//   mee / kan niet / nog geen antwoord, en een telregel (schets 016);
+// - een groepsrit toont de groep als chip, een rij per huidig lid met het
+//   statusicoon (check / prohibit / hourglass, #87), en de telregel
+//   (schets 016) als enige telzin -- de zin van de teller zou hem dupliceren;
 // - bij meerdere vensters staat per venster wie kan, met namen;
 // - alles past op 360 dp met tekstschaal 1.3 en 2.0.
 
@@ -37,6 +38,7 @@ import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
+import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
 import '../helpers/fake_group_gateway.dart';
@@ -218,11 +220,11 @@ void main() {
       // Chip met de groepsnaam bovenaan de kaart.
       expect(find.widgetWithText(ActionChip, 'On the Roll'), findsOneWidget);
 
-      _expectRow(tester, _me, 'Joost (jij)', 'gaat mee');
-      _expectRow(tester, _anna, 'Anna', 'gaat mee');
-      _expectRow(tester, _mark, 'Mark', 'kan niet');
-      _expectRow(tester, _jacco, 'Jacco', 'nog geen antwoord');
-      _expectRow(tester, _ingrid, 'Ingrid', 'nog geen antwoord');
+      _expectRow(tester, _me, 'Joost (jij)', ParticipantStatus.accepted);
+      _expectRow(tester, _anna, 'Anna', ParticipantStatus.accepted);
+      _expectRow(tester, _mark, 'Mark', ParticipantStatus.declined);
+      _expectRow(tester, _jacco, 'Jacco', ParticipantStatus.invited);
+      _expectRow(tester, _ingrid, 'Ingrid', ParticipantStatus.invited);
 
       expect(
         tester.widget<Text>(find.byKey(const ValueKey('group-ride-tally'))).data,
@@ -259,8 +261,8 @@ void main() {
       );
       await _pumpDetail(tester, fake, groupRideId: 'r2');
 
-      _expectRow(tester, _anna, 'Anna', 'gaat mee');
-      _expectRow(tester, _me, 'Joost (jij)', 'kan niet');
+      _expectRow(tester, _anna, 'Anna', ParticipantStatus.accepted);
+      _expectRow(tester, _me, 'Joost (jij)', ParticipantStatus.declined);
       expect(
         tester.getTopLeft(find.byKey(const ValueKey('member-row-$_anna'))).dy,
         lessThan(
@@ -316,19 +318,59 @@ void main() {
         final context = tester.element(find.byType(RideDetailScreen));
         final rw = context.rw;
         final cs = Theme.of(context).colorScheme;
-        Color? colorIn(String uid, String label) => tester
-            .widget<Text>(
+        Color? colorIn(String uid, IconData icon) => tester
+            .widget<Icon>(
               find.descendant(
                 of: find.byKey(ValueKey('member-row-$uid')),
-                matching: find.text(label),
+                matching: find.byIcon(icon),
               ),
             )
-            .style
-            ?.color;
-        expect(colorIn(_anna, 'gaat mee'), rw.scorePerfect);
-        expect(colorIn(_mark, 'kan niet'), cs.error);
-        expect(colorIn(_jacco, 'nog geen antwoord'), rw.textTertiary);
+            .color;
+        expect(colorIn(_anna, AppIcons.check), rw.scorePerfect);
+        expect(colorIn(_mark, AppIcons.prohibit), cs.error);
+        expect(colorIn(_jacco, AppIcons.hourglass), rw.textTertiary);
       }
+    });
+
+    testWidgets('de teller herhaalt de telregel niet (#87)', (tester) async {
+      await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3');
+
+      // De fietsjes blijven staan, de zin ernaast niet: op het detail staat
+      // direct eronder de telregel, en beide was precies de "dubbele tekst"
+      // die de tester aanwees.
+      expect(find.byIcon(AppIcons.personSimpleBike), findsWidgets);
+      expect(find.text('2 gaan mee · 2 wachten nog'), findsNothing);
+      expect(
+        tester.widget<Text>(find.byKey(const ValueKey('group-ride-tally'))).data,
+        '2 gaan mee · 1 kan niet · 2 nog niet',
+      );
+    });
+
+    testWidgets('het statuswoord blijft bestaan als Semantics-label',
+        (tester) async {
+      await _pumpDetail(tester, _myGroupRide(), groupRideId: 'r3');
+
+      // Er staat meer dan één Semantics-knoop in zo'n rij; het statuswoord
+      // is de enige met een niet-leeg label, en er is precies één van.
+      String? statusLabelOf(String uid) {
+        final labeled = tester
+            .widgetList<Semantics>(
+              find.descendant(
+                of: find.byKey(ValueKey('member-row-$uid')),
+                matching: find.byType(Semantics),
+              ),
+            )
+            .map((w) => w.properties.label)
+            .where((label) => label != null && label.isNotEmpty)
+            .toList();
+        expect(labeled, hasLength(1), reason: 'statuslabel in de rij $uid');
+        return labeled.first;
+      }
+
+      expect(statusLabelOf(_anna), 'gaat mee');
+      expect(statusLabelOf(_mark), 'kan niet');
+      expect(statusLabelOf(_jacco), 'nog geen antwoord');
+      expect(statusLabelOf(_ingrid), 'nog geen antwoord');
     });
 
     testWidgets('gewone gedeelde rit: geen chip, deelnemers, geen telregel',
@@ -338,7 +380,13 @@ void main() {
       expect(find.byType(ActionChip), findsNothing);
       expect(find.byKey(const ValueKey('group-ride-tally')), findsNothing);
       expect(find.text('Bram'), findsOneWidget);
-      expect(find.text('nog geen antwoord'), findsOneWidget);
+      expect(find.byIcon(AppIcons.hourglass), findsOneWidget);
+      // Zonder groep is er geen telregel, dus draagt de teller zelf de zin.
+      // De organisator telt bij een gewone gedeelde rit níét mee, dus 0+1.
+      expect(
+        find.text('Nog niemand geantwoord · 1 wacht nog'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('groep niet (meer) bekend: deelnemerslijst zonder chip',
@@ -364,7 +412,7 @@ void main() {
       expect(find.byType(ActionChip), findsNothing);
       expect(find.byKey(const ValueKey('group-ride-tally')), findsNothing);
       expect(find.text('Anna'), findsOneWidget);
-      expect(find.text('gaat mee'), findsOneWidget);
+      expect(find.byIcon(AppIcons.check), findsOneWidget);
     });
   });
 
@@ -566,7 +614,19 @@ FakeGroupGateway _withOptions({String? groupId}) {
   return fake;
 }
 
-void _expectRow(WidgetTester tester, String uid, String name, String status) {
+/// Het statusicoon dat bij elke status hoort (zelfde afspraak als de app).
+IconData _statusIcon(ParticipantStatus status) => switch (status) {
+      ParticipantStatus.accepted => AppIcons.check,
+      ParticipantStatus.declined => AppIcons.prohibit,
+      ParticipantStatus.invited => AppIcons.hourglass,
+    };
+
+void _expectRow(
+  WidgetTester tester,
+  String uid,
+  String name,
+  ParticipantStatus status,
+) {
   final row = find.byKey(ValueKey('member-row-$uid'));
   expect(row, findsOneWidget, reason: 'rij voor $uid');
   expect(
@@ -575,9 +635,9 @@ void _expectRow(WidgetTester tester, String uid, String name, String status) {
     reason: 'naam $name',
   );
   expect(
-    find.descendant(of: row, matching: find.text(status)),
+    find.descendant(of: row, matching: find.byIcon(_statusIcon(status))),
     findsOneWidget,
-    reason: '$name: $status',
+    reason: '$name: statusicoon',
   );
 }
 

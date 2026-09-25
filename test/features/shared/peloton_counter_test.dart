@@ -59,6 +59,7 @@ Future<void> _pump(
   WidgetTester tester,
   RideEntry entry, {
   bool dense = false,
+  bool showText = true,
   Locale locale = const Locale('nl'),
   double width = 800,
 }) async {
@@ -71,7 +72,7 @@ Future<void> _pump(
       home: Scaffold(
         body: SizedBox(
           width: width,
-          child: PelotonCounter(entry: entry, dense: dense),
+          child: PelotonCounter(entry: entry, dense: dense, showText: showText),
         ),
       ),
     ),
@@ -176,5 +177,19 @@ void main() {
     await _pump(tester, _entry(role: RideRole.solo));
     expect(_bikes(tester), isEmpty);
     expect(find.byType(Text), findsNothing);
+  });
+
+  testWidgets('zonder zin: alleen de fietsjes', (tester) async {
+    // Voor het groepsrit-detail, waar de telregel van CLUB-16 de telling
+    // al zegt (#87). De zin zou hem daar tweemaal zeggen.
+    await _pump(
+      tester,
+      _entry(role: RideRole.organiser, accepted: 2, invited: 1),
+      showText: false,
+    );
+
+    expect(_bikes(tester).length, 3);
+    expect(find.text('2 gaan mee · 1 wacht nog'), findsNothing);
+    expect(find.text('2 mee · 1 wacht'), findsNothing);
   });
 }

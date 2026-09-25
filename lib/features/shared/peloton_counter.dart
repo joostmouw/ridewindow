@@ -21,12 +21,24 @@ import 'package:ridewindow/theme/app_theme.dart';
 /// doorzichtige. De organisator zit in geen van beide -- die staat niet in zijn
 /// eigen deelnemerslijst (zie [RideEntry.acceptedCount]).
 class PelotonCounter extends StatelessWidget {
-  const PelotonCounter({super.key, required this.entry, this.dense = false});
+  const PelotonCounter({
+    super.key,
+    required this.entry,
+    this.dense = false,
+    this.showText = true,
+  });
 
   final RideEntry entry;
 
   /// Compacter, voor de kaartjes onder GEPLAND op Home.
   final bool dense;
+
+  /// Alleen de fietsjes, geen zin ernaast. Voor het detailscherm van een
+  /// groepsrit: daar staat direct onder de teller de telregel van CLUB-16,
+  /// en stond de zin eróók boven, las de tester hetzelfde tweemaal onder
+  /// elkaar ("dubbele tekst", #87). Bij een gewone gedeelde rit is er geen
+  /// telregel en draagt de zin wél iets, dus daar blijft hij.
+  final bool showText;
 
   /// Meer dan dit aantal fietsjes wordt een getal. Bij zes man op een rij van
   /// 372px blijft er anders niets over voor de zin ernaast, en juist die zin
@@ -85,6 +97,10 @@ class PelotonCounter extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bikes = drawn * (size + 1) + (rest > 0 ? 22 : 0);
+        if (!showText) {
+          return _line(context, null, textStyle, drawn, accepted, rest, size,
+              waiting, rw);
+        }
         final room = constraints.maxWidth - bikes - 7;
         final painter = TextPainter(
           text: TextSpan(text: full, style: textStyle),
@@ -93,15 +109,24 @@ class PelotonCounter extends StatelessWidget {
         )..layout();
         final summary =
             painter.width <= room ? full : (_shortSummary(context) ?? full);
-        return _line(context, summary, textStyle, drawn, accepted, rest,
-            size, waiting, rw);
+        return _line(
+          context,
+          summary,
+          textStyle,
+          drawn,
+          accepted,
+          rest,
+          size,
+          waiting,
+          rw,
+        );
       },
     );
   }
 
   Widget _line(
     BuildContext context,
-    String summary,
+    String? summary,
     TextStyle? textStyle,
     int drawn,
     int accepted,
@@ -142,15 +167,19 @@ class PelotonCounter extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 7),
-          Expanded(
-            child: Text(
-              summary,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textStyle,
+          // Zonder zin is de rij alleen de fietsjes; de lucht ernaast mag
+          // dan ook weg.
+          if (summary case final text?) ...[
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textStyle,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

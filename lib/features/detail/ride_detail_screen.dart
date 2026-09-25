@@ -589,8 +589,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                     ),
                   ],
                 ),
-                // Eerst het overzicht, dan de namen eronder.
-                PelotonCounter(entry: entry),
+                // Eerst het overzicht, dan de namen eronder. Bij een
+                // groepsrit laat de teller zijn zin weg: de telregel hier
+                // onder zegt hetzelfde, en beide stond dubbel (#87). Zonder
+                // groep is er geen telregel en draagt de zin de telling.
+                PelotonCounter(entry: entry, showText: pelotonGroup == null),
                 if (pelotonGroup != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 6),
@@ -794,14 +797,26 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final s = S.of(context);
     final rw = context.rw;
     final theme = Theme.of(context);
-    // Schets 016: gaat mee groen, kan niet rood, nog niet gedempt.
-    final (label, color) = switch (status) {
-      ParticipantStatus.accepted => (s.pelotonStatusGoing, rw.scorePerfect),
+    // Schets 016: gaat mee groen, kan niet rood, nog niet gedempt. Sinds #87
+    // draagt de vórm de status en niet het woord -- de tester vroeg om
+    // iconen -- maar de vorm verschilt per status, dus kleur alleen zegt
+    // nooit alles. Het woord blijft bestaan als Semantics-label.
+    final (icon, statusLabel, color) = switch (status) {
+      ParticipantStatus.accepted => (
+          AppIcons.check,
+          s.pelotonStatusGoing,
+          rw.scorePerfect,
+        ),
       ParticipantStatus.declined => (
+          AppIcons.prohibit,
           s.pelotonStatusDeclined,
           theme.colorScheme.error,
         ),
-      ParticipantStatus.invited => (s.pelotonStatusWaiting, rw.textTertiary),
+      ParticipantStatus.invited => (
+          AppIcons.hourglass,
+          s.pelotonStatusWaiting,
+          rw.textTertiary,
+        ),
     };
     final initial = name.trim().isEmpty
         ? '?'
@@ -832,9 +847,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium,
                 ),
-                Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(color: color),
+                // Status als icoon in plaats van tekst (#87): drie
+                // verschillende vormen, dus het verschil lees je ook als
+                // kleur alleen niets zegt. Het woord blijft beschikbaar voor
+                // een screenreader via het Semantics-label.
+                Semantics(
+                  label: statusLabel,
+                  child: Icon(icon, size: 18, color: color),
                 ),
               ],
             ),
