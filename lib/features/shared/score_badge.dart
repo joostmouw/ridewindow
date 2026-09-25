@@ -11,7 +11,14 @@ import 'package:ridewindow/theme/app_theme.dart';
 class ScoreBadge extends StatefulWidget {
   final RideTier tier;
 
-  const ScoreBadge({super.key, required this.tier});
+  /// Toon het getal in plaats van het woord. Voor de plankaartjes onder
+  /// GEPLAND op Home: het woord ("Toprit") at daar de breedte van een heel
+  /// vak op een rij die ook nog een merkteken, rol en prullenbak moet
+  /// bevatten (Joost, 2026-09-25). De kleur blijft het oordeel dragen, het
+  /// getal levert de precisie. Het detail houdt het woord.
+  final int? score;
+
+  const ScoreBadge({super.key, required this.tier, this.score});
 
   @override
   State<ScoreBadge> createState() => _ScoreBadgeState();
@@ -61,8 +68,20 @@ class _ScoreBadgeState extends State<ScoreBadge>
         fg = t.poorFg;
     }
 
+    final tierWord = switch (widget.tier) {
+      Perfect() => S.of(context).tierPerfect,
+      Great() => S.of(context).tierGreat,
+      Acceptable() => S.of(context).tierAcceptable,
+      Poor() => S.of(context).tierPoor,
+    };
+    final value = widget.score;
+
     Widget badge = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      // Strakker opgepoten als er alleen een getal in staat: het woord
+      // vroeg een eigen vulling, een getal leest ook krap.
+      padding: value == null
+          ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
+          : const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: AppShapes.roundedXl,
@@ -72,23 +91,28 @@ class _ScoreBadgeState extends State<ScoreBadge>
       // hier staan -- en daarmee stond dezelfde beoordeling op twee plekken in
       // twee talen. De pil draagt het woord; een gezichtje zegt daar niets
       // bovenop wat er niet al staat.
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            switch (widget.tier) {
-              Perfect() => S.of(context).tierPerfect,
-              Great() => S.of(context).tierGreat,
-              Acceptable() => S.of(context).tierAcceptable,
-              Poor() => S.of(context).tierPoor,
-            },
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: fg,
+      child: value == null
+          ? Text(
+              tierWord,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: fg,
+              ),
+            )
+          : Semantics(
+              // Het getal alléén zegt een screenreader niets over het
+              // oordeel; woord en getal samen wel.
+              label: '$tierWord, $value',
+              child: Text(
+                '$value',
+                style: TextStyle(
+                  color: fg,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
     );
 
     return ScaleTransition(

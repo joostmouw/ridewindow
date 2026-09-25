@@ -113,6 +113,23 @@ class FakePlannedRidesNotifier extends PlannedRidesNotifier {
   }
 }
 
+/// Zelfde stub, maar met één geplande rit, voor de plankaart. Morgen, want
+/// de entries-provider laat verstreken ritten vallen.
+class FakeOnePlannedRideNotifier extends FakePlannedRidesNotifier {
+  @override
+  Future<List<PlannedRide>> build() async {
+    final day = DateTime.now().add(const Duration(days: 1));
+    final start = DateTime(day.year, day.month, day.day, 8);
+    return [
+      PlannedRide(
+        start: start,
+        end: start.add(const Duration(hours: 2)),
+        plannedScore: 88,
+      ),
+    ];
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Fixture: minimaal RideSlot (Perfect tier, maandag 09:00-13:00)
 // ---------------------------------------------------------------------------
@@ -269,6 +286,45 @@ void main() {
     // HomeScreen toont: 'Geen goede rijmomenten deze week. Slecht weer verwacht.'
     expect(find.textContaining('Slecht weer'), findsOneWidget);
     expect(find.text('Inplannen'), findsNothing);
+  });
+
+  // ---------------------------------------------------------------------------
+  // Test 3b: de plankaart toont de score klein, niet het tier-woord
+  // ---------------------------------------------------------------------------
+  testWidgets('de plankaart toont het scoregetal, niet het tier-woord',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          weatherProvider.overrideWith(() => FakeWeatherReady()),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider
+              .overrideWith(() => FakeOnePlannedRideNotifier()),
+          slotsProvider.overrideWith(
+            () => FakeStaticSlotsNotifier(
+              const SlotsLoaded([], reason: SlotsEmptyReason.badWeather),
+            ),
+          ),
+        ],
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 600));
+
+    // Het getal staat klein in de pil; het woord at de breedte van het
+    // vakje op (Joost, 25 sept). De kleur van de pil blijft het oordeel
+    // dragen.
+    expect(find.text('88'), findsOneWidget);
+    expect(find.text('Toprit'), findsNothing);
   });
 
   // ---------------------------------------------------------------------------

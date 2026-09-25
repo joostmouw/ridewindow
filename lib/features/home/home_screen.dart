@@ -1018,7 +1018,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ],
                   ),
                 ),
-                ScoreBadge(tier: rideTierFromScore(entry.plannedScore)),
+                // Het getal in plaats van het tier-woord (Joost 25 sept):
+                // het woord at de breedte van het vakje op; de kleur draagt
+                // het oordeel, het getal de precisie.
+                ScoreBadge(
+                  tier: rideTierFromScore(entry.plannedScore),
+                  score: entry.plannedScore.round(),
+                ),
                 // Ook bij een rit die jij organiseert (2026-09-25): die had
                 // hier geen prullenbak, en via het detail ging alleen je
                 // eigen planning eraf -- de rit kwam meteen terug.
