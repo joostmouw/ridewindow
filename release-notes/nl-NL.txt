@@ -1,1 +1,1 @@
-Interne testbuild: groepsritten, plus drie verbeteringen uit testerfeedback. Terug brengt je eerst naar Home voordat de app sluit, de Peloton-tab heeft een inlogknop als je uitgelogd bent, en ritkaarten tonen de duur in jouw taal.
+Interne testbuild: een rit weghalen werkt nu overal hetzelfde. Een rit die je organiseert zeg je af vanaf Home, Ritten of het ritscherm, en hij verdwijnt echt voor iedereen. Een rit van jou alleen is meteen weg, met Ongedaan maken.

@@ -1,1 +1,1 @@
-Internal test build: group rides, plus three fixes from tester feedback. Back now returns to Home before closing the app, the Peloton tab has a sign-in button when you are signed out, and ride cards show durations in your language.
+Internal test build: removing a ride is now the same everywhere. A ride you organise can be cancelled from Home, Rides and the ride screen, and really disappears for everyone. A ride of your own goes at once, with Undo.
