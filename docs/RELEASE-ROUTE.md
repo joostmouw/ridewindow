@@ -101,19 +101,21 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
   script; `docs/CONSOLE-SETUP-CHECKLIST.md` de eenmalige inrichting. Bij een
   wijziging aan de route werk je dit bestand bij, niet de andere twee los.
 
-## Stand 24 september 2026, na de release van 1.0.44 (55)
+## Stand 25 september 2026, na de internal-release van 1.0.47 (58)
 
 | Waar | Stand |
 |---|---|
-| Oppo | 1.0.46 (57) via Play; #80 en #83 op het toestel geverifieerd |
-| PWA | 1.0.46 (57), gedeployed met `scripts/deploy_web.sh`, live hash geverifieerd |
-| Internal | 1.0.46 (57) |
-| Alpha / closed | 1.0.44 (55); promotie van 57 wacht op de groepsrit-test |
-| main | 1.0.46+57 |
+| Oppo | 1.0.47 (58) via Play; #84 met een tijdelijke rit in een eenpersoonsgroep op Home geverifieerd, niet de oorspronkelijke rit verwijderd |
+| PWA | 1.0.47 (58), gedeployed met `scripts/deploy_web.sh`, live bundelhash `457908fe9d66949c15c4c13c95935521` |
+| Internal | 1.0.47 (58) |
+| Alpha / closed | 1.0.44 (55); 58 niet gepromoveerd, verdere toestel-/groepsritgoedkeuring staat open |
+| main | 1.0.47+58 (`b39f8d5`), plus lokale toestel- en feedbackdocumentatie |
 
-**Wat 55 brengt:** groepsritten (fase 35). Een rit uitzetten voor een hele
-groep, antwoorden op kaart en detail, wie er komt per lid, de teller op
-Ritten en bij Peloton, en groepschips boven de rittenlijst.
+**Wat 58 brengt:** #84 maakt afzeggen van een georganiseerde rit consequent
+vanaf Home, Ritten en ritdetail. Op de Oppo is Home bewezen met een nieuwe
+rit zonder andere deelnemers; detail en Ritten zijn in tests afgedekt maar
+niet afzonderlijk op het toestel doorlopen. De eerdere release 55 bracht
+groepsritten (fase 35); 57 bevatte #80 en #83.
 
 ## Stand 21 september 2026, na de release van 1.0.42 (53)
 

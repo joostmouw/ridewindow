@@ -15,6 +15,36 @@ progress:
 
 # Project State
 
+## Stand na 2026-09-25 -- build 58 op Oppo en web
+
+| Waar | Stand |
+|---|---|
+| Oppo | **1.0.47 (58) via Play internal** (`installerPackageName=com.android.vending`, user 0; kloonprofiel niet geïnstalleerd), lokale data behouden |
+| PWA | **1.0.47 (58)** op `my-project-joost.web.app`; `scripts/deploy_web.sh` vergeleek de live `main.dart.js` met de lokale build: beide MD5 `457908fe9d66949c15c4c13c95935521` |
+| Internal | **1.0.47 (58)**, Play Developer API `--list-tracks`: completed |
+| Alpha / closed | **1.0.44 (55)**, build 58 niet gepromoveerd |
+| main | **1.0.47+58** (`b39f8d5`), plus lokale documentatie van deze toestelronde |
+| meldingen-werkboom | #74/#77 naast main; #84-fix overgenomen in `4f525c7`, volledige suite groen, nog niet gemerged; **niet** dezelfde versionCode 58 opnieuw uitbrengen |
+
+**#84 op glas:** op de Oppo een nieuw venster voor zaterdag 26 september
+08:00–10:00 gepland, uitsluitend gedeeld met een groep met alleen de eigenaar, en
+vanaf Home via de prullenbak na de afzegvraag verwijderd. Het venster verdween
+ook uit de eigen planning; de drie bestaande ritten bleven zichtbaar. Niet de
+oorspronkelijke rit van Joost verwijderd, en detail/Ritten niet afzonderlijk
+op toestel bewezen. De 5 nieuwe widgettests en de eerdere volledige suite
+dekken de andere paden.
+
+**Testerfeedback van dezelfde dag** staat als #85–#87 in `BACKLOG.md`: een
+groepsrit delen met een gast, eenmalig met een groep meerijden, en de
+dubbele/tekstzware deelnemersstatus. #85 en #86 raken expliciet de RLS-grens;
+geen client-only fix aannemen.
+
+**Play-bediening:** bij het zoeken naar de update is in Play per ongeluk
+`Update all` aangeraakt en meteen geannuleerd. Ridewindow had toen build 58
+al via Play ontvangen; de lijst toonde daarna nog 22 andere beschikbare
+updates. Er is geen sideload gebruikt. Bij een volgende toestelsessie
+installeer alleen de bedoelde app-update vanuit zijn eigen Play-vermelding.
+
 ## Stand na 2026-09-22 -- lees dit eerst
 
 **Het kritieke pad is wachten, en dat wachten is begonnen.** Play Console zei op
