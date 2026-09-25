@@ -381,7 +381,15 @@ class SupabasePelotonGateway implements PelotonGateway {
 
   @override
   Future<void> deleteGroupRide(String rideId) async {
-    await _client.from(kGroupRidesTable).delete().eq('id', rideId);
+    // Met `select` terug, anders is "niets verwijderd" niet te onderscheiden
+    // van "verwijderd": RLS weigert een delete niet met een fout maar laat hem
+    // stil nul rijen raken. Dan zei de app "rit afgezegd" en kwam de rit bij
+    // de volgende verversing gewoon terug (2026-09-25).
+    final rows =
+        await _client.from(kGroupRidesTable).delete().eq('id', rideId).select('id');
+    if ((rows as List).isEmpty) {
+      throw StateError('rit $rideId niet verwijderd (bestaat niet of niet van jou)');
+    }
   }
 
   @override

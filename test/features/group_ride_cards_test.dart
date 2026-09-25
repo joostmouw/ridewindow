@@ -110,13 +110,7 @@ class _Host implements RideCardHost {
   Future<void> withdraw(RideEntry entry) async {}
 
   @override
-  Future<void> cancelOwnRide(RideEntry entry) async {}
-
-  @override
-  Future<bool> confirmRemove(RideEntry entry) async => true;
-
-  @override
-  void removePlanned(RideEntry entry) {}
+  Future<bool> remove(RideEntry entry) async => true;
 
   @override
   Future<void> voteOnOption(

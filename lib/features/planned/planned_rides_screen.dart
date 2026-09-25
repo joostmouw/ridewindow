@@ -24,6 +24,7 @@ import 'package:ridewindow/features/peloton/group_crest.dart';
 import 'package:ridewindow/features/peloton/ride_response.dart';
 import 'package:ridewindow/features/shared/daylight_note.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
+import 'package:ridewindow/features/shared/ride_removal.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -31,7 +32,6 @@ import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
-import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/providers/unit_prefs_provider.dart';
@@ -249,14 +249,10 @@ abstract class RideCardHost {
 
   Future<void> respond(RideEntry entry, {required bool accepted});
   Future<void> withdraw(RideEntry entry);
-  Future<void> cancelOwnRide(RideEntry entry);
 
-  /// Vraagt bevestiging voor een veeg. Bij een rit die je organiseert is dat
-  /// een dialoog -- daar hangen andere mensen aan. Bij een solo-rit niet: die
-  /// haal je terug met de snackbar.
-  Future<bool> confirmRemove(RideEntry entry);
-
-  void removePlanned(RideEntry entry);
+  /// Een veeg haalt de rit weg zoals bij je rol past; zie [removeRide]. Geeft
+  /// `false` bij annuleren of een fout, en dan komt de kaart terug.
+  Future<bool> remove(RideEntry entry);
 
   /// Zeggen of je bij dit voorgelegde venster kunt (slice 2 van epic #65).
   Future<void> voteOnOption(RideEntry entry, RideOption option,
@@ -423,72 +419,8 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
     );
   }
 
-  /// De rit die jij organiseert helemaal afzeggen.
-  ///
-  /// **Dit ontbrak.** `deleteGroupRide` stond sinds epic #62 in de poort en het
-  /// RLS-beleid `group_rides_delete_own` stond het toe, maar geen enkel scherm
-  /// riep het aan -- als organisator kwam je er niet meer vanaf. Dat viel niet
-  /// op zolang je eigen geplande rit los weg te vegen was; nu die twee één
-  /// kaart zijn, zou het gat een echte doodlopende weg worden.
   @override
-  Future<void> cancelOwnRide(RideEntry entry) async {
-    final s = S.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final group = entry.group;
-    if (group == null) return;
-
-    await _run(() async {
-      try {
-        await ref.read(pelotonGatewayProvider).deleteGroupRide(group.id);
-      } catch (error) {
-        debugPrint('Peloton: afzeggen mislukt: $error');
-        messenger.showSnackBar(SnackBar(content: Text(s.pelotonCancelFailed)));
-        return;
-      }
-      // De persoonlijke rij eronder gaat mee. Laat je die staan, dan komt de
-      // rit terug als "Alleen jij" en lijkt het afzeggen mislukt.
-      final planned = entry.planned;
-      if (planned != null) {
-        await ref.read(plannedRidesProvider.notifier).remove(planned);
-      }
-      _invalidatePeloton();
-      messenger.showSnackBar(SnackBar(content: Text(s.pelotonRideCancelled)));
-    });
-  }
-
-  @override
-  Future<bool> confirmRemove(RideEntry entry) async {
-    if (entry.role != RideRole.organiser) return true;
-    final s = S.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(s.pelotonCancelRideTitle),
-        content: Text(s.pelotonCancelRideBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(s.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(s.pelotonCancelRide),
-          ),
-        ],
-      ),
-    );
-    return confirmed ?? false;
-  }
-
-  @override
-  void removePlanned(RideEntry entry) {
-    final planned = entry.planned;
-    if (planned == null) return;
-    ref.read(plannedRidesProvider.notifier).remove(planned);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context).rideRemoved)),
-    );
-  }
+  Future<bool> remove(RideEntry entry) => removeRide(context, ref, entry);
 
   @override
   Widget build(BuildContext context) {
@@ -1277,10 +1209,10 @@ class RideCard extends StatelessWidget {
               child: Icon(AppIcons.trash, color: theme.colorScheme.error),
             ),
           ),
-          confirmDismiss: (_) => host.confirmRemove(entry),
-          onDismissed: (_) => entry.role == RideRole.organiser
-              ? host.cancelOwnRide(entry)
-              : host.removePlanned(entry),
+          // Alles gebeurt in confirmDismiss: pas als de rit echt weg is, mag
+          // de kaart weg. Mislukt het afzeggen, dan schuift hij terug in plaats
+          // van later onverwacht weer op te duiken.
+          confirmDismiss: (_) => host.remove(entry),
           // Deze clip beweegt mét de kaart mee en maakt er een écht afgerond
           // blok van. De `ClipRRect` hierboven staat stil en zou de kaart bij
           // het wegschuiven langs een rechte lijn afsnijden; de `shape` van de

@@ -23,7 +23,7 @@ import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/score_display.dart';
-import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
+import 'package:ridewindow/features/shared/ride_removal.dart';
 import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
@@ -1019,24 +1019,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
                 ScoreBadge(tier: rideTierFromScore(entry.plannedScore)),
-                if (entry.role == RideRole.solo) ...[
+                // Ook bij een rit die jij organiseert (2026-09-25): die had
+                // hier geen prullenbak, en via het detail ging alleen je
+                // eigen planning eraf -- de rit kwam meteen terug.
+                if (entry.isRemovable) ...[
                   const SizedBox(width: 4),
                   IconButton(
                     icon: const Icon(AppIcons.trash),
-                    tooltip: s.removePlannedRideTooltip,
+                    tooltip: entry.role == RideRole.organiser
+                        ? s.pelotonCancelRide
+                        : s.removePlannedRideTooltip,
                     color: cs.error,
-                    onPressed: () async {
-                      final planned = entry.planned;
-                      if (planned == null) return;
-                      final confirmed = await showUnplanConfirmDialog(context);
-                      if (!confirmed) return;
-                      ref.read(plannedRidesProvider.notifier).remove(planned);
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(S.of(context).rideRemoved)),
-                        );
-                      }
-                    },
+                    onPressed: () => removeRide(context, ref, entry),
                   ),
                 ],
               ],

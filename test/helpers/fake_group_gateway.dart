@@ -281,6 +281,17 @@ class FakeGroupGateway implements PelotonGateway {
     return ride;
   }
 
+  /// group_rides_delete_own: alleen de eigenaar. Iets anders raakt in de
+  /// echte database nul rijen, en de echte gateway gooit dan (2026-09-25).
+  @override
+  Future<void> deleteGroupRide(String rideId) async {
+    calls.add('deleteGroupRide:$rideId');
+    _maybeFail('deleteGroupRide');
+    final i = rides.indexWhere((r) => r.id == rideId && r.ownerId == me);
+    if (i < 0) throw StateError('rit $rideId niet verwijderd');
+    rides.removeAt(i);
+  }
+
   /// Een maatje aan een rit hangen (participant-rij `invited`). Alleen op een
   /// eigen rit, net als de insert-policy op group_ride_participants.
   @override

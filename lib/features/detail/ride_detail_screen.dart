@@ -33,7 +33,7 @@ import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/feels_like_bar.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
-import 'package:ridewindow/features/shared/unplan_confirm_dialog.dart';
+import 'package:ridewindow/features/shared/ride_removal.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
@@ -1445,23 +1445,46 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       child: isPlanned
           ? OutlinedButton.icon(
               onPressed: () async {
-                final confirmed = await showUnplanConfirmDialog(context);
-                if (!confirmed) return;
-                ref.read(plannedRidesProvider.notifier).remove(
-                      PlannedRide(
-                        start: slot.start,
-                        end: slot.end,
-                        plannedScore: slot.overallScore,
-                      ),
-                    );
+                // Organiseer jij deze rit, dan is "niet meer gepland" de rit
+                // afzeggen. Tot 2026-09-25 ging hier alleen je eigen planning
+                // af: de gedeelde rit bleef in de cloud en stond meteen weer
+                // op Home als "Je organiseert".
+                final organised = _pelotonEntry;
+                if (organised != null && organised.role == RideRole.organiser) {
+                  final router = GoRouter.of(context);
+                  if (await removeRide(context, ref, organised)) {
+                    trackEvent(ref, kEvRideUnplanned, props: {
+                      'score': slot.overallScore,
+                      'hours': slot.end.difference(slot.start).inHours,
+                    });
+                    if (router.canPop()) router.pop();
+                  }
+                  return;
+                }
+                final planned = PlannedRide(
+                  start: slot.start,
+                  end: slot.end,
+                  plannedScore: slot.overallScore,
+                );
+                final notifier = ref.read(plannedRidesProvider.notifier);
+                final s = S.of(context);
+                await notifier.remove(planned);
                 trackEvent(ref, kEvRideUnplanned, props: {
                   'score': slot.overallScore,
                   'hours': slot.end.difference(slot.start).inHours,
                 });
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(S.of(context).rideRemoved)),
-                  );
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(s.rideRemoved),
+                        action: SnackBarAction(
+                          label: s.pelotonUndo,
+                          onPressed: () => notifier.add(planned),
+                        ),
+                      ),
+                    );
                 }
               },
               icon: const Icon(AppIcons.checkCircle),
