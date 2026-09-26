@@ -15,6 +15,26 @@ progress:
 
 # Project State
 
+## Stand na 2026-09-26 (avond) -- 1.0.50 (61) op internal en web
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.50 (61)**; `--list-tracks` bevestigt internal 61, alpha 55. De eerste upload faalde bij `edits.insert` (voor er iets geüpload was), de tweede slaagde meteen: tijdelijke fout aan Google's kant |
+| PWA | **1.0.50 (61)**; `scripts/deploy_web.sh` mat live en lokaal dezelfde `main.dart.js`-MD5 `f4597a85f0efb73409b65d40f34a708d`; live `version.json` zegt build 61, live `manifest.json` heeft `related_applications` |
+| Oppo | laatst gezien op **1.0.49 (60)** via Play; bij de release van 61 niet via `adb` aangesloten, dus niet gecontroleerd. Eerst `dumpsys package` lezen voordat je "Open" in Play uitlegt |
+| Alpha / closed | **1.0.44 (55)** |
+| main | **1.0.50+61** (`115d245`), met de drie features `462f5d0`, `c2adae8`, `4cae43d` |
+
+**Wat er in 61 zit:** zie `.planning/quick/260926-bolletjes-update-storebanner/SUMMARY.md`.
+Het rode bolletje telt ook groepsaanvragen (beheerder) en nieuwe maatjes; een
+update-balk bovenaan (Play op Android, `version.json` op web); een store-balk
+voor Android-bezoekers van de website met de drie teststappen.
+
+**Toestelcontrole die openstaat:** de update-balk zit pas vanaf 61 in de app.
+Hij is dus pas te zien bij de eerste build daarna (62): op een Oppo met 61
+moet dan bovenaan "Er staat een nieuwe versie klaar" verschijnen. De
+store-balk is te controleren door de website in Chrome op de Oppo te openen.
+
 ## Stand na 2026-09-26 -- 1.0.49 (60) op internal en web
 
 | Waar | Stand |

@@ -101,6 +101,21 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
   script; `docs/CONSOLE-SETUP-CHECKLIST.md` de eenmalige inrichting. Bij een
   wijziging aan de route werk je dit bestand bij, niet de andere twee los.
 
+## Stand 26 september 2026 (avond), na de internal-release van 1.0.50 (61)
+
+| Waar | Stand |
+|---|---|
+| Oppo | laatst gezien op 1.0.49 (60) via Play; bij de release niet aangesloten |
+| PWA | 1.0.50 (61), live bundelhash `f4597a85f0efb73409b65d40f34a708d` |
+| Internal | 1.0.50 (61) |
+| Alpha / closed | 1.0.44 (55) |
+| main | 1.0.50+61 (`115d245`) |
+
+**Wat 61 brengt:** bolletjes voor groepsaanvragen en nieuwe maatjes, een
+update-balk bovenaan, en een store-balk op de website voor Android-bezoekers.
+Vanaf 61 meldt de app zelf dat er een nieuwere build klaarstaat; de eerste
+keer dat dat te zien is, is bij 62.
+
 ## Stand 26 september 2026, na de internal-release van 1.0.49 (60)
 
 | Waar | Stand |
