@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
 import 'package:ridewindow/features/shared/app_update_banner.dart';
+import 'package:ridewindow/features/shared/store_app_banner.dart';
 
 class TopBanners extends StatelessWidget {
   const TopBanners({super.key});
@@ -27,6 +28,7 @@ class TopBanners extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppUpdateBanner(),
+            StoreAppBanner(),
             AddToHomeScreenOverlay(),
           ],
         ),

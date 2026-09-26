@@ -41,3 +41,15 @@ bool get isStandaloneDisplayMode =>
 /// as [isStandaloneDisplayMode].
 bool get isIosBrowserMode =>
     isWebPlatform && (debugIsIosBrowserOverride ?? impl.readIsIosUserAgent());
+
+/// Test-only override for [isAndroidWeb]. `null` means "use the real
+/// platform value". Always reset to `null` in `tearDown()`.
+@visibleForTesting
+bool? debugIsAndroidWebOverride;
+
+/// Of de website draait op een Android-toestel, in de browser of als
+/// geïnstalleerde PWA. Altijd `false` in de native app: daar is de
+/// store-balk zinloos, want je hebt de app al.
+bool get isAndroidWeb =>
+    isWebPlatform &&
+    (debugIsAndroidWebOverride ?? impl.readIsAndroidUserAgent());

@@ -14,12 +14,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Vandaar de middenweg: wegklikken sluimert hem een week, en na drie keer
 /// wegklikken houdt de app erover op. Wie hem drie keer wegklikt, meent het.
 class InstallHintStore {
-  InstallHintStore(this._prefs);
+  InstallHintStore(this._prefs)
+      : _atKey = kDismissedAtKey,
+        _countKey = kDismissCountKey;
+
+  /// Dezelfde regel voor de store-balk op de website (Android-bezoekers),
+  /// met eigen sleutels: wie de ene wegklikt, heeft de andere niet gezien.
+  InstallHintStore.storeApp(this._prefs)
+      : _atKey = kStoreDismissedAtKey,
+        _countKey = kStoreDismissCountKey;
 
   final SharedPreferences _prefs;
+  final String _atKey;
+  final String _countKey;
 
   static const kDismissedAtKey = 'pwa.installHintDismissedAt';
   static const kDismissCountKey = 'pwa.installHintDismissCount';
+  static const kStoreDismissedAtKey = 'pwa.storeHintDismissedAt';
+  static const kStoreDismissCountKey = 'pwa.storeHintDismissCount';
 
   /// Na zoveel keer wegklikken vraagt de app het niet meer.
   static const int kMaxDismissals = 3;
@@ -27,10 +39,10 @@ class InstallHintStore {
   /// Hoe lang de balk wegblijft na één keer wegklikken.
   static const Duration kSnooze = Duration(days: 7);
 
-  int get dismissCount => _prefs.getInt(kDismissCountKey) ?? 0;
+  int get dismissCount => _prefs.getInt(_countKey) ?? 0;
 
   DateTime? get dismissedAt {
-    final millis = _prefs.getInt(kDismissedAtKey);
+    final millis = _prefs.getInt(_atKey);
     return millis == null ? null : DateTime.fromMillisecondsSinceEpoch(millis);
   }
 
@@ -41,9 +53,9 @@ class InstallHintStore {
       );
 
   Future<void> recordDismissal({DateTime? now}) async {
-    await _prefs.setInt(kDismissCountKey, dismissCount + 1);
+    await _prefs.setInt(_countKey, dismissCount + 1);
     await _prefs.setInt(
-      kDismissedAtKey,
+      _atKey,
       (now ?? DateTime.now()).millisecondsSinceEpoch,
     );
   }

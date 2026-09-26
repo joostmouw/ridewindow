@@ -1567,6 +1567,31 @@ class SEn extends S {
   String get updateBannerReload => 'Reload';
 
   @override
+  String get storeBannerText => 'Ridewindow is also an Android app';
+
+  @override
+  String get storeBannerAction => 'Join';
+
+  @override
+  String get storeStepsTitle => 'Test the Android app';
+
+  @override
+  String get storeStepsIntro =>
+      'The app is still in testing. Joining takes two minutes. Use the same Google account as on your phone for all three steps.';
+
+  @override
+  String get storeStepGroup => 'Join the test group';
+
+  @override
+  String get storeStepOptIn => 'Sign up as a tester';
+
+  @override
+  String get storeStepInstall => 'Install Ridewindow from Play';
+
+  @override
+  String get storeStepOpen => 'Open';
+
+  @override
   String get pelotonEmptyTitle => 'Ride together';
 
   @override

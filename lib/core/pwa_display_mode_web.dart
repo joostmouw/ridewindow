@@ -14,3 +14,6 @@ bool readIsIosUserAgent() {
       userAgent.contains('iPad') ||
       userAgent.contains('iPod');
 }
+
+bool readIsAndroidUserAgent() =>
+    web.window.navigator.userAgent.contains('Android');

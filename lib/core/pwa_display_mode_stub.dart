@@ -9,3 +9,5 @@
 bool readIsStandalone() => false;
 
 bool readIsIosUserAgent() => false;
+
+bool readIsAndroidUserAgent() => false;

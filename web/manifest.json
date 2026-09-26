@@ -8,6 +8,13 @@
     "description": "Cyclist-specific weather windows and ride planning",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam",
+            "id": "ridewindow.joost.amsterdam"
+        }
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",

@@ -16,11 +16,8 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ridewindow/core/app_version.dart';
+import 'package:ridewindow/core/store_links.dart';
 import 'package:ridewindow/core/web_reload.dart';
-
-/// De Play-vermelding, voor als de updateflow van Play zelf niet mag of faalt.
-const kPlayStoreListingUrl =
-    'https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam';
 
 abstract class AppUpdateService {
   /// Het buildnummer dat klaarstaat, of `null` als er niets nieuwers is of de
@@ -66,7 +63,7 @@ class PlayAppUpdateService implements AppUpdateService {
         return;
       }
     } catch (_) {
-      // Val terug op de Play-vermelding hieronder.
+      // Mag of lukt de updateflow van Play niet: dan de Play-vermelding.
     }
     await launchUrl(
       Uri.parse(kPlayStoreListingUrl),

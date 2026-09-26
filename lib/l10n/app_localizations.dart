@@ -2875,6 +2875,54 @@ abstract class S {
   /// **'Vernieuwen'**
   String get updateBannerReload;
 
+  /// Balk bovenaan de website voor bezoekers op een Android-toestel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ridewindow is er ook als Android-app'**
+  String get storeBannerText;
+
+  /// Knop in de store-balk: opent de stappen om tester te worden (of de Play-pagina na de lancering).
+  ///
+  /// In nl, this message translates to:
+  /// **'Doe mee'**
+  String get storeBannerAction;
+
+  /// Titel van het venster met de drie teststappen.
+  ///
+  /// In nl, this message translates to:
+  /// **'Test de Android-app'**
+  String get storeStepsTitle;
+
+  /// Uitleg boven de drie teststappen.
+  ///
+  /// In nl, this message translates to:
+  /// **'De app zit nog in de testfase. Meedoen kost twee minuten. Gebruik bij alle drie de stappen hetzelfde Google-account als op je telefoon.'**
+  String get storeStepsIntro;
+
+  /// Stap 1: de Google-groep ridewindow-testers.
+  ///
+  /// In nl, this message translates to:
+  /// **'Word lid van de testgroep'**
+  String get storeStepGroup;
+
+  /// Stap 2: de opt-in-pagina van Play.
+  ///
+  /// In nl, this message translates to:
+  /// **'Meld je aan als tester'**
+  String get storeStepOptIn;
+
+  /// Stap 3: de Play-vermelding.
+  ///
+  /// In nl, this message translates to:
+  /// **'Installeer Ridewindow via Play'**
+  String get storeStepInstall;
+
+  /// Knop per teststap: opent de link in een nieuw tabblad.
+  ///
+  /// In nl, this message translates to:
+  /// **'Openen'**
+  String get storeStepOpen;
+
   /// No description provided for @pelotonEmptyTitle.
   ///
   /// In nl, this message translates to:

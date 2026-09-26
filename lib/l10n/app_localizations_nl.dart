@@ -1570,6 +1570,31 @@ class SNl extends S {
   String get updateBannerReload => 'Vernieuwen';
 
   @override
+  String get storeBannerText => 'Ridewindow is er ook als Android-app';
+
+  @override
+  String get storeBannerAction => 'Doe mee';
+
+  @override
+  String get storeStepsTitle => 'Test de Android-app';
+
+  @override
+  String get storeStepsIntro =>
+      'De app zit nog in de testfase. Meedoen kost twee minuten. Gebruik bij alle drie de stappen hetzelfde Google-account als op je telefoon.';
+
+  @override
+  String get storeStepGroup => 'Word lid van de testgroep';
+
+  @override
+  String get storeStepOptIn => 'Meld je aan als tester';
+
+  @override
+  String get storeStepInstall => 'Installeer Ridewindow via Play';
+
+  @override
+  String get storeStepOpen => 'Openen';
+
+  @override
   String get pelotonEmptyTitle => 'Samen fietsen';
 
   @override
