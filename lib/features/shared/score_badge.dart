@@ -18,7 +18,19 @@ class ScoreBadge extends StatefulWidget {
   /// getal levert de precisie. Het detail houdt het woord.
   final int? score;
 
-  const ScoreBadge({super.key, required this.tier, this.score});
+  /// Kleur die op het getal de tierkleur overruled. De plankaartjes onder
+  /// GEPLAND lopen al in gepland-blauw; daar las de groene tierpil als een
+  /// tweede kleur op één kaart (Joost, build 59). Met de kleur van het
+  /// kaartje zelf blijft er één kleur over, en het oordeel lees je gewoon
+  /// uit het Semantics-label en op het detail.
+  final Color? color;
+
+  const ScoreBadge({
+    super.key,
+    required this.tier,
+    this.score,
+    this.color,
+  });
 
   @override
   State<ScoreBadge> createState() => _ScoreBadgeState();
@@ -76,6 +88,14 @@ class _ScoreBadgeState extends State<ScoreBadge>
     };
     final value = widget.score;
 
+    // De override geldt alléén de getalvariant: een blauw woord "Toprit"
+    // zou het oordeel verbergen in plaats van laten zien. De vulling is een
+    // stap sterker dan het kaartje eromheen (alpha 18), zodat de pil ook op
+    // een blauw kaartje nog als pil leest.
+    final override = value != null ? widget.color : null;
+    final pillBg = override?.withAlpha(40) ?? bg;
+    final pillFg = override ?? fg;
+
     Widget badge = Container(
       // Strakker opgepoten als er alleen een getal in staat: het woord
       // vroeg een eigen vulling, een getal leest ook krap.
@@ -83,7 +103,7 @@ class _ScoreBadgeState extends State<ScoreBadge>
           ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
           : const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: bg,
+        color: pillBg,
         borderRadius: AppShapes.roundedXl,
       ),
       // Geen smiley meer. Die verdween in v4.0 al van de ritkaarten toen de
@@ -106,7 +126,7 @@ class _ScoreBadgeState extends State<ScoreBadge>
               child: Text(
                 '$value',
                 style: TextStyle(
-                  color: fg,
+                  color: pillFg,
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                   fontFeatures: const [FontFeature.tabularFigures()],

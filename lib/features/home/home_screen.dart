@@ -1019,11 +1019,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
                 // Het getal in plaats van het tier-woord (Joost 25 sept):
-                // het woord at de breedte van het vakje op; de kleur draagt
-                // het oordeel, het getal de precisie.
+                // het woord at de breedte van het vakje op. In gepland-blauw
+                // en niet in de tierkleur: het kaartje is al blauw, en groen
+                // op blauw las als twee kleuren op één kaart (Joost, build
+                // 59). Het oordeel zit in het Semantics-label van de pil.
                 ScoreBadge(
                   tier: rideTierFromScore(entry.plannedScore),
                   score: entry.plannedScore.round(),
+                  color: rw.plannedRide,
                 ),
                 // Ook bij een rit die jij organiseert (2026-09-25): die had
                 // hier geen prullenbak, en via het detail ging alleen je

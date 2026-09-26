@@ -112,7 +112,12 @@ class RideRoleLine extends StatelessWidget {
     final label = Expanded(
       child: Text(
         style.label,
-        maxLines: 1,
+        // Twee regels i.p.v. één: op het smalle plankaartje van Home liep de
+        // rolzin tegen een ellips aan ("You're o..."), terwijl juist deze zin
+        // zegt wat er van jou gevraagd wordt. Past het op één regel, dan
+        // blijft hij er ook op; de kaart groeit alleen als het echt niet
+        // past (Joost, build 59).
+        maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: textStyle,
       ),
