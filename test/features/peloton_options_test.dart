@@ -276,6 +276,67 @@ void main() {
       expect(find.text('Ik kan'), findsNWidgets(2));
     });
 
+    testWidgets('overal gestemd: de keuze staat dicht tot je hem opent',
+        (tester) async {
+      await _pump(
+        tester,
+        rides: [
+          _ride(
+            options: [
+              _option(
+                id: 'a',
+                dayOffset: 1,
+                votes: const [
+                  OptionVote(optionId: 'a', userId: _me, canRide: true),
+                ],
+              ),
+              _option(
+                id: 'b',
+                dayOffset: 2,
+                votes: const [
+                  OptionVote(optionId: 'b', userId: _me, canRide: false),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+
+      // Dicht: alleen de kopregel met je status, geen stemhokjes.
+      expect(find.text('Kies samen een venster'), findsOneWidget);
+      expect(find.text('Jij hebt overal gestemd'), findsOneWidget);
+      expect(find.text('Ik kan'), findsNothing);
+
+      // Een tik klapt hem open, met de stemrijen er gewoon weer in.
+      await tester.tap(find.text('Kies samen een venster'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ik kan'), findsNWidgets(2));
+    });
+
+    testWidgets('nog niet overal gestemd: de keuze staat gewoon open',
+        (tester) async {
+      await _pump(
+        tester,
+        rides: [
+          _ride(
+            options: [
+              _option(
+                id: 'a',
+                dayOffset: 1,
+                votes: const [
+                  OptionVote(optionId: 'a', userId: _me, canRide: true),
+                ],
+              ),
+              _option(id: 'b', dayOffset: 2),
+            ],
+          ),
+        ],
+      );
+
+      expect(find.text('Wachten op jouw antwoord'), findsOneWidget);
+      expect(find.text('Ik kan'), findsNWidgets(2));
+    });
+
     testWidgets('"Ik kan" stuurt mijn antwoord voor dat ene venster',
         (tester) async {
       final gateway = await _pump(tester, rides: [

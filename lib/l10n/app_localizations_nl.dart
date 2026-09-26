@@ -1690,6 +1690,19 @@ class SNl extends S {
   String get pelotonChooseTogether => 'Kies samen een venster';
 
   @override
+  String get pelotonMultiWindows => 'Meerdere vensters voorleggen';
+
+  @override
+  String get pelotonMultiWindowsHint =>
+      'Daarna kies je extra momenten om voor te leggen.';
+
+  @override
+  String get pelotonOptionsYouVoted => 'Jij hebt overal gestemd';
+
+  @override
+  String get pelotonOptionsWaitingForYou => 'Wachten op jouw antwoord';
+
+  @override
   String get pelotonOptionCanRide => 'Ik kan';
 
   @override

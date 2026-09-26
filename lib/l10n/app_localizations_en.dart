@@ -1685,6 +1685,19 @@ class SEn extends S {
   String get pelotonChooseTogether => 'Pick a window together';
 
   @override
+  String get pelotonMultiWindows => 'Select multiple ride dates';
+
+  @override
+  String get pelotonMultiWindowsHint =>
+      'You can then add extra windows to propose.';
+
+  @override
+  String get pelotonOptionsYouVoted => 'You\'ve voted on all';
+
+  @override
+  String get pelotonOptionsWaitingForYou => 'Waiting for your answer';
+
+  @override
   String get pelotonOptionCanRide => 'I can';
 
   @override

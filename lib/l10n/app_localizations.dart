@@ -3079,6 +3079,30 @@ abstract class S {
   /// **'Kies samen een venster'**
   String get pelotonChooseTogether;
 
+  /// No description provided for @pelotonMultiWindows.
+  ///
+  /// In nl, this message translates to:
+  /// **'Meerdere vensters voorleggen'**
+  String get pelotonMultiWindows;
+
+  /// No description provided for @pelotonMultiWindowsHint.
+  ///
+  /// In nl, this message translates to:
+  /// **'Daarna kies je extra momenten om voor te leggen.'**
+  String get pelotonMultiWindowsHint;
+
+  /// No description provided for @pelotonOptionsYouVoted.
+  ///
+  /// In nl, this message translates to:
+  /// **'Jij hebt overal gestemd'**
+  String get pelotonOptionsYouVoted;
+
+  /// No description provided for @pelotonOptionsWaitingForYou.
+  ///
+  /// In nl, this message translates to:
+  /// **'Wachten op jouw antwoord'**
+  String get pelotonOptionsWaitingForYou;
+
   /// No description provided for @pelotonOptionCanRide.
   ///
   /// In nl, this message translates to:

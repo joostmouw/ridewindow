@@ -947,7 +947,12 @@ class RideCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Beide kolommen bovenaan uitgelijnd: de scorepil hoort in de
+                // rechterbovenhoek van de kaart en de "+"-regel eronder op de
+                // hoogte van de datum. Gecentreerd zweefde de pil midden
+                // naast de linkerkolom (Joost, ronde #87).
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
@@ -1253,10 +1258,15 @@ class _WeatherChip extends StatelessWidget {
 /// waar het weer al staat. Een apart stemscherm zou dat allemaal opnieuw
 /// moeten tonen, of -- erger -- de keuze laten maken zonder.
 ///
+/// **Inklapbaar sinds build 59.** Ben je eenmaal overal beantwoord, dan hoeft
+/// dit blok geen halve kaart meer in te nemen: het klapt dicht tot één regel
+/// met je status, en een tik klapt hem weer open (Joost, toestelcontrole
+/// 1.0.48).
+///
 /// De volgorde is die van [GroupRide.frontRunner]: meeste stemmen, dan hoogste
 /// score, dan vroegste. Dat is dezelfde volgorde die Home aanhoudt, zodat "de
 /// beste" overal hetzelfde betekent.
-class _OptionsBlock extends StatelessWidget {
+class _OptionsBlock extends StatefulWidget {
   const _OptionsBlock({
     required this.ride,
     required this.entry,
@@ -1272,13 +1282,22 @@ class _OptionsBlock extends StatelessWidget {
   final String? myUserId;
 
   @override
+  State<_OptionsBlock> createState() => _OptionsBlockState();
+}
+
+class _OptionsBlockState extends State<_OptionsBlock> {
+  /// Een tik van de gebruiker gaat vóór de automatiek: wie hem dichtklapt
+  /// terwijl er nog gestemd moet worden, krijgt hem niet ongevraagd terug.
+  bool? _manual;
+
+  @override
   Widget build(BuildContext context) {
     final s = S.of(context);
     final theme = Theme.of(context);
     final rw = context.rw;
-    final front = ride.frontRunner;
+    final front = widget.ride.frontRunner;
 
-    final sorted = [...ride.options]..sort((a, b) {
+    final sorted = [...widget.ride.options]..sort((a, b) {
         final byVotes = b.yesCount.compareTo(a.yesCount);
         if (byVotes != 0) return byVotes;
         final byScore = b.plannedScore.compareTo(a.plannedScore);
@@ -1286,31 +1305,66 @@ class _OptionsBlock extends StatelessWidget {
         return a.start.compareTo(b.start);
       });
 
+    // Dicht zodra jij overal antwoord op hebt: het werk van dit blok zit er
+    // dan voor jou op. Wie nog niet overal heeft gereageerd, moet hem eerst
+    // zien -- vandaar open.
+    final votedAll = widget.myUserId != null &&
+        widget.ride.options.every((o) => o.voteOf(widget.myUserId) != null);
+    final expanded = _manual ?? !votedAll;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          s.pelotonChooseTogether,
-          style: theme.textTheme.labelLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6),
-        for (final option in sorted) ...[
-          _OptionRow(
-            option: option,
-            entry: entry,
-            host: host,
-            isOwner: isOwner,
-            myVote: option.voteOf(myUserId),
-            // Alleen markeren als er werkelijk iets voorop ligt. Bij nul
-            // stemmen wint de hoogste score, en die "Voorop" noemen zou
-            // suggereren dat iemand al gekozen heeft.
-            isFrontRunner: front != null &&
-                front.id == option.id &&
-                option.yesCount > 0,
-            tonal: _scoreTonal(option.plannedScore, rw),
+        InkWell(
+          onTap: () => setState(() => _manual = !expanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    s.pelotonChooseTogether,
+                    style: theme.textTheme.labelLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Text(
+                  votedAll
+                      ? s.pelotonOptionsYouVoted
+                      : s.pelotonOptionsWaitingForYou,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  expanded ? AppIcons.caretUp : AppIcons.caretDown,
+                  size: 16,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 4),
+        ),
+        if (expanded) ...[
+          const SizedBox(height: 6),
+          for (final option in sorted) ...[
+            _OptionRow(
+              option: option,
+              entry: widget.entry,
+              host: widget.host,
+              isOwner: widget.isOwner,
+              myVote: option.voteOf(widget.myUserId),
+              // Alleen markeren als er werkelijk iets voorop ligt. Bij nul
+              // stemmen wint de hoogste score, en die "Voorop" noemen zou
+              // suggereren dat iemand al gekozen heeft.
+              isFrontRunner: front != null &&
+                  front.id == option.id &&
+                  option.yesCount > 0,
+              tonal: _scoreTonal(option.plannedScore, rw),
+            ),
+            const SizedBox(height: 4),
+          ],
         ],
       ],
     );
