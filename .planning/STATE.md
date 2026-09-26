@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-23T08:00:00.000Z"
-last_activity: 2026-09-23
+last_updated: "2026-09-26T10:00:00.000Z"
+last_activity: 2026-09-26
 progress:
   total_phases: 12
   completed_phases: 6
@@ -14,6 +14,30 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-09-26 -- 1.0.48 (59) op internal en web
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.48 (59)**, geüpload via de Play Developer API (versionCode 59 bevestigd) |
+| PWA | **1.0.48 (59)** op `my-project-joost.web.app`; `scripts/deploy_web.sh` mat live en lokaal dezelfde `main.dart.js`-MD5 `255587ee42c720ee1107cb089ebf0977` |
+| Oppo | nog op **1.0.47 (58)**; de update komt via Play internal -- ophalen uit zijn éigen Play-vermelding, niet met `Update all` (les van 25 sept). Toestelcontrole van deze ronde staat open |
+| Alpha / closed | **1.0.44 (55)**, 59 niet gepromoveerd |
+| main | **1.0.48+59** + drie voorafgaande commits: #88 in de backlog (`e4a101b`), de #87-fix (`b32b191`), de plankaart-score (`4544eb9`) en het specimen (`e568b37`) |
+
+**Wat er in 59 zit (goedgekeurd op specimen, `preview.html` in de taakmap):**
+#87 is gebouwd — op het groepsritdetail draait de teller alleen fietsjes en is
+de telregel de enige telzin; deelnemersstatus is icoon (check/prohibit/hourglass)
+met het woord als Semantics-label. Op de plankaartjes onder GEPLAND toont de
+badge het scoregetal klein in de tierkleur in plaats van het woord "Toprit".
+Volledige suite 983 groen, analyze 201 infos / nul errors. Bewust niet
+meegenomen: de "100 Toprit"-pil op de Ritten-tab en het woord in de
+detail-AppBar; de Ritten-pil volgt pas als Joost 59 op het toestel goed vindt.
+
+**Nieuw in de backlog:** #88 (`e4a101b`) — een (deels) verstreken venster blijft
+stembaar en kiesbaar in "Kies samen een venster"; nergens een tijdfilter, ook de
+database niet (0010). Gevonden bij het verwerken van de onverwerkte screenshots
+in `photos/` (20 sept); de 25-september-twee bleken al verwerkt als #85–#87.
 
 ## Stand na 2026-09-25 -- build 58 op Oppo en web
 
