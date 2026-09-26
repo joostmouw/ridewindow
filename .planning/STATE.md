@@ -21,7 +21,7 @@ progress:
 |---|---|
 | Internal | **1.0.49 (60)**, geüpload via de Play Developer API; `--list-tracks` bevestigt internal 60, alpha 55 |
 | PWA | **1.0.49 (60)** op `my-project-joost.web.app`; `scripts/deploy_web.sh` mat live en lokaal dezelfde `main.dart.js`-MD5 `877c4ff9e0340efca07190c7d15245d6` (de eerste twee metingen gaven nog de oude hash van 59: CDN-vertraging, geen fout) |
-| Oppo | nog op **1.0.47 (58)**, `installerPackageName=com.android.vending`. De eigen Play-vermelding toonde ruim vier minuten na de upload, ook na `force-stop` van Play, nog "Open" in plaats van "Update". 59 is dus evenmin op het toestel beland. Ophalen gaat via de eigen vermelding (`-d "https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam" -p com.android.vending`; `market://` opent HeyTap) |
+| Oppo | **1.0.49 (60)** via Play (`installerPackageName=com.android.vending`, `lastUpdateTime=2026-09-26 16:33:59`), door Play zelf geïnstalleerd zodra het toestel ontgrendeld was. **Les:** "Open" op de Play-vermelding betekent ook "al bijgewerkt"; lees eerst `versionCode` met `dumpsys package` voordat je "Open" als "nog niet aangeboden" uitlegt. Die vergissing stond hier eerst. `market://` opent HeyTap; gebruik `-d "https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam" -p com.android.vending` |
 | Alpha / closed | **1.0.44 (55)**, 60 niet gepromoveerd |
 | main | **1.0.49+60** (`8c2a09f`), bovenop de build-59-rondje (`db08a48`, `b347de5`) en de plankaart-ronde (`ebc44e7`) |
 

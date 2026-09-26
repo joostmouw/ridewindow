@@ -1,7 +1,7 @@
 ---
 quick_id: 260926-bolletjes-update-storebanner
 date: 2026-09-26
-status: in_progress
+status: complete
 ---
 
 # Rode bolletjes erbij, update-melding bovenaan, store-balk op de website
