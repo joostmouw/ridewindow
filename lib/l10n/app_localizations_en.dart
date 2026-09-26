@@ -1558,6 +1558,15 @@ class SEn extends S {
       'Tap the Share icon, then \"Add to Home Screen\" to install Ridewindow.';
 
   @override
+  String get updateBannerText => 'A new version is ready';
+
+  @override
+  String get updateBannerUpdate => 'Update';
+
+  @override
+  String get updateBannerReload => 'Reload';
+
+  @override
   String get pelotonEmptyTitle => 'Ride together';
 
   @override

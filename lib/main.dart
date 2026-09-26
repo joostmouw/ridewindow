@@ -20,7 +20,7 @@ import 'package:workmanager/workmanager.dart';
 import 'package:ridewindow/app/router.dart';
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/supabase_config.dart';
-import 'package:ridewindow/features/shared/add_to_home_screen_overlay.dart';
+import 'package:ridewindow/features/shared/top_banners.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -214,13 +214,13 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
       darkTheme: buildAppTheme(Brightness.dark),
       themeMode: ref.watch(themeModeProvider),
       routerConfig: router,
-      // Renders the iOS "Add to Home Screen" instructional banner above
-      // every route from a single wiring point (PWA-03). Resolves to
-      // nothing on native/Android since isWebPlatform is false there.
+      // De balken bovenaan (update-melding, store-balk, iOS-installatie) boven
+      // elke route, vanaf één aansluitpunt (PWA-03). Wat er per platform
+      // verschijnt, beslist elke balk zelf.
       builder: (context, child) => Stack(
         children: [
           if (child != null) child,
-          const AddToHomeScreenOverlay(),
+          const TopBanners(),
         ],
       ),
     );

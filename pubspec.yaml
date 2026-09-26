@@ -88,6 +88,13 @@ dependencies:
   # geluiden. Op web bewust niet in gebruik: autoplay blokkeert daar een intro
   # die zonder tik start.
   audioplayers: ^6.4.0
+
+  # Update-melding bovenaan (2026-09-26). Google's eigen Play Core-API: Play
+  # weet zelf welke build de nieuwste is, ook op internal en closed, dus er
+  # hoeft nergens een "laatste versie" bijgehouden te worden. Alleen Android
+  # en alleen bij een Play-installatie; op web vergelijkt de app version.json.
+  in_app_update: ^5.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -2857,6 +2857,24 @@ abstract class S {
   /// **'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om Ridewindow te installeren.'**
   String get addToHomeScreenHint;
 
+  /// Balk bovenaan als Play (Android) of de webserver (PWA) een nieuwere build heeft.
+  ///
+  /// In nl, this message translates to:
+  /// **'Er staat een nieuwe versie klaar'**
+  String get updateBannerText;
+
+  /// Knop in de update-balk op Android: start de updateflow van Play.
+  ///
+  /// In nl, this message translates to:
+  /// **'Bijwerken'**
+  String get updateBannerUpdate;
+
+  /// Knop in de update-balk op web: herlaadt de pagina met de nieuwe bundel.
+  ///
+  /// In nl, this message translates to:
+  /// **'Vernieuwen'**
+  String get updateBannerReload;
+
   /// No description provided for @pelotonEmptyTitle.
   ///
   /// In nl, this message translates to:

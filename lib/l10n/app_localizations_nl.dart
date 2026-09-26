@@ -1561,6 +1561,15 @@ class SNl extends S {
       'Tik op het Deel-icoon en kies \'Zet op beginscherm\' om Ridewindow te installeren.';
 
   @override
+  String get updateBannerText => 'Er staat een nieuwe versie klaar';
+
+  @override
+  String get updateBannerUpdate => 'Bijwerken';
+
+  @override
+  String get updateBannerReload => 'Vernieuwen';
+
+  @override
   String get pelotonEmptyTitle => 'Samen fietsen';
 
   @override

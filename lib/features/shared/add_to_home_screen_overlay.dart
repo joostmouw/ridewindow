@@ -11,8 +11,7 @@
 // Hij is nu weg te klikken, sluimert dan een week, en na drie keer wegklikken
 // houdt de app erover op. Zie `InstallHintStore` voor waarom niet voorgoed.
 //
-// Staat bovenaan en niet onderaan, zodat hij de vaste NavigationBar in
-// ScaffoldWithNav nooit afdekt.
+// Waar hij staat, bepaalt TopBanners.
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,43 +76,37 @@ class _AddToHomeScreenOverlayState extends State<AddToHomeScreenOverlay> {
     final colorScheme = Theme.of(context).colorScheme;
     final s = S.of(context);
 
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: SafeArea(
-        bottom: false,
-        child: Material(
-          color: colorScheme.inverseSurface,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 6, 8),
-            child: Row(
-              children: [
-                Icon(
-                  AppIcons.export,
-                  color: colorScheme.onInverseSurface,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    s.addToHomeScreenHint,
-                    style: TextStyle(color: colorScheme.onInverseSurface),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  icon: const Icon(AppIcons.x, size: 18),
-                  color: colorScheme.onInverseSurface,
-                  // MaterialLocalizations en geen eigen ARB-sleutel: Flutter
-                  // vertaalt deze al in beide talen.
-                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  visualDensity: VisualDensity.compact,
-                  onPressed: _dismiss,
-                ),
-              ],
+    // Geen eigen Positioned of SafeArea: die komen van TopBanners, zodat deze
+    // balk en de andere onder elkaar staan in plaats van over elkaar.
+    return Material(
+      color: colorScheme.inverseSurface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 6, 8),
+        child: Row(
+          children: [
+            Icon(
+              AppIcons.export,
+              color: colorScheme.onInverseSurface,
+              size: 20,
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                s.addToHomeScreenHint,
+                style: TextStyle(color: colorScheme.onInverseSurface),
+              ),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
+              icon: const Icon(AppIcons.x, size: 18),
+              color: colorScheme.onInverseSurface,
+              // MaterialLocalizations en geen eigen ARB-sleutel: Flutter
+              // vertaalt deze al in beide talen.
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+              visualDensity: VisualDensity.compact,
+              onPressed: _dismiss,
+            ),
+          ],
         ),
       ),
     );
