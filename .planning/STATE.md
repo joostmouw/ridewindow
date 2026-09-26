@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-26T10:00:00.000Z"
+last_updated: "2026-09-26T16:45:00.000Z"
 last_activity: 2026-09-26
 progress:
   total_phases: 12
@@ -14,6 +14,22 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-09-26 -- 1.0.49 (60) op internal en web
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.49 (60)**, geüpload via de Play Developer API; `--list-tracks` bevestigt internal 60, alpha 55 |
+| PWA | **1.0.49 (60)** op `my-project-joost.web.app`; `scripts/deploy_web.sh` mat live en lokaal dezelfde `main.dart.js`-MD5 `877c4ff9e0340efca07190c7d15245d6` (de eerste twee metingen gaven nog de oude hash van 59: CDN-vertraging, geen fout) |
+| Oppo | nog op **1.0.47 (58)**, `installerPackageName=com.android.vending`. De eigen Play-vermelding toonde ruim vier minuten na de upload, ook na `force-stop` van Play, nog "Open" in plaats van "Update". 59 is dus evenmin op het toestel beland. Ophalen gaat via de eigen vermelding (`-d "https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam" -p com.android.vending`; `market://` opent HeyTap) |
+| Alpha / closed | **1.0.44 (55)**, 60 niet gepromoveerd |
+| main | **1.0.49+60** (`8c2a09f`), bovenop de build-59-rondje (`db08a48`, `b347de5`) en de plankaart-ronde (`ebc44e7`) |
+
+**Wat er in 60 zit:** de scorepil rechtsboven op de ritkaart, het inklapbare
+blok "Kies samen een venster", het vinkje "Meerdere vensters voorleggen" bij
+uitnodigen, en de plankaartjes onder GEPLAND in één kleur met een rolregel die
+omslaat. Suite 986 groen, analyze 201 infos (baseline). Toestelgoedkeuring
+staat open en loopt via Play, niet via een sideload.
 
 ## Stand na 2026-09-26 -- 1.0.48 (59) op internal en web
 

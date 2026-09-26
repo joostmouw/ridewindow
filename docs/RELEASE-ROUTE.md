@@ -101,6 +101,20 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
   script; `docs/CONSOLE-SETUP-CHECKLIST.md` de eenmalige inrichting. Bij een
   wijziging aan de route werk je dit bestand bij, niet de andere twee los.
 
+## Stand 26 september 2026, na de internal-release van 1.0.49 (60)
+
+| Waar | Stand |
+|---|---|
+| Oppo | 1.0.47 (58) via Play; Play bood 59 en 60 bij de release nog niet aan |
+| PWA | 1.0.49 (60), live bundelhash `877c4ff9e0340efca07190c7d15245d6` |
+| Internal | 1.0.49 (60) |
+| Alpha / closed | 1.0.44 (55) |
+| main | 1.0.49+60 (`8c2a09f`) |
+
+**Wat 60 brengt:** nettere ritkaarten (scorepil rechtsboven, inklapbaar
+keuzeblok, meerkeuze achter een vinkje, plankaartjes in één kleur). De
+details staan in `.planning/STATE.md`.
+
 ## Stand 25 september 2026, na de internal-release van 1.0.47 (58)
 
 | Waar | Stand |
