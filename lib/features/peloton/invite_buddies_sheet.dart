@@ -26,10 +26,12 @@ import 'package:ridewindow/services/peloton_gateway.dart';
 /// gevraagd is. Een groepsrit is daarop de uitzondering: daar is de groep de
 /// deelnemer, en de leden zien de rit via `group_id` (0012, `is_ride_member`).
 ///
-/// **Slice 2 van epic #65.** Na het kiezen van maatjes vraagt de app welke
-/// vensters je voorlegt. Kies je er meer dan een, dan komen ze als keuze bij de
-/// rit te staan en geeft iedereen aan wanneer hij kan. Kies je er een, dan is
-/// het precies wat het altijd was: een uitnodiging voor dat ene tijdvak.
+/// **Slice 2 van epic #65, maar sinds build 59 achter een vinkje.** Meerkeuze
+/// is geen stap meer die ongevraagd komt: alleen wie in stap 1 "Meerdere
+/// vensters voorleggen" aanvinkt, krijgt de vensterkiezer te zien. Kies je
+/// daar meer dan een, dan komen ze als keuze bij de rit te staan en geeft
+/// iedereen aan wanneer hij kan. Zonder vinkje is de uitnodiging precies wat
+/// het altijd was: één uitnodiging voor dat ene tijdvak, zonder tussenstap.
 ///
 /// **Groep of maatjes (fase 35).** Zit je in een groep, dan kies je eerst met
 /// wie je rijdt: een groep, of losse maatjes -- nooit allebei. Een
@@ -100,7 +102,7 @@ Future<void> showInviteBuddiesSheet(
   if (!context.mounted) return;
 
   switch (target) {
-    case _GroupTarget(:final group):
+    case _GroupTarget(:final group, :final multiWindow):
       await _inviteGroup(
         context,
         ref,
@@ -111,8 +113,9 @@ Future<void> showInviteBuddiesSheet(
         myName: myName,
         messenger: messenger,
         gateway: gateway,
+        multiWindow: multiWindow,
       );
-    case _FriendsTarget(:final friendIds):
+    case _FriendsTarget(:final friendIds, :final multiWindow):
       if (friendIds.isEmpty) return;
       await _inviteFriends(
         context,
@@ -126,6 +129,7 @@ Future<void> showInviteBuddiesSheet(
         me: me,
         messenger: messenger,
         gateway: gateway,
+        multiWindow: multiWindow,
       );
   }
 }
@@ -145,6 +149,7 @@ Future<void> _inviteGroup(
   required String? myName,
   required ScaffoldMessengerState messenger,
   required PelotonGateway gateway,
+  required bool multiWindow,
 }) async {
   final s = S.of(context);
 
@@ -182,6 +187,7 @@ Future<void> _inviteGroup(
       start: start,
       end: end,
       plannedScore: plannedScore,
+      multiWindow: multiWindow,
     );
   } catch (error) {
     debugPrint('Peloton: vensters voorleggen mislukt: $error');
@@ -264,6 +270,7 @@ Future<void> _inviteFriends(
   required String? me,
   required ScaffoldMessengerState messenger,
   required PelotonGateway gateway,
+  required bool multiWindow,
 }) async {
   final s = S.of(context);
 
@@ -281,6 +288,7 @@ Future<void> _inviteFriends(
       start: start,
       end: end,
       plannedScore: plannedScore,
+      multiWindow: multiWindow,
     );
   } catch (error) {
     debugPrint('Peloton: vensters voorleggen mislukt: $error');
@@ -368,16 +376,20 @@ Future<void> _inviteFriends(
 
 /// Wat de eerste stap oplevert: een groep of een set maatjes, nooit allebei.
 sealed class _InviteTarget {
-  const _InviteTarget();
+  const _InviteTarget({required this.multiWindow});
+
+  /// Moet de tweede stap (vensters kiezen) openen? Meerkeuze is sinds build
+  /// 59 een aangevinkte keuze in plaats van een stap die ongevraagd komt.
+  final bool multiWindow;
 }
 
 final class _GroupTarget extends _InviteTarget {
-  const _GroupTarget(this.group);
+  const _GroupTarget(this.group, {required super.multiWindow});
   final PelotonGroup group;
 }
 
 final class _FriendsTarget extends _InviteTarget {
-  const _FriendsTarget(this.friendIds);
+  const _FriendsTarget(this.friendIds, {required super.multiWindow});
   final Set<String> friendIds;
 }
 
@@ -400,6 +412,10 @@ class _InviteTargetPickerState extends State<_InviteTargetPicker> {
   final _selected = <String>{};
   String? _groupId;
 
+  /// Meerkeuze pas na een aangevinkte keuze; de bevestigknop zegt er iets
+  /// van, want zonder vinkje is er geen volgende stap.
+  bool _multiWindows = false;
+
   bool get _hasGroups => widget.groups.isNotEmpty;
 
   PelotonGroup? get _group {
@@ -412,7 +428,9 @@ class _InviteTargetPickerState extends State<_InviteTargetPicker> {
   void _confirm() {
     final group = _group;
     Navigator.of(context).pop<_InviteTarget>(
-      group != null ? _GroupTarget(group) : _FriendsTarget({..._selected}),
+      group != null
+          ? _GroupTarget(group, multiWindow: _multiWindows)
+          : _FriendsTarget({..._selected}, multiWindow: _multiWindows),
     );
   }
 
@@ -502,6 +520,15 @@ class _InviteTargetPickerState extends State<_InviteTargetPicker> {
               ],
             ),
           ),
+          // De meerkeuze staat los van de keuze groep-of-maatjes: allebei de
+          // paden kunnen vensters voorleggen, dus het vinkje hoort onder de
+          // lijst en niet in een van de twee secties.
+          CheckboxListTile(
+            value: _multiWindows,
+            onChanged: (on) => setState(() => _multiWindows = on ?? false),
+            title: Text(s.pelotonMultiWindows),
+            subtitle: Text(s.pelotonMultiWindowsHint),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
             child: SizedBox(
@@ -509,7 +536,9 @@ class _InviteTargetPickerState extends State<_InviteTargetPicker> {
               child: FilledButton(
                 onPressed: canConfirm ? _confirm : null,
                 child: Text(
-                  _hasGroups ? s.groupRideNextWindows : s.pelotonInviteAction,
+                  _multiWindows
+                      ? s.groupRideNextWindows
+                      : s.pelotonInviteAction,
                 ),
               ),
             ),
@@ -522,6 +551,9 @@ class _InviteTargetPickerState extends State<_InviteTargetPicker> {
 
 /// Stap 2 van het uitnodigen: welke vensters leg je voor?
 ///
+/// Wordt alleen gebeld als de gebruiker in stap 1 om meerkeuze vroeg; zonder
+/// die vraag levert hij het oorspronkelijke venster, zonder sheet.
+///
 /// Geeft `null` bij annuleren en een lijst bij bevestigen. Het venster waar de
 /// gebruiker vandaan komt zit er altijd in -- ook als de slot-generator hem
 /// inmiddels niet meer aanbeveelt, want daar begon deze handeling.
@@ -531,6 +563,7 @@ Future<List<RideSlot>?> _pickWindows(
   required DateTime start,
   required DateTime end,
   required double plannedScore,
+  required bool multiWindow,
 }) async {
   final state = ref.read(slotsProvider);
   final generated = switch (state) {
@@ -544,6 +577,10 @@ Future<List<RideSlot>?> _pickWindows(
     tier: rideTierFromScore(plannedScore),
     hours: const [],
   );
+
+  // Zonder vinkje geen tussenstap: de uitnodiging is wat hij vóór slice 2 al
+  // was, voor precies het venster waar de gebruiker vandaan komt.
+  if (!multiWindow) return [origin];
 
   // Het eigen venster vooraan, de rest op score. Geen dubbele: twee keer
   // hetzelfde tijdvak voorleggen is geen keuze maar een fout, en de database

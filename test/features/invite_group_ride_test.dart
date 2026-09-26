@@ -153,8 +153,18 @@ Future<void> _open(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Finder get _nextButton =>
+Finder get _inviteButton =>
+    find.widgetWithText(FilledButton, 'Uitnodigen');
+
+Finder get _windowsButton =>
     find.widgetWithText(FilledButton, 'Verder: kies vensters');
+
+/// Zet het meerkeuze-vinkje aan in stap 1; zonder dat komt de vensterstap
+/// niet meer (build 59).
+Future<void> _tickMulti(WidgetTester tester) async {
+  await tester.tap(find.text('Meerdere vensters voorleggen'));
+  await tester.pumpAndSettle();
+}
 
 bool _enabled(WidgetTester tester, Finder button) =>
     tester.widget<FilledButton>(button).onPressed != null;
@@ -194,6 +204,8 @@ void main() {
       expect(find.text('Of losse maatjes'), findsNothing);
       expect(find.byType(RadioListTile<String>), findsNothing);
       expect(find.widgetWithText(FilledButton, 'Uitnodigen'), findsOneWidget);
+      // Meerkeuze bestaat ook zonder groepen, maar staat uit.
+      expect(find.text('Meerdere vensters voorleggen'), findsOneWidget);
     });
 
     testWidgets('zonder maatjes en zonder groepen: de oude melding',
@@ -225,7 +237,7 @@ void main() {
         tester.getTopLeft(find.text('Een groep')).dy,
         lessThan(tester.getTopLeft(find.text('Of losse maatjes')).dy),
       );
-      expect(_enabled(tester, _nextButton), isFalse);
+      expect(_enabled(tester, _inviteButton), isFalse);
     });
 
     testWidgets('groep kiezen zet de maatjes uit; nog eens tikken maakt het ongedaan',
@@ -237,14 +249,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(_friendTile(tester).onChanged, isNull);
-      expect(_enabled(tester, _nextButton), isTrue);
+      expect(_enabled(tester, _inviteButton), isTrue);
       expect(find.text('2 leden · ieder lid ziet de rit'), findsOneWidget);
 
       await tester.tap(find.text('On the Roll'));
       await tester.pumpAndSettle();
 
       expect(_friendTile(tester).onChanged, isNotNull);
-      expect(_enabled(tester, _nextButton), isFalse);
+      expect(_enabled(tester, _inviteButton), isFalse);
       expect(find.text('2 leden'), findsOneWidget);
     });
 
@@ -256,7 +268,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(_groupTile(tester).enabled, isFalse);
-      expect(_enabled(tester, _nextButton), isTrue);
+      expect(_enabled(tester, _inviteButton), isTrue);
     });
 
     testWidgets('geen maatjes maar wel een groep: de kiezer opent',
@@ -280,10 +292,12 @@ void main() {
 
       await tester.tap(find.text('On the Roll'));
       await tester.pumpAndSettle();
-      await tester.tap(_nextButton);
+      // Het vinkje staat uit: geen vensterstap meer, de rit gaat direct de
+      // groep in. De knop heet daarom niet "Verder" maar "Uitnodigen".
+      await tester.tap(_inviteButton);
       await tester.pumpAndSettle();
-      await _confirmWindows(tester);
 
+      expect(find.text('Welke vensters leg je voor?'), findsNothing);
       expect(gateway.calls, contains('createGroupRide:g1'));
       expect(gateway.calls.where((c) => c.startsWith('inviteToRide')), isEmpty);
       expect(
@@ -304,7 +318,9 @@ void main() {
 
       await tester.tap(find.text('On the Roll'));
       await tester.pumpAndSettle();
-      await tester.tap(_nextButton);
+      // Met het vinkje aan heet de knop Verder, want er komt wél een stap.
+      await _tickMulti(tester);
+      await tester.tap(_windowsButton);
       await tester.pumpAndSettle();
       await _confirmWindows(tester, extraWindow: true);
 
@@ -325,7 +341,11 @@ void main() {
 
       await tester.tap(find.text('On the Roll'));
       await tester.pumpAndSettle();
-      await tester.tap(_nextButton);
+      // Met het vinkje aan, want de dupliekcontrole hoort vóór de
+      // vensterstap: niemand kiest eerst vensters om daarna te horen dat
+      // het niet kan.
+      await _tickMulti(tester);
+      await tester.tap(_windowsButton);
       await tester.pumpAndSettle();
 
       expect(find.text('Welke vensters leg je voor?'), findsNothing);
@@ -358,10 +378,11 @@ void main() {
 
       await tester.tap(find.text('Fleur'));
       await tester.pumpAndSettle();
-      await tester.tap(_nextButton);
+      // Zonder vinkje: direct uitnodigen, zonder vensterstap.
+      await tester.tap(_inviteButton);
       await tester.pumpAndSettle();
-      await _confirmWindows(tester);
 
+      expect(find.text('Welke vensters leg je voor?'), findsNothing);
       expect(gateway.calls, contains('createGroupRide:-'));
       expect(gateway.calls, contains('inviteToRide:ride-new-1:uid-f'));
       expect(find.text('Uitnodiging verstuurd'), findsOneWidget);
@@ -376,15 +397,35 @@ void main() {
 
       await tester.tap(find.text('Fleur'));
       await tester.pumpAndSettle();
-      await tester.tap(_nextButton);
+      await tester.tap(_inviteButton);
       await tester.pumpAndSettle();
-      await _confirmWindows(tester);
 
       expect(
         gateway.calls.where((c) => c.startsWith('createGroupRide')),
         isEmpty,
       );
       expect(gateway.calls, contains('inviteToRide:mijn-rit:uid-f'));
+    });
+
+    testWidgets('maatjes met het vinkje aan: eerst vensters, dan uitnodigen',
+        (tester) async {
+      final gateway = _gateway();
+      await _pump(tester, gateway);
+      await _open(tester);
+
+      await tester.tap(find.text('Fleur'));
+      await tester.pumpAndSettle();
+      await _tickMulti(tester);
+      await tester.tap(_windowsButton);
+      await tester.pumpAndSettle();
+      await _confirmWindows(tester);
+
+      expect(gateway.calls, contains('inviteToRide:ride-new-1:uid-f'));
+      expect(
+        gateway.calls.where((c) => c.startsWith('proposeOptions')),
+        isEmpty,
+        reason: 'één aangevinkt venster is geen keuze',
+      );
     });
 
     testWidgets('past op 360 dp met tekstschaal 1.3 en een lange groepsnaam',
