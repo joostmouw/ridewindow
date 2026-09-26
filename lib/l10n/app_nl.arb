@@ -813,8 +813,8 @@
   "@groupRideOpenGroup": {"description": "Tooltip van de groepschip op het ritdetail."},
   "groupRideNobodyYet": "Nog niemand",
   "@groupRideNobodyYet": {"description": "Onder een venster op het ritdetail als nog niemand heeft gezegd dat hij kan."},
-  "navRidesUnanswered": "{count, plural, =1{1 wacht op je antwoord} other{{count} wachten op je antwoord}}",
-  "@navRidesUnanswered": {"description": "Voorleestekst bij het rode bolletje op Ritten in de onderbalk en bij de tab Peloton.", "placeholders": {"count": {"type": "int"}}},
+  "navPelotonAttention": "{count, plural, =1{1 ding wacht op je} other{{count} dingen wachten op je}}",
+  "@navPelotonAttention": {"description": "Voorleestekst bij het rode bolletje op Ritten in de onderbalk en bij de tab Peloton: ritantwoorden, groepsaanvragen en nieuwe maatjes samen.", "placeholders": {"count": {"type": "int"}}},
   "groupFilterEmpty": "Nog geen ritten van {group}",
   "@groupFilterEmpty": {"description": "Lege lijst op de Ritten-tab als op een groep gefilterd is die nog geen ritten heeft.", "placeholders": {"group": {"type": "String"}}}
 }

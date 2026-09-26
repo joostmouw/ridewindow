@@ -626,3 +626,112 @@ final class PelotonGroupFamily extends $Family
   @override
   String toString() => r'pelotonGroupProvider';
 }
+
+/// Hoeveel aanvragen er bij jou als beheerder liggen, over al je groepen.
+///
+/// Dezelfde telling als de chip op de groepskaart ([PelotonGroup.openRequests]),
+/// zodat het bolletje en de kaart nooit iets anders zeggen. Een lid dat geen
+/// beheerder is ziet via RLS alleen zijn eigen voordrachten; die wachten niet
+/// op hem en tellen dus niet.
+
+@ProviderFor(openGroupRequestCount)
+final openGroupRequestCountProvider = OpenGroupRequestCountProvider._();
+
+/// Hoeveel aanvragen er bij jou als beheerder liggen, over al je groepen.
+///
+/// Dezelfde telling als de chip op de groepskaart ([PelotonGroup.openRequests]),
+/// zodat het bolletje en de kaart nooit iets anders zeggen. Een lid dat geen
+/// beheerder is ziet via RLS alleen zijn eigen voordrachten; die wachten niet
+/// op hem en tellen dus niet.
+
+final class OpenGroupRequestCountProvider
+    extends $FunctionalProvider<int, int, int> with $Provider<int> {
+  /// Hoeveel aanvragen er bij jou als beheerder liggen, over al je groepen.
+  ///
+  /// Dezelfde telling als de chip op de groepskaart ([PelotonGroup.openRequests]),
+  /// zodat het bolletje en de kaart nooit iets anders zeggen. Een lid dat geen
+  /// beheerder is ziet via RLS alleen zijn eigen voordrachten; die wachten niet
+  /// op hem en tellen dus niet.
+  OpenGroupRequestCountProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'openGroupRequestCountProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$openGroupRequestCountHash();
+
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int create(Ref ref) {
+    return openGroupRequestCount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$openGroupRequestCountHash() =>
+    r'419c45e21953ee0a274499b205ef1bc524f95e15';
+
+/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
+
+@ProviderFor(UnseenFriends)
+final unseenFriendsProvider = UnseenFriendsProvider._();
+
+/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
+final class UnseenFriendsProvider
+    extends $AsyncNotifierProvider<UnseenFriends, int> {
+  /// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+  /// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
+  UnseenFriendsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'unseenFriendsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$unseenFriendsHash();
+
+  @$internal
+  @override
+  UnseenFriends create() => UnseenFriends();
+}
+
+String _$unseenFriendsHash() => r'c4285e9acccc0388ed5825c15b1a8378fc0786eb';
+
+/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
+
+abstract class _$UnseenFriends extends $AsyncNotifier<int> {
+  FutureOr<int> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<int>, int>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<int>, int>, AsyncValue<int>, Object?, Object?>;
+    return element.handleCreate(ref, build);
+  }
+}

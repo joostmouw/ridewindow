@@ -4399,11 +4399,11 @@ abstract class S {
   /// **'Nog niemand'**
   String get groupRideNobodyYet;
 
-  /// Voorleestekst bij het rode bolletje op Ritten in de onderbalk en bij de tab Peloton.
+  /// Voorleestekst bij het rode bolletje op Ritten in de onderbalk en bij de tab Peloton: ritantwoorden, groepsaanvragen en nieuwe maatjes samen.
   ///
   /// In nl, this message translates to:
-  /// **'{count, plural, =1{1 wacht op je antwoord} other{{count} wachten op je antwoord}}'**
-  String navRidesUnanswered(int count);
+  /// **'{count, plural, =1{1 ding wacht op je} other{{count} dingen wachten op je}}'**
+  String navPelotonAttention(int count);
 
   /// Lege lijst op de Ritten-tab als op een groep gefilterd is die nog geen ritten heeft.
   ///

@@ -169,7 +169,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
         .toList();
     // Hetzelfde getal als het bolletje op Ritten in de onderbalk: dezelfde
     // provider, dus ze kunnen niet uit elkaar lopen (CLUB-25).
-    final unanswered = ref.watch(unansweredRideCountProvider);
+    final attention = ref.watch(pelotonAttentionCountProvider);
 
     return Stack(
       children: [
@@ -198,13 +198,13 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (unanswered > 0) ...[
+                      if (attention > 0) ...[
                         const SizedBox(width: 6),
                         Semantics(
-                          label: S.of(context).navRidesUnanswered(unanswered),
+                          label: S.of(context).navPelotonAttention(attention),
                           child: ExcludeSemantics(
                             child: Badge(
-                              label: Text(unansweredBadgeLabel(unanswered)),
+                              label: Text(unansweredBadgeLabel(attention)),
                             ),
                           ),
                         ),

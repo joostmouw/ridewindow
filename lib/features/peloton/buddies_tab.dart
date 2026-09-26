@@ -172,6 +172,16 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
 
     final friends = ref.watch(friendsProvider);
 
+    // Deze tab blijft bestaan als je naar een andere tab van de onderbalk gaat
+    // (StatefulShellRoute houdt elke tak in een IndexedStack). TickerMode staat
+    // dan uit; alleen als hij aan staat, zie je de maatjes echt.
+    final unseen = ref.watch(unseenFriendsProvider).value ?? 0;
+    if (unseen > 0 && friends.hasValue && TickerMode.valuesOf(context).enabled) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.read(unseenFriendsProvider.notifier).markAllSeen();
+      });
+    }
+
     return RefreshIndicator(
       onRefresh: () async => _invalidateAll(),
       child: ListView(

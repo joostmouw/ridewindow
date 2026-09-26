@@ -1,5 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/repositories/seen_friends_store.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -161,4 +163,48 @@ Future<PelotonGroup?> pelotonGroup(Ref ref, String groupId) async {
     if (g.id == groupId) return g;
   }
   return null;
+}
+
+/// Hoeveel aanvragen er bij jou als beheerder liggen, over al je groepen.
+///
+/// Dezelfde telling als de chip op de groepskaart ([PelotonGroup.openRequests]),
+/// zodat het bolletje en de kaart nooit iets anders zeggen. Een lid dat geen
+/// beheerder is ziet via RLS alleen zijn eigen voordrachten; die wachten niet
+/// op hem en tellen dus niet.
+@riverpod
+int openGroupRequestCount(Ref ref) {
+  final me = ref.watch(currentUserIdProvider);
+  if (me == null) return 0;
+  final groups = ref.watch(myGroupsProvider).value ?? const <PelotonGroup>[];
+  return groups
+      .where((g) => g.isAdmin(me))
+      .fold<int>(0, (sum, g) => sum + g.openRequests(me).length);
+}
+
+/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
+@riverpod
+class UnseenFriends extends _$UnseenFriends {
+  @override
+  Future<int> build() async {
+    final me = ref.watch(currentUserIdProvider);
+    if (me == null) return 0;
+    final friends = await ref.watch(friendsProvider.future);
+    final store = SeenFriendsStore(await SharedPreferences.getInstance());
+    final seen = store.seenFor(me);
+    final ids = friends.map((f) => f.userId);
+    // De eerste keer na deze update: wat er nu staat, is al gezien.
+    if (seen == null) await store.save(me, ids);
+    return unseenFriendCount(current: ids, seen: seen);
+  }
+
+  /// Aangeroepen door de tab Peloton zodra die de maatjes echt toont.
+  Future<void> markAllSeen() async {
+    final me = ref.read(currentUserIdProvider);
+    final friends = ref.read(friendsProvider).value;
+    if (me == null || friends == null) return;
+    final store = SeenFriendsStore(await SharedPreferences.getInstance());
+    await store.save(me, friends.map((f) => f.userId));
+    state = const AsyncData(0);
+  }
 }

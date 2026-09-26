@@ -28,7 +28,9 @@ import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
+import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/last_refreshed_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
@@ -210,7 +212,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (isWebPlatform) {
         ref.invalidate(weatherProvider);
       }
+      _refreshPelotonOnResume();
     }
+  }
+
+  /// Wanneer Peloton voor het laatst ververst werd bij terugkeer in de app.
+  /// Statisch, omdat Home bij een uit- en inlog opnieuw gebouwd kan worden en
+  /// de grens dan anders meteen weer open zou staan.
+  static DateTime? _lastPelotonRefresh;
+
+  /// Het rode bolletje is de enige melding die Peloton heeft (geen push).
+  /// Zonder verversen bij terugkeer verschijnt een nieuwe uitnodiging,
+  /// aanvraag of een nieuw maatje pas na een koude start. Hooguit eens per vijf
+  /// minuten, zodat heen-en-weer schakelen geen stroom aanvragen oplevert, en
+  /// alleen ingelogd: uitgelogd gaat er niets van het toestel af.
+  void _refreshPelotonOnResume() {
+    if (ref.read(currentUserIdProvider) == null) return;
+    final now = DateTime.now();
+    final last = _lastPelotonRefresh;
+    if (last != null && now.difference(last) < const Duration(minutes: 5)) {
+      return;
+    }
+    _lastPelotonRefresh = now;
+    ref
+      ..invalidate(friendsProvider)
+      ..invalidate(groupRidesProvider)
+      ..invalidate(visibleGroupsProvider);
   }
 
   // ---------------------------------------------------------------------------

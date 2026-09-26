@@ -1,6 +1,7 @@
 // test/app/nav_unanswered_badge_test.dart
 //
-// De teller "wacht op je antwoord" (CLUB-25, schets 016 vraag 1 A).
+// Het rode bolletje "wacht op je" (CLUB-25, schets 016 vraag 1 A). Wat het
+// telt, staat in test/providers/peloton_attention_test.dart.
 //
 // Zonder pushmeldingen is de onderbalk de plek waar je moet zien dat er iets
 // op je wacht. Onderbalk en de tab Peloton lezen dezelfde provider, dus deze
@@ -60,7 +61,7 @@ Future<void> _pumpShell(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        unansweredRideCountProvider.overrideWithValue(count),
+        pelotonAttentionCountProvider.overrideWithValue(count),
       ],
       child: MaterialApp.router(
         routerConfig: router,
@@ -83,7 +84,7 @@ Future<void> _pumpRidesScreen(WidgetTester tester, int count) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        unansweredRideCountProvider.overrideWithValue(count),
+        pelotonAttentionCountProvider.overrideWithValue(count),
         rideEntriesProvider.overrideWithValue(const []),
         currentUserIdProvider.overrideWithValue(null),
         plannedRidesProvider.overrideWith(_FakePlannedRides.new),
@@ -116,7 +117,7 @@ void main() {
     testWidgets('bij 0 staat er geen bolletje', (tester) async {
       await _pumpShell(tester, 0);
       expect(_navBadges(), findsNothing);
-      expect(find.textContaining('wachten op je antwoord'), findsNothing);
+      expect(find.textContaining('wachten op je'), findsNothing);
     });
 
     testWidgets('bij 2 staat er een bolletje met 2 op Ritten', (tester) async {
@@ -155,8 +156,8 @@ void main() {
       await _pumpShell(tester, 2);
       expect(
         find.bySemanticsLabel(
-          RegExp(r'Ritten[\s\S]*2 wachten op je antwoord|'
-              r'2 wachten op je antwoord[\s\S]*Ritten'),
+          RegExp(r'Ritten[\s\S]*2 dingen wachten op je|'
+              r'2 dingen wachten op je[\s\S]*Ritten'),
         ),
         findsOneWidget,
       );

@@ -55,10 +55,7 @@ List<RideEntry> rideEntries(Ref ref) {
 /// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
 /// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
 ///
-/// CLUB-25 optie A (schets 016): de onderbalk en de Peloton-tab lezen allebei
-/// dit getal, zodat ze nooit iets anders zeggen. Open groepsaanvragen voor
-/// beheerders tellen bewust niet mee; die staan op de groepskaart (34-05,
-/// bevestigd door Joost 2026-09-24).
+/// Eén van de drie delen van [pelotonAttentionCount].
 @riverpod
 int unansweredRideCount(Ref ref) {
   final now = DateTime.now();
@@ -66,4 +63,21 @@ int unansweredRideCount(Ref ref) {
       .watch(rideEntriesProvider)
       .where((e) => e.role == RideRole.pending && e.end.isAfter(now))
       .length;
+}
+
+/// Het getal in het rode bolletje op Ritten en op de tab Peloton: ritten die
+/// op jouw antwoord wachten, aanvragen die bij jou als beheerder liggen, en
+/// maatjes die je nog niet zag.
+///
+/// CLUB-25 optie A (schets 016): onderbalk en tab lezen allebei dit ene getal,
+/// zodat ze nooit iets anders zeggen. Tot 2026-09-26 telden groepsaanvragen
+/// bewust niet mee (34-05); Joost wilde ze er toen toch bij, omdat er zonder
+/// pushmeldingen geen andere plek is waar een beheerder ze ziet zonder de
+/// groep te openen.
+@riverpod
+int pelotonAttentionCount(Ref ref) {
+  final int rides = ref.watch(unansweredRideCountProvider);
+  final int requests = ref.watch(openGroupRequestCountProvider);
+  final int friends = ref.watch(unseenFriendsProvider).value ?? 0;
+  return rides + requests + friends;
 }

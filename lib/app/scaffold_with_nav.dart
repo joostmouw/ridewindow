@@ -15,7 +15,7 @@ class ScaffoldWithNav extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unanswered = ref.watch(unansweredRideCountProvider);
+    final attention = ref.watch(pelotonAttentionCountProvider);
 
     // Terug vanuit Agenda, Ritten of Profiel gaat eerst naar Home, pas daar
     // sluit terug de app (#80) -- het gewone Android-gedrag bij een onderbalk.
@@ -51,12 +51,12 @@ class ScaffoldWithNav extends ConsumerWidget {
               label: S.of(context).navAgenda,
             ),
             NavigationDestination(
-              icon: _UnansweredBadge(
-                count: unanswered,
+              icon: _AttentionBadge(
+                count: attention,
                 child: const Icon(AppIcons.bicycle),
               ),
-              selectedIcon: _UnansweredBadge(
-                count: unanswered,
+              selectedIcon: _AttentionBadge(
+                count: attention,
                 child: const Icon(AppIconsFill.bicycle),
               ),
               label: S.of(context).navRides,
@@ -73,18 +73,18 @@ class ScaffoldWithNav extends ConsumerWidget {
   }
 }
 
-/// Het rode bolletje met het aantal ritten dat op jouw antwoord wacht
-/// (CLUB-25, schets 016 vraag 1 A).
+/// Het rode bolletje met wat er in Peloton op je wacht (CLUB-25, schets 016
+/// vraag 1 A): ritantwoorden, groepsaanvragen en nieuwe maatjes.
 ///
-/// **Onderbalk en de tab Peloton lezen allebei [unansweredRideCountProvider]**
+/// **Onderbalk en de tab Peloton lezen allebei [pelotonAttentionCountProvider]**
 /// en tonen het getal met [unansweredBadgeLabel], zodat ze nooit iets anders
 /// zeggen. Bij 0 is er geen bolletje: een leeg rood rondje zou "er is iets"
 /// zeggen terwijl er niets is.
 ///
 /// Geen eigen kleuren: de M3-standaard is `colorScheme.error` met `onError`,
 /// in licht en donker uit het thema.
-class _UnansweredBadge extends StatelessWidget {
-  const _UnansweredBadge({required this.count, required this.child});
+class _AttentionBadge extends StatelessWidget {
+  const _AttentionBadge({required this.count, required this.child});
 
   final int count;
   final Widget child;
@@ -93,7 +93,7 @@ class _UnansweredBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     if (count <= 0) return child;
     return Semantics(
-      label: S.of(context).navRidesUnanswered(count),
+      label: S.of(context).navPelotonAttention(count),
       child: ExcludeSemantics(
         child: Badge(label: Text(unansweredBadgeLabel(count)), child: child),
       ),

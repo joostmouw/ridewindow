@@ -2557,12 +2557,12 @@ class SNl extends S {
   String get groupRideNobodyYet => 'Nog niemand';
 
   @override
-  String navRidesUnanswered(int count) {
+  String navPelotonAttention(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count wachten op je antwoord',
-      one: '1 wacht op je antwoord',
+      other: '$count dingen wachten op je',
+      one: '1 ding wacht op je',
     );
     return '$_temp0';
   }
