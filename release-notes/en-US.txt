@@ -1,1 +1,1 @@
-Internal test build: calmer cards. The group ride detail shows the tally once instead of twice, and participant answers are now icons instead of text. Planned rides on Home show the score as a small number instead of the tier word.
+Internal test build: tidier ride cards. The score sits in the top-right corner, and "Pick a window together" folds away once you have voted everywhere. Proposing several windows is now a checkbox when inviting. Planned rides on Home use one colour, and the role line wraps instead of being cut off.
