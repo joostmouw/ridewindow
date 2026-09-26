@@ -1,1 +1,1 @@
-Internal test build: removing a ride is now the same everywhere. A ride you organise can be cancelled from Home, Rides and the ride screen, and really disappears for everyone. A ride of your own goes at once, with Undo.
+Internal test build: calmer cards. The group ride detail shows the tally once instead of twice, and participant answers are now icons instead of text. Planned rides on Home show the score as a small number instead of the tier word.

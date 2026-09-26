@@ -1,1 +1,1 @@
-Interne testbuild: een rit weghalen werkt nu overal hetzelfde. Een rit die je organiseert zeg je af vanaf Home, Ritten of het ritscherm, en hij verdwijnt echt voor iedereen. Een rit van jou alleen is meteen weg, met Ongedaan maken.
+Interne testbuild: rustiger op de kaarten. Het groepsritdetail toont de telling één keer in plaats van twee, en de antwoorden van deelnemers zijn icoontjes geworden in plaats van tekst. De geplande ritten op Home tonen de score als klein getal in plaats van het oordeel-woord.
