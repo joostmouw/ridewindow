@@ -105,7 +105,7 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
 
 | Waar | Stand |
 |---|---|
-| Oppo | laatst gezien op 1.0.49 (60) via Play; bij de release niet aangesloten |
+| Oppo | 1.0.50 (61) via Play, op de achtergrond geïnstalleerd 2026-09-27 12:32 |
 | PWA | 1.0.50 (61), live bundelhash `f4597a85f0efb73409b65d40f34a708d` |
 | Internal | 1.0.50 (61) |
 | Alpha / closed | 1.0.44 (55) |

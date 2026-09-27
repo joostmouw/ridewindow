@@ -21,7 +21,7 @@ progress:
 |---|---|
 | Internal | **1.0.50 (61)**; `--list-tracks` bevestigt internal 61, alpha 55. De eerste upload faalde bij `edits.insert` (voor er iets geüpload was), de tweede slaagde meteen: tijdelijke fout aan Google's kant |
 | PWA | **1.0.50 (61)**; `scripts/deploy_web.sh` mat live en lokaal dezelfde `main.dart.js`-MD5 `f4597a85f0efb73409b65d40f34a708d`; live `version.json` zegt build 61, live `manifest.json` heeft `related_applications` |
-| Oppo | laatst gezien op **1.0.49 (60)** via Play; bij de release van 61 niet via `adb` aangesloten, dus niet gecontroleerd. Eerst `dumpsys package` lezen voordat je "Open" in Play uitlegt |
+| Oppo | **1.0.50 (61)** via Play (`installerPackageName=com.android.vending`, `lastUpdateTime=2026-09-27 12:32:26`), door Play zelf op de achtergrond geïnstalleerd terwijl de vermelding nog "Open" toonde. **Les:** "Open" in Play zegt niets over de geïnstalleerde versie -- lees altijd eerst `versionCode` met `dumpsys package`. `market://` opent HeyTap; gebruik `-d "https://play.google.com/store/apps/details?id=ridewindow.joost.amsterdam" -p com.android.vending` |
 | Alpha / closed | **1.0.44 (55)** |
 | main | **1.0.50+61** (`115d245`), met de drie features `462f5d0`, `c2adae8`, `4cae43d` |
 
