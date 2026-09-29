@@ -1,7 +1,7 @@
 ---
 quick_id: 260929-app-links-en-bolletje
 date: 2026-09-29
-status: code-complete, wacht op release en toestelcontrole
+status: complete (1.0.51 (62), op de Oppo geverifieerd, zie STATE.md)
 ---
 
 # Website naar de app, en een bolletje dat verdwijnt als je het gezien hebt
@@ -66,7 +66,7 @@ status: code-complete, wacht op release en toestelcontrole
 - Het bolletje op Peloton was geen nieuw maatje (dat zou 2 geven en werd bij
   het kijken al gewist), maar Richards ritvraag, die telde tot je antwoordde.
 
-## Nog open
+## Nog open (afgevinkt 2026-09-29, zie STATE.md)
 
 - Release: versiebump, AAB naar internal, web-deploy op hetzelfde moment
   (`docs/RELEASE-ROUTE.md`). Pas na de web-deploy staat assetlinks live.

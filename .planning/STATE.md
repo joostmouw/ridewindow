@@ -21,7 +21,7 @@ progress:
 |---|---|
 | Internal | **1.0.51 (62)**, geüpload via de Play Developer API |
 | PWA | **1.0.51 (62)**; uitgerold door GitHub Actions (`deploy-web.yml` draait bij elke push naar main die `lib/`, `web/` of `firebase.json` raakt). Live `version.json` zegt 62; `/.well-known/assetlinks.json` komt als `application/json`, en Google's Digital Asset Links API geeft beide statements terug |
-| Oppo | laatst gezien op **1.0.50 (61)**; bij de release niet aangesloten |
+| Oppo | **1.0.51 (62)** via Play (`installerPackageName=com.android.vending`, `lastUpdateTime=2026-09-29 10:48:07`), geïnstalleerd via de update-balk van 61 |
 | Alpha / closed | **1.0.44 (55)** |
 | main | **1.0.51+62**, met `a4651f6` (store-balk), `6617e6c` (bolletje), `35b1142` (App Links), `152ecf6` (werkregel) |
 
@@ -30,16 +30,23 @@ progress:
 bolletje telt wat je nog niet zag en staat op de tab waar het over gaat;
 uitnodigings- en groepslinks zijn padlinks die als App Link de app openen.
 
-**Toestelcontrole die openstaat:**
-1. Na de Play-update: `adb shell pm get-app-links ridewindow.joost.amsterdam`
-   moet `my-project-joost.web.app: verified` zeggen. Zo niet: `adb shell pm
-   verify-app-links --re-verify ridewindow.joost.amsterdam` en opnieuw lezen.
-2. Een link `https://my-project-joost.web.app/invite/<code>` uit WhatsApp of
-   Gmail opent de app, niet Chrome. Oude `/#/invite/`-links openen Chrome, dat
-   is verwacht.
-3. De update-balk ("Er staat een nieuwe versie klaar") moet op 61 verschijnen
-   zodra 62 in Play staat: de eerste echte test van die balk.
-4. De website in Chrome op de Oppo toont met de app erop "Openen in app".
+**Toestelcontrole op de Oppo, 2026-09-29 10:47-10:50 (alles groen):**
+1. **Update-balk op 61:** "A new version is ready" stond bovenaan. "Update"
+   opende het in-app-updatescherm van Play (`PlayCoreAcquisitionActivity`),
+   en binnen tien seconden stond 62 erop.
+2. **App Links:** `pm get-app-links` zegt `my-project-joost.web.app: verified`,
+   met als handtekening de Play-sleutel `17:A9:37:…`. Voor de meting na de
+   installatie was geen `--re-verify` nodig.
+3. **Link opent de app:** een VIEW-intent zonder pakket (zoals WhatsApp hem
+   stuurt) op `/invite/TESTAAAA` kwam warm binnen op het uitnodigingsscherm, en
+   op `/group/TESTAAAA` koud (na `force-stop`) op het groepsscherm. Allebei
+   meldden ze netjes dat de code niet werkt, want de code was verzonnen.
+   `/` (de rest van de site) gaat nog naar Chrome (`resolve-activity`).
+4. **Website in Chrome:** de balk zei "The Ridewindow app is on your phone"
+   met "Open app", en die knop opende de app.
+5. **Bolletje:** Ritten stond op 3. Na één bezoek aan Ritten stond het op 1,
+   en die 1 stond op de subtab Peloton. Daar stond Andrea Farina bovenaan met
+   "New buddy", en na dat bezoek was het bolletje weg.
 
 ## Stand na 2026-09-26 (avond) -- 1.0.50 (61) op internal en web
 
