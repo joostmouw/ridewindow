@@ -35,6 +35,32 @@ en wat de volgende stap is.
 
 ---
 
+## 0. Openstaand na de 62-63-64-ronde (2026-09-29)
+
+Wat die ronde opleverde staat in `.planning/quick/260929-app-links-en-bolletje/`,
+`260929-datum-bij-geplande-rit/` en `260929-verlopen-optie/`. Wat er openbleef:
+
+### a. De PLANNED-kaartjes verspringen bij een koude start
+
+Op Home staat na het openen eerst alleen de kop PLANNED; de kaartjes komen er
+een paar seconden later bij, en het scherm springt. De gedeelde ritten komen
+van de server (`rideEntriesProvider`), en die wachten zichtbaar niets af.
+Gezien op de Oppo bij build 64. Volgende stap: bepalen of PLANNED op de
+lokale kopie kan openen (Drift is de bron van waarheid) en de server alleen
+bijwerkt, zoals de rest van Home dat met het weer doet.
+
+### b. De update-balk ziet een nieuwe internal-build laat of niet
+
+Bij 61 naar 62 werkte de balk (Play kende 62 toen al). Bij 62 naar 63 en 63
+naar 64 bleef hij weg, terwijl de Play-vermelding openen de build meteen
+liet downloaden. Vermoeden: Play meldt een verse internal-upload pas later
+aan de in-app-update-API; de balk kan dus per definitie achterlopen. Te
+onderzoeken: hoe vaak en wanneer de app om een update vraagt, en of een
+actievere check (bij het openen, met de Play-vermelding als trigger) de
+vertraging weghaalt. Geen bug in de balk zelf; die is bij 62 bewezen.
+
+---
+
 ## 1. Het ongevraagde Google-inlogvenster bij het openen van Profiel
 
 **Status: code opgelost, toestelcontrole nog open.** De oorzaak en fix zijn

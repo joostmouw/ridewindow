@@ -22,7 +22,7 @@ progress:
 | Internal | **1.0.53 (64)**, geüpload via de Play Developer API |
 | PWA | **1.0.53 (64)**, uitgerold door GitHub Actions na de push; live `version.json` zegt 64 |
 | Oppo | **1.0.53 (64)** via Play (`installerPackageName=com.android.vending`, `lastUpdateTime=2026-09-29 11:50:51`). De update-balk zag hem weer niet; de Play-vermelding openen bracht hem binnen |
-| Alpha / closed | **1.0.44 (55)** |
+| Alpha / closed | **1.0.53 (64)**, gepromoveerd vanuit internal (dezelfde bytes); bij Google ter review. `--list-tracks` bevestigt alpha 64, internal 64 |
 | main | **1.0.53+64**, met `4b8b42b` (verlopen venster telt niet meer mee) |
 
 **Toestelcontrole op de Oppo, 2026-09-29 11:52 (groen):** Richards rit op de
