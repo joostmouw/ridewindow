@@ -1323,8 +1323,9 @@ class _OptionsBlockState extends State<_OptionsBlock> {
     final theme = Theme.of(context);
     final rw = context.rw;
     final front = widget.ride.frontRunner;
+    final open = widget.ride.openOptions();
 
-    final sorted = [...widget.ride.options]..sort((a, b) {
+    final sorted = [...open]..sort((a, b) {
         final byVotes = b.yesCount.compareTo(a.yesCount);
         if (byVotes != 0) return byVotes;
         final byScore = b.plannedScore.compareTo(a.plannedScore);
@@ -1336,7 +1337,7 @@ class _OptionsBlockState extends State<_OptionsBlock> {
     // dan voor jou op. Wie nog niet overal heeft gereageerd, moet hem eerst
     // zien -- vandaar open.
     final votedAll = widget.myUserId != null &&
-        widget.ride.options.every((o) => o.voteOf(widget.myUserId) != null);
+        open.every((o) => o.voteOf(widget.myUserId) != null);
     final expanded = _manual ?? !votedAll;
 
     return Column(

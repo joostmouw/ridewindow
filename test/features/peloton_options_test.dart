@@ -258,6 +258,106 @@ void main() {
     });
   });
 
+  group('een venster dat voorbij is', () {
+    // Op 29 september stond bij Richards rit nog een venster van de 27e ter
+    // keuze, met "Ik kan / Kan niet" erbij.
+    test('telt niet meer mee, en een lopend venster evenmin', () {
+      final now = DateTime(2026, 9, 29, 12, 30);
+      GroupRide rideWith(List<DateTime> starts) => GroupRide(
+            id: 'ride',
+            ownerId: _other,
+            start: DateTime(2026, 9, 30, 9),
+            end: DateTime(2026, 9, 30, 11),
+            plannedScore: 80,
+            options: [
+              for (final (i, s) in starts.indexed)
+                RideOption(
+                  id: 'o$i',
+                  rideId: 'ride',
+                  start: s,
+                  end: s.add(const Duration(hours: 2)),
+                  plannedScore: 80,
+                ),
+            ],
+          );
+
+      final ride = rideWith([
+        DateTime(2026, 9, 27, 18), // voorbij
+        DateTime(2026, 9, 29, 12), // al begonnen
+        DateTime(2026, 9, 30, 9),
+      ]);
+      expect(ride.openOptions(now: now).map((o) => o.id), ['o2']);
+    });
+
+    test('een verlopen venster naast een toekomstig is geen keuze', () {
+      final ride = _ride(
+        options: [
+          _option(id: 'oud', dayOffset: -2),
+          _option(id: 'a', dayOffset: 1),
+        ],
+      );
+      expect(ride.hasOpenChoice, isFalse);
+      expect(ride.frontRunner?.id, 'a');
+    });
+
+    test('twee toekomstige naast een verlopen blijven een keuze', () {
+      final ride = _ride(
+        options: [
+          _option(
+            id: 'oud',
+            dayOffset: -2,
+            score: 100,
+            votes: const [
+              OptionVote(optionId: 'oud', userId: _other, canRide: true),
+            ],
+          ),
+          _option(id: 'a', dayOffset: 1, score: 70),
+          _option(id: 'b', dayOffset: 2, score: 90),
+        ],
+      );
+      expect(ride.hasOpenChoice, isTrue);
+      expect(
+        ride.frontRunner?.id,
+        'b',
+        reason: 'de stem en de 100 op het verlopen venster tellen niet meer',
+      );
+    });
+
+    testWidgets('op de ritkaart: geen blok, geen stemknoppen', (tester) async {
+      await _pump(
+        tester,
+        rides: [
+          _ride(
+            options: [
+              _option(id: 'oud', dayOffset: -2),
+              _option(id: 'a', dayOffset: 1),
+            ],
+          ),
+        ],
+      );
+      expect(find.text('Kies samen een venster'), findsNothing);
+      expect(find.text('Ik kan'), findsNothing);
+    });
+
+    testWidgets('op de ritkaart: alleen de toekomstige staan ter keuze',
+        (tester) async {
+      await _pump(
+        tester,
+        rides: [
+          _ride(
+            options: [
+              _option(id: 'oud', dayOffset: -2),
+              _option(id: 'a', dayOffset: 1),
+              _option(id: 'b', dayOffset: 2),
+            ],
+          ),
+        ],
+      );
+      expect(find.text('Kies samen een venster'), findsOneWidget);
+      expect(find.text('Ik kan'), findsNWidgets(2));
+    });
+  });
+
   group('op de ritkaart', () {
     testWidgets('twee vensters leveren een keuze op, een venster niet',
         (tester) async {

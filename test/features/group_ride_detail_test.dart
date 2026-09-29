@@ -430,6 +430,21 @@ void main() {
       );
     });
 
+    // Het detail toonde bij Richards rit nog een venster van twee dagen
+    // eerder (toestelcontrole 63).
+    testWidgets('een venster dat voorbij is, staat er niet bij',
+        (tester) async {
+      await _pumpDetail(
+        tester,
+        _withOptions(groupId: 'g1', withPastOption: true),
+        groupRideId: 'r6',
+      );
+
+      expect(find.text('Anna, Joost (jij)'), findsOneWidget);
+      expect(find.text('Nog niemand'), findsOneWidget);
+      expect(find.text('Anna, Mark'), findsNothing);
+    });
+
     testWidgets('gewone rit met twee vensters: zelfde blok', (tester) async {
       await _pumpDetail(tester, _withOptions(), groupRideId: 'r6');
 
@@ -564,7 +579,7 @@ FakeGroupGateway _myGroupRide({
 
 /// Anna's rit met twee vensters; Anna en jij kunnen op venster 1, niemand op
 /// venster 2. Met [groupId] een groepsrit, anders een gewone rit.
-FakeGroupGateway _withOptions({String? groupId}) {
+FakeGroupGateway _withOptions({String? groupId, bool withPastOption = false}) {
   final fake = FakeGroupGateway(myName: 'Joost');
   fake.groups['g1'] = _onTheRoll();
   final o1 = RideOption(
@@ -608,7 +623,22 @@ FakeGroupGateway _withOptions({String? groupId}) {
             displayName: 'Mark',
           ),
       ],
-      options: [o1, o2],
+      options: [
+        o1,
+        o2,
+        if (withPastOption)
+          RideOption(
+            id: 'o-oud',
+            rideId: 'r6',
+            start: _at(-2, 18),
+            end: _at(-2, 20),
+            plannedScore: 94,
+            votes: const [
+              OptionVote(optionId: 'o-oud', userId: _anna, canRide: true),
+              OptionVote(optionId: 'o-oud', userId: _mark, canRide: true),
+            ],
+          ),
+      ],
     ),
   );
   return fake;

@@ -204,16 +204,29 @@ class GroupRide {
   Iterable<RideParticipant> get accepted =>
       participants.where((p) => p.status == ParticipantStatus.accepted);
 
+  /// De vensters waar nog op te kiezen valt. Wat al begonnen is, hoort daar
+  /// niet meer bij: op 29 september stond bij een rit nog een venster van
+  /// de 27e met "Ik kan / Kan niet" erbij.
+  List<RideOption> openOptions({DateTime? now}) {
+    final t = now ?? DateTime.now();
+    return [
+      for (final o in options)
+        if (o.start.isAfter(t)) o,
+    ];
+  }
+
   /// Ligt er nog een keuze voor? Eén venster is geen keuze -- dan is het het
-  /// voorstel zelf, en hoort er geen stemming omheen te staan.
-  bool get hasOpenChoice => options.length > 1;
+  /// voorstel zelf, en hoort er geen stemming omheen te staan. Dat geldt ook
+  /// als de rest al voorbij is.
+  bool get hasOpenChoice => openOptions().length > 1;
 
   /// De optie waar de meeste mensen bij kunnen. Bij gelijkspel wint de hoogste
   /// score, en daarna de vroegste -- dezelfde volgorde als Home aanhoudt, zodat
   /// "de beste" overal hetzelfde betekent.
   RideOption? get frontRunner {
-    if (options.isEmpty) return null;
-    final sorted = [...options]..sort((a, b) {
+    final open = openOptions();
+    if (open.isEmpty) return null;
+    final sorted = [...open]..sort((a, b) {
         final byVotes = b.yesCount.compareTo(a.yesCount);
         if (byVotes != 0) return byVotes;
         final byScore = b.plannedScore.compareTo(a.plannedScore);

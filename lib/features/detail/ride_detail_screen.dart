@@ -912,7 +912,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final option in ride.options)
+          for (final option in ride.openOptions())
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Column(
