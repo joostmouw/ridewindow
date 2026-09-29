@@ -1,1 +1,1 @@
-Internal test build: a planned ride now says Today or Tomorrow, and further out the weekday with the date, so a ride ten days away no longer looks like one this week. The ride detail shows which day it is at the top, and a shared ride carries the date.
+Internal test build: on a ride with several windows, a window that has already passed is no longer up for a vote. If only one window is left, the choice disappears, because there is nothing left to choose.
