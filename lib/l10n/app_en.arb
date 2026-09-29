@@ -505,6 +505,8 @@
   "pelotonInviteShare": "Ride with me on Ridewindow. Open the app and enter code {code}.",
   "pelotonYourCode": "Your code: {code}",
   "pelotonRemoveFriend": "Remove buddy",
+  "pelotonFriendNew": "New buddy",
+  "@pelotonFriendNew": {"description": "Under the name of a buddy who was added since you last saw the Peloton tab."},
   "pelotonRemoveFailed": "Couldn't remove this buddy. Try again.",
   "pelotonAccept": "Join",
   "pelotonDecline": "Can't make it",

@@ -172,30 +172,66 @@ Future<PelotonGroup?> pelotonGroup(Ref ref, String groupId) async {
 /// beheerder is ziet via RLS alleen zijn eigen voordrachten; die wachten niet
 /// op hem en tellen dus niet.
 @riverpod
-int openGroupRequestCount(Ref ref) {
+int openGroupRequestCount(Ref ref) =>
+    ref.watch(openGroupRequestIdsProvider).length;
+
+/// De ids achter [openGroupRequestCount].
+@riverpod
+Set<String> openGroupRequestIds(Ref ref) {
   final me = ref.watch(currentUserIdProvider);
-  if (me == null) return 0;
+  if (me == null) return const {};
   final groups = ref.watch(myGroupsProvider).value ?? const <PelotonGroup>[];
-  return groups
-      .where((g) => g.isAdmin(me))
-      .fold<int>(0, (sum, g) => sum + g.openRequests(me).length);
+  return {
+    for (final g in groups.where((g) => g.isAdmin(me)))
+      for (final r in g.openRequests(me)) r.id,
+  };
 }
 
-/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// De groepsaanvragen die je als beheerder nog niet op de tab Peloton zag.
+/// Zie [SeenIdsStore] voor waarom gezien genoeg is.
+@riverpod
+class UnseenGroupRequests extends _$UnseenGroupRequests {
+  @override
+  Future<Set<String>> build() async {
+    final me = ref.watch(currentUserIdProvider);
+    if (me == null) return const {};
+    final ids = ref.watch(openGroupRequestIdsProvider);
+    if (ids.isEmpty) return const {};
+    final store = SeenGroupRequestsStore(await SharedPreferences.getInstance());
+    return unseenIds(current: ids, seen: store.seenFor(me) ?? const {});
+  }
+
+  /// Aangeroepen door de tab Peloton zodra die de groepskaarten echt toont;
+  /// de aanvragenchip op de kaart zegt dan waar het over gaat.
+  Future<void> markAllSeen() async {
+    final me = ref.read(currentUserIdProvider);
+    final ids = ref.read(openGroupRequestIdsProvider);
+    if (me == null || ids.isEmpty) return;
+    final store = SeenGroupRequestsStore(await SharedPreferences.getInstance());
+    await store.add(me, ids);
+    state = const AsyncData({});
+  }
+}
+
+/// De maatjes die er zijn bijgekomen sinds je de tab Peloton voor het laatst
 /// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
 @riverpod
 class UnseenFriends extends _$UnseenFriends {
   @override
-  Future<int> build() async {
+  Future<Set<String>> build() async {
     final me = ref.watch(currentUserIdProvider);
-    if (me == null) return 0;
+    if (me == null) return const {};
     final friends = await ref.watch(friendsProvider.future);
     final store = SeenFriendsStore(await SharedPreferences.getInstance());
     final seen = store.seenFor(me);
     final ids = friends.map((f) => f.userId);
-    // De eerste keer na deze update: wat er nu staat, is al gezien.
-    if (seen == null) await store.save(me, ids);
-    return unseenFriendCount(current: ids, seen: seen);
+    // De eerste keer na de update van build 61: wat er toen stond, was al
+    // gezien.
+    if (seen == null) {
+      await store.save(me, ids);
+      return const {};
+    }
+    return unseenIds(current: ids, seen: seen);
   }
 
   /// Aangeroepen door de tab Peloton zodra die de maatjes echt toont.
@@ -205,6 +241,6 @@ class UnseenFriends extends _$UnseenFriends {
     if (me == null || friends == null) return;
     final store = SeenFriendsStore(await SharedPreferences.getInstance());
     await store.save(me, friends.map((f) => f.userId));
-    state = const AsyncData(0);
+    state = const AsyncData({});
   }
 }

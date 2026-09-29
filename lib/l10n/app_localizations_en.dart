@@ -1650,6 +1650,9 @@ class SEn extends S {
   String get pelotonRemoveFriend => 'Remove buddy';
 
   @override
+  String get pelotonFriendNew => 'New buddy';
+
+  @override
   String get pelotonRemoveFailed => 'Couldn\'t remove this buddy. Try again.';
 
   @override

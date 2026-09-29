@@ -38,6 +38,10 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
   final _codeController = TextEditingController();
   bool _busy = false;
 
+  /// Maatjes die bij dit bezoek nieuw waren. Zoals Facebook een nieuw item één
+  /// keer oplicht: het label verdwijnt met de tab, niet bij de eerste tik.
+  final Set<String> _newFriends = {};
+
   @override
   void dispose() {
     _codeController.dispose();
@@ -175,10 +179,23 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
     // Deze tab blijft bestaan als je naar een andere tab van de onderbalk gaat
     // (StatefulShellRoute houdt elke tak in een IndexedStack). TickerMode staat
     // dan uit; alleen als hij aan staat, zie je de maatjes echt.
-    final unseen = ref.watch(unseenFriendsProvider).value ?? 0;
-    if (unseen > 0 && friends.hasValue && TickerMode.valuesOf(context).enabled) {
+    final visible = TickerMode.valuesOf(context).enabled;
+    final unseen = ref.watch(unseenFriendsProvider).value ?? const {};
+    if (unseen.isNotEmpty && friends.hasValue && visible) {
+      // Onthouden vóór het wegvinken: het bolletje gaat meteen weg, maar wie
+      // erbij kwam, moet je nog zien (het label "Nieuw" zolang je hier bent).
+      _newFriends.addAll(unseen);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) ref.read(unseenFriendsProvider.notifier).markAllSeen();
+      });
+    }
+    final unseenRequests =
+        ref.watch(unseenGroupRequestsProvider).value ?? const {};
+    if (unseenRequests.isNotEmpty && visible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(unseenGroupRequestsProvider.notifier).markAllSeen();
+        }
       });
     }
 
@@ -205,10 +222,16 @@ class _BuddiesTabState extends ConsumerState<BuddiesTab> {
                     ? _EmptyFriends(s: s, theme: theme)
                     : Column(
                         children: [
-                          for (final friend in list)
+                          // Nieuw bovenaan, zoals een nieuwe connectie bij
+                          // LinkedIn: je hoeft niet te zoeken wie erbij kwam.
+                          for (final friend in [
+                            ...list.where((f) => _newFriends.contains(f.userId)),
+                            ...list.where((f) => !_newFriends.contains(f.userId)),
+                          ])
                             _FriendRow(
                               friend: friend,
                               fallback: s.pelotonUnnamedFriend,
+                              isNew: _newFriends.contains(friend.userId),
                               onRemove: _busy
                                   ? null
                                   : () => _run(() async {
@@ -375,19 +398,30 @@ class _FriendRow extends StatelessWidget {
   const _FriendRow({
     required this.friend,
     required this.fallback,
+    this.isNew = false,
     this.onRemove,
   });
 
   final Friend friend;
   final String fallback;
+  final bool isNew;
   final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
     final name = friend.label(fallback);
+    final theme = Theme.of(context);
     return ListTile(
       leading: CircleAvatar(child: Text(name.characters.first.toUpperCase())),
       title: Text(name),
+      subtitle: isNew
+          ? Text(
+              S.of(context).pelotonFriendNew,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.primary,
+              ),
+            )
+          : null,
       trailing: IconButton(
         icon: const Icon(AppIcons.userMinus),
         tooltip: S.of(context).pelotonRemoveFriend,

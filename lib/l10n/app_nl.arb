@@ -536,6 +536,8 @@
   "pelotonInviteShare": "Fiets met me mee in Ridewindow. Open de app en vul code {code} in.",
   "pelotonYourCode": "Jouw code: {code}",
   "pelotonRemoveFriend": "Maatje verwijderen",
+  "pelotonFriendNew": "Nieuw maatje",
+  "@pelotonFriendNew": {"description": "Onder de naam van een maatje dat erbij kwam sinds je de tab Peloton voor het laatst zag."},
   "pelotonRemoveFailed": "Dit maatje kon niet worden verwijderd. Probeer het opnieuw.",
   "pelotonAccept": "Ik ga mee",
   "pelotonDecline": "Kan niet",

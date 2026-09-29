@@ -64,15 +64,18 @@ void main() {
   testWidgets('zichtbaar: het nieuwe maatje is daarna gezien', (tester) async {
     final c = await _pump(tester, visible: true);
     expect(find.text('Anna'), findsOneWidget);
-    expect(c.read(unseenFriendsProvider).value, 0);
+    expect(c.read(unseenFriendsProvider).value, isEmpty);
     final prefs = await SharedPreferences.getInstance();
     expect(SeenFriendsStore(prefs).seenFor(_me), {'uid-a'});
+    // Het bolletje is weg, maar je ziet nog wie erbij kwam.
+    expect(find.text('Nieuw maatje'), findsOneWidget);
   });
 
   testWidgets('gebouwd maar niet zichtbaar: het bolletje blijft',
       (tester) async {
     final c = await _pump(tester, visible: false);
-    expect(c.read(unseenFriendsProvider).value, 1);
+    expect(c.read(unseenFriendsProvider).value, {'uid-a'});
+    expect(find.text('Nieuw maatje'), findsNothing);
     final prefs = await SharedPreferences.getInstance();
     expect(SeenFriendsStore(prefs).seenFor(_me), isEmpty);
   });

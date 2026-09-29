@@ -686,19 +686,118 @@ final class OpenGroupRequestCountProvider
 }
 
 String _$openGroupRequestCountHash() =>
-    r'419c45e21953ee0a274499b205ef1bc524f95e15';
+    r'88da6693ce8305a1dd07cd6001ce382d5bb85fbc';
 
-/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// De ids achter [openGroupRequestCount].
+
+@ProviderFor(openGroupRequestIds)
+final openGroupRequestIdsProvider = OpenGroupRequestIdsProvider._();
+
+/// De ids achter [openGroupRequestCount].
+
+final class OpenGroupRequestIdsProvider
+    extends $FunctionalProvider<Set<String>, Set<String>, Set<String>>
+    with $Provider<Set<String>> {
+  /// De ids achter [openGroupRequestCount].
+  OpenGroupRequestIdsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'openGroupRequestIdsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$openGroupRequestIdsHash();
+
+  @$internal
+  @override
+  $ProviderElement<Set<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Set<String> create(Ref ref) {
+    return openGroupRequestIds(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Set<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Set<String>>(value),
+    );
+  }
+}
+
+String _$openGroupRequestIdsHash() =>
+    r'65be5b3ce76459ed633eb49899c2e52a51708bcd';
+
+/// De groepsaanvragen die je als beheerder nog niet op de tab Peloton zag.
+/// Zie [SeenIdsStore] voor waarom gezien genoeg is.
+
+@ProviderFor(UnseenGroupRequests)
+final unseenGroupRequestsProvider = UnseenGroupRequestsProvider._();
+
+/// De groepsaanvragen die je als beheerder nog niet op de tab Peloton zag.
+/// Zie [SeenIdsStore] voor waarom gezien genoeg is.
+final class UnseenGroupRequestsProvider
+    extends $AsyncNotifierProvider<UnseenGroupRequests, Set<String>> {
+  /// De groepsaanvragen die je als beheerder nog niet op de tab Peloton zag.
+  /// Zie [SeenIdsStore] voor waarom gezien genoeg is.
+  UnseenGroupRequestsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'unseenGroupRequestsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$unseenGroupRequestsHash();
+
+  @$internal
+  @override
+  UnseenGroupRequests create() => UnseenGroupRequests();
+}
+
+String _$unseenGroupRequestsHash() =>
+    r'f049780bbfb04fe592479c4888cf0fe67686d8ed';
+
+/// De groepsaanvragen die je als beheerder nog niet op de tab Peloton zag.
+/// Zie [SeenIdsStore] voor waarom gezien genoeg is.
+
+abstract class _$UnseenGroupRequests extends $AsyncNotifier<Set<String>> {
+  FutureOr<Set<String>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<Set<String>>, Set<String>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<Set<String>>, Set<String>>,
+        AsyncValue<Set<String>>,
+        Object?,
+        Object?>;
+    return element.handleCreate(ref, build);
+  }
+}
+
+/// De maatjes die er zijn bijgekomen sinds je de tab Peloton voor het laatst
 /// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
 
 @ProviderFor(UnseenFriends)
 final unseenFriendsProvider = UnseenFriendsProvider._();
 
-/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// De maatjes die er zijn bijgekomen sinds je de tab Peloton voor het laatst
 /// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
 final class UnseenFriendsProvider
-    extends $AsyncNotifierProvider<UnseenFriends, int> {
-  /// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+    extends $AsyncNotifierProvider<UnseenFriends, Set<String>> {
+  /// De maatjes die er zijn bijgekomen sinds je de tab Peloton voor het laatst
   /// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
   UnseenFriendsProvider._()
       : super(
@@ -719,19 +818,22 @@ final class UnseenFriendsProvider
   UnseenFriends create() => UnseenFriends();
 }
 
-String _$unseenFriendsHash() => r'c4285e9acccc0388ed5825c15b1a8378fc0786eb';
+String _$unseenFriendsHash() => r'73dbdf471d1e18c8cfaba9170fb29770e2d35238';
 
-/// Hoeveel maatjes er zijn bijgekomen sinds je de tab Peloton voor het laatst
+/// De maatjes die er zijn bijgekomen sinds je de tab Peloton voor het laatst
 /// zag. Zie [SeenFriendsStore] voor waarom dit lokaal is.
 
-abstract class _$UnseenFriends extends $AsyncNotifier<int> {
-  FutureOr<int> build();
+abstract class _$UnseenFriends extends $AsyncNotifier<Set<String>> {
+  FutureOr<Set<String>> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<int>, int>;
+    final ref = this.ref as $Ref<AsyncValue<Set<String>>, Set<String>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<int>, int>, AsyncValue<int>, Object?, Object?>;
+        AnyNotifier<AsyncValue<Set<String>>, Set<String>>,
+        AsyncValue<Set<String>>,
+        Object?,
+        Object?>;
     return element.handleCreate(ref, build);
   }
 }

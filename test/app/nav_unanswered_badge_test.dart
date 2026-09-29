@@ -75,7 +75,11 @@ Future<void> _pumpShell(
   await tester.pumpAndSettle();
 }
 
-Future<void> _pumpRidesScreen(WidgetTester tester, int count) async {
+Future<void> _pumpRidesScreen(
+  WidgetTester tester,
+  int count, {
+  int rides = 0,
+}) async {
   SharedPreferences.setMockInitialValues({'hint_seen_rides': true});
   tester.view.physicalSize = const Size(360 * 3, 800 * 3);
   tester.view.devicePixelRatio = 3;
@@ -84,7 +88,8 @@ Future<void> _pumpRidesScreen(WidgetTester tester, int count) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        pelotonAttentionCountProvider.overrideWithValue(count),
+        ridesTabAttentionCountProvider.overrideWithValue(rides),
+        pelotonTabAttentionCountProvider.overrideWithValue(count),
         rideEntriesProvider.overrideWithValue(const []),
         currentUserIdProvider.overrideWithValue(null),
         plannedRidesProvider.overrideWith(_FakePlannedRides.new),
@@ -201,6 +206,34 @@ void main() {
         '9+',
       );
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  // Video 29 september: "Peloton 1" terwijl de 1 een ritvraag op de tab
+  // Ritten was. Elk getal hoort op de tab waar het over gaat.
+  group('elke tab zijn eigen getal', () {
+    Finder badgeOn(String tab) => find.descendant(
+          of: find.ancestor(of: find.text(tab), matching: find.byType(Tab)),
+          matching: find.byType(Badge),
+        );
+
+    testWidgets('een ritvraag staat op Ritten, niet op Peloton',
+        (tester) async {
+      await _pumpRidesScreen(tester, 0, rides: 1);
+      expect(badgeOn('Ritten'), findsOneWidget);
+      expect(badgeOn('Peloton'), findsNothing);
+    });
+
+    testWidgets('allebei: twee bolletjes met elk hun getal', (tester) async {
+      await _pumpRidesScreen(tester, 2, rides: 1);
+      expect(
+        (tester.widget<Badge>(badgeOn('Ritten')).label! as Text).data,
+        '1',
+      );
+      expect(
+        (tester.widget<Badge>(badgeOn('Peloton')).label! as Text).data,
+        '2',
+      );
     });
   });
 }

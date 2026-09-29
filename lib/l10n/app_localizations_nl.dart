@@ -1654,6 +1654,9 @@ class SNl extends S {
   String get pelotonRemoveFriend => 'Maatje verwijderen';
 
   @override
+  String get pelotonFriendNew => 'Nieuw maatje';
+
+  @override
   String get pelotonRemoveFailed =>
       'Dit maatje kon niet worden verwijderd. Probeer het opnieuw.';
 

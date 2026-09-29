@@ -3025,6 +3025,12 @@ abstract class S {
   /// **'Maatje verwijderen'**
   String get pelotonRemoveFriend;
 
+  /// Onder de naam van een maatje dat erbij kwam sinds je de tab Peloton voor het laatst zag.
+  ///
+  /// In nl, this message translates to:
+  /// **'Nieuw maatje'**
+  String get pelotonFriendNew;
+
   /// No description provided for @pelotonRemoveFailed.
   ///
   /// In nl, this message translates to:

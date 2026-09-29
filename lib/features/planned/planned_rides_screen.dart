@@ -167,9 +167,10 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
         .watch(rideEntriesProvider)
         .where((e) => !e.isDeclined)
         .toList();
-    // Hetzelfde getal als het bolletje op Ritten in de onderbalk: dezelfde
-    // provider, dus ze kunnen niet uit elkaar lopen (CLUB-25).
-    final attention = ref.watch(pelotonAttentionCountProvider);
+    // Elke tab zijn eigen getal, over wat daar staat; de onderbalk telt ze op
+    // uit dezelfde providers, dus ze kunnen niet uit elkaar lopen (CLUB-25).
+    final ridesAttention = ref.watch(ridesTabAttentionCountProvider);
+    final pelotonAttention = ref.watch(pelotonTabAttentionCountProvider);
 
     return Stack(
       children: [
@@ -186,31 +187,13 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
             bottom: TabBar(
               controller: _tabController,
               tabs: [
-                Tab(text: S.of(context).ridesTabRides),
-                Tab(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          S.of(context).ridesTabBuddies,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (attention > 0) ...[
-                        const SizedBox(width: 6),
-                        Semantics(
-                          label: S.of(context).navPelotonAttention(attention),
-                          child: ExcludeSemantics(
-                            child: Badge(
-                              label: Text(unansweredBadgeLabel(attention)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                _BadgedTab(
+                  label: S.of(context).ridesTabRides,
+                  count: ridesAttention,
+                ),
+                _BadgedTab(
+                  label: S.of(context).ridesTabBuddies,
+                  count: pelotonAttention,
                 ),
               ],
             ),
@@ -232,6 +215,36 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
             },
           ),
       ],
+    );
+  }
+}
+
+/// Een tab met het rode bolletje erachter, als er daar iets nieuws staat.
+class _BadgedTab extends StatelessWidget {
+  const _BadgedTab({required this.label, required this.count});
+
+  final String label;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    if (count <= 0) return Tab(text: label);
+    return Tab(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 6),
+          Semantics(
+            label: S.of(context).navPelotonAttention(count),
+            child: ExcludeSemantics(
+              child: Badge(label: Text(unansweredBadgeLabel(count))),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -477,6 +490,25 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
     final shown =
         (filter == null ? actief : entries.where((e) => e.role == filter))
             .toList();
+
+    // Een ritvraag die je hier ziet, telt niet meer in het bolletje; de kaart
+    // blijft "vraagt je mee" zeggen tot je antwoordt. TickerMode om dezelfde
+    // reden als bij de maatjes: de shell houdt deze tak gebouwd als je op Home
+    // staat.
+    final unseen = ref.watch(unseenRideInvitesProvider).value ?? const {};
+    if (unseen.isNotEmpty && TickerMode.valuesOf(context).enabled) {
+      final seenHere = [
+        for (final e in shown)
+          if (unseen.contains(e.key)) e.key,
+      ];
+      if (seenHere.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ref.read(unseenRideInvitesProvider.notifier).markSeen(seenHere);
+          }
+        });
+      }
+    }
 
     return Column(
       children: [

@@ -1,8 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/repositories/seen_friends_store.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
+import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 
@@ -55,29 +58,75 @@ List<RideEntry> rideEntries(Ref ref) {
 /// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
 /// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
 ///
-/// Eén van de drie delen van [pelotonAttentionCount].
+/// Telt niet meer mee in het bolletje; dat telt [UnseenRideInvites].
 @riverpod
-int unansweredRideCount(Ref ref) {
+int unansweredRideCount(Ref ref) => ref.watch(pendingRideKeysProvider).length;
+
+/// De sleutels achter [unansweredRideCount].
+@riverpod
+List<String> pendingRideKeys(Ref ref) {
   final now = DateTime.now();
-  return ref
-      .watch(rideEntriesProvider)
-      .where((e) => e.role == RideRole.pending && e.end.isAfter(now))
-      .length;
+  return [
+    for (final e in ref.watch(rideEntriesProvider))
+      if (e.role == RideRole.pending && e.end.isAfter(now)) e.key,
+  ];
 }
 
-/// Het getal in het rode bolletje op Ritten en op de tab Peloton: ritten die
-/// op jouw antwoord wachten, aanvragen die bij jou als beheerder liggen, en
-/// maatjes die je nog niet zag.
-///
-/// CLUB-25 optie A (schets 016): onderbalk en tab lezen allebei dit ene getal,
-/// zodat ze nooit iets anders zeggen. Tot 2026-09-26 telden groepsaanvragen
-/// bewust niet mee (34-05); Joost wilde ze er toen toch bij, omdat er zonder
-/// pushmeldingen geen andere plek is waar een beheerder ze ziet zonder de
-/// groep te openen.
+/// De ritvragen die je nog niet op de tab Ritten zag. Zie [SeenIdsStore] voor
+/// waarom gezien genoeg is: de kaart zelf blijft "vraagt je mee" zeggen tot je
+/// antwoordt.
 @riverpod
-int pelotonAttentionCount(Ref ref) {
-  final int rides = ref.watch(unansweredRideCountProvider);
-  final int requests = ref.watch(openGroupRequestCountProvider);
-  final int friends = ref.watch(unseenFriendsProvider).value ?? 0;
-  return rides + requests + friends;
+class UnseenRideInvites extends _$UnseenRideInvites {
+  @override
+  Future<Set<String>> build() async {
+    final me = ref.watch(currentUserIdProvider);
+    if (me == null) return const {};
+    final keys = ref.watch(pendingRideKeysProvider);
+    if (keys.isEmpty) return const {};
+    final store = SeenRideInvitesStore(await SharedPreferences.getInstance());
+    return unseenIds(current: keys, seen: store.seenFor(me) ?? const {});
+  }
+
+  /// Aangeroepen door de tab Ritten met de kaarten die hij echt toont. Niet
+  /// "alles": met een groepsfilter aan zie je een ritvraag uit een andere
+  /// groep niet, en dan mag hij niet stil als gezien gelden.
+  Future<void> markSeen(Iterable<String> keys) async {
+    final me = ref.read(currentUserIdProvider);
+    final shown = keys.toSet();
+    if (me == null || shown.isEmpty) return;
+    final store = SeenRideInvitesStore(await SharedPreferences.getInstance());
+    await store.add(me, shown);
+    state = AsyncData((state.value ?? const {}).difference(shown));
+  }
 }
+
+/// Het getal op de tab Ritten: ritvragen die je nog niet zag.
+@riverpod
+int ridesTabAttentionCount(Ref ref) =>
+    ref.watch(unseenRideInvitesProvider).value?.length ?? 0;
+
+/// Het getal op de tab Peloton: groepsaanvragen en maatjes die je nog niet
+/// zag.
+@riverpod
+int pelotonTabAttentionCount(Ref ref) {
+  final int requests = ref.watch(unseenGroupRequestsProvider).value?.length ?? 0;
+  final int friends = ref.watch(unseenFriendsProvider).value?.length ?? 0;
+  return requests + friends;
+}
+
+/// Het getal in het rode bolletje op Ritten in de onderbalk: de som van de
+/// twee tabs.
+///
+/// **Elk bolletje staat op de tab waar het over gaat.** Tot build 61 las de
+/// tab Peloton dit hele getal, ook de ritvragen die op de tab Ritten staan. In
+/// de video van 29 september bleef "Peloton 1" daardoor staan terwijl Joost
+/// naar zijn maatjes keek: de 1 was een ritvraag van Richard. En het telde
+/// wat op antwoord wachtte in plaats van wat je nog niet zag.
+///
+/// Groepsaanvragen tellen mee sinds 2026-09-26 (Joost): zonder pushmeldingen
+/// is er geen andere plek waar een beheerder ze ziet zonder de groep te
+/// openen.
+@riverpod
+int pelotonAttentionCount(Ref ref) =>
+    ref.watch(ridesTabAttentionCountProvider) +
+    ref.watch(pelotonTabAttentionCountProvider);

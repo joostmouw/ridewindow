@@ -95,7 +95,7 @@ String _$rideEntriesHash() => r'f31a206e0eb523606fa0e5986f8439e72bb65b9f';
 /// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
 /// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
 ///
-/// Eén van de drie delen van [pelotonAttentionCount].
+/// Telt niet meer mee in het bolletje; dat telt [UnseenRideInvites].
 
 @ProviderFor(unansweredRideCount)
 final unansweredRideCountProvider = UnansweredRideCountProvider._();
@@ -103,14 +103,14 @@ final unansweredRideCountProvider = UnansweredRideCountProvider._();
 /// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
 /// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
 ///
-/// Eén van de drie delen van [pelotonAttentionCount].
+/// Telt niet meer mee in het bolletje; dat telt [UnseenRideInvites].
 
 final class UnansweredRideCountProvider
     extends $FunctionalProvider<int, int, int> with $Provider<int> {
   /// Hoeveel ritten er op jouw antwoord wachten: losse uitnodigingen plus
   /// groepsritten zonder jouw rij, alleen wat nog niet voorbij is.
   ///
-  /// Eén van de drie delen van [pelotonAttentionCount].
+  /// Telt niet meer mee in het bolletje; dat telt [UnseenRideInvites].
   UnansweredRideCountProvider._()
       : super(
           from: null,
@@ -145,42 +145,247 @@ final class UnansweredRideCountProvider
 }
 
 String _$unansweredRideCountHash() =>
-    r'7e8a77d5ea14db69746e6fee609224d90c026df6';
+    r'5a55bb17df188e8a1b922aa87c6ffdbfb65e72b6';
 
-/// Het getal in het rode bolletje op Ritten en op de tab Peloton: ritten die
-/// op jouw antwoord wachten, aanvragen die bij jou als beheerder liggen, en
-/// maatjes die je nog niet zag.
+/// De sleutels achter [unansweredRideCount].
+
+@ProviderFor(pendingRideKeys)
+final pendingRideKeysProvider = PendingRideKeysProvider._();
+
+/// De sleutels achter [unansweredRideCount].
+
+final class PendingRideKeysProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  /// De sleutels achter [unansweredRideCount].
+  PendingRideKeysProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'pendingRideKeysProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pendingRideKeysHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return pendingRideKeys(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$pendingRideKeysHash() => r'3b696f56be7378d06a96e818e158c397c5111a77';
+
+/// De ritvragen die je nog niet op de tab Ritten zag. Zie [SeenIdsStore] voor
+/// waarom gezien genoeg is: de kaart zelf blijft "vraagt je mee" zeggen tot je
+/// antwoordt.
+
+@ProviderFor(UnseenRideInvites)
+final unseenRideInvitesProvider = UnseenRideInvitesProvider._();
+
+/// De ritvragen die je nog niet op de tab Ritten zag. Zie [SeenIdsStore] voor
+/// waarom gezien genoeg is: de kaart zelf blijft "vraagt je mee" zeggen tot je
+/// antwoordt.
+final class UnseenRideInvitesProvider
+    extends $AsyncNotifierProvider<UnseenRideInvites, Set<String>> {
+  /// De ritvragen die je nog niet op de tab Ritten zag. Zie [SeenIdsStore] voor
+  /// waarom gezien genoeg is: de kaart zelf blijft "vraagt je mee" zeggen tot je
+  /// antwoordt.
+  UnseenRideInvitesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'unseenRideInvitesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$unseenRideInvitesHash();
+
+  @$internal
+  @override
+  UnseenRideInvites create() => UnseenRideInvites();
+}
+
+String _$unseenRideInvitesHash() => r'af42593f475cd00f6b2e4a16321004ac06583029';
+
+/// De ritvragen die je nog niet op de tab Ritten zag. Zie [SeenIdsStore] voor
+/// waarom gezien genoeg is: de kaart zelf blijft "vraagt je mee" zeggen tot je
+/// antwoordt.
+
+abstract class _$UnseenRideInvites extends $AsyncNotifier<Set<String>> {
+  FutureOr<Set<String>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<Set<String>>, Set<String>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<Set<String>>, Set<String>>,
+        AsyncValue<Set<String>>,
+        Object?,
+        Object?>;
+    return element.handleCreate(ref, build);
+  }
+}
+
+/// Het getal op de tab Ritten: ritvragen die je nog niet zag.
+
+@ProviderFor(ridesTabAttentionCount)
+final ridesTabAttentionCountProvider = RidesTabAttentionCountProvider._();
+
+/// Het getal op de tab Ritten: ritvragen die je nog niet zag.
+
+final class RidesTabAttentionCountProvider
+    extends $FunctionalProvider<int, int, int> with $Provider<int> {
+  /// Het getal op de tab Ritten: ritvragen die je nog niet zag.
+  RidesTabAttentionCountProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'ridesTabAttentionCountProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$ridesTabAttentionCountHash();
+
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int create(Ref ref) {
+    return ridesTabAttentionCount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$ridesTabAttentionCountHash() =>
+    r'c25a040907240aa9203092569ebf0c463f5de484';
+
+/// Het getal op de tab Peloton: groepsaanvragen en maatjes die je nog niet
+/// zag.
+
+@ProviderFor(pelotonTabAttentionCount)
+final pelotonTabAttentionCountProvider = PelotonTabAttentionCountProvider._();
+
+/// Het getal op de tab Peloton: groepsaanvragen en maatjes die je nog niet
+/// zag.
+
+final class PelotonTabAttentionCountProvider
+    extends $FunctionalProvider<int, int, int> with $Provider<int> {
+  /// Het getal op de tab Peloton: groepsaanvragen en maatjes die je nog niet
+  /// zag.
+  PelotonTabAttentionCountProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'pelotonTabAttentionCountProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pelotonTabAttentionCountHash();
+
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int create(Ref ref) {
+    return pelotonTabAttentionCount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$pelotonTabAttentionCountHash() =>
+    r'67d534a29009178a0875df5f9b825beb0647c95f';
+
+/// Het getal in het rode bolletje op Ritten in de onderbalk: de som van de
+/// twee tabs.
 ///
-/// CLUB-25 optie A (schets 016): onderbalk en tab lezen allebei dit ene getal,
-/// zodat ze nooit iets anders zeggen. Tot 2026-09-26 telden groepsaanvragen
-/// bewust niet mee (34-05); Joost wilde ze er toen toch bij, omdat er zonder
-/// pushmeldingen geen andere plek is waar een beheerder ze ziet zonder de
-/// groep te openen.
+/// **Elk bolletje staat op de tab waar het over gaat.** Tot build 61 las de
+/// tab Peloton dit hele getal, ook de ritvragen die op de tab Ritten staan. In
+/// de video van 29 september bleef "Peloton 1" daardoor staan terwijl Joost
+/// naar zijn maatjes keek: de 1 was een ritvraag van Richard. En het telde
+/// wat op antwoord wachtte in plaats van wat je nog niet zag.
+///
+/// Groepsaanvragen tellen mee sinds 2026-09-26 (Joost): zonder pushmeldingen
+/// is er geen andere plek waar een beheerder ze ziet zonder de groep te
+/// openen.
 
 @ProviderFor(pelotonAttentionCount)
 final pelotonAttentionCountProvider = PelotonAttentionCountProvider._();
 
-/// Het getal in het rode bolletje op Ritten en op de tab Peloton: ritten die
-/// op jouw antwoord wachten, aanvragen die bij jou als beheerder liggen, en
-/// maatjes die je nog niet zag.
+/// Het getal in het rode bolletje op Ritten in de onderbalk: de som van de
+/// twee tabs.
 ///
-/// CLUB-25 optie A (schets 016): onderbalk en tab lezen allebei dit ene getal,
-/// zodat ze nooit iets anders zeggen. Tot 2026-09-26 telden groepsaanvragen
-/// bewust niet mee (34-05); Joost wilde ze er toen toch bij, omdat er zonder
-/// pushmeldingen geen andere plek is waar een beheerder ze ziet zonder de
-/// groep te openen.
+/// **Elk bolletje staat op de tab waar het over gaat.** Tot build 61 las de
+/// tab Peloton dit hele getal, ook de ritvragen die op de tab Ritten staan. In
+/// de video van 29 september bleef "Peloton 1" daardoor staan terwijl Joost
+/// naar zijn maatjes keek: de 1 was een ritvraag van Richard. En het telde
+/// wat op antwoord wachtte in plaats van wat je nog niet zag.
+///
+/// Groepsaanvragen tellen mee sinds 2026-09-26 (Joost): zonder pushmeldingen
+/// is er geen andere plek waar een beheerder ze ziet zonder de groep te
+/// openen.
 
 final class PelotonAttentionCountProvider
     extends $FunctionalProvider<int, int, int> with $Provider<int> {
-  /// Het getal in het rode bolletje op Ritten en op de tab Peloton: ritten die
-  /// op jouw antwoord wachten, aanvragen die bij jou als beheerder liggen, en
-  /// maatjes die je nog niet zag.
+  /// Het getal in het rode bolletje op Ritten in de onderbalk: de som van de
+  /// twee tabs.
   ///
-  /// CLUB-25 optie A (schets 016): onderbalk en tab lezen allebei dit ene getal,
-  /// zodat ze nooit iets anders zeggen. Tot 2026-09-26 telden groepsaanvragen
-  /// bewust niet mee (34-05); Joost wilde ze er toen toch bij, omdat er zonder
-  /// pushmeldingen geen andere plek is waar een beheerder ze ziet zonder de
-  /// groep te openen.
+  /// **Elk bolletje staat op de tab waar het over gaat.** Tot build 61 las de
+  /// tab Peloton dit hele getal, ook de ritvragen die op de tab Ritten staan. In
+  /// de video van 29 september bleef "Peloton 1" daardoor staan terwijl Joost
+  /// naar zijn maatjes keek: de 1 was een ritvraag van Richard. En het telde
+  /// wat op antwoord wachtte in plaats van wat je nog niet zag.
+  ///
+  /// Groepsaanvragen tellen mee sinds 2026-09-26 (Joost): zonder pushmeldingen
+  /// is er geen andere plek waar een beheerder ze ziet zonder de groep te
+  /// openen.
   PelotonAttentionCountProvider._()
       : super(
           from: null,
@@ -215,4 +420,4 @@ final class PelotonAttentionCountProvider
 }
 
 String _$pelotonAttentionCountHash() =>
-    r'4cde0f5a343809d42adb701ea06147f4143265c0';
+    r'f4022d99e9ecf9084d6da70798159aa6e0a298d7';

@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/repositories/seen_friends_store.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
@@ -23,6 +24,7 @@ import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
+import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 
@@ -109,6 +111,7 @@ Future<FakeGroupGateway> _pump(
   double scale = 1.0,
   Brightness brightness = Brightness.light,
   bool failGroups = false,
+  bool visible = true,
 }) async {
   SharedPreferences.setMockInitialValues({});
   tester.view.physicalSize = const Size(360 * 3, 800 * 3);
@@ -143,7 +146,9 @@ Future<FakeGroupGateway> _pump(
     routes: [
       GoRoute(
         path: '/',
-        builder: (_, __) => const Scaffold(body: RidesTab()),
+        builder: (_, __) => Scaffold(
+          body: TickerMode(enabled: visible, child: const RidesTab()),
+        ),
       ),
       GoRoute(
         path: '/detail',
@@ -305,6 +310,37 @@ void main() {
     expect(find.text('Wacht op jou'), findsOneWidget);
     expect(find.text('Ik organiseer'), findsOneWidget);
     expect(find.text('Alleen ik'), findsNothing);
+  });
+
+  // Het bolletje telt wat je nog niet zag (video 29 september): een ritvraag
+  // die hier in beeld staat, telt daarna niet meer, maar blijft "wacht op jou".
+  testWidgets('een ritvraag die je hier ziet, telt niet meer in het bolletje',
+      (tester) async {
+    await _pump(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(RidesTab)),
+    );
+    // RidesTab houdt de provider levend; .value en niet .future, want een
+    // lege set moet ook echt geladen zijn en niet "nog bezig".
+    expect(container.read(unseenRideInvitesProvider).value, isEmpty);
+    expect(container.read(unansweredRideCountProvider), 2);
+    final prefs = await SharedPreferences.getInstance();
+    expect(SeenRideInvitesStore(prefs).seenFor(_me), hasLength(2));
+    expect(find.text('Wacht op jou'), findsOneWidget);
+  });
+
+  testWidgets('gebouwd maar niet zichtbaar: de ritvragen blijven nieuw',
+      (tester) async {
+    await _pump(tester, visible: false);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(RidesTab)),
+    );
+    // Riverpod 3 pauzeert een provider die alleen onzichtbare widgets lezen,
+    // dus het getal zelf is hier niet te lezen. Wat telt: niets is als gezien
+    // opgeslagen.
+    expect(container.read(unseenRideInvitesProvider).value, isNull);
+    final prefs = await SharedPreferences.getInstance();
+    expect(SeenRideInvitesStore(prefs).seenFor(_me), isNull);
   });
 
   testWidgets('een verdwenen groep valt terug op Alles', (tester) async {
