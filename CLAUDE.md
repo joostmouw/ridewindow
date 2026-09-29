@@ -23,6 +23,16 @@ Ridewindow is an Android app for casual cyclists who want to know — at a glanc
 > `CLAUDE.md`). Dit bestand blijft de bron van waarheid; verandert er iets aan de
 > commando's, de werkwijze of de grenzen, werk dan beide bij.
 
+## Werkregel: kijk eerst hoe goedlopende apps het doen
+
+Bij elke interactie die je ontwerpt of repareert (een bolletje, een melding,
+een link, een balk, een lege staat) ga je eerst na hoe apps die het goed doen
+het oplossen: Instagram, WhatsApp, Strava, Google Maps, YouTube. Schrijf dat
+als eigen kopje in het PLAN.md, met wat je overneemt en waar je bewust
+afwijkt. Regel van Joost (2026-09-29), na een bolletje dat bleef staan terwijl
+hij al gekeken had: elke grote app wist het bij het kijken, en dat hadden we
+eerder kunnen weten. Staat ook in `AGENTS.md`.
+
 <!-- GSD:stack-start source:research/STACK.md -->
 ## Technology Stack
 

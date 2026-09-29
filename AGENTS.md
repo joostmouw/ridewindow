@@ -129,6 +129,14 @@ Wat dat voor jou betekent, ook als je geen GSD-commando's hebt:
 4. **Werk de SUMMARY bij** als je klaar bent: wat je vond, niet alleen wat je
    deed. De vondsten zijn het waardevolste deel van het archief.
 
+**Kijk eerst hoe goedlopende apps het doen.** Bij elke interactie die je
+ontwerpt of repareert (een bolletje, een melding, een link, een balk, een
+lege staat) ga je eerst na hoe apps die het goed doen het oplossen: Instagram,
+WhatsApp, Strava, Google Maps, YouTube. Schrijf dat als eigen kopje in het
+PLAN.md, met wat je overneemt en waar je bewust afwijkt. Regel van Joost
+(2026-09-29), na een bolletje dat bleef staan terwijl hij al gekeken had: elke
+grote app wist het bij het kijken, en dat hadden we eerder kunnen weten.
+
 **Loop de hele app na bij een wijziging.** Als je een patroon aanpast, pas je
 het overal toe waar het speelt en noem je zelf de plekken die je gevonden hebt.
 Een halve sweep levert drift op, en die kost later een hele sessie.
