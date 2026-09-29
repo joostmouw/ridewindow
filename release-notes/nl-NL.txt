@@ -1,1 +1,1 @@
-Interne testbuild: een gedeelde uitnodigings- of groepslink opent nu de app in plaats van de website. Het rode bolletje verdwijnt zodra je gezien hebt waar het over gaat, en elke tab telt alleen zijn eigen nieuws. Op de website werkt de knop om mee te doen weer, en staat de app erop, dan opent hij hem.
+Interne testbuild: een geplande rit zegt nu Vandaag of Morgen, en verder weg de weekdag met datum, zodat een rit over tien dagen niet meer net zo heet als die van deze week. Het ritdetail toont bovenaan welke dag het is, en een gedeelde rit draagt de datum.

@@ -1,1 +1,1 @@
-Internal test build: a shared invite or group link now opens the app instead of the website. The red dot goes away once you have seen what it is about, and each tab counts only its own news. On the website the join button works again, and if the app is installed it opens the app.
+Internal test build: a planned ride now says Today or Tomorrow, and further out the weekday with the date, so a ride ten days away no longer looks like one this week. The ride detail shows which day it is at the top, and a shared ride carries the date.
