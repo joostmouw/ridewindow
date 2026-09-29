@@ -15,6 +15,26 @@ progress:
 
 # Project State
 
+## Stand na 2026-09-29 (middag) -- 1.0.52 (63) op internal en web
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.52 (63)**, geüpload via de Play Developer API |
+| PWA | **1.0.52 (63)**, uitgerold door GitHub Actions na de push; live `version.json` zegt 63 |
+| Oppo | laatst gezien op **1.0.51 (62)**; bij de release van 63 niet aangesloten |
+| Alpha / closed | **1.0.44 (55)** |
+| main | **1.0.52+63**, met `cb0db64` (dag bij een geplande rit) en `4bb8520` (dag in het ritdetail) |
+
+**Wat er in 63 zit:** zie `.planning/quick/260929-datum-bij-geplande-rit/SUMMARY.md`.
+Een geplande rit zegt Vandaag, Morgen, of "Zaterdag 3 okt." op Home en de
+rittenlijst; het ritdetail draagt de dag vooraan de tweede kopregel; de
+deeltekst krijgt altijd de datum.
+
+**Toestelcontrole die openstaat:** op de Oppo, na de update via de balk:
+het plankaartje onder PLANNED, de kop van een rit op de rittenlijst en de
+kopbalk van het ritdetail. Let op of "Donderdag 1 okt." op het plankaartje
+netjes past naast de scorepil.
+
 ## Stand na 2026-09-29 -- 1.0.51 (62) op internal en web
 
 | Waar | Stand |

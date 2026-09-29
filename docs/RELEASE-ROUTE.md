@@ -101,6 +101,15 @@ $ADB shell pm list packages | grep ridewindow             # leeg = schoon
   script; `docs/CONSOLE-SETUP-CHECKLIST.md` de eenmalige inrichting. Bij een
   wijziging aan de route werk je dit bestand bij, niet de andere twee los.
 
+## Stand 29 september 2026 (middag), na de internal-release van 1.0.52 (63)
+
+| Waar | Stand |
+|---|---|
+| Oppo | laatst gezien op 1.0.51 (62); bij de release niet aangesloten |
+| PWA | 1.0.52 (63), uitgerold door GitHub Actions; live `version.json` zegt 63 |
+| Internal | 1.0.52 (63) |
+| Alpha / closed | 1.0.44 (55) |
+
 ## Stand 29 september 2026, na de internal-release van 1.0.51 (62)
 
 | Waar | Stand |
