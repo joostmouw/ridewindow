@@ -172,7 +172,7 @@ void main() {
       expect(shared.single, contains('Dinsdagclub'));
       expect(
         shared.single,
-        contains('https://my-project-joost.web.app/#/group/$code'),
+        contains('https://my-project-joost.web.app/group/$code'),
       );
       expect(shared.single, contains('code $code'));
     });
@@ -213,7 +213,7 @@ void main() {
       expect(shared, hasLength(1));
       expect(
         shared.single,
-        contains('https://my-project-joost.web.app/#/group/$code'),
+        contains('https://my-project-joost.web.app/group/$code'),
       );
       // Delen van de nieuwe code vraagt niet nog eens een code op.
       expect(gateway.calls, isNot(contains('groupInviteCode:g1')));

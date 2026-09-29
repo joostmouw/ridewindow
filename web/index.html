@@ -16,6 +16,21 @@
   -->
   <base href="$FLUTTER_BASE_HREF">
 
+  <!--
+    Uitnodigings- en groepslinks zijn padlinks (/invite/CODE, /group/CODE),
+    omdat Android een App Link alleen op het pad kan herkennen en nooit op wat
+    na de # staat. Staat de app er niet op, dan komt de link hier: de rewrite
+    "**" in firebase.json serveert dit bestand, en deze regel zet het pad om
+    naar de hash-route waar go_router op draait, voordat Flutter hem leest.
+    Oude links in de /#/-vorm hebben dit niet nodig en blijven werken.
+  -->
+  <script>
+    (function () {
+      var m = location.pathname.match(/^\/(invite|group)\/([^\/]+)\/?$/);
+      if (m) history.replaceState(null, '', '/#/' + m[1] + '/' + m[2]);
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Cyclist-specific weather windows and ride planning">

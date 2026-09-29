@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ridewindow.joost.amsterdam",
+      "sha256_cert_fingerprints": [
+        "17:A9:37:85:89:14:A2:E9:D9:BD:C7:CF:5B:DC:16:CA:C8:EB:EC:69:E0:D5:A1:73:BC:CF:67:5A:61:3A:1B:6F",
+        "2F:F3:88:0F:DA:C5:D5:82:7D:79:DB:4E:61:62:A8:59:D5:74:60:75:D9:E1:2A:80:66:88:1F:D2:CE:5D:A8:92"
+      ]
+    }
+  }
+]

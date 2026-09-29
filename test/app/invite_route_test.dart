@@ -65,12 +65,13 @@ void main() {
     },
   );
 
-  test('de gedeelde link houdt de hash-vorm aan', () {
-    // Zonder de `/#/` belandt de link op de server in plaats van in de app, en
-    // dat geeft een 404: deze app draait op go_router's default
-    // hash-strategie. Verdwijnt de `#` hier, dan is elke al verstuurde
-    // uitnodiging stuk.
-    expect(inviteLinkFor('ABCD2345'), contains('/#/invite/'));
-    expect(inviteLinkFor('ABCD2345'), endsWith('/ABCD2345'));
+  test('de gedeelde link is een padlink, zodat Android de app kan openen', () {
+    // Android matcht een App Link op het pad en ziet niets na de `#`. Een
+    // `/#/invite/`-link opent daarom altijd Chrome, ook als de app erop staat.
+    // De web-kant vangt de padvorm op in web/index.html.
+    expect(
+      inviteLinkFor('ABCD2345'),
+      'https://my-project-joost.web.app/invite/ABCD2345',
+    );
   });
 }

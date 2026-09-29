@@ -50,7 +50,41 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="ridewindow"/>
             </intent-filter>
+            <!--
+                App Links (2026-09-29): een gedeelde uitnodigings- of groepslink
+                opent de app in plaats van Chrome, zoals een Strava- of
+                YouTube-link dat doet. Alleen /invite/ en /group/: de rest van de
+                site blijft de PWA, ook voor wie de app heeft.
+
+                autoVerify laat Android bij de installatie
+                https://my-project-joost.web.app/.well-known/assetlinks.json
+                ophalen. Staat daar de vingerafdruk van de sleutel waarmee de
+                APK getekend is niet in, dan valt dit stil terug op "openen met
+                Chrome" zonder foutmelding. Voor een Play-build is dat de
+                Play-sleutel, niet de uploadsleutel; allebei staan erin.
+
+                Een fragment (/#/invite/...) kan Android niet matchen, daarom
+                zijn de links sinds deze wijziging padlinks.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"/>
+                <data android:host="my-project-joost.web.app"/>
+                <data android:pathPrefix="/invite/"/>
+                <data android:pathPrefix="/group/"/>
+            </intent-filter>
         </activity>
+        <!--
+            De andere kant van de koppeling: de app verklaart dat de website bij
+            hem hoort. Chrome eist dat voordat getInstalledRelatedApps() op de
+            site de app laat zien; zonder dit toont de store-balk altijd "Doe
+            mee", ook als de app erop staat.
+        -->
+        <meta-data
+            android:name="asset_statements"
+            android:resource="@string/asset_statements" />
         <!-- WorkManager achtergrondtaak service -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"

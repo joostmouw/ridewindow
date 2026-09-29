@@ -18,15 +18,19 @@ import 'package:ridewindow/theme/app_icons.dart';
 /// De basis-URL van de gedeelde link. Bewust hier als constante en niet
 /// verspreid over de plekken die hem nodig hebben.
 ///
-/// **De `/#/` is geen slordigheid maar noodzaak:** deze app draait op
-/// go_router's default hash-strategie (er staat nergens `usePathUrlStrategy`),
-/// dus `https://…/invite/ABC` komt op de server terecht en geeft een 404,
-/// terwijl `https://…/#/invite/ABC` door de app zelf wordt afgehandeld. Zet je
-/// ooit padroutering aan, dan moet deze constante mee.
+/// **Een padlink, zonder `/#/`, en dat is opzet.** Android herkent een App
+/// Link alleen aan het pad; wat na de `#` staat ziet het niet. Met deze vorm
+/// opent de link de app als die erop staat (het intent-filter in
+/// `AndroidManifest.xml`). Staat hij er niet op, dan serveert de rewrite `**`
+/// in `firebase.json` `index.html`, en een regel daarin zet het pad om naar
+/// `/#/invite/ABC`, want de web-app draait op go_router's hash-strategie.
+/// Tot 2026-09-29 was dit `/#/invite`; die al verstuurde links blijven werken
+/// in de browser, maar openen de app niet.
 ///
 /// Verandert het domein (backlog #54 stelt `ridewindow.web.app` voor), dan is
-/// dit de plek — en let erop dat oude, al verstuurde links dan doodlopen.
-const kInviteLinkBase = 'https://my-project-joost.web.app/#/invite';
+/// dit de plek, samen met het intent-filter en `assetlinks.json`; en let erop
+/// dat oude, al verstuurde links dan doodlopen.
+const kInviteLinkBase = 'https://my-project-joost.web.app/invite';
 
 String inviteLinkFor(String code) => '$kInviteLinkBase/$code';
 

@@ -192,8 +192,8 @@ GoRouter router(Ref ref) {
       ),
       // Clubs (CLUB-02): de gedeelde groepslink, naar het model van
       // /invite/:code hierboven. Opent een aanvraag, of het groepsscherm als
-      // je al lid bent. De Firebase-rewrite "**" en de hash-routing (/#/group)
-      // dekken dit pad al; firebase.json hoeft niet mee.
+      // je al lid bent. Op Android komt de padlink hier via het App
+      // Link-filter binnen; op web zet index.html hem eerst om naar /#/group.
       GoRoute(
         path: '/group/:code',
         pageBuilder: (context, state) => _fadeTransition(
