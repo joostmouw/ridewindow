@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-26T16:45:00.000Z"
-last_activity: 2026-09-26
+last_updated: "2026-09-29T11:00:00.000Z"
+last_activity: 2026-09-29
 progress:
   total_phases: 12
   completed_phases: 6
@@ -14,6 +14,32 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-09-29 -- 1.0.51 (62) op internal en web
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.51 (62)**, geüpload via de Play Developer API |
+| PWA | **1.0.51 (62)**; uitgerold door GitHub Actions (`deploy-web.yml` draait bij elke push naar main die `lib/`, `web/` of `firebase.json` raakt). Live `version.json` zegt 62; `/.well-known/assetlinks.json` komt als `application/json`, en Google's Digital Asset Links API geeft beide statements terug |
+| Oppo | laatst gezien op **1.0.50 (61)**; bij de release niet aangesloten |
+| Alpha / closed | **1.0.44 (55)** |
+| main | **1.0.51+62**, met `a4651f6` (store-balk), `6617e6c` (bolletje), `35b1142` (App Links), `152ecf6` (werkregel) |
+
+**Wat er in 62 zit:** zie `.planning/quick/260929-app-links-en-bolletje/SUMMARY.md`.
+"Doe mee" op de website werkt weer (de sheet vond geen Navigator); het
+bolletje telt wat je nog niet zag en staat op de tab waar het over gaat;
+uitnodigings- en groepslinks zijn padlinks die als App Link de app openen.
+
+**Toestelcontrole die openstaat:**
+1. Na de Play-update: `adb shell pm get-app-links ridewindow.joost.amsterdam`
+   moet `my-project-joost.web.app: verified` zeggen. Zo niet: `adb shell pm
+   verify-app-links --re-verify ridewindow.joost.amsterdam` en opnieuw lezen.
+2. Een link `https://my-project-joost.web.app/invite/<code>` uit WhatsApp of
+   Gmail opent de app, niet Chrome. Oude `/#/invite/`-links openen Chrome, dat
+   is verwacht.
+3. De update-balk ("Er staat een nieuwe versie klaar") moet op 61 verschijnen
+   zodra 62 in Play staat: de eerste echte test van die balk.
+4. De website in Chrome op de Oppo toont met de app erop "Openen in app".
 
 ## Stand na 2026-09-26 (avond) -- 1.0.50 (61) op internal en web
 
