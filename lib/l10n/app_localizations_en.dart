@@ -1573,6 +1573,12 @@ class SEn extends S {
   String get storeBannerAction => 'Join';
 
   @override
+  String get storeBannerInstalledText => 'The Ridewindow app is on your phone';
+
+  @override
+  String get storeBannerOpenApp => 'Open app';
+
+  @override
   String get storeStepsTitle => 'Test the Android app';
 
   @override

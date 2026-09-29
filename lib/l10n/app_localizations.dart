@@ -2887,6 +2887,18 @@ abstract class S {
   /// **'Doe mee'**
   String get storeBannerAction;
 
+  /// Store-balk op de website als de Android-app al op het toestel staat.
+  ///
+  /// In nl, this message translates to:
+  /// **'De Ridewindow-app staat op je telefoon'**
+  String get storeBannerInstalledText;
+
+  /// Knop in de store-balk als de app erop staat: opent de app op hetzelfde scherm.
+  ///
+  /// In nl, this message translates to:
+  /// **'Openen in app'**
+  String get storeBannerOpenApp;
+
   /// Titel van het venster met de drie teststappen.
   ///
   /// In nl, this message translates to:

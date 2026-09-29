@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/data/repositories/update_banner_store.dart';
+import 'package:ridewindow/features/shared/banner_close_button.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/app_update_provider.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -128,13 +129,7 @@ class _AppUpdateBannerState extends ConsumerState<AppUpdateBanner>
                 isWebPlatform ? s.updateBannerReload : s.updateBannerUpdate,
               ),
             ),
-            IconButton(
-              icon: const Icon(AppIcons.x, size: 18),
-              color: onColor,
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              visualDensity: VisualDensity.compact,
-              onPressed: _dismiss,
-            ),
+            BannerCloseButton(color: onColor, onPressed: _dismiss),
           ],
         ),
       ),

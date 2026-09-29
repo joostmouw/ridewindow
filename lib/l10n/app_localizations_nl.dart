@@ -1576,6 +1576,13 @@ class SNl extends S {
   String get storeBannerAction => 'Doe mee';
 
   @override
+  String get storeBannerInstalledText =>
+      'De Ridewindow-app staat op je telefoon';
+
+  @override
+  String get storeBannerOpenApp => 'Openen in app';
+
+  @override
   String get storeStepsTitle => 'Test de Android-app';
 
   @override

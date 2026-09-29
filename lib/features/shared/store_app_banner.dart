@@ -12,19 +12,32 @@
 // Ook in de geïnstalleerde PWA: de native app kan meer (widget, meldingen,
 // agenda), dus de verwijzing blijft zinvol. Wegklikken sluimert zoals de
 // iOS-balk: een week, en na drie keer houdt de app erover op.
+//
+// Staat de app al op het toestel, dan zegt de balk dat en opent "Openen in
+// app" hem op hetzelfde scherm, zoals YouTube en Reddit op hun website doen.
+// "Doe mee" zou dan vragen om iets wat je al gedaan hebt.
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ridewindow/core/native_app.dart';
 import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/core/store_links.dart';
 import 'package:ridewindow/data/repositories/install_hint_store.dart';
+import 'package:ridewindow/features/shared/banner_close_button.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
 class StoreAppBanner extends StatefulWidget {
-  const StoreAppBanner({super.key});
+  const StoreAppBanner({super.key, this.navigatorKey});
+
+  /// De navigator van de router. De balk staat in `MaterialApp.router(builder:)`
+  /// en dus bóven die navigator: met zijn eigen context vindt
+  /// `showModalBottomSheet` geen Navigator en gooit hij, en de knop deed niets
+  /// (build 61, video van 29 september). `null` in een test die de balk zelf
+  /// onder een Navigator hangt.
+  final GlobalKey<NavigatorState>? navigatorKey;
 
   @override
   State<StoreAppBanner> createState() => _StoreAppBannerState();
@@ -34,12 +47,16 @@ class _StoreAppBannerState extends State<StoreAppBanner> {
   /// Falen naar zichtbaar, zoals de iOS-balk: lukt het lezen niet, dan staat
   /// hij er gewoon.
   bool _hidden = false;
+  bool _appInstalled = false;
   InstallHintStore? _store;
 
   @override
   void initState() {
     super.initState();
-    if (isAndroidWeb) _loadState();
+    if (isAndroidWeb) {
+      _loadState();
+      _checkInstalled();
+    }
   }
 
   Future<void> _loadState() async {
@@ -57,6 +74,11 @@ class _StoreAppBannerState extends State<StoreAppBanner> {
     }
   }
 
+  Future<void> _checkInstalled() async {
+    final installed = await isNativeAppInstalled();
+    if (mounted && installed) setState(() => _appInstalled = true);
+  }
+
   Future<void> _dismiss() async {
     setState(() => _hidden = true);
     try {
@@ -67,12 +89,16 @@ class _StoreAppBannerState extends State<StoreAppBanner> {
   }
 
   Future<void> _join() async {
+    if (_appInstalled) {
+      openNativeApp();
+      return;
+    }
     if (kStoreAppPublic) {
       await openStoreLink(kPlayStoreListingUrl);
       return;
     }
     await showModalBottomSheet<void>(
-      context: context,
+      context: widget.navigatorKey?.currentContext ?? context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (_) => const TesterStepsSheet(),
@@ -96,22 +122,21 @@ class _StoreAppBannerState extends State<StoreAppBanner> {
             Icon(AppIcons.personSimpleBike, color: onColor, size: 20),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(s.storeBannerText, style: TextStyle(color: onColor)),
+              child: Text(
+                _appInstalled ? s.storeBannerInstalledText : s.storeBannerText,
+                style: TextStyle(color: onColor),
+              ),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: colorScheme.inversePrimary,
               ),
               onPressed: _join,
-              child: Text(s.storeBannerAction),
+              child: Text(
+                _appInstalled ? s.storeBannerOpenApp : s.storeBannerAction,
+              ),
             ),
-            IconButton(
-              icon: const Icon(AppIcons.x, size: 18),
-              color: onColor,
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              visualDensity: VisualDensity.compact,
-              onPressed: _dismiss,
-            ),
+            BannerCloseButton(color: onColor, onPressed: _dismiss),
           ],
         ),
       ),

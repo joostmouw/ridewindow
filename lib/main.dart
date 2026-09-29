@@ -220,7 +220,7 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
       builder: (context, child) => Stack(
         children: [
           if (child != null) child,
-          const TopBanners(),
+          TopBanners(navigatorKey: router.routerDelegate.navigatorKey),
         ],
       ),
     );

@@ -85,7 +85,7 @@ void main() {
     testWidgets('wegklikken geldt voor deze build en wordt onthouden',
         (tester) async {
       await _pump(tester, _FakeUpdates(_here + 1));
-      await tester.tap(find.byTooltip('Sluiten'));
+      await tester.tap(find.bySemanticsLabel('Sluiten'));
       await tester.pumpAndSettle();
       expect(find.text('Er staat een nieuwe versie klaar'), findsNothing);
       final prefs = await SharedPreferences.getInstance();

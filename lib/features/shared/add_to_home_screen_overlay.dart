@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/data/repositories/install_hint_store.dart';
+import 'package:ridewindow/features/shared/banner_close_button.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
@@ -97,13 +98,8 @@ class _AddToHomeScreenOverlayState extends State<AddToHomeScreenOverlay> {
               ),
             ),
             const SizedBox(width: 4),
-            IconButton(
-              icon: const Icon(AppIcons.x, size: 18),
+            BannerCloseButton(
               color: colorScheme.onInverseSurface,
-              // MaterialLocalizations en geen eigen ARB-sleutel: Flutter
-              // vertaalt deze al in beide talen.
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              visualDensity: VisualDensity.compact,
               onPressed: _dismiss,
             ),
           ],
