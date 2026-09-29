@@ -25,8 +25,12 @@ status: complete (lokaal gecommit, nog niet in een build)
 2. **De deeltekst had hetzelfde gat.** "Fietsrit Zaterdag 10:00-12:00" in een
    WhatsApp-bericht zegt niet welke zaterdag. Een gedeeld bericht krijgt
    bewust geen "morgen": dat hangt af van wanneer de ander het leest.
-3. **Het ritdetail toont helemaal geen dag.** De kopbalk zegt alleen de tijd
-   en de score. Niet aangepast in deze ronde; staat open als vraag aan Joost.
+3. **Het ritdetail toont helemaal geen dag.** De kopbalk zei alleen de tijd
+   en de score. Op Joosts ja nu vooraan de tweede regel: "Morgen · 4u ·
+   Ideaal fietsweer". Naast de tijd paste het niet: "Donderdag 1 okt." plus
+   de scorepil loopt op 360 dp over. Google Calendar zet de datum ook op een
+   eigen regel onder de titel. Wordt de regel te lang, dan valt de
+   omschrijving weg en blijft de dag staan (tweede commit).
 4. **In widget-tests is `DateFormat('…', 'nl_NL')` bruikbaar zonder
    `initializeDateFormatting`:** de `GlobalMaterialLocalizations`-delegate in
    `S.localizationsDelegates` laadt de datumsymbolen al. In een kale unit-test
