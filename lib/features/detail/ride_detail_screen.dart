@@ -374,8 +374,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               ScoreBadge(tier: slot.tier),
             ],
           ),
+          // De dag vooraan, want naast de tijd op de regel erboven past hij
+          // op 360 dp niet ("Donderdag 1 okt." plus de scorepil). Loopt deze
+          // regel te lang, dan valt de omschrijving weg en blijft de dag staan.
           Text(
-            '$duration \u00B7 $description',
+            '${rideDayLabel(slot.start, s)} \u00B7 $duration \u00B7 $description',
             style: Theme.of(context).textTheme.bodySmall,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

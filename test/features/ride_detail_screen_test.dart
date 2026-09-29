@@ -220,6 +220,33 @@ void main() {
       expect(find.textContaining('13:00'), findsWidgets);
     });
 
+    // Het detail droeg alleen de tijd: wie een rit opende, zag niet welke dag.
+    testWidgets('AppBar zegt welke dag het is, vooraan de tweede regel',
+        (tester) async {
+      final now = DateTime.now();
+      final tomorrow = DateTime(now.year, now.month, now.day + 1, 9);
+      final slot = makeSlot(
+        start: tomorrow,
+        end: tomorrow.add(const Duration(hours: 4)),
+      );
+      final forecasts = makeForecasts(slot.start);
+
+      await tester.pumpWidget(
+        wrapInMaterial(
+          RideDetailScreen(slot: slot, forecasts: forecasts),
+          forecasts: forecasts,
+          hours: slot.hours,
+        ),
+      );
+      await tester.pump();
+
+      final subtitle = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.textContaining('Morgen \u00B7 4'),
+      );
+      expect(subtitle, findsOneWidget);
+    });
+
     testWidgets('Score-banner toont het tier-woord voor Perfect slot, zonder smiley',
         (tester) async {
       final slot = makeSlot(tier: const Perfect());
