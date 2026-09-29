@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/core/ride_day_label.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
@@ -25,6 +26,7 @@ import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/features/shared/score_display.dart';
 import 'package:ridewindow/data/repositories/home_view_store.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/l10n/app_localizations_nl.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/theme/app_theme.dart';
@@ -618,5 +620,54 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Anna vraagt of je meegaat'), findsOneWidget);
+  });
+
+  // PLANNED toont de eerstvolgende drie ritten, niet die van één week. Met
+  // alleen de weekdag heette een rit over tien dagen net zo als een van deze
+  // week.
+  testWidgets('de plankaart zegt Morgen, en verder weg de datum erbij',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({'hint_seen_home': true});
+    final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1, 10);
+    final later = DateTime(now.year, now.month, now.day + 10, 10);
+    RideEntry solo(DateTime start) => RideEntry(
+          start: start,
+          end: start.add(const Duration(hours: 2)),
+          plannedScore: 90,
+          role: RideRole.solo,
+        );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          weatherProvider.overrideWith(() => FakeWeatherReady()),
+          profileProvider.overrideWith(() => FakeProfileNotifier()),
+          availabilityProvider.overrideWith(() => FakeAvailabilityNotifier()),
+          plannedRidesProvider.overrideWith(() => FakePlannedRidesNotifier()),
+          slotsProvider.overrideWith(
+            () => FakeStaticSlotsNotifier(
+              const SlotsLoaded([], reason: null),
+            ),
+          ),
+          rideEntriesProvider
+              .overrideWith((ref) => [solo(tomorrow), solo(later)]),
+        ],
+        child: MaterialApp.router(
+          routerConfig: _makeRouter(),
+          locale: const Locale('nl'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: ThemeData(extensions: const [RideWindowTheme.light]),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(find.text('Morgen'), findsOneWidget);
+    final laterLabel = rideDayLabelAbsolute(later, SNl());
+    expect(laterLabel, contains('${later.day} '));
+    expect(find.text(laterLabel), findsOneWidget);
   });
 }

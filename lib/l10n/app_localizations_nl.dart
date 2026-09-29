@@ -210,6 +210,12 @@ class SNl extends S {
   String get daySunFull => 'Zondag';
 
   @override
+  String get dayToday => 'Vandaag';
+
+  @override
+  String get dayTomorrow => 'Morgen';
+
+  @override
   String get dayMonLower => 'maandag';
 
   @override

@@ -427,6 +427,18 @@ abstract class S {
   /// **'Zondag'**
   String get daySunFull;
 
+  /// Dag van een rit die vandaag is, bovenaan een ritkaart
+  ///
+  /// In nl, this message translates to:
+  /// **'Vandaag'**
+  String get dayToday;
+
+  /// Dag van een rit die morgen is, bovenaan een ritkaart
+  ///
+  /// In nl, this message translates to:
+  /// **'Morgen'**
+  String get dayTomorrow;
+
   /// No description provided for @dayMonLower.
   ///
   /// In nl, this message translates to:

@@ -55,6 +55,8 @@
   "dayFriFull": "Friday",
   "daySatFull": "Saturday",
   "daySunFull": "Sunday",
+  "dayToday": "Today",
+  "dayTomorrow": "Tomorrow",
   "dayMonLower": "monday",
   "dayTueLower": "tuesday",
   "dayWedLower": "wednesday",

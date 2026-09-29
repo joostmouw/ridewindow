@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:ridewindow/app/scaffold_with_nav.dart'
     show unansweredBadgeLabel;
+import 'package:ridewindow/core/ride_day_label.dart';
 import 'package:ridewindow/theme/app_shapes.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_score.dart';
@@ -991,13 +992,7 @@ class RideCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            DateFormat(
-                              'EEEE d MMM',
-                              Localizations.localeOf(context).languageCode ==
-                                      'en'
-                                  ? 'en_US'
-                                  : 'nl_NL',
-                            ).format(entry.start),
+                            rideDayLabel(entry.start, S.of(context)),
                             style: theme.textTheme.titleSmall
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),

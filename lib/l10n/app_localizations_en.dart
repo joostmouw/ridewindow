@@ -210,6 +210,12 @@ class SEn extends S {
   String get daySunFull => 'Sunday';
 
   @override
+  String get dayToday => 'Today';
+
+  @override
+  String get dayTomorrow => 'Tomorrow';
+
+  @override
   String get dayMonLower => 'monday';
 
   @override

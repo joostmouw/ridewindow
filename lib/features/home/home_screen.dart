@@ -28,6 +28,7 @@ import 'package:ridewindow/features/shared/weather_icon.dart';
 import 'package:ridewindow/features/shared/weather_indicator_bar.dart';
 import 'package:ridewindow/core/config.dart';
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/core/ride_day_label.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/cloud_sync_reconciler_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
@@ -1027,7 +1028,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _formatDayName(entry.start),
+                        rideDayLabel(entry.start, s),
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: rw.plannedRide,

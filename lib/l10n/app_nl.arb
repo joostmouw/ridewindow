@@ -60,6 +60,14 @@
   "dayFriFull": "Vrijdag",
   "daySatFull": "Zaterdag",
   "daySunFull": "Zondag",
+  "dayToday": "Vandaag",
+  "@dayToday": {
+    "description": "Dag van een rit die vandaag is, bovenaan een ritkaart"
+  },
+  "dayTomorrow": "Morgen",
+  "@dayTomorrow": {
+    "description": "Dag van een rit die morgen is, bovenaan een ritkaart"
+  },
   "dayMonLower": "maandag",
   "dayTueLower": "dinsdag",
   "dayWedLower": "woensdag",

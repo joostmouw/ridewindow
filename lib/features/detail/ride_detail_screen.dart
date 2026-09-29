@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ridewindow/theme/app_shapes.dart';
+import 'package:ridewindow/core/ride_day_label.dart';
 import 'package:ridewindow/core/safe_back_button.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/hourly_row.dart';
@@ -1200,33 +1201,10 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
       Poor() => s.tierPoor,
     };
     final summary = _weatherSummaryText(context);
-    final day = _dayName(context, widget.slot.start);
+    final day = rideDayLabelAbsolute(widget.slot.start, s);
     final timeRange =
         '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
     Share.share(s.shareText(day, timeRange, tierLabel, summary));
-  }
-
-  String _dayName(BuildContext context, DateTime dt) {
-    final s = S.of(context);
-    const days = [
-      DateTime.monday,
-      DateTime.tuesday,
-      DateTime.wednesday,
-      DateTime.thursday,
-      DateTime.friday,
-      DateTime.saturday,
-      DateTime.sunday
-    ];
-    final names = [
-      s.dayMonFull,
-      s.dayTueFull,
-      s.dayWedFull,
-      s.dayThuFull,
-      s.dayFriFull,
-      s.daySatFull,
-      s.daySunFull
-    ];
-    return names[days.indexOf(dt.weekday)];
   }
 
   String _compassDirection(BuildContext context, double degrees) {
