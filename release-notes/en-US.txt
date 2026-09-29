@@ -1,1 +1,1 @@
-Internal test build: the red dot on Rides now also counts group requests for admins and new buddies. A banner at the top tells you when a new version is ready in Play. Android visitors of the website see that there is an Android app, with the steps to join the test.
+Internal test build: a shared invite or group link now opens the app instead of the website. The red dot goes away once you have seen what it is about, and each tab counts only its own news. On the website the join button works again, and if the app is installed it opens the app.
