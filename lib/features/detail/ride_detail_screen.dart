@@ -5,6 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -1545,33 +1546,14 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
             ),
             const SizedBox(height: 10),
           ],
-          FilledButton.tonalIcon(
-            onPressed: () async {
-              final notifService = widget.notificationServiceFactory();
-              // Pak S vóór de eerste await -- daarna is context gebruiken
-              // een lint-overtreding (use_build_context_synchronously).
-              final strings = S.of(context);
-              final canExact = await notifService.canScheduleExact();
-              final slotTitle =
-                  '${_fmtTime(_start)}\u2013${_fmtTime(_end)}';
-              await notifService.scheduleEveningBefore(
-                slotDay: _start,
-                slotTitle: slotTitle,
-                exact: canExact,
-                strings: strings,
-              );
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(S.of(context).reminderPlanned),
-                  ),
-                );
-              }
-            },
-            icon: const Icon(AppIcons.bell, size: 18),
-            label: Text(S.of(context).remindEveningBefore),
-          ),
-          const SizedBox(height: 10),
+          if (!kIsWeb) ...[
+            FilledButton.tonalIcon(
+              onPressed: _remindEveningBefore,
+              icon: const Icon(AppIcons.bell, size: 18),
+              label: Text(S.of(context).remindEveningBefore),
+            ),
+            const SizedBox(height: 10),
+          ],
           OutlinedButton.icon(
             onPressed: _shareSlot,
             icon: const Icon(AppIcons.shareNetwork, size: 18),
@@ -1580,6 +1562,61 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _remindEveningBefore() async {
+    final strings = S.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final evening = DateTime(_start.year, _start.month, _start.day - 1, 19);
+    if (!evening.isAfter(DateTime.now())) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(strings.notifReminderTooLate)),
+      );
+      return;
+    }
+    try {
+      final service = widget.notificationServiceFactory();
+      await service.init(strings: strings);
+      final permitted = await service.requestPostNotificationsPermission();
+      if (!mounted) return;
+      if (!permitted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(strings.notifPermissionDenied),
+            action: SnackBarAction(
+              label: strings.settingsLabel,
+              onPressed: () => service.openSystemSettings(),
+            ),
+          ),
+        );
+        return;
+      }
+      final exact = await service.canScheduleExact();
+      if (!mounted) return;
+      if (!evening.isAfter(DateTime.now())) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(strings.notifReminderTooLate)),
+        );
+        return;
+      }
+      await service.scheduleEveningBefore(
+        slotDay: _start,
+        slotTitle: '${_fmtTime(_start)}–${_fmtTime(_end)}',
+        exact: exact,
+        strings: strings,
+      );
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(strings.reminderPlanned)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(strings.notifSettingsFailed)),
+        );
+      }
+    }
   }
 
   @override

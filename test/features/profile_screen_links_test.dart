@@ -145,6 +145,13 @@ void main() {
 
   Future<void> tikOp(WidgetTester tester, String label) async {
     final rij = find.text(label, skipOffstage: false);
+    // Profiel groeit met nieuwe instellingen. De onderste sectie kan buiten
+    // de bouwcache vallen, ook op dit hoge testscherm.
+    await tester.scrollUntilVisible(
+      rij,
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(rij, findsOneWidget, reason: 'rij "$label" hoort in Profiel te staan');
     await tester.ensureVisible(rij);
     await tester.pump();

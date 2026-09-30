@@ -379,6 +379,41 @@ class SNl extends S {
   String get sectionNotifications => 'MELDINGEN';
 
   @override
+  String get notifScoreDropSetting => 'Mijn rit wordt minder';
+
+  @override
+  String get notifScoreDropSettingSub =>
+      'Waarschuw bij een lagere weerscore voor een geplande rit. Controle bij openen en ongeveer elke 3 uur op de achtergrond; Android kan dit uitstellen. Alleen op dit toestel.';
+
+  @override
+  String get notifScoreDropThreshold => 'Melden bij een daling van';
+
+  @override
+  String notifScoreDropPoints(int points) {
+    return '$points procentpunt';
+  }
+
+  @override
+  String get notifScoreDropTitle => 'Het weer voor je rit wordt minder';
+
+  @override
+  String notifScoreDropBody(String slot, int drop, int previous, int current) {
+    return '$slot: $drop procentpunt gedaald, van $previous naar $current.';
+  }
+
+  @override
+  String get notifWebExplanation =>
+      'Je ritscores verversen met het weer en je voorkeuren. Meldingen bij een gesloten app werken nu alleen in de Android-app, niet in deze webapp.';
+
+  @override
+  String get notifSettingsFailed =>
+      'Meldingen instellen is niet gelukt. Probeer het opnieuw.';
+
+  @override
+  String get notifReminderTooLate =>
+      'De avond voor deze rit is al voorbij. Er is geen herinnering ingesteld.';
+
+  @override
   String get sectionTheme => 'THEMA';
 
   @override

@@ -2,9 +2,12 @@
 // WorkManager callback — draait in aparte Dart-isolate.
 // KRITISCH: Geen Riverpod/ProviderScope — eigen Drift + HTTP client initialiseren.
 
+import 'dart:ui' show DartPluginRegistrant;
+
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/core/config.dart';
@@ -19,6 +22,14 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/services/availability_filter.dart';
 import 'package:ridewindow/domain/services/scoring_engine.dart';
 import 'package:ridewindow/domain/services/slot_generator.dart';
+import 'package:ridewindow/platform/device_timezone.dart';
+import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/platform/ride_score_alerts.dart';
+import 'package:ridewindow/domain/services/ride_window_scorer.dart';
+import 'package:ridewindow/domain/models/watched_ride.dart';
+import 'package:ridewindow/domain/models/ride_entry.dart';
+import 'package:ridewindow/data/repositories/planned_rides_repository.dart';
+import 'package:ridewindow/data/repositories/ride_score_alert_store.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
 
 /// Naam voor Workmanager.executeTask herkenning.
@@ -34,6 +45,10 @@ const _kLastRefreshedKey = 'weather.lastRefreshed';
 /// @pragma voorkomt dat de Dart tree-shaker deze functie verwijdert in release-builds.
 @pragma('vm:entry-point')
 void callbackDispatcher() {
+  // Plugins (flutter_timezone, flutter_local_notifications) bestaan in deze
+  // isolate pas na registratie, en de tijdzonedata pas na het laden.
+  DartPluginRegistrant.ensureInitialized();
+  tzdata.initializeTimeZones();
   Workmanager().executeTask((taskName, inputData) async {
     if (taskName == kWeatherRefreshTaskName) {
       await _runWeatherRefresh();
@@ -90,15 +105,64 @@ Future<void> _runWeatherRefresh() async {
     );
 
     // 8. Bereken volgende beste rijslot en update het home screen widget
+    RideSlot? nextSlot;
     try {
-      final nextSlot = await _computeNextSlot(prefs, forecasts);
+      nextSlot = await _computeNextSlot(prefs, forecasts);
       await WidgetUpdateService.update(nextSlot);
     } catch (_) {
       // Widget-update is niet kritisch — negeer fouten zodat de WeatherRefresh
       // taak alsnog succesvol wordt gerapporteerd aan WorkManager.
     }
+
+    // 9. Meldingen opnieuw plannen voor dat venster (#74), zodat ze niet
+    //    leeglopen als de app dagen dicht blijft. Alleen met een bekende
+    //    tijdzone: zonder staat tz.local hier op UTC en gaat elke melding
+    //    uren verkeerd af. Dan liever niets -- de voorgrond plant weer zodra
+    //    de app opengaat.
+    try {
+      if (await applyDeviceTimezone(prefs) != null) {
+        await rescheduleRideNotifications(
+          profile: profileRepo.readLocal(),
+          slot: nextSlot,
+        );
+      }
+    } catch (_) {
+      // Meldingen zijn niet kritisch voor de taak zelf.
+    }
+    // Ook een slechte rit blijft een plan: deze controle staat los van het
+    // beste suggestievenster hierboven en gebruikt exact de voorgrondscore.
+    try {
+      final profile = profileRepo.readLocal();
+      final cached = RideScoreAlertStore(prefs).read();
+      final personal = PlannedRidesRepository(prefs).readLocal();
+      final rides = [
+        for (final r in cached.rides)
+          if (r.shared) r,
+        for (final r in personal)
+          if (!cached.rides.any((c) =>
+              c.shared && c.window == RideEntry.slotKey(r.start, r.end)))
+            WatchedRide(
+              key: RideEntry.slotKey(r.start, r.end),
+              start: r.start,
+              end: r.end,
+            ),
+      ];
+      await RideScoreAlerts(prefs).check(
+        scorer: RideWindowScorer(
+          forecasts: forecasts,
+          tolerances: profile.tolerances,
+          latitude: lat,
+          longitude: lon,
+        ),
+        locale: profile.locale,
+        rides: rides,
+        owner: cached.owner,
+      );
+    } catch (_) {
+      // Een mislukte aflevering bewaart de oude vergelijkingsscore.
+    }
   } finally {
-    // 9. Sluit HTTP client; Drift-database wordt automatisch gesloten
+    // 10. Sluit HTTP client; Drift-database wordt automatisch gesloten
     client.close();
     await db.close();
   }
@@ -136,6 +200,16 @@ Future<RideSlot?> _computeNextSlot(
     notBefore: DateTime.now(),
   );
   allSlots = generator.refine(allSlots, forecasts);
+  final (lat, lon) = resolveBackgroundLocation(
+    prefs: prefs,
+    locationOverride: profile.locationOverride,
+  );
+  allSlots = generator.applyDaylight(
+    allSlots,
+    latitude: lat,
+    longitude: lon,
+    darknessWeight: tolerances.darknessWeight,
+  );
 
   var filtered = filter.apply(allSlots, blockedHours);
   filtered = generator.dedup(filtered);

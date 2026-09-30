@@ -379,6 +379,42 @@ class SEn extends S {
   String get sectionNotifications => 'NOTIFICATIONS';
 
   @override
+  String get notifScoreDropSetting => 'My ride\'s score drops';
+
+  @override
+  String get notifScoreDropSettingSub =>
+      'Warn when a planned ride\'s weather score drops. Checked on opening and roughly every 3 hours in the background; Android may delay this. On this device only.';
+
+  @override
+  String get notifScoreDropThreshold => 'Notify when the score drops by';
+
+  @override
+  String notifScoreDropPoints(int points) {
+    return '$points percentage points';
+  }
+
+  @override
+  String get notifScoreDropTitle =>
+      'The weather for your ride is getting worse';
+
+  @override
+  String notifScoreDropBody(String slot, int drop, int previous, int current) {
+    return '$slot: down $drop percentage points, from $previous to $current.';
+  }
+
+  @override
+  String get notifWebExplanation =>
+      'Your ride scores update with the weather and your preferences. Notifications while the app is closed currently work only in the Android app, not in this web app.';
+
+  @override
+  String get notifSettingsFailed =>
+      'Could not save notification settings. Please try again.';
+
+  @override
+  String get notifReminderTooLate =>
+      'The evening before this ride has already passed. No reminder was set.';
+
+  @override
   String get sectionTheme => 'THEME';
 
   @override

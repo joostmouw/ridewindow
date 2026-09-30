@@ -9,12 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
@@ -23,14 +21,15 @@ import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/features/shared/top_banners.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
+import 'package:ridewindow/platform/device_timezone.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
-import 'package:ridewindow/domain/services/notification_plan.dart';
 import 'package:ridewindow/platform/notification_service.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/analytics_provider.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
 import 'package:ridewindow/providers/locale_provider.dart';
 import 'package:ridewindow/providers/slots_notifier.dart';
+import 'package:ridewindow/providers/ride_score_alerts_provider.dart';
 import 'package:ridewindow/providers/theme_mode_provider.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:ridewindow/services/widget_update_service.dart';
@@ -46,17 +45,17 @@ Future<void> main() async {
   await initializeDateFormatting('nl_NL');
   await initializeDateFormatting('en_US');
 
-  // Parallel laden: timezone + SharedPreferences + Supabase voor snelle cold start.
-  final tzFuture = FlutterTimezone.getLocalTimezone();
+  // Parallel laden: SharedPreferences + Supabase voor snelle cold start.
   final prefsFuture = SharedPreferences.getInstance();
   final supabaseFuture = Supabase.initialize(
     url: supabaseUrl,
     publishableKey: supabaseAnonKey,
   );
-  final timezoneInfo = await tzFuture;
   final prefs = await prefsFuture;
 
-  tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+  // Zet tz.local én bewaart de zone, zodat de achtergrondtaak hem kent als
+  // zijn eigen peiling faalt (#74). Zie device_timezone.dart.
+  await applyDeviceTimezone(prefs);
 
   // Wacht Supabase-init af vóórdat de eerste widget bouwt — anders kan een
   // provider authStateProvider lezen terwijl Supabase.instance nog niet
@@ -135,32 +134,14 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
 
   /// Plant de meldingen opnieuw voor het eerstvolgende venster.
   ///
-  /// **Waarom vanuit de voorgrond en niet vanuit de achtergrondtaak.** Die
-  /// draait in een eigen isolate zonder `tz.initializeTimeZones()` en zonder de
-  /// tijdzone van het toestel. Daar plannen zou `tz.local` op UTC laten staan en
-  /// elke melding uren verkeerd laten afgaan -- precies dezelfde klasse fout als
-  /// de Aruba-melding van dezelfde dag. De prijs is dat de meldingen alleen
-  /// bijwerken zolang iemand de app af en toe opent; dat is een bewuste keuze en
-  /// staat als vervolg op de backlog.
+  /// De achtergrondtaak doet sinds #74 hetzelfde, met dezelfde functie
+  /// ([rescheduleRideNotifications]); dit is de voorgrondkant, voor als het
+  /// venster verschuift terwijl de app open is.
   Future<void> _rescheduleNotifications(RideSlot? slot) async {
     try {
       final profile = ref.read(profileProvider).value;
       if (profile == null) return;
-
-      final service = NotificationService();
-      final plans = planNotifications(
-        profile: profile,
-        nextSlot: slot,
-        now: DateTime.now(),
-      );
-
-      final strings = await S.delegate.load(Locale(profile.locale));
-      await service.applyPlans(
-        plans,
-        strings: strings,
-        exact: await service.canScheduleExact(),
-        weeklySlotTitle: slot == null ? null : formatSlotTitle(slot),
-      );
+      await rescheduleRideNotifications(profile: profile, slot: slot);
     } catch (_) {
       // Meldingen mogen nooit de reden zijn dat de app hapert.
     }
@@ -168,6 +149,7 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (!kIsWeb) ref.watch(monitorRideScoresProvider);
     // Luister op slotsProvider en update het Android home screen widget
     // telkens als de slots-staat verandert (b.v. na WeatherRefresh of profielwijziging).
     ref.listen<SlotsState>(slotsProvider, (_, next) {

@@ -6,12 +6,19 @@
 // geen BuildContext, dus de aanroeper levert de geladen `S` aan: vanuit een
 // scherm met `S.of(context)`, vanuit main.dart met `S.delegate.load(locale)`.
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:ridewindow/domain/models/ride_slot.dart';
+import 'package:ridewindow/domain/models/user_profile.dart';
+import 'package:ridewindow/domain/models/watched_ride.dart';
 import 'package:ridewindow/domain/services/notification_plan.dart';
+import 'package:ridewindow/core/ride_day_label.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 
 /// Unieke notificatie-ID's per notificatietype.
@@ -88,6 +95,40 @@ class NotificationService {
     final status = await Permission.notification.request();
     return status.isGranted;
   }
+
+  Future<bool> areNotificationsEnabled() async =>
+      await _androidPlugin?.areNotificationsEnabled() ?? false;
+
+  Future<void> showScoreDrop({
+    required WatchedRide ride,
+    required double previousScore,
+    required double currentScore,
+    required S strings,
+  }) async {
+    // WorkManager draait zonder de locale-data die main.dart geladen heeft.
+    await initializeDateFormatting(
+      strings.localeName == 'nl' ? 'nl_NL' : 'en_US',
+    );
+    String time(DateTime value) =>
+        '${value.hour.toString().padLeft(2, '0')}:'
+        '${value.minute.toString().padLeft(2, '0')}';
+    final slot = '${rideDayLabelAbsolute(ride.start, strings)} '
+        '${time(ride.start)}–${time(ride.end)}';
+    await _plugin.show(
+      id: scoreDropNotificationId(ride.key),
+      title: strings.notifScoreDropTitle,
+      body: strings.notifScoreDropBody(
+        slot,
+        (previousScore - currentScore).round(),
+        previousScore.round(),
+        currentScore.round(),
+      ),
+      notificationDetails: _rideAlertDetails(strings),
+    );
+  }
+
+  Future<void> cancelScoreDrop(String key) =>
+      _plugin.cancel(id: scoreDropNotificationId(key));
 
   /// Controleer of exacte alarmen mogelijk zijn (Android 12+).
   Future<bool> canScheduleExact() async {
@@ -202,7 +243,7 @@ class NotificationService {
 
   /// Voer [plans] uit: annuleer wat er stond en plan opnieuw.
   ///
-  /// **Waarom eerst alles annuleren.** De drie meldingen hangen aan het
+  /// **Waarom eerst de herinneringen annuleren.** De drie meldingen hangen aan het
   /// eerstvolgende beste venster, en dat venster verschuift bij elke nieuwe
   /// voorspelling. Bijwerken-waar-nodig zou bijhouden vergen wat er stond;
   /// opnieuw opbouwen is korter en kan niet uit de pas lopen. Er staan er
@@ -217,7 +258,14 @@ class NotificationService {
   }) async {
     if (kIsWeb) return;
 
-    await cancelAll();
+    // cancelAll zou ook zojuist getoonde scoredalingsmeldingen weghalen.
+    for (final id in [
+      kNotifIdEveningBefore,
+      kNotifIdMorningOf,
+      kNotifIdWeeklyDigest,
+    ]) {
+      await _plugin.cancel(id: id);
+    }
 
     for (final plan in plans) {
       switch (plan) {
@@ -260,4 +308,45 @@ class NotificationService {
           priority: Priority.high,
         ),
       );
+}
+
+/// Stabiel na een herstart en los van de drie vaste herinnerings-id's.
+int scoreDropNotificationId(String key) {
+  var hash = 0;
+  for (final unit in key.codeUnits) {
+    hash = (hash * 31 + unit) & 0x3fffffff;
+  }
+  return 20000 + hash;
+}
+
+/// Plant de meldingen opnieuw voor het eerstvolgende venster [slot].
+///
+/// **Gedeeld door voorgrond en achtergrondtaak (#74).** Tot 2026-09-24
+/// gebeurde dit alleen op de voorgrond, dus liepen de meldingen leeg zodra
+/// iemand de app een paar dagen niet opende. De achtergrondtaak draait elke
+/// drie uur en rekent het venster toch al uit voor de widget; nu plant hij
+/// ook. Verwacht dat `tz.local` al goed staat -- zie `device_timezone.dart`.
+///
+/// Roept [NotificationService.init] aan: in de isolate van de achtergrondtaak
+/// is de plugin nog niet geïnitialiseerd. Op de voorgrond is het een no-op.
+Future<void> rescheduleRideNotifications({
+  required UserProfile profile,
+  required RideSlot? slot,
+  NotificationService? service,
+  DateTime? now,
+}) async {
+  if (kIsWeb) return;
+  final notifications = service ?? NotificationService();
+  final strings = await S.delegate.load(Locale(profile.locale));
+  await notifications.init(strings: strings);
+  await notifications.applyPlans(
+    planNotifications(
+      profile: profile,
+      nextSlot: slot,
+      now: now ?? DateTime.now(),
+    ),
+    strings: strings,
+    exact: await notifications.canScheduleExact(),
+    weeklySlotTitle: slot == null ? null : formatSlotTitle(slot),
+  );
 }

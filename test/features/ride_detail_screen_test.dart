@@ -43,6 +43,15 @@ class _FakeLocation extends LocationNotifier {
 /// platform channel, which is not available in a plain widget test
 /// (LateInitializationError on FlutterLocalNotificationsPlatform.instance).
 class FakeNotificationService extends NotificationService {
+  bool permitted = true;
+  int scheduled = 0;
+
+  @override
+  Future<void> init({required S strings}) async {}
+
+  @override
+  Future<bool> requestPostNotificationsPermission() async => permitted;
+
   @override
   Future<bool> canScheduleExact() async => false;
 
@@ -52,7 +61,7 @@ class FakeNotificationService extends NotificationService {
     required String slotTitle,
     required bool exact,
     required S strings,
-  }) async {}
+  }) async => scheduled++;
 }
 
 // ---------------------------------------------------------------------------
@@ -158,7 +167,7 @@ RideSlot makeSlot({
   List<HourlyScore>? hours,
 }) {
   final s = start ?? DateTime(2026, 6, 13, 9, 0); // Saturday
-  final e = end ?? DateTime(2026, 6, 13, 13, 0);
+  final e = end ?? s.add(const Duration(hours: 4));
   return RideSlot(
     start: s,
     end: e,
@@ -413,7 +422,8 @@ void main() {
     });
 
     testWidgets('"Herinner me" knop toont SnackBar', (tester) async {
-      final slot = makeSlot();
+      final day = DateTime.now().add(const Duration(days: 2));
+      final slot = makeSlot(start: DateTime(day.year, day.month, day.day, 9));
       final forecasts = makeForecasts(slot.start);
 
       await tester.pumpWidget(wrapInMaterial(
@@ -436,6 +446,48 @@ void main() {
       await tester.pump();
 
       expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('een te late herinnering zegt niet dat hij ingesteld is',
+        (tester) async {
+      final notifications = FakeNotificationService();
+      await tester.pumpWidget(wrapInMaterial(RideDetailScreen(
+        slot: makeSlot(start: DateTime(2020)),
+        forecasts: const [],
+        notificationServiceFactory: () => notifications,
+      )));
+      await tester.pump();
+      await tester.scrollUntilVisible(
+        find.textContaining('Herinner'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.textContaining('Herinner'));
+      await tester.pump();
+      expect(notifications.scheduled, 0);
+      expect(find.text('De avond voor deze rit is al voorbij. Er is geen herinnering ingesteld.'),
+          findsOneWidget);
+    });
+
+    testWidgets('geweigerde herinneringspermissie geeft geen succesmelding',
+        (tester) async {
+      final day = DateTime.now().add(const Duration(days: 2));
+      final notifications = FakeNotificationService()..permitted = false;
+      await tester.pumpWidget(wrapInMaterial(RideDetailScreen(
+        slot: makeSlot(start: DateTime(day.year, day.month, day.day, 9)),
+        forecasts: const [],
+        notificationServiceFactory: () => notifications,
+      )));
+      await tester.pump();
+      await tester.scrollUntilVisible(
+        find.textContaining('Herinner'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.textContaining('Herinner'));
+      await tester.pump();
+      expect(notifications.scheduled, 0);
+      expect(find.text('Meldingen staan uit in de systeeminstellingen.'), findsOneWidget);
     });
 
     testWidgets('Info-kaart "Weer" toont gemiddelde temperatuur',

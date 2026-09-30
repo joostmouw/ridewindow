@@ -739,6 +739,60 @@ abstract class S {
   /// **'MELDINGEN'**
   String get sectionNotifications;
 
+  /// No description provided for @notifScoreDropSetting.
+  ///
+  /// In nl, this message translates to:
+  /// **'Mijn rit wordt minder'**
+  String get notifScoreDropSetting;
+
+  /// No description provided for @notifScoreDropSettingSub.
+  ///
+  /// In nl, this message translates to:
+  /// **'Waarschuw bij een lagere weerscore voor een geplande rit. Controle bij openen en ongeveer elke 3 uur op de achtergrond; Android kan dit uitstellen. Alleen op dit toestel.'**
+  String get notifScoreDropSettingSub;
+
+  /// No description provided for @notifScoreDropThreshold.
+  ///
+  /// In nl, this message translates to:
+  /// **'Melden bij een daling van'**
+  String get notifScoreDropThreshold;
+
+  /// No description provided for @notifScoreDropPoints.
+  ///
+  /// In nl, this message translates to:
+  /// **'{points} procentpunt'**
+  String notifScoreDropPoints(int points);
+
+  /// No description provided for @notifScoreDropTitle.
+  ///
+  /// In nl, this message translates to:
+  /// **'Het weer voor je rit wordt minder'**
+  String get notifScoreDropTitle;
+
+  /// No description provided for @notifScoreDropBody.
+  ///
+  /// In nl, this message translates to:
+  /// **'{slot}: {drop} procentpunt gedaald, van {previous} naar {current}.'**
+  String notifScoreDropBody(String slot, int drop, int previous, int current);
+
+  /// No description provided for @notifWebExplanation.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je ritscores verversen met het weer en je voorkeuren. Meldingen bij een gesloten app werken nu alleen in de Android-app, niet in deze webapp.'**
+  String get notifWebExplanation;
+
+  /// No description provided for @notifSettingsFailed.
+  ///
+  /// In nl, this message translates to:
+  /// **'Meldingen instellen is niet gelukt. Probeer het opnieuw.'**
+  String get notifSettingsFailed;
+
+  /// No description provided for @notifReminderTooLate.
+  ///
+  /// In nl, this message translates to:
+  /// **'De avond voor deze rit is al voorbij. Er is geen herinnering ingesteld.'**
+  String get notifReminderTooLate;
+
   /// No description provided for @sectionTheme.
   ///
   /// In nl, this message translates to:

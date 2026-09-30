@@ -21,6 +21,7 @@ import 'package:ridewindow/core/cities.dart';
 import 'package:ridewindow/core/platform_info.dart';
 import 'package:ridewindow/features/profile/account_section.dart';
 import 'package:ridewindow/features/profile/feedback_dialog.dart';
+import 'package:ridewindow/features/profile/ride_score_alert_settings.dart';
 import 'package:ridewindow/features/shared/section_card.dart';
 import 'package:ridewindow/features/shared/app_tour_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -197,13 +198,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       final slot =
           slotsState is SlotsLoaded ? slotsState.slots.firstOrNull : null;
 
+      final strings = await S.delegate.load(Locale(profile.locale));
+      await _notifService.init(strings: strings);
       await _notifService.applyPlans(
         planNotifications(
           profile: profile,
           nextSlot: slot,
           now: DateTime.now(),
         ),
-        strings: await S.delegate.load(Locale(profile.locale)),
+        strings: strings,
         exact: canExact ?? await _notifService.canScheduleExact(),
         weeklySlotTitle: slot == null ? null : formatSlotTitle(slot),
       );
@@ -697,6 +700,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // implementatie, dus de drie schakelaars konden er sowieso nooit iets
           // doen. Ze stonden er tot 2026-09-19 wel -- een iOS-tester kon ze
           // aanzetten en wachten op meldingen die nooit zouden komen.
+          if (kIsWeb)
+            SectionCard(
+              title: s.sectionNotifications,
+              children: [
+                ListTile(
+                  title: Text(s.notifScoreDropSetting),
+                  subtitle: Text(s.notifWebExplanation),
+                ),
+              ],
+            ),
           if (!kIsWeb)
             SectionCard(
             title: s.sectionNotifications,
@@ -750,6 +763,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   }
                 },
               ),
+              const RideScoreAlertSettings(),
             ],
           ),
 

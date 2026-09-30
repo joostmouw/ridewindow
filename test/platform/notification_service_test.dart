@@ -15,6 +15,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/notification_service.dart';
+import 'package:ridewindow/domain/models/watched_ride.dart';
 
 // ---------------------------------------------------------------------------
 // Fake plugin (v21 API: alle named parameters)
@@ -31,6 +32,9 @@ class FakeFlutterLocalNotificationsPlugin extends Fake
         String? title,
         String? body,
       })> zonedScheduleCalls = [];
+  final List<({int id, String? title, String? body})> shown = [];
+  final List<int> cancelled = [];
+  int cancelledAll = 0;
 
   @override
   Future<bool?> initialize({
@@ -58,7 +62,19 @@ class FakeFlutterLocalNotificationsPlugin extends Fake
   }
 
   @override
-  Future<void> cancelAll() async {}
+  Future<void> cancelAll() async => cancelledAll++;
+
+  @override
+  Future<void> cancel({required int id, String? tag}) async => cancelled.add(id);
+
+  @override
+  Future<void> show({
+    required int id,
+    String? title,
+    String? body,
+    NotificationDetails? notificationDetails,
+    String? payload,
+  }) async => shown.add((id: id, title: title, body: body));
 }
 
 // ---------------------------------------------------------------------------
@@ -104,6 +120,40 @@ void main() {
   setUp(() {
     fakePlugin = FakeFlutterLocalNotificationsPlugin();
     service = NotificationService(plugin: fakePlugin);
+  });
+
+  test('scoredaling heeft datum, tijd, procentpunten en de juiste taal', () async {
+    final ride = WatchedRide(
+      key: 'r1',
+      start: DateTime(2026, 10, 3, 9),
+      end: DateTime(2026, 10, 3, 11),
+    );
+    for (final strings in [nl, en]) {
+      await service.showScoreDrop(
+        ride: ride, previousScore: 90, currentScore: 80, strings: strings,
+      );
+      final call = fakePlugin.shown.last;
+      expect(call.title, strings.notifScoreDropTitle);
+      expect(call.body, contains('09:00–11:00'));
+      expect(
+        call.body,
+        contains(
+          strings.localeName == 'nl'
+              ? '10 procentpunt'
+              : '10 percentage points',
+        ),
+      );
+      expect(call.body, contains('90'));
+      expect(call.body, contains('80'));
+      expect(call.body, contains('3'));
+      expect(call.id, scoreDropNotificationId('r1'));
+    }
+    await service.applyPlans([], strings: nl, exact: false);
+    expect(fakePlugin.cancelledAll, 0);
+    expect(fakePlugin.cancelled, [
+      kNotifIdEveningBefore, kNotifIdMorningOf, kNotifIdWeeklyDigest,
+    ]);
+    expect(fakePlugin.cancelled, isNot(contains(scoreDropNotificationId('r1'))));
   });
 
   group('scheduleEveningBefore', () {
