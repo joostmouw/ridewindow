@@ -21,6 +21,7 @@ import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/providers/ride_window_scorer_provider.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/score_display.dart';
 import 'package:ridewindow/features/shared/ride_removal.dart';
@@ -980,6 +981,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final rw = context.rw;
     final cs = Theme.of(context).colorScheme;
     final s = S.of(context);
+    final score = ref.watch(rideWindowScorerProvider)
+            ?.score(entry.start, entry.end)
+            ?.overallScore ??
+        entry.plannedScore;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
@@ -1052,8 +1057,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 // op blauw las als twee kleuren op één kaart (Joost, build
                 // 59). Het oordeel zit in het Semantics-label van de pil.
                 ScoreBadge(
-                  tier: rideTierFromScore(entry.plannedScore),
-                  score: entry.plannedScore.round(),
+                  tier: rideTierFromScore(score),
+                  score: score.round(),
                   color: rw.plannedRide,
                 ),
                 // Ook bij een rit die jij organiseert (2026-09-25): die had
@@ -1079,7 +1084,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _openPlannedRideDetail(RideEntry ride) {
-    final slotsState = ref.read(slotsProvider);
     final weatherState = ref.read(weatherProvider);
     final allForecasts =
         weatherState.hasValue ? weatherState.requireValue : <HourlyForecast>[];
@@ -1087,19 +1091,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         .where((f) => !f.time.isBefore(ride.start) && f.time.isBefore(ride.end))
         .toList();
 
-    // Try to find the matching RideSlot from current slots
-    RideSlot? matchingSlot;
-    if (slotsState is SlotsLoaded) {
-      for (final slot in slotsState.slots) {
-        if (slot.start == ride.start && slot.end == ride.end) {
-          matchingSlot = slot;
-          break;
-        }
-      }
-    }
-
-    // Fallback: construct a minimal RideSlot from the planned ride data
-    matchingSlot ??= RideSlot(
+    // De suggestielijst kan deze rit door beschikbaarheid, dedup of slecht
+    // weer kwijt zijn. Dat verandert niets aan de score van een bestaand plan.
+    final matchingSlot = ref.read(rideWindowScorerProvider)
+            ?.score(ride.start, ride.end) ??
+        RideSlot(
       start: ride.start,
       end: ride.end,
       overallScore: ride.plannedScore,

@@ -35,6 +35,8 @@ import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/profile_notifier.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/providers/ride_window_scorer_provider.dart';
+import 'package:ridewindow/domain/services/ride_window_scorer.dart';
 import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -553,6 +555,7 @@ class _RidesTabState extends ConsumerState<RidesTab> implements RideCardHost {
                 units: ref.watch(unitsProvider),
                 myUserId: ref.watch(currentUserIdProvider),
                 allScores: allScores,
+                scorer: ref.watch(rideWindowScorerProvider),
                 forecasts: forecasts,
                 cityName: cityName,
                 location: location,
@@ -828,6 +831,7 @@ class RideCard extends StatelessWidget {
     required this.forecasts,
     required this.cityName,
     required this.location,
+    this.scorer,
   });
 
   final RideEntry entry;
@@ -852,6 +856,7 @@ class RideCard extends StatelessWidget {
   /// Waar je bent, of `null` als de app dat niet weet. Nodig voor de zonstand;
   /// zonder locatie blijft de daglichtregel gewoon weg.
   final LocationData? location;
+  final RideWindowScorer? scorer;
 
   List<HourlyScore> _rideScores() {
     final result = <HourlyScore>[];
@@ -889,11 +894,6 @@ class RideCard extends StatelessWidget {
     return result;
   }
 
-  double? _avgScore(List<HourlyScore> scores) {
-    if (scores.isEmpty) return null;
-    return scores.fold(0.0, (s, h) => s + h.overall) / scores.length;
-  }
-
   void _openDetail(
     BuildContext context,
     List<HourlyScore> scores,
@@ -924,7 +924,7 @@ class RideCard extends StatelessWidget {
     final rw = context.rw;
     final scores = _rideScores();
     final rideForecasts = _rideForecasts();
-    final currentScore = _avgScore(scores);
+    final currentScore = scorer?.score(entry.start, entry.end)?.overallScore;
     final delta =
         currentScore != null ? currentScore - entry.plannedScore : null;
     final tonal = currentScore != null
@@ -1138,6 +1138,7 @@ class RideCard extends StatelessWidget {
                     host: host,
                     isOwner: entry.role == RideRole.organiser,
                     myUserId: myUserId,
+                    scorer: scorer,
                   ),
                 ],
                 if (avgTemp != null) ...[
@@ -1300,6 +1301,7 @@ class _OptionsBlock extends StatefulWidget {
     required this.host,
     required this.isOwner,
     required this.myUserId,
+    this.scorer,
   });
 
   final GroupRide ride;
@@ -1307,6 +1309,7 @@ class _OptionsBlock extends StatefulWidget {
   final RideCardHost host;
   final bool isOwner;
   final String? myUserId;
+  final RideWindowScorer? scorer;
 
   @override
   State<_OptionsBlock> createState() => _OptionsBlockState();
@@ -1389,7 +1392,14 @@ class _OptionsBlockState extends State<_OptionsBlock> {
               isFrontRunner: front != null &&
                   front.id == option.id &&
                   option.yesCount > 0,
-              tonal: _scoreTonal(option.plannedScore, rw),
+              tonal: _scoreTonal(
+                widget.scorer?.score(option.start, option.end)?.overallScore ??
+                    option.plannedScore,
+                rw,
+              ),
+              currentScore: widget.scorer
+                  ?.score(option.start, option.end)
+                  ?.overallScore,
             ),
             const SizedBox(height: 4),
           ],
@@ -1408,10 +1418,12 @@ class _OptionRow extends StatelessWidget {
     required this.myVote,
     required this.isFrontRunner,
     required this.tonal,
+    this.currentScore,
   });
 
   final RideOption option;
   final RideEntry entry;
+  final double? currentScore;
   final RideCardHost host;
   final bool isOwner;
 
@@ -1441,7 +1453,7 @@ class _OptionRow extends StatelessWidget {
                 borderRadius: AppShapes.roundedSm,
               ),
               child: Text(
-                '${option.plannedScore.round()}',
+                '${(currentScore ?? option.plannedScore).round()}',
                 style: TextStyle(
                   color: tonal.fg,
                   fontWeight: FontWeight.bold,

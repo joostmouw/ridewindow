@@ -24,6 +24,9 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_tolerances.dart';
 import 'package:ridewindow/features/home/home_screen.dart';
 import 'package:ridewindow/features/shared/score_display.dart';
+import 'package:ridewindow/features/shared/score_badge.dart';
+import 'package:ridewindow/domain/services/ride_window_scorer.dart';
+import 'package:ridewindow/providers/ride_window_scorer_provider.dart';
 import 'package:ridewindow/data/repositories/home_view_store.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/l10n/app_localizations_nl.dart';
@@ -172,6 +175,54 @@ GoRouter _makeRouter() => GoRouter(
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+  });
+
+  testWidgets('Home toont de actuele lage score, niet de opgeslagen 88',
+      (tester) async {
+    final start = DateTime.now().add(const Duration(days: 2));
+    final time = DateTime(start.year, start.month, start.day, 12);
+    final entry = RideEntry(
+      start: time,
+      end: time.add(const Duration(hours: 1)),
+      plannedScore: 88,
+      role: RideRole.solo,
+    );
+    final scorer = RideWindowScorer(
+      tolerances: const WeatherTolerances(),
+      forecasts: [
+        HourlyForecast(
+          time: time, temperatureC: -15, apparentTemperatureC: -15,
+          precipitationMm: 10, precipitationProbability: 100,
+          windspeedKmh: 100, winddirectionDeg: 90,
+        ),
+      ],
+    );
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        weatherProvider.overrideWith(FakeWeatherReady.new),
+        profileProvider.overrideWith(FakeProfileNotifier.new),
+        availabilityProvider.overrideWith(FakeAvailabilityNotifier.new),
+        plannedRidesProvider.overrideWith(FakePlannedRidesNotifier.new),
+        slotsProvider.overrideWith(
+          () => FakeStaticSlotsNotifier(const SlotsLoaded([])),
+        ),
+        rideEntriesProvider.overrideWith((ref) => [entry]),
+        rideWindowScorerProvider.overrideWithValue(scorer),
+      ],
+      child: MaterialApp.router(
+        routerConfig: _makeRouter(),
+        locale: const Locale('nl'),
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        theme: ThemeData(extensions: const [RideWindowTheme.light]),
+      ),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    final badge = tester.widget<ScoreBadge>(find.byType(ScoreBadge));
+    expect(badge.score, scorer.score(entry.start, entry.end)!.overallScore.round());
+    expect(badge.score, lessThan(50));
+    expect(entry.plannedScore, 88);
   });
 
   // ---------------------------------------------------------------------------

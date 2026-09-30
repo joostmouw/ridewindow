@@ -28,6 +28,7 @@ import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
 import 'package:ridewindow/features/shared/ride_role_style.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
+import 'package:ridewindow/providers/ride_window_scorer_provider.dart';
 import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/peloton_providers.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -35,7 +36,6 @@ import 'package:ridewindow/features/shared/clothing_tip.dart';
 import 'package:ridewindow/features/shared/feels_like_bar.dart';
 import 'package:ridewindow/features/shared/score_badge.dart';
 import 'package:ridewindow/features/shared/ride_removal.dart';
-import 'package:ridewindow/domain/models/hourly_score.dart';
 import 'package:ridewindow/providers/hourly_scores_provider.dart';
 import 'package:ridewindow/providers/planned_rides_notifier.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
@@ -112,17 +112,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     _end = widget.slot.end;
   }
 
-  /// Get the effective slot hours and forecasts for the adjusted time range.
-  List<HourlyScore> get _effectiveHours {
-    final allScores = ref.read(allHourlyScoresProvider);
-    return allScores
-        .where((s) => !s.time.isBefore(_start) && s.time.isBefore(_end))
-        .toList()
-      ..sort((a, b) => a.time.compareTo(b.time));
-  }
-
   List<HourlyForecast> get _effectiveForecasts {
-    final allForecasts = ref.read(weatherProvider).value ?? <HourlyForecast>[];
+    final allForecasts =
+        ref.read(weatherProvider).value ?? widget.forecasts;
     return allForecasts
         .where((f) => !f.time.isBefore(_start) && f.time.isBefore(_end))
         .toList()
@@ -130,16 +122,14 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   RideSlot get _effectiveSlot {
-    final hours = _effectiveHours;
-    final avgScore = hours.isEmpty
-        ? widget.slot.overallScore
-        : hours.fold(0.0, (sum, s) => sum + s.overall) / hours.length;
-    return RideSlot(
+    return ref.read(rideWindowScorerProvider)?.score(_start, _end) ?? RideSlot(
       start: _start,
       end: _end,
-      overallScore: avgScore,
-      tier: rideTierFromScore(avgScore),
-      hours: hours,
+      overallScore: widget.slot.overallScore,
+      tier: widget.slot.tier,
+      hours: _start == widget.slot.start && _end == widget.slot.end
+          ? widget.slot.hours
+          : const [],
     );
   }
 
@@ -187,14 +177,14 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   // ---------------------------------------------------------------------------
 
   String _avgTempString(BuildContext context) {
-    final temps = widget.forecasts
+    final temps = _effectiveForecasts
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
         .toList();
     if (temps.isEmpty) return '\u2013';
     final avg = temps.reduce((a, b) => a + b) / temps.length;
 
-    final apparent = widget.forecasts
+    final apparent = _effectiveForecasts
         .where((f) => f.apparentTemperatureC != null)
         .map((f) => f.apparentTemperatureC!)
         .toList();
@@ -210,13 +200,13 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   String _totalPrecipString(BuildContext context) {
-    final vals = widget.forecasts
+    final vals = _effectiveForecasts
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .toList();
     if (vals.isEmpty) return '\u2013';
     final total = vals.reduce((a, b) => a + b);
-    final probs = widget.forecasts
+    final probs = _effectiveForecasts
         .map((f) => f.precipitationProbability)
         .whereType<double>()
         .toList();
@@ -231,7 +221,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   String _avgWindString(BuildContext context) {
-    final vals = widget.forecasts
+    final vals = _effectiveForecasts
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
@@ -244,7 +234,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final units = ref.read(unitsProvider);
     final shownWind = '${convertWind(avg, units.wind).round()} '
         '${windSuffix(units.wind)}';
-    final dirs = widget.forecasts
+    final dirs = _effectiveForecasts
         .map((f) => f.winddirectionDeg)
         .whereType<double>()
         .toList();
@@ -268,11 +258,11 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   String _weatherSummaryText(BuildContext context) {
     final s = S.of(context);
-    if (widget.forecasts.isEmpty) return s.calendarNoWeatherData;
+    if (_effectiveForecasts.isEmpty) return s.calendarNoWeatherData;
 
     final units = ref.read(unitsProvider);
 
-    final temps = widget.forecasts
+    final temps = _effectiveForecasts
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
         .toList();
@@ -280,7 +270,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
         ? '?${units.temp.suffix}'
         : '~${convertTemp(temps.reduce((a, b) => a + b) / temps.length, units.temp).round()}${units.temp.suffix}';
 
-    final precips = widget.forecasts
+    final precips = _effectiveForecasts
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .toList();
@@ -288,7 +278,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     final precipStr =
         totalPrecip == 0.0 ? s.calendarDry : '${totalPrecip.round()}mm';
 
-    final winds = widget.forecasts
+    final winds = _effectiveForecasts
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
@@ -304,7 +294,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   String _calendarEventTitle(BuildContext context) {
     final timeRange =
-        '${_fmtTime(widget.slot.start)}–${_fmtTime(widget.slot.end)}';
+        '${_fmtTime(_start)}–${_fmtTime(_end)}';
     return S.of(context).calendarEventTitle(timeRange);
   }
 
@@ -316,7 +306,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     setState(() => _isLoading = true);
     try {
       await widget.calendarServiceFactory().addRideSlotToCalendar(
-            widget.slot,
+            _effectiveSlot,
             title: _calendarEventTitle(context),
             description: _weatherSummaryText(context),
           );
@@ -395,7 +385,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
           onPressed: () {
             showModalBottomSheet<void>(
               context: context,
-              builder: (_) => InsightsSheet(slot: widget.slot),
+              builder: (_) => InsightsSheet(slot: _effectiveSlot),
             );
           },
         ),
@@ -1004,18 +994,18 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   Widget _buildClothingTip() {
     final rw = context.rw;
-    final temps = widget.forecasts
+    final temps = _effectiveForecasts
         .where((f) => f.temperatureC != null)
         .map((f) => f.temperatureC!)
         .toList();
     if (temps.isEmpty) return const SizedBox.shrink();
 
     final avgTemp = temps.reduce((a, b) => a + b) / temps.length;
-    final totalPrecip = widget.forecasts
+    final totalPrecip = _effectiveForecasts
         .where((f) => f.precipitationMm != null)
         .map((f) => f.precipitationMm!)
         .fold(0.0, (a, b) => a + b);
-    final winds = widget.forecasts
+    final winds = _effectiveForecasts
         .where((f) => f.windspeedKmh != null)
         .map((f) => f.windspeedKmh!)
         .toList();
@@ -1025,7 +1015,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
     // De gevoelstemperatuur die de weerlijst hierboven ook toont. Hetzelfde
     // getal als startpunt nemen is precies waarom de twee elkaar niet meer
     // tegenspreken.
-    final apparents = widget.forecasts
+    final apparents = _effectiveForecasts
         .where((f) => f.apparentTemperatureC != null)
         .map((f) => f.apparentTemperatureC!)
         .toList();
@@ -1197,16 +1187,16 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   void _shareSlot() {
     final s = S.of(context);
-    final tierLabel = switch (widget.slot.tier) {
+    final tierLabel = switch (_effectiveSlot.tier) {
       Perfect() => s.tierPerfect,
       Great() => s.tierGreat,
       Acceptable() => s.tierAcceptable,
       Poor() => s.tierPoor,
     };
     final summary = _weatherSummaryText(context);
-    final day = rideDayLabelAbsolute(widget.slot.start, s);
+    final day = rideDayLabelAbsolute(_start, s);
     final timeRange =
-        '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
+        '${_fmtTime(_start)}\u2013${_fmtTime(_end)}';
     Share.share(s.shareText(day, timeRange, tierLabel, summary));
   }
 
@@ -1227,7 +1217,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
   }
 
   double _windPenaltyPercent() {
-    return windVariabilityPenalty(widget.forecasts) * 100;
+    return windVariabilityPenalty(_effectiveForecasts) * 100;
   }
 
   Widget _buildWindPenaltyNote() {
@@ -1540,9 +1530,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                   : () => showInviteBuddiesSheet(
                         context,
                         ref,
-                        start: widget.slot.start,
-                        end: widget.slot.end,
-                        plannedScore: widget.slot.overallScore,
+                        start: _start,
+                        end: _end,
+                        plannedScore: _effectiveSlot.overallScore,
                       ),
               icon: const Icon(AppIcons.userPlus, size: 18),
               // Met een groep is "een maatje" te smal: de knop opent dan ook
@@ -1563,9 +1553,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
               final strings = S.of(context);
               final canExact = await notifService.canScheduleExact();
               final slotTitle =
-                  '${_fmtTime(widget.slot.start)}\u2013${_fmtTime(widget.slot.end)}';
+                  '${_fmtTime(_start)}\u2013${_fmtTime(_end)}';
               await notifService.scheduleEveningBefore(
-                slotDay: widget.slot.start,
+                slotDay: _start,
                 slotTitle: slotTitle,
                 exact: canExact,
                 strings: strings,
@@ -1594,6 +1584,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ook een open detail volgt nieuw weer en gewijzigde voorkeuren.
+    ref.watch(rideWindowScorerProvider);
+    ref.watch(weatherProvider);
     final rw = context.rw;
     final slot = _effectiveSlot;
     final forecasts = _effectiveForecasts;
