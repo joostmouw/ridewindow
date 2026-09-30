@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-09-29T11:00:00.000Z"
-last_activity: 2026-09-29
+last_updated: "2026-09-30"
+last_activity: 2026-09-30
 progress:
   total_phases: 12
   completed_phases: 6
@@ -14,6 +14,39 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-09-30 -- 1.0.54 (65) op internal en web
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.54 (65)**, geüpload via de Play Developer API; `--list-tracks` bevestigt internal 65, completed |
+| PWA | **1.0.54 (65)**, GitHub Actions-run `36774805008` geslaagd vanaf releasecommit `adaf0c7`; live `version.json` zegt 65 en de live appbundel bevat 1.0.54 |
+| Oppo | Laatst bewezen **1.0.53 (64)** via Play. Nu geen toestel aangesloten; ontvangst van 65 en toestelcontrole nog niet bewezen |
+| Alpha / closed | **1.0.53 (64)**, ongewijzigd. 65 niet gepromoveerd; eerst toestelgoedkeuring |
+| main | **1.0.54+65**, releasecommit `adaf0c7`, gepusht naar origin |
+
+**Wat 65 brengt:** geplande ritscores volgen het huidige weer en de
+voorkeuren op Home, Ritten en detail; detail gebruikt hetzelfde actuele
+venster voor uitleg, delen en Agenda. Profiel biedt op Android lokale
+dalingsmeldingen vanaf 5, 10 of 20 procentpunt (standaard uit), bij
+voorgrondwijzigingen en de drie-uursweerrefresh. Geen onmiddellijke
+serverpush en geen meldingen uit een gesloten webapp. Details in
+`.planning/quick/260930-actuele-ritscores-en-meldingen/SUMMARY.md`.
+Komoot-groepsplanning staat afzonderlijk als toekomstig onderzoek in #89.
+
+**Releasebewijs:** 1087 gecommitteerde tests groen; analyze 0 errors,
+0 warnings, 214 infos; AAB- en webreleasebuild geslaagd; dry-run geslaagd;
+Play bevestigt versionCode 65 en de doorgevoerde edit. PWA uitgerold door CI,
+niet door een tweede lokale deploy. Lokale en CI-webbundel zijn niet
+bytegelijk: lokale MD5 `f7b64a53388b266eec27dd86e99f717b`, live
+`3a232e3e59889f2f95e3ec4bb878fc80`. Het verschil is niet onderzocht; de
+geslaagde CI-run bevestigt de broncommit en de live versie is apart gemeten.
+Zie `.planning/quick/260930-release65-ritscores/SUMMARY.md`.
+
+**Nog op de Oppo te bewijzen, via de normale Play-update:** permissievraag,
+meldingsinstellingen op het kleine scherm, dalingsmelding met de app dicht,
+WorkManager-tijdzone en aanklikken van de melding. Geen sideload gebruikt.
+Play kan de update-balk later bijwerken dan de eigen storevermelding.
 
 ## Stand na 2026-09-29 (middag) -- 1.0.53 (64) op internal, web en Oppo
 
