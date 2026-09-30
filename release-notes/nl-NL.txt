@@ -1,1 +1,1 @@
-Interne testbuild: bij een rit met meerdere vensters staat een venster dat al voorbij is niet meer ter keuze. Blijft er maar één venster over, dan verdwijnt de keuze, want dan is er niets meer te kiezen.
+Geplande ritscores volgen nu het actuele weer en je voorkeuren. Zet op Android in Profiel een melding aan bij een daling van 5, 10 of 20 procentpunt. De controle loopt als de app open is en bij de weerverversing op de achtergrond. Meldingen vanuit een gesloten webapp zijn nog niet beschikbaar.

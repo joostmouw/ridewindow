@@ -1,1 +1,1 @@
-Internal test build: on a ride with several windows, a window that has already passed is no longer up for a vote. If only one window is left, the choice disappears, because there is nothing left to choose.
+Planned ride scores now follow the latest weather and your preferences. On Android, enable alerts in Profile when a score drops by 5, 10 or 20 percentage points. Checks run when the app is open and during background weather refreshes. Notifications from a closed web app are not available yet.
