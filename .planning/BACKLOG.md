@@ -65,6 +65,7 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 86 | **Eenmalig met een groep meerijden zonder lid te worden** — dezelfde testerfeedback per screenshot 2026-09-25. Een gast voor één groepsrit is iets anders dan toetreden tot de vaste club; de bestaande groepslink geeft lidmaatschap en daarmee toegang tot alle huidige groepsritten en de ledenlijst. Maak die grens expliciet voordat er een gastlink of tijdelijke rol komt. Raakt #85, maar los bewaren: delen van een rit en toetreden voor één rit zijn twee gebruikershandelingen | MEDIUM | M | Backlog — scope en privacygrens open |
 | 87 | **Deelnemerskaart zegt aantallen dubbel en leunt te zwaar op tekst** — testerfeedback per screenshot 2026-09-25: de groepsrit toont boven de deelnemerslijst al een regel zoals "2 gaan mee · 2 wachten nog" en herhaalt daaronder "2 gaan mee · 2 nog niet". Ook de status per persoon is tekstzwaar; tester vraagt om een intuïtievere combinatie van iconen en korte labels, bijvoorbeeld bij "gaat mee". Eerst de dubbele samenvatting opruimen en alle deelnemerweergaven (Ritten, ritdetail, Peloton) vergelijken. Iconen mogen status niet alléén door kleur overbrengen; screenreaderlabels en beide talen behouden | MEDIUM | S | Backlog — visuele sweep en toestelcontrole nodig |
 | 88 | **Een venster dat al voorbij is blijft stembaar in "Kies samen een venster"** — gezien op screenshot 2026-09-20 14:32: bij de rit van maandag 21 sep lag ook "zo 20 sep 13:00-15:00" voor, op dat moment al 1,5 uur gaande, nog steeds met actieve stemknoppen. Nergens zit een tijdfilter: `_OptionsBlock` toont alle opties en `_OptionRow` zet "Ik kan"/"Kan niet" en voor de organisator "Kies dit" op élke optie (`planned_rides_screen.dart`); `PelotonGateway.chooseOption()` verzet de rit zonder controle, zodat de organisator de groepsrit nog ná het venster in het verleden kan zetten; de database eist alleen `end_at > start_at` (0010). Drie kwesties op één plek: volledig verstreken vensters verbergen of grijs geven (zoals #18 en #19 dat voor Agenda en Home doen), het venster dat nú loopt, en of kiezen/stemmen op een verstreken venster ook server-side geweigerd moet worden | MEDIUM | S | Backlog — gevonden bij het verwerken van de screenshots van 20 sept. **Lees bij het verwerken van screenshots:** dit Droid-model kan géén afbeeldingen lezen; OCR ging via `/usr/bin/swift` met Apple Vision (`VNRecognizeTextRequest`, script stond in `/tmp`, dus opnieuw schrijven). De screenshots zelf blijven bewust uit git (gesprekken en namen) en ongemoeid op hun plek |
+| 89 | **Komoot-groepsplanning: overlap en eigen positie onderzoeken** - Joost meldt op 2026-09-30 een nieuwe functie om ritten met een groep te plannen. Later verifiëren wat nieuw is ten opzichte van de Group Tours die al in #65 zijn onderzocht. Vergelijk vooral route importeren/delen, vrienden uitnodigen en samen plannen met #23, #24 en #65. Beslis welke waarde Ridewindow toevoegt met fietsspecifiek weer + gezamenlijke beschikbaarheid, en waar een Komoot-link/import beter is dan functionaliteit kopiëren. Zie de onderzoeksvragen onderaan | MEDIUM | M | Backlog - toekomstig onderzoek, geen implementatiebesluit |
 
 **Waarom dit item anders is dan de rest van deze lijst.** Fase 21 heeft vijf gap-closure-plannen nodig gehad (21-10 t/m 21-14) en bij élk daarvan gold dezelfde beperking: de defecte laag was niet gedragsmatig testbaar, dus het bewijs moest van een toestel komen of van een structurele broncode-scan. Vier keer landde een bug in productie die een gewone test had gevangen als het seam had bestaan.
 
@@ -518,3 +519,42 @@ Wat het nodig heeft: `DartPluginRegistrant.ensureInitialized()` in de isolate, e
 verifiëren dát `flutter_timezone` daar werkt. Niet op te lossen zonder een toestel.
 
 Herkomst: quick-taak notificatieschakelaars, 2026-09-19.
+
+## 89 - Komoot-groepsplanning, route-import en de eigen positie
+
+Aanleiding: Joost, 2026-09-30. Volgens hem heeft Komoot een nieuwe functie om
+ritten met een groep te plannen. Dat raakt Ridewindow als we ook routes gaan
+importeren en met vrienden delen. Komoot is veel groter en heeft een ander
+hoofddoel; overlap alleen is dus geen reden om Ridewindow dezelfde kant op te
+laten groeien.
+
+**Dit is een onderzoekspunt voor later, geen onderzoek dat al is uitgevoerd.**
+Group Tours was al beschreven in #65. Begin met officiële bronnen en een echte
+groepsflow om vast te stellen welke functie Joost bedoelt en wat daadwerkelijk
+nieuw is. Neem de eerdere bronnen niet als bewijs voor een nieuwe lancering.
+
+Vragen voor dat onderzoek:
+
+1. Wat biedt Komoot precies bij uitnodigen, route kiezen, importeren/delen,
+   datum kiezen en wijzigingen doorgeven? Wat is gratis of betaald, en wat
+   vraagt van deelnemers een account of installatie?
+2. Welke overlap bestaat met #23 (Strava/route-import), #24
+   (routeweer + delen) en #65 (Peloton v2)? Markeer ontbrekende functies en
+   doublures apart.
+3. Welke combinatie van **fietsspecifiek weer, gezamenlijke beschikbaarheid en
+   een concreet boekbaar venster** voegt Ridewindow aantoonbaar toe? Onderzoek
+   eerst of Komoot zelf vergelijkbare weer- of beschikbaarheidsfuncties biedt;
+   neem ons onderscheidend vermogen niet bij voorbaat aan.
+4. Is Ridewindow beter een aanvulling die een Komoot-route/link accepteert,
+   het moment kiest en naar Komoot terugverwijst voor navigatie, of is eigen
+   routeopslag nodig? Vergelijk GPX-import, route-links en toegestane
+   koppelingen. ROUTES.md stelde eerder dat er geen publieke Komoot-API is:
+   verifieer dat opnieuw, zonder scraping of onofficiële accountkoppeling.
+5. Wat is de kleinste nuttige stap voor vrienden: een externe route-link bij
+   een ritvenster, een geïmporteerde route delen, of iets anders? Toets aan
+   €0/maand, privacy en de grens op servercode voordat het een bouwplan wordt.
+
+Uitkomst: een korte vergelijking, onderbouwde productkeuze
+**bouwen / koppelen / bewust niet doen**, en pas daarna een scope. Voorwerk:
+`.planning/research/ROUTES.md`, `.planning/research/BIKEWIND.md` en de
+Group Tours-bronnen bij #65.
