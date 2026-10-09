@@ -15,6 +15,20 @@ progress:
 
 # Project State
 
+## Stand na 2026-10-09 (middag) -- productie-aanvraag ingediend
+
+| Waar | Stand |
+|---|---|
+| Internal | **1.0.55 (66)** |
+| PWA | **1.0.55 (66)** |
+| Oppo | **1.0.55 (66)** via Play, goedgekeurd (App Link-controle groen) |
+| Alpha / closed | **1.0.55 (66)** |
+| Productie | **Aanvraag ingediend 2026-10-09 15:53**; Google beoordeelt, antwoord per mail aan de account-eigenaar, meestal binnen zeven dagen |
+
+Tot de uitslag: niets aan de track-opzet veranderen en blijven releasen volgens
+de vaste route. De volledige randvoorwaarden en het afkeur-scenario staan in
+`OPEN.md`, bovenste sectie.
+
 ## Stand na 2026-10-09 -- 1.0.55 (66) op internal en web
 
 | Waar | Stand |

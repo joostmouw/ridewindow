@@ -1,6 +1,6 @@
 # Openstaande punten
 
-> **Stand 2026-09-21.** De secties vanaf "Openstaande punten (stand 2026-09-10)"
+> **Stand 2026-10-09.** De secties vanaf "Openstaande punten (stand 2026-09-10)"
 > verderop zijn van 10 september en gedeeltelijk achterhaald: de Play Developer
 > API is inmiddels wél ingericht (punt I), de screenshots en de listing zijn
 > vervangen, en de bundel staat allang in de Console. Lees eerst wat hieronder
@@ -32,6 +32,30 @@ praktisch:
 Elk punt hieronder is zo opgeschreven dat een agent die deze sessie niet heeft
 meegemaakt er koud mee verder kan: wat er aan de hand is, wat al onderzocht is,
 en wat de volgende stap is.
+
+---
+
+## Productie-aanvraag loopt — randvoorwaarden tot de uitslag (2026-10-09)
+
+**"Apply for access to production" is ingediend op 2026-10-09 om 15:53.** Google
+beoordeelt het formulier en mailt de account-eigenaar; meestal binnen zeven
+dagen, soms langer. De antwoordteksten zijn opgesteld vanuit `TESTERS.md`,
+`BACKLOG.md`, `docs/testers/changelog.md` en de debug-dossiers, dus elke claim
+daarin is hier te staven.
+
+Tot de uitslag binnen is:
+
+- **Niets aan de track-opzet veranderen** — geen testers verwijderen, alpha niet
+  sluiten of pauzeren, de winkellijst laten staan.
+- **Blijven releasen volgens de vaste route.** Een test die na de aanvraag
+  doodvalt is een bekende afkeurbron. Een fix bouwen kan altijd; of je hem
+  tijdens de review ook uitrolt is een afweging per geval.
+- **Bij afkeuring:** de twee redenen die Google zelf noemt staan in punt 16
+  (te weinig testers, onvoldoende betrokkenheid). Wordt iets over onbereikbare
+  functionaliteit genoemd, dan zijn testcredentials de eerste stap — de app
+  werkt uitgelogd, maar Peloton niet.
+- **Bij goedkeuring:** dezelfde bytes promoveren naar productie via
+  `tool/play_upload.dart`, en BACKLOG #76 (LinkedIn-lanceerpost) komt in beeld.
 
 ---
 
@@ -130,6 +154,13 @@ Volledige uitwerking in `.planning/debug/consent-card-en-privacy-link.md`.
 ---
 
 ## 3. Feedbackadres in Play Console loopt niet gelijk met het privacybeleid
+
+**Status: opgelost, geverifieerd 2026-10-09.** De fix uit build 53 (changelog:
+"beide staan nu op joostmouw@gmail.com") is nagemeten: alle vier de plekken in
+`docs/privacy-policy.html` (account-verwijdering en Contact, in beide talen)
+noemen `joostmouw@gmail.com`, hetzelfde adres als het feedbackveld in de
+Console. De beslissing welk adres zou winnen is daarmee impliciet genomen. De
+oorspronkelijke notitie hieronder blijft staan als archief.
 
 **Prioriteit: middel, maar nu urgent geworden.** Er zitten twintig testers in de
 groep die straks iets willen melden.
@@ -254,6 +285,17 @@ feature-graphic en de intro-video. Zie `docs/promo/README.md`.
 ---
 
 ## 9. Oude debugsessie die nooit is afgerond
+
+**Status: gesloten 2026-10-09.** Uitgezocht: de sessie wás allang afgerond.
+`.planning/debug/resolved/test-binding-state-leakage.md` bevat de eindversie met
+`status: resolved` en een sluitingsnotitie van 2026-07-18 (hypothese bevestigd:
+test-wrappers misten `S.localizationsDelegates` en de thema-extensie, geen
+cross-file state-lekkage; opgelost in vijf ronden, 215/69 naar 282/2, alle 13
+symptomatische bestanden groen). In `debug/` stond alleen nog een oudere kopie
+die per ongeluk was blijven staan met `awaiting_human_verify`; die kopie bevatte
+niets dat de resolved-versie mist en is op 2026-10-09 verwijderd. Het symptoom
+is weg: de suite staat op 1087 groen (build 66, 2026-10-09). De oorspronkelijke
+notitie hieronder blijft staan als archief.
 
 `.planning/debug/test-binding-state-leakage.md` staat sinds 2026-07-17 op
 `awaiting_human_verify`. Het ging om 69 falende tests over 13 bestanden wanneer
