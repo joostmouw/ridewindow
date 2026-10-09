@@ -22,7 +22,7 @@ progress:
 | Internal | **1.0.55 (66)**, geüpload via de Play Developer API; `--list-tracks` bevestigt internal 66, completed |
 | PWA | **1.0.55 (66)**, GitHub Actions-run `37936646253` geslaagd vanaf `c869a40`; live `version.json` zegt 66 |
 | Oppo | Laatst bewezen **1.0.53 (64)** via Play. Ontvangst en App Link-controle van 66 staan nog open |
-| Alpha / closed | **1.0.53 (64)**, ongewijzigd. 66 niet gepromoveerd; eerst toestelgoedkeuring |
+| Alpha / closed | **1.0.55 (66)**, gepromoveerd vanuit internal na Oppo-goedkeuring |
 | main | **1.0.55+66**, `c869a40`, gepusht naar origin |
 
 **Wat 66 brengt:** `ridewindow.web.app` is de PWA-host en de Android App
@@ -37,10 +37,9 @@ geslaagd; live `version.json`, `assetlinks.json` en de drie legacy-redirects
 apart gemeten. AAB SHA-256:
 `3abc6b83df9a183bab250bc172de1a9463c64a2d9b09291473b29f4173915aea`.
 
-**Nog op de Oppo te bewijzen, via de normale Play-update:** de update naar 66
-ontvangen, een nieuwe `/invite/`- of `/group/`-link direct in de app openen,
-en Google-inloggen/Agenda controleren. Geen sideload. Pas daarna mag 66 naar
-alpha.
+**Oppo-controle 2026-10-09 (groen):** build 66 werkt op het toestel. De
+App Link-migratie is daarmee goedgekeurd en 66 is als dezelfde bytes naar
+alpha gepromoveerd. Geen sideload.
 
 ## Stand na 2026-09-30 -- 1.0.54 (65) op internal en web
 

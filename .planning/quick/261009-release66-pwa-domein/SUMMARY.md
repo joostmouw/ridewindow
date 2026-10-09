@@ -6,8 +6,7 @@ Datum: 2026-10-09. Releasebron: `c869a40`, gepusht naar origin/main.
 
 - AAB 1.0.55+66 gebouwd, Play-dry-run groen en via de Play Developer API naar
   internal geüpload.
-- `--list-tracks` bevestigt internal **1.0.55 (66)** completed; alpha blijft
-  **1.0.53 (64)** completed.
+- `--list-tracks` bevestigt internal én alpha op **1.0.55 (66)** completed.
 - GitHub Actions-run `37936646253` bouwde en deployde de PWA vanaf
   `c869a40`; live `version.json` zegt 1.0.55 / 66.
 - `ridewindow.web.app` serveert de PWA en `assetlinks.json`; de oude host
@@ -39,6 +38,5 @@ vond dezelfde compilerfout vóór de Play-upload. De constante is hersteld in
 
 ## Open
 
-66 is nog niet op de Oppo gezien en daarom niet naar alpha gepromoveerd.
-Controleer via de normale Play-update of een nieuwe uitnodigings- of
-groepslink direct de app opent, plus Google-inloggen en Agenda. Geen sideload.
+De Oppo-controle is groen: 66 werkt op het toestel. Dezelfde bytes zijn
+daarna naar alpha gepromoveerd. Geen sideload.
