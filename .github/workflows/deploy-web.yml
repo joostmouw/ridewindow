@@ -22,8 +22,9 @@
 # On a push to main that touches files able to change the web build (see
 # the path filter below), or on manual dispatch, it runs
 # `flutter build web --release` and deploys build/web to the Firebase
-# Hosting *live* channel for the my-project-joost project. It does NOT run
-# `flutter test` or `flutter analyze` as a deploy gate -- that was
+# Hosting *live* channel for the new ridewindow site and the legacy
+# my-project-joost redirect site. It does NOT run `flutter test` or
+# `flutter analyze` as a deploy gate -- that was
 # considered and rejected for now: the suite's known baseline
 # (.planning/STATE.md, 17-01) is 215 passing / 69 pre-existing failures
 # unrelated to hosting (tracked in BACKLOG.md #11), so gating every deploy
@@ -148,5 +149,15 @@ jobs:
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST }}
           projectId: my-project-joost
+          target: ridewindow
+          channelId: live
+          firebaseToolsVersion: 15.23.0 # pinned to the version already verified locally (the uploader.js timeout formula referenced above was read from this exact version)
+
+      - name: Deploy legacy URL redirect
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MY_PROJECT_JOOST }}
+          projectId: my-project-joost
+          target: legacy
           channelId: live
           firebaseToolsVersion: 15.23.0 # pinned to the version already verified locally (the uploader.js timeout formula referenced above was read from this exact version)

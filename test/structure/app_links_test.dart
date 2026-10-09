@@ -66,7 +66,12 @@ void main() {
   test('firebase.json rolt .well-known mee uit', () {
     final config =
         jsonDecode(File('firebase.json').readAsStringSync()) as Map;
-    final ignore = (config['hosting'] as Map)['ignore'] as List;
+    final hosting = config['hosting'];
+    final sites = hosting is Map ? [hosting] : hosting as List;
+    final ridewindowSite = (sites.cast<Map>()).singleWhere(
+      (site) => site['target'] == 'ridewindow',
+    );
+    final ignore = ridewindowSite['ignore'] as List;
     expect(
       ignore,
       isNot(contains('**/.*')),

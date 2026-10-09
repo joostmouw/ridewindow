@@ -57,7 +57,7 @@
                 site blijft de PWA, ook voor wie de app heeft.
 
                 autoVerify laat Android bij de installatie
-                https://my-project-joost.web.app/.well-known/assetlinks.json
+                https://ridewindow.web.app/.well-known/assetlinks.json
                 ophalen. Staat daar de vingerafdruk van de sleutel waarmee de
                 APK getekend is niet in, dan valt dit stil terug op "openen met
                 Chrome" zonder foutmelding. Voor een Play-build is dat de
@@ -71,7 +71,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https"/>
-                <data android:host="my-project-joost.web.app"/>
+                <data android:host="ridewindow.web.app"/>
                 <data android:pathPrefix="/invite/"/>
                 <data android:pathPrefix="/group/"/>
             </intent-filter>

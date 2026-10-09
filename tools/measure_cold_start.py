@@ -85,7 +85,7 @@ def list_webapks():
         if "webapk" not in pkg:
             continue
         dump = adb("shell", "dumpsys", "package", pkg).stdout
-        marker = "my-project-joost.web.app" if "my-project-joost.web.app" in dump else ""
+        marker = "ridewindow.web.app" if "ridewindow.web.app" in dump else ""
         print(f"{pkg}  {marker}")
 
 

@@ -27,10 +27,11 @@ import 'package:ridewindow/theme/app_icons.dart';
 /// Tot 2026-09-29 was dit `/#/invite`; die al verstuurde links blijven werken
 /// in de browser, maar openen de app niet.
 ///
-/// Verandert het domein (backlog #54 stelt `ridewindow.web.app` voor), dan is
-/// dit de plek, samen met het intent-filter en `assetlinks.json`; en let erop
-/// dat oude, al verstuurde links dan doodlopen.
-const kInviteLinkBase = 'https://my-project-joost.web.app/invite';
+/// Het domein is de nieuwe productie-site. Het intent-filter en
+/// `assetlinks.json` gebruiken dezelfde host; de oude Firebase-site blijft
+/// bestaan als padbehoudende redirect, zodat al verstuurde links blijven
+/// werken.
+const kInviteLinkBase = 'https://ridewindow.web.app/invite';
 
 String inviteLinkFor(String code) => '$kInviteLinkBase/$code';
 

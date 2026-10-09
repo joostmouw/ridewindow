@@ -121,7 +121,7 @@ void main() {
   });
 
   group('WebAppUpdateService', () {
-    final base = Uri.parse('https://my-project-joost.web.app/');
+    final base = Uri.parse('https://ridewindow.web.app/');
 
     WebAppUpdateService service(http.Client client) =>
         WebAppUpdateService(client: client, base: base);

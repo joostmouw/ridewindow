@@ -64,7 +64,7 @@ void main() {
         '  abcd2345  ',
         'ABCD-2345',
         'abcd 2345',
-        'https://my-project-joost.web.app/invite/ABCD2345',
+        'https://ridewindow.web.app/invite/ABCD2345',
         'https://example.test/join?code=abcd2345',
       ]) {
         expect(

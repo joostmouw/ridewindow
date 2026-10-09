@@ -50,7 +50,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 PROJECT_ID="my-project-joost"
-LIVE_URL="https://${PROJECT_ID}.web.app"
+LIVE_URL="https://ridewindow.web.app"
 TARGET_FILE="build/web/main.dart.js"
 MAX_DEPLOY_ATTEMPTS=3
 HASH_VERIFY_ATTEMPTS=3

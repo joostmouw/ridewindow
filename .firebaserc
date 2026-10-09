@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "my-project-joost"
+  },
+  "targets": {
+    "my-project-joost": {
+      "hosting": {
+        "ridewindow": [
+          "ridewindow"
+        ],
+        "legacy": [
+          "my-project-joost"
+        ]
+      }
+    }
   }
 }

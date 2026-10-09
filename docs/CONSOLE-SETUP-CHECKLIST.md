@@ -18,7 +18,7 @@ Runbook side — what to do when it is already broken — lives in [`ACCOUNTS-OP
 | Play Console app signing page | `https://play.google.com/console/u/0/developers/4716806605533867534/app/4975932698287804363/keymanagement` | Play Console URL |
 | Supabase project ref | `hcdrydlgqpnmumfupgcx` | 18-CONTEXT.md |
 | Supabase API URL | `https://hcdrydlgqpnmumfupgcx.supabase.co` | verified live, HTTP 401 without key |
-| Deployed PWA origin | `https://my-project-joost.web.app` | Firebase Hosting |
+| Deployed PWA origin | `https://ridewindow.web.app` | Firebase Hosting; `my-project-joost.web.app` blijft als legacy-redirect bestaan |
 | Privacy policy URL | `https://joostmouw.github.io/ridewindow/privacy-policy.html` | verified live |
 | OAuth scope in use | `https://www.googleapis.com/auth/calendar.events` (Sensitive) | `lib/services/calendar_service.dart` |
 
@@ -66,7 +66,7 @@ The local fingerprint above is from `/Users/joostmouw/upload-keystore.jks`, alia
 | Created | Phase 15-01 (v2.0), for web Calendar OAuth |
 | Wired into | `web/index.html:47` as `<meta name="google-signin-client_id">` |
 | Client name in console | `RideWindow Web`, created 13 July 2026 |
-| Authorized JavaScript origins | `http://localhost:5000` and `https://my-project-joost.web.app` | ✓ both already present 2026-07-26 |
+| Authorized JavaScript origins | `http://localhost:5000`, `https://ridewindow.web.app`, and legacy `https://my-project-joost.web.app` | New origin must be added before web Google login is tested; legacy origin stays during migration |
 | Authorized redirect URIs | `https://hcdrydlgqpnmumfupgcx.supabase.co/auth/v1/callback` | ✓ added and read back 2026-07-26, see F-5 |
 
 Credentials page: `https://console.cloud.google.com/apis/credentials?project=my-project-joost`
@@ -177,7 +177,7 @@ _Recorded rather than omitted — findings are the most valuable thing this file
 
 ⚠ **The signed copy carries personal data and must stay out of this repository**, which is public. See the note under Coordinates.
 
-**F-5 (open). The Google web client has no Authorized redirect URIs, which the PWA sign-in flow will need.** Supabase's Google provider panel states its callback URL `https://hcdrydlgqpnmumfupgcx.supabase.co/auth/v1/callback` must be registered "when using Sign-in with Google on the web using OAuth". The web client's redirect URI list is currently empty. This does not affect the native Android `signInWithIdToken` path — that flow verifies the ID token's audience and needs no redirect URI — but RideWindow ships a live PWA at `https://my-project-joost.web.app` that iOS testers use, and browser sign-in there will fail without it. Registering it now is one line and costs nothing; discovering it during Phase 21 costs a debugging session. **Second-order caveat:** the web OAuth flow also needs the client *secret* in Supabase, and Cloud Console states "Viewing and downloading client secrets is no longer available" — the existing secret (`****CpdM`, created 13 July 2026) cannot be read back, so a new secret must be generated if that flow is implemented.
+**F-5 (open). The Google web client has no Authorized redirect URIs, which the PWA sign-in flow will need.** Supabase's Google provider panel states its callback URL `https://hcdrydlgqpnmumfupgcx.supabase.co/auth/v1/callback` must be registered "when using Sign-in with Google on the web using OAuth". The web client's redirect URI list is currently empty. This does not affect the native Android `signInWithIdToken` path — that flow verifies the ID token's audience and needs no redirect URI — but Ridewindow now ships its PWA at `https://ridewindow.web.app`; browser sign-in there will fail without the matching OAuth origin and Supabase URL configuration. The old `https://my-project-joost.web.app` remains a redirect during migration. **Second-order caveat:** the web OAuth flow also needs the client *secret* in Supabase, and Cloud Console states "Viewing and downloading client secrets is no longer available" — the existing secret (`****CpdM`, created 13 July 2026) cannot be read back, so a new secret must be generated if that flow is implemented.
 
 **F-2 (resolved 2026-07-26). Consent screen is genuinely "In production".** Verified by reading `Google Auth Platform → Audience` directly, closing the gap left by `OAUTH-PUBLISH-CHECKLIST.md`, whose final verification steps were never ticked. User type: External. The same page shows the OAuth user cap counter at **3 of 100** — live confirmation of the cap described in `ACCOUNTS-OPERATIONS.md` §1, and a reminder that it is cumulative and never resets.
 

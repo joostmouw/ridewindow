@@ -10,7 +10,7 @@ er waar live staat.
 | Kanaal | Wanneer gebruik je het | Review van Google | Effect op het toestel |
 |---|---|---|---|
 | **Lokale APK** (`adb install`) | alleen voor verse-installatie-testen (o.a. de eerste-minuut-flow) | geen | vervangt de Play-installatie: lokale database en Calendar-grant gaan overboord, en Play kan daarna niet meer bijwerken tot je de sideload overal verwijdert (zie "Terug van een sideload naar Play"). Noteer het in STATE.md als je het doet |
-| **PWA** (`my-project-joost.web.app`) | op een releasemoment, vanaf dezelfde commit als de internal-build | geen | aparte webbundel, eigen cache: na een deploy hard herladen of `?v=<code>` meegeven |
+| **PWA** (`ridewindow.web.app`) | op een releasemoment, vanaf dezelfde commit als de internal-build | geen | aparte webbundel, eigen cache: na een deploy hard herladen of `?v=<code>` meegeven; `my-project-joost.web.app` blijft als 301-legacy-URL bestaan |
 | **Internal testing** | élke release komt hier eerst; testers zien het onmiddellijk | geen | niets raakt het toestel: de Oppo haalt de build via Play-update op en houdt database en grants intact. Dé manier om op het toestel te testen |
 | **Alpha / closed testing** | de track die Google telt voor de productie-eis (12 testers, 14 dagen) | ja, bij élke promotie (duurt soms dagen) | alleen krijgen wat op internal is goedgekeurd; zichtbaar voor testers pas ná review |
 

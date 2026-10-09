@@ -71,7 +71,7 @@ void main() {
     // De web-kant vangt de padvorm op in web/index.html.
     expect(
       inviteLinkFor('ABCD2345'),
-      'https://my-project-joost.web.app/invite/ABCD2345',
+      'https://ridewindow.web.app/invite/ABCD2345',
     );
   });
 }
