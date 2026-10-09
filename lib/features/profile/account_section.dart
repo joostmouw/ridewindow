@@ -19,6 +19,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ridewindow/data/remote/supabase_tables.dart';
 import 'package:ridewindow/core/supabase_config.dart';
+import 'package:ridewindow/data/repositories/peloton_cache_store.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/domain/services/account_switch_resolver.dart';
 import 'package:ridewindow/features/peloton/group_error_text.dart';
@@ -246,6 +247,11 @@ class _AccountSectionState extends ConsumerState<AccountSection> {
                 .read(availabilityProvider.notifier)
                 .resetForAccountSwitch();
             await ref.read(plannedRidesProvider.notifier).clearAll();
+            // De Peloton-kopieën zijn per account gesleuteld, dus het nieuwe
+            // account zou ze toch nooit lezen -- maar "start fresh" betekent
+            // dat de oude data het toestel verlaat, niet dat hij blijft
+            // liggen tot niemand er meer kijkt.
+            await PelotonCacheStore(prefs).clearAllAccounts();
           } finally {
             availabilitySub.close();
           }

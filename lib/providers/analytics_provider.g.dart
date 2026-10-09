@@ -39,7 +39,7 @@ final class AnalyticsConsentProvider
   AnalyticsConsent create() => AnalyticsConsent();
 }
 
-String _$analyticsConsentHash() => r'a71fa2657102b94cbbd80b219991063ec343e1c3';
+String _$analyticsConsentHash() => r'd8e2a02a4139786b0887bb90d9d261a78765b48e';
 
 /// De toestemmingsstand. Een `Notifier` en geen simpele lees-provider, omdat
 /// Profiel hem moet kunnen omzetten en Home moet zien dat de vraag beantwoord is.

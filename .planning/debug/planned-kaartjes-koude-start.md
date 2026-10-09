@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: awaiting_human_verify
 trigger: "OPEN.md punt 0a: de PLANNED-kaartjes verschijnen pas een paar seconden na een koude start; tot dan staat er alleen de kop. Gezien op de Oppo bij build 64, opnieuw genoemd bij 66."
 created: 2026-10-09
 updated: 2026-10-09
@@ -83,7 +83,37 @@ seconden, de eerste geslaagde refresh overschrijft hem.
 
 ## Beslissing die bij Joost ligt
 
-Fix A bouwen (richting een dagdeel: gateway-splitsing, cache-store, twee
-providers om, tests), of het dossier parkeren tot na de uitslag van de
-productie-aanvraag. Bouwen en uitrollen zijn losse beslissingen: tijdens de
-review kan de fix op main klaarliggen zonder dat er een release uit hoeft.
+~~Fix A bouwen of parkeren.~~ **Joost koos op 2026-10-09: bouwen.**
+
+## Oplossing (2026-10-09)
+
+Fix A gebouwd in quick `261009-gedeelde-ritten-cache`:
+
+- `GroupRide`, `RideParticipant`, `RideOption`, `OptionVote`, `PelotonGroup`,
+  `GroupMember` en `GroupJoinRequest` kregen `toJson`/`fromJson` met dezelfde
+  sleutels als de database-rijen, zodat `fromRow` het parsen blijft doen.
+- Nieuwe `PelotonCacheStore` (SharedPreferences, per account gesleuteld,
+  corrupte JSON leest als geen cache, `clearAllAccounts()` voor de
+  accountwissel-"start fresh"-tak).
+- `groupRides` en `visibleGroups` werden AsyncNotifiers: cache eerst, dan een
+  achtergrond-refresh die state én kopie bijwerkt; een mislukte refresh laat
+  de kopie staan. Uitgelogd, offline en zonder cache ongewijzigd.
+
+**Twee valkuilen die de suite ving, en de les eruit:**
+
+1. `ref.read(pelotonGatewayProvider)` in plaats van `watch` brak stil de
+   invalidatieketen: `ProviderScope.updateOverrides` (wat een tweede
+   `pumpWidget` in tests doet) invalidates alleen watchers. De gateway wordt
+   nu synchroon in `build()` gewatcht, vóór de eerste `await`.
+2. `ref` aan het netwerk ná een async gap (`await
+   SharedPreferences.getInstance()` en pas daarna `ref.watch`) knalt bij een
+   autoDispose-provider die intussen is afgebouwd ("Cannot use the Ref after
+   it has been disposed"). Dezelfde les als de stille-takken-sweep: na elke
+   `await` staat er een andere wereld.
+
+**Verificatie:** suite 1099 groen (12 nieuwe tests: store round-trips,
+per-account isolatie, corrupte JSON, cache-eerst-ververst, falende refresh
+blijft staan, uitgelogd raakt niets); analyze op baseline (0/0/214).
+Nog te doen door Joost: op de Oppo een koude start met gedeelde ritten — de
+kaartjes horen er meteen te staan. Bewust géén release: build 66 ligt bij
+Google, deze fix blijft op main tot Joost anders beslist.

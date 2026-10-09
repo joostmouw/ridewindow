@@ -104,18 +104,52 @@ String _$friendsHash() => r'09f1314e18c748984a008bc8ee6c6ef6ecff6655';
 
 /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
 /// code — de query vraagt bewust alles op.
+///
+/// **Cache eerst, daarna het netwerk (bug 0a).** Zonder lokale kopie opende
+/// Home bij een koude start met alleen de kop PLANNED en sprongen de gedeelde
+/// ritten er een Supabase-retourtje later bij. Staat er een kopie in
+/// [PelotonCacheStore], dan is die meteen de waarde en ververst een
+/// achtergrond-refresh state én kopie. Een mislukte refresh laat de kopie
+/// staan: Peloton is additief, een haperend netwerk mag nooit ritten
+/// wegnemen (REQUIREMENTS.md regel 8).
+///
+/// Bewust géén keepAlive: de autoDispose-levenscyclus is precies de
+/// verversfrequentie die dit vandaag heeft. keepAlive met een cache zou een
+/// langlopende app juist eeuwig op de kopie laten kijken.
 
-@ProviderFor(groupRides)
+@ProviderFor(GroupRides)
 final groupRidesProvider = GroupRidesProvider._();
 
 /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
 /// code — de query vraagt bewust alles op.
-
-final class GroupRidesProvider extends $FunctionalProvider<
-        AsyncValue<List<GroupRide>>, List<GroupRide>, FutureOr<List<GroupRide>>>
-    with $FutureModifier<List<GroupRide>>, $FutureProvider<List<GroupRide>> {
+///
+/// **Cache eerst, daarna het netwerk (bug 0a).** Zonder lokale kopie opende
+/// Home bij een koude start met alleen de kop PLANNED en sprongen de gedeelde
+/// ritten er een Supabase-retourtje later bij. Staat er een kopie in
+/// [PelotonCacheStore], dan is die meteen de waarde en ververst een
+/// achtergrond-refresh state én kopie. Een mislukte refresh laat de kopie
+/// staan: Peloton is additief, een haperend netwerk mag nooit ritten
+/// wegnemen (REQUIREMENTS.md regel 8).
+///
+/// Bewust géén keepAlive: de autoDispose-levenscyclus is precies de
+/// verversfrequentie die dit vandaag heeft. keepAlive met een cache zou een
+/// langlopende app juist eeuwig op de kopie laten kijken.
+final class GroupRidesProvider
+    extends $AsyncNotifierProvider<GroupRides, List<GroupRide>> {
   /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
   /// code — de query vraagt bewust alles op.
+  ///
+  /// **Cache eerst, daarna het netwerk (bug 0a).** Zonder lokale kopie opende
+  /// Home bij een koude start met alleen de kop PLANNED en sprongen de gedeelde
+  /// ritten er een Supabase-retourtje later bij. Staat er een kopie in
+  /// [PelotonCacheStore], dan is die meteen de waarde en ververst een
+  /// achtergrond-refresh state én kopie. Een mislukte refresh laat de kopie
+  /// staan: Peloton is additief, een haperend netwerk mag nooit ritten
+  /// wegnemen (REQUIREMENTS.md regel 8).
+  ///
+  /// Bewust géén keepAlive: de autoDispose-levenscyclus is precies de
+  /// verversfrequentie die dit vandaag heeft. keepAlive met een cache zou een
+  /// langlopende app juist eeuwig op de kopie laten kijken.
   GroupRidesProvider._()
       : super(
           from: null,
@@ -132,17 +166,40 @@ final class GroupRidesProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<List<GroupRide>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<GroupRide>> create(Ref ref) {
-    return groupRides(ref);
-  }
+  GroupRides create() => GroupRides();
 }
 
-String _$groupRidesHash() => r'7189bfe90716c5387435e56d79ac55aa40d52cf9';
+String _$groupRidesHash() => r'52626eddf5e6e1482ba50809dec5e18ff2a0a2a5';
+
+/// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
+/// code — de query vraagt bewust alles op.
+///
+/// **Cache eerst, daarna het netwerk (bug 0a).** Zonder lokale kopie opende
+/// Home bij een koude start met alleen de kop PLANNED en sprongen de gedeelde
+/// ritten er een Supabase-retourtje later bij. Staat er een kopie in
+/// [PelotonCacheStore], dan is die meteen de waarde en ververst een
+/// achtergrond-refresh state én kopie. Een mislukte refresh laat de kopie
+/// staan: Peloton is additief, een haperend netwerk mag nooit ritten
+/// wegnemen (REQUIREMENTS.md regel 8).
+///
+/// Bewust géén keepAlive: de autoDispose-levenscyclus is precies de
+/// verversfrequentie die dit vandaag heeft. keepAlive met een cache zou een
+/// langlopende app juist eeuwig op de kopie laten kijken.
+
+abstract class _$GroupRides extends $AsyncNotifier<List<GroupRide>> {
+  FutureOr<List<GroupRide>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<GroupRide>>, List<GroupRide>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<GroupRide>>, List<GroupRide>>,
+        AsyncValue<List<GroupRide>>,
+        Object?,
+        Object?>;
+    return element.handleCreate(ref, build);
+  }
+}
 
 /// Ritten die op jouw antwoord wachten: losse uitnodigingen (status
 /// `invited`) en groepsritten van anderen waarop jij nog geen rij hebt.
@@ -400,8 +457,12 @@ String _$declinedGroupRidesHash() =>
 /// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
 ///
 /// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+///
+/// Cache eerst, daarna het netwerk — dezelfde reden en dezelfde afwegingen als
+/// [GroupRides] hierboven. De gesorteerde volgorde gaat mee de kopie in, dus
+/// uit de cache teruglezen hoeft niet opnieuw te sorteren.
 
-@ProviderFor(visibleGroups)
+@ProviderFor(VisibleGroups)
 final visibleGroupsProvider = VisibleGroupsProvider._();
 
 /// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
@@ -409,19 +470,21 @@ final visibleGroupsProvider = VisibleGroupsProvider._();
 /// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
 ///
 /// Op naam gesorteerd, zonder onderscheid in hoofdletters.
-
-final class VisibleGroupsProvider extends $FunctionalProvider<
-        AsyncValue<List<PelotonGroup>>,
-        List<PelotonGroup>,
-        FutureOr<List<PelotonGroup>>>
-    with
-        $FutureModifier<List<PelotonGroup>>,
-        $FutureProvider<List<PelotonGroup>> {
+///
+/// Cache eerst, daarna het netwerk — dezelfde reden en dezelfde afwegingen als
+/// [GroupRides] hierboven. De gesorteerde volgorde gaat mee de kopie in, dus
+/// uit de cache teruglezen hoeft niet opnieuw te sorteren.
+final class VisibleGroupsProvider
+    extends $AsyncNotifierProvider<VisibleGroups, List<PelotonGroup>> {
   /// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
   /// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder
   /// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
   ///
   /// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+  ///
+  /// Cache eerst, daarna het netwerk — dezelfde reden en dezelfde afwegingen als
+  /// [GroupRides] hierboven. De gesorteerde volgorde gaat mee de kopie in, dus
+  /// uit de cache teruglezen hoeft niet opnieuw te sorteren.
   VisibleGroupsProvider._()
       : super(
           from: null,
@@ -438,17 +501,36 @@ final class VisibleGroupsProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<List<PelotonGroup>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<PelotonGroup>> create(Ref ref) {
-    return visibleGroups(ref);
-  }
+  VisibleGroups create() => VisibleGroups();
 }
 
-String _$visibleGroupsHash() => r'63c971fb03be7c32ad6882ddb74d336355950649';
+String _$visibleGroupsHash() => r'0d41ed79d78b8e970d82dfe57cd4ad3f5f1151b9';
+
+/// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
+/// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder
+/// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
+///
+/// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+///
+/// Cache eerst, daarna het netwerk — dezelfde reden en dezelfde afwegingen als
+/// [GroupRides] hierboven. De gesorteerde volgorde gaat mee de kopie in, dus
+/// uit de cache teruglezen hoeft niet opnieuw te sorteren.
+
+abstract class _$VisibleGroups extends $AsyncNotifier<List<PelotonGroup>> {
+  FutureOr<List<PelotonGroup>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<PelotonGroup>>, List<PelotonGroup>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<PelotonGroup>>, List<PelotonGroup>>,
+        AsyncValue<List<PelotonGroup>>,
+        Object?,
+        Object?>;
+    return element.handleCreate(ref, build);
+  }
+}
 
 /// Groepen waar jij lid van bent (de sectie "Groepen" op de Peloton-tab).
 

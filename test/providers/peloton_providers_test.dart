@@ -7,6 +7,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -62,6 +63,11 @@ ProviderContainer _containerWith(List<GroupRide> rides, {String? userId = _me}) 
 }
 
 void main() {
+  // groupRides opent sinds bug 0a op de SharedPreferences-kopie; zonder mock
+  // gooit getInstance() hier. Leeg is genoeg: "geen cache" gedraagt zich
+  // precies zoals de provider voorheen.
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   group('joinedGroupRides', () {
     test('bevat een rit van een maatje die ik heb geaccepteerd', () async {
       final container = _containerWith([

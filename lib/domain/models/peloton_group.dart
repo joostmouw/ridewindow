@@ -79,6 +79,19 @@ class GroupMember {
         joinedAt: DateTime.parse(row['joined_at'] as String).toLocal(),
       );
 
+  /// Dezelfde sleutels als de rij, voor de koude-startcache
+  /// ([PelotonCacheStore]). UTC schrijven, lokaal lezen.
+  Map<String, dynamic> toJson() => {
+        'group_id': groupId,
+        'user_id': userId,
+        'role': role.row,
+        'display_name': displayName,
+        'joined_at': joinedAt.toUtc().toIso8601String(),
+      };
+
+  factory GroupMember.fromJson(Map<String, dynamic> json) =>
+      GroupMember.fromRow(json);
+
   bool get isAdmin => role == GroupRole.admin;
 
   String label(String fallback) => _labelOr(displayName, fallback);
@@ -117,6 +130,19 @@ class GroupJoinRequest {
         proposedByName: row['proposed_by_name'] as String?,
         createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'group_id': groupId,
+        'user_id': userId,
+        'proposed_by': proposedBy,
+        'display_name': displayName,
+        'proposed_by_name': proposedByName,
+        'created_at': createdAt.toUtc().toIso8601String(),
+      };
+
+  factory GroupJoinRequest.fromJson(Map<String, dynamic> json) =>
+      GroupJoinRequest.fromRow(json);
 
   bool get isViaLink => proposedBy == null;
 
@@ -165,6 +191,25 @@ class PelotonGroup {
       requests: requests,
     );
   }
+
+  /// Voor de koude-startcache ([PelotonCacheStore]): leden en aanvragen zitten
+  /// genest in het JSON-object; [fromJson] gebruikt [fromRows], zodat de
+  /// sortering van leden en aanvragen uit de cache exact zo terugkomt als uit
+  /// de gateway.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'created_at': createdAt.toUtc().toIso8601String(),
+        'members': [for (final m in members) m.toJson()],
+        'requests': [for (final r in requests) r.toJson()],
+      };
+
+  factory PelotonGroup.fromJson(Map<String, dynamic> json) =>
+      PelotonGroup.fromRows(
+        json,
+        (json['members'] as List? ?? const []).cast<Map<String, dynamic>>(),
+        (json['requests'] as List? ?? const []).cast<Map<String, dynamic>>(),
+      );
 
   int get memberCount => members.length;
   int get adminCount => members.where((m) => m.isAdmin).length;

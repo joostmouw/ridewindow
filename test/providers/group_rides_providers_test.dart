@@ -11,6 +11,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
@@ -84,6 +85,11 @@ DateTime _tomorrowAt(int hour) {
 }
 
 void main() {
+  // groupRides en visibleGroups openen sinds bug 0a op een
+  // SharedPreferences-kopie; zonder mock gooit getInstance() hier. Leeg is
+  // genoeg: "geen cache" gedraagt zich als voorheen.
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   group('pendingRideInvites', () {
     test(
         'bevat een groepsrit zonder jouw rij en een losse uitnodiging, '

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/data/repositories/peloton_cache_store.dart';
 import 'package:ridewindow/data/repositories/seen_friends_store.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
 import 'package:ridewindow/domain/models/peloton_group.dart';
@@ -26,11 +29,54 @@ Future<List<Friend>> friends(Ref ref) async {
 
 /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
 /// code — de query vraagt bewust alles op.
+///
+/// **Cache eerst, daarna het netwerk (bug 0a).** Zonder lokale kopie opende
+/// Home bij een koude start met alleen de kop PLANNED en sprongen de gedeelde
+/// ritten er een Supabase-retourtje later bij. Staat er een kopie in
+/// [PelotonCacheStore], dan is die meteen de waarde en ververst een
+/// achtergrond-refresh state én kopie. Een mislukte refresh laat de kopie
+/// staan: Peloton is additief, een haperend netwerk mag nooit ritten
+/// wegnemen (REQUIREMENTS.md regel 8).
+///
+/// Bewust géén keepAlive: de autoDispose-levenscyclus is precies de
+/// verversfrequentie die dit vandaag heeft. keepAlive met een cache zou een
+/// langlopende app juist eeuwig op de kopie laten kijken.
 @riverpod
-Future<List<GroupRide>> groupRides(Ref ref) async {
-  final userId = ref.watch(currentUserIdProvider);
-  if (userId == null) return const [];
-  return ref.watch(pelotonGatewayProvider).listGroupRides();
+class GroupRides extends _$GroupRides {
+  @override
+  Future<List<GroupRide>> build() async {
+    final userId = ref.watch(currentUserIdProvider);
+    if (userId == null) return const [];
+    // De gateway wordt synchroon gewatcht, vóór de eerste await -- zoals de
+    // oude functionele provider dat deed. Na een async gap mag ref niet meer
+    // aan het netwerk: een autoDispose-provider kan dan al afgebouwd zijn
+    // ("Cannot use the Ref ... after it has been disposed", gemeten in
+    // invite_group_ride_test), en met een read zou een gateway-override deze
+    // provider niet meer invalideren.
+    final gateway = ref.watch(pelotonGatewayProvider);
+    final store = PelotonCacheStore(await SharedPreferences.getInstance());
+    final cached = store.readGroupRides(userId);
+    if (cached == null) return _fetchAndCache(gateway, userId, store);
+    unawaited(
+      _fetchAndCache(gateway, userId, store).then(
+        (fresh) {
+          if (ref.mounted) state = AsyncData(fresh);
+        },
+        onError: (_) {},
+      ),
+    );
+    return cached;
+  }
+
+  Future<List<GroupRide>> _fetchAndCache(
+    PelotonGateway gateway,
+    String userId,
+    PelotonCacheStore store,
+  ) async {
+    final rides = await gateway.listGroupRides();
+    await store.saveGroupRides(userId, rides);
+    return rides;
+  }
 }
 
 /// Ritten die op jouw antwoord wachten: losse uitnodigingen (status
@@ -126,13 +172,43 @@ Future<List<GroupRide>> declinedGroupRides(Ref ref) async {
 /// gateway-aanroep als je uitgelogd bent: Clubs is additief, net als Peloton.
 ///
 /// Op naam gesorteerd, zonder onderscheid in hoofdletters.
+///
+/// Cache eerst, daarna het netwerk — dezelfde reden en dezelfde afwegingen als
+/// [GroupRides] hierboven. De gesorteerde volgorde gaat mee de kopie in, dus
+/// uit de cache teruglezen hoeft niet opnieuw te sorteren.
 @riverpod
-Future<List<PelotonGroup>> visibleGroups(Ref ref) async {
-  final userId = ref.watch(currentUserIdProvider);
-  if (userId == null) return const [];
-  final groups = await ref.watch(pelotonGatewayProvider).listGroups();
-  return [...groups]
-    ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+class VisibleGroups extends _$VisibleGroups {
+  @override
+  Future<List<PelotonGroup>> build() async {
+    final userId = ref.watch(currentUserIdProvider);
+    if (userId == null) return const [];
+    // Synchroon watchten vóór de eerste await — zie GroupRides hierboven.
+    final gateway = ref.watch(pelotonGatewayProvider);
+    final store = PelotonCacheStore(await SharedPreferences.getInstance());
+    final cached = store.readGroups(userId);
+    if (cached == null) return _fetchAndCache(gateway, userId, store);
+    unawaited(
+      _fetchAndCache(gateway, userId, store).then(
+        (fresh) {
+          if (ref.mounted) state = AsyncData(fresh);
+        },
+        onError: (_) {},
+      ),
+    );
+    return cached;
+  }
+
+  Future<List<PelotonGroup>> _fetchAndCache(
+    PelotonGateway gateway,
+    String userId,
+    PelotonCacheStore store,
+  ) async {
+    final groups = await gateway.listGroups();
+    final sorted = [...groups]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    await store.saveGroups(userId, sorted);
+    return sorted;
+  }
 }
 
 /// Groepen waar jij lid van bent (de sectie "Groepen" op de Peloton-tab).

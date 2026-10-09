@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/peloton.dart';
@@ -108,6 +109,9 @@ FakeGroupGateway _gateway({
 }
 
 Future<void> _pump(WidgetTester tester, FakeGroupGateway gateway) async {
+  // visibleGroups opent sinds bug 0a op een SharedPreferences-kopie; zonder
+  // mock gooit getInstance() hier.
+  SharedPreferences.setMockInitialValues({});
   await tester.pumpWidget(
     ProviderScope(
       overrides: [

@@ -66,15 +66,13 @@ Wat die ronde opleverde staat in `.planning/quick/260929-app-links-en-bolletje/`
 
 ### a. De PLANNED-kaartjes verspringen bij een koude start
 
-**Status: gediagnosticeerd 2026-10-09**, dossier
-`.planning/debug/planned-kaartjes-koude-start.md`. De gedeelde ritten hebben
-geen lokale cache: `groupRidesProvider` en `visibleGroupsProvider` doen bij
-elke koude start live Supabase-rondgangen, dus ontbreken die kaartjes tot het
-netwerk antwoordt. Voorgestelde fix: rij-cache in SharedPreferences (het
-`PlannedRidesRepository`-patroon), openen op de cache en de server laten
-bijwerken — zoals Home dat met het weer al doet. **Beslissing bij Joost:**
-bouwen (kan tijdens de review, uitrollen is los) of parkeren tot na de
-uitslag.
+**Status: code opgelost 2026-10-09, toestelcontrole open.** Dossier
+`.planning/debug/planned-kaartjes-koude-start.md` (nu `awaiting_human_verify`).
+Gedeelde ritten en groepen openen sindsdien op een SharedPreferences-kopie en
+verversen stil vanaf de server — hetzelfde patroon als de forecast-cache.
+Suite 1099 groen, analyze op baseline. Resterend: op de Oppo een koude start
+met gedeelde ritten bevestigen, en pas dan een release-overweging (build 66
+ligt bij Google).
 
 ### b. De update-balk ziet een nieuwe internal-build laat of niet
 

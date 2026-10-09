@@ -60,6 +60,17 @@ class RideParticipant {
         status: ParticipantStatus.fromRow(row['status'] as String?),
         displayName: row['display_name'] as String?,
       );
+
+  /// De cache in [PelotonCacheStore] gebruikt dezelfde sleutels als de
+  /// database-rij, zodat `fromRow` hier gewoon weer geldt.
+  Map<String, dynamic> toJson() => {
+        'user_id': userId,
+        'status': status.row,
+        'display_name': displayName,
+      };
+
+  factory RideParticipant.fromJson(Map<String, dynamic> json) =>
+      RideParticipant.fromRow(json);
 }
 
 /// Een venster dat voorligt bij een gedeelde rit (slice 2 van epic #65).
@@ -98,6 +109,28 @@ class RideOption {
         votes: votes,
       );
 
+  /// UTC schrijven, lokaal lezen — dezelfde conventie als [fromRow], zodat
+  /// een rit uit de cache op hetzelfde klokgetal landt als een verse.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'ride_id': rideId,
+        'start_at': start.toUtc().toIso8601String(),
+        'end_at': end.toUtc().toIso8601String(),
+        'planned_score': plannedScore,
+        'votes': [for (final v in votes) v.toJson()],
+      };
+
+  factory RideOption.fromJson(Map<String, dynamic> json) =>
+      RideOption.fromRow(
+        json,
+        votes: [
+          for (final v
+              in (json['votes'] as List? ?? const [])
+                  .cast<Map<String, dynamic>>())
+            OptionVote.fromJson(v),
+        ],
+      );
+
   /// Hoeveel mensen bij dit venster kunnen.
   int get yesCount => votes.where((v) => v.canRide).length;
 
@@ -131,6 +164,15 @@ class OptionVote {
         userId: row['user_id'] as String,
         canRide: row['can_ride'] as bool,
       );
+
+  Map<String, dynamic> toJson() => {
+        'option_id': optionId,
+        'user_id': userId,
+        'can_ride': canRide,
+      };
+
+  factory OptionVote.fromJson(Map<String, dynamic> json) =>
+      OptionVote.fromRow(json);
 }
 
 /// Een gedeelde rit: één object met deelnemers, geen kopie per persoon.
@@ -195,6 +237,38 @@ class GroupRide {
         participants: participants,
         options: options,
         groupId: row['group_id'] as String?,
+      );
+
+  /// Voor de koude-startcache ([PelotonCacheStore]): dezelfde sleutels als de
+  /// database-rij, met deelnemers en opties erin genest. Datums UTC; lezen gaat
+  /// via [fromJson] weer naar lokaal, zoals [fromRow] dat doet.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'owner_id': ownerId,
+        'start_at': start.toUtc().toIso8601String(),
+        'end_at': end.toUtc().toIso8601String(),
+        'planned_score': plannedScore,
+        'owner_name': ownerName,
+        'note': note,
+        'group_id': groupId,
+        'participants': [for (final p in participants) p.toJson()],
+        'options': [for (final o in options) o.toJson()],
+      };
+
+  factory GroupRide.fromJson(Map<String, dynamic> json) => GroupRide.fromRow(
+        json,
+        participants: [
+          for (final p
+              in (json['participants'] as List? ?? const [])
+                  .cast<Map<String, dynamic>>())
+            RideParticipant.fromJson(p),
+        ],
+        options: [
+          for (final o
+              in (json['options'] as List? ?? const [])
+                  .cast<Map<String, dynamic>>())
+            RideOption.fromJson(o),
+        ],
       );
 
   bool isOwnedBy(String? userId) => userId != null && userId == ownerId;

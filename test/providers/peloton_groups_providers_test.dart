@@ -6,6 +6,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/domain/models/peloton_group.dart';
 import 'package:ridewindow/providers/auth_notifier.dart';
@@ -60,6 +61,11 @@ ProviderContainer _container(FakeGroupGateway gateway, {String? userId = _me}) {
 }
 
 void main() {
+  // visibleGroups opent sinds bug 0a op een SharedPreferences-kopie; zonder
+  // mock gooit getInstance() hier. Leeg betekent: geen cache, gedrag als voor
+  // de cache.
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   test('uitgelogd: lege lijsten, gateway onaangeroerd', () async {
     final gateway = _gateway();
     final c = _container(gateway, userId: null);
