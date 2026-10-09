@@ -1,1 +1,1 @@
-Geplande ritscores volgen nu het actuele weer en je voorkeuren. Zet op Android in Profiel een melding aan bij een daling van 5, 10 of 20 procentpunt. De controle loopt als de app open is en bij de weerverversing op de achtergrond. Meldingen vanuit een gesloten webapp zijn nog niet beschikbaar.
+Ridewindow gebruikt nu ridewindow.web.app. Oude links blijven werken en openen dezelfde uitnodiging of groep. Na de update herkent Android het nieuwe adres rechtstreeks als App Link.
