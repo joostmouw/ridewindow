@@ -66,12 +66,15 @@ Wat die ronde opleverde staat in `.planning/quick/260929-app-links-en-bolletje/`
 
 ### a. De PLANNED-kaartjes verspringen bij een koude start
 
-Op Home staat na het openen eerst alleen de kop PLANNED; de kaartjes komen er
-een paar seconden later bij, en het scherm springt. De gedeelde ritten komen
-van de server (`rideEntriesProvider`), en die wachten zichtbaar niets af.
-Gezien op de Oppo bij build 64. Volgende stap: bepalen of PLANNED op de
-lokale kopie kan openen (Drift is de bron van waarheid) en de server alleen
-bijwerkt, zoals de rest van Home dat met het weer doet.
+**Status: gediagnosticeerd 2026-10-09**, dossier
+`.planning/debug/planned-kaartjes-koude-start.md`. De gedeelde ritten hebben
+geen lokale cache: `groupRidesProvider` en `visibleGroupsProvider` doen bij
+elke koude start live Supabase-rondgangen, dus ontbreken die kaartjes tot het
+netwerk antwoordt. Voorgestelde fix: rij-cache in SharedPreferences (het
+`PlannedRidesRepository`-patroon), openen op de cache en de server laten
+bijwerken — zoals Home dat met het weer al doet. **Beslissing bij Joost:**
+bouwen (kan tijdens de review, uitrollen is los) of parkeren tot na de
+uitslag.
 
 ### b. De update-balk ziet een nieuwe internal-build laat of niet
 
