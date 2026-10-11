@@ -18,7 +18,7 @@ last_activity: 2026-10-11progress:
 
 | Waar | Stand |
 |---|---|
-| Productie | **1.0.59 (70) als concept** (draft), gezet op 2026-10-11 na Joosts Oppo-controle. Nog niet gepubliceerd: eerst landen, uitrolpercentage en app-content nalopen, dan publiceert Joost |
+| Productie | **1.0.59 (70) ingediend ter review** op 2026-10-11, op Joosts verzoek: volledige uitrol, alle landen (177 + rest van de wereld; stond op 0), algemene release-notitie. App-content had niets openstaan. Na Google's review gaat hij vanzelf live (managed publishing staat uit) |
 | Internal | **1.0.58 (69)**, geüpload; `--list-tracks` bevestigt internal 69, completed. AAB SHA-256 `a65f08ff0ed72be3fdc34e0b97a29d1c599137c28acc46084ee4e2913dd9fdaa` |
 | PWA | **1.0.58 (69)**, CI-deploy vanaf `8d07b9b`; live `version.json` zegt 69 |
 | Alpha / closed | **1.0.57 (68)**, bij Google ter review |
