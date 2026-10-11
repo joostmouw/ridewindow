@@ -1301,6 +1301,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final idx = order.indexWhere((s) => s.start == _paneShownStart);
     final next = idx < 0 ? (delta > 0 ? 0 : -1) : idx + delta;
     if (next < 0 || next >= order.length) return;
+    // Ook de momentopname bijwerken: twee toetsaanslagen vóór de volgende
+    // build (snel tikken, of de toets ingedrukt houden) moeten twee stappen
+    // zijn, geen twee keer dezelfde.
+    _paneShownStart = order[next].start;
     setState(() => _paneSlotStart = order[next].start);
     if (next == 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

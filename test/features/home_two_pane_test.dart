@@ -202,6 +202,20 @@ void main() {
     });
   });
 
+  testWidgets('1280x800: twee keer omlaag vóór de volgende build zijn twee stappen',
+      (tester) async {
+    await ignoringTestFontOverflow(() async {
+      await pumpHome(tester, const Size(1280, 800), slots);
+      expect(_paneStart(tester), DateTime(2026, 6, 8, 11));
+
+      // Geen pump tussendoor: zo komt een ingedrukt gehouden toets binnen.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await _settle(tester);
+      expect(_paneStart(tester), DateTime(2026, 6, 8, 15));
+    });
+  });
+
   testWidgets('1280x800 zonder vensters: geen crash, paneel leeg',
       (tester) async {
     await ignoringTestFontOverflow(() async {
