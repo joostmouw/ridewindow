@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
 status: executing
-last_updated: "2026-10-11T18:14:29.338Z"
-last_activity: 2026-10-11 -- 37-01 klaar (usage_daily_counts)
+last_updated: "2026-10-11T18:17:48.922Z"
+last_activity: 2026-10-11 -- 37-02 klaar (sleutelmodule + regel)
 progress:
   total_phases: 16
   completed_phases: 6
   total_plans: 42
-  completed_plans: 38
+  completed_plans: 39
   percent: 38
 ---
 
@@ -737,11 +737,11 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 37 of 37–40 (Meten)
-Plan: 2 of 6 (37-01 af: migratie 0014 + testscript, nog niet live)
-Status: Executing
-Last activity: 2026-10-11 -- 37-01 klaar (usage_daily_counts + usage_monitor)
+Plan: 3 of 6 (37-01, 37-02 af; 0014 nog niet live)
+Status: Ready to execute
+Last activity: 2026-10-11 -- 37-02 klaar (gedeelde sleutelmodule + uitschieterregel in tool/usage/)
 
-Progress: [██░░░░░░░░] 1/6 plannen fase 37
+Progress: [███░░░░░░░] 2/6 plannen fase 37
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
@@ -1132,6 +1132,7 @@ Beslissingen zijn gelogd in PROJECT.md Key Decisions tabel.
 Recente beslissingen die het huidige werk beinvloeden:
 
 - [37-01] usage_daily_counts is server-functie 14 (CLAUDE.md-telling volgt in fase 40); usage_monitor krijgt geen wachtwoord in de migratie en alleen execute op die ene functie. Clubs fase 36 schuift naar migratie 0015.
+- [37-02] Sleutelcode staat in tool/src/service_role_key.dart (gedeeld); de uitschieterregel in tool/usage/ zonder package:-imports. Vloeren zijn beginwaarden tot de nulmeting (37-05); een bron zonder vloer geeft UsageConfigError, meldingen dragen nooit een getal.
 
 - Roadmap geherstructureerd 2026-06-02: originele Phase 1 (skeleton + scoring) gesplitst in Phase 1 (skeleton only) + Phase 1.5 (scoring domain).
 - Flutter test vereist (niet dart test) voor tests die AppDatabase importeren — drift_flutter trekt dart:ui mee; NativeDatabase.memory() direct doorgeven als QueryExecutor (DatabaseConnection wrapper niet nodig in Drift 2.x).

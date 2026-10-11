@@ -383,7 +383,7 @@ Plans:
 **Wave 1**
 
 - [x] 37-01-PLAN.md — Migratie 0014: usage_daily_counts (alleen totalen) + rol usage_monitor + SQL-Editor-test
-- [ ] 37-02-PLAN.md — Gedeelde sleutelmodule + geteste uitschieterregel en vloeren (tool/usage/)
+- [x] 37-02-PLAN.md — Gedeelde sleutelmodule + geteste uitschieterregel en vloeren (tool/usage/)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -484,7 +484,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 30. Werving | v4.1 | 0/TBD | Not started | - |
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
-| 37. Meten | v4.3 | 1/6 | In Progress|  |
+| 37. Meten | v4.3 | 2/6 | In Progress|  |
 | 38. Open deuren begrensd | v4.3 | 0/TBD | Not started | - |
 | 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
 | 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |
