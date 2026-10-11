@@ -158,7 +158,8 @@ Future<List<DayCount>> _fetchCounts({
       if (rows.length < _pageSize) return all;
     }
     throw const HttpException(
-        'meer pagina\'s dan verwacht; telling afgebroken');
+      'meer pagina\'s dan verwacht; telling afgebroken',
+    );
   } finally {
     client.close();
   }
