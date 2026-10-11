@@ -16,8 +16,8 @@
 
 ### Meten (MEET)
 
-- [ ] **MEET-01**: Joost ziet per dag, per tabel (`feedback`, `app_events`, maatjes- en groepsuitnodigingen, nieuwe accounts) hoeveel rijen erbij kwamen en van hoeveel verschillende toestellen of accounts
-- [ ] **MEET-02**: Een dag die ver boven het normale ligt valt op, zonder dat Joost er zelf naar hoeft te zoeken
+- [x] **MEET-01**: Joost ziet per dag, per tabel (`feedback`, `app_events`, maatjes- en groepsuitnodigingen, nieuwe accounts) hoeveel rijen erbij kwamen en van hoeveel verschillende toestellen of accounts
+- [x] **MEET-02**: Een dag die ver boven het normale ligt valt op, zonder dat Joost er zelf naar hoeft te zoeken
 
 ### Begrenzen (RATE)
 
@@ -67,8 +67,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MEET-01 | Phase 37 | Pending |
-| MEET-02 | Phase 37 | Pending |
+| MEET-01 | Phase 37 | Complete |
+| MEET-02 | Phase 37 | Complete |
 | RATE-01 | Phase 38 | Pending |
 | RATE-02 | Phase 38 | Pending |
 | RATE-03 | Phase 38 | Pending |

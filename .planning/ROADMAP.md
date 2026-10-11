@@ -80,7 +80,7 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 
 **Milestone Goal:** Wat een vreemde met de publieke Supabase-sleutel kan, wordt zichtbaar en begrensd: feedback en statistiek niet meer onbeperkt vol te pompen, uitnodigingscodes niet meer onbeperkt te raden, en niemand die de app gewoon gebruikt merkt er iets van. Meten gaat vóór dichttimmeren; captcha en App Check blijven buiten deze milestone tot de metingen erom vragen.
 
-- [ ] **Phase 37: Meten** - Een dagtelling per tabel (rijen, unieke toestellen of accounts) en een signaal bij een uitschieter, zodat er een nulmeting ligt vóór er één grens staat
+- [x] **Phase 37: Meten** - Een dagtelling per tabel (rijen, unieke toestellen of accounts) en een signaal bij een uitschieter, zodat er een nulmeting ligt vóór er één grens staat
 - [ ] **Phase 38: Open deuren begrensd** - `feedback` en `app_events` krijgen in de database een plafond per toestel en per afzender per dag en een maximale rijgrootte, ook voor builds die al in het veld staan; anonieme feedback blijft mogelijk
 - [ ] **Phase 39: Codes en grenzen per account** - Een teller op mislukte pogingen bij maatjescodes én groepslinks, en bovengrenzen op wat één account kan aanmaken, met een uitleg in de app
 - [ ] **Phase 40: Accounts en afronding** - E-mailaccounts pas actief na bevestiging, Supabase Auth-limieten bewust ingesteld, privacybeleid en `CLAUDE.md`/`AGENTS.md` bijgewerkt, regressie groen en de build bij de testers
@@ -396,7 +396,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 37-06-PLAN.md — Wacht live: push, faalmail bewezen, secret gezet, groene run als usage_monitor
+- [x] 37-06-PLAN.md — Wacht live: push, faalmail bewezen, secret gezet, groene run als usage_monitor
 
 ### Phase 38: Open deuren begrensd
 
@@ -484,7 +484,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 30. Werving | v4.1 | 0/TBD | Not started | - |
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
-| 37. Meten | v4.3 | 5/6 | In Progress|  |
+| 37. Meten | v4.3 | 6/6 | Complete | 2026-10-11 |
 | 38. Open deuren begrensd | v4.3 | 0/TBD | Not started | - |
 | 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
 | 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |

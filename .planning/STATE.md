@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
-status: executing
-last_updated: "2026-10-11T18:52:00.000Z"
-last_activity: 2026-10-11 -- 37-05 nulmeting vastgelegd
+status: fase 37 af; volgende is 38
+last_updated: "2026-10-11T19:20:00.000Z"
+last_activity: 2026-10-11 -- fase 37 af, wacht live
 progress:
   total_phases: 16
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 42
   completed_plans: 42
   percent: 38
@@ -15,7 +15,7 @@ progress:
 
 # Project State
 
-## Stand na 2026-10-11 (20:52) -- 1.0.59 (70) ter productiereview
+## Stand na 2026-10-11 (21:20) -- 1.0.59 (70) ter productiereview, fase 37 af
 
 | Waar | Stand |
 |---|---|
@@ -24,7 +24,7 @@ progress:
 | PWA | **1.0.59 (70)**, live `version.json` zegt 70 |
 | Alpha / closed | **1.0.57 (68)** |
 | Oppo | **1.0.59 (70) geïnstalleerd** (dumpsys: versionCode 70, targetSdk 36). Draait **Android 16 (SDK 36)**, dus edge-to-edge is er door de OS afgedwongen |
-| main | Lokaal **27 commits voor** op origin: fase-37-werk (meten, migraties 0014/0015, breedteklasse), raakt `lib/`; origin/main staat op `1e0cbdf` (release 70). Werkende tree is schoon; de paginering-fix in `tool/usage_report.dart` is gecommit (`059ddc7`) |
+| main | **Gepusht** tot `4335302` (fase 37, 31 commits). De push herdeployde de PWA: nog steeds versie 70, maar met andere bytes dan de gereleasete 70-bundel; bij de volgende release bumpen. Fase-37-docs (37-06) lokaal gecommit, niet gepusht |
 
 **Edge-to-edge-advies van Play bij de release (niet blokkerend):**
 beoordeeld en afgedaan. De Flutter-embedding doet de opt-in zelf (aanroep
@@ -33,10 +33,10 @@ Scaffold/NavigationBar/SafeArea, en het enige testtoestel draait al Android 16
 met afgedwongen edge-to-edge. Bevindingen en redenen: `.planning/OPEN.md`
 bovenaan.
 
-**Duwen van main is een bewuste keuze geworden:** de 27 lokale commits raken
-`lib/`, dus een push deployt de PWA automatisch opnieuw: versie 70 met andere
-bytes dan de gereleasete 70-bundel. Eerst besluiten: bumpen naar 71 en
-releasen, of laten staan tot de volgende release.
+**Main is gepusht (2026-10-11, 21:03):** daarmee draait de dagelijkse wacht
+`usage-watch` (05:00 UTC). Rode run zonder secret gaf een mail bij Joost, groene
+run als usage_monitor zonder telwaarden in de log. Vervolgpunten: checkout@v4
+op Node 20 en ubuntu-latest naar Ubuntu 26 vanaf 2026-10-19 (zie 37-06-SUMMARY).
 
 **Eerste adoptiemeting (Play-dashboard, 2026-10-11):** **44 active
 devices** in de laatste 30 dagen, allemaal via de testtracks (productie is nog
@@ -770,12 +770,12 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 ## Current Position
 
-Phase: 37 of 37–40 (Meten)
-Plan: 6 of 6 (37-01 t/m 37-05 af; nulmeting vastgelegd, vloeren gemeten)
-Status: 37-06 is aan de beurt (secret + eerste Action-run)
-Last activity: 2026-10-11 -- 37-05 klaar (37-NULMETING.md, vloeren 3x, plafonds 10x)
+Phase: 37 of 37–40 (Meten) -- af; volgende: fase 38 (Open deuren begrensd)
+Plan: 6 of 6 (alle plannen af; MEET-01 en MEET-02 bewezen)
+Status: fase 37 compleet; fase 38 nog te plannen
+Last activity: 2026-10-11 -- 37-06 klaar (usage-watch live: rode run 38166434090 gaf mail, groene run 38166644227 als usage_monitor)
 
-Progress: [████████░░] 5/6 plannen fase 37
+Progress: [██████████] 6/6 plannen fase 37
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
