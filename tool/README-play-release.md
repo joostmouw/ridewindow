@@ -200,9 +200,19 @@ Twee dingen die de API zelf zegt, en die het gedrag verklaren:
    ```
 
    `--list-testers` toont internal dus als "(geen testerlijst)" en een
-   `--set-testers` erop faalt. De testerlijst van internal stel je in de Console
-   in, op het tabblad Testers van die track. De poging laat geen halve edit
-   achter: het script gooit de edit weg als de API weigert.
+   `--set-testers` erop faalt. De poging laat geen halve edit achter: het script
+   gooit de edit weg als de API weigert.
+
+   **En internal kent sowieso geen Google Groups.** Google's hulppagina
+   (answer 9845334) beschrijft internal testers als een **e-maillijst**:
+   "Create email list", adressen met komma's of een CSV. De keuze tussen "Email"
+   en "Google Groups" staat alleen bij **closed testing**. Een internal test kan
+   **maximaal 100 testers** hebben (closed: 2.000 per lijst, 200 lijsten).
+
+   Let ook op deze regel uit diezelfde pagina, want hij is niet omkeerbaar
+   zonder actie van de tester: *"A user who opts into your app's internal test
+   is no longer eligible to receive an open or closed test."* Wie meegaat naar
+   internal valt dus van alpha af tot hij zich daar opnieuw voor aanmeldt.
 
 `production` is geen testtrack en heeft dus nooit een testerlijst; `--list-testers`
 toont dat als "(geen testtrack)" in plaats van te knallen op de 400 die de API

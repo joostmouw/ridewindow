@@ -310,32 +310,56 @@ doen; het bericht hoort naar de gewone winkellink te wijzen.
 
 ## Internal als vijfde kanaal voor de groep (2026-10-11)
 
-Joost wilde de groep ook op **internal** zetten, zodat de 91 leden nieuwe builds
-zien zonder de review die alpha wel heeft. Dat kan, maar niet via de API:
+Joost wilde de groep ook op **internal** zetten, zodat de leden nieuwe builds
+zien zonder de review die alpha wel heeft. Dat kan, maar **niet met de Google
+Group**: internal werkt met een e-maillijst.
+
+Wat Google's eigen hulppagina (answer 9845334, nagelezen 2026-10-11) zegt:
+
+- **Internal testers zijn een e-maillijst, geen Google Group.** De hele
+  internal-instructie gaat over "Create email list", adressen met komma's of een
+  CSV. Google Groups staat alleen beschreven bij **closed testing**, met een
+  expliciete keuze tussen "Email" en "Google Groups". Bij internal staat die
+  keuze er niet.
+- **Maximaal 100 testers** op internal, tegen 2.000 per lijst en 200 lijsten bij
+  closed testing. De groep telt er 91, dus dit is krap: hij past, maar er is
+  ruimte voor negen meer.
+- **Opt-in op internal sluit je uit van open en closed.** Letterlijk: *"A user
+  who opts into your app's internal test is no longer eligible to receive an
+  open or closed test"* en *"Users who opt into internal testing aren't eligible
+  for open and closed testing, even if included as testers on those tracks."*
+  Wie dus meegaat naar internal, valt van alpha af tot hij zich daar weer voor
+  aanmeldt. Sinds de productietoegang is verleend maakt dat niet meer uit voor
+  de 12-testerseis, maar het is wel een echte consequentie.
+- **Het opt-in-principe blijft:** op de lijst staan maakt iemand *eligible*, pas
+  na zijn eigen opt-in krijgt hij builds. Google: *"Be included in the managed
+  track configuration"* én *"Actively opt into the corresponding test
+  program"*.
+- **CSV-regels die lijsten slopen:** één adres per regel zonder komma's, een
+  upload **overschrijft** wat er al staat, en UTF-8 met BOM wordt geweigerd
+  (precies wat een spreadsheet bij "CSV UTF-8" maakt).
+
+**Waarom de API het weigerde.** Een schrijfpoging via `--set-testers` gaf:
 
 ```
 403 The internal track has been upgraded to use open or closed testing;
 switch back to communities-based testing before using the API for this track.
 ```
 
-Google heeft de internal-track van deze app gemigreerd naar een nieuwer
-testmodel, en het communities-based testers-endpoint (`edits.testers`) mag daar
-niet meer bij. **Wat dat betekent:**
+Die track is dus gemigreerd naar het e-maillijst-model, en het
+communities-based testers-endpoint (`edits.testers`) mag er niet meer bij. Dat
+verklaart ook waarom `--list-testers` internal als "(geen testerlijst)" toont en
+alpha wél de groep laat zien: alpha is nog wel communities-based.
 
-- **Via de Console kan het wel:** internal testing > tabblad Testers > de groep
-  `ridewindow-testers@googlegroups.com` toevoegen. Eenmalig handwerk.
-- **Wat er dan verandert:** internal heeft géén review, dus een nieuwe build is
-  binnen minuten bij de leden in plaats van na dagen. Alpha blijft de track die
-  Google telt voor de productie-eis.
-- **Alpha is ongewijzigd.** Daar staat de groep al, en `--list-testers` laat dat
-  zien. `--set-testers` werkt voor alpha en beta; alleen internal weigert.
-- **De API kent geen losse adressen**, alleen Google Groups. Dat zegt de
-  API-documentatie zelf: *"Testers resource does not support email lists"*.
+**Wat dit praktisch betekent.** Voor internal moet Joost in de Console een
+e-maillijst maken van de groepsadressen (max 100). Maar de vraag is of dat nog
+iets toevoegt: zodra de app in productie staat, installeert iedereen hem uit de
+winkel en is de testtrack nergens meer voor nodig. Google: *"All users are
+eligible to receive the Production track"*, en een hogere versionCode in
+productie overschaduwt de testtrack.
 
-De tool kreeg hiervoor `--list-testers` en `--set-testers` (zie
-`tool/README-play-release.md`). De leesvariant werkt op alle tracks en is de
-manier om te controleren welke lijst een track voedt zonder de Console te
-openen.
+De tool kreeg `--list-testers` en `--set-testers` voor de tracks waar het wel
+kan; zie `tool/README-play-release.md`.
 
 **Openstaand:** `.planning/TESTERS.md` noemt zelf al drie adressen
 (`joostmouw@gmail.com`, `Andrea.farina@goflink.com`,
