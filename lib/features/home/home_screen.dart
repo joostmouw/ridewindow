@@ -54,6 +54,7 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
+import 'package:ridewindow/app/window_size.dart';
 
 /// Vorm van een ride-kaart. De Dismissible-clip, de kaartrand en de
 /// InkWell-ripple gebruiken dezelfde waarden, zodat je precies het blokje
@@ -99,6 +100,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// dan die je hebt aangetikt.
   final Map<DateTime, bool> _cardExpanded = {};
 
+  /// Het venster dat rechts in het detailpaneel staat, op begintijd (alleen
+  /// vanaf expanded, quick-plan 261011-jru). Los van [_selectedDay], dat het
+  /// dagfilter is. null = het beste venster, zoals Gmail het eerste bericht
+  /// al open heeft; valt de keuze door een filter weg, dan ook terug naar het
+  /// beste. Sleutel is de begintijd, om dezelfde reden als bij [_cardExpanded].
+  DateTime? _paneSlotStart;
+
   /// Toont RIDE TIMES de volledige lijst in plaats van alleen de beste
   /// [_kVisibleSlotCount]?
   ///
@@ -118,6 +126,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// tier met de beste vooraan, dus dit zijn ook echt de vijf beste — en bij een
   /// actief filter de vijf beste bínnen die selectie.
   static const _kVisibleSlotCount = 5;
+
+  /// Breedte van de lijst links vanaf expanded (quick-plan 261011-jru).
+  static const double _kListPaneWidth = 400;
 
   /// Hoeveel geplande ritten PLANNED standaard toont. Lager dan bij de
   /// tijdvakken omdat dit geen keuzelijst is maar een geheugensteun: wat komt
@@ -284,7 +295,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Stack(
       children: [
         Scaffold(
-          body: RefreshIndicator(
+          // Telefoon en medium: alleen de lijst, precies zoals altijd. Vanaf
+          // expanded komt het gekozen venster ernaast (quick-plan 261011-jru).
+          body: _withDetailPane(slotsState, RefreshIndicator(
             color: cs.primary,
             onRefresh: () => ref.refresh(weatherProvider.future),
             edgeOffset:
@@ -397,6 +410,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const SliverPadding(padding: EdgeInsets.only(bottom: 16)),
               ],
             ),
+          ),
           ),
         ),
         if (_showHints)
@@ -1115,6 +1129,110 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   // ---------------------------------------------------------------------------
+  // Lijst plus detail vanaf expanded (quick-plan 261011-jru)
+  // ---------------------------------------------------------------------------
+
+  /// Zet vanaf expanded het detailpaneel naast [list], zoals Gmail op een
+  /// tablet: de lijst links op vaste breedte, het gekozen venster rechts. Kop,
+  /// banners, dagstrook en filters horen bij de lijst. Op telefoon en medium
+  /// komt [list] ongewijzigd terug.
+  Widget _withDetailPane(SlotsState slotsState, Widget list) {
+    if (windowSizeClassOf(context) != WindowSizeClass.expanded) return list;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(width: _kListPaneWidth, child: list),
+        const VerticalDivider(width: 1),
+        Expanded(
+          child: KeyedSubtree(
+            key: const ValueKey('home_detail_pane'),
+            child: _buildDetailPane(slotsState),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// De vensters die RIDE TIMES toont, na de drie filters (al gepland, dag,
+  /// dagdeel) en nog ongesorteerd. Eén plek, zodat de lijst en het
+  /// detailpaneel altijd over dezelfde vensters gaan.
+  ({List<RideSlot> slots, List<RideSlot> candidates}) _listedSlots(
+    SlotsLoaded state,
+  ) {
+    // Filter out already-planned rides
+    final planned =
+        ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
+    // Dezelfde drie filters over twee lijsten: de opgeschoonde vensters die
+    // je ziet, en de vensters van vóór `dedup` die alleen de regel "hoe lang
+    // kan ik weg" voeden. Zouden die twee verschillend gefilterd worden, dan
+    // kan de blokweergave een ritduur noemen die door het periodefilter net
+    // is weggevallen.
+    List<RideSlot> applyFilters(List<RideSlot> input) {
+      var out = input
+          .where((s) =>
+              !planned.any((r) => r.start == s.start && r.end == s.end))
+          .toList();
+      if (_selectedDay != null) {
+        out = out
+            .where((s) =>
+                s.start.year == _selectedDay!.year &&
+                s.start.month == _selectedDay!.month &&
+                s.start.day == _selectedDay!.day)
+            .toList();
+      }
+      return out.where(_slotMatchesPeriod).toList();
+    }
+
+    return (
+      slots: applyFilters(state.slots),
+      candidates: applyFilters(state.candidates),
+    );
+  }
+
+  /// Het venster in het detailpaneel: de keuze van de gebruiker als die nog in
+  /// de lijst staat, anders het beste. null als er niets te tonen valt.
+  ({RideSlot slot, bool isBest})? _paneSelection(SlotsState slotsState) {
+    if (slotsState is! SlotsLoaded) return null;
+    final slots = _listedSlots(slotsState).slots;
+    if (slots.isEmpty) return null;
+    final bestIdx = indexOfBestSlot(slots);
+    if (bestIdx < 0) return null;
+    var idx = _paneSlotStart == null
+        ? -1
+        : slots.indexWhere((s) => s.start == _paneSlotStart);
+    if (idx < 0) idx = bestIdx;
+    final bestTier = slots[bestIdx].tier;
+    return (
+      slot: slots[idx],
+      // Dezelfde regel als in de lijst: alleen een Perfect- of Great-venster
+      // draagt het "beste keuze"-label.
+      isBest: idx == bestIdx && (bestTier is Perfect || bestTier is Great),
+    );
+  }
+
+  /// Het rechterpaneel: de uitgeklapte ritkaart van het gekozen venster. De
+  /// tik daarop opent nog steeds `/detail` -- bewust geen tweede
+  /// detailweergave om te onderhouden. Leeg als er geen venster is.
+  Widget _buildDetailPane(SlotsState slotsState) {
+    final selection = _paneSelection(slotsState);
+    if (selection == null) return const SizedBox.shrink();
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: kReadableMaxWidth),
+          child: _buildRideCard(
+            selection.slot,
+            isBest: selection.isBest,
+            inPane: true,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // Cards section (as sliver)
   // ---------------------------------------------------------------------------
 
@@ -1173,32 +1291,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         );
       }
 
-      // Filter out already-planned rides
-      final planned =
-          ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
-      // Dezelfde drie filters over twee lijsten: de opgeschoonde vensters die
-      // je ziet, en de vensters van vóór `dedup` die alleen de regel "hoe lang
-      // kan ik weg" voeden. Zouden die twee verschillend gefilterd worden, dan
-      // kan de blokweergave een ritduur noemen die door het periodefilter net
-      // is weggevallen.
-      List<RideSlot> applyFilters(List<RideSlot> input) {
-        var out = input
-            .where((s) =>
-                !planned.any((r) => r.start == s.start && r.end == s.end))
-            .toList();
-        if (_selectedDay != null) {
-          out = out
-              .where((s) =>
-                  s.start.year == _selectedDay!.year &&
-                  s.start.month == _selectedDay!.month &&
-                  s.start.day == _selectedDay!.day)
-              .toList();
-        }
-        return out.where(_slotMatchesPeriod).toList();
-      }
-
-      var slots = applyFilters(slotsState.slots);
-      final candidates = applyFilters(slotsState.candidates);
+      final listed = _listedSlots(slotsState);
+      var slots = listed.slots;
+      final candidates = listed.candidates;
 
       if (slots.isEmpty &&
           (_selectedDay != null || _activePeriods.length < 3)) {
@@ -1346,6 +1441,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // je hier zou boeken.
           onTap: () {
             HapticFeedback.selectionClick();
+            // Vanaf expanded naar het detailpaneel in plaats van een nieuw
+            // scherm (quick-plan 261011-jru).
+            if (windowSizeClassOf(context) == WindowSizeClass.expanded) {
+              setState(() => _paneSlotStart = day.best.start);
+              return;
+            }
             final forecasts = ref
                     .read(weatherProvider)
                     .value
@@ -1587,8 +1688,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // Ride card — M3 Expressive
   // ---------------------------------------------------------------------------
 
-  Widget _buildRideCard(RideSlot slot, {bool isBest = false}) {
+  Widget _buildRideCard(
+    RideSlot slot, {
+    bool isBest = false,
+    bool inPane = false,
+  }) {
     final cs = Theme.of(context).colorScheme;
+    // Vanaf expanded staat de lijst naast het detailpaneel (quick-plan
+    // 261011-jru): een tik kiest het venster voor rechts in plaats van te
+    // pushen, en de gekozen kaart krijgt een rand zoals in Gmail.
+    final twoPane =
+        !inPane && windowSizeClassOf(context) == WindowSizeClass.expanded;
+    final selected = twoPane &&
+        _paneSelection(ref.read(slotsProvider))?.slot.start == slot.start;
     final weatherState = ref.watch(weatherProvider);
 
     final allForecasts =
@@ -1641,7 +1753,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     // Standaard: de beste open, de rest dicht. Zodra de gebruiker zelf een
     // kaart heeft aangetikt wint die keuze — ook op de beste kaart.
-    final isExpanded = _cardExpanded[slot.start] ?? isBest;
+    //
+    // In het detailpaneel is de kaart altijd open (het paneel ís het
+    // uitgeklapte venster); in de lijst ernaast begint alles dicht, want het
+    // detail staat al rechts.
+    final isExpanded =
+        inPane || (_cardExpanded[slot.start] ?? (twoPane ? false : isBest));
 
     // Alle kaarten dezelfde marge. De beste kaart had er onderaan extra, omdat
     // zijn slagschaduw anders over de kaart eronder viel; die schaduw is er
@@ -1741,7 +1858,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 color: cs.surfaceContainerLowest,
                 shape: RoundedRectangleBorder(
                   borderRadius: radius,
-                  side: BorderSide(color: cs.surfaceContainerHigh),
+                  side: selected
+                      ? BorderSide(color: cs.primary, width: 2)
+                      : BorderSide(color: cs.surfaceContainerHigh),
                 ),
                 child: Stack(
                   children: [
@@ -1749,6 +1868,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       borderRadius: radius,
                       onTap: () {
                         HapticFeedback.selectionClick();
+                        if (twoPane) {
+                          setState(() => _paneSlotStart = slot.start);
+                          return;
+                        }
                         context.push(
                           '/detail',
                           extra: DetailArgs(
@@ -1905,11 +2028,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         avgWind: avgWind,
                                       ),
                                     ),
-                                    _buildExpandToggle(slot, expanded: false),
+                                    if (!inPane)
+                                      _buildExpandToggle(
+                                        slot,
+                                        expanded: false,
+                                      ),
                                   ],
                                 ),
                               ),
-                              if (isExpanded)
+                              if (isExpanded && !inPane)
                                 _buildExpandToggle(slot, expanded: true),
                             ],
                             SizedBox(height: isExpanded ? 14 : 6),
