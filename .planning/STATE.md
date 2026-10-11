@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
-last_updated: "2026-10-09"
-last_activity: 2026-10-09
+last_updated: "2026-10-11"
+last_activity: 2026-10-11
 progress:
   total_phases: 12
   completed_phases: 6
@@ -14,6 +14,35 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-10-11 -- productietoegang verleend, 67 klaar
+
+| Waar | Stand |
+|---|---|
+| Productie | **Toegang verleend op 2026-10-11.** De track is nog **leeg**: de app staat dus nog niet in de winkel en is nog niet downloadbaar |
+| Internal | **1.0.55 (66)**; 1.0.56 (67) is gebouwd en wacht op upload |
+| PWA | **1.0.55 (66)**; 67 volgt bij de push, want CI deployt op elke push naar `main` die `lib/**` raakt |
+| Oppo | **1.0.55 (66)** via Play |
+| Alpha / closed | **1.0.55 (66)**, 75 testers |
+| main | **1.0.56+67**, lokaal gecommit (`963e2f9`), nog niet gepusht |
+
+**Wat 67 brengt:** gedeelde ritten en groepen openen op een lokale
+SharedPreferences-kopie, dus de PLANNED-kaartjes staan er bij een koude start
+meteen in plaats van een Supabase-rondgang later. Een mislukte verversing laat
+de kopie staan. Details in `.planning/quick/261009-gedeelde-ritten-cache/`.
+
+**Waarom 67 en niet simpelweg 66 promoveren:** de koude-start-fix is precies de
+eerste indruk van een verse gebruiker, en de eerste productie-release is de
+enige waarbij iedereen die indruk voor het eerst krijgt.
+
+**Releasebewijs:** suite 1099 groen; analyze 0 errors, 0 warnings, 214 infos;
+AAB gebouwd (71,5 MB).
+
+**Wat nog moet, in deze volgorde:** push (op Joosts sein) en daarmee de
+PWA-deploy, upload naar internal, toestelcontrole op de Oppo, promotie naar
+alpha, dan de productie-upload. Die laatste is nieuw terrein: het
+service-account heeft het productierecht nog niet (zie `OPEN.md`, bovenste
+sectie).
 
 ## Stand na 2026-10-09 (middag) -- productie-aanvraag ingediend
 

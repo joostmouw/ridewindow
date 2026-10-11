@@ -255,3 +255,36 @@ groepsroute.
   handmatig toegevoegde adressen). Zie de vondst hierboven.
 - De Console-teller is vanaf nu het dagelijkse meetpunt (WERV-04: vijftien
   aangemeld).
+
+## De testerlijst staat sinds 2026-10-11 buiten de repo
+
+De adressen staan in `~/.config/ridewindow/testers/` (README, `testers.csv`, en
+het productiebericht in beide talen), naast de Play- en Supabase-sleutel. **Deze
+repo is openbaar**, dus een ledenlijst met twintig e-mailadressen hoort hier niet
+in: git-historie is niet meer weg te halen zodra iets gepusht is. De prijs is
+dat die map niet in git zit en dus niet meegaat naar een andere machine; de bron
+is opnieuw op te halen uit de Google Group en de Play Console, en de README
+beschrijft hoe.
+
+**Wat die export opleverde, en wat er niet klopt aan "twintig testers":**
+
+- De Google Group telt **20 testers plus Joost als eigenaar** (21 rijen).
+- Daarvan zijn er **16 via de groep te bereiken**: `e.j.heineke@gmail.com`
+  bounct, en `fajisfajar@gmail.com` en `hatshiljodhani@gmail.com` hebben de
+  groep op "no email" staan. Die drie hebben een eigen mail nodig.
+- De Play Console toont **75 testers** op de gesloten test. Die 55 anderen zijn
+  losse adressen in de Console, niet in de groep, en dus ook niet in de export.
+  Wie ze zijn is nergens vastgelegd.
+- Van de twee exports in `~/Downloads/` is die van **18:15** de volledige; die
+  van 17:32 mist `dev.soliman`, `hatshiljodhani` en `markdenis.dev`, die zich
+  daarna aanmeldden.
+- `andrea.farina42@gmail.com` en `andrea.farina@goflink.com` zijn één persoon
+  met twee adressen, dus de groep telt 20 rijen maar 19 mensen.
+- **Ingrid**, wier feedback tot #68, #69 en #70 leidde, is in deze lijst niet
+  aan te wijzen. Haar adres staat nergens in de repo; zoek dat in de Console op
+  voordat een bericht naar haar verwijst.
+
+**Openstaand:** `.planning/TESTERS.md` noemt zelf al drie adressen
+(`joostmouw@gmail.com`, `Andrea.farina@goflink.com`,
+`andrea.farina42@gmail.com`) en die staan dus publiek. Weghalen kan alleen met
+een historie-rewrite. Zolang het er staat: zet er geen nieuwe bij.

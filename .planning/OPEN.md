@@ -35,27 +35,41 @@ en wat de volgende stap is.
 
 ---
 
-## Productie-aanvraag loopt — randvoorwaarden tot de uitslag (2026-10-09)
+## Productietoegang verleend — de app is nog niet live (2026-10-11)
 
-**"Apply for access to production" is ingediend op 2026-10-09 om 15:53.** Google
-beoordeelt het formulier en mailt de account-eigenaar; meestal binnen zeven
-dagen, soms langer. De antwoordteksten zijn opgesteld vanuit `TESTERS.md`,
-`BACKLOG.md`, `docs/testers/changelog.md` en de debug-dossiers, dus elke claim
-daarin is hier te staven.
+**De aanvraag van 2026-10-09 15:53 is gehonoreerd.** Google: *"Your app has been
+granted Google Play production access."* De twee dingen die dat wél en níét
+betekenen, want die lopen hier makkelijk door elkaar:
 
-Tot de uitslag binnen is:
+- **Wél:** de productietrack is ontgrendeld. `--list-tracks` toont hem nu naast
+  beta en alpha, en open testing is beschikbaar.
+- **Niet:** de app staat nog niet in de winkel. De productietrack is **leeg**;
+  er is nog geen enkele release op. Publiceren is een aparte handeling, en pas
+  daarna kan iemand hem downloaden.
 
-- **Niets aan de track-opzet veranderen** — geen testers verwijderen, alpha niet
-  sluiten of pauzeren, de winkellijst laten staan.
-- **Blijven releasen volgens de vaste route.** Een test die na de aanvraag
-  doodvalt is een bekende afkeurbron. Een fix bouwen kan altijd; of je hem
-  tijdens de review ook uitrolt is een afweging per geval.
-- **Bij afkeuring:** de twee redenen die Google zelf noemt staan in punt 16
-  (te weinig testers, onvoldoende betrokkenheid). Wordt iets over onbereikbare
-  functionaliteit genoemd, dan zijn testcredentials de eerste stap — de app
-  werkt uitgelogd, maar Peloton niet.
-- **Bij goedkeuring:** dezelfde bytes promoveren naar productie via
-  `tool/play_upload.dart`, en BACKLOG #76 (LinkedIn-lanceerpost) komt in beeld.
+De randvoorwaarden van tijdens de review (niets aan de track-opzet veranderen,
+blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
+
+- **Eerste productie-release: 1.0.56 (67)**, met de koude-start-fix. Gekozen op
+  2026-10-11 boven het simpelweg promoveren van 66, omdat de eerste indruk van
+  een verse gebruiker precies is wat die fix verbetert.
+- **Het service-account mag nog geen productie-upload.** De inrichting in
+  `tool/README-play-release.md` zet bewust alleen "Release apps to testing
+  tracks" aan. Productie vraagt een tweede uitnodiging met dat recht; zonder
+  dat geeft `--track production` een 403.
+- **Eerste upload als concept** (`--status draft`), dan de eenmalige
+  productie-instellingen in de Console nalopen (landen, uitrolpercentage,
+  app-content-verklaringen), dan publiceren.
+- **BACKLOG #76 (LinkedIn-lanceerpost) komt in beeld** zodra de release
+  gepubliceerd is, niet eerder.
+- **Het testerbericht wacht op de publicatie.** "We staan live in de winkel"
+  is onwaar zolang de productietrack leeg is; de link werkt dan nog niet voor
+  wie geen tester is.
+
+**Twee dingen die bij de eerste productie-release nieuw zijn en nergens anders
+in de route staan:** de productie-track heeft een eigen review (bij internal
+niet), en een uitrolpercentage en landenselectie die de testtracks niet kennen.
+Beide zijn eenmalig handwerk in de Console.
 
 ---
 
