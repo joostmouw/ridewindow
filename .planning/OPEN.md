@@ -53,8 +53,23 @@ blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
 - **Eerste productie-release: 1.0.56 (67)**, met de koude-start-fix. Gekozen op
   2026-10-11 boven het simpelweg promoveren van 66, omdat de eerste indruk van
   een verse gebruiker precies is wat die fix verbetert. **Stand:** 67 staat op
-  internal en op de PWA; de toestelcontrole op de Oppo en de promotie naar
-  alpha staan nog open.
+  internal en op de PWA, en is op de Oppo bewezen (koude start met wifi en data
+  uit: de gedeelde ritten en groepen stonden er). De promotie naar alpha staat
+  nog open, omdat hieronder eerst een beslissing ligt.
+- **Beslissing die de eerste productie-build bepaalt: 67, of eerst 68?** Dezelfde
+  offline proef op de Oppo liet zien dat de **maatjeslijst** nog geen cache heeft
+  (`friends` in `peloton_providers.dart`, dezelfde vorm die `groupRides` en
+  `visibleGroups` vóór 9 oktober hadden). Dat is klein werk en het is de enige
+  overgebleven netwerk-only lijstprovider op die tab. Zie punt c verderop. De
+  productietrack is nog leeg, dus wachten kost niets en er staat nog niets
+  publiek. Advies: eerst 68, dan publiceren.
+- **Internal als kanaal voor de groep: onderzocht, advies is overslaan.** Google
+  kent internal testers als **e-maillijst** (max 100), niet als Google Group; de
+  API weigert er zelfs bij (403, track gemigreerd). Wie voor internal opte-int
+  valt bovendien van alpha af. Zodra de app in productie staat is internal
+  nergens meer voor nodig, want iedereen is dan eligible voor productie. Joost
+  pakt dit later op met Claude als hij er alsnog door wil; de volledige
+  uitwerking staat in `.planning/TESTERS.md`.
 - **Het service-account mag nog geen productie-upload.** De inrichting in
   `tool/README-play-release.md` zet bewust alleen "Release apps to testing
   tracks" aan. Productie vraagt een tweede uitnodiging met dat recht; zonder
