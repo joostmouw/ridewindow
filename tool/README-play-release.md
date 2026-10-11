@@ -175,6 +175,48 @@ de winkel als "…" eindigt.
 | `--dry-run` | — | Controleert alles en logt in, schrijft niets |
 | `--force` | — | Negeert de staleness-vangrail |
 
+## Naar productie: één recht dat er nog niet is (nagegaan 2026-10-11)
+
+Een promotie van 68 naar `production --status draft` faalde met:
+
+```
+✓ Track "production" wijst nu naar 68
+✗ Mislukt: DetailedApiRequestError(status: 403, message: The caller does not
+  have permission)
+  Edit 07786028926852601464 is opgeruimd.
+```
+
+De edit is weggegooid, dus er staat niets half in de Console. **Wat dit wel en
+niet betekent:**
+
+- **Niet** dat het script of de sleutel stuk is: dezelfde aanroep zette 68
+  seconden eerder op internal, en `--list-tracks` en `--list-testers` werken.
+- **Wel** dat dit specifiek het productierecht mist. Dat is de bewuste keuze
+  uit stap 5 van de inrichting hierboven: het account kreeg alleen *"Release
+  apps to testing tracks"*, zodat een gelekt sleutel geen publieke release kan
+  publiceren.
+- De 403 komt pas bij de **commit**, niet bij het openen van de edit of het
+  bijwerken van de track. Een `--dry-run` voorspelt dit dus niet: die stopt
+  vóór de eerste schrijfactie. Reken erop dat je het pas weet als je het echt
+  probeert, en dat dat veilig is omdat het script de edit opruimt.
+
+**Zo zet je het recht aan (Joosts hand, een rechtenwijziging op zijn account):**
+
+1. Play Console → **Users and permissions**.
+2. Open de rij van `play-release-uploader@my-project-joost.iam.gserviceaccount.com`.
+3. Tabblad **App permissions** → **Ridewindow**.
+4. Onder **Releases**: zet *Release to production, exclude devices, and use Play
+   App Signing* aan, naast het bestaande *Release apps to testing tracks*.
+5. Opslaan. Rechten kunnen tot ~24 uur nodig hebben; meestal is het sneller.
+6. Verifiëren: `dart run tool/play_upload.dart --promote 68 --track production
+   --status draft --notes en-US:release-notes/en-US.txt --notes
+   nl-NL:release-notes/nl-NL.txt`. Lukt hij, dan staat 68 als concept op
+   productie en kun je in de Console de eenmalige instellingen nalopen.
+
+**Daarna het recht weer weghalen** is de middenweg die de inrichting zelf
+aanraadt: één release naar productie vraagt het één keer, en daarna kan de
+sleutel weer niets publiek maken.
+
 ## Testerlijsten: alleen Google Groups, en internal kan niet via de API
 
 ```bash

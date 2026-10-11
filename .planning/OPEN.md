@@ -62,10 +62,16 @@ blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
   nergens meer voor nodig, want iedereen is dan eligible voor productie. Joost
   pakt dit later op met Claude als hij er alsnog door wil; de volledige
   uitwerking staat in `.planning/TESTERS.md`.
-- **Het service-account mag nog geen productie-upload.** De inrichting in
-  `tool/README-play-release.md` zet bewust alleen "Release apps to testing
-  tracks" aan. Productie vraagt een tweede uitnodiging met dat recht; zonder
-  dat geeft `--track production` een 403.
+- **Het service-account mag nog geen productie-upload.** Op 2026-10-11 gemeten,
+  niet aangenomen: een promotie van 68 naar `production --status draft` gaf een
+  **403 bij de commit** ("The caller does not have permission"), waarna de edit
+  werd opgeruimd. Dezelfde aanroep zette 68 kort daarvoor zonder klagen op
+  internal, dus het is specifiek het productierecht dat de inrichting bewust
+  niet heeft meegegeven. De klik-voor-klik staat in
+  `tool/README-play-release.md` onder "Naar productie".
+  **Let op:** een `--dry-run` voorspelt dit niet, want die stopt vóór de eerste
+  schrijfactie. Het script ruimt bij een weigering de edit op, dus proberen is
+  veilig.
 - **Eerste upload als concept** (`--status draft`), dan de eenmalige
   productie-instellingen in de Console nalopen (landen, uitrolpercentage,
   app-content-verklaringen), dan publiceren.

@@ -38,8 +38,9 @@ zegt 68. AAB SHA-256:
 
 **Wat nog moet:** de Oppo-controle van 68 (koude start met wifi en data uit: nu
 horen ook de maatjes er te staan), dan de promotie naar alpha, dan de
-productie-upload. Die laatste vraagt eerst het productierecht op het
-service-account.
+productie-upload. Die laatste is gemeten op 2026-10-11: hij geeft een 403 bij de
+commit, want het service-account heeft het productierecht niet. De klik-voor-
+klik staat in `tool/README-play-release.md`.
 
 ## Stand na 2026-10-11 -- productietoegang verleend, 67 klaar
 
