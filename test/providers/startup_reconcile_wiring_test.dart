@@ -92,6 +92,7 @@ class _CountingSyncOutboxService extends SyncOutboxService {
       Map<String, dynamic> payload,
     ) upsertFn,
     required Future<void> Function(String entity, String entityKey) deleteFn,
+    void Function(RateLimitedRefusal refusal)? onRateLimited,
   }) async {
     drainCount++;
   }

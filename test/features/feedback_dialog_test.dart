@@ -14,6 +14,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/providers/app_database_provider.dart';
@@ -89,6 +90,7 @@ class _RecordingSyncOutboxService extends SyncOutboxService {
       Map<String, dynamic> payload,
     ) upsertFn,
     required Future<void> Function(String entity, String entityKey) deleteFn,
+    void Function(RateLimitedRefusal refusal)? onRateLimited,
   }) async {
     drainCalled = true;
   }
@@ -166,6 +168,41 @@ void main() {
     // Een lege reactie wordt null en niet de lege string: dan is in de database
     // te zien dat er niets is ingevuld, in plaats van dat het leeg lijkt.
     expect(row['comment'], isNull);
+  });
+
+  test(
+      'Test 3b — device_id gaat mee als hij bestaat en blijft weg als hij niet '
+      'bestaat (fase 38, D-08)',
+      () {
+    final withDevice = buildFeedbackRow(
+      id: 'ffffffff-ffff-4fff-bfff-ffffffffffff',
+      userId: null,
+      rating: 4,
+      comment: 'goede rit',
+      context: const {},
+      deviceId: '11111111-1111-4111-8111-111111111111',
+    );
+    expect(
+      withDevice['device_id'],
+      '11111111-1111-4111-8111-111111111111',
+      reason: 'zonder id telt 0016 alleen de afzender, en dat is zwakker '
+          'dan de bedoeling van het toestelplafond',
+    );
+
+    final withoutDevice = buildFeedbackRow(
+      id: 'ffffffff-ffff-4fff-bfff-ffffffffffff',
+      userId: null,
+      rating: 3,
+      comment: '   ',
+      context: const {},
+    );
+    expect(
+      withoutDevice.containsKey('device_id'),
+      isFalse,
+      reason: 'de sleutel weglaten is geen leugen maar de exacte vorm van '
+          'builds van vóór deze fase: een lege string of null meesturen '
+          'zou in de database een andere betekenis krijgen dan "afwezig"',
+    );
   });
 
   testWidgets('Test 4 — dialoog toont titel en vijf sterren', (tester) async {
@@ -247,6 +284,12 @@ void main() {
     // De outbox blijft de vangnetlaag -- mislukt de drain, dan blijft de rij
     // staan voor de volgende. Wat hier bewaakt wordt is dat de poging
     // überhaupt gedaan wordt.
+    //
+    // Sinds fase 38 leest `_submit` het feedback-toestel-id uit
+    // SharedPreferences vóór de enqueue. Zonder mock-waarden lost die lookup
+    // in een widgettest nooit op (het platformkanaal antwoordt niet), blijft
+    // de hele `_submit`-keten hangen vóór de enqueue, en is de outbox leeg.
+    SharedPreferences.setMockInitialValues({});
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     final outbox = _RecordingSyncOutboxService(db.syncOutboxDao);

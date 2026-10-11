@@ -52,11 +52,15 @@ class FeedbackService {
   /// zou dat betekenen dat je tweede bericht je eerste overschrijft. Een verse
   /// id per inzending zet die samenvoeging uit, terwijl een herhaalde poging op
   /// dezelfde id wél samenvalt.
+  ///
+  /// [deviceId] is het toestel-id van fase 38 (D-08) en mag `null` zijn; de
+  /// rij gaat er dan zonder, zoals bij builds van vóór deze fase.
   Future<String> submit({
     required String? userId,
     required int rating,
     required String comment,
     required Map<String, dynamic> context,
+    String? deviceId,
   }) async {
     final id = _uuidV4();
     final row = buildFeedbackRow(
@@ -65,6 +69,7 @@ class FeedbackService {
       rating: rating,
       comment: comment,
       context: context,
+      deviceId: deviceId,
     );
 
     await _outbox.enqueueOrCoalesce(

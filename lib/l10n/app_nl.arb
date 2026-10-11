@@ -572,6 +572,7 @@
   "@pelotonAutoJoined": {"placeholders": {"name": {"type": "String"}}},
   "feedbackThanks": "Dank je, je feedback is onderweg.",
   "feedbackFailed": "Je feedback kon niet worden opgeslagen. Probeer het opnieuw.",
+  "feedbackRateLimited": "Je feedback is bewaard op dit toestel en gaat later automatisch opnieuw. Voor vandaag is de daglimiet bereikt.",
   "scoreSemanticLabel": "Score {score} van 100, {tier}",
   "@scoreSemanticLabel": {"placeholders": {"score": {"type": "int"}, "tier": {"type": "String"}}},
   "pelotonFriendAdded": "{name} is nu je maatje",

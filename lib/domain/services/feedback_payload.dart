@@ -78,12 +78,20 @@ Map<String, dynamic> buildFeedbackContext({
 /// in de lokale outbox belandt (FB-04). De outbox sleutelt op die id, zodat twee
 /// keer versturen twee rijen oplevert en een herhaalde poging na een mislukte
 /// verzending er precies één.
+///
+/// [deviceId] is het toestel-id van fase 38 (D-08): de database telt er zijn
+/// feedback-dagplafond mee (0016). `null` laten kan en mag -- builds van vóór
+/// deze fase sturen hem niet, en zo'n rij is gewoon begrensd op de afzender.
+/// Daarom staat de sleutel er wél in als hij bestaat en ontbreekt hij
+/// volledig als hij `null` is: geen lege string sturen, dat is in de database
+/// een andere waarde dan "afwezig".
 Map<String, dynamic> buildFeedbackRow({
   required String id,
   required String? userId,
   required int rating,
   required String comment,
   required Map<String, dynamic> context,
+  String? deviceId,
 }) {
   final trimmed = comment.trim();
   return {
@@ -92,5 +100,6 @@ Map<String, dynamic> buildFeedbackRow({
     'rating': rating,
     'comment': trimmed.isEmpty ? null : trimmed,
     'context': context,
+    if (deviceId != null) 'device_id': deviceId,
   };
 }

@@ -1745,6 +1745,10 @@ class SNl extends S {
       'Je feedback kon niet worden opgeslagen. Probeer het opnieuw.';
 
   @override
+  String get feedbackRateLimited =>
+      'Je feedback is bewaard op dit toestel en gaat later automatisch opnieuw. Voor vandaag is de daglimiet bereikt.';
+
+  @override
   String scoreSemanticLabel(int score, String tier) {
     return 'Score $score van 100, $tier';
   }

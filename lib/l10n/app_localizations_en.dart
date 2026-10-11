@@ -1740,6 +1740,10 @@ class SEn extends S {
   String get feedbackFailed => 'Couldn\'t save your feedback. Try again.';
 
   @override
+  String get feedbackRateLimited =>
+      'Your feedback is saved on this device and will be sent again later. The daily limit has been reached for today.';
+
+  @override
   String scoreSemanticLabel(int score, String tier) {
     return 'Score $score of 100, $tier';
   }

@@ -77,6 +77,10 @@ class _FakeGateway implements CloudSyncGateway {
   /// Wat `profiles` teruggeeft. Default `null` (geen cloud-rij).
   Map<String, dynamic>? profileRow;
 
+  /// Niet-null: elke `insertRow` gooit dit (fase 38: de database weigerde
+  /// boven het dagplafond, of welke cloudfout dan ook).
+  Object? insertError;
+
   final deletedRideIds = <String>[];
 
   @override
@@ -111,6 +115,7 @@ class _FakeGateway implements CloudSyncGateway {
   @override
   Future<void> insertRow(String table, Map<String, dynamic> payload) async {
     _log.add('insertRow:$table');
+    if (insertError != null) throw insertError!;
   }
 
   @override
@@ -139,6 +144,7 @@ class _LoggingSyncOutboxService extends SyncOutboxService {
       Map<String, dynamic> payload,
     ) upsertFn,
     required Future<void> Function(String entity, String entityKey) deleteFn,
+    void Function(RateLimitedRefusal refusal)? onRateLimited,
   }) async {
     _log.add('drain');
   }
@@ -269,6 +275,138 @@ void main() {
         await reconcilerIn(container).reconcileOnForeground();
 
         expect(log.events, contains('insertRow:feedback'));
+      },
+    );
+  });
+
+  group('feedback-weigering (fase 38, RATE-05, plan 38-02)', () {
+    /// Zelfde vorm als `containerWithRealOutbox` hierboven: de échte
+    /// SyncOutboxService, want hier wordt getoetst wat de drain doet met een
+    /// geweigerde rij -- de no-op-fake meet dat niet.
+    ProviderContainer containerWithRealOutbox(Stream<User?> authStream) {
+      final container = ProviderContainer(
+        overrides: [
+          authStateProvider.overrideWith((ref) => authStream),
+          syncOutboxServiceProvider
+              .overrideWith((ref) => SyncOutboxService(db.syncOutboxDao)),
+          appDatabaseProvider.overrideWith((ref) => db),
+          cloudSyncReconcilerProvider.overrideWith(
+            (ref) => CloudSyncReconciler(ref, gateway: gateway),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final sub = container.listen(authStateProvider, (_, __) {});
+      addTearDown(sub.close);
+      return container;
+    }
+
+    test(
+      'een door het dagplafond geweigerde feedbackrij blijft pending, telt '
+      'geen poging en stijgt de teller van de app-root met precies één',
+      () async {
+        await db.syncOutboxDao.enqueueOrCoalesce(
+          entity: kOutboxEntityFeedback,
+          entityKey: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',
+          operation: 'upsert',
+          payload: '{"id":"bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb","rating":5}',
+        );
+        gateway.insertError = Exception(
+          'PostgrestException(message: rw_rate_limited:feedback:sender, '
+          'code: 42900, details: null, hint: null)',
+        );
+
+        final container = containerWithRealOutbox(Stream<User?>.value(null));
+        await Future<void>.delayed(Duration.zero);
+
+        await reconcilerIn(container).drainOutbox();
+
+        final remaining = await db.syncOutboxDao.pendingRows();
+        expect(
+          remaining,
+          hasLength(1),
+          reason: 'de rij is bewaard en gaat later opnieuw (RATE-05)',
+        );
+        expect(
+          remaining.single.attempts,
+          0,
+          reason: 'anders dropt de vijf-pogingen-regel hem binnen een dag, '
+              'en dat is precies de fout die F-03 uitsluit',
+        );
+        expect(
+          container.read(feedbackRateLimitedProvider),
+          1,
+          reason: 'de app-root toont hieraan precies één melding',
+        );
+      },
+    );
+
+    test(
+      'een geweigerde analytics-rij blijft óók pending, maar is stil: de '
+      'teller van de app-root beweegt niet (D-10)',
+      () async {
+        await db.syncOutboxDao.enqueueOrCoalesce(
+          entity: kOutboxEntityAnalytics,
+          entityKey: 'device-1:app_open',
+          operation: 'upsert',
+          payload: '{"id":"cccccccc-cccc-4cccc-8ccc-cccccccccccc"}',
+        );
+        gateway.insertError = Exception(
+          'PostgrestException(message: rw_rate_limited:app_events:device, '
+          'code: 42900, details: null, hint: null)',
+        );
+
+        final container = containerWithRealOutbox(Stream<User?>.value(null));
+        await Future<void>.delayed(Duration.zero);
+
+        await reconcilerIn(container).drainOutbox();
+
+        final remaining = await db.syncOutboxDao.pendingRows();
+        expect(remaining, hasLength(1));
+        expect(remaining.single.attempts, 0);
+        expect(
+          container.read(feedbackRateLimitedProvider),
+          0,
+          reason: 'statistiek boven het plafond is geen nieuws voor de '
+              'gebruiker; alleen zijn feedback is dat',
+        );
+      },
+    );
+
+    test(
+      'twee geweigerde feedbackrijen in één drain geven één stijging: één '
+      'drain, één melding',
+      () async {
+        await db.syncOutboxDao.enqueueOrCoalesce(
+          entity: kOutboxEntityFeedback,
+          entityKey: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+          operation: 'upsert',
+          payload: '{"id":"dddddddd-dddd-4ddd-8ddd-dddddddddddd","rating":5}',
+        );
+        await db.syncOutboxDao.enqueueOrCoalesce(
+          entity: kOutboxEntityFeedback,
+          entityKey: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+          operation: 'upsert',
+          payload: '{"id":"eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee","rating":4}',
+        );
+        gateway.insertError = Exception(
+          'PostgrestException(message: rw_rate_limited:feedback:device, '
+          'code: 42900, details: null, hint: null)',
+        );
+
+        final container = containerWithRealOutbox(Stream<User?>.value(null));
+        await Future<void>.delayed(Duration.zero);
+
+        await reconcilerIn(container).drainOutbox();
+
+        final remaining = await db.syncOutboxDao.pendingRows();
+        expect(remaining, hasLength(2));
+        expect(
+          container.read(feedbackRateLimitedProvider),
+          1,
+          reason: 'wie drie keer feedback stuurt en overal nee op krijgt, '
+              'hoort één melding, geen rij (RATE-05)',
+        );
       },
     );
   });

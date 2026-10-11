@@ -68,6 +68,28 @@ Stream<int> outboxPendingCount(Ref ref) =>
 SyncOutboxService syncOutboxService(Ref ref) =>
     SyncOutboxService(ref.watch(appDatabaseProvider).syncOutboxDao);
 
+/// Telling van feedbackweigeringen sinds de laatste keer dat de app-ROOT
+/// ernaar keek (fase 38, RATE-05).
+///
+/// De reconciler verhoogt hem met één per drain waarin feedback werd
+/// geweigerd, ongeacht hoeveel rijen nee kregen: de luisteraar in de
+/// app-root toont er precies één melding aan en zet hem terug op nul.
+/// app_events is bewust stil (D-10): statistiek boven het plafond is geen
+/// nieuws voor de gebruiker, zijn feedback wel.
+///
+/// keepAlive: true om dezelfde reden als [cloudSyncReconciler]: de reconciler
+/// benadert hem met een kale `read`, en de teller moet tóch overleven tot de
+/// app-root hem bij de volgende build ziet.
+@Riverpod(keepAlive: true)
+class FeedbackRateLimited extends _$FeedbackRateLimited {
+  @override
+  int build() => 0;
+
+  void bump(int by) => state += by;
+
+  void clear() => state = 0;
+}
+
 /// Constructs the real [AccountSyncService] (plan 21-06) with production
 /// dependencies (plan 21-07): the three repositories, the two cloud-read
 /// closures composed from `CloudReconcileService`'s pure row parsers plus
@@ -311,10 +333,18 @@ class CloudSyncReconciler {
   /// [SupabaseCloudSyncGateway] en is hij daar een getter per aanroep, om
   /// exact dezelfde reden — de eis is dus niet verdwenen, alleen verhuisd.
   Future<void> drainOutbox() async {
+    // Eén telling per drain, niet per geweigerde rij (RATE-05): wie drie
+    // feedbackberichten stuurt en overal nee op krijgt, hoort één melding.
+    var feedbackRefusals = 0;
     try {
       final outbox = _ref.read(syncOutboxServiceProvider);
 
       await outbox.drain(
+        onRateLimited: (refusal) {
+          // Alleen feedback is nieuws voor de gebruiker; statistiek boven
+          // het plafond is stil (D-10).
+          if (refusal.table == kFeedbackTable) feedbackRefusals++;
+        },
         upsertFn: (entity, entityKey, payload) async {
           // Feedback is de enige entiteit die een échte insert nodig heeft in
           // plaats van een upsert (FB-04). `public.feedback` heeft alleen een
@@ -323,7 +353,16 @@ class CloudSyncReconciler {
           // hoort daarom hier en niet in `SyncOutboxService`, dat bewust niets
           // van tabellen of van de cloud-SDK weet.
           if (entity == kOutboxEntityFeedback) {
-            await _gateway.insertRow(kFeedbackTable, payload);
+            try {
+              await _gateway.insertRow(kFeedbackTable, payload);
+            } catch (error) {
+              // 0016's trigger weigert boven het dagplafond met
+              // rw_rate_limited:<tabel>:<soort>. Die komt er hier als
+              // getypte weigering uit, zodat de pogingenregel in de drain
+              // niet aanslaat (RATE-05); elke andere fout gaat onveranderd
+              // door.
+              throw RateLimitedRefusal.tryFrom(error) ?? error;
+            }
             return;
           }
           // Gebruiksstatistiek (v4.1, migratie 0008) is van dezelfde soort als
@@ -337,7 +376,15 @@ class CloudSyncReconciler {
           // en dat antwoordt de prop `signed_in` net zo goed zonder de rij aan
           // een persoon te knopen.
           if (entity == kOutboxEntityAnalytics) {
-            await _gateway.insertRow(kAppEventsTable, payload);
+            try {
+              await _gateway.insertRow(kAppEventsTable, payload);
+            } catch (error) {
+              // Zelfde herkenning als bij feedback, al komt er voor de
+              // gebruiker geen melding uit: de rij blijft pending zonder
+              // pogingentelling, wat het enige is wat app_events nodig heeft
+              // (D-10).
+              throw RateLimitedRefusal.tryFrom(error) ?? error;
+            }
             return;
           }
           final table = _tableForEntity(entity);
@@ -359,6 +406,12 @@ class CloudSyncReconciler {
           await _gateway.deletePlannedRide(userId: userId, rideId: rideId);
         },
       );
+      if (feedbackRefusals > 0) {
+        // Eén stijging per drain, ongeacht hoeveel rijen nee kregen: de
+        // app-root toont er één melding aan, en "drie rijen geweigerd" is
+        // geen nieuws bovenop "je feedback is bewaard".
+        _ref.read(feedbackRateLimitedProvider.notifier).bump(1);
+      }
     } catch (error) {
       debugPrint('CloudSyncReconciler.drainOutbox failed: $error');
     }

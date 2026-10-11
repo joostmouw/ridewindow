@@ -231,6 +231,103 @@ final class SyncOutboxServiceProvider extends $FunctionalProvider<
 
 String _$syncOutboxServiceHash() => r'8e100295f0d507e0cc7125f7dc7db35ae0d58e39';
 
+/// Telling van feedbackweigeringen sinds de laatste keer dat de app-ROOT
+/// ernaar keek (fase 38, RATE-05).
+///
+/// De reconciler verhoogt hem per drain met het aantal geweigerde
+/// feedbackrijen (één drain, één stijging, ongeacht hoeveel rijen nee
+/// kregen), en de luisteraar in de app-root toont er precies één melding
+/// voor en zet hem terug op nul. app_events is bewust stil (D-10): statistiek
+/// boven het plafond is geen nieuws voor de gebruiker, zijn feedback wel.
+///
+/// keepAlive: true om dezelfde reden als [cloudSyncReconciler]: de reconciler
+/// benadert hem met een kale `read`, en de teller moet tóch overleven tot de
+/// app-root hem bij de volgende build ziet.
+
+@ProviderFor(FeedbackRateLimited)
+final feedbackRateLimitedProvider = FeedbackRateLimitedProvider._();
+
+/// Telling van feedbackweigeringen sinds de laatste keer dat de app-ROOT
+/// ernaar keek (fase 38, RATE-05).
+///
+/// De reconciler verhoogt hem per drain met het aantal geweigerde
+/// feedbackrijen (één drain, één stijging, ongeacht hoeveel rijen nee
+/// kregen), en de luisteraar in de app-root toont er precies één melding
+/// voor en zet hem terug op nul. app_events is bewust stil (D-10): statistiek
+/// boven het plafond is geen nieuws voor de gebruiker, zijn feedback wel.
+///
+/// keepAlive: true om dezelfde reden als [cloudSyncReconciler]: de reconciler
+/// benadert hem met een kale `read`, en de teller moet tóch overleven tot de
+/// app-root hem bij de volgende build ziet.
+final class FeedbackRateLimitedProvider
+    extends $NotifierProvider<FeedbackRateLimited, int> {
+  /// Telling van feedbackweigeringen sinds de laatste keer dat de app-ROOT
+  /// ernaar keek (fase 38, RATE-05).
+  ///
+  /// De reconciler verhoogt hem per drain met het aantal geweigerde
+  /// feedbackrijen (één drain, één stijging, ongeacht hoeveel rijen nee
+  /// kregen), en de luisteraar in de app-root toont er precies één melding
+  /// voor en zet hem terug op nul. app_events is bewust stil (D-10): statistiek
+  /// boven het plafond is geen nieuws voor de gebruiker, zijn feedback wel.
+  ///
+  /// keepAlive: true om dezelfde reden als [cloudSyncReconciler]: de reconciler
+  /// benadert hem met een kale `read`, en de teller moet tóch overleven tot de
+  /// app-root hem bij de volgende build ziet.
+  FeedbackRateLimitedProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'feedbackRateLimitedProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$feedbackRateLimitedHash();
+
+  @$internal
+  @override
+  FeedbackRateLimited create() => FeedbackRateLimited();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$feedbackRateLimitedHash() =>
+    r'dadaef2c435accdeef4ac21fb3ab9ceef9fa8420';
+
+/// Telling van feedbackweigeringen sinds de laatste keer dat de app-ROOT
+/// ernaar keek (fase 38, RATE-05).
+///
+/// De reconciler verhoogt hem per drain met het aantal geweigerde
+/// feedbackrijen (één drain, één stijging, ongeacht hoeveel rijen nee
+/// kregen), en de luisteraar in de app-root toont er precies één melding
+/// voor en zet hem terug op nul. app_events is bewust stil (D-10): statistiek
+/// boven het plafond is geen nieuws voor de gebruiker, zijn feedback wel.
+///
+/// keepAlive: true om dezelfde reden als [cloudSyncReconciler]: de reconciler
+/// benadert hem met een kale `read`, en de teller moet tóch overleven tot de
+/// app-root hem bij de volgende build ziet.
+
+abstract class _$FeedbackRateLimited extends $Notifier<int> {
+  int build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<int, int>;
+    final element = ref.element
+        as $ClassProviderElement<AnyNotifier<int, int>, int, Object?, Object?>;
+    return element.handleCreate(ref, build);
+  }
+}
+
 /// Constructs the real [AccountSyncService] (plan 21-06) with production
 /// dependencies (plan 21-07): the three repositories, the two cloud-read
 /// closures composed from `CloudReconcileService`'s pure row parsers plus

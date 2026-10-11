@@ -19,6 +19,7 @@ import 'package:ridewindow/app/router.dart';
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/core/supabase_config.dart';
+import 'package:ridewindow/features/shared/feedback_rate_limited_listener.dart';
 import 'package:ridewindow/features/shared/top_banners.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/platform/background_task.dart';
@@ -209,10 +210,12 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
       routerConfig: router,
       // De balken bovenaan (update-melding, store-balk, iOS-installatie) boven
       // elke route, vanaf één aansluitpunt (PWA-03). Wat er per platform
-      // verschijnt, beslist elke balk zelf.
+      // verschijnt, beslist elke balk zelf. De luisteraar ernaast is zelf
+      // nul bij nul en alleen voor de feedback-melding van fase 38 (RATE-05).
       builder: (context, child) => Stack(
         children: [
           if (child != null) child,
+          const FeedbackRateLimitedListener(),
           TopBanners(navigatorKey: router.routerDelegate.navigatorKey),
         ],
       ),

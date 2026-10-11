@@ -7,10 +7,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/core/app_version.dart';
 import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/data/repositories/feedback_device_store.dart';
 import 'package:ridewindow/domain/models/hourly_forecast.dart';
 import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/services/feedback_payload.dart';
@@ -97,6 +99,18 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
     final reconciler = ref.read(cloudSyncReconcilerProvider);
 
     try {
+      // Het toestel-id van feedback (fase 38, D-08). Lukt het ophalen of
+      // aanmaken niet, dan vertrekt de rij zonder: begrensd is hij dan
+      // evengoed, want 0016 telt de afzender apart. Feedback zelf mag nooit
+      // aan dit id vastzitten.
+      String? deviceId;
+      try {
+        final store =
+            FeedbackDeviceStore(await SharedPreferences.getInstance());
+        deviceId = await store.getOrCreateDeviceId();
+      } catch (_) {
+        // Met opzet stil.
+      }
       final service = FeedbackService(
         ref.read(appDatabaseProvider).syncOutboxDao,
       );
@@ -104,6 +118,7 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
         // `null` wanneer niemand is ingelogd -- dat is de anonieme route van
         // FB-03, niet een foutgeval.
         userId: ref.read(currentUserIdProvider),
+        deviceId: deviceId,
         rating: _rating,
         comment: _controller.text,
         context: _buildContext(),

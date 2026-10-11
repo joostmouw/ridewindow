@@ -7,6 +7,46 @@ import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
 /// actual cloud upsert/delete calls are injected by the caller, so this
 /// class never imports the cloud SDK and stays fully unit testable without
 /// mocking a fluent query builder.
+
+/// De database weigerde deze rij omdat het dagplafond is bereikt (migratie
+/// 0016, fase 38). Geen gewone fout: de payload is niet kapot, de verbinding
+/// niet stuk, er is vandaag alleen geen ruimte meer.
+///
+/// Voor de drain is dit de enige foutsoort waarbij een poging níet telt.
+/// [SyncOutboxService.kMaxSendAttempts] dropt een rij na vijf mislukte
+/// pogingen -- bedoeld voor payloads die bewezen onverzendbaar zijn. Een
+/// weigering zegt het tegendeel: morgen past hij weer, en de feedback van een
+/// gebruiker mag niet verdwijnen omdat de database vandaag vol zat (RATE-05).
+class RateLimitedRefusal implements Exception {
+  const RateLimitedRefusal({required this.table, required this.subject});
+
+  /// De geweigerde tabel ('feedback' of 'app_events'), zoals de trigger van
+  /// 0016 die in zijn melding noemt.
+  final String table;
+
+  /// Wie het plafond raakte: 'device', 'account' of 'sender'.
+  final String subject;
+
+  /// Herkent de weigering in willekeurige vorm op de cloudkant.
+  ///
+  /// De trigger weigert met `rw_rate_limited:<tabel>:<soort>`, en bij de app
+  /// arriveert dat in allerlei gedaanten: al als [RateLimitedRefusal] (de
+  /// reconciler wikkelt insertRow-fouten om), of ingebed in de tekst van een
+  /// PostgrestException. Daarom wordt de prefix in de tekst gezocht, en
+  /// alléén dan een weigering gemaakt: geen enkele andere fout mag de
+  /// pogingenregel buiten werking zetten.
+  static RateLimitedRefusal? tryFrom(Object error) {
+    if (error is RateLimitedRefusal) return error;
+    final match =
+        RegExp(r'rw_rate_limited:(\w+):(\w+)').firstMatch(error.toString());
+    if (match == null) return null;
+    return RateLimitedRefusal(table: match.group(1)!, subject: match.group(2)!);
+  }
+
+  @override
+  String toString() => 'RateLimitedRefusal(table: $table, subject: $subject)';
+}
+
 class SyncOutboxService {
   SyncOutboxService(this._dao);
 
@@ -49,6 +89,13 @@ class SyncOutboxService {
   /// live — this class never imports the cloud SDK itself, which keeps it
   /// trivially unit-testable and keeps it out of any import graph REG-05
   /// cares about.
+  ///
+  /// [onRateLimited] is de optionele melding dat een rij door het dagplafond
+  /// van 0016 is geweigerd. Zo'n rij blijft pending zonder dat zijn
+  /// pogingentelling stijgt; de callback ontvangt per weigering één
+  /// [RateLimitedRefusal]. Net als de andere callbacks wordt hij nooit
+  /// aangeroepen door een drain-aanroep die samenvalt met een al lopende
+  /// ([_inFlightDrain]): alleen de callbacks van de eerste aanroep draaien.
   Future<void> drain({
     required Future<void> Function(
       String entity,
@@ -56,11 +103,16 @@ class SyncOutboxService {
       Map<String, dynamic> payload,
     ) upsertFn,
     required Future<void> Function(String entity, String entityKey) deleteFn,
+    void Function(RateLimitedRefusal refusal)? onRateLimited,
   }) {
     final existing = _inFlightDrain;
     if (existing != null) return existing;
 
-    final future = _drainInternal(upsertFn: upsertFn, deleteFn: deleteFn);
+    final future = _drainInternal(
+      upsertFn: upsertFn,
+      deleteFn: deleteFn,
+      onRateLimited: onRateLimited,
+    );
     _inFlightDrain = future;
     return future.whenComplete(() => _inFlightDrain = null);
   }
@@ -72,10 +124,12 @@ class SyncOutboxService {
       Map<String, dynamic> payload,
     ) upsertFn,
     required Future<void> Function(String entity, String entityKey) deleteFn,
+    void Function(RateLimitedRefusal refusal)? onRateLimited,
   }) async {
     final rows = await _dao.pendingRows();
     var sent = 0;
     var failed = 0;
+    var rateLimited = 0;
     final sentEntities = <String>[];
 
     for (final row in rows) {
@@ -93,6 +147,23 @@ class SyncOutboxService {
         sent++;
         sentEntities.add(row.entity);
       } catch (e) {
+        final refusal = RateLimitedRefusal.tryFrom(e);
+        if (refusal != null) {
+          // Geweigerd door het dagplafond (0016): géén markFailed, géén
+          // dropRow, attempts ongemoeid. De rij is niet kapot, hij mag er
+          // vandaag alleen niet uit; morgen past hij weer, en de
+          // vijf-pogingen-regel mag nooit iets laten verdwijnen om een reden
+          // die vanzelf overgaat (RATE-05, F-03). De insert zelf rolde al
+          // terug, dus de tellers serverzijds zijn ook netjes ongedaan.
+          rateLimited++;
+          debugPrint(
+            'SyncOutboxService: ${row.entity}/${row.entityKey} geweigerd door '
+            'het dagplafond (${refusal.table}/${refusal.subject}); blijft '
+            'pending zonder pogingentelling',
+          );
+          onRateLimited?.call(refusal);
+          continue;
+        }
         failed++;
         final attemptNumber = row.attempts + 1;
         // The one debugPrint every failure gets — this is the part that
@@ -137,7 +208,7 @@ class SyncOutboxService {
     final sentDetail = sentEntities.isEmpty ? '' : ' (${sentEntities.join(', ')})';
     debugPrint(
       'SyncOutboxService: drain done: ${rows.length} pending, '
-      '$sent sent$sentDetail, $failed failed',
+      '$sent sent$sentDetail, $failed failed, $rateLimited rate-limited',
     );
   }
 }

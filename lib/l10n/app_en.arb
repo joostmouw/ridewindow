@@ -535,6 +535,7 @@
   "@pelotonAutoJoined": {"placeholders": {"name": {"type": "String"}}},
   "feedbackThanks": "Thanks, your feedback is on its way.",
   "feedbackFailed": "Couldn't save your feedback. Try again.",
+  "feedbackRateLimited": "Your feedback is saved on this device and will be sent again later. The daily limit has been reached for today.",
   "scoreSemanticLabel": "Score {score} of 100, {tier}",
   "@scoreSemanticLabel": {"placeholders": {"score": {"type": "int"}, "tier": {"type": "String"}}},
   "pelotonFriendAdded": "{name} is now your buddy",

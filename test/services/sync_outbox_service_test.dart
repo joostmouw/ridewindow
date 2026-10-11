@@ -351,4 +351,152 @@ void main() {
       },
     );
   });
+
+  group('rate-limit-weigering (fase 38, RATE-05, plan 38-02)', () {
+    test(
+      'een geweigerde rij telt geen poging en overleeft de pogingenregel: '
+      'vijf drains later bestaat hij nog, attempts = 0',
+      () async {
+        final dao = db.syncOutboxDao;
+        await dao.enqueueOrCoalesce(
+          entity: 'feedback',
+          entityKey: 'f1',
+          operation: 'upsert',
+          payload: '{"id":"f1"}',
+        );
+
+        var refusals = 0;
+        // Twee drains méér dan het plafond aan pogingen: bewijst dat de
+        // weigering de telling niet alleen vertraagt maar helemaal niet raakt.
+        for (var i = 0; i < SyncOutboxService.kMaxSendAttempts + 2; i++) {
+          await service.drain(
+            upsertFn: (entity, key, payload) async {
+              throw const RateLimitedRefusal(
+                table: 'feedback',
+                subject: 'sender',
+              );
+            },
+            deleteFn: (entity, key) async {},
+            onRateLimited: (refusal) => refusals++,
+          );
+        }
+
+        final remaining = await dao.pendingRows();
+        expect(
+          remaining,
+          hasLength(1),
+          reason: 'de rij is niet kapot, hij mag er vandaag alleen niet uit '
+              '(F-03). Hij dropt hem na vijf pogingen was de precies de '
+              'fout die RATE-05 moest voorkomen.',
+        );
+        expect(
+          remaining.single.attempts,
+          0,
+          reason: 'een weigering is geen poging',
+        );
+        expect(
+          refusals,
+          SyncOutboxService.kMaxSendAttempts + 2,
+          reason: 'elke drain meldt zijn weigering aan de callback',
+        );
+      },
+    );
+
+    test(
+      'de weigering wordt ook herkend in een gewone fouttekst van PostgREST, '
+      'met tabel en soort uit de melding',
+      () async {
+        final dao = db.syncOutboxDao;
+        await dao.enqueueOrCoalesce(
+          entity: 'feedback',
+          entityKey: 'f2',
+          operation: 'upsert',
+          payload: '{"id":"f2"}',
+        );
+
+        final refusals = <RateLimitedRefusal>[];
+        await service.drain(
+          upsertFn: (entity, key, payload) async {
+            // Zo komt de weigering bij de app binnen als de reconciler hem
+            // níet heeft omgewikkeld: ingebed in de tekst van de fout die
+            // insertRow gooit.
+            throw Exception(
+              'PostgrestException(message: rw_rate_limited:feedback:sender, '
+              'code: 42900, details: null, hint: null)',
+            );
+          },
+          deleteFn: (entity, key) async {},
+          onRateLimited: refusals.add,
+        );
+
+        final remaining = await dao.pendingRows();
+        expect(remaining, hasLength(1));
+        expect(remaining.single.attempts, 0);
+        expect(refusals.single.table, 'feedback');
+        expect(refusals.single.subject, 'sender');
+      },
+    );
+
+    test(
+      'een gewone fout valt nog wél onder de pogingenregel -- de weigerings-tak '
+      'mag geen enkele andere fout opeten',
+      () async {
+        final dao = db.syncOutboxDao;
+        await dao.enqueueOrCoalesce(
+          entity: 'feedback',
+          entityKey: 'f3',
+          operation: 'upsert',
+          payload: '{"id":"f3"}',
+        );
+
+        for (var i = 0; i < SyncOutboxService.kMaxSendAttempts; i++) {
+          await service.drain(
+            upsertFn: (entity, key, payload) async {
+              throw Exception('network down');
+            },
+            deleteFn: (entity, key) async {},
+          );
+        }
+
+        expect(
+          await dao.pendingRows(),
+          isEmpty,
+          reason: 'bestaand gedrag bewaard (21-12): een rij die vijf keer '
+              'faalt met een gewone fout wordt gedropt',
+        );
+      },
+    );
+
+    test('tryFrom herkent alleen echte weigeringen', () {
+      const refusal = RateLimitedRefusal(table: 'feedback', subject: 'account');
+      expect(
+        RateLimitedRefusal.tryFrom(refusal),
+        same(refusal),
+        reason: 'al omgewikkeld: dan niet opnieuw parsen maar hergebruiken',
+      );
+
+      final parsed = RateLimitedRefusal.tryFrom(
+        Exception(
+          '{"code":"42900","message":"rw_rate_limited:app_events:device"}',
+        ),
+      );
+      expect(parsed, isNotNull);
+      expect(parsed!.table, 'app_events');
+      expect(parsed.subject, 'device');
+
+      expect(RateLimitedRefusal.tryFrom(Exception('network down')), isNull);
+      expect(
+        RateLimitedRefusal.tryFrom(Exception('rw_rate_limited')),
+        isNull,
+        reason: 'zonder tabel en soort is het geen herkende weigering',
+      );
+      expect(
+        RateLimitedRefusal.tryFrom(
+          Exception('new row violates check constraint "feedback_rating_range"'),
+        ),
+        isNull,
+        reason: 'een CHECK-weigering is een gewone fout, geen dagplafond',
+      );
+    });
+  });
 }

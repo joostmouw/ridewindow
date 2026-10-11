@@ -415,8 +415,8 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 38-01-PLAN.md — Migratie 0016: plafonds per toestel/account/afzender, rijgroottegrensen, rate_limits_test.sql (RATE-01, RATE-02, RATE-03)
-- [ ] 38-02-PLAN.md — App: device_id bij feedback, weigering herkennen/bewaren/melden zonder de vijf-pogingen-regel te raken (RATE-05)
+- [x] 38-01-PLAN.md — Migratie 0016: plafonds per toestel/account/afzender, rijgroottegrensen, rate_limits_test.sql (RATE-01, RATE-02, RATE-03)
+- [x] 38-02-PLAN.md — App: device_id bij feedback, weigering herkennen/bewaren/melden zonder de vijf-pogingen-regel te raken (RATE-05)
 
 **Wave 2** *(blocked on 38-01 + 38-02; Joost bevestigt de plafonds en past 0016 live toe)*
 
@@ -495,7 +495,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
 | 37. Meten | v4.3 | 6/6 | Complete | 2026-10-11 |
-| 38. Open deuren begrensd | v4.3 | 0/3 | In Progress |  |
+| 38. Open deuren begrensd | v4.3 | 2/3 | In Progress |  |
 | 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
 | 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |
 

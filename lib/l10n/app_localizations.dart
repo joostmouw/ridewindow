@@ -3181,6 +3181,12 @@ abstract class S {
   /// **'Je feedback kon niet worden opgeslagen. Probeer het opnieuw.'**
   String get feedbackFailed;
 
+  /// No description provided for @feedbackRateLimited.
+  ///
+  /// In nl, this message translates to:
+  /// **'Je feedback is bewaard op dit toestel en gaat later automatisch opnieuw. Voor vandaag is de daglimiet bereikt.'**
+  String get feedbackRateLimited;
+
   /// No description provided for @scoreSemanticLabel.
   ///
   /// In nl, this message translates to:
