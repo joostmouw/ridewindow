@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
 status: executing
-last_updated: "2026-10-11T18:23:05.457Z"
-last_activity: 2026-10-11 -- 37-03 klaar (rapport + wacht)
+last_updated: "2026-10-11T18:39:00.000Z"
+last_activity: 2026-10-11 -- 37-04 klaar (0014+0015 live)
 progress:
   total_phases: 16
   completed_phases: 6
   total_plans: 42
-  completed_plans: 40
+  completed_plans: 41
   percent: 38
 ---
 
@@ -737,11 +737,11 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 37 of 37–40 (Meten)
-Plan: 4 of 6 (37-01 t/m 37-03 af; 0014 nog niet live)
-Status: 37-04 wacht op Joost (0014 in de SQL Editor)
-Last activity: 2026-10-11 -- 37-03 klaar (rapport + wacht)
+Plan: 5 of 6 (37-01 t/m 37-04 af; 0014 en 0015 live, grens bewezen)
+Status: 37-05 wacht op Joosts akkoord om productietotalen te lezen (D-19)
+Last activity: 2026-10-11 -- 37-04 klaar (0014+0015 live, 19/19 groen)
 
-Progress: [█████░░░░░] 3/6 plannen fase 37
+Progress: [███████░░░] 4/6 plannen fase 37
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
