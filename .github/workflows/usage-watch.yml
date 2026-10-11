@@ -1,0 +1,117 @@
+# Usage watch (uitschieter-seintje)
+#
+# Waarom dit bestaat:
+# Epic "Dicht huis" (v4.3, fase 37, MEET-02). Wie de publieke app-sleutel
+# heeft -- en die zit in elke build -- kan feedback, gebruiksgebeurtenissen,
+# uitnodigingen en groepsritten aanmaken zo vaak hij wil. Voordat fase 38 en
+# 39 plafonds zetten, moet Joost het merken als iemand dat doet. Deze job
+# toetst elke ochtend de dag ervoor tegen de uitschieterregel uit
+# tool/usage/usage_rule.dart (vijf keer de mediaan van 28 dagen en boven een
+# vloer, of één afzender boven een vloer) en faalt als er iets uitschiet.
+# Een mislukte run mailt GitHub naar Joost: hetzelfde signaal waar de
+# keep-warm-job op leunt, zonder nieuw kanaal en zonder nieuwe sub-processor.
+#
+# Wat de job wel en niet doet:
+# Hij leest één ding: public.usage_daily_counts(30), als de login-rol
+# usage_monitor die alleen die functie mag aanroepen (migratie 0014). Hij
+# schrijft niets, bouwt de app niet, draait geen tests en maakt GEEN issue
+# (D-13): de repo is publiek, en een issue laat een aanvaller zien of hij
+# opgemerkt is. Ook geen pg_cron: die kan Joost niet bereiken.
+#
+# Publieke log (F-01, D-11):
+# De repo is publiek, dus deze log ook. De log noemt daarom alleen bron en
+# regel ("uitschieter: app_events, één afzender boven de vloer"), nooit een
+# getal. counts.csv wordt nooit getoond, niet als artifact bewaard, niet in
+# een job summary gezet, en na afloop gewist. De getallen bekijkt Joost lokaal
+# met `dart run tool/usage_report.dart`.
+# Een fout in de wacht zelf heet "infrafout:"; een uitschieter heet
+# "uitschieter:". Zo is in de mail meteen te zien of er iets gebeurt of dat
+# de wacht stuk is.
+#
+# Geen service-role-sleutel hier (D-12):
+# Die sleutel omzeilt RLS volledig en gaat niet naar GitHub; zie de uitleg in
+# supabase-keep-warm.yml. Deze job gebruikt in plaats daarvan het wachtwoord
+# van usage_monitor, een rol die alleen de telfunctie kan aanroepen.
+#
+# Bekende kanttekening (dezelfde als bij keep-warm):
+# GitHub zet geplande workflows uit in een repo zonder activiteit gedurende
+# 60 dagen. Stopt de ontwikkeling echt, dan stopt deze wacht ook. Dat is
+# aanvaard, maar het staat hier zodat het niet als verrassing komt.
+#
+# Eenmalige inrichting (door de repo-eigenaar, Settings > Secrets and
+# variables > Actions, zie plan 37-04):
+#   - Repository secret  USAGE_MONITOR_DB_URL
+#       postgresql://usage_monitor.hcdrydlgqpnmumfupgcx:<wachtwoord>@<pooler-host>:5432/postgres?sslmode=require
+#     <pooler-host> komt uit Supabase > Connect > Session pooler
+#     (aws-<n>-eu-west-3.pooler.supabase.com; de gedeelde pooler is IPv4, en
+#     GitHub-runners hebben geen IPv6). Het wachtwoord staat lokaal in
+#     ~/.config/ridewindow/usage-monitor.pw en hoort nergens in de repo.
+# Tot dat secret er is, faalt de eerste stap met een infrafout.
+
+name: Usage watch (uitschieter-seintje)
+
+on:
+  schedule:
+    # 05:00 UTC = 07:00 Nederlandse zomertijd, 06:00 wintertijd. Op beide
+    # tijden is "gisteren" in Amsterdam een afgesloten dag (D-10).
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    # Met de hand draaien vanuit het Actions-tabblad, bv. na het inrichten.
+
+permissions:
+  contents: read
+
+jobs:
+  watch:
+    name: Gisteren toetsen
+    runs-on: ubuntu-latest # heeft de PostgreSQL-client (psql) aan boord
+    timeout-minutes: 10
+    steps:
+      - name: USAGE_MONITOR_DB_URL ingericht? (infra)
+        env:
+          USAGE_MONITOR_DB_URL: ${{ secrets.USAGE_MONITOR_DB_URL }}
+        run: |
+          if [ -z "${USAGE_MONITOR_DB_URL}" ]; then
+            echo "::error::infrafout: USAGE_MONITOR_DB_URL ontbreekt (zie de kop van usage-watch.yml)"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dart
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1 (v1.8.1)
+        with:
+          sdk: stable
+
+      - name: Telling ophalen (infra)
+        env:
+          USAGE_MONITOR_DB_URL: ${{ secrets.USAGE_MONITOR_DB_URL }}
+        run: |
+          set -euo pipefail
+          # Zes kolommen in vaste volgorde, zonder kop, komma-gescheiden;
+          # null blijft leeg. Dit is de vorm die parseCountsCsv verwacht.
+          # De uitvoer gaat alleen naar een bestand, nooit naar de log.
+          if ! psql "$USAGE_MONITOR_DB_URL" -v ON_ERROR_STOP=1 -X -q -A -t -F, \
+            -c "select to_char(day, 'YYYY-MM-DD'), source, rows, distinct_senders, max_rows_one_sender, p95_rows_one_sender from public.usage_daily_counts(30) order by day, source" \
+            > "$RUNNER_TEMP/counts.csv" 2> "$RUNNER_TEMP/psql.err"; then
+            echo "::error::infrafout: telling ophalen mislukt"
+            # psql-fouten gaan over verbinding en rechten, niet over tellingen.
+            cat "$RUNNER_TEMP/psql.err"
+            exit 1
+          fi
+
+      - name: Gisteren toetsen
+        run: |
+          set -euo pipefail
+          DAY=$(TZ=Europe/Amsterdam date -d yesterday +%F)
+          # Buiten de repo draaien, zodat `dart run` de Flutter-pubspec niet
+          # probeert op te lossen. tool/usage/ heeft geen package-imports.
+          cp -r tool/usage "$RUNNER_TEMP/usage"
+          cd "$RUNNER_TEMP"
+          # exit 0 = rustig, 2 = uitschieter, 1 = infrafout
+          dart run "$RUNNER_TEMP/usage/usage_check.dart" --csv "$RUNNER_TEMP/counts.csv" --day "$DAY"
+
+      - name: Opruimen
+        if: always()
+        run: rm -f "$RUNNER_TEMP/counts.csv" "$RUNNER_TEMP/psql.err"
