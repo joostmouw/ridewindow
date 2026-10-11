@@ -14,6 +14,20 @@ last_activity: 2026-10-11progress:
 
 # Project State
 
+## Stand na 2026-10-11 (avond) -- 1.0.58 (69), de tablet-layout
+
+| Waar | Stand |
+|---|---|
+| Productie | Nog **leeg**. 68 is de bedoelde eerste productie-build; het service-account heeft sinds vandaag het productierecht |
+| Internal | **1.0.58 (69)**, geüpload; `--list-tracks` bevestigt internal 69, completed. AAB SHA-256 `a65f08ff0ed72be3fdc34e0b97a29d1c599137c28acc46084ee4e2913dd9fdaa` |
+| PWA | **1.0.58 (69)**, CI-deploy vanaf `8d07b9b`; live `version.json` zegt 69 |
+| Alpha / closed | **1.0.57 (68)**, bij Google ter review |
+| Oppo | Ontvangst van 69 nog niet gecontroleerd (niet via adb verbonden) |
+| main | **1.0.58+69**, gepusht (`8d07b9b`) |
+
+**Wat 69 brengt:** de tablet-layout uit quick 261011-jru en 261011-kb9. Telefoon ongewijzigd.
+Internal heeft sinds vandaag ook de e-maillijst "Ridewindow Testers (Google Group)" met de 91 groepsleden.
+
 ## Stand na 2026-10-11 (middag) -- 1.0.57 (68) klaar als eerste productie-build
 
 | Waar | Stand |
