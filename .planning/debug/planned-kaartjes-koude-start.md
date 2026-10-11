@@ -144,8 +144,6 @@ aanbrengt, breng je overal aan waar het speelt.
 de bolletjestellers offline hetzelfde doen. Ze leunen op `groupRides` (nu
 gecachet), dus vermoedelijk niet, maar dat is niet gemeten.
 
-**Openstaand:** de maatjeslijst dezelfde behandeling geven (Friend-model
-serialiseren, store-methoden, provider om) is klein en dezelfde vorm. Besluit
-op 2026-10-11: eerst Joost, want het bepaalt of 67 of 68 de eerste
-productie-build wordt. Er is geen haast: de productietrack is nog leeg, dus er
-staat nog niets publiek.
+**Openstaand:** ~~de maatjeslijst dezelfde behandeling geven~~ **gedaan in
+1.0.57 (68)**, en daarna op het toestel bewezen met dezelfde offline proef:
+GROUPS én BUDDIES gevuld, geen "Try again" meer. Zie punt c in `OPEN.md`.

@@ -53,8 +53,9 @@ blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
 - **Eerste productie-release: 1.0.57 (68)** met de koude-start-fix voor ritten,
   groepen én maatjes. Joost koos op 2026-10-11 voor 68 boven 67, omdat de
   productietrack nog leeg was en de eerste publieke build dan in één keer
-  coherent is. **Stand:** 68 staat op internal en op de PWA. De toestelcontrole
-  op de Oppo en de promotie naar alpha staan nog open.
+  coherent is. **Stand:** 68 staat op internal, op de PWA en op alpha, en is op
+  de Oppo bewezen (koude start met wifi en data uit: GROUPS én BUDDIES gevuld).
+  Alleen de productie-upload zelf staat nog open.
 - **Internal als kanaal voor de groep: onderzocht, advies is overslaan.** Google
   kent internal testers als **e-maillijst** (max 100), niet als Google Group; de
   API weigert er zelfs bij (403, track gemigreerd). Wie voor internal opte-int
@@ -124,8 +125,8 @@ zichtbaar waar het eerst onzichtbaar was. Eerst faalde de hele tab offline, nu
 gemist. Dat is de werkregel "loop de hele app na bij een wijziging" in het
 klein.
 
-**Rest:** de Oppo-controle van 68 staat nog open (het toestel zat op het
-vergrendelscherm).
+**Rest:** de Oppo-controle van 68 is gedaan en groen: koude start met wifi en
+data uit, GROUPS én BUDDIES gevuld.
 
 ### b. De update-balk ziet een nieuwe internal-build laat of niet
 

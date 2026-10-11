@@ -21,9 +21,9 @@ last_activity: 2026-10-11progress:
 | Productie | **Toegang verleend op 2026-10-11.** De track is nog **leeg**: de app staat dus nog niet in de winkel |
 | Internal | **1.0.57 (68)**, geüpload; `--list-tracks` bevestigt internal 68, completed |
 | PWA | **1.0.57 (68)**, CI-deploy vanaf `86c76d6`; live `version.json` zegt 68 |
-| Oppo | Laatst bewezen **1.0.56 (67)**. Ontvangst van 68 nog niet gedaan: het toestel zat op het vergrendelscherm en dat vraagt Joosts vingerafdruk |
-| Alpha / closed | **1.0.55 (66)**, 75 van 91 leden opted-in |
-| main | **1.0.57+68**, gepusht (`86c76d6`) |
+| Oppo | **1.0.57 (68)** via Play, automatisch bijgewerkt 12:46. Koude start met wifi en data uit: GROUPS én BUDDIES volledig gevuld |
+| Alpha / closed | **1.0.57 (68)**, gepromoveerd na de Oppo-goedkeuring; bij Google ter review |
+| main | **1.0.57+68**, gepusht (`8412ee5`) |
 
 **Wat 68 brengt:** de maatjeslijst op de Peloton-tab komt nu ook uit een lokale
 kopie. Daarmee opent die tab volledig op wat er de vorige keer stond, ook
@@ -32,15 +32,17 @@ cache terwijl BUDDIES nog "Try again" toonde. Details in
 `.planning/OPEN.md` punt c en `.planning/quick/261009-gedeelde-ritten-cache/`.
 
 **Releasebewijs:** suite 1104 groen; analyze 0 errors, 0 warnings, 214 infos;
-AAB gebouwd en geüpload; Play bevestigt versionCode 68; live `version.json`
-zegt 68. AAB SHA-256:
+AAB gebouwd en geüpload; Play bevestigt versionCode 68 op internal én alpha;
+live `version.json` zegt 68 en de live appbundel bevat `1.0.57` en niet meer
+`1.0.56`; Oppo bijgewerkt via Play (geen sideload) en offline geverifieerd.
+AAB SHA-256:
 `b6358f78d6174312a6e1d28ff12f04135300b8512019e823e1f9bb3290f0f4d6`.
 
-**Wat nog moet:** de Oppo-controle van 68 (koude start met wifi en data uit: nu
-horen ook de maatjes er te staan), dan de promotie naar alpha, dan de
-productie-upload. Die laatste is gemeten op 2026-10-11: hij geeft een 403 bij de
-commit, want het service-account heeft het productierecht niet. De klik-voor-
-klik staat in `tool/README-play-release.md`.
+**Wat nog moet:** de productie-upload. Die is gemeten op 2026-10-11 en geeft een
+403 bij de commit, want het service-account heeft het productierecht niet. De
+klik-voor-klik staat in `tool/README-play-release.md`. Zodra dat recht er is:
+`dart run tool/play_upload.dart --promote 68 --track production --status draft`
+en dan in de Console de eenmalige instellingen nalopen.
 
 ## Stand na 2026-10-11 -- productietoegang verleend, 67 klaar
 
