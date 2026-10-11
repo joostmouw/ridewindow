@@ -4,12 +4,12 @@ milestone: v4.3
 milestone_name: Dicht huis
 status: executing
 last_updated: "2026-10-11T18:52:00.000Z"
-last_activity: 2026-10-11 -- stand rechtgezet: 70 overal behalve alpha; edge-to-edge-advies beoordeeld
+last_activity: 2026-10-11 -- 37-05 nulmeting vastgelegd
 progress:
   total_phases: 16
   completed_phases: 6
   total_plans: 42
-  completed_plans: 41
+  completed_plans: 42
   percent: 38
 ---
 
@@ -771,11 +771,11 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 37 of 37–40 (Meten)
-Plan: 5 of 6 (37-01 t/m 37-04 af; 0014 en 0015 live, grens bewezen)
-Status: 37-05 wacht op Joosts akkoord om productietotalen te lezen (D-19)
-Last activity: 2026-10-11 -- 37-04 klaar (0014+0015 live, 19/19 groen)
+Plan: 6 of 6 (37-01 t/m 37-05 af; nulmeting vastgelegd, vloeren gemeten)
+Status: 37-06 is aan de beurt (secret + eerste Action-run)
+Last activity: 2026-10-11 -- 37-05 klaar (37-NULMETING.md, vloeren 3x, plafonds 10x)
 
-Progress: [███████░░░] 4/6 plannen fase 37
+Progress: [████████░░] 5/6 plannen fase 37
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 

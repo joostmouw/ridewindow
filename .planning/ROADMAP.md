@@ -392,7 +392,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 37-05-PLAN.md — Nulmeting (historie + zware Oppo-sessie), 37-NULMETING.md, vloeren bijwerken
+- [x] 37-05-PLAN.md — Nulmeting (historie + zware Oppo-sessie), 37-NULMETING.md, vloeren bijwerken
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -484,7 +484,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 30. Werving | v4.1 | 0/TBD | Not started | - |
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
-| 37. Meten | v4.3 | 4/6 | In Progress|  |
+| 37. Meten | v4.3 | 5/6 | In Progress|  |
 | 38. Open deuren begrensd | v4.3 | 0/TBD | Not started | - |
 | 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
 | 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |
