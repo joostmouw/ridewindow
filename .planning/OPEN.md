@@ -35,57 +35,64 @@ en wat de volgende stap is.
 
 ---
 
-## Productietoegang verleend — de app is nog niet live (2026-10-11)
+## 1.0.59 (70) ter productiereview; edge-to-edge-advies beoordeeld (2026-10-11, laat)
 
-**De aanvraag van 2026-10-09 15:53 is gehonoreerd.** Google: *"Your app has been
-granted Google Play production access."* De twee dingen die dat wél en níét
-betekenen, want die lopen hier makkelijk door elkaar:
+**70 staat ter review op productie.** Volledige uitrol, alle landen, managed
+publishing uit: na goedkeuring gaat hij vanzelf de winkel in. De publieke
+winkelpagina geeft nog 404 (gemeten 20:52), dus downloadbaar is hij nog niet en
+het testerbericht wacht nog. Play toont bij deze release één *action
+recommended*: **edge-to-edge**. Onderzocht; conclusie: **geen actie nodig voor
+deze release.**
 
-- **Wél:** de productietrack is ontgrendeld. `--list-tracks` toont hem nu naast
-  beta en alpha, en open testing is beschikbaar.
-- **Niet:** de app staat nog niet in de winkel. De productietrack is **leeg**;
-  er is nog geen enkele release op. Publiceren is een aparte handeling, en pas
-  daarna kan iemand hem downloaden.
-
-De randvoorwaarden van tijdens de review (niets aan de track-opzet veranderen,
-blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
-
-- **Eerste productie-release: 1.0.57 (68)** met de koude-start-fix voor ritten,
-  groepen én maatjes. Joost koos op 2026-10-11 voor 68 boven 67, omdat de
-  productietrack nog leeg was en de eerste publieke build dan in één keer
-  coherent is. **Stand:** 68 staat op internal, op de PWA en op alpha, en is op
-  de Oppo bewezen (koude start met wifi en data uit: GROUPS én BUDDIES gevuld).
-  Alleen de productie-upload zelf staat nog open.
-- **Internal als kanaal voor de groep: onderzocht, advies is overslaan.** Google
-  kent internal testers als **e-maillijst** (max 100), niet als Google Group; de
-  API weigert er zelfs bij (403, track gemigreerd). Wie voor internal opte-int
-  valt bovendien van alpha af. Zodra de app in productie staat is internal
-  nergens meer voor nodig, want iedereen is dan eligible voor productie. Joost
-  pakt dit later op met Claude als hij er alsnog door wil; de volledige
-  uitwerking staat in `.planning/TESTERS.md`.
-- **Het service-account mag nog geen productie-upload.** Op 2026-10-11 gemeten,
-  niet aangenomen: een promotie van 68 naar `production --status draft` gaf een
-  **403 bij de commit** ("The caller does not have permission"), waarna de edit
-  werd opgeruimd. Dezelfde aanroep zette 68 kort daarvoor zonder klagen op
-  internal, dus het is specifiek het productierecht dat de inrichting bewust
-  niet heeft meegegeven. De klik-voor-klik staat in
-  `tool/README-play-release.md` onder "Naar productie".
-  **Let op:** een `--dry-run` voorspelt dit niet, want die stopt vóór de eerste
-  schrijfactie. Het script ruimt bij een weigering de edit op, dus proberen is
-  veilig.
-- **Eerste upload als concept** (`--status draft`), dan de eenmalige
-  productie-instellingen in de Console nalopen (landen, uitrolpercentage,
-  app-content-verklaringen), dan publiceren.
-- **BACKLOG #76 (LinkedIn-lanceerpost) komt in beeld** zodra de release
-  gepubliceerd is, niet eerder.
-- **Het testerbericht wacht op de publicatie.** "We staan live in de winkel"
-  is onwaar zolang de productietrack leeg is; de link werkt dan nog niet voor
-  wie geen tester is.
-
-**Twee dingen die bij de eerste productie-release nieuw zijn en nergens anders
-in de route staan:** de productie-track heeft een eigen review (bij internal
-niet), en een uitrolpercentage en landenselectie die de testtracks niet kennen.
-Beide zijn eenmalig handwerk in de Console.
+- **Edge-to-edge (SDK 35+): al in orde, en niet door eigen code.**
+  - De app target **36** (`compileSdk = 36`; Flutter 3.44.1 pint
+    `targetSdkVersion = 36`, en `dumpsys` op de Oppo bevestigt targetSdk 36).
+    Op Android 15+ is edge-to-edge daarmee afgedwongen en niet meer uit te
+    zetten.
+  - De Flutter-embedding doet de opt-in zelf: in de release-APK staat een
+    aanroep van `Window.setDecorFitsSystemWindows`, met een compat-pad voor
+    oudere API's (gemeten in classes.dex, geminificeerde klasse `j0/a;`).
+    Plays suggestie (`enableEdgeToEdge()` in Kotlin) is voor native apps; in
+    Flutter is dat de taak van de embedding, niet van de app.
+  - Insets behandelt de app via de standaardmechanismen: `Scaffold` +
+    `AppBar`, de M3 `NavigationBar` (zorgt zelf voor de onderpadding),
+    `SafeArea` op de plekken waar content tot de rand loopt (banners, sheets,
+    overlays, de plan-rit-balk), en de tablet-rail.
+  - Het enige testtoestel, de Oppo, draait **Android 16 (SDK 36)**: alle
+    visuele verificatie van deze sessie draaide dus al op afgedwongen
+    edge-to-edge, en 70 staat erop geïnstalleerd.
+  - **Restrisico:** toestellen onder Android 15 zijn hier niet te testen
+    (geen toestel). Komt daar ooit een melding vandaan, dan is dat het moment
+    om er een taak van te maken; nu valt er niets te doen.
+- **Play's dashboardsuggesties: beoordeeld en overgeslagen** (zelfde avond).
+  Open testing is overbodig zodra de productie-release live is (iedereen kan
+  de app dan toch pakken) en pre-registration is voor wie nog niet wil
+  lanceren. Het dashboard toonde **44 active devices** (laatste 30 dagen):
+  allemaal via de testtracks, want productie is nog niet installeerbaar. Van
+  de 91 groepsleden gebruikt dus ruwweg de helft de app actief: de eerste
+  echte adoptiemeting.
+- **Duwen van main is een besluit geworden, geen routine.** Lokale main staat
+  27 commits voor op origin: het fase-37-werk (gebruiksmeting, migraties
+  0014/0015, breedteklasse + invoermiddel op web, en de paginering-fix
+  `059ddc7` in `tool/usage_report.dart`: Range-headers, 1000 rijen per
+  pagina, want PostgREST stopte stilletjes na 1000 rijen), en het raakt
+  `lib/`. De deploy-workflow pikt dat automatisch op: een push deployt de PWA
+  opnieuw, op versie 70 met ándere bytes dan de gereleasete 70-bundel. Twee
+  schone wegen: eerst bumpen naar 71 en als release duwen, of het werk laten
+  staan tot de volgende release. Pushen alleen op Joosts sein.
+- **Na publicatie ligt klaar:** het testerbericht (tekst in
+  `~/.config/ridewindow/testers/`, met de conditonele openingszin en de
+  beloning die bewust geen onbetaalbare belofte is), BACKLOG #76
+  (LinkedIn-lanceerpost), en een verse export van de Google Group voor alle
+  91 leden (de dataset heeft er nog 20).
+- **Historie die klopt en blijft:** het productierecht dat vanochtend nog
+  ontbrak (403 bij de commit) is er nu; 70 stond eerst als concept en is
+  ingediend. Het klik-voor-klik-verhaal en de middenweg (recht er na de
+  release weer af) staan in `tool/README-play-release.md` onder "Naar
+  productie". Internal als extra kanaal blijft overgeslagen (e-maillijst van
+  max 100, geen Google Groups via de API), maar de 91 groepsleden staan er
+  sinds vandaag wél als e-maillijst op internal. Uitwerking:
+  `.planning/TESTERS.md`.
 
 ---
 

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
 status: executing
-last_updated: "2026-10-11T18:39:00.000Z"
-last_activity: 2026-10-11 -- 37-04 klaar (0014+0015 live)
+last_updated: "2026-10-11T18:52:00.000Z"
+last_activity: 2026-10-11 -- stand rechtgezet: 70 overal behalve alpha; edge-to-edge-advies beoordeeld
 progress:
   total_phases: 16
   completed_phases: 6
@@ -14,6 +14,40 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-10-11 (20:52) -- 1.0.59 (70) ter productiereview
+
+| Waar | Stand |
+|---|---|
+| Productie | **1.0.59 (70) ter review** (volledige uitrol, alle landen, managed publishing uit: na goedkeuring vanzelf live). Publieke winkelpagina geeft nog 404, dus downloadbaar is hij nog niet |
+| Internal | **1.0.59 (70)**, bevestigd met `--list-tracks` |
+| PWA | **1.0.59 (70)**, live `version.json` zegt 70 |
+| Alpha / closed | **1.0.57 (68)** |
+| Oppo | **1.0.59 (70) geïnstalleerd** (dumpsys: versionCode 70, targetSdk 36). Draait **Android 16 (SDK 36)**, dus edge-to-edge is er door de OS afgedwongen |
+| main | Lokaal **27 commits voor** op origin: fase-37-werk (meten, migraties 0014/0015, breedteklasse), raakt `lib/`; origin/main staat op `1e0cbdf` (release 70). Werkende tree is schoon; de paginering-fix in `tool/usage_report.dart` is gecommit (`059ddc7`) |
+
+**Edge-to-edge-advies van Play bij de release (niet blokkerend):**
+beoordeeld en afgedaan. De Flutter-embedding doet de opt-in zelf (aanroep
+gemeten in de release-dex), de app behandelt insets via
+Scaffold/NavigationBar/SafeArea, en het enige testtoestel draait al Android 16
+met afgedwongen edge-to-edge. Bevindingen en redenen: `.planning/OPEN.md`
+bovenaan.
+
+**Duwen van main is een bewuste keuze geworden:** de 27 lokale commits raken
+`lib/`, dus een push deployt de PWA automatisch opnieuw: versie 70 met andere
+bytes dan de gereleasete 70-bundel. Eerst besluiten: bumpen naar 71 en
+releasen, of laten staan tot de volgende release.
+
+**Eerste adoptiemeting (Play-dashboard, 2026-10-11):** **44 active
+devices** in de laatste 30 dagen, allemaal via de testtracks (productie is nog
+niet installeerbaar). Van de 91 groepsleden gebruikt dus ruwweg de helft de
+app actief. De dashboardsuggesties (open testing, pre-registration) zijn
+beoordeeld en overgeslagen; zie OPEN.md bovenaan.
+
+**Wat na publicatie nog ligt:** het testerbericht (tekst klaar in
+`~/.config/ridewindow/testers/`), BACKLOG #76 (LinkedIn-lanceerpost), en een
+verse export van de Google Group voor alle 91 leden (`testers.csv` heeft er
+nog 20).
 
 ## Stand na 2026-10-11 (avond) -- 1.0.58 (69), de tablet-layout
 

@@ -175,7 +175,12 @@ de winkel als "…" eindigt.
 | `--dry-run` | — | Controleert alles en logt in, schrijft niets |
 | `--force` | — | Negeert de staleness-vangrail |
 
-## Naar productie: één recht dat er nog niet is (nagegaan 2026-10-11)
+## Naar productie: het recht dat er eerst ontbrak (opgelost 2026-10-11)
+
+**Opgelost:** sinds vanavond staat 1.0.59 (70) ter review op productie
+(volledige uitrol, alle landen). Het verhaal hieronder blijft staan: het
+verklaart de 403, de vangrail die de edit opruimt, en de middenweg (het recht
+er na de release weer afhalen).
 
 Een promotie van 68 naar `production --status draft` faalde met:
 
