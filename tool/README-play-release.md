@@ -169,8 +169,44 @@ de winkel als "…" eindigt.
 | `--notes` | — | `taal:pad`, herhaalbaar. Het script stopt boven 400 tekens (zie de paragraaf over notitielengte) |
 | `--promote` | — | `--promote <versionCode>`: zet een bestaande build op `--track`, mét `--notes` |
 | `--set-notes` | — | `--set-notes <versionCode>`: vervangt alleen de notities van een bestaande release op `--track` |
+| `--list-testers` | — | Toont per track welke Google Group als testerlijst dient. Leest alleen |
+| `--set-testers` | — | Zet de testerlijst van `--track` op de groepen uit `--group`. Vervangt wat er staat |
+| `--group` | — | Een Google Group als testerlijst, herhaalbaar |
 | `--dry-run` | — | Controleert alles en logt in, schrijft niets |
 | `--force` | — | Negeert de staleness-vangrail |
+
+## Testerlijsten: alleen Google Groups, en internal kan niet via de API
+
+```bash
+dart run tool/play_upload.dart --list-testers
+dart run tool/play_upload.dart --set-testers --track alpha \
+  --group ridewindow-testers@googlegroups.com
+```
+
+Twee dingen die de API zelf zegt, en die het gedrag verklaren:
+
+1. **Losse adressen bestaan hier niet.** De API-documentatie op het
+   testers-endpoint zegt letterlijk *"Testers resource does not support email
+   lists"*. Alleen Google Groups. Dat is ook waarom de groep in de Console de
+   testerlijst *is* en niet een lijst ernaast: wie lid van de groep is, kan
+   meedoen, en er valt niets over te zetten. Adressen één voor één toevoegen
+   kan alleen in de Console.
+2. **De internal-track is gemigreerd en de API mag er niet meer bij.** Op
+   2026-10-11 gaf een schrijfpoging op internal:
+
+   ```
+   403 The internal track has been upgraded to use open or closed testing;
+   switch back to communities-based testing before using the API for this track.
+   ```
+
+   `--list-testers` toont internal dus als "(geen testerlijst)" en een
+   `--set-testers` erop faalt. De testerlijst van internal stel je in de Console
+   in, op het tabblad Testers van die track. De poging laat geen halve edit
+   achter: het script gooit de edit weg als de API weigert.
+
+`production` is geen testtrack en heeft dus nooit een testerlijst; `--list-testers`
+toont dat als "(geen testtrack)" in plaats van te knallen op de 400 die de API
+daarvoor teruggeeft.
 
 ## Wat er bewezen is
 

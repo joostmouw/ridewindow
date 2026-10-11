@@ -308,6 +308,35 @@ app gepubliceerd is, installeert iedereen hem gewoon uit de winkel en is de
 testtrack niet meer nodig. Een lid dat nooit opte-de hoeft dat niet meer te
 doen; het bericht hoort naar de gewone winkellink te wijzen.
 
+## Internal als vijfde kanaal voor de groep (2026-10-11)
+
+Joost wilde de groep ook op **internal** zetten, zodat de 91 leden nieuwe builds
+zien zonder de review die alpha wel heeft. Dat kan, maar niet via de API:
+
+```
+403 The internal track has been upgraded to use open or closed testing;
+switch back to communities-based testing before using the API for this track.
+```
+
+Google heeft de internal-track van deze app gemigreerd naar een nieuwer
+testmodel, en het communities-based testers-endpoint (`edits.testers`) mag daar
+niet meer bij. **Wat dat betekent:**
+
+- **Via de Console kan het wel:** internal testing > tabblad Testers > de groep
+  `ridewindow-testers@googlegroups.com` toevoegen. Eenmalig handwerk.
+- **Wat er dan verandert:** internal heeft géén review, dus een nieuwe build is
+  binnen minuten bij de leden in plaats van na dagen. Alpha blijft de track die
+  Google telt voor de productie-eis.
+- **Alpha is ongewijzigd.** Daar staat de groep al, en `--list-testers` laat dat
+  zien. `--set-testers` werkt voor alpha en beta; alleen internal weigert.
+- **De API kent geen losse adressen**, alleen Google Groups. Dat zegt de
+  API-documentatie zelf: *"Testers resource does not support email lists"*.
+
+De tool kreeg hiervoor `--list-testers` en `--set-testers` (zie
+`tool/README-play-release.md`). De leesvariant werkt op alle tracks en is de
+manier om te controleren welke lijst een track voedt zonder de Console te
+openen.
+
 **Openstaand:** `.planning/TESTERS.md` noemt zelf al drie adressen
 (`joostmouw@gmail.com`, `Andrea.farina@goflink.com`,
 `andrea.farina42@gmail.com`) en die staan dus publiek. Weghalen kan alleen met

@@ -62,6 +62,14 @@ Zonder te uploaden:
                      worden. Bijv.:
                        --set-notes 48 --track internal
   --list-tracks      Toont welke tracks er zijn en welke builds erop staan.
+  --list-testers     Toont per track welke Google Group als testerlijst dient.
+                     Met --track: alleen die track. Leest alleen.
+  --set-testers      Zet de testerlijst van --track op de groepen uit --group.
+                     Vervangt wat er staat. Zonder --group weigert hij, want
+                     dat zou de lijst wissen. Bijv.:
+                       --set-testers --track internal \\
+                         --group ridewindow-testers@googlegroups.com
+  --group <adres>    Een Google Group als testerlijst, herhaalbaar.
   --list-listings    Toont per taal de winkelpagina: titel, korte en
                      volledige omschrijving, met hun lengte tegen de
                      grenzen van Play. Leest alleen.
@@ -76,8 +84,9 @@ Future<int> _run(List<String> args) async {
   final Map<String, String> opts;
   final List<String> notesArgs;
   final Set<String> flags;
+  final List<String> groupArgs;
   try {
-    (opts, notesArgs, flags) = _parseArgs(args);
+    (opts, notesArgs, flags, groupArgs) = _parseArgs(args);
   } on FormatException catch (e) {
     stderr.writeln('✗ ${e.message}\n\n$_usage');
     return 64; // EX_USAGE
@@ -108,7 +117,13 @@ Future<int> _run(List<String> args) async {
   final promoteCode = opts['promote'];
   final setNotesCode = opts['set-notes'];
   final listTracks = flags.contains('list-tracks');
+  final listTesters = flags.contains('list-testers');
+  final setTesters = flags.contains('set-testers');
   final listListings = flags.contains('list-listings');
+  // Alleen bij --list-testers maakt het uit of --track is meegegeven: zonder
+  // die optie toont hij alle tracks, met die optie alleen de genoemde. De
+  // standaardwaarde 'internal' mag daar dus niet als "meegegeven" gelden.
+  final trackWasGiven = opts.containsKey('track');
   if (promoteCode != null && int.tryParse(promoteCode) == null) {
     stderr.writeln('✗ --promote verwacht een versionCode, geen "$promoteCode".');
     return 64;
@@ -122,12 +137,28 @@ Future<int> _run(List<String> args) async {
   if (promoteCode != null ||
       setNotesCode != null ||
       listTracks ||
+      listTesters ||
+      setTesters ||
       listListings) {
     final api = await _connect(keyPath);
     if (api == null) return 66;
     final notes = _readNotes(notesArgs);
     try {
       if (listTracks) return await _listTracks(api.$1);
+      if (listTesters) {
+        return await _listTesters(
+          api.$1,
+          onlyTrack: trackWasGiven ? track : null,
+        );
+      }
+      if (setTesters) {
+        return await _setTesters(
+          api.$1,
+          track: track,
+          groups: groupArgs,
+          dryRun: dryRun,
+        );
+      }
       if (listListings) return await _listListings(api.$1);
       if (promoteCode != null) {
         return await _promote(
@@ -293,6 +324,101 @@ Future<int> _listTracks(play.AndroidPublisherApi api) async {
   } finally {
     // Alleen gelezen, dus de edit hoeft niet doorgevoerd te worden.
     await api.edits.delete(_packageName, edit.id!);
+  }
+}
+
+/// Toont per track welke Google Group als testerlijst dient.
+///
+/// Bestaat omdat de Console dit per track in een apart tabblad verstopt, en de
+/// vraag "welke lijst voedt deze track?" dan alleen met klikken te beantwoorden
+/// is. Zelfde alleen-lezende patroon als [_listTracks]: edit openen, lezen,
+/// weggooien zonder door te voeren.
+Future<int> _listTesters(
+  play.AndroidPublisherApi api, {
+  String? onlyTrack,
+}) async {
+  final edit = await api.edits.insert(play.AppEdit(), _packageName);
+  try {
+    final tracks = await api.edits.tracks.list(_packageName, edit.id!);
+    stdout.writeln('');
+    for (final track in tracks.tracks ?? const <play.Track>[]) {
+      final name = track.track;
+      if (name == null) continue;
+      if (onlyTrack != null && name != onlyTrack) continue;
+      String line;
+      try {
+        final testers =
+            await api.edits.testers.get(_packageName, edit.id!, name);
+        final groups = testers.googleGroups ?? const <String>[];
+        line = groups.isEmpty ? '(geen testerlijst)' : groups.join(', ');
+      } on Object catch (e) {
+        // Productie is geen testtrack en heeft dus geen testerlijst; de API
+        // zegt dat zelf met een 400. Dat is geen fout om te laten knallen,
+        // maar een feit om te tonen. Andere fouten gaan gewoon door.
+        if (!e.toString().contains('not a testing track')) rethrow;
+        line = '(geen testtrack)';
+      }
+      stdout.writeln('  ${name.padRight(12)} $line');
+    }
+    return 0;
+  } finally {
+    await api.edits.delete(_packageName, edit.id!);
+  }
+}
+
+/// Zet de testerlijst van één track.
+///
+/// **Play kent hier alleen Google Groups, geen losse adressen.** Dat staat in
+/// de API zelf ("Testers resource does not support email lists") en het is de
+/// reden dat de groep in de Console de testerlijst *is* en niet een lijst
+/// ernaast: wie lid is van de groep kan meedoen, en er valt niets over te
+/// zetten. Losse adressen toevoegen kan alleen in de Console.
+///
+/// Een lege `--group` wordt geweigerd: `update` vervangt de hele lijst, dus
+/// zonder die guard wist een vergeten optie de testerlijst van een track.
+Future<int> _setTesters(
+  play.AndroidPublisherApi api, {
+  required String track,
+  required List<String> groups,
+  required bool dryRun,
+}) async {
+  if (groups.isEmpty) {
+    stderr.writeln('✗ Geen --group opgegeven.\n'
+        '  --set-testers vervangt de hele testerlijst, dus een lege lijst zou '
+        'hem wissen.\n'
+        '  Geef de groepen mee die erop moeten staan, bijv. '
+        '--group ridewindow-testers@googlegroups.com');
+    return 64;
+  }
+
+  stdout.writeln('\nTesterlijst van "$track" wordt:');
+  for (final group in groups) {
+    stdout.writeln('  $group');
+  }
+  if (dryRun) {
+    stdout.writeln('— dry-run: er is niets naar Play geschreven.');
+    return 0;
+  }
+
+  final edit = await api.edits.insert(play.AppEdit(), _packageName);
+  final editId = edit.id!;
+  stdout.writeln('✓ Edit $editId geopend');
+  try {
+    await api.edits.testers.update(
+      play.Testers(googleGroups: groups),
+      _packageName,
+      editId,
+      track,
+    );
+    stdout.writeln('✓ Testerlijst bijgewerkt');
+    await api.edits.commit(_packageName, editId);
+    stdout.writeln('✓ Edit doorgevoerd\n');
+    return 0;
+  } catch (e) {
+    // Zoals bij de upload: een halve edit blijft niet in de Console staan.
+    stderr.writeln('✗ Mislukt: $e');
+    await api.edits.delete(_packageName, editId);
+    return 1;
   }
 }
 
@@ -646,16 +772,21 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
   return notes;
 }
 
-(Map<String, String>, List<String>, Set<String>) _parseArgs(List<String> args) {
+(Map<String, String>, List<String>, Set<String>, List<String>) _parseArgs(
+  List<String> args,
+) {
   final opts = <String, String>{};
   final notes = <String>[];
   final flags = <String>{};
+  final groups = <String>[];
   const valueOptions = {'track', 'aab', 'key', 'status', 'promote', 'set-notes'};
   const boolFlags = {
     'help',
     'dry-run',
     'force',
     'list-tracks',
+    'list-testers',
+    'set-testers',
     'list-listings',
   };
 
@@ -670,6 +801,9 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
     } else if (name == 'notes') {
       if (++i >= args.length) throw const FormatException('--notes mist een waarde.');
       notes.add(args[i]);
+    } else if (name == 'group') {
+      if (++i >= args.length) throw const FormatException('--group mist een waarde.');
+      groups.add(args[i]);
     } else if (valueOptions.contains(name)) {
       if (++i >= args.length) throw FormatException('--$name mist een waarde.');
       opts[name] = args[i];
@@ -677,5 +811,5 @@ List<play.LocalizedText> _readNotes(List<String> specs) {
       throw FormatException('Onbekende optie "$arg".');
     }
   }
-  return (opts, notes, flags);
+  return (opts, notes, flags, groups);
 }
