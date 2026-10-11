@@ -219,3 +219,11 @@ abstract final class AppColors {
   static const darkGreenBorder = Color(0xFF2E5B30);
   static const darkGreenGradientStart = Color(0xFF1B3A1E);
 }
+
+/// De hover-laag van Material 3: `onSurface` met 8% dekking (backlog #93).
+///
+/// Voor tikbare vlakken die hun eigen kleur dragen (dagchip op Home,
+/// agendavakje) en daarom niet de standaard InkWell-hover van het thema
+/// zichtbaar krijgen. Geen eigen hex: `onSurface` is in licht donker en in
+/// donker licht, dus de laag is in beide helderheden te zien.
+Color hoverOverlay(ColorScheme cs) => cs.onSurface.withValues(alpha: 0.08);

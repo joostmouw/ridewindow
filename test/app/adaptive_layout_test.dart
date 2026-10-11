@@ -114,6 +114,22 @@ void main() {
       });
     }
 
+    // Duimbereik (backlog #93): de bestemmingen staan verticaal in het
+    // midden, niet bovenaan geplakt.
+    for (final size in const [Size(700, 1000), Size(1280, 800)]) {
+      testWidgets('${size.width.toInt()}x${size.height.toInt()}: rail '
+          'verticaal gecentreerd', (tester) async {
+        await _pumpShell(tester, size);
+        final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+        expect(rail.groupAlignment, 0.0);
+        final home = find.descendant(
+          of: find.byType(NavigationRail),
+          matching: find.text('Home'),
+        );
+        expect(tester.getCenter(home).dy, greaterThan(size.height * 0.3));
+      });
+    }
+
     testWidgets('de rail toont hetzelfde bolletje (9+ bij 12)',
         (tester) async {
       await _pumpShell(tester, const Size(1280, 800), count: 12);

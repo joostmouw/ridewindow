@@ -20,6 +20,7 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/domain/models/units.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 
@@ -558,41 +559,53 @@ class _CellWidget extends ConsumerWidget {
     return Semantics(
       label: semanticLabel,
       button: true,
-      child: GestureDetector(
-        onTap: onTap,
-        onLongPress: () => _showDetail(context, ref, score),
-        child: Container(
-          margin: const EdgeInsets.all(0.5),
-          decoration: BoxDecoration(
-            // Geselecteerd = lichter, niet donkerder (zelfde regel als de
-            // best-choice kaart op Home). De groene rand en het vinkje dragen de
-            // selectie; het vlak zelf komt juist naar voren.
-            color: isSelected
-                ? Theme.of(context).colorScheme.surfaceContainerLowest
-                : blocked
-                    ? rw.gridBlocked
-                    : color,
-            borderRadius: AppShapes.roundedCell,
-            border: isSelected
-                ? Border.all(color: rw.tiers.perfectFg, width: 2)
-                : isPlanned
-                    ? Border.all(color: rw.plannedRide, width: 2)
-                    : null,
-          ),
-          child: blocked && !isSelected
-              // Het slotje mag nu op volle sterkte: op de oude olijfvulling was
-              // 120 alpha nodig om het niet te laten schreeuwen, op een
-              // neutrale vulling verdween het daardoor bijna.
-              ? Center(child: Icon(AppIcons.prohibit, size: 10, color: rw.textHint))
-              : isSelected
-                  ? Center(
-                      child: Icon(AppIcons.check, size: 12, color: rw.tiers.perfectFg),
-                    )
+      // De GestureDetector blijft (tik én lang drukken, kleine vakjes dicht op
+      // elkaar). Voor muis en trackpad komt er een klikcursor en een
+      // hover-laag uit het thema bij (backlog #93); de scorekleur verandert
+      // niet, de laag ligt erover.
+      child: _HoverCell(
+        builder: (hovered) => GestureDetector(
+          onTap: onTap,
+          onLongPress: () => _showDetail(context, ref, score),
+          child: Container(
+            margin: const EdgeInsets.all(0.5),
+            foregroundDecoration: hovered
+                ? BoxDecoration(
+                    color: hoverOverlay(Theme.of(context).colorScheme),
+                    borderRadius: AppShapes.roundedCell,
+                  )
+                : null,
+            decoration: BoxDecoration(
+              // Geselecteerd = lichter, niet donkerder (zelfde regel als de
+              // best-choice kaart op Home). De groene rand en het vinkje dragen de
+              // selectie; het vlak zelf komt juist naar voren.
+              color: isSelected
+                  ? Theme.of(context).colorScheme.surfaceContainerLowest
+                  : blocked
+                      ? rw.gridBlocked
+                      : color,
+              borderRadius: AppShapes.roundedCell,
+              border: isSelected
+                  ? Border.all(color: rw.tiers.perfectFg, width: 2)
                   : isPlanned
-                      ? Center(
-                          child: Icon(AppIcons.bicycle, size: 10, color: rw.plannedRide),
-                        )
+                      ? Border.all(color: rw.plannedRide, width: 2)
                       : null,
+            ),
+            child: blocked && !isSelected
+                // Het slotje mag nu op volle sterkte: op de oude olijfvulling was
+                // 120 alpha nodig om het niet te laten schreeuwen, op een
+                // neutrale vulling verdween het daardoor bijna.
+                ? Center(child: Icon(AppIcons.prohibit, size: 10, color: rw.textHint))
+                : isSelected
+                    ? Center(
+                        child: Icon(AppIcons.check, size: 12, color: rw.tiers.perfectFg),
+                      )
+                    : isPlanned
+                        ? Center(
+                            child: Icon(AppIcons.bicycle, size: 10, color: rw.plannedRide),
+                          )
+                        : null,
+          ),
         ),
       ),
     );
@@ -796,3 +809,28 @@ String _tempText(double? celsius, UnitPrefs units) => celsius == null
 String _windText(double? kmh, UnitPrefs units) => kmh == null
     ? '?'
     : '${convertWind(kmh, units.wind).round()} ${windSuffix(units.wind)}';
+
+/// Houdt alleen bij of de muis boven een agendavakje hangt, zodat niet het
+/// hele vakje of scherm stateful hoeft te worden (backlog #93).
+class _HoverCell extends StatefulWidget {
+  const _HoverCell({required this.builder});
+
+  final Widget Function(bool hovered) builder;
+
+  @override
+  State<_HoverCell> createState() => _HoverCellState();
+}
+
+class _HoverCellState extends State<_HoverCell> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: widget.builder(_hovered),
+    );
+  }
+}

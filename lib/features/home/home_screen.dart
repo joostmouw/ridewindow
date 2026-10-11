@@ -51,6 +51,7 @@ import 'package:ridewindow/providers/location_provider.dart';
 import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/features/shared/screen_hint_overlay.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
+import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
 import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -311,19 +312,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: userName == null || userName.isEmpty
-                            ? () => _showNameDialog(context)
-                            : null,
-                        child: _GreetingWithWhisperName(
-                          greeting: _buildTimeGreeting(context),
-                          name: userName,
-                          baseStyle:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                          showNameHint: userName == null || userName.isEmpty,
-                          hintColor: cs.primary.withAlpha(120),
+                      // Klikcursor alleen als de begroeting tikbaar is
+                      // (nog geen naam), backlog #93.
+                      MouseRegion(
+                        cursor: userName == null || userName.isEmpty
+                            ? SystemMouseCursors.click
+                            : MouseCursor.defer,
+                        child: GestureDetector(
+                          onTap: userName == null || userName.isEmpty
+                              ? () => _showNameDialog(context)
+                              : null,
+                          child: _GreetingWithWhisperName(
+                            greeting: _buildTimeGreeting(context),
+                            name: userName,
+                            baseStyle:
+                                Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                            showNameHint: userName == null || userName.isEmpty,
+                            hintColor: cs.primary.withAlpha(120),
+                          ),
                         ),
                       ),
                       Row(
@@ -809,98 +817,115 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Semantics(
       selected: isSelected,
       button: true,
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          setState(() {
-            _selectedDay = isSelected ? null : day;
-          });
-        },
-        // De `AnimatedScale` van 1.08 is vervallen. Een chip die opspringt trekt
-        // aandacht naar het filter terwijl het antwoord eronder staat -- en
-        // "rustiger" is de hele opdracht van deze stap. De haptische tik blijft,
-        // dus de bevestiging bij het aanraken is niet weg.
-        child: AnimatedContainer(
-          duration: AppMotion.effectsDuration,
-          curve: AppMotion.effectsCurve,
-          margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-          padding: const EdgeInsets.fromLTRB(0, 8, 0, 6),
-          decoration: BoxDecoration(
-            color: isSelected ? cs.surfaceContainer : Colors.transparent,
+      // De `AnimatedScale` van 1.08 is vervallen. Een chip die opspringt trekt
+      // aandacht naar het filter terwijl het antwoord eronder staat -- en
+      // "rustiger" is de hele opdracht van deze stap. De haptische tik blijft,
+      // dus de bevestiging bij het aanraken is niet weg.
+      //
+      // InkWell in plaats van GestureDetector (backlog #93): met muis of
+      // trackpad krijg je een klikcursor en een hover-laag, met het
+      // toetsenbord een focusrand. De volgorde is bewust: de InkWell tekent op
+      // de dichtstbijzijnde Material, dus die transparante Material staat
+      // *binnen* de gekleurde vulling, anders viel de laag eronder weg.
+      child: AnimatedContainer(
+        duration: AppMotion.effectsDuration,
+        curve: AppMotion.effectsCurve,
+        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? cs.surfaceContainer : Colors.transparent,
+          borderRadius: AppShapes.roundedLg,
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
             borderRadius: AppShapes.roundedLg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                // Vandaag was een randje van 1px om de chip. Zonder vulling
-                // heeft zo'n randje niets meer om omheen te liggen, en het
-                // botste bovendien met de rand die selectie aangaf. Nu draagt
-                // het weekdaglabel het: vandaag in de merkkleur, de rest grijs.
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: isToday ? cs.primary : cs.onSurfaceVariant,
-                      fontWeight: isToday || isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                    ),
-              ),
-              const SizedBox(height: 2),
-              // Het dagnummer draagt dezelfde kleur als het streepje eronder:
-              // de dag néémt de kleur van zijn beste rit over in plaats van
-              // hem alleen als randje mee te krijgen. Joost's keuze
-              // (2026-09-07) toen bleek dat één streepje van 3px te weinig was
-              // om het verschil tussen een perfecte en een goede dag te zien.
-              //
-              // Dit blijft één kanaal, geen twee: kleur is kwaliteit, en
-              // selectie is nog steeds uitsluitend de vulling. Alle vier de
-              // tierkleuren zijn donker (#1B5E20, #006457, #A42E0A, #585858),
-              // dus dit kost geen leesbaarheid op papier.
-              Text(
-                '${day.day}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: qualityColor,
-                      fontWeight:
-                          isSelected ? FontWeight.w800 : FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 5),
-              // De kwaliteit van de dag, als balk over de volle breedte van de
-              // dag in plaats van een streepje van 18px.
-              //
-              // Op 3×18 was de kleur niet af te lezen: de vier tierkleuren zijn
-              // allemaal donker, en op zo'n oppervlak zien #1B5E20 (perfect) en
-              // #006457 (great) er allebei uit als zwart. Kleur heeft oppervlak
-              // nodig om kleur te zíjn. Vier px over de volle dagbreedte is nog
-              // steeds geen gevuld blok — de reden dat de gekleurde chips
-              // moesten verdwijnen blijft staan — maar wel genoeg om groen van
-              // teal te onderscheiden zonder erop te turen.
-              //
-              // **De balk verloopt binnen zijn tier.** Vier vaste kleuren
-              // betekende dat een dag met 100 en een dag met 86 er identiek
-              // uitzagen -- allebei Perfect. De balk mengt daarom van de
-              // tierkleur op 55% aan de ondergrens van de band naar vol aan de
-              // bovengrens, zodat zaterdag met 100 zichtbaar sterker is dan
-              // vrijdag met 86. De hue blijft die van de tier, dus de strip kan
-              // de kaart eronder nooit tegenspreken: groen blijft groen.
-              //
-              // Het dagnummer houdt bewust de vólle tierkleur. Meemengen zou
-              // het op de zwakke kant van een band tot ongeveer 2,6:1 contrast
-              // terugbrengen, en dat is tekst die je moet kunnen lezen.
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: AnimatedContainer(
-                  duration: AppMotion.effectsDuration,
-                  curve: AppMotion.effectsCurve,
-                  height: 4,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: _barColor(bestScore, rw),
-                    borderRadius: AppShapes.roundedHair,
+            hoverColor: hoverOverlay(cs),
+            // Expliciet: InkWell kiest buiten het web standaard de pijl
+            // (`adaptiveClickable`), en de agendavakjes en de begroeting tonen
+            // ook de hand. Eén regel voor alles wat tikbaar is.
+            mouseCursor: SystemMouseCursors.click,
+            onTap: () {
+              HapticFeedback.lightImpact();
+              setState(() {
+                _selectedDay = isSelected ? null : day;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    // Vandaag was een randje van 1px om de chip. Zonder vulling
+                    // heeft zo'n randje niets meer om omheen te liggen, en het
+                    // botste bovendien met de rand die selectie aangaf. Nu draagt
+                    // het weekdaglabel het: vandaag in de merkkleur, de rest grijs.
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: isToday ? cs.primary : cs.onSurfaceVariant,
+                          fontWeight: isToday || isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
                   ),
-                ),
+                  const SizedBox(height: 2),
+                  // Het dagnummer draagt dezelfde kleur als het streepje eronder:
+                  // de dag néémt de kleur van zijn beste rit over in plaats van
+                  // hem alleen als randje mee te krijgen. Joost's keuze
+                  // (2026-09-07) toen bleek dat één streepje van 3px te weinig was
+                  // om het verschil tussen een perfecte en een goede dag te zien.
+                  //
+                  // Dit blijft één kanaal, geen twee: kleur is kwaliteit, en
+                  // selectie is nog steeds uitsluitend de vulling. Alle vier de
+                  // tierkleuren zijn donker (#1B5E20, #006457, #A42E0A, #585858),
+                  // dus dit kost geen leesbaarheid op papier.
+                  Text(
+                    '${day.day}',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: qualityColor,
+                          fontWeight:
+                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 5),
+                  // De kwaliteit van de dag, als balk over de volle breedte van de
+                  // dag in plaats van een streepje van 18px.
+                  //
+                  // Op 3×18 was de kleur niet af te lezen: de vier tierkleuren zijn
+                  // allemaal donker, en op zo'n oppervlak zien #1B5E20 (perfect) en
+                  // #006457 (great) er allebei uit als zwart. Kleur heeft oppervlak
+                  // nodig om kleur te zíjn. Vier px over de volle dagbreedte is nog
+                  // steeds geen gevuld blok — de reden dat de gekleurde chips
+                  // moesten verdwijnen blijft staan — maar wel genoeg om groen van
+                  // teal te onderscheiden zonder erop te turen.
+                  //
+                  // **De balk verloopt binnen zijn tier.** Vier vaste kleuren
+                  // betekende dat een dag met 100 en een dag met 86 er identiek
+                  // uitzagen -- allebei Perfect. De balk mengt daarom van de
+                  // tierkleur op 55% aan de ondergrens van de band naar vol aan de
+                  // bovengrens, zodat zaterdag met 100 zichtbaar sterker is dan
+                  // vrijdag met 86. De hue blijft die van de tier, dus de strip kan
+                  // de kaart eronder nooit tegenspreken: groen blijft groen.
+                  //
+                  // Het dagnummer houdt bewust de vólle tierkleur. Meemengen zou
+                  // het op de zwakke kant van een band tot ongeveer 2,6:1 contrast
+                  // terugbrengen, en dat is tekst die je moet kunnen lezen.
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: AnimatedContainer(
+                      duration: AppMotion.effectsDuration,
+                      curve: AppMotion.effectsCurve,
+                      height: 4,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: _barColor(bestScore, rw),
+                        borderRadius: AppShapes.roundedHair,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

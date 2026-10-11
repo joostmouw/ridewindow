@@ -95,6 +95,12 @@ class ScaffoldWithNav extends ConsumerWidget {
                 selectedIndex: navigationShell.currentIndex,
                 onDestinationSelected: onSelect,
                 labelType: NavigationRailLabelType.all,
+                // Verticaal gecentreerd (backlog #93, plan 261011-kb9 "Hoe
+                // goedlopende apps het doen"): een tablet hou je met twee
+                // handen vast en dan liggen de duimen halverwege de zijkant.
+                // Midden werkt in portret én liggend; onderaan zou botsen met
+                // de gebarenbalk van Android en ligt liggend onder de duim.
+                groupAlignment: 0.0,
                 destinations: [
                   for (final d in destinations)
                     NavigationRailDestination(
