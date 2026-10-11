@@ -98,5 +98,5 @@ Last activity: 2026-09-24 -- 35-05 teller en groepschips klaar
   met 2 vensters → rood bolletje bij Jacco → "Ik ga mee" → Joost ziet Jacco als "gaat mee".
   Bij "approved": 35-06-SUMMARY schrijven, CLUB-12..16, 25, 26 aanvinken, fase 35 afsluiten
   (`GSD_WORKSTREAM=clubs gsd-sdk query phase.complete 35`, daarna frontmatter-tellers met de hand).
-- Daarna fase 36 (afronden + CLUB-29 namen bijwerken, CLUB-30 naam vragen; 0015 (0014 is in v4.3 fase 37 gebruikt voor usage_daily_counts) + checkpoint).
+- Daarna fase 36 (afronden + CLUB-29 namen bijwerken, CLUB-30 naam vragen; 0016 (0014 en 0015 zijn in v4.3 fase 37 gebruikt: usage_daily_counts en het dichtzetten van de 0001-functies) + checkpoint).
 - Parallel: worktree `~/ridewindow-meldingen` (branch `meldingen`) werkt aan #77B/#74; mergen ná 35.
