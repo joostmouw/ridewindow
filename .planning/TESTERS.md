@@ -272,17 +272,41 @@ beschrijft hoe.
 - Daarvan zijn er **16 via de groep te bereiken**: `e.j.heineke@gmail.com`
   bounct, en `fajisfajar@gmail.com` en `hatshiljodhani@gmail.com` hebben de
   groep op "no email" staan. Die drie hebben een eigen mail nodig.
-- De Play Console toont **75 testers** op de gesloten test. Die 55 anderen zijn
-  losse adressen in de Console, niet in de groep, en dus ook niet in de export.
-  Wie ze zijn is nergens vastgelegd.
+- `andrea.farina42@gmail.com` en `andrea.farina@goflink.com` zijn één persoon
+  met twee adressen, dus de groep telt 20 rijen maar 19 mensen.
 - Van de twee exports in `~/Downloads/` is die van **18:15** de volledige; die
   van 17:32 mist `dev.soliman`, `hatshiljodhani` en `markdenis.dev`, die zich
   daarna aanmeldden.
-- `andrea.farina42@gmail.com` en `andrea.farina@goflink.com` zijn één persoon
-  met twee adressen, dus de groep telt 20 rijen maar 19 mensen.
 - **Ingrid**, wier feedback tot #68, #69 en #70 leidde, is in deze lijst niet
-  aan te wijzen. Haar adres staat nergens in de repo; zoek dat in de Console op
-  voordat een bericht naar haar verwijst.
+  aan te wijzen. Haar adres staat nergens in de repo; zoek dat in de groep of
+  de Console op voordat een bericht naar haar verwijst.
+
+**Correctie op de aanname hierboven (nagelezen in de Play-API, 2026-10-11).**
+Ik schreef eerst dat de Console 75 testers toont tegenover 20 in de groep, en
+dat die 55 anderen losse adressen in de Console zijn. **Dat is fout.** De
+testerlijst van de alpha-track bevat precies één regel:
+`ridewindow-testers@googlegroups.com`. Er staan geen losse adressen in.
+
+Wat er werkelijk aan de hand is:
+
+- **Lidmaatschap van de groep ís het testerschap.** Wie in de groep zit kan
+  meedoen; er valt niets over te zetten. Dit weerlegt ook de notitie van
+  20 september dat de groepsroute naar Play niet zou werken — die werkt, en is
+  inmiddels de énige route.
+- Het Console-getal is het aantal groepsleden dat de **opt-in** deed, niet het
+  aantal leden. Op 2026-10-11: **91 leden** in de groep, **75** in de Console.
+  Die zestien moeten nog één keer op de testerslink klikken.
+- De **internal**-track heeft géén testerlijst in de API. Daar komt alleen de
+  eigenaar binnen; anderen hebben de internal-link nodig.
+
+De eerdere notitie dat de testerlijst uit "tien losse adressen + het
+groepsadres" bestond, is dus achterhaald: die tien zijn eruit en de groep
+vervangt ze.
+
+**Praktisch gevolg voor het productiebericht:** dit is een niet-issue. Zodra de
+app gepubliceerd is, installeert iedereen hem gewoon uit de winkel en is de
+testtrack niet meer nodig. Een lid dat nooit opte-de hoeft dat niet meer te
+doen; het bericht hoort naar de gewone winkellink te wijzen.
 
 **Openstaand:** `.planning/TESTERS.md` noemt zelf al drie adressen
 (`joostmouw@gmail.com`, `Andrea.farina@goflink.com`,
