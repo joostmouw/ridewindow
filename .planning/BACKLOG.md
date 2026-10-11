@@ -603,3 +603,20 @@ en `.planning/research/BIKEWIND.md`.
   inloggen later. Alles in `.planning/research/ROUTE-INGANG.md`; als pagina:
   https://claude.ai/artifact/9k42ZUFHsCahTfyBSQZdSY
 
+**Aangevuld 2026-10-11 (avond, tweede onderzoeksronde, quick 261011-rtk):**
+- **Strava's ontwikkelaarsprogramma is per 1 juni 2026 betaald geworden:** een actief
+  Strava-abonnement is de voorwaarde voor de Standard-tier (VS $ 11,99/maand), 1 atleet standaard,
+  zelf uit te breiden naar 10, pas daarna review. "Strava met inloggen" is daarmee een bewuste
+  breuk van het €0-plafond plus een server-uitzondering voor de token-ruil. Bovendien staan
+  Strava-routelinks sinds ~april 2026 achter de login, dus zonder OAuth haalt een gedeelde link
+  geen lijn op. Advies van het onderzoek: alleen bij expliciete vraag van testers.
+- **Kaarttegels:** CARTO blijft gratis voor niet-commercieel (5 M tegelverzoeken/maand) maar vraagt
+  nu een gratis API-sleutel per e-mail; OpenFreeMap is zonder sleutel en zonder limiet, maar alleen
+  vector met een minder rijpe Flutter-plug-in. Silhouet zonder tegels wordt de offline basis.
+- **#89 is hiermee beantwoord:** Komoot Group Rides vraagt van elke deelnemer een Komoot-account,
+  notificaties en een ontgrendelde startregio, plant de tijd via route-comments en heeft geen enkele
+  weers- of beschikbaarheidsfunctie. Overlap met Ridewindow is alleen "route bij de groepsrit"
+  (fase 4 van dit epic). Komoot kiest het waar, Ridewindow het wanneer. Voorstel: #89 sluiten.
+- Uitwerking, antwoorden op de open vragen, besluitenlijst en het testprotocol voor privé-tours:
+  `.planning/research/ROUTE-EPIC.md`.
+
