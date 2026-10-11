@@ -71,15 +71,19 @@ deze release.**
   allemaal via de testtracks, want productie is nog niet installeerbaar. Van
   de 91 groepsleden gebruikt dus ruwweg de helft de app actief: de eerste
   echte adoptiemeting.
-- **Duwen van main is een besluit geworden, geen routine.** Lokale main staat
-  27 commits voor op origin: het fase-37-werk (gebruiksmeting, migraties
-  0014/0015, breedteklasse + invoermiddel op web, en de paginering-fix
-  `059ddc7` in `tool/usage_report.dart`: Range-headers, 1000 rijen per
-  pagina, want PostgREST stopte stilletjes na 1000 rijen), en het raakt
-  `lib/`. De deploy-workflow pikt dat automatisch op: een push deployt de PWA
-  opnieuw, op versie 70 met ándere bytes dan de gereleasete 70-bundel. Twee
-  schone wegen: eerst bumpen naar 71 en als release duwen, of het werk laten
-  staan tot de volgende release. Pushen alleen op Joosts sein.
+- **Gepusht (2026-10-11 21:03, nodig voor de wacht van 37-06), en het gevolg is
+  geaccepteerd.** De push bracht de 31 fase-37-commits naar origin en
+  herdeployde de PWA automatisch: die heet nog 1.0.59 (70), maar de bundel wijkt
+  inhoudelijk af van de gereleasete 70-bundel (de post-70-commits aan `lib/`
+  zitten er op het web nu wél in en in Play niet). **Besluit (Joost, direct na
+  de push): accepteren, en bij de volgende release de versie ophogen** —
+  `pubspec.yaml` én `lib/core/app_version.dart` samen, anders faalt
+  `test/core/app_version_test.dart` met opzet. Meegaand met de volgende push:
+  de docs-commits na deze (`cc468d7` fase-37-verslag, `f20d9a9` route-epic).
+  **Les bij de verificatie:** de eerste meting van `version.json` na een
+  herdeploy kan een stagnerende CDN-kop teruggeven (deze ronde zei de eerste
+  meting 66, de tweede met cache-buster 70); meet opnieuw met een
+  query-parameter voordat je concludeert dat de deploy mis is gegaan.
 - **Na publicatie ligt klaar:** het testerbericht (tekst in
   `~/.config/ridewindow/testers/`, met de conditonele openingszin en de
   beloning die bewust geen onbetaalbare belofte is), BACKLOG #76
