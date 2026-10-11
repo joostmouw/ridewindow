@@ -1,1 +1,1 @@
-Ridewindow now uses ridewindow.web.app. Older links keep working and open the same invite or group. After updating, Android recognises the new address as a direct app link.
+Shared rides and groups now appear right away when you open the app, even without internet. As soon as you are online, they refresh quietly in the background.

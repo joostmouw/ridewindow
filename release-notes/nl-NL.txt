@@ -1,1 +1,1 @@
-Ridewindow gebruikt nu ridewindow.web.app. Oude links blijven werken en openen dezelfde uitnodiging of groep. Na de update herkent Android het nieuwe adres rechtstreeks als App Link.
+Gedeelde ritten en groepen staan nu meteen op je scherm als je de app opent, ook zonder internet. Zodra er verbinding is, verversen ze stil op de achtergrond.
