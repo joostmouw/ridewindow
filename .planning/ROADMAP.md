@@ -10,6 +10,7 @@ RideWindow builds from the inside out: a pure-Dart scoring engine with 100% unit
 - ✅ **v2.0 iOS Web App (PWA)** - Phases 11–17 (shipped 2026-07-17) — see `.planning/milestones/v2.0-ROADMAP.md`
 - ✅ **v3.0 Accounts & Sociaal** - Phases 18–22 (shipped 2026-09-07) — see `.planning/milestones/v3.0-ACCOUNTS.md`. Milestone phases 3–5 waren gepland als uitgesteld, maar de sociale laag is er tijdens deze milestone alsnog gekomen als epic #62 "Peloton" (vrienden, uitnodigen voor een gedeelde rit, accepteren) — zie `.planning/PELOTON.md`. Wat wél uitgesteld blijft: gedeelde beschikbaarheid en server-side push, nu belegd in epic #65.
 - 🚧 **v4.1 Zo snel mogelijk live in de store** - Phases 26–32 (in progress, gestart 2026-09-10) — van gesloten test naar productie op Google Play, met testers die de app werkelijk gebruiken. Neemt epic #71 "Twaalf testers" op (`.planning/TESTERS.md`).
+- 🚧 **v4.3 Dicht huis** - Phases 37–40 (in progress, gestart 2026-10-11) — wat een vreemde met de publieke Supabase-sleutel kan, wordt zichtbaar en begrensd, zonder dat een gewone gebruiker iets merkt. Epic #75 (`.planning/BACKLOG.md`). Fases 33–36 zijn van de parallelle clubs-workstream (v4.2, `.planning/workstreams/clubs/`).
 - ✅ **v4.0 Eigen gezicht** - Phases 23–25 (afgerond 2026-09-08) — merkidentiteit en UI/UX: typografie, hiërarchie, iconografie. Startpunt: `.planning/EIGEN-GEZICHT.md`, backlog-epic #64. Eigen hoofdversie en geen punt-release: v1 was Android, v2 de PWA, v3 accounts — een eigen gezicht is een even zichtbare stap.
 
 ## Phases
@@ -74,6 +75,15 @@ Full phase details, plans, and decisions: `.planning/milestones/v2.0-ROADMAP.md`
 - [ ] **Phase 30: Werving** - Eigen kring direct na fase 26, de gekozen kanalen na build 43; minstens 15 aangemeld en afhakers binnen twee dagen gezien
 - [ ] **Phase 31: De veertien dagen** - Ingrids vensters (#69, #70) als echte builds op echte feedback; minstens drie builds naar de gesloten test
 - [ ] **Phase 32: Aanvraag en productie** - De aanvraag onderbouwd vanuit de changelog, en Ridewindow in productie
+
+### 🚧 v4.3 Dicht huis (In Progress)
+
+**Milestone Goal:** Wat een vreemde met de publieke Supabase-sleutel kan, wordt zichtbaar en begrensd: feedback en statistiek niet meer onbeperkt vol te pompen, uitnodigingscodes niet meer onbeperkt te raden, en niemand die de app gewoon gebruikt merkt er iets van. Meten gaat vóór dichttimmeren; captcha en App Check blijven buiten deze milestone tot de metingen erom vragen.
+
+- [ ] **Phase 37: Meten** - Een dagtelling per tabel (rijen, unieke toestellen of accounts) en een signaal bij een uitschieter, zodat er een nulmeting ligt vóór er één grens staat
+- [ ] **Phase 38: Open deuren begrensd** - `feedback` en `app_events` krijgen in de database een plafond per toestel en per afzender per dag en een maximale rijgrootte, ook voor builds die al in het veld staan; anonieme feedback blijft mogelijk
+- [ ] **Phase 39: Codes en grenzen per account** - Een teller op mislukte pogingen bij maatjescodes én groepslinks, en bovengrenzen op wat één account kan aanmaken, met een uitleg in de app
+- [ ] **Phase 40: Accounts en afronding** - E-mailaccounts pas actief na bevestiging, Supabase Auth-limieten bewust ingesteld, privacybeleid en `CLAUDE.md`/`AGENTS.md` bijgewerkt, regressie groen en de build bij de testers
 
 ## Phase Details
 
@@ -334,10 +344,58 @@ Plans:
   3. Ridewindow is installeerbaar uit de Play Store in productie
 **Plans**: TBD
 
+### Phase 37: Meten
+**Goal**: Joost kan op elk moment zien of iemand de open deuren al gebruikt, en er ligt een nulmeting van normaal gebruik waarop de grenzen van fase 38 en 39 gebaseerd worden.
+**Depends on**: Nothing (eerste fase van v4.3)
+**Requirements**: MEET-01, MEET-02
+**Success Criteria** (what must be TRUE):
+  1. Joost ziet per dag voor `feedback`, `app_events`, maatjes- en groepsuitnodigingen en nieuwe accounts hoeveel rijen erbij kwamen en van hoeveel verschillende toestellen of accounts, zonder zelf een query te schrijven (MEET-01)
+  2. De telling leest alleen bestaande tabellen en voegt niets toe aan wat een gewone gebruiker of `anon` kan lezen; een eventuele nieuwe functie is verantwoord in de migratie die hem toevoegt
+  3. Een dag die ver boven het normale ligt wordt als uitschieter gemarkeerd en komt bij Joost terecht zonder dat hij ernaar hoeft te zoeken (MEET-02)
+  4. Er staat een vastgelegde nulmeting (wat de app per toestel en per account op een drukke dag werkelijk verstuurt) die als onderbouwing dient voor de plafonds in fase 38 en 39
+**Plans**: TBD
+
+### Phase 38: Open deuren begrensd
+**Goal**: `feedback` en `app_events` kunnen niet meer onbeperkt volgepompt worden, ook niet via builds die al bij testers en in productie staan, terwijl een tester zonder account nog steeds feedback kan sturen en nooit feedback kwijtraakt.
+**Depends on**: Phase 37 (de plafonds volgen uit de nulmeting)
+**Requirements**: RATE-01, RATE-02, RATE-03, RATE-04, RATE-05
+**Success Criteria** (what must be TRUE):
+  1. Een script dat met de publieke sleutel `feedback` of `app_events` blijft insturen wordt na het dagplafond per toestel én per afzender geweigerd door de database zelf (trigger, plpgsql); een andere `device_id` kiezen helpt niet, omdat de afzender (gehasht IP-adres uit de PostgREST-request-headers, hooguit één dag bewaard) apart geteld wordt (RATE-01, RATE-02)
+  2. Een tester zonder account stuurt vanuit de app feedback en die komt aan; het plafond voor `app_events` ligt ruim boven wat de app zelf op een drukke dag verstuurt (RATE-01, RATE-02)
+  3. Een rij met tekst of meegestuurde context boven de maximale lengte wordt geweigerd, zonder dat normale feedback met volledige scorecontext daaronder valt (RATE-03)
+  4. De huidige productiebuild (1.0.59, 70), zonder update, valt aantoonbaar onder dezelfde grenzen: aanmaken binnen de grens werkt, erboven wordt geweigerd (RATE-04)
+  5. Een tester boven de feedbackgrens ziet in de app een duidelijke melding in plaats van een stille fout, en zijn feedback blijft lokaal bewaard en gaat later alsnog mee (RATE-05)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 39: Codes en grenzen per account
+**Goal**: Uitnodigingscodes en groepslinks zijn niet meer onbeperkt te raden, en één account kan niet onbeperkt dingen aanmaken, terwijl een mens die gewoon de app gebruikt nooit tegen een grens aanloopt zonder te horen waarom.
+**Depends on**: Phase 37 (grenzen volgen uit de nulmeting); los van fase 38
+**Requirements**: CODE-01, CODE-02, GRENS-01
+**Success Criteria** (what must be TRUE):
+  1. Na vijf mislukte pogingen binnen een uur weigert `redeem_friend_invite` voor dat account verdere pogingen, ook met een geldige code, en de app zegt hoe laat het weer kan (CODE-01)
+  2. Dezelfde teller geldt voor `redeem_group_invite`: mislukte maatjes- en groepspogingen tellen samen, en een geslaagde poging binnen de grens werkt als vanouds (CODE-02)
+  3. Eén account kan niet meer dan een vast aantal open uitnodigingen, groepsritten en vensteropties aanmaken; de grenzen liggen ver boven wat de nulmeting als normaal laat zien en worden in de database afgedwongen (GRENS-01)
+  4. Wie toch tegen een grens aanloopt, krijgt in de app een uitleg in NL en EN in plaats van een generieke fout (GRENS-01)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 40: Accounts en afronding
+**Goal**: Nepaccounts via e-mail zijn duurder geworden, alles wat er voor de begrenzing wordt bijgehouden is uitgelegd en verantwoord, en de nieuwe meldingen staan als echte build bij de testers.
+**Depends on**: Phase 38, Phase 39
+**Requirements**: ACCT-01, ACCT-02, AFR-01, AFR-02, AFR-03
+**Success Criteria** (what must be TRUE):
+  1. Een account dat met e-mail en wachtwoord wordt aangemaakt kan pas inloggen en synchroniseren na bevestiging van het e-mailadres; Google-inloggen werkt ongewijzigd (ACCT-01)
+  2. De Supabase Auth-limieten op aanmelden, inlogpogingen en verstuurde mails zijn in het dashboard bewust gekozen en met waarde en reden vastgelegd in de planning (ACCT-02)
+  3. Het gepubliceerde privacybeleid (NL en EN) beschrijft dat er voor de begrenzing een gehasht IP-adres wordt bijgehouden en dat het na hooguit één dag verdwijnt (AFR-01)
+  4. `CLAUDE.md` en `AGENTS.md` noemen elke nieuwe plpgsql-functie en trigger met de reden waarom de client hem niet kan vervangen, en het aantal functies in de constraint klopt weer (AFR-02)
+  5. De volledige suite is groen, en een build met de nieuwe meldingen staat via internal op de Oppo (via Play, niet gesideload) en bij de testers (AFR-03)
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 (Phase 22 may run in parallel with 20–21 once Phase 19 is complete, per its dependency note above)
+Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18 → 19 → 20 → 21 → 22 (Phase 22 may run in parallel with 20–21 once Phase 19 is complete, per its dependency note above). v4.3: 37 → 38 → 39 → 40 (38 en 39 hangen allebei alleen van 37 af)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -374,5 +432,9 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 30. Werving | v4.1 | 0/TBD | Not started | - |
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
+| 37. Meten | v4.3 | 0/TBD | Not started | - |
+| 38. Open deuren begrensd | v4.3 | 0/TBD | Not started | - |
+| 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
+| 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |
 
 **Note:** The v1.0 progress table rows above (Phases 1, 2, 3 marked Complete; others Not started) reflect the state carried over from the v1.0 STATE.md snapshot at milestone transition — see `git log` / `.planning/STATE.md` Accumulated Context for actual v1.0 completion history (all of Phases 1–10 shipped to the Internal testing track).

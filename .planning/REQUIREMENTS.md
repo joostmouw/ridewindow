@@ -67,12 +67,27 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| MEET-01 | Phase 37 | Pending |
+| MEET-02 | Phase 37 | Pending |
+| RATE-01 | Phase 38 | Pending |
+| RATE-02 | Phase 38 | Pending |
+| RATE-03 | Phase 38 | Pending |
+| RATE-04 | Phase 38 | Pending |
+| RATE-05 | Phase 38 | Pending |
+| CODE-01 | Phase 39 | Pending |
+| CODE-02 | Phase 39 | Pending |
+| GRENS-01 | Phase 39 | Pending |
+| ACCT-01 | Phase 40 | Pending |
+| ACCT-02 | Phase 40 | Pending |
+| AFR-01 | Phase 40 | Pending |
+| AFR-02 | Phase 40 | Pending |
+| AFR-03 | Phase 40 | Pending |
 
 **Coverage:**
-- v4.3 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 16
+- v4.3 requirements: 15 total
+- Mapped to phases: 15
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-11*
-*Last updated: 2026-10-11 after milestone v4.3 start*
+*Last updated: 2026-10-11 after roadmap v4.3 (fases 37–40)*
