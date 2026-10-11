@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
 status: planning
-last_updated: "2026-10-11T17:25:57.309Z"
-last_activity: 2026-10-11
+last_updated: "2026-10-11T17:46:46.617Z"
+last_activity: 2026-10-11 — Roadmap v4.3 gemaakt (fases 37–40)
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 16
+  completed_phases: 6
+  total_plans: 36
+  completed_plans: 37
+  percent: 38
 ---
 
 # Project State
@@ -1283,7 +1283,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-09-20T11:18:49.165Z
+Last session: 2026-10-11T17:46:46.607Z
 Last activity: 2026-09-02 - Fase 21 vrijwel dicht. Stap 1b: backlog #61 tegengeproefd op het toestel, **PASS aan beide helften** (inlogflow én koude start), met een negatieve controle op de pre-fix build 1.0.21+22 die de bug live reproduceerde. §6 (AUTH-09) uitgevoerd op de PWA: app-kant PASS inclusief D-03 op drie schermen, en de Supabase-kant geverifieerd via twee leesqueries (nul weesrijen, account weg uit `auth.users`). De `feedback`-controle is **vervallen, niet gehaald** — die tabel is leeg, dus `on delete set null` is alleen door het schema gedekt. Onderweg gevonden en gefixt: `lib/core/app_version.dart` liep achter op `pubspec.yaml` (quick 260901-r92) — de rode test die dat aanwees was maandenlang afgedaan als "de bekende flaky notificatietest". Suite nu **451/451**. Alles staat op **1.0.23+24**: main gepusht, PWA live geverifieerd in de bundel, toestel bijgewerkt via `adb install -r` (data behouden), en Play internal testing uitgerold op 2026-09-02 08:00. `21-08-SUMMARY.md` geschreven (compleet), `21-09-SUMMARY.md` geschreven (**incomplete**).
 
 **Enige openstaande stap voor fase 21:** de app één keer via Play installeren op het toestel. Vereist eerst deïnstalleren (sideload vs. Play-signing) en wist daarmee lokale data + de Calendar-OAuth-grant. Let daarna specifiek op inloggen en Google Calendar — zie `.planning/phases/21-sync-migration/MORGEN.md` stap 3. Blijft daarnaast staan: fase 19's ontbrekende koude-start-basislijn (plan 19-07), waardoor REG-03 geen vóór/ná-vergelijking heeft.
