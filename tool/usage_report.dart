@@ -113,31 +113,52 @@ Future<void> main(List<String> args) async {
 // Ophalen
 // ---------------------------------------------------------------------------
 
+/// PostgREST geeft per verzoek hoogstens zoveel rijen terug (Supabase-standaard
+/// `max-rows`). Tien bronnen per dag betekent dat alles boven honderd dagen
+/// stilzwijgend werd afgekapt -- het rapport toonde dan een oude dag als
+/// "vandaag". Daarom halen we in pagina's op met `offset`/`limit` in de query
+/// (een `Range`-header negeert PostgREST bij een POST-rpc); de functie sorteert
+/// vast op dag en bron, dus de pagina's sluiten op elkaar aan.
+const _pageSize = 1000;
+
 Future<List<DayCount>> _fetchCounts({
   required String key,
   required int days,
 }) async {
   final client = HttpClient();
   try {
-    final uri = Uri.parse('$_projectUrl/rest/v1/rpc/usage_daily_counts');
-    final request = await client.postUrl(uri);
-    request.headers.set('apikey', key);
-    request.headers.set('Authorization', 'Bearer $key');
-    request.headers.contentType = ContentType.json;
-    request.write(jsonEncode({'p_days': days}));
-    final response = await request.close();
-    final body = await response.transform(utf8.decoder).join();
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw HttpException(
-        'Supabase gaf ${response.statusCode}${_postgrestReason(body)}',
+    final all = <DayCount>[];
+    // Tien bronnen per dag: meer pagina's dan dit kan niet, ook niet bij de
+    // maximale --days. Een vangnet tegen een eindeloze lus.
+    final maxPages = (days * kUsageSources.length) ~/ _pageSize + 2;
+    for (var page = 0; page < maxPages; page++) {
+      final uri = Uri.parse(
+        '$_projectUrl/rest/v1/rpc/usage_daily_counts'
+        '?offset=${all.length}&limit=$_pageSize',
       );
-    }
+      final request = await client.postUrl(uri);
+      request.headers.set('apikey', key);
+      request.headers.set('Authorization', 'Bearer $key');
+      request.headers.contentType = ContentType.json;
+      request.write(jsonEncode({'p_days': days}));
+      final response = await request.close();
+      final body = await response.transform(utf8.decoder).join();
 
-    return (jsonDecode(body) as List)
-        .cast<Map<String, dynamic>>()
-        .map(DayCount.fromJson)
-        .toList();
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw HttpException(
+          'Supabase gaf ${response.statusCode}${_postgrestReason(body)}',
+        );
+      }
+
+      final rows = (jsonDecode(body) as List)
+          .cast<Map<String, dynamic>>()
+          .map(DayCount.fromJson)
+          .toList();
+      all.addAll(rows);
+      if (rows.length < _pageSize) return all;
+    }
+    throw const HttpException(
+        'meer pagina\'s dan verwacht; telling afgebroken');
   } finally {
     client.close();
   }
