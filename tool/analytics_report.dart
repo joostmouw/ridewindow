@@ -41,96 +41,21 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'src/service_role_key.dart';
+
 const _projectUrl = 'https://hcdrydlgqpnmumfupgcx.supabase.co';
 const _table = 'app_events';
 
-/// Waar de sleutel standaard staat. Buiten de repo, met opzet.
-String get _defaultKeyPath {
-  final home = Platform.environment['HOME'] ?? '.';
-  return '$home/.config/ridewindow/supabase-service-role.key';
-}
-
-/// Hoe een sleutel eruitziet. Twee vormen, want Supabase kent er twee:
-///  * de klassieke JWT -- drie met punten gescheiden base64url-delen;
-///  * het nieuwe formaat `sb_secret_...`, dat geen JWT is.
-///
-/// Alleen op de JWT controleren leek veiliger, maar zou een geldige sleutel van
-/// het nieuwe soort botweg weigeren met "geen regel die op een JWT lijkt" -- een
-/// foutmelding die naar de verkeerde kant wijst.
-final _keyPattern = RegExp(
-  r'^(?:[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'
-  r'|sb_secret_[A-Za-z0-9_-]+)$',
-);
-
-/// Leest de sleutel uit -- eerst `--key`, dan de omgeving, dan het
-/// standaardbestand. Geeft null als hij nergens staat of nergens op lijkt.
-///
-/// **Waarom hier een vormcontrole staat.** De eerste versie gaf de ruwe
-/// bestandsinhoud rechtstreeks door aan een HTTP-header. Stond er iets anders
-/// in dan een sleutel -- op 2026-09-19 was dat de commandoregel die per ongeluk
-/// was meegeplakt -- dan gooide Dart een `FormatException` met *de volledige
-/// waarde erin*. Daarmee lekte een service-role sleutel naar de uitvoer, en
-/// die moest ingetrokken worden. Een sleutel hoort nooit in een foutmelding te
-/// kunnen belanden.
-///
-/// Vandaar twee dingen: er wordt gezocht naar de eerste regel die op een JWT
-/// lijkt (zodat een meegeplakte regel ervoor of erna niets breekt), en wat er
-/// niet op lijkt wordt geweigerd zónder de inhoud te tonen.
-String? _readKey(List<String> args) {
-  final fromArg = _stringArg(args, '--key');
-
-  if (fromArg == null) {
-    final fromEnv = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
-    if (fromEnv != null && fromEnv.trim().isNotEmpty) {
-      return _firstKey(fromEnv);
-    }
-  }
-
-  final file = File(fromArg ?? _defaultKeyPath);
-  if (!file.existsSync()) return null;
-  return _firstKey(file.readAsStringSync());
-}
-
-/// De eerste regel die de vorm van een sleutel heeft, of null.
-String? _firstKey(String raw) {
-  for (final line in raw.split('\n')) {
-    final candidate = line.trim();
-    if (_keyPattern.hasMatch(candidate)) return candidate;
-  }
-  return null;
-}
-
 Future<void> main(List<String> args) async {
-  final key = _readKey(args);
+  final key = readServiceRoleKey(args);
   if (key == null) {
-    stderr.writeln('Geen bruikbare service-role sleutel gevonden.');
-    stderr.writeln('');
-    stderr
-        .writeln('Als het bestand wél bestaat: er staat geen regel in die de');
-    stderr.writeln(
-      'vorm van een sleutel heeft (JWT of sb_secret_...). De inhoud',
-    );
-    stderr.writeln('wordt met opzet niet getoond.');
-    stderr.writeln('');
-    stderr.writeln('Gezocht in:');
-    stderr.writeln('  SUPABASE_SERVICE_ROLE_KEY (omgevingsvariabele)');
-    stderr.writeln('  $_defaultKeyPath');
-    stderr.writeln('');
-    stderr.writeln('De sleutel staat in Supabase > Project Settings > API >');
-    stderr.writeln('service_role. Zo zet je hem neer zonder dat hij in je');
-    stderr.writeln('shell-history belandt:');
-    stderr.writeln('');
-    stderr.writeln('  mkdir -p ~/.config/ridewindow');
-    stderr.writeln(
-      '  (umask 077; cat > ~/.config/ridewindow/supabase-service-role.key)',
-    );
-    stderr.writeln('  <plak de sleutel, Enter, Ctrl-D>');
+    printMissingKeyHelp();
     exitCode = 1;
     return;
   }
 
-  final days = _intArg(args, '--days') ?? 14;
-  final htmlPath = _stringArg(args, '--html');
+  final days = intArg(args, '--days') ?? 14;
+  final htmlPath = stringArg(args, '--html');
   final since = DateTime.now().toUtc().subtract(Duration(days: days));
 
   final List<Map<String, dynamic>> events;
@@ -452,13 +377,3 @@ ${r.locationWarnings.isEmpty ? '' : '<h2>Locatie-waarschuwingen</h2><table>${row
 
 String _escape(String s) =>
     s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-
-int? _intArg(List<String> args, String flag) {
-  final v = _stringArg(args, flag);
-  return v == null ? null : int.tryParse(v);
-}
-
-String? _stringArg(List<String> args, String flag) {
-  final i = args.indexOf(flag);
-  return (i >= 0 && i + 1 < args.length) ? args[i + 1] : null;
-}
