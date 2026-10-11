@@ -1,5 +1,5 @@
 ---
-status: awaiting_human_verify
+status: verified_on_device
 trigger: "OPEN.md punt 0a: de PLANNED-kaartjes verschijnen pas een paar seconden na een koude start; tot dan staat er alleen de kop. Gezien op de Oppo bij build 64, opnieuw genoemd bij 66."
 created: 2026-10-09
 updated: 2026-10-09
@@ -114,6 +114,38 @@ Fix A gebouwd in quick `261009-gedeelde-ritten-cache`:
 **Verificatie:** suite 1099 groen (12 nieuwe tests: store round-trips,
 per-account isolatie, corrupte JSON, cache-eerst-ververst, falende refresh
 blijft staan, uitgelogd raakt niets); analyze op baseline (0/0/214).
-Nog te doen door Joost: op de Oppo een koude start met gedeelde ritten — de
-kaartjes horen er meteen te staan. Bewust géén release: build 66 ligt bij
-Google, deze fix blijft op main tot Joost anders beslist.
+
+## Toestelverificatie (2026-10-11, build 1.0.56 (67) op de Oppo)
+
+Via Play bijgewerkt (geen sideload), daarna **offline** een koude start gedaan
+met wifi en data uit. Dat is de scherpste proef: een geslaagde netwerkrefresh
+kan de cache niet maskeren.
+
+**Wat werkt.** De Peloton-tab toont de groepen (Dawon, 3 leden; On the Roll,
+4 leden) en Home opent met de volledige gecachte lijst. Zonder de fix was hier
+niets of een foutmelding te zien geweest. De cache-route is dus bewezen op een
+echt toestel, niet alleen in tests.
+
+**Wat dezelfde proef blootlegde: de maatjeslijst heeft géén cache.** In
+dezelfde offline sessie staat onder GROUPS een correcte lijst en onder BUDDIES
+"Try again" met het netwerk-icoon. Oorzaak: `friends` in
+`peloton_providers.dart` is nog een gewone functionele provider
+(`return ref.watch(pelotonGatewayProvider).listFriends();`), precies de vorm
+die `groupRides` en `visibleGroups` vóór deze fix hadden.
+
+**Waarom dit de moeite is om vast te leggen.** Het is dezelfde fout, in
+hetzelfde bestand, op hetzelfde scherm, en de fix maakte hem zichtbaarder dan
+hij was: eerst faalde de hele tab offline, nu faalt alleen dit blok. Wie alleen
+naar "werken de groepen offline?" kijkt, mist het. Dit is de werkregel "loop de
+hele app na bij een wijziging" in het klein: een patroon dat je op één plek
+aanbrengt, breng je overal aan waar het speelt.
+
+**Niet onderzocht, dus niet beweren:** of `pendingRideInvites`, `rideEntries` en
+de bolletjestellers offline hetzelfde doen. Ze leunen op `groupRides` (nu
+gecachet), dus vermoedelijk niet, maar dat is niet gemeten.
+
+**Openstaand:** de maatjeslijst dezelfde behandeling geven (Friend-model
+serialiseren, store-methoden, provider om) is klein en dezelfde vorm. Besluit
+op 2026-10-11: eerst Joost, want het bepaalt of 67 of 68 de eerste
+productie-build wordt. Er is geen haast: de productietrack is nog leeg, dus er
+staat nog niets publiek.

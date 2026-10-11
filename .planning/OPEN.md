@@ -82,13 +82,34 @@ Wat die ronde opleverde staat in `.planning/quick/260929-app-links-en-bolletje/`
 
 ### a. De PLANNED-kaartjes verspringen bij een koude start
 
-**Status: code opgelost 2026-10-09, toestelcontrole open.** Dossier
-`.planning/debug/planned-kaartjes-koude-start.md` (nu `awaiting_human_verify`).
-Gedeelde ritten en groepen openen sindsdien op een SharedPreferences-kopie en
-verversen stil vanaf de server — hetzelfde patroon als de forecast-cache.
-Suite 1099 groen, analyze op baseline. Resterend: op de Oppo een koude start
-met gedeelde ritten bevestigen, en pas dan een release-overweging (build 66
-ligt bij Google).
+**Status: code opgelost 2026-10-09, op het toestel bewezen 2026-10-11.**
+Dossier `.planning/debug/planned-kaartjes-koude-start.md`. Gedeelde ritten en
+groepen openen op een SharedPreferences-kopie en verversen stil vanaf de
+server. Bewezen met een **offline** koude start op de Oppo op 1.0.56 (67): de
+groepen stonden er, terwijl er geen netwerk was. Suite 1099 groen, analyze op
+baseline.
+
+### c. De maatjeslijst is offline leeg, en dat viel pas op na de fix van a
+
+**Status: gevonden 2026-10-11, besluit bij Joost.** Dezelfde offline koude start
+die a bewees, liet zien dat de Peloton-tab nu een gespleten beeld geeft: onder
+GROUPS staan de gecachte groepen, onder BUDDIES staat "Try again". Oorzaak:
+`friends` in `peloton_providers.dart` is nog een gewone provider zonder cache,
+dezelfde vorm die `groupRides` en `visibleGroups` vóór 2026-10-09 hadden.
+
+Klein werk (Friend serialiseren, twee store-methoden, provider omzetten), en
+dezelfde tests als bij a. **Waarom het toch een eigen punt is:** de fix van a
+maakt dit zichtbaar waar het eerst onzichtbaar was. Eerst faalde de hele tab
+offline, nu één blok ernaast. Wie alleen "werken de groepen offline?" nagemeten
+had, had dit gemist.
+
+**Niet gemeten, dus niet aannemen:** of `pendingRideInvites`, `rideEntries` en
+de bolletjestellers offline hetzelfde doen. Ze leunen op `groupRides`, dus
+vermoedelijk niet, maar dat is een vermoeden.
+
+**Besluit dat hierbij hoort:** 67 als eerste productie-build, of eerst c fixen
+en 68 sturen. De productietrack is nog leeg, dus er staat nog niets publiek en
+wachten kost niets.
 
 ### b. De update-balk ziet een nieuwe internal-build laat of niet
 
