@@ -387,7 +387,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 37-03-PLAN.md — Lokaal rapport tool/usage_report.dart + dagelijkse workflow usage-watch.yml
+- [x] 37-03-PLAN.md — Lokaal rapport tool/usage_report.dart + dagelijkse workflow usage-watch.yml
 - [ ] 37-04-PLAN.md — [BLOCKING] 0014 live via SQL Editor (Joost) + live grantgrens-bewijs
 
 **Wave 3** *(blocked on Wave 2 completion)*
@@ -484,7 +484,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 30. Werving | v4.1 | 0/TBD | Not started | - |
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
-| 37. Meten | v4.3 | 2/6 | In Progress|  |
+| 37. Meten | v4.3 | 3/6 | In Progress|  |
 | 38. Open deuren begrensd | v4.3 | 0/TBD | Not started | - |
 | 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
 | 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |
