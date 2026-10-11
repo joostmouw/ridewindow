@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
 status: executing
-last_updated: "2026-10-11T17:59:26.089Z"
-last_activity: 2026-10-11 -- Phase 37 planning complete
+last_updated: "2026-10-11T18:14:29.338Z"
+last_activity: 2026-10-11 -- 37-01 klaar (usage_daily_counts)
 progress:
   total_phases: 16
   completed_phases: 6
   total_plans: 42
-  completed_plans: 37
+  completed_plans: 38
   percent: 38
 ---
 
@@ -737,11 +737,11 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 ## Current Position
 
 Phase: 37 of 37–40 (Meten)
-Plan: —
-Status: Ready to execute
-Last activity: 2026-10-11 -- Phase 37 planning complete
+Plan: 2 of 6 (37-01 af: migratie 0014 + testscript, nog niet live)
+Status: Executing
+Last activity: 2026-10-11 -- 37-01 klaar (usage_daily_counts + usage_monitor)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 1/6 plannen fase 37
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 
@@ -1131,6 +1131,8 @@ en volle testsuite zelf geverifieerd op main.
 Beslissingen zijn gelogd in PROJECT.md Key Decisions tabel.
 Recente beslissingen die het huidige werk beinvloeden:
 
+- [37-01] usage_daily_counts is server-functie 14 (CLAUDE.md-telling volgt in fase 40); usage_monitor krijgt geen wachtwoord in de migratie en alleen execute op die ene functie. Clubs fase 36 schuift naar migratie 0015.
+
 - Roadmap geherstructureerd 2026-06-02: originele Phase 1 (skeleton + scoring) gesplitst in Phase 1 (skeleton only) + Phase 1.5 (scoring domain).
 - Flutter test vereist (niet dart test) voor tests die AppDatabase importeren — drift_flutter trekt dart:ui mee; NativeDatabase.memory() direct doorgeven als QueryExecutor (DatabaseConnection wrapper niet nodig in Drift 2.x).
 - Plan 02-03: mockito ^5.6.4 (niet ^5.7.0 — analyzer-versieconflict met drift_dev 2.33.0).
@@ -1284,7 +1286,7 @@ Recente beslissingen die het huidige werk beinvloeden:
 
 ## Session Continuity
 
-Last session: 2026-10-11T17:46:46.607Z
+Last session: 2026-10-11T18:14:29.333Z
 Last activity: 2026-09-02 - Fase 21 vrijwel dicht. Stap 1b: backlog #61 tegengeproefd op het toestel, **PASS aan beide helften** (inlogflow én koude start), met een negatieve controle op de pre-fix build 1.0.21+22 die de bug live reproduceerde. §6 (AUTH-09) uitgevoerd op de PWA: app-kant PASS inclusief D-03 op drie schermen, en de Supabase-kant geverifieerd via twee leesqueries (nul weesrijen, account weg uit `auth.users`). De `feedback`-controle is **vervallen, niet gehaald** — die tabel is leeg, dus `on delete set null` is alleen door het schema gedekt. Onderweg gevonden en gefixt: `lib/core/app_version.dart` liep achter op `pubspec.yaml` (quick 260901-r92) — de rode test die dat aanwees was maandenlang afgedaan als "de bekende flaky notificatietest". Suite nu **451/451**. Alles staat op **1.0.23+24**: main gepusht, PWA live geverifieerd in de bundel, toestel bijgewerkt via `adb install -r` (data behouden), en Play internal testing uitgerold op 2026-09-02 08:00. `21-08-SUMMARY.md` geschreven (compleet), `21-09-SUMMARY.md` geschreven (**incomplete**).
 
 **Enige openstaande stap voor fase 21:** de app één keer via Play installeren op het toestel. Vereist eerst deïnstalleren (sideload vs. Play-signing) en wist daarmee lokale data + de Calendar-OAuth-grant. Let daarna specifiek op inloggen en Google Calendar — zie `.planning/phases/21-sync-migration/MORGEN.md` stap 3. Blijft daarnaast staan: fase 19's ontbrekende koude-start-basislijn (plan 19-07), waardoor REG-03 geen vóór/ná-vergelijking heeft.
