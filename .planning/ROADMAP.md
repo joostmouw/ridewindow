@@ -163,6 +163,7 @@ Plans:
 
 **Plans**: 5 - 20-01 availability repository, 20-02 profile repository (both complete), 20-03 planned-rides repository + async auth-reactive notifier, 20-04 background_task.dart REG-05 cleanup, 20-05 wire UI consumers to the async contract + final suite/release-build gate
 Plans:
+
 - [x] 20-01-PLAN.md — AvailabilityRepository + thin AvailabilityNotifier
 - [x] 20-02-PLAN.md — ProfileRepository + thin ProfileNotifier + D-07 non-stamping sign-in autofill
 - [x] 20-03-PLAN.md — PlannedRidesRepository + async, authStateProvider-reactive PlannedRidesNotifier
@@ -252,15 +253,18 @@ Plans:
 **UI hint**: yes
 
 ### Phase 26: Console op orde
+
 **Goal**: Een nieuwe tester, waar ook ter wereld, kan zich met één link aanmelden en installeert een build die Joost zelf vanaf Play heeft getest; alles wat een tester of Google ziet zegt Ridewindow en dezelfde versie.
 **Depends on**: Nothing (build 41 in review, 42 gebouwd)
 **Requirements**: CON-01, CON-02, CON-03, CON-04, CON-05, CON-06, PROOF-01
 **Success Criteria** (what must be TRUE):
+
   1. Build 42 staat op internal, is vanaf een Play-installatie op de Oppo getest (inclusief de korte intro bij een verse start), en is gepromoot naar de gesloten test
   2. De gesloten test staat open voor alle landen, heeft een feedback-adres en een gekoppelde Google Group met één aanmeldlink
   3. De winkelpagina bestaat in en-GB én nl-NL met de teksten uit `docs/store-listing.md`
   4. PWA, privacybeleid en GitHub `main` tonen 1.0.31 en de naam Ridewindow
   5. `docs/testers/changelog.md` beschrijft build 41 en 42, met Ingrids daglicht-melding als eerste opgeloste feedback
+
 **Plans**: 4 plans
 Plans:
 **Wave 1**
@@ -271,13 +275,16 @@ Plans:
 - [ ] 26-04-PLAN.md — CON-05: nl-NL store listing translation
 
 ### Phase 27: Wervingsonderzoek
+
 **Goal**: Joost weet waar hij echte fietsers vandaan haalt die de app veertien dagen blijven openen, en heeft voor elk gekozen kanaal een tekst klaar om te versturen.
 **Depends on**: Nothing — kan parallel aan fase 26
 **Requirements**: WERV-01, WERV-02
 **Success Criteria** (what must be TRUE):
+
   1. Een vergelijking van minstens zeven kanalen op bereik, doorlooptijd, doelgroepgehalte en inspanning, onderbouwd met bronnen
   2. Een gemotiveerde keuze voor 2–3 kanalen, inclusief of een LinkedIn-post van Joost zelf erbij hoort
   3. Per gekozen kanaal een verzendklare tekst, eerst als HTML aan Joost getoond
+
 **Plans**: 2 plans
 Plans:
 **Wave 1**
@@ -289,107 +296,152 @@ Plans:
 - [x] 27-02-PLAN.md — WERV-02: fresh Reddit self-promo rule check (D-08) + 3 ready-to-send texts + HTML preview shown to Joost before approval (D-05)
 
 ### Phase 28: Feedbackstroom
+
 **Goal**: Elke melding van een tester komt gestructureerd binnen, krijgt een uitkomst op de backlog, en de tester hoort terug wat ermee gebeurde.
 **Depends on**: Phase 26 (feedback-adres)
 **Requirements**: FEED-01, FEED-02, FEED-03, FEED-04, FEED-05
 **Success Criteria** (what must be TRUE):
+
   1. Eén register (bron, tester, versie, scherm, soort, ernst, status) waarin in-app-, Play-, WhatsApp- en mailfeedback samenkomen
   2. Het in-app formulier vraagt soort en verwachting, en stuurt versie en scherm automatisch mee
   3. De app vraagt op een natuurlijk moment om feedback, niet in de eerste minuut en niet vaker dan de afgesproken grens
   4. Een beoordelingsronde is beschreven én één keer gedraaid op de bestaande meldingen (Ingrids drie punten): elk heeft een uitkomst
   5. Een opgeloste melding verschijnt in de changelog met tester en versie, en de tester is ingelicht
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 29: Eerste minuut
+
 **Goal**: Een nieuwe tester ziet in zijn eerste minuut iets bruikbaars en wordt niet overladen, in zijn eigen taal — ook in notificaties.
 **Depends on**: Nothing — levert samen met fase 28 build 43
 **Requirements**: EERST-01, EERST-02, EERST-03
 **Success Criteria** (what must be TRUE):
+
   1. Een verse installatie zonder ingevulde week toont een scherm dat naar het invullen leidt in plaats van een lege lijst of grijze uren
   2. Voordat de gebruiker zelf iets doet verschijnt hooguit één uitlegoverlay
   3. Met de app op Engels komen alle zes notificatieteksten in het Engels binnen
   4. Build 43 (fase 28 + 29) staat via internal op de gesloten test
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 30: Werving
+
 **Goal**: Er staan minstens vijftien testers aangemeld die de app werkelijk gebruiken, en een afhaker valt binnen twee dagen op.
 **Depends on**: Phase 26 (eigen kring), Phase 27 en Phase 29 (overige kanalen)
 **Requirements**: WERV-03, WERV-04, WERV-05
 **Success Criteria** (what must be TRUE):
+
   1. Zes mensen uit de eigen kring zijn persoonlijk uitgenodigd en tellen mee in Google's teller
   2. Google's teller toont minstens 15 aangemelde testers
   3. De testerslijst toont per tester bron, aanmelddatum en laatste teken van gebruik
+
 **Plans**: TBD
 
 ### Phase 31: De veertien dagen
+
 **Goal**: Tijdens de veertien dagen ziet Google een app die op echte feedback verbetert — met Ingrids vensterpunten als zichtbaarste voorbeeld.
 **Depends on**: Phase 30 (de klok loopt)
 **Requirements**: WIN-01, WIN-02, PROOF-02
 **Success Criteria** (what must be TRUE):
+
   1. Per dag toont de lijst het aaneengesloten goede blok met het beste venster erin gemarkeerd
   2. De gebruiker ziet waarom een venster gekozen is en de score van het alternatief ernaast
   3. Minstens drie builds zijn tijdens de veertien dagen naar de gesloten test gegaan, elk in de changelog
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 32: Aanvraag en productie
+
 **Goal**: Ridewindow staat in productie op Google Play.
 **Depends on**: Phase 31 (veertien dagen voltooid met ≥12 testers)
 **Requirements**: PROOF-03, PROOF-04
 **Success Criteria** (what must be TRUE):
+
   1. Alle vragen van de aanvraag zijn beantwoord met minstens 250 tekens, concrete versies en fixes uit de changelog — eerst als HTML aan Joost getoond
   2. De aanvraag is ingediend en goedgekeurd; bij afwijzing ligt er een herstelplan op basis van Google's reden
   3. Ridewindow is installeerbaar uit de Play Store in productie
+
 **Plans**: TBD
 
 ### Phase 37: Meten
+
 **Goal**: Joost kan op elk moment zien of iemand de open deuren al gebruikt, en er ligt een nulmeting van normaal gebruik waarop de grenzen van fase 38 en 39 gebaseerd worden.
 **Depends on**: Nothing (eerste fase van v4.3)
 **Requirements**: MEET-01, MEET-02
 **Success Criteria** (what must be TRUE):
+
   1. Joost ziet per dag voor `feedback`, `app_events`, maatjes- en groepsuitnodigingen en nieuwe accounts hoeveel rijen erbij kwamen en van hoeveel verschillende toestellen of accounts, zonder zelf een query te schrijven (MEET-01)
   2. De telling leest alleen bestaande tabellen en voegt niets toe aan wat een gewone gebruiker of `anon` kan lezen; een eventuele nieuwe functie is verantwoord in de migratie die hem toevoegt
   3. Een dag die ver boven het normale ligt wordt als uitschieter gemarkeerd en komt bij Joost terecht zonder dat hij ernaar hoeft te zoeken (MEET-02)
   4. Er staat een vastgelegde nulmeting (wat de app per toestel en per account op een drukke dag werkelijk verstuurt) die als onderbouwing dient voor de plafonds in fase 38 en 39
-**Plans**: TBD
+
+**Plans**: 6 plans
+Plans:
+**Wave 1**
+
+- [ ] 37-01-PLAN.md — Migratie 0014: usage_daily_counts (alleen totalen) + rol usage_monitor + SQL-Editor-test
+- [ ] 37-02-PLAN.md — Gedeelde sleutelmodule + geteste uitschieterregel en vloeren (tool/usage/)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 37-03-PLAN.md — Lokaal rapport tool/usage_report.dart + dagelijkse workflow usage-watch.yml
+- [ ] 37-04-PLAN.md — [BLOCKING] 0014 live via SQL Editor (Joost) + live grantgrens-bewijs
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 37-05-PLAN.md — Nulmeting (historie + zware Oppo-sessie), 37-NULMETING.md, vloeren bijwerken
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 37-06-PLAN.md — Wacht live: push, faalmail bewezen, secret gezet, groene run als usage_monitor
 
 ### Phase 38: Open deuren begrensd
+
 **Goal**: `feedback` en `app_events` kunnen niet meer onbeperkt volgepompt worden, ook niet via builds die al bij testers en in productie staan, terwijl een tester zonder account nog steeds feedback kan sturen en nooit feedback kwijtraakt.
 **Depends on**: Phase 37 (de plafonds volgen uit de nulmeting)
 **Requirements**: RATE-01, RATE-02, RATE-03, RATE-04, RATE-05
 **Success Criteria** (what must be TRUE):
+
   1. Een script dat met de publieke sleutel `feedback` of `app_events` blijft insturen wordt na het dagplafond per toestel én per afzender geweigerd door de database zelf (trigger, plpgsql); een andere `device_id` kiezen helpt niet, omdat de afzender (gehasht IP-adres uit de PostgREST-request-headers, hooguit één dag bewaard) apart geteld wordt (RATE-01, RATE-02)
   2. Een tester zonder account stuurt vanuit de app feedback en die komt aan; het plafond voor `app_events` ligt ruim boven wat de app zelf op een drukke dag verstuurt (RATE-01, RATE-02)
   3. Een rij met tekst of meegestuurde context boven de maximale lengte wordt geweigerd, zonder dat normale feedback met volledige scorecontext daaronder valt (RATE-03)
   4. De huidige productiebuild (1.0.59, 70), zonder update, valt aantoonbaar onder dezelfde grenzen: aanmaken binnen de grens werkt, erboven wordt geweigerd (RATE-04)
   5. Een tester boven de feedbackgrens ziet in de app een duidelijke melding in plaats van een stille fout, en zijn feedback blijft lokaal bewaard en gaat later alsnog mee (RATE-05)
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 39: Codes en grenzen per account
+
 **Goal**: Uitnodigingscodes en groepslinks zijn niet meer onbeperkt te raden, en één account kan niet onbeperkt dingen aanmaken, terwijl een mens die gewoon de app gebruikt nooit tegen een grens aanloopt zonder te horen waarom.
 **Depends on**: Phase 37 (grenzen volgen uit de nulmeting); los van fase 38
 **Requirements**: CODE-01, CODE-02, GRENS-01
 **Success Criteria** (what must be TRUE):
+
   1. Na vijf mislukte pogingen binnen een uur weigert `redeem_friend_invite` voor dat account verdere pogingen, ook met een geldige code, en de app zegt hoe laat het weer kan (CODE-01)
   2. Dezelfde teller geldt voor `redeem_group_invite`: mislukte maatjes- en groepspogingen tellen samen, en een geslaagde poging binnen de grens werkt als vanouds (CODE-02)
   3. Eén account kan niet meer dan een vast aantal open uitnodigingen, groepsritten en vensteropties aanmaken; de grenzen liggen ver boven wat de nulmeting als normaal laat zien en worden in de database afgedwongen (GRENS-01)
   4. Wie toch tegen een grens aanloopt, krijgt in de app een uitleg in NL en EN in plaats van een generieke fout (GRENS-01)
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 40: Accounts en afronding
+
 **Goal**: Nepaccounts via e-mail zijn duurder geworden, alles wat er voor de begrenzing wordt bijgehouden is uitgelegd en verantwoord, en de nieuwe meldingen staan als echte build bij de testers.
 **Depends on**: Phase 38, Phase 39
 **Requirements**: ACCT-01, ACCT-02, AFR-01, AFR-02, AFR-03
 **Success Criteria** (what must be TRUE):
+
   1. Een account dat met e-mail en wachtwoord wordt aangemaakt kan pas inloggen en synchroniseren na bevestiging van het e-mailadres; Google-inloggen werkt ongewijzigd (ACCT-01)
   2. De Supabase Auth-limieten op aanmelden, inlogpogingen en verstuurde mails zijn in het dashboard bewust gekozen en met waarde en reden vastgelegd in de planning (ACCT-02)
   3. Het gepubliceerde privacybeleid (NL en EN) beschrijft dat er voor de begrenzing een gehasht IP-adres wordt bijgehouden en dat het na hooguit één dag verdwijnt (AFR-01)
   4. `CLAUDE.md` en `AGENTS.md` noemen elke nieuwe plpgsql-functie en trigger met de reden waarom de client hem niet kan vervangen, en het aantal functies in de constraint klopt weer (AFR-02)
   5. De volledige suite is groen, en een build met de nieuwe meldingen staat via internal op de Oppo (via Play, niet gesideload) en bij de testers (AFR-03)
+
 **Plans**: TBD
 
 ## Progress
