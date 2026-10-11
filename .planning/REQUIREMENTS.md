@@ -1,116 +1,78 @@
-# Requirements — Milestone v4.1 Zo snel mogelijk live in de store
+# Requirements — Milestone v4.3 Dicht huis
 
-**Defined:** 2026-09-10
+**Defined:** 2026-10-11
 **Core Value:** Accurate cyclist-specific weather scoring translated into concrete bookable time slots.
-**Milestone goal:** Ridewindow staat in productie op Google Play, via een gesloten test met testers die de app werkelijk gebruiken.
-**Neemt op:** epic #71 "Twaalf testers" (`.planning/TESTERS.md`).
-**Vorige requirements:** v3.0 staat in `.planning/milestones/v3.0-REQUIREMENTS.md`.
+**Milestone goal:** Wat een vreemde met de publieke Supabase-sleutel kan, wordt zichtbaar en begrensd, zonder dat iemand die de app gewoon gebruikt er iets van merkt.
+**Bron:** epic #75 in `.planning/BACKLOG.md`. Ontwerp: https://claude.ai/artifact/2iWe1d2BbCanxrTgvsyG9b
+**Vorige requirements:** v4.1 staat in `.planning/milestones/v4.1-REQUIREMENTS.md`; v4.2 Clubs in `.planning/workstreams/clubs/REQUIREMENTS.md`.
 
-**Leidend principe:** de klok van veertien dagen start pas bij twaalf aangemelde testers, en pauzeert of reset als het aantal daaronder zakt. Wat de werving vervroegt gaat vóór; wat haar niet raakt mag parallel lopen, maar nooit ervoor in de weg staan.
+**Leidend principe:** eerst het gat dat vandaag bestaat, niet het gat dat ooit kan ontstaan. Meten gaat vóór dichttimmeren, en de zwaarste maatregel (captcha, App Check) komt pas als de metingen erom vragen.
 
-**Wat Google meet (stand 2026):** sinds april 2026 worden aanvragen afgewezen op gebrek aan gebruik door testers — aanmelden en installeren is niet genoeg. Alleen aanmelden via de Play-link telt; een gesideloade APK telt niet. De aanvraag stelt ongeveer negen vragen (werving, feedback, wat je veranderde, waarom de app klaar is) en vage antwoorden worden afgewezen.
+**Randvoorwaarden:** €0/maand; alleen plpgsql, geen Edge Functions; uitgelogd blijft alles werken; de anonieme feedbackroute (FB-03) wordt begrensd, nooit geblokkeerd; elke nieuwe functie wordt verantwoord in de migratie die hem toevoegt.
 
 ---
 
-## v4.1 Requirements
+## v4.3 Requirements
 
-### Console (CON)
+### Meten (MEET)
 
-- [ ] **CON-01**: Elke build gaat eerst naar internal testing, wordt vanaf een Play-installatie op de Oppo getest, en pas daarna gepromoot naar de gesloten test — nooit rechtstreeks
-- [ ] **CON-02**: Een tester in elk land waar Google Play beschikbaar is kan zich aanmelden voor de gesloten test
-- [ ] **CON-03**: Een tester ziet in Play een feedback-adres dat bij Ridewindow hoort
-- [ ] **CON-04**: Een tester meldt zich aan via één vaste link — een Google Group is gekoppeld aan de gesloten test
-- [ ] **CON-05**: Een bezoeker met Nederlands als Play-taal ziet de winkelpagina in het Nederlands (nl-NL)
-- [x] **CON-06**: PWA, gepubliceerd privacybeleid en GitHub `main` tonen dezelfde versie en naam (Ridewindow) als de laatste Play-build
+- [ ] **MEET-01**: Joost ziet per dag, per tabel (`feedback`, `app_events`, maatjes- en groepsuitnodigingen, nieuwe accounts) hoeveel rijen erbij kwamen en van hoeveel verschillende toestellen of accounts
+- [ ] **MEET-02**: Een dag die ver boven het normale ligt valt op, zonder dat Joost er zelf naar hoeft te zoeken
 
-### Werving (WERV)
+### Begrenzen (RATE)
 
-- [x] **WERV-01**: Voor elk kandidaat-kanaal — eigen LinkedIn-post, LinkedIn-vacature "vrijwillige tester", Strava-clubs, NTFU-toerclubs, fiets-Facebookgroepen, collega's, r/AndroidClosedTesting — is vastgelegd: bereik, doorlooptijd, doelgroepgehalte, inspanning voor Joost, en wat ervaringen van anderen laten zien; de uitkomst is een gemotiveerde keuze voor 2–3 kanalen
-- [x] **WERV-02**: Per gekozen kanaal ligt een verzendklare tekst (NL en/of EN) die de veertien dagen, het regelmatig openen, en het waarom uitlegt
-- [ ] **WERV-03**: Zes testers uit de eigen kring zijn persoonlijk uitgenodigd en staan als aangemeld in Google's eigen teller
-- [ ] **WERV-04**: Google's teller toont minstens 15 aangemelde testers (12 plus buffer)
-- [ ] **WERV-05**: Een testerslijst houdt per tester bij: bron, aanmelddatum en laatste teken van gebruik; een afhaker wordt binnen twee dagen opgemerkt en vervangen
+- [ ] **RATE-01**: `feedback` heeft een plafond per toestel en per afzender per dag; een tester zonder account kan nog steeds feedback sturen
+- [ ] **RATE-02**: `app_events` heeft een plafond per toestel en per afzender per dag, ruim boven wat de app zelf ooit verstuurt
+- [ ] **RATE-03**: Een rij in `feedback` of `app_events` kan niet onbeperkt groot zijn: er is een maximale lengte op tekst en op de meegestuurde context
+- [ ] **RATE-04**: Builds die al bij testers en in productie staan vallen onder de grenzen zonder app-update
+- [ ] **RATE-05**: Een tester boven de feedbackgrens krijgt in de app een duidelijke melding in plaats van een stille fout, en zijn feedback gaat niet verloren
 
-### Feedback (FEED)
+### Uitnodigingscodes (CODE)
 
-- [ ] **FEED-01**: Alle feedback — in-app, Play-testerfeedback, WhatsApp, mail — komt in één register met vaste velden: bron, tester, app-versie, scherm, soort (fout / verwarring / wens / lof), ernst en status
-- [ ] **FEED-02**: Het in-app feedbackformulier vraagt gestructureerd (soort, en wat de tester verwachtte) en voegt app-versie en scherm automatisch toe
-- [ ] **FEED-03**: De app vraagt een tester op een natuurlijk moment om feedback — niet tijdens de eerste minuut, en niet vaker dan een vaste grens — in plaats van alleen via Profiel → Over
-- [ ] **FEED-04**: Een vaste beoordelingsronde geeft elke open melding een uitkomst: nieuw backlog-item met prioriteit, duplicaat van een bestaand item, of bewust niet met reden — geen melding blijft zonder uitkomst
-- [ ] **FEED-05**: Een tester hoort terug wat er met zijn melding is gebeurd en in welke versie het is opgelost; die koppeling voedt de changelog (PROOF-01)
+- [ ] **CODE-01**: Na vijf mislukte pogingen binnen een uur kan een account tijdelijk geen maatjescode meer inwisselen; de app zegt wanneer het weer kan
+- [ ] **CODE-02**: Dezelfde teller geldt voor het inwisselen van een groepslink
 
-### Eerste minuut (EERST)
+### Grenzen per account (GRENS)
 
-- [ ] **EERST-01**: Een nieuwe gebruiker die zijn week niet invult, ziet toch een bruikbaar scherm dat hem naar het invullen leidt in plaats van een lege app
-- [ ] **EERST-02**: Een nieuwe gebruiker krijgt niet meer dan één uitlegoverlay voordat hij zelf iets in de app heeft gedaan
-- [ ] **EERST-03**: Notificaties verschijnen in de taal van de app (backlog #67)
+- [ ] **GRENS-01**: Eén account kan niet onbeperkt open uitnodigingen, groepsritten en vensteropties aanmaken; de grenzen liggen ver boven normaal gebruik en de app legt uit wat er aan de hand is als je er toch tegenaan loopt
 
-### Vensters (WIN)
+### Accounts (ACCT)
 
-- [ ] **WIN-01**: Per dag ziet de gebruiker het aaneengesloten goede blok, met het beste venster daarin gemarkeerd (backlog #69)
-- [ ] **WIN-02**: De gebruiker kan zien waarom dit venster is gekozen en niet het venster ernaast, inclusief de score van dat alternatief (backlog #70)
+- [ ] **ACCT-01**: Een account dat met e-mail en wachtwoord is aangemaakt werkt pas na bevestiging van het e-mailadres
+- [ ] **ACCT-02**: De limieten van Supabase Auth op aanmelden, inlogpogingen en verstuurde mails staan bewust ingesteld en vastgelegd
 
-### Bewijs (PROOF)
+### Afronden (AFR)
 
-- [x] **PROOF-01**: Een changelog per build, vanaf build 41, legt vast: versie, datum, track, inhoud, en welke tester-feedback ermee is opgelost
-- [ ] **PROOF-02**: Tijdens de veertien dagen gaan minstens drie builds naar de gesloten test
-- [ ] **PROOF-03**: De productie-aanvraag is ingediend; elk antwoord is minstens 250 tekens en noemt concrete versies en fixes uit de changelog
-- [ ] **PROOF-04**: Ridewindow is installeerbaar uit de Play Store in productie
+- [ ] **AFR-01**: Het privacybeleid beschrijft wat er voor de begrenzing wordt bijgehouden (zoals een gehasht IP-adres) en hoe lang
+- [ ] **AFR-02**: `CLAUDE.md` en `AGENTS.md` noemen de nieuwe plpgsql-functies en waarom de client ze niet kan vervangen
+- [ ] **AFR-03**: Regressie groen en een build met de nieuwe meldingen staat bij de testers, via internal en de Oppo
 
 ## Future Requirements (deferred)
 
-- **De fietser bij het verversen** (backlog #72, nice to have) — schets 013, stand A+B; eerst als EERST-04 in fase 29, op 2026-09-10 naar de backlog
-
-- **Peloton v2** (#65) — meekijken zonder account, gedeelde beschikbaarheid, maatjes via gebruikersnaam
-- **iPhone-tester komt niet terug uit beschikbaarheid** (#63) — vraagt een iPhone
-- **Afgezegde ritten onbereikbaar** (#66)
-- **Lanceringsmarketing** — een eigen epic na productie
-- **Radii als systeem, `ScoreBadge` naast `ScoreDisplay`** — losse einden uit v4.0
+- **Captcha (Cloudflare Turnstile) op aanmelden of feedback** — pas als MEET laat zien dat begrenzen alleen niet genoeg is
+- **App Check / Play Integrity** — raakt elke gebruiker, hoort achteraan
+- **Nepaccounts tegenhouden bij zoeken op gebruikersnaam** — wordt pas een vector bij slice 5 van epic #65
+- **Route inladen uit Komoot of Strava bij geplande ritten** — volgende epic, na deze milestone (verzoek Joost 2026-10-11)
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Betaalde testdiensten (BetaTesting e.d.) | Breekt de expliciete €0/maand-grens uit `CLAUDE.md`; pas heroverwegen als de gratis route na twee weken vastloopt |
-| Testers via ruilnetwerken als hoofdroute | Levert aanmeldingen zonder gebruik — precies waar Google sinds april 2026 op afwijst; hooguit opvulling |
-| Analytics of tracking om gebruik te meten | "Geen tracking" is een belofte in de winkeltekst en het privacybeleid; gebruik volgen gaat via de testerslijst en Google's eigen teller |
-| Feedback lezen via een service-role-sleutel in een script | Sleutels met volledige rechten horen niet op een laptop in een side-project; het register leest uit het dashboard of een export |
+| WAF of Cloudflare vóór Supabase | Kost geld; de €0/maand-grens blijft staan |
+| Edge Functions | De constraint is "alleen plpgsql"; alles hier past in triggers en functies |
+| Maatregelen die de uitgelogde gebruiker raken | Accounts zijn additief; de app moet zonder account volledig blijven werken |
+| De anonieme feedbackroute sluiten | FB-03 eist dat een tester zonder account feedback kan sturen; begrenzen mag, blokkeren niet |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CON-01 | Phase 26 | Pending |
-| CON-02 | Phase 26 | Pending |
-| CON-03 | Phase 26 | Pending |
-| CON-04 | Phase 26 | Pending |
-| CON-05 | Phase 26 | Pending |
-| CON-06 | Phase 26 | Complete |
-| PROOF-01 | Phase 26 | Complete |
-| WERV-01 | Phase 27 | Complete |
-| WERV-02 | Phase 27 | Complete |
-| FEED-01 | Phase 28 | Pending |
-| FEED-02 | Phase 28 | Pending |
-| FEED-03 | Phase 28 | Pending |
-| FEED-04 | Phase 28 | Pending |
-| FEED-05 | Phase 28 | Pending |
-| EERST-01 | Phase 29 | Pending |
-| EERST-02 | Phase 29 | Pending |
-| EERST-03 | Phase 29 | Pending |
-| WERV-03 | Phase 30 | Pending |
-| WERV-04 | Phase 30 | Pending |
-| WERV-05 | Phase 30 | Pending |
-| WIN-01 | Phase 31 | Pending |
-| WIN-02 | Phase 31 | Pending |
-| PROOF-02 | Phase 31 | Pending |
-| PROOF-03 | Phase 32 | Pending |
-| PROOF-04 | Phase 32 | Pending |
 
 **Coverage:**
-- v4.1 requirements: 25 total
-- Mapped to phases: 25
-- Unmapped: 0
+- v4.3 requirements: 16 total
+- Mapped to phases: 0
+- Unmapped: 16
 
 ---
-*Requirements defined: 2026-09-10*
-*Last updated: 2026-09-10 after milestone v4.1 start*
+*Requirements defined: 2026-10-11*
+*Last updated: 2026-10-11 after milestone v4.3 start*
