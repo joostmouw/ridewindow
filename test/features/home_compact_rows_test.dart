@@ -38,6 +38,18 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 600));
 }
 
+Future<void> _scrollTo(WidgetTester tester, Finder target) =>
+    tester.scrollUntilVisible(
+      target,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(CustomScrollView).first,
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+
 Finder _row(int hour) => find.byKey(
       ValueKey(
         'compact_row_${DateTime(2026, 6, 8, hour).millisecondsSinceEpoch}',
@@ -135,13 +147,26 @@ void main() {
     });
   });
 
+  testWidgets('1280x800: tien rijen voor "toon alle", niet vijf', (tester) async {
+    await ignoringTestFontOverflow(() async {
+      await pumpHome(tester, const Size(1280, 800), many);
+      final showAll = _inList(find.text('Toon alle 12 momenten'));
+      await _scrollTo(tester, showAll);
+      await _settle(tester);
+      // Beste eerst: score 60 + 3h, dus de tiende is h=2 (start 04:00) en de
+      // elfde h=1 (start 02:00).
+      expect(_row(4), findsOneWidget);
+      expect(_row(2), findsNothing);
+    });
+  });
+
   group('1280x800: vastgezette filterkop', () {
     testWidgets('de kop blijft staan als de lijst scrolt', (tester) async {
       await ignoringTestFontOverflow(() async {
         await pumpHome(tester, const Size(1280, 800), many);
         // Alles tonen, zodat er echt iets te scrollen valt.
         final showAll = _inList(find.text('Toon alle 12 momenten'));
-        await tester.ensureVisible(showAll);
+        await _scrollTo(tester, showAll);
         await tester.tap(showAll);
         await _settle(tester);
         expect(_pinned, findsOneWidget);
@@ -162,7 +187,7 @@ void main() {
       await ignoringTestFontOverflow(() async {
         await pumpHome(tester, const Size(1280, 800), many);
         final showAll = _inList(find.text('Toon alle 12 momenten'));
-        await tester.ensureVisible(showAll);
+        await _scrollTo(tester, showAll);
         await tester.tap(showAll);
         await _settle(tester);
         // Beste eerst: de eerste rij is het hoogst scorende venster (22:00).

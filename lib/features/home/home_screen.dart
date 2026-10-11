@@ -142,6 +142,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// actief filter de vijf beste bínnen die selectie.
   static const _kVisibleSlotCount = 5;
 
+  /// Idem op expanded, waar de lijst uit compacte rijen bestaat.
+  static const _kVisibleSlotCountExpanded = 10;
+
   /// Breedte van de lijst links vanaf expanded (quick-plan 261011-jru).
   static const double _kListPaneWidth = 400;
 
@@ -1519,12 +1522,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
 
     // Afgetopt op de beste vijf, met een rij eronder die de rest erbij haalt.
-    // Zie [_showAllSlots] voor waarom.
+    // Zie [_showAllSlots] voor waarom. Op expanded staan er compacte rijen van
+    // ~64 px: vijf vulden daar nog geen halve kolom, dus daar tien. Het
+    // plafond zelf blijft, om dezelfde reden als op de telefoon.
+    final cap = windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded)
+        ? _kVisibleSlotCountExpanded
+        : _kVisibleSlotCount;
     final total = slots.length;
-    final hidden = total - _kVisibleSlotCount;
+    final hidden = total - cap;
     return (
       slots: slots,
-      visible: _showAllSlots || hidden <= 0 ? total : _kVisibleSlotCount,
+      visible: _showAllSlots || hidden <= 0 ? total : cap,
     );
   }
 
