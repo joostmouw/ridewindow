@@ -28,12 +28,19 @@ void main() {
         final theme = buildAppTheme(brightness);
         await pumpHome(tester, const Size(1280, 800), slots, theme: theme);
 
-        // De dagchips van de weekstrip: de enige InkWells met de hover-laag
-        // uit het thema.
+        // De dagchips van de weekstrip: de InkWells met de hover-laag uit het
+        // thema, op de compacte vensterrijen na (quick-plan 261011-l5k), die
+        // dezelfde laag dragen.
         final overlay = hoverOverlay(theme.colorScheme);
         expect(overlay.a, greaterThan(0));
         final chips = find.byWidgetPredicate(
-          (w) => w is InkWell && w.hoverColor == overlay,
+          (w) =>
+              w is InkWell &&
+              w.hoverColor == overlay &&
+              !(w.key is ValueKey<String> &&
+                  (w.key! as ValueKey<String>)
+                      .value
+                      .startsWith('compact_row_')),
         );
         expect(chips, findsNWidgets(7));
         final chip = chips.first;

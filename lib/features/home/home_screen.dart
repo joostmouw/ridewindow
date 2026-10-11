@@ -17,6 +17,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
+import 'package:ridewindow/features/home/filled_score_badge.dart';
 import 'package:ridewindow/features/planned/planned_rides_screen.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
@@ -317,6 +318,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final subtitle =
         lastUpdatedLabel != null ? '$primary · $lastUpdatedLabel' : primary;
 
+    // Vanaf expanded blijft de filterkop staan (quick-plan 261011-l5k).
+    final pinFilters =
+        windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded);
+
     return Stack(
       children: [
         Scaffold(
@@ -411,29 +416,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     child: _buildLocationBanner(context, locationAsync.value!),
                   ),
 
-                // ── Week strip ──
-                SliverToBoxAdapter(
-                  child: KeyedSubtree(
-                    key: _weekStripKey,
-                    child: _buildWeekStrip(slotsState),
+                if (pinFilters) ...[
+                  // ── Planned rides ──
+                  // Op een tablet boven de kop: ze scrollen weg zoals de
+                  // banners, en de weergaverij grenst zo direct aan de rijen
+                  // die hij bestuurt.
+                  _buildPlannedRidesSliver(),
+
+                  // ── Vastgezette filterkop (schets 017 A) ──
+                  // Zoals de kop boven de berichtenlijst van Outlook op een
+                  // tablet: dagstrip, dagdeelfilter en weergave blijven staan,
+                  // alleen de rijen eronder scrollen. Een PinnedHeaderSliver
+                  // meet zijn kind zelf, zodat de kop meegroeit met de
+                  // tekstschaal; een vaste extent zou dat niet doen. Een
+                  // ondoorzichtig vlak, anders schemeren de rijen erdoor.
+                  PinnedHeaderSliver(
+                    child: KeyedSubtree(
+                      key: const ValueKey('home_pinned_filters'),
+                      child: Material(
+                        color: cs.surface,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            KeyedSubtree(
+                              key: _weekStripKey,
+                              child: _buildWeekStrip(slotsState),
+                            ),
+                            KeyedSubtree(
+                              key: _periodFilterKey,
+                              child: _buildPeriodFilter(),
+                            ),
+                            _buildViewRow(),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-
-                // ── Period filter ──
-                SliverToBoxAdapter(
-                  child: KeyedSubtree(
-                    key: _periodFilterKey,
-                    child: _buildPeriodFilter(),
+                ] else ...[
+                  // ── Week strip ──
+                  SliverToBoxAdapter(
+                    child: KeyedSubtree(
+                      key: _weekStripKey,
+                      child: _buildWeekStrip(slotsState),
+                    ),
                   ),
-                ),
 
-                // ── Planned rides ──
-                _buildPlannedRidesSliver(),
+                  // ── Period filter ──
+                  SliverToBoxAdapter(
+                    child: KeyedSubtree(
+                      key: _periodFilterKey,
+                      child: _buildPeriodFilter(),
+                    ),
+                  ),
 
-                // ── Weergave en volgorde ──
-                // Vervangt het vaste sectielabel "RIJTIJDEN": de twee keuzes
-                // zeggen zelf al wat de lijst is, dus het label was dubbelop.
-                SliverToBoxAdapter(child: _buildViewRow()),
+                  // ── Planned rides ──
+                  _buildPlannedRidesSliver(),
+
+                  // ── Weergave en volgorde ──
+                  // Vervangt het vaste sectielabel "RIJTIJDEN": de twee
+                  // keuzes zeggen zelf al wat de lijst is, dus het label was
+                  // dubbelop.
+                  SliverToBoxAdapter(child: _buildViewRow()),
+                ],
 
                 // ── Cards ──
                 _buildCardsSliver(weatherState, slotsState),
@@ -1578,6 +1622,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       // nadruk de verkeerde kaart aan.
       final bestIdx = indexOfBestSlot(slots);
       final bestTier = bestIdx >= 0 ? slots[bestIdx].tier : null;
+      final twoPane =
+          windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded);
 
       return SliverList.builder(
         // +1 voor de "toon alles"-rij, maar alleen als er iets te tonen valt.
@@ -1587,7 +1633,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           final isBest = index == bestIdx &&
               (bestTier is Perfect || bestTier is Great);
           final staggerIndex = index.clamp(0, AppMotion.maxStaggerItems);
-          Widget card = _buildRideCard(slots[index], isBest: isBest);
+          // Naast het detailpaneel compacte rijen (schets 017 A); op
+          // telefoon en medium de grote kaarten zoals altijd.
+          Widget card = twoPane
+              ? _buildCompactRow(slots[index], isBest: isBest)
+              : _buildRideCard(slots[index], isBest: isBest);
           if (index == 0) {
             card = KeyedSubtree(key: _firstCardKey, child: card);
           }
@@ -1905,21 +1955,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   // ---------------------------------------------------------------------------
-  // Ride card — M3 Expressive
+  // Weer per venster (gedeeld door de kaart en de compacte rij)
   // ---------------------------------------------------------------------------
 
-  Widget _buildRideCard(
-    RideSlot slot, {
-    bool isBest = false,
-  }) {
-    final cs = Theme.of(context).colorScheme;
-    // Vanaf expanded staat de lijst naast het detailpaneel (quick-plan
-    // 261011-jru): een tik kiest het venster voor rechts in plaats van te
-    // pushen, en de gekozen kaart krijgt een rand zoals in Gmail.
-    final twoPane =
-        windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded);
-    final selected = twoPane &&
-        _paneSelection(ref.read(slotsProvider))?.slot.start == slot.start;
+  /// De voorspellingen binnen [slot] en hun gemiddelden: temperatuur en wind
+  /// gemiddeld, neerslag opgeteld. Eén plek, zodat de grote kaart en de
+  /// compacte tabletrij hetzelfde weer noemen.
+  ({
+    List<HourlyForecast> forecasts,
+    double? avgTemp,
+    double? totalPrecip,
+    double? avgWind,
+  }) _slotWeather(RideSlot slot) {
     final weatherState = ref.watch(weatherProvider);
 
     final allForecasts =
@@ -1938,12 +1985,200 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final winds =
         slotForecasts.map((f) => f.windspeedKmh).whereType<double>().toList();
 
-    final avgTemp =
-        temps.isEmpty ? null : temps.reduce((a, b) => a + b) / temps.length;
-    final totalPrecip =
-        precips.isEmpty ? null : precips.reduce((a, b) => a + b);
-    final avgWind =
-        winds.isEmpty ? null : winds.reduce((a, b) => a + b) / winds.length;
+    return (
+      forecasts: slotForecasts,
+      avgTemp:
+          temps.isEmpty ? null : temps.reduce((a, b) => a + b) / temps.length,
+      totalPrecip: precips.isEmpty ? null : precips.reduce((a, b) => a + b),
+      avgWind:
+          winds.isEmpty ? null : winds.reduce((a, b) => a + b) / winds.length,
+    );
+  }
+
+  /// Het weer van een venster als één regel: "17° · droog · 9 km/u". Dezelfde
+  /// omrekeningen en hetzelfde regenoordeel als [_buildWeatherSummary], maar
+  /// als tekst, voor de compacte tabletrij. Wat onbekend is valt weg.
+  String _weatherSummaryText({
+    double? avgTemp,
+    double? totalPrecip,
+    double? avgWind,
+  }) {
+    final s = S.of(context);
+    final rainMax =
+        ref.watch(profileProvider).value?.tolerances.rainMaxIdealMm ?? 0.5;
+    final units = ref.watch(unitsProvider);
+    return [
+      if (avgTemp != null) '${convertTemp(avgTemp, units.temp).round()}\u00B0',
+      // Midden in de zin klein; alleen Engels en Nederlands bestaan, en in
+      // allebei is het oordeel een gewoon woord.
+      if (totalPrecip != null)
+        _verdictText(
+          s,
+          weatherVerdictFor(WeatherMetric.rain, totalPrecip, idealMax: rainMax),
+        ).toLowerCase(),
+      if (avgWind != null)
+        '${convertWind(avgWind, units.wind).round()} ${windSuffix(units.wind)}',
+    ].join(' · ');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Compacte rij — alleen vanaf expanded (quick-plan 261011-l5k, schets 017 A)
+  // ---------------------------------------------------------------------------
+
+  /// Een vensterrij zoals een bericht in Gmail op een tablet: links een rond
+  /// scorebolletje in de tierkleur, dag + tijd en een weerregel, rechts de
+  /// duur. Geen knoppen, geen chevron en geen veeg: Inplannen staat in het
+  /// paneel ernaast, één tik verder, en een muis of trackpad kan niet vegen.
+  ///
+  /// De gekozen rij is tonaal gevuld, zonder rand en zonder streep.
+  ///
+  /// "Beste keuze" is hier een klein tekstlabel rechtsonder, op de plek van
+  /// Gmails ster, en geen pil: een pil van 24 px breekt de rijhoogte van 64.
+  /// Helemaal weglaten kan niet. Gesorteerd op tijd staat het beste venster
+  /// niet bovenaan, en dan is het label het enige dat het aanwijst (dezelfde
+  /// reden als bij [indexOfBestSlot]).
+  Widget _buildCompactRow(RideSlot slot, {required bool isBest}) {
+    final cs = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final s = S.of(context);
+    final selected =
+        _paneSelection(ref.read(slotsProvider))?.slot.start == slot.start;
+    final w = _slotWeather(slot);
+    final radius = BorderRadius.circular(12);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          key: ValueKey('compact_row_${slot.start.millisecondsSinceEpoch}'),
+          borderRadius: radius,
+          hoverColor: hoverOverlay(cs),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            setState(() => _paneSlotStart = slot.start);
+          },
+          child: Ink(
+            decoration: BoxDecoration(
+              color: selected ? cs.surfaceContainerHighest : null,
+              borderRadius: radius,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 64),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
+                  children: [
+                    FilledScoreBadge(
+                      score: slot.overallScore,
+                      tier: slot.tier,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: _formatDayName(slot.start),
+                                  style: text.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const TextSpan(text: '  '),
+                                TextSpan(
+                                  text: '${_formatTime(slot.start)} – '
+                                      '${_formatTime(slot.end)}',
+                                  style: text.bodyMedium?.copyWith(
+                                    color: cs.onSurfaceVariant,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _weatherSummaryText(
+                              avgTemp: w.avgTemp,
+                              totalPrecip: w.totalPrecip,
+                              avgWind: w.avgWind,
+                            ),
+                            style: text.labelMedium?.copyWith(
+                              color: context.rw.textTertiary,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          s.durationHours(_durationHours(slot)),
+                          style: text.labelMedium?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ),
+                        if (isBest) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            s.bestChoice,
+                            style: text.labelSmall?.copyWith(
+                              color: cs.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Ride card — M3 Expressive
+  // ---------------------------------------------------------------------------
+
+  Widget _buildRideCard(
+    RideSlot slot, {
+    bool isBest = false,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    // Vanaf expanded staat de lijst naast het detailpaneel (quick-plan
+    // 261011-jru): een tik kiest het venster voor rechts in plaats van te
+    // pushen, en de gekozen kaart krijgt een rand zoals in Gmail.
+    final twoPane =
+        windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded);
+    final selected = twoPane &&
+        _paneSelection(ref.read(slotsProvider))?.slot.start == slot.start;
+    final (
+      forecasts: slotForecasts,
+      avgTemp: avgTemp,
+      totalPrecip: totalPrecip,
+      avgWind: avgWind,
+    ) = _slotWeather(slot);
 
     // De echte deelscores uit de motor, gemiddeld over de uren van dit venster
     // — niet nagerekend uit de gemiddelde waarde hierboven. Dat scheelt: de
