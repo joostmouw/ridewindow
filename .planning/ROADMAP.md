@@ -411,7 +411,17 @@ Plans:
   4. De huidige productiebuild (1.0.59, 70), zonder update, valt aantoonbaar onder dezelfde grenzen: aanmaken binnen de grens werkt, erboven wordt geweigerd (RATE-04)
   5. Een tester boven de feedbackgrens ziet in de app een duidelijke melding in plaats van een stille fout, en zijn feedback blijft lokaal bewaard en gaat later alsnog mee (RATE-05)
 
-**Plans**: TBD
+**Plans**: 3
+Plans:
+**Wave 1**
+
+- [ ] 38-01-PLAN.md — Migratie 0016: plafonds per toestel/account/afzender, rijgroottegrensen, rate_limits_test.sql (RATE-01, RATE-02, RATE-03)
+- [ ] 38-02-PLAN.md — App: device_id bij feedback, weigering herkennen/bewaren/melden zonder de vijf-pogingen-regel te raken (RATE-05)
+
+**Wave 2** *(blocked on 38-01 + 38-02; Joost bevestigt de plafonds en past 0016 live toe)*
+
+- [ ] 38-03-PLAN.md — [BLOCKING] 0016 live + SQL-Editor-bewijs + PostgREST-probe met de publieke sleutel (RATE-04), opruimen, boekhouding
+
 **UI hint**: yes
 
 ### Phase 39: Codes en grenzen per account
@@ -485,7 +495,7 @@ Phases execute in numeric order: 1 → 1.5 → 2 → 3 → 4 → 5 → 6 → 7 �
 | 31. De veertien dagen | v4.1 | 0/TBD | Not started | - |
 | 32. Aanvraag en productie | v4.1 | 0/TBD | Not started | - |
 | 37. Meten | v4.3 | 6/6 | Complete | 2026-10-11 |
-| 38. Open deuren begrensd | v4.3 | 0/TBD | Not started | - |
+| 38. Open deuren begrensd | v4.3 | 0/3 | In Progress |  |
 | 39. Codes en grenzen per account | v4.3 | 0/TBD | Not started | - |
 | 40. Accounts en afronding | v4.3 | 0/TBD | Not started | - |
 

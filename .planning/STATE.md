@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
-status: fase 37 af; volgende is 38
-last_updated: "2026-10-11T19:20:00.000Z"
-last_activity: 2026-10-11 -- fase 37 af, wacht live
+status: fase 38 in uitvoering (golf 1, Droid tweede terminal)
+last_updated: "2026-10-11T20:30:00.000Z"
+last_activity: 2026-10-11 -- fase 38 gepland (38-CONTEXT, 3 plannen) en golf 1 gestart
 progress:
   total_phases: 16
   completed_phases: 7
