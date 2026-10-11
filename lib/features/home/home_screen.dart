@@ -16,6 +16,7 @@ import 'package:ridewindow/domain/models/ride_slot.dart';
 import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
+import 'package:ridewindow/features/detail/ride_detail_screen.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
@@ -107,6 +108,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// al open heeft; valt de keuze door een filter weg, dan ook terug naar het
   /// beste. Sleutel is de begintijd, om dezelfde reden als bij [_cardExpanded].
   DateTime? _paneSlotStart;
+
+  /// Toetsenbord op expanded Home (backlog #93), zoals Gmail: pijltjes lopen
+  /// door de lijst, Enter zet de focus in het detailpaneel, Esc terug.
+  final FocusNode _listFocus = FocusNode(debugLabel: 'home_list');
+  final FocusScopeNode _paneFocus = FocusScopeNode(debugLabel: 'home_pane');
+
+  /// De vensters in de volgorde waarin de lijst ze nu toont, en welk venster
+  /// rechts staat. Vastgelegd tijdens build, zodat de toetsen buiten build
+  /// geen providers hoeven te lezen. Leeg in de blokweergave.
+  List<RideSlot> _keyboardOrder = const [];
+  DateTime? _paneShownStart;
 
   /// Toont RIDE TIMES de volledige lijst in plaats van alleen de beste
   /// [_kVisibleSlotCount]?
@@ -206,6 +218,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _listFocus.dispose();
+    _paneFocus.dispose();
     super.dispose();
   }
 
@@ -1161,21 +1175,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// tablet: de lijst links op vaste breedte, het gekozen venster rechts. Kop,
   /// banners, dagstrook en filters horen bij de lijst. Op telefoon en medium
   /// komt [list] ongewijzigd terug.
+  ///
+  /// Toetsenbord (backlog #93): pijl omhoog/omlaag kiest het buurvenster in
+  /// de getoonde volgorde, Enter zet de focus in het paneel, Esc in het
+  /// paneel terug naar de lijst en Esc in de lijst terug naar het beste
+  /// venster. De pijltjes gelden alleen in de lijst; in het paneel blijven ze
+  /// van de tijdschuif en het scrollen.
   Widget _withDetailPane(SlotsState slotsState, Widget list) {
-    if (windowSizeClassOf(context) != WindowSizeClass.expanded) return list;
+    if (!windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded)) {
+      return list;
+    }
+    _paneShownStart = _paneSelection(slotsState)?.slot.start;
+    if (slotsState is SlotsLoaded && _view != HomeView.blocks) {
+      final displayed = _displayedSlots(slotsState);
+      _keyboardOrder = displayed.slots.take(displayed.visible).toList();
+    } else {
+      _keyboardOrder = const [];
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(width: _kListPaneWidth, child: list),
+        SizedBox(
+          width: _kListPaneWidth,
+          child: Focus(
+            focusNode: _listFocus,
+            autofocus: true,
+            onKeyEvent: _onListKey,
+            child: list,
+          ),
+        ),
         const VerticalDivider(width: 1),
         Expanded(
           child: KeyedSubtree(
             key: const ValueKey('home_detail_pane'),
-            child: _buildDetailPane(slotsState),
+            child: CallbackShortcuts(
+              bindings: {
+                const SingleActivator(LogicalKeyboardKey.escape):
+                    _listFocus.requestFocus,
+              },
+              child: FocusScope(
+                node: _paneFocus,
+                child: _buildDetailPane(slotsState),
+              ),
+            ),
           ),
         ),
       ],
     );
+  }
+
+  /// Toetsen in de lijst. Bewust een `onKeyEvent` en geen CallbackShortcuts:
+  /// Enter en Esc tellen alleen als de lijst zelf de focus heeft, zodat Enter
+  /// op een met Tab gekozen knop (een dagchip, een filter) die knop gewoon
+  /// bedient.
+  KeyEventResult _onListKey(FocusNode node, KeyEvent event) {
+    if (event is KeyUpEvent) return KeyEventResult.ignored;
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowDown) {
+      _movePaneSelection(1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp) {
+      _movePaneSelection(-1);
+      return KeyEventResult.handled;
+    }
+    if (event is! KeyDownEvent || !node.hasPrimaryFocus) {
+      return KeyEventResult.ignored;
+    }
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      _paneFocus.requestFocus();
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.escape) {
+      setState(() => _paneSlotStart = null);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  /// Kiest het buurvenster van wat er nu rechts staat, in de volgorde van de
+  /// lijst. Aan de randen gebeurt niets; staat het huidige venster niet in de
+  /// lijst (net ingepland), dan begint omlaag bij de eerste kaart.
+  void _movePaneSelection(int delta) {
+    final order = _keyboardOrder;
+    if (order.isEmpty) return;
+    final idx = order.indexWhere((s) => s.start == _paneShownStart);
+    final next = idx < 0 ? (delta > 0 ? 0 : -1) : idx + delta;
+    if (next < 0 || next >= order.length) return;
+    setState(() => _paneSlotStart = order[next].start);
+    if (next == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ctx = _firstCardKey.currentContext;
+        if (ctx != null && ctx.mounted) {
+          Scrollable.ensureVisible(ctx, duration: AppMotion.effectsDuration);
+        }
+      });
+    }
   }
 
   /// De vensters die RIDE TIMES toont, na de drie filters (al gepland, dag,
@@ -1218,6 +1314,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   /// de lijst staat, anders het beste. null als er niets te tonen valt.
   ({RideSlot slot, bool isBest})? _paneSelection(SlotsState slotsState) {
     if (slotsState is! SlotsLoaded) return null;
+    // Net ingepland in het paneel: de rit valt dan door het filter uit de
+    // lijst, maar blijft rechts staan, nu met de knop Gepland. Bewuste
+    // afwijking van Gmail, dat na archiveren doorspringt: inplannen is "deze
+    // wil ik", en dan wil je de knop zien omslaan en kunnen terugdraaien.
+    final kept = _paneSlotStart;
+    if (kept != null) {
+      final planned =
+          ref.watch(plannedRidesProvider).value ?? const <PlannedRide>[];
+      final ride = planned.where((r) => r.start == kept).firstOrNull;
+      final listed = _listedSlots(slotsState).slots;
+      if (ride != null && !listed.any((s) => s.start == kept)) {
+        // Het ongefilterde venster, of (na de tijdschuif) de score van de
+        // rit zoals hij is ingepland, net als bij een geplande rit op Home.
+        final slot = slotsState.slots
+                .where((s) => s.start == ride.start && s.end == ride.end)
+                .firstOrNull ??
+            ref.watch(rideWindowScorerProvider)?.score(ride.start, ride.end) ??
+            RideSlot(
+              start: ride.start,
+              end: ride.end,
+              overallScore: ride.plannedScore,
+              tier: rideTierFromScore(ride.plannedScore),
+              hours: const [],
+            );
+        return (slot: slot, isBest: false);
+      }
+    }
     final slots = _listedSlots(slotsState).slots;
     if (slots.isEmpty) return null;
     final bestIdx = indexOfBestSlot(slots);
@@ -1235,25 +1358,87 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  /// Het rechterpaneel: de uitgeklapte ritkaart van het gekozen venster. De
-  /// tik daarop opent nog steeds `/detail` -- bewust geen tweede
-  /// detailweergave om te onderhouden. Leeg als er geen venster is.
+  /// Het rechterpaneel: het volledige ritdetail van het gekozen venster
+  /// (tijdschuif, weer, uurrijen, Inplannen), zoals Gmail een mail rechts
+  /// opent, zonder routewissel en zonder terugknop (backlog #93). Leeg als er
+  /// geen venster is.
+  ///
+  /// De key is de begintijd: het detail legt start en eind in `initState`
+  /// vast voor de tijdschuif, dus een andere keuze vraagt om een nieuwe staat.
   Widget _buildDetailPane(SlotsState slotsState) {
     final selection = _paneSelection(slotsState);
     if (selection == null) return const SizedBox.shrink();
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: kReadableMaxWidth),
-          child: _buildRideCard(
-            selection.slot,
-            isBest: selection.isBest,
-            inPane: true,
+    final slot = selection.slot;
+    final weatherState = ref.watch(weatherProvider);
+    final allForecasts =
+        weatherState.hasValue ? weatherState.requireValue : <HourlyForecast>[];
+    final forecasts = allForecasts
+        .where((f) => !f.time.isBefore(slot.start) && f.time.isBefore(slot.end))
+        .toList();
+    // Het detail is een Scaffold en scrolt zelf: een strakke hoogte, en
+    // horizontaal de leesbreedte, gecentreerd.
+    return LayoutBuilder(
+      builder: (context, constraints) => Center(
+        child: SizedBox(
+          width: math.min(constraints.maxWidth, kReadableMaxWidth),
+          height: constraints.maxHeight,
+          child: RideDetailScreen(
+            key: ValueKey(slot.start),
+            slot: slot,
+            forecasts: forecasts,
+            embedded: true,
+            onPlanned: (planned) =>
+                setState(() => _paneSlotStart = planned.start),
           ),
         ),
       ),
+    );
+  }
+
+  /// De vensters van RIDE TIMES in de volgorde waarin de lijst ze toont
+  /// (sorteerknop), en hoeveel er zichtbaar zijn (aftopping). Eén plek, zodat
+  /// de kaarten en de pijltjestoetsen (backlog #93) dezelfde volgorde volgen.
+  ({List<RideSlot> slots, int visible}) _displayedSlots(SlotsLoaded state) {
+    final slots = _listedSlots(state).slots;
+    // Dart's List.sort is niet stabiel, dus de tiebreak moet expliciet;
+    // anders wisselt de kaartvolgorde per rebuild.
+    switch (_sort) {
+      case SlotSort.best:
+        // Op score, hoog naar laag. Bij gelijke score wint de vroegste rit --
+        // dezelfde afspraak als [indexOfBestSlot].
+        //
+        // Sorteerde tot 2026-09-19 op *tier* en binnen een tier
+        // chronologisch, met het beste venster daarna naar voren gehaald. Die
+        // keuze had een reden: binnen een tier las de lijst als een agenda.
+        // Maar alles boven de 85 is "Toprit", dus een 85 van zes uur 's
+        // ochtends stond boven een 93 van acht uur -- onder een knop die
+        // letterlijk "Beste eerst" belooft. Joost zag het meteen.
+        //
+        // De agendalezing is niet verdwenen, die heeft nu een eigen knop:
+        // SlotSort.time. Dat maakt de weg vrij om hier te doen wat er staat.
+        slots.sort((a, b) {
+          final byScore = b.overallScore.compareTo(a.overallScore);
+          return byScore != 0 ? byScore : a.start.compareTo(b.start);
+        });
+      case SlotSort.time:
+        // Puur chronologisch, als een agenda. Geen tier-groepering en geen
+        // beste-naar-voren: wie hierop schakelt vraagt "wanneer", niet "welke
+        // is het beste", en dan is elke herschikking een leugen over de tijd.
+        slots.sort((a, b) {
+          final byStart = a.start.compareTo(b.start);
+          return byStart != 0
+              ? byStart
+              : b.overallScore.compareTo(a.overallScore);
+        });
+    }
+
+    // Afgetopt op de beste vijf, met een rij eronder die de rest erbij haalt.
+    // Zie [_showAllSlots] voor waarom.
+    final total = slots.length;
+    final hidden = total - _kVisibleSlotCount;
+    return (
+      slots: slots,
+      visible: _showAllSlots || hidden <= 0 ? total : _kVisibleSlotCount,
     );
   }
 
@@ -1338,43 +1523,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         );
       }
 
-      // Dart's List.sort is niet stabiel, dus de tiebreak moet expliciet;
-      // anders wisselt de kaartvolgorde per rebuild.
-      switch (_sort) {
-        case SlotSort.best:
-          // Op score, hoog naar laag. Bij gelijke score wint de vroegste rit --
-          // dezelfde afspraak als [indexOfBestSlot].
-          //
-          // Sorteerde tot 2026-09-19 op *tier* en binnen een tier
-          // chronologisch, met het beste venster daarna naar voren gehaald. Die
-          // keuze had een reden: binnen een tier las de lijst als een agenda.
-          // Maar alles boven de 85 is "Toprit", dus een 85 van zes uur 's
-          // ochtends stond boven een 93 van acht uur -- onder een knop die
-          // letterlijk "Beste eerst" belooft. Joost zag het meteen.
-          //
-          // De agendalezing is niet verdwenen, die heeft nu een eigen knop:
-          // SlotSort.time. Dat maakt de weg vrij om hier te doen wat er staat.
-          slots.sort((a, b) {
-            final byScore = b.overallScore.compareTo(a.overallScore);
-            return byScore != 0 ? byScore : a.start.compareTo(b.start);
-          });
-        case SlotSort.time:
-          // Puur chronologisch, als een agenda. Geen tier-groepering en geen
-          // beste-naar-voren: wie hierop schakelt vraagt "wanneer", niet "welke
-          // is het beste", en dan is elke herschikking een leugen over de tijd.
-          slots.sort((a, b) {
-            final byStart = a.start.compareTo(b.start);
-            return byStart != 0
-                ? byStart
-                : b.overallScore.compareTo(a.overallScore);
-          });
-      }
-
-      // Afgetopt op de beste vijf, met een rij eronder die de rest erbij haalt.
-      // Zie [_showAllSlots] voor waarom.
+      final displayed = _displayedSlots(slotsState);
+      slots = displayed.slots;
       final total = slots.length;
       final hidden = total - _kVisibleSlotCount;
-      final visible = _showAllSlots || hidden <= 0 ? total : _kVisibleSlotCount;
+      final visible = displayed.visible;
 
       // Wélke kaart het "beste keuze"-label draagt, los van wáár hij staat.
       // Op score gesorteerd is dat kaart 0 en was `index == 0` genoeg; op tijd
@@ -1468,7 +1621,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             HapticFeedback.selectionClick();
             // Vanaf expanded naar het detailpaneel in plaats van een nieuw
             // scherm (quick-plan 261011-jru).
-            if (windowSizeClassOf(context) == WindowSizeClass.expanded) {
+            if (windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded)) {
               setState(() => _paneSlotStart = day.best.start);
               return;
             }
@@ -1716,14 +1869,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _buildRideCard(
     RideSlot slot, {
     bool isBest = false,
-    bool inPane = false,
   }) {
     final cs = Theme.of(context).colorScheme;
     // Vanaf expanded staat de lijst naast het detailpaneel (quick-plan
     // 261011-jru): een tik kiest het venster voor rechts in plaats van te
     // pushen, en de gekozen kaart krijgt een rand zoals in Gmail.
     final twoPane =
-        !inPane && windowSizeClassOf(context) == WindowSizeClass.expanded;
+        windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded);
     final selected = twoPane &&
         _paneSelection(ref.read(slotsProvider))?.slot.start == slot.start;
     final weatherState = ref.watch(weatherProvider);
@@ -1779,11 +1931,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // Standaard: de beste open, de rest dicht. Zodra de gebruiker zelf een
     // kaart heeft aangetikt wint die keuze — ook op de beste kaart.
     //
-    // In het detailpaneel is de kaart altijd open (het paneel ís het
-    // uitgeklapte venster); in de lijst ernaast begint alles dicht, want het
-    // detail staat al rechts.
+    // Naast het detailpaneel begint alles dicht, want het detail staat al
+    // rechts.
     final isExpanded =
-        inPane || (_cardExpanded[slot.start] ?? (twoPane ? false : isBest));
+        _cardExpanded[slot.start] ?? (twoPane ? false : isBest);
 
     // Alle kaarten dezelfde marge. De beste kaart had er onderaan extra, omdat
     // zijn slagschaduw anders over de kaart eronder viel; die schaduw is er
@@ -2053,15 +2204,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         avgWind: avgWind,
                                       ),
                                     ),
-                                    if (!inPane)
-                                      _buildExpandToggle(
-                                        slot,
-                                        expanded: false,
-                                      ),
+                                    _buildExpandToggle(
+                                      slot,
+                                      expanded: false,
+                                    ),
                                   ],
                                 ),
                               ),
-                              if (isExpanded && !inPane)
+                              if (isExpanded)
                                 _buildExpandToggle(slot, expanded: true),
                             ],
                             SizedBox(height: isExpanded ? 14 : 6),

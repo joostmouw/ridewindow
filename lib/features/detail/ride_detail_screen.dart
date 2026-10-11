@@ -88,11 +88,25 @@ class RideDetailScreen extends ConsumerStatefulWidget {
   /// of een rit die er niet meer is: dan de eerste gedeelde rit op het tijdvak.
   final String? groupRideId;
 
+  /// `true` als dit scherm in het rechterpaneel van Home staat (vanaf
+  /// expanded, backlog #93) en niet als eigen route: dan geen terugknop en
+  /// nooit een `pop`, want er is niets om naar terug te gaan. Home beslist
+  /// wat er in het paneel staat. De route /detail laat dit op `false`, dus de
+  /// telefoon blijft precies zoals hij was.
+  final bool embedded;
+
+  /// Wordt aangeroepen nadat Inplannen de rit heeft toegevoegd, met het
+  /// venster zoals het ingepland is. Home gebruikt dit om het paneel op deze
+  /// rit te laten staan (bewust geen Gmail-"auto-advance").
+  final ValueChanged<RideSlot>? onPlanned;
+
   const RideDetailScreen({
     super.key,
     required this.slot,
     required this.forecasts,
     this.groupRideId,
+    this.embedded = false,
+    this.onPlanned,
     this.calendarServiceFactory = _defaultCalendarServiceFactory,
     this.notificationServiceFactory = _defaultNotificationServiceFactory,
   });
@@ -347,7 +361,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
 
     return AppBar(
       toolbarHeight: 64,
-      leading: const SafeBackButton(),
+      // In het paneel van Home is er niets om naar terug te gaan.
+      leading: widget.embedded ? null : const SafeBackButton(),
+      automaticallyImplyLeading: !widget.embedded,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -1448,7 +1464,9 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                       'score': slot.overallScore,
                       'hours': slot.end.difference(slot.start).inHours,
                     });
-                    if (router.canPop()) router.pop();
+                    // In het paneel niet poppen: dan zou Home zelf van de
+                    // stapel gaan. Home kiest wat er rechts komt.
+                    if (!widget.embedded && router.canPop()) router.pop();
                   }
                   return;
                 }
@@ -1490,6 +1508,7 @@ class _RideDetailScreenState extends ConsumerState<RideDetailScreen> {
                         plannedScore: slot.overallScore,
                       ),
                     );
+                widget.onPlanned?.call(slot);
                 trackEvent(ref, kEvRidePlanned, props: {
                   'score': slot.overallScore,
                   'hours': slot.end.difference(slot.start).inHours,

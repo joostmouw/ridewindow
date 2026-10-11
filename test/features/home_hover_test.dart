@@ -47,7 +47,9 @@ void main() {
             .first;
 
         final gesture = await tester.createGesture(
-            kind: PointerDeviceKind.mouse, pointer: 1);
+          kind: PointerDeviceKind.mouse,
+          pointer: 1,
+        );
         await gesture.addPointer(location: Offset.zero);
         addTearDown(gesture.removePointer);
         await gesture.moveTo(tester.getCenter(dayNumber));

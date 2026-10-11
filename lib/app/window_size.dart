@@ -1,5 +1,5 @@
 // lib/app/window_size.dart
-// Breedteklassen volgens Material 3 (compact / medium / expanded) en een
+// Breedteklassen volgens Material 3 (compact / medium / expanded / large) en een
 // leesbreedte voor schermen met één kolom tekst. Quick-plan 261011-jru.
 //
 // Eén regel voor de hele app: de klasse volgt uit de **vensterbreedte**, niet
@@ -23,10 +23,34 @@ const double kExpandedMinWidth = 840.0;
 /// detailpaneel op Home).
 const double kReadableMaxWidth = 640.0;
 
-enum WindowSizeClass { compact, medium, expanded }
+/// Vanaf deze breedte (dp) is het venster "large" (M3): een liggende tablet
+/// van 1280 of een desktopvenster. Gedraagt zich als expanded, tenzij een
+/// scherm er iets extra mee doet (backlog #93).
+const double kLargeMinWidth = 1200.0;
+
+/// Vanaf deze breedte (dp) krijgt Home een derde kolom met je ritten.
+///
+/// Afleiding: rail ~80 + lijst 400 + detail 640 (leesbreedte) + ritten 360
+/// ≈ 1480. Vanaf 1440 houdt het detail er ~600 over, en een tablet van 1535
+/// liggend valt erbinnen; 1280 niet. Bewust geen eigen breedteklasse: het is
+/// de regel van één scherm, maar hij staat hier zodat alle breekpunten op één
+/// plek blijven.
+const double kHomeThreeColumnMinWidth = 1440.0;
+
+/// Let op: de volgorde compact < medium < expanded < large is betekenisvol,
+/// [WindowSizeClassX.isAtLeast] vergelijkt op index.
+enum WindowSizeClass { compact, medium, expanded, large }
+
+extension WindowSizeClassX on WindowSizeClass {
+  /// Of deze klasse minstens zo breed is als [other]. Gebruik dit in plaats
+  /// van een gelijkheidstest op expanded, anders valt large (1280) terug naar
+  /// het gedrag van een smaller venster.
+  bool isAtLeast(WindowSizeClass other) => index >= other.index;
+}
 
 /// Pure functie, los te testen.
 WindowSizeClass windowSizeClassFor(double width) {
+  if (width >= kLargeMinWidth) return WindowSizeClass.large;
   if (width >= kExpandedMinWidth) return WindowSizeClass.expanded;
   if (width >= kMediumMinWidth) return WindowSizeClass.medium;
   return WindowSizeClass.compact;

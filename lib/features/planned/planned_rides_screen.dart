@@ -179,7 +179,7 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
     // Vanaf expanded (840 dp) staan Ritten en Peloton naast elkaar in plaats
     // van achter tabs (quick-plan 261011-jru). Op telefoon en medium blijft
     // alles precies zoals het was.
-    if (windowSizeClassOf(context) == WindowSizeClass.expanded) {
+    if (windowSizeClassOf(context).isAtLeast(WindowSizeClass.expanded)) {
       return Stack(
         children: [
           Scaffold(

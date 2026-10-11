@@ -74,13 +74,22 @@ Future<void> _pumpReadable(WidgetTester tester, Size size) async {
 
 void main() {
   group('windowSizeClassFor', () {
-    test('grenzen op 600 en 840', () {
+    test('grenzen op 600, 840 en 1200', () {
       expect(windowSizeClassFor(0), WindowSizeClass.compact);
       expect(windowSizeClassFor(599), WindowSizeClass.compact);
       expect(windowSizeClassFor(600), WindowSizeClass.medium);
       expect(windowSizeClassFor(839), WindowSizeClass.medium);
       expect(windowSizeClassFor(840), WindowSizeClass.expanded);
-      expect(windowSizeClassFor(1280), WindowSizeClass.expanded);
+      expect(windowSizeClassFor(1199), WindowSizeClass.expanded);
+      expect(windowSizeClassFor(1200), WindowSizeClass.large);
+      expect(windowSizeClassFor(1280), WindowSizeClass.large);
+    });
+
+    test('isAtLeast volgt de volgorde compact < medium < expanded < large', () {
+      expect(WindowSizeClass.large.isAtLeast(WindowSizeClass.expanded), isTrue);
+      expect(WindowSizeClass.expanded.isAtLeast(WindowSizeClass.expanded), isTrue);
+      expect(WindowSizeClass.medium.isAtLeast(WindowSizeClass.expanded), isFalse);
+      expect(WindowSizeClass.compact.isAtLeast(WindowSizeClass.medium), isFalse);
     });
   });
 
