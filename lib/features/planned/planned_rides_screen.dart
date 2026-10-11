@@ -197,8 +197,8 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: _PaneColumn(
-                    header: _LabelWithBadge(
+                  child: PaneColumn(
+                    header: LabelWithBadge(
                       label: S.of(context).ridesTabRides,
                       count: ridesAttention,
                     ),
@@ -207,8 +207,8 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
                 ),
                 const VerticalDivider(width: 1),
                 Expanded(
-                  child: _PaneColumn(
-                    header: _LabelWithBadge(
+                  child: PaneColumn(
+                    header: LabelWithBadge(
                       label: S.of(context).ridesTabBuddies,
                       count: pelotonAttention,
                     ),
@@ -287,15 +287,16 @@ class _BadgedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (count <= 0) return Tab(text: label);
-    return Tab(child: _LabelWithBadge(label: label, count: count));
+    return Tab(child: LabelWithBadge(label: label, count: count));
   }
 }
 
 /// Label met het rode bolletje erachter. Gedeeld door de tab ([_BadgedTab])
-/// en de kolomkop naast elkaar ([_PaneColumn]), zodat tab en kolom nooit een
-/// ander getal tonen (CLUB-25).
-class _LabelWithBadge extends StatelessWidget {
-  const _LabelWithBadge({required this.label, required this.count});
+/// en de kolomkop naast elkaar ([PaneColumn]), zodat tab en kolom nooit een
+/// ander getal tonen (CLUB-25). Openbaar voor de rittenkolom op Home
+/// (backlog #93).
+class LabelWithBadge extends StatelessWidget {
+  const LabelWithBadge({required this.label, required this.count, super.key});
 
   final String label;
   final int count;
@@ -322,9 +323,10 @@ class _LabelWithBadge extends StatelessWidget {
 
 /// Een kolom met een kop, voor Ritten en Peloton naast elkaar vanaf expanded
 /// (quick-plan 261011-jru). De kop draagt hetzelfde label en bolletje als de
-/// tab op de telefoon.
-class _PaneColumn extends StatelessWidget {
-  const _PaneColumn({required this.header, required this.child});
+/// tab op de telefoon. Openbaar, want Home gebruikt hem vanaf 1440 dp voor de
+/// derde kolom met je ritten (backlog #93): één kolomkop in de hele app.
+class PaneColumn extends StatelessWidget {
+  const PaneColumn({required this.header, required this.child, super.key});
 
   final Widget header;
   final Widget child;

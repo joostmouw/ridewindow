@@ -17,6 +17,7 @@ import 'package:ridewindow/domain/models/ride_tier.dart';
 import 'package:ridewindow/domain/models/weather_verdict.dart';
 import 'package:ridewindow/features/detail/detail_args.dart';
 import 'package:ridewindow/features/detail/ride_detail_screen.dart';
+import 'package:ridewindow/features/planned/planned_rides_screen.dart';
 import 'package:ridewindow/domain/models/ride_entry.dart';
 import 'package:ridewindow/features/shared/daylight_bar.dart';
 import 'package:ridewindow/features/shared/peloton_counter.dart';
@@ -142,6 +143,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   /// Breedte van de lijst links vanaf expanded (quick-plan 261011-jru).
   static const double _kListPaneWidth = 400;
+
+  /// Breedte van de derde kolom met je ritten vanaf
+  /// [kHomeThreeColumnMinWidth] (backlog #93).
+  static const double _kRidesColumnWidth = 360;
+
+  /// Staat er rechts een derde kolom met je ritten? Eén getter voor de kolom
+  /// zelf en voor het verbergen van de geplande-sectie in de lijst.
+  bool get _showsRidesColumn =>
+      MediaQuery.sizeOf(context).width >= kHomeThreeColumnMinWidth;
 
   /// Hoeveel geplande ritten PLANNED standaard toont. Lager dan bij de
   /// tijdvakken omdat dit geen keuzelijst is maar een geheugensteun: wat komt
@@ -951,6 +961,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   // ---------------------------------------------------------------------------
 
   Widget _buildPlannedRidesSliver() {
+    // Vanaf 1440 dp staan dezelfde ritten al in de derde kolom rechts; wat
+    // daar staat, staat niet nog eens op hetzelfde scherm (backlog #93).
+    if (_showsRidesColumn) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
     // Eén bron voor alle vier de ritsoorten (schets 008). Dit stond hier als
     // twee handmatig samengevoegde lijsten -- eigen geplande ritten plus de
     // gedeelde ritten waar je ja op had gezegd -- en dat miste er één: wat je
@@ -1220,6 +1235,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ),
         ),
+        // Derde kolom vanaf 1440 dp, zoals Google Calendar en Maps op een
+        // groot scherm: pas als het detail er niet smaller dan leesbaar door
+        // wordt. Dezelfde RidesTab als op het rittenscherm, geen tweede lijst;
+        // een tik op een rit opent het volledige detail, zoals daar.
+        //
+        // RidesTab markeert ritvragen als gezien zolang hij zichtbaar is
+        // (TickerMode). Hier klopt dat ook: op deze breedte zie je ze.
+        if (_showsRidesColumn) ...[
+          const VerticalDivider(width: 1),
+          SizedBox(
+            width: _kRidesColumnWidth,
+            child: KeyedSubtree(
+              key: const ValueKey('home_rides_column'),
+              child: PaneColumn(
+                header: LabelWithBadge(
+                  label: S.of(context).ridesTabRides,
+                  count: ref.watch(ridesTabAttentionCountProvider),
+                ),
+                child: const RidesTab(),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
