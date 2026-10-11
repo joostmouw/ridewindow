@@ -14,11 +14,14 @@
 // wordt in fase 38/39 tegengehouden door de plafonds. De vloer bepaalt alleen
 // wanneer Joost een seintje krijgt; hij houdt niemand tegen.
 //
-// Beginwaarden
-// ------------
-// Onderstaande getallen zijn ruime beginwaarden, gekozen voordat er gemeten
-// is. Plan 37-05 vervangt ze door waarden op basis van de nulmeting en
-// verwijst dan naar `.planning/phases/37-meten/37-NULMETING.md`.
+// Vloeren uit de nulmeting
+// ------------------------
+// Vloeren uit de nulmeting van 2026-10-11, zie
+// .planning/phases/37-meten/37-NULMETING.md (tabel "Vloeren"). De regel daar:
+// vloer_totaal = 3x de drukste echte dag, vloer_afzender = 3x het hoogste van
+// (max per afzender in de historie, de zware Oppo-sessie), naar boven
+// afgerond op een rond getal en minimaal 5. Wie een vloer bijstelt, werkt die
+// tabel mee bij.
 //
 // Alleen `dart:core`: dit bestand moet zonder Flutter/pub op een runner draaien.
 
@@ -49,25 +52,25 @@ const kSenderlessSources = <String>{
 /// Vloer voor regel 1: een dagtotaal moet hier boven zitten (en boven vijf
 /// keer de mediaan) om als uitschieter te tellen.
 const Map<String, int> kFloorTotal = {
-  'feedback_account': 20,
-  'feedback_anoniem': 20,
-  'app_events': 3000,
+  'feedback_account': 10,
+  'feedback_anoniem': 10,
+  'app_events': 100,
   'friend_invites': 30,
-  'group_invites': 30,
-  'group_rides': 30,
-  'group_ride_options': 120,
-  'accounts_google': 20,
-  'accounts_email': 20,
-  'accounts_overig': 10,
+  'group_invites': 10,
+  'group_rides': 10,
+  'group_ride_options': 15,
+  'accounts_google': 40,
+  'accounts_email': 10,
+  'accounts_overig': 5,
 };
 
 /// Vloer voor regel 2: zoveel rijen van één afzender op één dag is genoeg
 /// voor een seintje. Alleen voor bronnen met een afzender.
 const Map<String, int> kFloorSender = {
-  'feedback_account': 5,
-  'app_events': 600,
-  'friend_invites': 10,
+  'feedback_account': 10,
+  'app_events': 40,
+  'friend_invites': 25,
   'group_invites': 10,
   'group_rides': 10,
-  'group_ride_options': 40,
+  'group_ride_options': 15,
 };
