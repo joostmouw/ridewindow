@@ -63,9 +63,12 @@ class FakeGpsPermissionNotifier extends GpsPermissionNotifier {
 // Helper
 // ---------------------------------------------------------------------------
 
-Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile,
-    {LocationPermission permission = LocationPermission.denied,
-    Size size = const Size(400, 3000)}) async {
+Future<void> pumpProfileScreen(
+  WidgetTester tester,
+  UserProfile profile, {
+  LocationPermission permission = LocationPermission.denied,
+  Size size = const Size(400, 3000),
+}) async {
   // ProfileScreen's body is a ListView (SliverList under the hood), which —
   // like ListView.builder — only lays out children within the viewport +
   // cache extent. skipOffstage: false alone does NOT force off-viewport

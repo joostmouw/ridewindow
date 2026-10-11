@@ -41,6 +41,7 @@ import 'package:ridewindow/providers/unit_prefs_provider.dart';
 import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/theme/app_icons.dart';
 import 'package:ridewindow/theme/app_theme.dart';
+import 'package:ridewindow/app/window_size.dart';
 
 ({Color bg, Color fg}) _scoreTonal(double score, RideWindowTheme rw) {
   final t = rw.tiers;
@@ -175,6 +176,60 @@ class _PlannedRidesScreenState extends ConsumerState<PlannedRidesScreen>
     final ridesAttention = ref.watch(ridesTabAttentionCountProvider);
     final pelotonAttention = ref.watch(pelotonTabAttentionCountProvider);
 
+    // Vanaf expanded (840 dp) staan Ritten en Peloton naast elkaar in plaats
+    // van achter tabs (quick-plan 261011-jru). Op telefoon en medium blijft
+    // alles precies zoals het was.
+    if (windowSizeClassOf(context) == WindowSizeClass.expanded) {
+      return Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              title: Text(S.of(context).ridesTitle),
+              actions: [
+                IconButton(
+                  icon: const Icon(AppIcons.info, size: 20),
+                  tooltip: S.of(context).showTips,
+                  onPressed: () => setState(() => _showHints = true),
+                ),
+              ],
+            ),
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: _PaneColumn(
+                    header: _LabelWithBadge(
+                      label: S.of(context).ridesTabRides,
+                      count: ridesAttention,
+                    ),
+                    child: RidesTab(firstRideKey: _firstRideKey),
+                  ),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  child: _PaneColumn(
+                    header: _LabelWithBadge(
+                      label: S.of(context).ridesTabBuddies,
+                      count: pelotonAttention,
+                    ),
+                    child: const BuddiesTab(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (_showHints && entries.isNotEmpty)
+            ScreenHintOverlay(
+              hints: _ridesHints(context),
+              onDismiss: () {
+                markHintSeen('rides');
+                setState(() => _showHints = false);
+              },
+            ),
+        ],
+      );
+    }
+
     return Stack(
       children: [
         Scaffold(
@@ -232,22 +287,65 @@ class _BadgedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (count <= 0) return Tab(text: label);
-    return Tab(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+    return Tab(child: _LabelWithBadge(label: label, count: count));
+  }
+}
+
+/// Label met het rode bolletje erachter. Gedeeld door de tab ([_BadgedTab])
+/// en de kolomkop naast elkaar ([_PaneColumn]), zodat tab en kolom nooit een
+/// ander getal tonen (CLUB-25).
+class _LabelWithBadge extends StatelessWidget {
+  const _LabelWithBadge({required this.label, required this.count});
+
+  final String label;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
+    if (count <= 0) return text;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(child: text),
+        const SizedBox(width: 6),
+        Semantics(
+          label: S.of(context).navPelotonAttention(count),
+          child: ExcludeSemantics(
+            child: Badge(label: Text(unansweredBadgeLabel(count))),
           ),
-          const SizedBox(width: 6),
-          Semantics(
-            label: S.of(context).navPelotonAttention(count),
-            child: ExcludeSemantics(
-              child: Badge(label: Text(unansweredBadgeLabel(count))),
+        ),
+      ],
+    );
+  }
+}
+
+/// Een kolom met een kop, voor Ritten en Peloton naast elkaar vanaf expanded
+/// (quick-plan 261011-jru). De kop draagt hetzelfde label en bolletje als de
+/// tab op de telefoon.
+class _PaneColumn extends StatelessWidget {
+  const _PaneColumn({required this.header, required this.child});
+
+  final Widget header;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: DefaultTextStyle.merge(
+              style: Theme.of(context).textTheme.titleSmall,
+              child: header,
             ),
           ),
-        ],
-      ),
+        ),
+        Expanded(child: child),
+      ],
     );
   }
 }
