@@ -8,6 +8,7 @@ import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/features/welcome/spoke_track.dart';
 import 'package:ridewindow/theme/app_colors.dart';
 import 'package:ridewindow/theme/app_motion.dart';
+import 'package:ridewindow/app/window_size.dart';
 
 /// Het eerste scherm: het RW-monogram tekent zichzelf, wordt een fiets, en de
 /// renner stapt op. Daarna schuift het geheel omhoog en maakt plaats.
@@ -255,77 +256,81 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         onTap: _skipIntro,
         behavior: HitTestBehavior.opaque,
         child: SafeArea(
-          child: AnimatedBuilder(
-            animation: _settle,
-            builder: (context, _) {
-              return Stack(
-                children: [
-                  Align(
-                    alignment: align.value,
-                    child: Transform.scale(
-                      scale: scale.value,
-                      child: RepaintBoundary(
-                        child: Image.asset(
-                          'assets/animations/welcome_ride.webp',
-                          width: math.min(
-                            MediaQuery.sizeOf(context).width * 0.92,
-                            460,
+          // Vanaf medium max 640 breed; het groen blijft het hele venster
+          // vullen (quick-plan 261011-jru).
+          child: ReadableWidth(
+            child: AnimatedBuilder(
+              animation: _settle,
+              builder: (context, _) {
+                return Stack(
+                  children: [
+                    Align(
+                      alignment: align.value,
+                      child: Transform.scale(
+                        scale: scale.value,
+                        child: RepaintBoundary(
+                          child: Image.asset(
+                            'assets/animations/welcome_ride.webp',
+                            width: math.min(
+                              MediaQuery.sizeOf(context).width * 0.92,
+                              460,
+                            ),
+                            fit: BoxFit.contain,
+                            // De laatste frame blijft staan; zonder dit knippert
+                            // hij bij een herbouw even naar leeg.
+                            gaplessPlayback: true,
                           ),
-                          fit: BoxFit.contain,
-                          // De laatste frame blijft staan; zonder dit knippert
-                          // hij bij een herbouw even naar leeg.
-                          gaplessPlayback: true,
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 32,
-                    right: 32,
-                    bottom: 56,
-                    child: FadeTransition(
-                      opacity: fadeIn,
-                      child: SlideTransition(
-                        position: slideIn,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              s.welcomeTitle,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: theme.colorScheme.onSurface,
+                    Positioned(
+                      left: 32,
+                      right: 32,
+                      bottom: 56,
+                      child: FadeTransition(
+                        opacity: fadeIn,
+                        child: SlideTransition(
+                          position: slideIn,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                s.welcomeTitle,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
-                              s.welcomeSubtitle,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                height: 1.6,
+                              const SizedBox(height: 14),
+                              Text(
+                                s.welcomeSubtitle,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  height: 1.6,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 32),
-                            FilledButton(
-                              onPressed: () => context.push('/onboard'),
-                              child: Text(s.welcomeButton),
-                            ),
-                            const SizedBox(height: 4),
-                            TextButton(
-                              onPressed: _goToSignIn,
-                              child: Text(s.welcomeHaveAccount),
-                            ),
-                          ],
+                              const SizedBox(height: 32),
+                              FilledButton(
+                                onPressed: () => context.push('/onboard'),
+                                child: Text(s.welcomeButton),
+                              ),
+                              const SizedBox(height: 4),
+                              TextButton(
+                                onPressed: _goToSignIn,
+                                child: Text(s.welcomeHaveAccount),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

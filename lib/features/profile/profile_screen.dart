@@ -41,6 +41,7 @@ import 'package:ridewindow/providers/weather_notifier.dart';
 import 'package:ridewindow/services/calendar_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ridewindow/theme/app_icons.dart';
+import 'package:ridewindow/app/window_size.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -582,785 +583,789 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final s = S.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(s.profileTitle)),
-      body: ListView(
-        key: const PageStorageKey('profile_settings'),
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
-          // Sectie: ACCOUNT (D-01: bewust bovenaan, boven Naam en de
-          // tolerantie-instellingen -- zie 19-CONTEXT.md).
-          const AccountSection(),
+      // Vanaf medium max 640 breed, zoals instellingen op een tablet
+      // (quick-plan 261011-jru).
+      body: ReadableWidth(
+        child: ListView(
+          key: const PageStorageKey('profile_settings'),
+          padding: const EdgeInsets.only(bottom: 24),
+          children: [
+            // Sectie: ACCOUNT (D-01: bewust bovenaan, boven Naam en de
+            // tolerantie-instellingen -- zie 19-CONTEXT.md).
+            const AccountSection(),
 
-          // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
-          SectionCard(
-            title: s.sectionLocation,
-            children: [
-              // ELEMENT 0 — Web-only promoted city picker CTA (LOC-07 primary path)
-              if (isWebPlatform &&
-                  (permission == LocationPermission.denied ||
-                      permission == LocationPermission.deniedForever))
-                SectionBanner(
-                  // Tonaal, niet vol groen. Dit is een terugvalstaat -- er ging
-                  // iets mis met je locatie -- en op de papieren achtergrond was
-                  // `primaryContainer` het meest verzadigde vlak van het hele
-                  // scherm geworden. Daarmee trok een foutmelding meer aandacht
-                  // dan je account.
-                  //
-                  // De groene rand die die urgentie vasthield is vervallen: als
-                  // strook bovenin de sectiekaart doet de kleur dat werk al, en
-                  // een rand ín een omrande kaart geeft een dubbele lijn.
-                  color: Theme.of(context).colorScheme.surfaceContainer,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        s.chooseCityPrimaryTitle,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(s.chooseCityPrimaryHint),
-                      const SizedBox(height: 8),
-                      FilledButton.icon(
-                        onPressed: () => _openCityPicker(context),
-                        icon: const Icon(AppIcons.buildings),
-                        label: Text(s.tapToChooseCity),
-                      ),
-                    ],
-                  ),
-                ),
-
-              // ELEMENT 1 — GPS-geblokkeerd banner (deniedForever)
-              if (permission == LocationPermission.deniedForever)
-                SectionBanner(
-                  color: Theme.of(context).colorScheme.errorContainer,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        s.locationBlocked,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        isWebPlatform
-                            ? s.locationBlockedWebHint
-                            : s.locationBlockedHint,
-                      ),
-                      if (!isWebPlatform)
-                        TextButton(
-                          onPressed: () => ref
-                              .read(gpsPermissionProvider.notifier)
-                              .openSettings(),
-                          child: Text(s.openSettings),
-                        ),
-                    ],
-                  ),
-                ),
-
-              // ELEMENT 2 — GPS toestemming vragen (denied, niet deniedForever)
-              if (permission == LocationPermission.denied)
-                ListTile(
-                  leading: const Icon(AppIcons.crosshair),
-                  title: Text(s.useGpsLocation),
-                  trailing: TextButton(
-                    onPressed: () => ref
-                        .read(gpsPermissionProvider.notifier)
-                        .requestPermission(),
-                    child: Text(s.grantPermission),
-                  ),
-                ),
-
-              // ELEMENT 3 — Actieve locatie + stad-picker
-              ListTile(
-                leading: const Icon(AppIcons.buildings),
-                title: Text(profile.locationOverride ?? s.gpsAutomatic),
-                subtitle: Text(s.tapToChooseCity),
-                trailing: profile.locationOverride != null
-                    ? IconButton(
-                        icon: const Icon(AppIcons.x),
-                        tooltip: s.clearLocationOverride,
-                        onPressed: () => ref
-                            .read(profileProvider.notifier)
-                            .setLocationOverride(null),
-                      )
-                    : null,
-                onTap: () => _openCityPicker(context),
-              ),
-            ],
-          ),
-
-          // Sectie: NOTIFICATIES (NOTIF-01, NOTIF-02, NOTIF-03)
-          //
-          // Niet op web: `flutter_local_notifications` heeft daar geen
-          // implementatie, dus de drie schakelaars konden er sowieso nooit iets
-          // doen. Ze stonden er tot 2026-09-19 wel -- een iOS-tester kon ze
-          // aanzetten en wachten op meldingen die nooit zouden komen.
-          if (kIsWeb)
+            // Sectie: LOCATIE (D-07-06: stad-picker + GPS-banner, LOC-03, LOC-04)
             SectionCard(
-              title: s.sectionNotifications,
+              title: s.sectionLocation,
               children: [
+                // ELEMENT 0 — Web-only promoted city picker CTA (LOC-07 primary path)
+                if (isWebPlatform &&
+                    (permission == LocationPermission.denied ||
+                        permission == LocationPermission.deniedForever))
+                  SectionBanner(
+                    // Tonaal, niet vol groen. Dit is een terugvalstaat -- er ging
+                    // iets mis met je locatie -- en op de papieren achtergrond was
+                    // `primaryContainer` het meest verzadigde vlak van het hele
+                    // scherm geworden. Daarmee trok een foutmelding meer aandacht
+                    // dan je account.
+                    //
+                    // De groene rand die die urgentie vasthield is vervallen: als
+                    // strook bovenin de sectiekaart doet de kleur dat werk al, en
+                    // een rand ín een omrande kaart geeft een dubbele lijn.
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          s.chooseCityPrimaryTitle,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(s.chooseCityPrimaryHint),
+                        const SizedBox(height: 8),
+                        FilledButton.icon(
+                          onPressed: () => _openCityPicker(context),
+                          icon: const Icon(AppIcons.buildings),
+                          label: Text(s.tapToChooseCity),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // ELEMENT 1 — GPS-geblokkeerd banner (deniedForever)
+                if (permission == LocationPermission.deniedForever)
+                  SectionBanner(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          s.locationBlocked,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isWebPlatform
+                              ? s.locationBlockedWebHint
+                              : s.locationBlockedHint,
+                        ),
+                        if (!isWebPlatform)
+                          TextButton(
+                            onPressed: () => ref
+                                .read(gpsPermissionProvider.notifier)
+                                .openSettings(),
+                            child: Text(s.openSettings),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                // ELEMENT 2 — GPS toestemming vragen (denied, niet deniedForever)
+                if (permission == LocationPermission.denied)
+                  ListTile(
+                    leading: const Icon(AppIcons.crosshair),
+                    title: Text(s.useGpsLocation),
+                    trailing: TextButton(
+                      onPressed: () => ref
+                          .read(gpsPermissionProvider.notifier)
+                          .requestPermission(),
+                      child: Text(s.grantPermission),
+                    ),
+                  ),
+
+                // ELEMENT 3 — Actieve locatie + stad-picker
                 ListTile(
-                  title: Text(s.notifScoreDropSetting),
-                  subtitle: Text(s.notifWebExplanation),
+                  leading: const Icon(AppIcons.buildings),
+                  title: Text(profile.locationOverride ?? s.gpsAutomatic),
+                  subtitle: Text(s.tapToChooseCity),
+                  trailing: profile.locationOverride != null
+                      ? IconButton(
+                          icon: const Icon(AppIcons.x),
+                          tooltip: s.clearLocationOverride,
+                          onPressed: () => ref
+                              .read(profileProvider.notifier)
+                              .setLocationOverride(null),
+                        )
+                      : null,
+                  onTap: () => _openCityPicker(context),
                 ),
               ],
             ),
-          if (!kIsWeb)
+
+            // Sectie: NOTIFICATIES (NOTIF-01, NOTIF-02, NOTIF-03)
+            //
+            // Niet op web: `flutter_local_notifications` heeft daar geen
+            // implementatie, dus de drie schakelaars konden er sowieso nooit iets
+            // doen. Ze stonden er tot 2026-09-19 wel -- een iOS-tester kon ze
+            // aanzetten en wachten op meldingen die nooit zouden komen.
+            if (kIsWeb)
+              SectionCard(
+                title: s.sectionNotifications,
+                children: [
+                  ListTile(
+                    title: Text(s.notifScoreDropSetting),
+                    subtitle: Text(s.notifWebExplanation),
+                  ),
+                ],
+              ),
+            if (!kIsWeb)
+              SectionCard(
+              title: s.sectionNotifications,
+              children: [
+                SwitchListTile(
+                  title: Text(s.notifEveningBefore),
+                  subtitle: Text(s.notifEveningBeforeSub),
+                  value: profile.notifEveningBefore,
+                  onChanged: (v) async {
+                    await ref
+                        .read(profileProvider.notifier)
+                        .setNotifEveningBefore(v);
+                    if (v && context.mounted) {
+                      await _scheduleNotificationsIfPermitted(context);
+                    } else if (!v) {
+                      // Uitzetten moet ook iets doen: applyPlans annuleert wat
+                      // er stond en plant alleen wat nog aan staat terug.
+                      await _applyNotificationPlans();
+                    }
+                  },
+                ),
+                SwitchListTile(
+                  title: Text(s.notifMorningOf),
+                  subtitle: Text(s.notifMorningOfSub),
+                  value: profile.notifMorningOf,
+                  onChanged: (v) async {
+                    await ref.read(profileProvider.notifier).setNotifMorningOf(v);
+                    if (v && context.mounted) {
+                      await _scheduleNotificationsIfPermitted(context);
+                    } else if (!v) {
+                      // Uitzetten moet ook iets doen: applyPlans annuleert wat
+                      // er stond en plant alleen wat nog aan staat terug.
+                      await _applyNotificationPlans();
+                    }
+                  },
+                ),
+                SwitchListTile(
+                  title: Text(s.notifWeeklyDigest),
+                  subtitle: Text(s.notifWeeklyDigestSub),
+                  value: profile.notifWeeklyDigest,
+                  onChanged: (v) async {
+                    await ref
+                        .read(profileProvider.notifier)
+                        .setNotifWeeklyDigest(v);
+                    if (v && context.mounted) {
+                      await _scheduleNotificationsIfPermitted(context);
+                    } else if (!v) {
+                      // Uitzetten moet ook iets doen: applyPlans annuleert wat
+                      // er stond en plant alleen wat nog aan staat terug.
+                      await _applyNotificationPlans();
+                    }
+                  },
+                ),
+                const RideScoreAlertSettings(),
+              ],
+            ),
+
+            // Sectie: GEBRUIKSSTATISTIEK (v4.1)
+            //
+            // Staat bewust als eigen kaart en niet weggestopt onder NOTIFICATIES:
+            // dit is de plek waar de gebruiker een toestemming intrekt, en die
+            // moet vindbaar zijn zonder te zoeken.
             SectionCard(
-            title: s.sectionNotifications,
-            children: [
-              SwitchListTile(
-                title: Text(s.notifEveningBefore),
-                subtitle: Text(s.notifEveningBeforeSub),
-                value: profile.notifEveningBefore,
-                onChanged: (v) async {
-                  await ref
-                      .read(profileProvider.notifier)
-                      .setNotifEveningBefore(v);
-                  if (v && context.mounted) {
-                    await _scheduleNotificationsIfPermitted(context);
-                  } else if (!v) {
-                    // Uitzetten moet ook iets doen: applyPlans annuleert wat
-                    // er stond en plant alleen wat nog aan staat terug.
-                    await _applyNotificationPlans();
-                  }
-                },
-              ),
-              SwitchListTile(
-                title: Text(s.notifMorningOf),
-                subtitle: Text(s.notifMorningOfSub),
-                value: profile.notifMorningOf,
-                onChanged: (v) async {
-                  await ref.read(profileProvider.notifier).setNotifMorningOf(v);
-                  if (v && context.mounted) {
-                    await _scheduleNotificationsIfPermitted(context);
-                  } else if (!v) {
-                    // Uitzetten moet ook iets doen: applyPlans annuleert wat
-                    // er stond en plant alleen wat nog aan staat terug.
-                    await _applyNotificationPlans();
-                  }
-                },
-              ),
-              SwitchListTile(
-                title: Text(s.notifWeeklyDigest),
-                subtitle: Text(s.notifWeeklyDigestSub),
-                value: profile.notifWeeklyDigest,
-                onChanged: (v) async {
-                  await ref
-                      .read(profileProvider.notifier)
-                      .setNotifWeeklyDigest(v);
-                  if (v && context.mounted) {
-                    await _scheduleNotificationsIfPermitted(context);
-                  } else if (!v) {
-                    // Uitzetten moet ook iets doen: applyPlans annuleert wat
-                    // er stond en plant alleen wat nog aan staat terug.
-                    await _applyNotificationPlans();
-                  }
-                },
-              ),
-              const RideScoreAlertSettings(),
-            ],
-          ),
-
-          // Sectie: GEBRUIKSSTATISTIEK (v4.1)
-          //
-          // Staat bewust als eigen kaart en niet weggestopt onder NOTIFICATIES:
-          // dit is de plek waar de gebruiker een toestemming intrekt, en die
-          // moet vindbaar zijn zonder te zoeken.
-          SectionCard(
-            title: s.analyticsSettingTitle,
-            children: [
-              Consumer(
-                builder: (context, ref, _) {
-                  final consentAsync = ref.watch(analyticsConsentProvider);
-                  final enabled = consentAsync.value?.consent == true;
-                  return SwitchListTile(
-                    title: Text(s.analyticsSettingTitle),
-                    subtitle: Text(
-                      enabled ? s.analyticsSettingOn : s.analyticsSettingOff,
-                    ),
-                    value: enabled,
-                    onChanged: consentAsync.hasValue
-                        ? (v) => ref
-                            .read(analyticsConsentProvider.notifier)
-                            .setConsent(v)
-                        : null,
-                  );
-                },
-              ),
-            ],
-          ),
-
-          // Sectie: TAAL
-          SectionCard(
-            title: s.sectionLanguage,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: SegmentedButton<String>(
-                  // Zie de noot bij de themakiezer hieronder: geen vinkje op een
-                  // enkelvoudige keuze. Hier past het label ook mét vinkje, maar
-                  // twee keuzeknoppen recht onder elkaar waarvan er één een
-                  // vinkje draagt en de ander niet, oogt als een fout.
-                  showSelectedIcon: false,
-                  segments: const [
-                    ButtonSegment(value: 'nl', label: Text('Nederlands')),
-                    ButtonSegment(value: 'en', label: Text('English')),
-                  ],
-                  selected: {profile.locale},
-                  onSelectionChanged: (s) =>
-                      ref.read(profileProvider.notifier).setLocale(s.first),
-                ),
-              ),
-            ],
-          ),
-
-          // Sectie: THEMA (D-06-09: SegmentedButton, PROF-04)
-          SectionCard(
-            title: s.sectionTheme,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                // D-06-09: SegmentedButton, PROF-04
-                child: SegmentedButton<String>(
-                  // Geen vinkje. In een sectiekaart is de knop 32px smaller —
-                  // dat is spec-conform (16dp schermmarge plus 16dp
-                  // list-item-inspringing), maar met drie segmenten brak
-                  // "System" daardoor af tot "Syste / m" op de Oppo. Het vinkje
-                  // is hier bovendien dubbelop: dit is een enkelvoudige keuze en
-                  // het gevulde `secondaryContainer` zégt al welke aan staat.
-                  //
-                  // Niet overnemen op de periodefilter van Home: die is
-                  // meervoudig, en daar draagt het vinkje wél informatie —
-                  // welke van de drie aan staan is niet af te lezen aan één
-                  // gevuld vlak.
-                  showSelectedIcon: false,
-                  segments: [
-                    ButtonSegment(value: 'system', label: Text(s.themeSystem)),
-                    ButtonSegment(value: 'light', label: Text(s.themeLight)),
-                    ButtonSegment(value: 'dark', label: Text(s.themeDark)),
-                  ],
-                  selected: {profile.theme},
-                  onSelectionChanged: (s) =>
-                      ref.read(profileProvider.notifier).setTheme(s.first),
-                ),
-              ),
-            ],
-          ),
-
-          // Sectie: EENHEDEN
-          //
-          // Staat bóven de toleranties en niet eronder: wie zijn grenzen gaat
-          // instellen, wil eerst weten in welke maat hij ze leest. Andersom
-          // stel je eerst een grens in graden in en ontdek je daarna dat het
-          // ook in Fahrenheit kon.
-          SectionCard(
-            title: s.sectionUnits,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        s.unitsTemperature,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+              title: s.analyticsSettingTitle,
+              children: [
+                Consumer(
+                  builder: (context, ref, _) {
+                    final consentAsync = ref.watch(analyticsConsentProvider);
+                    final enabled = consentAsync.value?.consent == true;
+                    return SwitchListTile(
+                      title: Text(s.analyticsSettingTitle),
+                      subtitle: Text(
+                        enabled ? s.analyticsSettingOn : s.analyticsSettingOff,
                       ),
-                    ),
-                    SegmentedButton<TempUnit>(
-                      showSelectedIcon: false,
-                      segments: [
-                        ButtonSegment(
-                          value: TempUnit.celsius,
-                          label: Text(s.unitsCelsius),
-                        ),
-                        ButtonSegment(
-                          value: TempUnit.fahrenheit,
-                          label: Text(s.unitsFahrenheit),
-                        ),
-                      ],
-                      selected: {units.temp},
-                      onSelectionChanged: (set) {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(unitPrefsProvider.notifier)
-                            .setTemp(set.first);
-                      },
-                    ),
-                  ],
+                      value: enabled,
+                      onChanged: consentAsync.hasValue
+                          ? (v) => ref
+                              .read(analyticsConsentProvider.notifier)
+                              .setConsent(v)
+                          : null,
+                    );
+                  },
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        s.unitsWind,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    SegmentedButton<WindUnit>(
-                      showSelectedIcon: false,
-                      segments: [
-                        ButtonSegment(
-                          value: WindUnit.kmh,
-                          label: Text(s.unitsKmh),
-                        ),
-                        ButtonSegment(
-                          value: WindUnit.beaufort,
-                          label: Text(s.unitsBeaufort),
-                        ),
-                        ButtonSegment(
-                          value: WindUnit.mph,
-                          label: Text(s.unitsMph),
-                        ),
-                      ],
-                      selected: {units.wind},
-                      onSelectionChanged: (set) {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(unitPrefsProvider.notifier)
-                            .setWind(set.first);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: Text(
-                  s.unitsHint,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ],
+            ),
+
+            // Sectie: TAAL
+            SectionCard(
+              title: s.sectionLanguage,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: SegmentedButton<String>(
+                    // Zie de noot bij de themakiezer hieronder: geen vinkje op een
+                    // enkelvoudige keuze. Hier past het label ook mét vinkje, maar
+                    // twee keuzeknoppen recht onder elkaar waarvan er één een
+                    // vinkje draagt en de ander niet, oogt als een fout.
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(value: 'nl', label: Text('Nederlands')),
+                      ButtonSegment(value: 'en', label: Text('English')),
+                    ],
+                    selected: {profile.locale},
+                    onSelectionChanged: (s) =>
+                        ref.read(profileProvider.notifier).setLocale(s.first),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          // Sectie: TOLERANTIES
-          SectionCard(
-            title: s.sectionTolerances,
-            children: [
-              // --- Temperatuurbereik (RangeSlider) ---
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Column(
-                  children: [
-                    // `Expanded` in plaats van een `Spacer` ná het label: in een
-                    // sectiekaart is de rij 32px smaller dan in de oude platte
-                    // lijst (kaartmarge plus binnenmarge), en met een label op
-                    // zijn natuurlijke breedte liep hij over. Nu mag het label
-                    // krimpen of afbreken; de waarde rechts houdt zijn maat.
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.toleranceTemperature,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        _infoButton(
-                          context,
-                          s.toleranceTempInfoTitle,
-                          s.toleranceTempInfo,
-                          _tempRangeDescription(context, _tempMin, _tempMax),
-                        ),
-                        Text(
-                          // De schuif zelf blijft in graden Celsius staan --
-                          // dat is waarin de motor rekent en wat er opgeslagen
-                          // wordt. Alleen het bijschrift praat jouw taal.
-                          '${convertTemp(_tempMin, units.temp).round()}'
-                          '${units.temp.suffix} \u2013 '
-                          '${convertTemp(_tempMax, units.temp).round()}'
-                          '${units.temp.suffix}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    RangeSlider(
-                      values: RangeValues(_tempMin, _tempMax),
-                      min: 0,
-                      max: 40,
-                      divisions: 40,
-                      labels: RangeLabels(
-                        '${convertTemp(_tempMin, units.temp).round()}'
-                            '${units.temp.suffix}',
-                        '${convertTemp(_tempMax, units.temp).round()}'
-                            '${units.temp.suffix}',
-                      ),
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      onChanged: (v) => setState(() {
-                        _tempMin = v.start;
-                        _tempMax = v.end;
-                      }),
-                      onChangeEnd: (v) =>
-                          ref.read(profileProvider.notifier).updateTolerances(
-                                profile.tolerances.copyWith(
-                                  tempMinIdealC: v.start,
-                                  tempMaxIdealC: v.end,
-                                ),
-                              ),
-                    ),
-                    Text(
-                      _tempRangeDescription(context, _tempMin, _tempMax),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                  ],
+            // Sectie: THEMA (D-06-09: SegmentedButton, PROF-04)
+            SectionCard(
+              title: s.sectionTheme,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  // D-06-09: SegmentedButton, PROF-04
+                  child: SegmentedButton<String>(
+                    // Geen vinkje. In een sectiekaart is de knop 32px smaller —
+                    // dat is spec-conform (16dp schermmarge plus 16dp
+                    // list-item-inspringing), maar met drie segmenten brak
+                    // "System" daardoor af tot "Syste / m" op de Oppo. Het vinkje
+                    // is hier bovendien dubbelop: dit is een enkelvoudige keuze en
+                    // het gevulde `secondaryContainer` zégt al welke aan staat.
+                    //
+                    // Niet overnemen op de periodefilter van Home: die is
+                    // meervoudig, en daar draagt het vinkje wél informatie —
+                    // welke van de drie aan staan is niet af te lezen aan één
+                    // gevuld vlak.
+                    showSelectedIcon: false,
+                    segments: [
+                      ButtonSegment(value: 'system', label: Text(s.themeSystem)),
+                      ButtonSegment(value: 'light', label: Text(s.themeLight)),
+                      ButtonSegment(value: 'dark', label: Text(s.themeDark)),
+                    ],
+                    selected: {profile.theme},
+                    onSelectionChanged: (s) =>
+                        ref.read(profileProvider.notifier).setTheme(s.first),
+                  ),
                 ),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
+              ],
+            ),
 
-              // --- Max. neerslag + animated drops ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.toleranceMaxRain,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
+            // Sectie: EENHEDEN
+            //
+            // Staat bóven de toleranties en niet eronder: wie zijn grenzen gaat
+            // instellen, wil eerst weten in welke maat hij ze leest. Andersom
+            // stel je eerst een grens in graden in en ontdek je daarna dat het
+            // ook in Fahrenheit kon.
+            SectionCard(
+              title: s.sectionUnits,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          s.unitsTemperature,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
-                        _infoButton(
-                          context,
-                          s.toleranceRainInfoTitle,
-                          s.toleranceRainInfo,
-                          _rainDescription(context, _rainMax),
-                        ),
-                        Text(
-                          '${_rainMax.toStringAsFixed(1)}mm',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: _AnimatedRainDrops(intensity: _rainMax / 5.0),
-                    ),
-                    Slider(
-                      value: _rainMax,
-                      min: 0,
-                      max: 5,
-                      divisions: 50,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      onChanged: (v) => setState(() => _rainMax = v),
-                      onChangeEnd: (v) =>
-                          ref.read(profileProvider.notifier).updateTolerances(
-                                profile.tolerances.copyWith(rainMaxIdealMm: v),
-                              ),
-                    ),
-                    Text(
-                      _rainDescription(context, _rainMax),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontStyle: FontStyle.italic,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                  ],
-                ),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-
-              // --- Max. wind + animated windsock ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.toleranceMaxWind,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                      SegmentedButton<TempUnit>(
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                            value: TempUnit.celsius,
+                            label: Text(s.unitsCelsius),
                           ),
-                        ),
-                        _infoButton(
-                          context,
-                          s.toleranceWindInfoTitle,
-                          s.toleranceWindInfo,
-                          _windDescription(context, _windMax),
-                        ),
-                        Text(
-                          '${convertWind(_windMax, units.wind).round()} '
-                          '${windSuffix(units.wind)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: _AnimatedWindFlag(intensity: _windMax / 50.0),
-                    ),
-                    Slider(
-                      value: _windMax,
-                      min: 0,
-                      max: 50,
-                      divisions: 50,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      onChanged: (v) => setState(() => _windMax = v),
-                      onChangeEnd: (v) =>
-                          ref.read(profileProvider.notifier).updateTolerances(
-                                profile.tolerances.copyWith(windMaxIdealKmh: v),
-                              ),
-                    ),
-                    Text(
-                      _windDescription(context, _windMax),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-
-              // --- Daglicht (backlog #68, schets 011) ---
-              //
-              // Anders dan de drie hierboven is dit geen grens maar een
-              // gewicht, en daarom staat er een woordschaal in plaats van een
-              // getal met een eenheid: "20 km/u" betekent iets in de wereld,
-              // "0,5 daglicht" niet.
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.toleranceDaylight,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        _infoButton(
-                          context,
-                          s.toleranceDaylightInfoTitle,
-                          s.toleranceDaylightInfo,
-                          _darknessDescription(context, _darkness),
-                        ),
-                        Text(
-                          _darknessLabel(context, _darkness),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: _darkness,
-                      divisions: 4,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      onChanged: (v) => setState(() => _darkness = v),
-                      onChangeEnd: (v) =>
-                          ref.read(profileProvider.notifier).updateTolerances(
-                                profile.tolerances.copyWith(darknessWeight: v),
-                              ),
-                    ),
-                    Text(
-                      _darknessDescription(context, _darkness),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.outline,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          // Sectie: RIJLENGTE
-          SectionCard(
-            title: s.sectionRideLength,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Wrap(
-                  spacing: 8,
-                  children: [
-                    // PROF-02: last-chip-guard zit in
-                    // ProfileNotifier.toggleDuration()
-                    FilterChip(
-                      label: const Text('2u'),
-                      selected: profile.allowedDurations.contains(2),
-                      onSelected: (_) {
-                        HapticFeedback.lightImpact();
-                        ref.read(profileProvider.notifier).toggleDuration(2);
-                      },
-                    ),
-                    FilterChip(
-                      label: const Text('3u'),
-                      selected: profile.allowedDurations.contains(3),
-                      onSelected: (_) {
-                        HapticFeedback.lightImpact();
-                        ref.read(profileProvider.notifier).toggleDuration(3);
-                      },
-                    ),
-                    FilterChip(
-                      label: const Text('4-5u'),
-                      selected: profile.allowedDurations.contains(5),
-                      onSelected: (_) {
-                        HapticFeedback.lightImpact();
-                        ref.read(profileProvider.notifier).toggleDuration(5);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-              // Beschikbaarheidskalender navigatie (D-06-08)
-              ListTile(
-                title: Text(s.editMySchedule),
-                trailing: const Icon(AppIcons.caretRight),
-                onTap: () => context.push('/availability'),
-              ),
-            ],
-          ),
-
-          // Sectie: NAAM
-          SectionCard(
-            title: s.sectionName,
-            children: [
-              ListTile(
-                leading: const Icon(AppIcons.user),
-                title: Text(profile.userName ?? s.setYourName),
-                subtitle: profile.userName == null ? Text(s.nameHint) : null,
-                onTap: () => _showNameDialog(context, profile.userName),
-              ),
-            ],
-          ),
-
-          // Sectie: OVER (REL-03: privacybeleid + versie)
-          SectionCard(
-            title: s.sectionAbout,
-            children: [
-              // De rondleiding van vier schermen hoort hier en niet achter een
-              // i'tje in een appbalk: hij gaat niet over één scherm maar over
-              // waar alles zit. De schermgebonden uitleg zit wél op het scherm
-              // zelf -- daar wijst hij naar dingen, en dat werkt alleen daar.
-              ListTile(
-                leading: const Icon(AppIcons.info),
-                title: Text(s.showWelcomeTour),
-                trailing: const Icon(AppIcons.caretRight),
-                onTap: () => showAppTour(context),
-              ),
-              ListTile(
-                leading: const Icon(AppIcons.chatCircleDots),
-                title: Text(s.sendFeedback),
-                trailing: const Icon(AppIcons.caretRight),
-                onTap: () => showFeedbackDialog(context),
-              ),
-              ListTile(
-                leading: const Icon(AppIcons.calendarBlank),
-                title: Text(s.googleCalendarLabel),
-                subtitle: _calendarMismatchEmail != null
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_calendarStatusText(s)),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                AppIcons.warning,
-                                size: 16,
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  s.calendarMismatchWarning(
-                                    _calendarMismatchEmail!,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          ButtonSegment(
+                            value: TempUnit.fahrenheit,
+                            label: Text(s.unitsFahrenheit),
                           ),
                         ],
-                      )
-                    : Text(_calendarStatusText(s)),
-                trailing: _calendarConnected == null
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : (_calendarConnected!
-                        ? TextButton(
-                            onPressed: () => _disconnectCalendar(context),
-                            child: Text(s.calendarDisconnectButton),
-                          )
-                        : null),
-              ),
-              // Twee rijen met hetzelfde pijltje horen zich hetzelfde te
-              // gedragen. Tot 1.0.35 deed de bovenste het via `canLaunchUrl`
-              // met `externalApplication` en de onderste via een kale
-              // `launchUrl` zonder mode, dus in een in-app tab. Dat verschil
-              // was niet bedoeld en het was precies wat de melding onleesbaar
-              // maakte. Nu allebei door dezelfde helper.
-              ListTile(
-                title: Text(s.privacyPolicy),
-                trailing: const Icon(AppIcons.arrowSquareOut),
-                onTap: () => _openExternal(context, _kPrivacyPolicyUrl),
-              ),
-              ListTile(
-                title: Text(s.weatherDataAttribution),
-                trailing: const Icon(AppIcons.arrowSquareOut),
-                onTap: () => _openExternal(context, _kOpenMeteoUrl),
-              ),
-              ListTile(
-                title: Text(s.version),
-                trailing: const Text(kAppVersionDisplay),
-                onTap: () {
-                  _versionTapCount++;
-                  if (_versionTapCount >= 5) {
-                    _versionTapCount = 0;
-                    _showDebugMenu(context);
-                  }
-                },
-              ),
-            ],
-          ),
-        ],
+                        selected: {units.temp},
+                        onSelectionChanged: (set) {
+                          HapticFeedback.lightImpact();
+                          ref
+                              .read(unitPrefsProvider.notifier)
+                              .setTemp(set.first);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          s.unitsWind,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      SegmentedButton<WindUnit>(
+                        showSelectedIcon: false,
+                        segments: [
+                          ButtonSegment(
+                            value: WindUnit.kmh,
+                            label: Text(s.unitsKmh),
+                          ),
+                          ButtonSegment(
+                            value: WindUnit.beaufort,
+                            label: Text(s.unitsBeaufort),
+                          ),
+                          ButtonSegment(
+                            value: WindUnit.mph,
+                            label: Text(s.unitsMph),
+                          ),
+                        ],
+                        selected: {units.wind},
+                        onSelectionChanged: (set) {
+                          HapticFeedback.lightImpact();
+                          ref
+                              .read(unitPrefsProvider.notifier)
+                              .setWind(set.first);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Text(
+                    s.unitsHint,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Sectie: TOLERANTIES
+            SectionCard(
+              title: s.sectionTolerances,
+              children: [
+                // --- Temperatuurbereik (RangeSlider) ---
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Column(
+                    children: [
+                      // `Expanded` in plaats van een `Spacer` ná het label: in een
+                      // sectiekaart is de rij 32px smaller dan in de oude platte
+                      // lijst (kaartmarge plus binnenmarge), en met een label op
+                      // zijn natuurlijke breedte liep hij over. Nu mag het label
+                      // krimpen of afbreken; de waarde rechts houdt zijn maat.
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              s.toleranceTemperature,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          _infoButton(
+                            context,
+                            s.toleranceTempInfoTitle,
+                            s.toleranceTempInfo,
+                            _tempRangeDescription(context, _tempMin, _tempMax),
+                          ),
+                          Text(
+                            // De schuif zelf blijft in graden Celsius staan --
+                            // dat is waarin de motor rekent en wat er opgeslagen
+                            // wordt. Alleen het bijschrift praat jouw taal.
+                            '${convertTemp(_tempMin, units.temp).round()}'
+                            '${units.temp.suffix} \u2013 '
+                            '${convertTemp(_tempMax, units.temp).round()}'
+                            '${units.temp.suffix}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      RangeSlider(
+                        values: RangeValues(_tempMin, _tempMax),
+                        min: 0,
+                        max: 40,
+                        divisions: 40,
+                        labels: RangeLabels(
+                          '${convertTemp(_tempMin, units.temp).round()}'
+                              '${units.temp.suffix}',
+                          '${convertTemp(_tempMax, units.temp).round()}'
+                              '${units.temp.suffix}',
+                        ),
+                        activeColor: Theme.of(context).colorScheme.primary,
+                        onChanged: (v) => setState(() {
+                          _tempMin = v.start;
+                          _tempMax = v.end;
+                        }),
+                        onChangeEnd: (v) =>
+                            ref.read(profileProvider.notifier).updateTolerances(
+                                  profile.tolerances.copyWith(
+                                    tempMinIdealC: v.start,
+                                    tempMaxIdealC: v.end,
+                                  ),
+                                ),
+                      ),
+                      Text(
+                        _tempRangeDescription(context, _tempMin, _tempMax),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+
+                // --- Max. neerslag + animated drops ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              s.toleranceMaxRain,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          _infoButton(
+                            context,
+                            s.toleranceRainInfoTitle,
+                            s.toleranceRainInfo,
+                            _rainDescription(context, _rainMax),
+                          ),
+                          Text(
+                            '${_rainMax.toStringAsFixed(1)}mm',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 40,
+                        child: _AnimatedRainDrops(intensity: _rainMax / 5.0),
+                      ),
+                      Slider(
+                        value: _rainMax,
+                        min: 0,
+                        max: 5,
+                        divisions: 50,
+                        activeColor: Theme.of(context).colorScheme.primary,
+                        onChanged: (v) => setState(() => _rainMax = v),
+                        onChangeEnd: (v) =>
+                            ref.read(profileProvider.notifier).updateTolerances(
+                                  profile.tolerances.copyWith(rainMaxIdealMm: v),
+                                ),
+                      ),
+                      Text(
+                        _rainDescription(context, _rainMax),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+
+                // --- Max. wind + animated windsock ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              s.toleranceMaxWind,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          _infoButton(
+                            context,
+                            s.toleranceWindInfoTitle,
+                            s.toleranceWindInfo,
+                            _windDescription(context, _windMax),
+                          ),
+                          Text(
+                            '${convertWind(_windMax, units.wind).round()} '
+                            '${windSuffix(units.wind)}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 40,
+                        child: _AnimatedWindFlag(intensity: _windMax / 50.0),
+                      ),
+                      Slider(
+                        value: _windMax,
+                        min: 0,
+                        max: 50,
+                        divisions: 50,
+                        activeColor: Theme.of(context).colorScheme.primary,
+                        onChanged: (v) => setState(() => _windMax = v),
+                        onChangeEnd: (v) =>
+                            ref.read(profileProvider.notifier).updateTolerances(
+                                  profile.tolerances.copyWith(windMaxIdealKmh: v),
+                                ),
+                      ),
+                      Text(
+                        _windDescription(context, _windMax),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+
+                // --- Daglicht (backlog #68, schets 011) ---
+                //
+                // Anders dan de drie hierboven is dit geen grens maar een
+                // gewicht, en daarom staat er een woordschaal in plaats van een
+                // getal met een eenheid: "20 km/u" betekent iets in de wereld,
+                // "0,5 daglicht" niet.
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              s.toleranceDaylight,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          _infoButton(
+                            context,
+                            s.toleranceDaylightInfoTitle,
+                            s.toleranceDaylightInfo,
+                            _darknessDescription(context, _darkness),
+                          ),
+                          Text(
+                            _darknessLabel(context, _darkness),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Slider(
+                        value: _darkness,
+                        divisions: 4,
+                        activeColor: Theme.of(context).colorScheme.primary,
+                        onChanged: (v) => setState(() => _darkness = v),
+                        onChangeEnd: (v) =>
+                            ref.read(profileProvider.notifier).updateTolerances(
+                                  profile.tolerances.copyWith(darknessWeight: v),
+                                ),
+                      ),
+                      Text(
+                        _darknessDescription(context, _darkness),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // Sectie: RIJLENGTE
+            SectionCard(
+              title: s.sectionRideLength,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      // PROF-02: last-chip-guard zit in
+                      // ProfileNotifier.toggleDuration()
+                      FilterChip(
+                        label: const Text('2u'),
+                        selected: profile.allowedDurations.contains(2),
+                        onSelected: (_) {
+                          HapticFeedback.lightImpact();
+                          ref.read(profileProvider.notifier).toggleDuration(2);
+                        },
+                      ),
+                      FilterChip(
+                        label: const Text('3u'),
+                        selected: profile.allowedDurations.contains(3),
+                        onSelected: (_) {
+                          HapticFeedback.lightImpact();
+                          ref.read(profileProvider.notifier).toggleDuration(3);
+                        },
+                      ),
+                      FilterChip(
+                        label: const Text('4-5u'),
+                        selected: profile.allowedDurations.contains(5),
+                        onSelected: (_) {
+                          HapticFeedback.lightImpact();
+                          ref.read(profileProvider.notifier).toggleDuration(5);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+                // Beschikbaarheidskalender navigatie (D-06-08)
+                ListTile(
+                  title: Text(s.editMySchedule),
+                  trailing: const Icon(AppIcons.caretRight),
+                  onTap: () => context.push('/availability'),
+                ),
+              ],
+            ),
+
+            // Sectie: NAAM
+            SectionCard(
+              title: s.sectionName,
+              children: [
+                ListTile(
+                  leading: const Icon(AppIcons.user),
+                  title: Text(profile.userName ?? s.setYourName),
+                  subtitle: profile.userName == null ? Text(s.nameHint) : null,
+                  onTap: () => _showNameDialog(context, profile.userName),
+                ),
+              ],
+            ),
+
+            // Sectie: OVER (REL-03: privacybeleid + versie)
+            SectionCard(
+              title: s.sectionAbout,
+              children: [
+                // De rondleiding van vier schermen hoort hier en niet achter een
+                // i'tje in een appbalk: hij gaat niet over één scherm maar over
+                // waar alles zit. De schermgebonden uitleg zit wél op het scherm
+                // zelf -- daar wijst hij naar dingen, en dat werkt alleen daar.
+                ListTile(
+                  leading: const Icon(AppIcons.info),
+                  title: Text(s.showWelcomeTour),
+                  trailing: const Icon(AppIcons.caretRight),
+                  onTap: () => showAppTour(context),
+                ),
+                ListTile(
+                  leading: const Icon(AppIcons.chatCircleDots),
+                  title: Text(s.sendFeedback),
+                  trailing: const Icon(AppIcons.caretRight),
+                  onTap: () => showFeedbackDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(AppIcons.calendarBlank),
+                  title: Text(s.googleCalendarLabel),
+                  subtitle: _calendarMismatchEmail != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(_calendarStatusText(s)),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  AppIcons.warning,
+                                  size: 16,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    s.calendarMismatchWarning(
+                                      _calendarMismatchEmail!,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Text(_calendarStatusText(s)),
+                  trailing: _calendarConnected == null
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : (_calendarConnected!
+                          ? TextButton(
+                              onPressed: () => _disconnectCalendar(context),
+                              child: Text(s.calendarDisconnectButton),
+                            )
+                          : null),
+                ),
+                // Twee rijen met hetzelfde pijltje horen zich hetzelfde te
+                // gedragen. Tot 1.0.35 deed de bovenste het via `canLaunchUrl`
+                // met `externalApplication` en de onderste via een kale
+                // `launchUrl` zonder mode, dus in een in-app tab. Dat verschil
+                // was niet bedoeld en het was precies wat de melding onleesbaar
+                // maakte. Nu allebei door dezelfde helper.
+                ListTile(
+                  title: Text(s.privacyPolicy),
+                  trailing: const Icon(AppIcons.arrowSquareOut),
+                  onTap: () => _openExternal(context, _kPrivacyPolicyUrl),
+                ),
+                ListTile(
+                  title: Text(s.weatherDataAttribution),
+                  trailing: const Icon(AppIcons.arrowSquareOut),
+                  onTap: () => _openExternal(context, _kOpenMeteoUrl),
+                ),
+                ListTile(
+                  title: Text(s.version),
+                  trailing: const Text(kAppVersionDisplay),
+                  onTap: () {
+                    _versionTapCount++;
+                    if (_versionTapCount >= 5) {
+                      _versionTapCount = 0;
+                      _showDebugMenu(context);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

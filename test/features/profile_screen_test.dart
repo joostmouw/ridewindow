@@ -64,14 +64,15 @@ class FakeGpsPermissionNotifier extends GpsPermissionNotifier {
 // ---------------------------------------------------------------------------
 
 Future<void> pumpProfileScreen(WidgetTester tester, UserProfile profile,
-    {LocationPermission permission = LocationPermission.denied}) async {
+    {LocationPermission permission = LocationPermission.denied,
+    Size size = const Size(400, 3000)}) async {
   // ProfileScreen's body is a ListView (SliverList under the hood), which —
   // like ListView.builder — only lays out children within the viewport +
   // cache extent. skipOffstage: false alone does NOT force off-viewport
   // sliver children into existence (that flag only affects Offstage
   // widgets). Grow the test surface tall enough that every section
   // (LOCATIE through OVER) is laid out without scrolling.
-  await tester.binding.setSurfaceSize(const Size(400, 3000));
+  await tester.binding.setSurfaceSize(size);
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
   await tester.pumpWidget(
@@ -174,5 +175,21 @@ void main() {
 
     expect(
         find.text('Mijn schema bewerken', skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets(
+      'tablet (1280x800): de instellingen zijn hooguit 640 breed (quick-plan 261011-jru)',
+      (tester) async {
+    await pumpProfileScreen(tester, testProfile, size: const Size(1280, 800));
+    final list = find.byKey(const PageStorageKey('profile_settings'));
+    expect(tester.getSize(list).width, lessThanOrEqualTo(640));
+    expect(tester.getCenter(list).dx, 640);
+  });
+
+  testWidgets('telefoon (400 breed): de instellingen vullen de breedte',
+      (tester) async {
+    await pumpProfileScreen(tester, testProfile);
+    final list = find.byKey(const PageStorageKey('profile_settings'));
+    expect(tester.getSize(list).width, 400);
   });
 }

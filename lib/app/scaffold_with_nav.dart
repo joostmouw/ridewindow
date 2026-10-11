@@ -1,9 +1,11 @@
 // lib/app/scaffold_with_nav.dart
-// Shell widget voor StatefulShellRoute: persistente NavigationBar over Home en Profiel tabs.
+// Shell widget voor StatefulShellRoute: persistente NavigationBar (telefoon)
+// of NavigationRail (vanaf medium, quick-plan 261011-jru) over de vier tabs.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridewindow/app/window_size.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
 import 'package:ridewindow/providers/ride_entries_provider.dart';
 import 'package:ridewindow/theme/app_icons.dart';
@@ -26,49 +28,95 @@ class ScaffoldWithNav extends ConsumerWidget {
     // voor de melding aan Android na een tabwissel en na het sluiten van een
     // scherm boven de shell (ritdetail, groep): dan meldt de hoofdnavigator.
     final onHome = navigationShell.currentIndex == 0;
+    final s = S.of(context);
+
+    // Eén lijst voor onderbalk én rail, zodat iconen, labels en het bolletje
+    // nooit uiteen kunnen lopen (quick-plan 261011-jru).
+    final destinations = <({Widget icon, Widget selectedIcon, String label})>[
+      (
+        icon: const Icon(AppIcons.house),
+        selectedIcon: const Icon(AppIconsFill.house),
+        label: s.navHome,
+      ),
+      (
+        icon: const Icon(AppIcons.calendarDots),
+        selectedIcon: const Icon(AppIconsFill.calendarDots),
+        label: s.navAgenda,
+      ),
+      (
+        icon: _AttentionBadge(
+          count: attention,
+          child: const Icon(AppIcons.bicycle),
+        ),
+        selectedIcon: _AttentionBadge(
+          count: attention,
+          child: const Icon(AppIconsFill.bicycle),
+        ),
+        label: s.navRides,
+      ),
+      (
+        icon: const Icon(AppIcons.user),
+        selectedIcon: const Icon(AppIconsFill.user),
+        label: s.navProfile,
+      ),
+    ];
+
+    void onSelect(int i) => navigationShell.goBranch(
+          i,
+          initialLocation: i == navigationShell.currentIndex,
+        );
+
+    // Telefoon: de onderbalk. Vanaf medium (600 dp) een rail links, zoals
+    // YouTube en Google Play op een tablet doen.
+    final Widget scaffold;
+    if (windowSizeClassOf(context) == WindowSizeClass.compact) {
+      scaffold = Scaffold(
+        body: navigationShell,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: onSelect,
+          destinations: [
+            for (final d in destinations)
+              NavigationDestination(
+                icon: d.icon,
+                selectedIcon: d.selectedIcon,
+                label: d.label,
+              ),
+          ],
+        ),
+      );
+    } else {
+      scaffold = Scaffold(
+        body: Row(
+          children: [
+            SafeArea(
+              right: false,
+              child: NavigationRail(
+                selectedIndex: navigationShell.currentIndex,
+                onDestinationSelected: onSelect,
+                labelType: NavigationRailLabelType.all,
+                destinations: [
+                  for (final d in destinations)
+                    NavigationRailDestination(
+                      icon: d.icon,
+                      selectedIcon: d.selectedIcon,
+                      label: Text(d.label),
+                    ),
+                ],
+              ),
+            ),
+            Expanded(child: navigationShell),
+          ],
+        ),
+      );
+    }
+
     return PopScope(
       canPop: onHome,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) navigationShell.goBranch(0);
       },
-      child: Scaffold(
-        body: navigationShell,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: (i) => navigationShell.goBranch(
-            i,
-            initialLocation: i == navigationShell.currentIndex,
-          ),
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(AppIcons.house),
-              selectedIcon: const Icon(AppIconsFill.house),
-              label: S.of(context).navHome,
-            ),
-            NavigationDestination(
-              icon: const Icon(AppIcons.calendarDots),
-              selectedIcon: const Icon(AppIconsFill.calendarDots),
-              label: S.of(context).navAgenda,
-            ),
-            NavigationDestination(
-              icon: _AttentionBadge(
-                count: attention,
-                child: const Icon(AppIcons.bicycle),
-              ),
-              selectedIcon: _AttentionBadge(
-                count: attention,
-                child: const Icon(AppIconsFill.bicycle),
-              ),
-              label: S.of(context).navRides,
-            ),
-            NavigationDestination(
-              icon: const Icon(AppIcons.user),
-              selectedIcon: const Icon(AppIconsFill.user),
-              label: S.of(context).navProfile,
-            ),
-          ],
-        ),
-      ),
+      child: scaffold,
     );
   }
 }

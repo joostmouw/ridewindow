@@ -12,6 +12,7 @@ import 'package:ridewindow/theme/app_theme.dart';
 import 'package:ridewindow/providers/availability_notifier.dart';
 import 'package:ridewindow/providers/availability_presets.dart';
 import 'package:ridewindow/theme/app_icons.dart';
+import 'package:ridewindow/app/window_size.dart';
 
 /// Interne data-structuur voor een onboarding preset-optie.
 class _PresetOption {
@@ -130,73 +131,76 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       // de rest van de app is sinds v4.0 papier.
       backgroundColor: AppColors.brandLight,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Terug-knop
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: const Icon(AppIcons.caretLeft),
-                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                  onPressed: () => context.go('/welcome'),
+        // Vanaf medium max 640 breed (quick-plan 261011-jru).
+        child: ReadableWidth(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Terug-knop
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: const Icon(AppIcons.caretLeft),
+                    tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                    onPressed: () => context.go('/welcome'),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Titel
-              Text(
-                S.of(context).onboardingTitle,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: context.rw.textPrimary,
-                  height: 1.2,
+                const SizedBox(height: 16),
+                // Titel
+                Text(
+                  S.of(context).onboardingTitle,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: context.rw.textPrimary,
+                    height: 1.2,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              // Subtitel
-              Text(
-                S.of(context).onboardingSubtitle,
-                style: const TextStyle(
-                  fontSize: 14,
-                  // Niet `rw.textTertiary`: die is in v4.0 lichter gezet voor
-                  // de papieren achtergrond en haalt op brandLight nog maar
-                  // 3.63:1. Deze waarde haalt 4.55:1 op groen.
-                  color: AppColors.brandScreenTextTertiary,
-                  height: 1.55,
+                const SizedBox(height: 8),
+                // Subtitel
+                Text(
+                  S.of(context).onboardingSubtitle,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    // Niet `rw.textTertiary`: die is in v4.0 lichter gezet voor
+                    // de papieren achtergrond en haalt op brandLight nog maar
+                    // 3.63:1. Deze waarde haalt 4.55:1 op groen.
+                    color: AppColors.brandScreenTextTertiary,
+                    height: 1.55,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              // Preset-opties
-              Expanded(
-                child: ListView.separated(
-                  itemCount: _options(context).length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final option = _options(context)[index];
-                    final isSelected = _selected == option.preset;
-                    return _PresetTile(
-                      option: option,
-                      isSelected: isSelected,
-                      green: green,
-                      greenBg: greenBg,
-                      onTap: () => setState(() => _selected = option.preset),
-                    );
-                  },
+                const SizedBox(height: 28),
+                // Preset-opties
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: _options(context).length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final option = _options(context)[index];
+                      final isSelected = _selected == option.preset;
+                      return _PresetTile(
+                        option: option,
+                        isSelected: isSelected,
+                        green: green,
+                        greenBg: greenBg,
+                        onTap: () => setState(() => _selected = option.preset),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              // Volgende-knop
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _handleNext,
-                  child: Text(S.of(context).onboardingNext),
+                const SizedBox(height: 24),
+                // Volgende-knop
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _handleNext,
+                    child: Text(S.of(context).onboardingNext),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
