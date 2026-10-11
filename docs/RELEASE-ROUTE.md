@@ -38,8 +38,40 @@ er waar live staat.
    bytes, geen nieuwe upload. Daarna `--list-tracks`: beide tracks op
    dezelfde code.
 7. **Productie (sluitstuk)**: pas als de eis is gehaald (12 testers, 14 dagen
-   ononderbroken) én de developer-verificatie (deadline 30 september 2026
-   volgens Play Console).
+   ononderbroken) én de developer-verificatie rond is. Beide zijn gehaald: de
+   toegang is op **2026-10-11** verleend. Zie "De eerste productie-release"
+   hieronder; die wijkt op drie punten af van een testtrack.
+
+## De eerste productie-release
+
+Toegang verleend op 2026-10-11. **Toegang is niet hetzelfde als live staan:** de
+productietrack begint leeg, dus de app is pas downloadbaar nadat er een release
+op staat en die gepubliceerd is. Wie een bericht stuurt met "we staan in de
+winkel" terwijl de track leeg is, stuurt een link die niet werkt.
+
+Drie dingen die een testtrack niet heeft:
+
+1. **Het service-account heeft het recht nog niet.** De inrichting in
+   `tool/README-play-release.md` zet bewust alleen "Release apps to testing
+   tracks" aan, om de schade te beperken als de sleutel lekt. Productie vraagt
+   een tweede uitnodiging met *Release to production, exclude devices, and use
+   Play App Signing*. Zonder dat recht geeft `--track production` een 403.
+   Tijdelijk aanzetten en daarna weer weghalen is de middenweg.
+2. **Eerste upload als concept**, niet meteen uitgerold:
+   `dart run tool/play_upload.dart --track production --status draft --notes …`
+   Daarna in de Console de eenmalige instellingen nalopen (landen,
+   uitrolpercentage, app-content-verklaringen) en pas dan publiceren.
+3. **De productietrack heeft een eigen review.** Internal niet; alpha en
+   productie wel. De release staat dus enige tijd klaar zonder zichtbaar te zijn.
+
+Promoveren kan ook: `--promote 67 --track production` zet dezelfde bytes die op
+internal zijn goedgekeurd op productie, in plaats van opnieuw te uploaden. Dat is
+dezelfde garantie als bij een promotie naar alpha, en de goedkoopste route.
+
+**Wat er ná publicatie in beeld komt:** BACKLOG #76 (LinkedIn-lanceerpost). De
+regel uit fase 27 blijft staan: een post vóór de winkelvermelding kan de werving
+voor de gesloten test niet meer helpen, en "we staan live" is pas waar als hij
+live staat.
 
 ## Terug van een sideload naar Play
 

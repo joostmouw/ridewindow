@@ -20,11 +20,11 @@ progress:
 | Waar | Stand |
 |---|---|
 | Productie | **Toegang verleend op 2026-10-11.** De track is nog **leeg**: de app staat dus nog niet in de winkel en is nog niet downloadbaar |
-| Internal | **1.0.55 (66)**; 1.0.56 (67) is gebouwd en wacht op upload |
-| PWA | **1.0.55 (66)**; 67 volgt bij de push, want CI deployt op elke push naar `main` die `lib/**` raakt |
-| Oppo | **1.0.55 (66)** via Play |
-| Alpha / closed | **1.0.55 (66)**, 75 testers |
-| main | **1.0.56+67**, lokaal gecommit (`963e2f9`), nog niet gepusht |
+| Internal | **1.0.56 (67)**, geüpload via de Play Developer API; `--list-tracks` bevestigt internal 67, completed |
+| PWA | **1.0.56 (67)**, CI-run #51 vanaf `6f9941c`; live `version.json` zegt 67 |
+| Oppo | Laatst bewezen **1.0.55 (66)** via Play. Ontvangst van 67 staat open |
+| Alpha / closed | **1.0.55 (66)**, 75 testers. 67 niet gepromoveerd; eerst toestelgoedkeuring |
+| main | **1.0.56+67**, gepusht (`6f9941c`) |
 
 **Wat 67 brengt:** gedeelde ritten en groepen openen op een lokale
 SharedPreferences-kopie, dus de PLANNED-kaartjes staan er bij een koude start
@@ -36,7 +36,11 @@ eerste indruk van een verse gebruiker, en de eerste productie-release is de
 enige waarbij iedereen die indruk voor het eerst krijgt.
 
 **Releasebewijs:** suite 1099 groen; analyze 0 errors, 0 warnings, 214 infos;
-AAB gebouwd (71,5 MB).
+AAB gebouwd (71,5 MB) en geüpload; Play bevestigt versionCode 67 op internal;
+live `version.json` zegt 67 en de live appbundel bevat `1.0.56` en niet meer
+`1.0.55`; legacy-redirect geeft 301 en `assetlinks.json` geeft 200.
+AAB SHA-256:
+`51b622e5e9bac2ffdbfa83bd72da88e5212e05be1c2ad16242498d1fe9bdd1f0`.
 
 **Wat nog moet, in deze volgorde:** push (op Joosts sein) en daarmee de
 PWA-deploy, upload naar internal, toestelcontrole op de Oppo, promotie naar

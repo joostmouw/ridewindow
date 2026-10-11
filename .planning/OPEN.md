@@ -52,7 +52,9 @@ blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
 
 - **Eerste productie-release: 1.0.56 (67)**, met de koude-start-fix. Gekozen op
   2026-10-11 boven het simpelweg promoveren van 66, omdat de eerste indruk van
-  een verse gebruiker precies is wat die fix verbetert.
+  een verse gebruiker precies is wat die fix verbetert. **Stand:** 67 staat op
+  internal en op de PWA; de toestelcontrole op de Oppo en de promotie naar
+  alpha staan nog open.
 - **Het service-account mag nog geen productie-upload.** De inrichting in
   `tool/README-play-release.md` zet bewust alleen "Release apps to testing
   tracks" aan. Productie vraagt een tweede uitnodiging met dat recht; zonder

@@ -3,6 +3,30 @@
 > Eén blok per build, vanaf build 41. Bijgehouden terwijl er gebouwd wordt, niet
 > achteraf gereconstrueerd. Wie er test en waarom staat in `.planning/TESTERS.md`.
 
+> **Let op, gat in deze lijst (opgemerkt 2026-10-11).** Tussen build 54 en build
+> 67 staan hier geen blokken, terwijl er wel releases waren: 55 tot en met 66
+> gingen naar internal, web en de gesloten test. Wat die builds brachten staat
+> per build in de "Stand na ..."-secties van `.planning/STATE.md`; die zijn
+> geschreven op het moment van uitbrengen en zijn dus de betrouwbare bron. Deze
+> lijst is hier niet mee aangevuld omdat een changelog die je achteraf
+> reconstrueert precies is wat de kop hierboven verbiedt.
+
+## Build 67: 1.0.56+67
+
+**Datum:** 2026-10-11
+**Track:** Internal testing, web en daarna de gesloten test. Dit is de beoogde
+eerste build voor de productietrack, die op 11 oktober is ontgrendeld
+
+**Inhoud**
+- Gedeelde ritten en groepen staan meteen op het scherm als je de app opent, ook
+  zonder internet. Ze komen uit een lokale kopie op het toestel en verversen
+  zodra er verbinding is. Voorheen deed de app bij elke koude start twee tot
+  drie rondgangen naar de server en verschenen die kaartjes pas daarna
+- Een mislukte verversing haalt niets weg: de kopie blijft staan. Peloton is
+  additief, een haperend netwerk mag nooit ritten laten verdwijnen
+- Wisselen van account wist de kopieën, zodat je nooit de ritten van een ander
+  ziet
+
 ## Build 54: 1.0.43+54
 
 **Datum:** 2026-09-24
