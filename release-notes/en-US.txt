@@ -1,1 +1,1 @@
-Shared rides and groups now appear right away when you open the app, even without internet. As soon as you are online, they refresh quietly in the background.
+The list of buddies and groups on the Peloton tab now works without internet too. It opens right away with what was there last time, and refreshes as soon as you are online.

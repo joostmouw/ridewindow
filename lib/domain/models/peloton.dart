@@ -21,6 +21,16 @@ class Friend {
         displayName: row['user_name'] as String?,
       );
 
+  /// Dezelfde sleutels als `friend_profiles()` teruggeeft, zodat [fromRow] het
+  /// parsen blijft doen en er één plek is die weet hoe een rij eruitziet.
+  /// Gebruikt door de koude-startcache (zie `PelotonCacheStore`).
+  Map<String, dynamic> toJson() => {
+        'user_id': userId,
+        'user_name': displayName,
+      };
+
+  factory Friend.fromJson(Map<String, dynamic> json) => Friend.fromRow(json);
+
   /// Wat je op het scherm zet als iemand nooit een naam heeft ingevuld.
   /// Bewust geen e-mailadres of uid: die kent de app niet en horen hier ook
   /// niet te staan.

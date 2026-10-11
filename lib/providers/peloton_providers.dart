@@ -20,11 +20,44 @@ PelotonGateway pelotonGateway(Ref ref) => const SupabasePelotonGateway();
 /// Je maatjes. Leeg (en niet fout) als je uitgelogd bent: Peloton is additief,
 /// een uitgelogde gebruiker merkt van het hele epic niets — dat is dezelfde
 /// eis als REQUIREMENTS.md regel 8 voor accounts zelf.
+///
+/// **Cache eerst, daarna het netwerk (bug 0a, tweede ronde).** Zonder kopie
+/// bleef de BUDDIES-sectie op "Try again" staan zodra er geen netwerk was,
+/// terwijl de GROUPS-sectie er direct boven al uit de cache kwam. Dat viel pas
+/// op toen de ritten en groepen wél gecacht waren: eerst faalde de hele tab,
+/// daarna één blok ernaast. Zelfde patroon als [GroupRides] hieronder.
 @riverpod
-Future<List<Friend>> friends(Ref ref) async {
-  final userId = ref.watch(currentUserIdProvider);
-  if (userId == null) return const [];
-  return ref.watch(pelotonGatewayProvider).listFriends();
+class Friends extends _$Friends {
+  @override
+  Future<List<Friend>> build() async {
+    final userId = ref.watch(currentUserIdProvider);
+    if (userId == null) return const [];
+    // Synchroon watchten vóór de eerste await — zie GroupRides hieronder voor
+    // waarom dat geen stijlkeuze is maar een eis.
+    final gateway = ref.watch(pelotonGatewayProvider);
+    final store = PelotonCacheStore(await SharedPreferences.getInstance());
+    final cached = store.readFriends(userId);
+    if (cached == null) return _fetchAndCache(gateway, userId, store);
+    unawaited(
+      _fetchAndCache(gateway, userId, store).then(
+        (fresh) {
+          if (ref.mounted) state = AsyncData(fresh);
+        },
+        onError: (_) {},
+      ),
+    );
+    return cached;
+  }
+
+  Future<List<Friend>> _fetchAndCache(
+    PelotonGateway gateway,
+    String userId,
+    PelotonCacheStore store,
+  ) async {
+    final friends = await gateway.listFriends();
+    await store.saveFriends(userId, friends);
+    return friends;
+  }
 }
 
 /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze

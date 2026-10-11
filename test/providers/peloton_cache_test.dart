@@ -27,9 +27,11 @@ const _me = 'uid-me';
 class _FakeGateway implements PelotonGateway {
   Completer<List<GroupRide>> ridesCompleter = Completer();
   List<PelotonGroup> groups = const [];
+  List<Friend> friends = const [];
   Object? error;
   int listRidesCalls = 0;
   int listGroupsCalls = 0;
+  int listFriendsCalls = 0;
 
   @override
   Future<List<GroupRide>> listGroupRides() {
@@ -43,6 +45,13 @@ class _FakeGateway implements PelotonGateway {
     listGroupsCalls++;
     if (error != null) return Future.error(error!);
     return Future.value(groups);
+  }
+
+  @override
+  Future<List<Friend>> listFriends() {
+    listFriendsCalls++;
+    if (error != null) return Future.error(error!);
+    return Future.value(friends);
   }
 
   @override
@@ -190,6 +199,76 @@ void main() {
 
       expect(await container.read(visibleGroupsProvider.future), isEmpty);
       expect(gateway.listGroupsCalls, 0);
+    });
+  });
+
+  group('friends met cache', () {
+    test('zonder cache haalt hij het netwerk en schrijft de kopie', () async {
+      final gateway = _FakeGateway()
+        ..friends = const [Friend(userId: 'uid-anna', displayName: 'Anna')];
+      final container = _container(gateway);
+
+      final friends = await container.read(friendsProvider.future);
+
+      expect(friends.single.userId, 'uid-anna');
+      expect(gateway.listFriendsCalls, 1);
+      final prefs = await SharedPreferences.getInstance();
+      expect(
+        PelotonCacheStore(prefs).readFriends(_me)!.single.displayName,
+        'Anna',
+      );
+    });
+
+    test('met cache opent hij op de kopie en ververst daarna state én kopie',
+        () async {
+      final prefs = await SharedPreferences.getInstance();
+      await PelotonCacheStore(prefs)
+          .saveFriends(_me, const [Friend(userId: 'oud', displayName: 'Oud')]);
+      final gateway = _FakeGateway()
+        ..friends = const [Friend(userId: 'nieuw', displayName: 'Nieuw')];
+      final container = _container(gateway);
+      container.listen(friendsProvider, (_, __) {});
+
+      // De waarde is er meteen; de refresh loopt daarna.
+      final first = await container.read(friendsProvider.future);
+      expect(first.single.userId, 'oud');
+      await pumpEventQueue();
+
+      expect(container.read(friendsProvider).value!.single.userId, 'nieuw');
+      expect(
+        PelotonCacheStore(prefs).readFriends(_me)!.single.userId,
+        'nieuw',
+      );
+    });
+
+    test('een falende refresh laat de kopie staan en gooit niet', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await PelotonCacheStore(prefs)
+          .saveFriends(_me, const [Friend(userId: 'oud', displayName: 'Oud')]);
+      final gateway = _FakeGateway()..error = StateError('offline');
+      final container = _container(gateway);
+      container.listen(friendsProvider, (_, __) {});
+
+      final first = await container.read(friendsProvider.future);
+      expect(first.single.userId, 'oud');
+      await pumpEventQueue();
+
+      // Dit is precies het beeld van de Oppo: offline "Try again" onder
+      // GROUPS, terwijl de lijst er wel is.
+      final state = container.read(friendsProvider);
+      expect(state.hasError, isFalse);
+      expect(state.value!.single.userId, 'oud');
+    });
+
+    test('uitgelogd is leeg, zonder poort en zonder cache-lezing', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await PelotonCacheStore(prefs)
+          .saveFriends(_me, const [Friend(userId: 'oud')]);
+      final gateway = _FakeGateway();
+      final container = _container(gateway, userId: null);
+
+      expect(await container.read(friendsProvider.future), isEmpty);
+      expect(gateway.listFriendsCalls, 0);
     });
   });
 }

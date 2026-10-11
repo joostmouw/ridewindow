@@ -11,6 +11,22 @@
 > lijst is hier niet mee aangevuld omdat een changelog die je achteraf
 > reconstrueert precies is wat de kop hierboven verbiedt.
 
+## Build 68: 1.0.57+68
+
+**Datum:** 2026-10-11
+**Track:** Internal testing, web en daarna de gesloten test. Dit is de beoogde
+eerste build voor de productietrack
+
+**Inhoud**
+- De maatjeslijst op de Peloton-tab komt nu ook uit een lokale kopie, net als de
+  ritten en groepen sinds 67. Zonder internet stond daar "Try again" terwijl de
+  groepen er direct boven al stonden; dat gespleten beeld is weg
+- Waarom dit pas opviel na 67: eerst faalde de hele tab offline, en toen de
+  ritten en groepen gecacht waren bleef er één blok over dat het nog niet deed.
+  De les staat in `.planning/OPEN.md` punt c
+- Alles bij elkaar: de Peloton-tab opent nu volledig op wat er de vorige keer
+  stond en ververst stil, ook zonder netwerk
+
 ## Build 67: 1.0.56+67
 
 **Datum:** 2026-10-11

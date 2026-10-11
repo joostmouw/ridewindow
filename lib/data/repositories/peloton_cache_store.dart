@@ -25,9 +25,11 @@ class PelotonCacheStore {
 
   static const _ridesPrefix = 'peloton.ridesCache.';
   static const _groupsPrefix = 'peloton.groupsCache.';
+  static const _friendsPrefix = 'peloton.friendsCache.';
 
   static String ridesKeyFor(String userId) => '$_ridesPrefix$userId';
   static String groupsKeyFor(String userId) => '$_groupsPrefix$userId';
+  static String friendsKeyFor(String userId) => '$_friendsPrefix$userId';
 
   /// `null` betekent: geen bruikbare kopie. Dat dekt "nog nooit opgehaald",
   /// maar ook corrupte of oudere JSON — wie geen cache heeft, haalt gewoon het
@@ -74,6 +76,27 @@ class PelotonCacheStore {
         jsonEncode([for (final g in groups) g.toJson()]),
       );
 
+  List<Friend>? readFriends(String userId) {
+    final raw = _prefs.getString(friendsKeyFor(userId));
+    if (raw == null) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return null;
+      return [
+        for (final f in decoded.cast<Map<String, dynamic>>())
+          Friend.fromJson(f),
+      ];
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveFriends(String userId, List<Friend> friends) =>
+      _prefs.setString(
+        friendsKeyFor(userId),
+        jsonEncode([for (final f in friends) f.toJson()]),
+      );
+
   /// Wist de kopieën van álle accounts. Hoort bij de "start fresh"-tak van
   /// een accountwissel (D-09): wie opnieuw begint, wil ook geen oude
   /// pelotondaten meer op het toestel. De Drift forecast-cache wordt daar
@@ -81,7 +104,9 @@ class PelotonCacheStore {
   /// zijn dat niet.
   Future<void> clearAllAccounts() async {
     for (final key in _prefs.getKeys()) {
-      if (key.startsWith(_ridesPrefix) || key.startsWith(_groupsPrefix)) {
+      if (key.startsWith(_ridesPrefix) ||
+          key.startsWith(_groupsPrefix) ||
+          key.startsWith(_friendsPrefix)) {
         await _prefs.remove(key);
       }
     }

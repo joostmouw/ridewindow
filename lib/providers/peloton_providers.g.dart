@@ -60,20 +60,36 @@ String _$pelotonGatewayHash() => r'f0038b2082225c6500bd464180f38b1d1e73151b';
 /// Je maatjes. Leeg (en niet fout) als je uitgelogd bent: Peloton is additief,
 /// een uitgelogde gebruiker merkt van het hele epic niets — dat is dezelfde
 /// eis als REQUIREMENTS.md regel 8 voor accounts zelf.
+///
+/// **Cache eerst, daarna het netwerk (bug 0a, tweede ronde).** Zonder kopie
+/// bleef de BUDDIES-sectie op "Try again" staan zodra er geen netwerk was,
+/// terwijl de GROUPS-sectie er direct boven al uit de cache kwam. Dat viel pas
+/// op toen de ritten en groepen wél gecacht waren: eerst faalde de hele tab,
+/// daarna één blok ernaast. Zelfde patroon als [GroupRides] hieronder.
 
-@ProviderFor(friends)
+@ProviderFor(Friends)
 final friendsProvider = FriendsProvider._();
 
 /// Je maatjes. Leeg (en niet fout) als je uitgelogd bent: Peloton is additief,
 /// een uitgelogde gebruiker merkt van het hele epic niets — dat is dezelfde
 /// eis als REQUIREMENTS.md regel 8 voor accounts zelf.
-
-final class FriendsProvider extends $FunctionalProvider<
-        AsyncValue<List<Friend>>, List<Friend>, FutureOr<List<Friend>>>
-    with $FutureModifier<List<Friend>>, $FutureProvider<List<Friend>> {
+///
+/// **Cache eerst, daarna het netwerk (bug 0a, tweede ronde).** Zonder kopie
+/// bleef de BUDDIES-sectie op "Try again" staan zodra er geen netwerk was,
+/// terwijl de GROUPS-sectie er direct boven al uit de cache kwam. Dat viel pas
+/// op toen de ritten en groepen wél gecacht waren: eerst faalde de hele tab,
+/// daarna één blok ernaast. Zelfde patroon als [GroupRides] hieronder.
+final class FriendsProvider
+    extends $AsyncNotifierProvider<Friends, List<Friend>> {
   /// Je maatjes. Leeg (en niet fout) als je uitgelogd bent: Peloton is additief,
   /// een uitgelogde gebruiker merkt van het hele epic niets — dat is dezelfde
   /// eis als REQUIREMENTS.md regel 8 voor accounts zelf.
+  ///
+  /// **Cache eerst, daarna het netwerk (bug 0a, tweede ronde).** Zonder kopie
+  /// bleef de BUDDIES-sectie op "Try again" staan zodra er geen netwerk was,
+  /// terwijl de GROUPS-sectie er direct boven al uit de cache kwam. Dat viel pas
+  /// op toen de ritten en groepen wél gecacht waren: eerst faalde de hele tab,
+  /// daarna één blok ernaast. Zelfde patroon als [GroupRides] hieronder.
   FriendsProvider._()
       : super(
           from: null,
@@ -90,17 +106,35 @@ final class FriendsProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<List<Friend>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<Friend>> create(Ref ref) {
-    return friends(ref);
-  }
+  Friends create() => Friends();
 }
 
-String _$friendsHash() => r'09f1314e18c748984a008bc8ee6c6ef6ecff6655';
+String _$friendsHash() => r'1785082d0a000441e0607191978bc9b76a435c7a';
+
+/// Je maatjes. Leeg (en niet fout) als je uitgelogd bent: Peloton is additief,
+/// een uitgelogde gebruiker merkt van het hele epic niets — dat is dezelfde
+/// eis als REQUIREMENTS.md regel 8 voor accounts zelf.
+///
+/// **Cache eerst, daarna het netwerk (bug 0a, tweede ronde).** Zonder kopie
+/// bleef de BUDDIES-sectie op "Try again" staan zodra er geen netwerk was,
+/// terwijl de GROUPS-sectie er direct boven al uit de cache kwam. Dat viel pas
+/// op toen de ritten en groepen wél gecacht waren: eerst faalde de hele tab,
+/// daarna één blok ernaast. Zelfde patroon als [GroupRides] hieronder.
+
+abstract class _$Friends extends $AsyncNotifier<List<Friend>> {
+  FutureOr<List<Friend>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Friend>>, List<Friend>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Friend>>, List<Friend>>,
+        AsyncValue<List<Friend>>,
+        Object?,
+        Object?>;
+    return element.handleCreate(ref, build);
+  }
+}
 
 /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
 /// code — de query vraagt bewust alles op.
@@ -169,7 +203,7 @@ final class GroupRidesProvider
   GroupRides create() => GroupRides();
 }
 
-String _$groupRidesHash() => r'52626eddf5e6e1482ba50809dec5e18ff2a0a2a5';
+String _$groupRidesHash() => r'95a5e07e5980e2d90e2530f6e1af317ae75ad30f';
 
 /// Alle gedeelde ritten die je mag zien. Welke dat zijn bepaalt RLS, niet deze
 /// code — de query vraagt bewust alles op.
@@ -504,7 +538,7 @@ final class VisibleGroupsProvider
   VisibleGroups create() => VisibleGroups();
 }
 
-String _$visibleGroupsHash() => r'0d41ed79d78b8e970d82dfe57cd4ad3f5f1151b9';
+String _$visibleGroupsHash() => r'8b72b3d372c46554ea89f43a840e5430257fc120';
 
 /// Alle groepen die je mag zien: waar je lid bent en waar je aanvraag loopt.
 /// Welke dat zijn bepaalt RLS (0012 + 0013), niet deze code. Leeg en zonder

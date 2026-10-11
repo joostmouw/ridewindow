@@ -77,6 +77,25 @@ PelotonGroup _group() => PelotonGroup(
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('maatjes overleven de round-trip, met en zonder naam', () async {
+    final prefs = await SharedPreferences.getInstance();
+    final store = PelotonCacheStore(prefs);
+
+    await store.saveFriends('uid-me', const [
+      Friend(userId: 'uid-anna', displayName: 'Anna'),
+      Friend(userId: 'uid-zonder-naam'),
+    ]);
+    final back = store.readFriends('uid-me');
+
+    expect(back, hasLength(2));
+    expect(back!.first.userId, 'uid-anna');
+    expect(back.first.displayName, 'Anna');
+    expect(back.first.label('Fietser'), 'Anna');
+    // Zonder naam valt het label terug op de meegegeven tekst, net als bij een
+    // vers opgehaalde rij.
+    expect(back.last.displayName, isNull);
+    expect(back.last.label('Fietser'), 'Fietser');
+  });
   test('ritten overleven de round-trip inclusief geneste lijsten en datums',
       () async {
     final prefs = await SharedPreferences.getInstance();
@@ -132,9 +151,11 @@ void main() {
 
     await store.saveGroupRides('uid-me', [_ride()]);
     await store.saveGroups('uid-me', [_group()]);
+    await store.saveFriends('uid-me', const [Friend(userId: 'uid-anna')]);
 
     expect(store.readGroupRides('uid-ander'), isNull);
     expect(store.readGroups('uid-ander'), isNull);
+    expect(store.readFriends('uid-ander'), isNull);
   });
 
   test('corrupte of vormloze JSON leest als geen cache, niet als een crash',
@@ -142,10 +163,15 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(PelotonCacheStore.ridesKeyFor('uid-me'), '{geen lijst');
     await prefs.setString(PelotonCacheStore.groupsKeyFor('uid-me'), '{"vorm":1}');
+    await prefs.setString(
+        PelotonCacheStore.friendsKeyFor('uid-me'), '[{"user_id":1}]');
     final store = PelotonCacheStore(prefs);
 
     expect(store.readGroupRides('uid-me'), isNull);
     expect(store.readGroups('uid-me'), isNull);
+    // Een rij met het verkeerde type gooit in fromRow; dat moet als "geen
+    // cache" tellen, niet als een crash.
+    expect(store.readFriends('uid-me'), isNull);
   });
 
   test('clearAllAccounts raakt alleen de cache-sleutels', () async {
@@ -153,12 +179,14 @@ void main() {
     final store = PelotonCacheStore(prefs);
     await store.saveGroupRides('uid-me', [_ride()]);
     await store.saveGroups('uid-ander', [_group()]);
+    await store.saveFriends('uid-me', const [Friend(userId: 'uid-anna')]);
     await prefs.setString('peloton.seenFriends.uid-me', 'blijf');
 
     await store.clearAllAccounts();
 
     expect(store.readGroupRides('uid-me'), isNull);
     expect(store.readGroups('uid-ander'), isNull);
+    expect(store.readFriends('uid-me'), isNull);
     expect(prefs.getString('peloton.seenFriends.uid-me'), 'blijf');
   });
 }

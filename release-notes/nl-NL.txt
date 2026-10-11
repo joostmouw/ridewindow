@@ -1,1 +1,1 @@
-Gedeelde ritten en groepen staan nu meteen op je scherm als je de app opent, ook zonder internet. Zodra er verbinding is, verversen ze stil op de achtergrond.
+De lijst met maatjes en groepen op de Peloton-tab werkt nu ook zonder internet. Hij opent meteen met wat er de vorige keer stond en ververs zodra je verbinding hebt.
