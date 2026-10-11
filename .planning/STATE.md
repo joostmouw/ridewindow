@@ -1,15 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v4.1
-milestone_name: Zo snel mogelijk live in de store
-status: executing
-last_updated: "2026-10-11"
-last_activity: 2026-10-11progress:
-  total_phases: 12
-  completed_phases: 6
-  total_plans: 37
-  completed_plans: 37
-  percent: 50
+milestone: v4.3
+milestone_name: Dicht huis
+status: planning
+last_updated: "2026-10-11T17:25:57.309Z"
+last_activity: 2026-10-11
+progress:
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -225,19 +226,24 @@ bolletje telt wat je nog niet zag en staat op de tab waar het over gaat;
 uitnodigings- en groepslinks zijn padlinks die als App Link de app openen.
 
 **Toestelcontrole op de Oppo, 2026-09-29 10:47-10:50 (alles groen):**
+
 1. **Update-balk op 61:** "A new version is ready" stond bovenaan. "Update"
    opende het in-app-updatescherm van Play (`PlayCoreAcquisitionActivity`),
    en binnen tien seconden stond 62 erop.
+
 2. **App Links:** `pm get-app-links` zegt `my-project-joost.web.app: verified`,
    met als handtekening de Play-sleutel `17:A9:37:…`. Voor de meting na de
    installatie was geen `--re-verify` nodig.
+
 3. **Link opent de app:** een VIEW-intent zonder pakket (zoals WhatsApp hem
    stuurt) op `/invite/TESTAAAA` kwam warm binnen op het uitnodigingsscherm, en
    op `/group/TESTAAAA` koud (na `force-stop`) op het groepsscherm. Allebei
    meldden ze netjes dat de code niet werkt, want de code was verzonnen.
    `/` (de rest van de site) gaat nog naar Chrome (`resolve-activity`).
+
 4. **Website in Chrome:** de balk zei "The Ridewindow app is on your phone"
    met "Open app", en die knop opende de app.
+
 5. **Bolletje:** Ritten stond op 3. Na één bezoek aan Ritten stond het op 1,
    en die 1 stond op de subtab Peloton. Daar stond Andrea Farina bovenaan met
    "New buddy", en na dat bezoek was het bolletje weg.
@@ -729,10 +735,10 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 
 ## Current Position
 
-Phase: 27 (wervingsonderzoek) — COMPLETE (27-01 en 27-02; WERV-01 en WERV-02)
-Plan: 2 of 2
-Status: Phase 27 afgerond 2026-09-20; verder met fase 26, plan 26-02
-Last activity: 2026-09-20
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-10-11 — Milestone v4.3 started
 
 ## Stand na 2026-09-02 08:25 — lees dit eerst, de rest hieronder is historie
 

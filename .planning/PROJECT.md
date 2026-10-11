@@ -26,7 +26,21 @@ Ridewindow is an app for casual cyclists who want to know — at a glance — th
 
 </details>
 
-## Current Milestone: v4.1 Zo snel mogelijk live in de store
+## Current Milestone: v4.3 Dicht huis
+
+**Goal:** Wat een vreemde met de publieke Supabase-sleutel kan, wordt zichtbaar en begrensd: feedback en statistiek kunnen niet meer onbeperkt volgepompt worden, uitnodigingscodes niet meer onbeperkt geraden, en niemand die de app gewoon gebruikt merkt er iets van.
+
+**Target features:**
+- Meten eerst: een dagtelling per tabel (rijen, unieke toestellen of accounts) en een signaal bij een uitschieter
+- `feedback` en `app_events` begrensd per toestel en per afzender per dag, met een maximale rijgrootte; de anonieme feedbackroute (FB-03) blijft open en een tester boven de grens krijgt een duidelijke melding zonder dat zijn feedback verloren gaat
+- Een teller op mislukte pogingen bij `redeem_friend_invite` én `redeem_group_invite`
+- Bovengrenzen op wat één account kan aanmaken (uitnodigingen, groepsritten, vensteropties)
+- E-mailaccounts pas actief na bevestiging; Supabase's eigen limieten op aanmelden en mails bewust ingesteld
+- Afronding: privacybeleid, `CLAUDE.md`/`AGENTS.md` (nieuwe functies verantwoord), regressie, build naar de testers
+
+**Key context:** Epic #75 uit `.planning/BACKLOG.md`, gestart 2026-10-11 terwijl 1.0.59 (70) bij Google ter review ligt voor productie. Twee aanvullingen op de backlogtekst van 2026-09-19: de groepslinks uit de clubs hebben dezelfde teller nodig, en inloggen met e-mail maakt nepaccounts (punt D) goedkoper. Randvoorwaarden: €0/maand, alleen plpgsql, uitgelogd blijft alles werken, anonieme feedback begrenzen maar niet blokkeren. Voorkeur voor de techniek (te toetsen in de planning): begrenzen met een trigger op de tabel in plaats van de insert achter een functie te zetten, zodat builds die al in het veld staan er zonder update onder vallen. Een `device_id` kiest een aanvaller zelf; een grens per IP-adres (via de request-headers die PostgREST doorgeeft) houdt een script wel tegen, maar een IP-adres is een persoonsgegeven: alleen gehasht, na een dag weg, en vermeld in het privacybeleid. Captcha/App Check pas als de metingen erom vragen. Ontwerp: https://claude.ai/artifact/2iWe1d2BbCanxrTgvsyG9b. Fasenummering gaat verder na 36 (clubs).
+
+## Afrondend: v4.1 Zo snel mogelijk live in de store
 
 **Goal:** Ridewindow staat in productie op Google Play, via een gesloten test met testers die de app werkelijk gebruiken — niet alleen installeren, want sinds april 2026 wijst Google aanvragen af op gebrek aan gebruik.
 
@@ -129,6 +143,8 @@ Three constraints below ("No backend", "Budget", "Privacy") are broken by this m
 - Vensters (WIN) — Ingrids #69 en #70
 - Bewijs (PROOF) — changelog, builds tijdens de veertien dagen, aanvraag, productie
 
+**v4.3 — Dicht huis.** Requirements in `.planning/REQUIREMENTS.md` (prefixen MEET, RATE, CODE, GRENS, ACCT, AFR). v4.1's lijst staat sinds 2026-10-11 in `.planning/milestones/v4.1-REQUIREMENTS.md`; v4.1 wacht alleen nog op Google's review van 70.
+
 **v4.2 — Clubs (parallel, workstream `clubs`).** Requirements in `.planning/workstreams/clubs/REQUIREMENTS.md`, prefix CLUB.
 
 ### Out of Scope
@@ -215,4 +231,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-23 — v4.2 Clubs gestart als parallelle workstream naast v4.1*
+*Last updated: 2026-10-11 — v4.3 Dicht huis gestart (epic #75)*
