@@ -72,7 +72,7 @@ Kleine verbeteringen die snel uit te rollen zijn op basis van eerste tester-feed
 | 93 | **Tablet, ronde 2** — vervolg op quick 261011-jru (rail, Home lijst-plus-detail, Ritten naast Peloton). Open punten tegen de tablet-checklist van Joost (2026-10-11): (a) de rail staat bovenaan, buiten duimbereik; M3 staat items in het midden of onderaan toe (`groupAlignment`); (b) Ritdetail opent op een tablet nog als los scherm, terwijl het het rechterpaneel kan zijn; (c) liggend blijft rechts van het detailpaneel lege ruimte: een derde kolom (bv. de geplande ritten of het weer per uur) of een breder paneel; (d) staand (medium) is één kolom; secundaire inhoud als bottom sheet of zijpaneel overwegen; (e) geen toetsenbordsneltoetsen (Esc, pijltjes door de lijst, Ctrl+F); (f) hover-states op kaarten die een `GestureDetector` gebruiken in plaats van `InkWell` nalopen; (g) split-screen/multi-window op een echte Android-tablet testen: de breedteklasse volgt `MediaQuery.sizeOf`, dus het hoort mee te schalen, maar dat is niet op een toestel bewezen; (h) Agenda: de weerdetails bij lang indrukken als zijpaneel in plaats van pop-up | MEDIUM | M | Backlog — scope per punt open |
 | 94 | **Tabletscreenshots in de Play-winkelvermelding** — de vermelding heeft aparte plekken voor 7- en 10-inch-screenshots; zonder die toont Play de app op tablets minder prominent. Sinds 1.0.58 (69) heeft de app een eigen tablet-layout (rail, lijst-plus-detail, derde kolom), dus er valt iets te laten zien. Maken op Joosts Android-tablet zodra de compacte lijst (quick 261011-l5k) erin zit: liggend Home met lijst en detail, staand, Ritten naast Peloton. Volgens de afspraak levert Joost de bestanden aan en zet Claude ze in de Console | MEDIUM | S | Backlog — wacht op de compacte lijst |
 | 95 | **Vouwtelefoons: de vouwlijn respecteren** — de tablet-layout (quick 261011-jru/kb9/l5k) schakelt al mee bij open- en dichtvouwen, want dat is voor Android een vensterwissel en `configChanges` vangt het op zonder herstart. Wat ontbreekt: de app weet niet waar de scharnier zit. Bij een model dat gedraaid boven 840 dp komt, kan de grens tussen lijst en detail naast de vouw vallen; Gmail legt hem er precies op. Flutter levert de positie via `MediaQuery.displayFeatures`. Ook de half-open "tafelstand" (lijst boven, detail onder de vouw) is een mogelijk extraatje. Pas oppakken als iemand met een vouwtelefoon test; testen kan met een emulator-vouwprofiel (~1,5 GB image) | LAAG | M | Backlog — wacht op een tester met een vouwtelefoon |
-| 96 | **Epic "Route bij je rit": een Komoot- of Strava-route aan een geplande rit hangen** — Joost 2026-10-11, als volgende epic na #75. Bij een geplande rit kun je de route terugvinden die je gaat rijden. Bundelt het route-deel van #23, #24, #45 en #89; onderzoek staat al in `.planning/research/ROUTES.md` en `BIKEWIND.md`, en Joosts eigen Bikewind-app dient als referentie. Zie de sectie onderaan | HOOG | XL | Backlog — epic, start na v4.3 Dicht huis |
+| 96 | **Epic "Route bij je rit": een Komoot- of Strava-route aan een geplande rit hangen** — Joost 2026-10-11, als volgende epic na #75. Bij een geplande rit kun je de route terugvinden die je gaat rijden. Bundelt het route-deel van #23, #24, #45 en #89; onderzoek staat al in `.planning/research/ROUTES.md` en `BIKEWIND.md`, en Joosts eigen Bikewind-app dient als referentie. Zie de sectie onderaan | HOOG | XL | Backlog — epic, start na v4.3 Dicht huis; onderzoek ingang klaar (`ROUTE-INGANG.md`) |
 
 **Waarom dit item anders is dan de rest van deze lijst.** Fase 21 heeft vijf gap-closure-plannen nodig gehad (21-10 t/m 21-14) en bij élk daarvan gold dezelfde beperking: de defecte laag was niet gedragsmatig testbaar, dus het bewijs moest van een toestel komen of van een structurele broncode-scan. Vier keer landde een bug in productie die een gewone test had gevangen als het seam had bestaan.
 
@@ -589,4 +589,17 @@ en `.planning/research/BIKEWIND.md`.
   zaterdag", dus de route hangt aan een geplande rit en reist mee naar Peloton en groepsritten.
 - De vier open vragen onderaan ROUTES.md (GPX genoeg?, interactieve kaart?, delen hoe breed?)
   gaan mee in de vragenronde van de milestone. Vraag 3 (v4.1 of later) is beantwoord: later.
+
+**Besluit en onderzoek 2026-10-11:**
+- **Volgorde (Joost):** eerst v4.3 "Dicht huis" afmaken, daarna kaart en route als nieuwe epic.
+- **De wens is de ingang:** routes maak je in Komoot, Strava of elders; Ridewindow moet ze snel en
+  makkelijk binnenhalen. Wind langs de route in de score is een later vervolg.
+- **Getest op de Oppo:** Komoot deelt alleen een link, maar de openbare tour levert zonder login de
+  volledige lijn (`api.komoot.de/v007/tours/{id}/coordinates`, ~3.300 punten met hoogte). Strava
+  deelt via een eigen menu; de volledige lijn gaat alleen via OAuth. BikeWind staat niet in het
+  deelmenu en kent geen Komoot.
+- **Voorstel:** twee ingangen (Delen → Ridewindow → bij welke rit; en Route toevoegen in de rit) en
+  vier fases: link bij de rit, Komoot-lijn met kaartje, GPX/FIT, route mee naar de groep. Strava met
+  inloggen later. Alles in `.planning/research/ROUTE-INGANG.md`; als pagina:
+  https://claude.ai/artifact/9k42ZUFHsCahTfyBSQZdSY
 

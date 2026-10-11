@@ -6,6 +6,10 @@
 **Versie onderzocht:** 1.0.7 (aug 2026)
 **Downloads:** 100+ (Google Play), nog geen ratings zichtbaar
 
+**Aanvulling 2026-10-11:** de APK van 1.0.7 is op de Oppo bekeken. Hoe routes binnenkomen
+(bestandskiezer en "Openen met", Strava via OAuth met een eigen worker voor de token-ruil, geen
+Komoot, niet in het deelmenu) staat in `ROUTE-INGANG.md`.
+
 ---
 
 ## Wat Bikewind is
