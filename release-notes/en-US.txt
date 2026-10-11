@@ -1,1 +1,1 @@
-The list of buddies and groups on the Peloton tab now works without internet too. It opens right away with what was there last time, and refreshes as soon as you are online.
+Ridewindow now makes full use of a tablet. The menu moves to the side, within reach of your thumb. On a wide screen you see your ride windows on the left and the full details of the chosen window on the right, and on very wide screens your planned rides as a third column. Arrow keys move through the list.

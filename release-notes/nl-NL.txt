@@ -1,1 +1,1 @@
-De lijst met maatjes en groepen op de Peloton-tab werkt nu ook zonder internet. Hij opent meteen met wat er de vorige keer stond en ververs zodra je verbinding hebt.
+Ridewindow benut nu een tablet. Het menu staat aan de zijkant, binnen bereik van je duim. Op een breed scherm zie je links je ritvensters en rechts alle details van het gekozen venster, en op een heel breed scherm je geplande ritten als derde kolom. Met de pijltjestoetsen loop je door de lijst.
