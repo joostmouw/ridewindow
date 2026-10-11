@@ -112,6 +112,13 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
   }
 
   Future<void> _recordAppOpen() async {
+    // De breedte vóór de eerste await lezen, zolang de context nog zeker
+    // geldig is. View en niet MediaQuery: deze context zit boven MaterialApp,
+    // en View zet runApp altijd neer. Het is dezelfde breedte waar
+    // windowSizeClassOf op rekent.
+    final view = View.maybeOf(context);
+    final width =
+        view == null ? null : view.physicalSize.width / view.devicePixelRatio;
     try {
       final consent = await ref.read(analyticsConsentProvider.future);
       final wasFirstRun = consent.isFirstRun;
@@ -124,13 +131,15 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
       if (wasFirstRun) await analytics.track(kEvFirstRun);
       await analytics.track(
         kEvAppOpen,
-        props: {'signed_in': ref.read(currentUserIdProvider) != null},
+        props: appOpenProps(
+          signedIn: ref.read(currentUserIdProvider) != null,
+          windowWidth: width,
+        ),
       );
     } catch (_) {
       // Statistiek mag nooit de reden zijn dat de app niet start.
     }
   }
-
 
   /// Plant de meldingen opnieuw voor het eerstvolgende venster.
   ///

@@ -10,6 +10,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ridewindow/app/window_size.dart';
 import 'package:ridewindow/core/analytics_events.dart';
 import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
@@ -43,7 +44,8 @@ void main() {
     );
   }
 
-  Future<int> pendingCount() async => (await outbox.select(db.syncOutboxEntries).get()).length;
+  Future<int> pendingCount() async =>
+      (await outbox.select(db.syncOutboxEntries).get()).length;
 
   /// Store én service, voor de tests die de wachtkamer zelf bekijken.
   Future<(AnalyticsConsentStore, AnalyticsService)> pairWith({
@@ -249,6 +251,84 @@ void main() {
       }
       expect(store.pending, hasLength(AnalyticsConsentStore.kMaxPending));
       expect(await pendingCount(), 0);
+    });
+  });
+
+  // De breedteklasse op app_open (quick-plan 261011-l5k): beantwoordt of
+  // tablets het onderhoud waard zijn. Een klasse, nooit pixels, en via precies
+  // dezelfde sloten als alles hierboven.
+  group('breedteklasse op app_open', () {
+    test('appOpenProps geeft een van de vier codes', () {
+      expect(
+        appOpenProps(signedIn: true, windowWidth: 1280),
+        {'signed_in': true, kPropWindowClass: 'large'},
+      );
+      for (final (width, code) in [
+        (400.0, 'compact'),
+        (700.0, 'medium'),
+        (900.0, 'expanded'),
+      ]) {
+        final props = appOpenProps(signedIn: true, windowWidth: width);
+        expect(props[kPropWindowClass], code);
+      }
+    });
+
+    test('zonder breedte geen sleutel', () {
+      final props = appOpenProps(signedIn: false, windowWidth: null);
+      expect(props.containsKey(kPropWindowClass), isFalse);
+      expect(props, {'signed_in': false});
+    });
+
+    test('elke code past door sanitizeProps', () {
+      for (final c in WindowSizeClass.values) {
+        expect(
+          c.name.length,
+          lessThanOrEqualTo(AnalyticsService.kMaxPropStringLength),
+        );
+        expect(
+          AnalyticsService.sanitizeProps({kPropWindowClass: c.name}),
+          {kPropWindowClass: c.name},
+        );
+      }
+    });
+
+    test('met een ja: de rij draagt window_class en verder niets nieuws',
+        () async {
+      final service = await serviceWith(consent: true);
+      await service.track(
+        kEvAppOpen,
+        props: appOpenProps(signedIn: false, windowWidth: 1280),
+      );
+      final entries = await outbox.select(db.syncOutboxEntries).get();
+      final row = jsonDecode(entries.single.payload) as Map<String, dynamic>;
+      expect(row['props'], {'signed_in': false, 'window_class': 'large'});
+    });
+
+    test('met een nee vertrekt er niets', () async {
+      final service = await serviceWith(consent: false);
+      expect(
+        await service.track(
+          kEvAppOpen,
+          props: appOpenProps(signedIn: false, windowWidth: 1280),
+        ),
+        isFalse,
+      );
+      expect(await pendingCount(), 0);
+    });
+
+    test('in de wachtkamer niets weg; bij een ja met de klasse', () async {
+      final (store, service) = await pairWith(consent: null);
+      await service.track(
+        kEvAppOpen,
+        props: appOpenProps(signedIn: false, windowWidth: 1280),
+      );
+      expect(await pendingCount(), 0);
+
+      await store.setConsent(true);
+      expect(await service.flushPending(), 1);
+      final entries = await outbox.select(db.syncOutboxEntries).get();
+      final row = jsonDecode(entries.single.payload) as Map<String, dynamic>;
+      expect((row['props'] as Map)['window_class'], 'large');
     });
   });
 }

@@ -10,9 +10,30 @@
 // de gebruiker zelf op verzenden drukt. Zie de migratie 0008 voor de `check`
 // die het ook aan de databasekant afdwingt.
 
+import 'package:ridewindow/app/window_size.dart';
+
 /// De app is geopend (koude start of terug uit de achtergrond na >30 min).
 /// Beantwoordt: hoeveel testers zijn er werkelijk actief, en hoe lang blijven ze?
+/// Draagt `signed_in` en [kPropWindowClass]; zie [appOpenProps].
 const kEvAppOpen = 'app_open';
+
+/// De breedteklasse (compact|medium|expanded|large) bij app_open. Beantwoordt
+/// of tablets het onderhoud waard zijn. Een klasse, nooit een schermmaat in
+/// pixels: vier waarden zijn niet herleidbaar tot een toestel.
+const kPropWindowClass = 'window_class';
+
+/// De props van [kEvAppOpen]: of je bent ingelogd en, als de breedte bekend
+/// is, de breedteklasse als korte code. Verder niets; een nieuwe sleutel hier
+/// hoort ook in het privacybeleid.
+Map<String, Object?> appOpenProps({
+  required bool signedIn,
+  double? windowWidth,
+}) =>
+    {
+      'signed_in': signedIn,
+      if (windowWidth != null)
+        kPropWindowClass: windowSizeClassFor(windowWidth).name,
+    };
 
 /// De eerste start ooit op dit toestel. Beantwoordt: hoeveel van de aangemelde
 /// testers komen voorbij het installeren?
