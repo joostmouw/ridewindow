@@ -50,19 +50,11 @@ betekenen, want die lopen hier makkelijk door elkaar:
 De randvoorwaarden van tijdens de review (niets aan de track-opzet veranderen,
 blijven releasen) zijn daarmee vervallen. Wat ervoor in de plaats komt:
 
-- **Eerste productie-release: 1.0.56 (67)**, met de koude-start-fix. Gekozen op
-  2026-10-11 boven het simpelweg promoveren van 66, omdat de eerste indruk van
-  een verse gebruiker precies is wat die fix verbetert. **Stand:** 67 staat op
-  internal en op de PWA, en is op de Oppo bewezen (koude start met wifi en data
-  uit: de gedeelde ritten en groepen stonden er). De promotie naar alpha staat
-  nog open, omdat hieronder eerst een beslissing ligt.
-- **Beslissing die de eerste productie-build bepaalt: 67, of eerst 68?** Dezelfde
-  offline proef op de Oppo liet zien dat de **maatjeslijst** nog geen cache heeft
-  (`friends` in `peloton_providers.dart`, dezelfde vorm die `groupRides` en
-  `visibleGroups` vóór 9 oktober hadden). Dat is klein werk en het is de enige
-  overgebleven netwerk-only lijstprovider op die tab. Zie punt c verderop. De
-  productietrack is nog leeg, dus wachten kost niets en er staat nog niets
-  publiek. Advies: eerst 68, dan publiceren.
+- **Eerste productie-release: 1.0.57 (68)** met de koude-start-fix voor ritten,
+  groepen én maatjes. Joost koos op 2026-10-11 voor 68 boven 67, omdat de
+  productietrack nog leeg was en de eerste publieke build dan in één keer
+  coherent is. **Stand:** 68 staat op internal en op de PWA. De toestelcontrole
+  op de Oppo en de promotie naar alpha staan nog open.
 - **Internal als kanaal voor de groep: onderzocht, advies is overslaan.** Google
   kent internal testers als **e-maillijst** (max 100), niet als Google Group; de
   API weigert er zelfs bij (403, track gemigreerd). Wie voor internal opte-int
@@ -104,27 +96,30 @@ server. Bewezen met een **offline** koude start op de Oppo op 1.0.56 (67): de
 groepen stonden er, terwijl er geen netwerk was. Suite 1099 groen, analyze op
 baseline.
 
-### c. De maatjeslijst is offline leeg, en dat viel pas op na de fix van a
+### c. De maatjeslijst was offline leeg, en dat viel pas op na de fix van a
 
-**Status: gevonden 2026-10-11, besluit bij Joost.** Dezelfde offline koude start
-die a bewees, liet zien dat de Peloton-tab nu een gespleten beeld geeft: onder
-GROUPS staan de gecachte groepen, onder BUDDIES staat "Try again". Oorzaak:
-`friends` in `peloton_providers.dart` is nog een gewone provider zonder cache,
-dezelfde vorm die `groupRides` en `visibleGroups` vóór 2026-10-09 hadden.
+**Status: opgelost 2026-10-11 in 1.0.57 (68).** Dezelfde offline koude start die
+a bewees, liet zien dat de Peloton-tab een gespleten beeld gaf: onder GROUPS
+stonden de gecachte groepen, onder BUDDIES "Try again". Oorzaak: `friends` in
+`peloton_providers.dart` was nog een gewone provider zonder cache, dezelfde
+vorm die `groupRides` en `visibleGroups` vóór 2026-10-09 hadden. Het was ook de
+**laatste** netwerk-only lijstprovider op die tab: alle andere leiden af uit
+`groupRides` of `visibleGroups`.
 
-Klein werk (Friend serialiseren, twee store-methoden, provider omzetten), en
-dezelfde tests als bij a. **Waarom het toch een eigen punt is:** de fix van a
-maakt dit zichtbaar waar het eerst onzichtbaar was. Eerst faalde de hele tab
-offline, nu één blok ernaast. Wie alleen "werken de groepen offline?" nagemeten
-had, had dit gemist.
+Fix: `Friend` kreeg `toJson`/`fromJson` met de sleutels van
+`friend_profiles()`, `PelotonCacheStore` kreeg een derde sleutel per account
+(`peloton.friendsCache.<uid>`, ook gewist door `clearAllAccounts`), en
+`friends` werd een AsyncNotifier die op de kopie opent en stil ververst.
+Vijf nieuwe tests; suite 1104 groen.
 
-**Niet gemeten, dus niet aannemen:** of `pendingRideInvites`, `rideEntries` en
-de bolletjestellers offline hetzelfde doen. Ze leunen op `groupRides`, dus
-vermoedelijk niet, maar dat is een vermoeden.
+**Waarom dit een eigen punt was en geen detail:** de fix van a maakte dit
+zichtbaar waar het eerst onzichtbaar was. Eerst faalde de hele tab offline, nu
+één blok ernaast. Wie alleen "werken de groepen offline?" nagemeten had, had dit
+gemist. Dat is de werkregel "loop de hele app na bij een wijziging" in het
+klein.
 
-**Besluit dat hierbij hoort:** 67 als eerste productie-build, of eerst c fixen
-en 68 sturen. De productietrack is nog leeg, dus er staat nog niets publiek en
-wachten kost niets.
+**Rest:** de Oppo-controle van 68 staat nog open (het toestel zat op het
+vergrendelscherm).
 
 ### b. De update-balk ziet een nieuwe internal-build laat of niet
 

@@ -4,8 +4,7 @@ milestone: v4.1
 milestone_name: Zo snel mogelijk live in de store
 status: executing
 last_updated: "2026-10-11"
-last_activity: 2026-10-11
-progress:
+last_activity: 2026-10-11progress:
   total_phases: 12
   completed_phases: 6
   total_plans: 37
@@ -14,6 +13,33 @@ progress:
 ---
 
 # Project State
+
+## Stand na 2026-10-11 (middag) -- 1.0.57 (68) klaar als eerste productie-build
+
+| Waar | Stand |
+|---|---|
+| Productie | **Toegang verleend op 2026-10-11.** De track is nog **leeg**: de app staat dus nog niet in de winkel |
+| Internal | **1.0.57 (68)**, geüpload; `--list-tracks` bevestigt internal 68, completed |
+| PWA | **1.0.57 (68)**, CI-deploy vanaf `86c76d6`; live `version.json` zegt 68 |
+| Oppo | Laatst bewezen **1.0.56 (67)**. Ontvangst van 68 nog niet gedaan: het toestel zat op het vergrendelscherm en dat vraagt Joosts vingerafdruk |
+| Alpha / closed | **1.0.55 (66)**, 75 van 91 leden opted-in |
+| main | **1.0.57+68**, gepusht (`86c76d6`) |
+
+**Wat 68 brengt:** de maatjeslijst op de Peloton-tab komt nu ook uit een lokale
+kopie. Daarmee opent die tab volledig op wat er de vorige keer stond, ook
+zonder netwerk. Dat was het laatste blok: op 67 kwamen de groepen al uit de
+cache terwijl BUDDIES nog "Try again" toonde. Details in
+`.planning/OPEN.md` punt c en `.planning/quick/261009-gedeelde-ritten-cache/`.
+
+**Releasebewijs:** suite 1104 groen; analyze 0 errors, 0 warnings, 214 infos;
+AAB gebouwd en geüpload; Play bevestigt versionCode 68; live `version.json`
+zegt 68. AAB SHA-256:
+`b6358f78d6174312a6e1d28ff12f04135300b8512019e823e1f9bb3290f0f4d6`.
+
+**Wat nog moet:** de Oppo-controle van 68 (koude start met wifi en data uit: nu
+horen ook de maatjes er te staan), dan de promotie naar alpha, dan de
+productie-upload. Die laatste vraagt eerst het productierecht op het
+service-account.
 
 ## Stand na 2026-10-11 -- productietoegang verleend, 67 klaar
 
