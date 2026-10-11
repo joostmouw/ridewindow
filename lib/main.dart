@@ -17,6 +17,7 @@ import 'package:workmanager/workmanager.dart';
 
 import 'package:ridewindow/app/router.dart';
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/core/supabase_config.dart';
 import 'package:ridewindow/features/shared/top_banners.dart';
 import 'package:ridewindow/l10n/app_localizations.dart';
@@ -134,6 +135,7 @@ class _RideWindowAppState extends ConsumerState<RideWindowApp> {
         props: appOpenProps(
           signedIn: ref.read(currentUserIdProvider) != null,
           windowWidth: width,
+          input: webPrimaryInput,
         ),
       );
     } catch (_) {

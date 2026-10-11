@@ -22,17 +22,24 @@ const kEvAppOpen = 'app_open';
 /// pixels: vier waarden zijn niet herleidbaar tot een toestel.
 const kPropWindowClass = 'window_class';
 
-/// De props van [kEvAppOpen]: of je bent ingelogd en, als de breedte bekend
-/// is, de breedteklasse als korte code. Verder niets; een nieuwe sleutel hier
-/// hoort ook in het privacybeleid.
+/// Het hoofdinvoermiddel (touch|pointer) bij app_open, alleen op het web.
+/// Beantwoordt wat de breedte alleen niet kan: is `web` + expanded een tablet
+/// of een desktop? Zie `webPrimaryInput` in pwa_display_mode.dart.
+const kPropInput = 'input';
+
+/// De props van [kEvAppOpen]: of je bent ingelogd, als de breedte bekend is de
+/// breedteklasse als korte code, en op het web het hoofdinvoermiddel. Verder
+/// niets; een nieuwe sleutel hier hoort ook in het privacybeleid.
 Map<String, Object?> appOpenProps({
   required bool signedIn,
   double? windowWidth,
+  String? input,
 }) =>
     {
       'signed_in': signedIn,
       if (windowWidth != null)
         kPropWindowClass: windowSizeClassFor(windowWidth).name,
+      if (input != null) kPropInput: input,
     };
 
 /// De eerste start ooit op dit toestel. Beantwoordt: hoeveel van de aangemelde

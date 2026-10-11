@@ -42,6 +42,24 @@ bool get isStandaloneDisplayMode =>
 bool get isIosBrowserMode =>
     isWebPlatform && (debugIsIosBrowserOverride ?? impl.readIsIosUserAgent());
 
+/// Test-only override for [webPrimaryInput]. `null` means "use the real
+/// platform value". Always reset to `null` in `tearDown()`.
+@visibleForTesting
+bool? debugPrimaryPointerIsCoarseOverride;
+
+/// Het hoofdinvoermiddel van de browser: `touch` of `pointer` (muis of
+/// trackpad), via de media query `(pointer: coarse)`. Bewust niet de
+/// user-agent: Safari op een iPad doet zich standaard voor als een Mac, en
+/// dan zou elke iPad als desktop tellen. Een toetsenbord is geen aanwijzer en
+/// verandert hier niets aan. `null` in de native app: daar zegt
+/// `platform: android` al genoeg.
+String? get webPrimaryInput {
+  if (!isWebPlatform) return null;
+  final coarse =
+      debugPrimaryPointerIsCoarseOverride ?? impl.readPrimaryPointerIsCoarse();
+  return coarse ? 'touch' : 'pointer';
+}
+
 /// Test-only override for [isAndroidWeb]. `null` means "use the real
 /// platform value". Always reset to `null` in `tearDown()`.
 @visibleForTesting

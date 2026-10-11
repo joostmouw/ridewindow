@@ -17,3 +17,6 @@ bool readIsIosUserAgent() {
 
 bool readIsAndroidUserAgent() =>
     web.window.navigator.userAgent.contains('Android');
+
+bool readPrimaryPointerIsCoarse() =>
+    web.window.matchMedia('(pointer: coarse)').matches;

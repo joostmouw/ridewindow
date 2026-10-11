@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ridewindow/app/window_size.dart';
 import 'package:ridewindow/core/analytics_events.dart';
+import 'package:ridewindow/core/platform_info.dart';
+import 'package:ridewindow/core/pwa_display_mode.dart';
 import 'package:ridewindow/data/database/app_database.dart';
 import 'package:ridewindow/data/database/daos/sync_outbox_dao.dart';
 import 'package:ridewindow/data/database/sync_outbox_entity_types.dart';
@@ -271,6 +273,38 @@ void main() {
         final props = appOpenProps(signedIn: true, windowWidth: width);
         expect(props[kPropWindowClass], code);
       }
+    });
+
+    test('het invoermiddel gaat alleen mee als het bekend is', () {
+      expect(
+        appOpenProps(signedIn: false, windowWidth: 1280, input: 'touch'),
+        {'signed_in': false, kPropWindowClass: 'large', kPropInput: 'touch'},
+      );
+      expect(
+        appOpenProps(signedIn: false, windowWidth: 1280)
+            .containsKey(kPropInput),
+        isFalse,
+      );
+    });
+
+    test('webPrimaryInput: null in de app, touch of pointer op het web', () {
+      addTearDown(() {
+        debugIsWebOverride = null;
+        debugPrimaryPointerIsCoarseOverride = null;
+      });
+      debugIsWebOverride = false;
+      debugPrimaryPointerIsCoarseOverride = true;
+      expect(webPrimaryInput, isNull);
+
+      debugIsWebOverride = true;
+      expect(webPrimaryInput, 'touch');
+      debugPrimaryPointerIsCoarseOverride = false;
+      expect(webPrimaryInput, 'pointer');
+      // Beide codes passen door de props-snoeier.
+      expect(
+        AnalyticsService.sanitizeProps({kPropInput: 'pointer'}),
+        {kPropInput: 'pointer'},
+      );
     });
 
     test('zonder breedte geen sleutel', () {
