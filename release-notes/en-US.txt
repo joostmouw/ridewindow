@@ -1,1 +1,1 @@
-On a tablet, your ride windows now appear as a compact list, so you can compare ten at a glance, with the filters fixed at the top. The details of the chosen window stay on the right. If you have allowed anonymous usage statistics, the app now also notes whether it runs on a phone or a tablet.
+If you send a lot of feedback in one day, the app now keeps anything above the daily limit on your phone and sends it again later by itself. You see one short message saying so, and nothing you wrote gets lost. Everything else works as before.
