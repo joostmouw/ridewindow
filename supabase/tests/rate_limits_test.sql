@@ -454,6 +454,6 @@ begin
   end if;
 end $$;
 
-select seq, check_name, want, got, ok from rate_test_results order by seq;
+select seq, check_name, want, got, ok from pg_temp.rate_test_results order by seq;
 
 rollback;

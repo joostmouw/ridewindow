@@ -137,6 +137,6 @@ begin
   end if;
 end $$;
 
-select check_name, rows_seen from rls_test_results order by seq;
+select check_name, rows_seen from pg_temp.rls_test_results order by seq;
 
 rollback;

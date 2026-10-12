@@ -318,6 +318,6 @@ begin
   end if;
 end $$;
 
-select seq, check_name, want, got, ok from usage_test_results order by seq;
+select seq, check_name, want, got, ok from pg_temp.usage_test_results order by seq;
 
 rollback;

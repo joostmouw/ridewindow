@@ -723,6 +723,6 @@ begin
   end if;
 end $$;
 
-select seq, check_name, want, got, ok from club_request_results order by seq;
+select seq, check_name, want, got, ok from pg_temp.club_request_results order by seq;
 
 rollback;
