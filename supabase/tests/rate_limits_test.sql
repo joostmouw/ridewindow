@@ -2,6 +2,10 @@
 -- rate_limits_test.sql -- het bewijs voor 0016_rate_limits.sql
 -- (v4.3 "Dicht huis", fase 38, RATE-01 t/m RATE-04)
 --
+-- VERSIE 3. Staat deze regel niet bovenaan in de SQL Editor, dan draait de
+-- tab nog oude tekst: hele tab selecteren en het klembord opnieuw plakken.
+-- (v1 miste het id op app_events, v2 had een slotselect zonder pg_temp.)
+--
 -- WAT HET BEWIJST
 --   1. De grantgrens in de catalogus: geen clientrol leest of schrijft
 --      rate_limit_counts, geen clientrol voert enforce_insert_rate_limit()
