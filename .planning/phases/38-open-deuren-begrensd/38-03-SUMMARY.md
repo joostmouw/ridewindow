@@ -11,7 +11,7 @@ Status: af. Fase 38 is daarmee dicht (RATE-01 t/m RATE-05).
 | 06:37:51-06:38:07 | `dart run tool/rate_limit_probe.dart` (publieke sleutel, PostgREST) | A: 20 feedback in de vorm van build 70 aangenomen, 21e `rw_rate_limited:feedback:sender`. B: vers `device_id`, weer `feedback:sender`. C: 120 app_events met elk een eigen toestel aangenomen, 121e `rw_rate_limited:app_events:sender` |
 | ~06:39 | Opruim-SQL | `feedback_over 0, app_events_over 0, tellers_vandaag 0` |
 | 06:40:20 | `--verify-open` | Eén insert aangenomen (201): de grens staat weer open |
-| daarna | Opruim-SQL nogmaals, voor die laatste rij | |
+| daarna | Opruim-SQL nogmaals, voor die laatste rij | `0, 0, 0`: niets van de probe staat nog in productie |
 
 Bewijs per eis:
 
