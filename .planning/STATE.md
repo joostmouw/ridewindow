@@ -2,18 +2,33 @@
 gsd_state_version: 1.0
 milestone: v4.3
 milestone_name: Dicht huis
-status: fase 38 golf 1 af; 38-03 wacht op Joost (plafonds bevestigen, 0016 live, testscript + probe)
-last_updated: "2026-10-11T20:45:00.000Z"
-last_activity: 2026-10-11 -- golf 1 gebouwd en groen: migratie 0016 + SQL-bewijs (38-01), app-melding + toestel-id (38-02)
+status: fase 38 af (0016 live, bewezen); volgende in v4.3 is fase 39
+last_updated: "2026-10-12T06:45:00.000Z"
+last_activity: 2026-10-12 -- 0016 live, rate_limits_test.sql 27/27 groen, PostgREST-probe geslaagd, opgeruimd
 progress:
   total_phases: 16
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 42
   completed_plans: 42
   percent: 38
 ---
 
 # Project State
+
+## Stand na 2026-10-12 (08:45) -- fase 38 af, 0016 live
+
+| Waar | Stand |
+|---|---|
+| Supabase | **0016_rate_limits live** (toegepast 2026-10-12): dagplafonds feedback 30/account, 20/toestel, 20/afzender; app_events 120/toestel en /afzender; NOT VALID lengte-CHECKs op feedback. Server-functie nr. 15: `enforce_insert_rate_limit()` (CLAUDE.md/AGENTS.md tellen nog dertien; bijwerken in fase 40, AFR-02) |
+| Bewijs | `rate_limits_test.sql` live 27/27 ok; PostgREST-probe met de publieke sleutel 06:37 UTC: build-70-vorm 20x aangenomen, 21e geweigerd, roterend device_id helpt niet, app_events 120/121. Proberijen en tellers van vandaag opgeruimd |
+| App | 38-02 (toestel-id bij feedback, weigering blijft pending, één melding) zit in main, **nog in geen enkele build**: gaat mee met de eerstvolgende release (dan ook bumpen, zie hieronder) |
+| main | **Niet gepusht**: 11+ commits boven `4335302` (37-06-docs, route-epic, fase 38) |
+
+**Gevonden onderweg:** de Supabase SQL Editor vindt in de slotselect geen
+tijdelijke tabel uit hetzelfde script (42P01, ook in een kaal script van vijf
+regels), terwijl een transactie-lokale instelling wél zichtbaar is. Alle
+SQL-testscripts schrijven hun checks daarom nu naar `rw_test.results`.
+Details en wat het níét bleek: `38-03-SUMMARY.md`.
 
 ## Stand na 2026-10-11 (21:20) -- 1.0.59 (70) ter productiereview, fase 37 af
 

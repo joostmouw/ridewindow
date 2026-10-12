@@ -21,11 +21,11 @@
 
 ### Begrenzen (RATE)
 
-- [ ] **RATE-01**: `feedback` heeft een plafond per toestel en per afzender per dag; een tester zonder account kan nog steeds feedback sturen
-- [ ] **RATE-02**: `app_events` heeft een plafond per toestel en per afzender per dag, ruim boven wat de app zelf ooit verstuurt
-- [ ] **RATE-03**: Een rij in `feedback` of `app_events` kan niet onbeperkt groot zijn: er is een maximale lengte op tekst en op de meegestuurde context
-- [ ] **RATE-04**: Builds die al bij testers en in productie staan vallen onder de grenzen zonder app-update
-- [ ] **RATE-05**: Een tester boven de feedbackgrens krijgt in de app een duidelijke melding in plaats van een stille fout, en zijn feedback gaat niet verloren
+- [x] **RATE-01**: `feedback` heeft een plafond per toestel en per afzender per dag; een tester zonder account kan nog steeds feedback sturen *(0016 live 2026-10-12; rate_limits_test.sql checks 2, 4, 5, 6 live groen; probe fase A/B)*
+- [x] **RATE-02**: `app_events` heeft een plafond per toestel en per afzender per dag, ruim boven wat de app zelf ooit verstuurt *(checks 7.1-7.3 live groen; probe fase C: 120 aangenomen, 121e geweigerd)*
+- [x] **RATE-03**: Een rij in `feedback` of `app_events` kan niet onbeperkt groot zijn: er is een maximale lengte op tekst en op de meegestuurde context *(checks 3.1-3.4 live groen; app_events was al begrensd door 0008)*
+- [x] **RATE-04**: Builds die al bij testers en in productie staan vallen onder de grenzen zonder app-update *(PostgREST-probe met de publieke sleutel, vorm van build 70, 2026-10-12 06:37 UTC)*
+- [x] **RATE-05**: Een tester boven de feedbackgrens krijgt in de app een duidelijke melding in plaats van een stille fout, en zijn feedback gaat niet verloren *(unit-getest in 38-02; de melding gaat mee met de eerstvolgende build)*
 
 ### Uitnodigingscodes (CODE)
 
@@ -69,11 +69,11 @@
 |-------------|-------|--------|
 | MEET-01 | Phase 37 | Complete |
 | MEET-02 | Phase 37 | Complete |
-| RATE-01 | Phase 38 | Pending |
-| RATE-02 | Phase 38 | Pending |
-| RATE-03 | Phase 38 | Pending |
-| RATE-04 | Phase 38 | Pending |
-| RATE-05 | Phase 38 | Pending |
+| RATE-01 | Phase 38 | Complete |
+| RATE-02 | Phase 38 | Complete |
+| RATE-03 | Phase 38 | Complete |
+| RATE-04 | Phase 38 | Complete |
+| RATE-05 | Phase 38 | Complete |
 | CODE-01 | Phase 39 | Pending |
 | CODE-02 | Phase 39 | Pending |
 | GRENS-01 | Phase 39 | Pending |

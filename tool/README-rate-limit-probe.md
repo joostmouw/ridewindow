@@ -47,6 +47,14 @@ delete from public.rate_limit_counts
  where day = (now() at time zone 'Europe/Amsterdam')::date;
 
 commit;
+
+-- De editor toont alleen het laatste resultaat: verwacht drie nullen.
+select (select count(*) from public.feedback
+         where comment like 'rate-limit-probe:%')          as feedback_over,
+       (select count(*) from public.app_events
+         where name = 'rate_limit_probe')                  as app_events_over,
+       (select count(*) from public.rate_limit_counts
+         where day = (now() at time zone 'Europe/Amsterdam')::date) as tellers_vandaag;
 ```
 
 De SQL is idempotent: nog een keer plakken kan geen kwaad en is in stap 5
