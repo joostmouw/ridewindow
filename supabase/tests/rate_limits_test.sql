@@ -297,14 +297,16 @@ declare
 begin
   set local request.headers = '';
 
+  -- app_events.id heeft geen default (0008: de app maakt de uuid op het
+  -- toestel, anders dan feedback). De test geeft hem dus zelf mee.
   for l_i in 1..120 loop
-    insert into public.app_events (device_id, name, platform, app_version, occurred_at)
-      values (l_dev, 'test', 'android', '0', now());
+    insert into public.app_events (id, device_id, name, platform, app_version, occurred_at)
+      values (gen_random_uuid(), l_dev, 'test', 'android', '0', now());
   end loop;
 
   l_got := pg_temp.try_exec('insert into public.app_events '
-    '(device_id, name, platform, app_version, occurred_at) '
-    'values (''' || l_dev || ''', ''test'', ''android'', ''0'', now())');
+    '(id, device_id, name, platform, app_version, occurred_at) '
+    'values (gen_random_uuid(), ''' || l_dev || ''', ''test'', ''android'', ''0'', now())');
   perform pg_temp.expect('7.1 de 121e app_event van hetzelfde toestel geweigerd',
     'rw_rate_limited:app_events:device', l_got);
   perform pg_temp.expect('7.2 de toestelteller staat op 120',
@@ -314,13 +316,13 @@ begin
 
   set local request.headers = '{"x-forwarded-for":"198.51.100.78"}';
   for l_i in 1..120 loop
-    insert into public.app_events (device_id, name, platform, app_version, occurred_at)
-      values (gen_random_uuid(), 'test', 'android', '0', now());
+    insert into public.app_events (id, device_id, name, platform, app_version, occurred_at)
+      values (gen_random_uuid(), gen_random_uuid(), 'test', 'android', '0', now());
   end loop;
 
   l_got := pg_temp.try_exec('insert into public.app_events '
-    '(device_id, name, platform, app_version, occurred_at) '
-    'values (gen_random_uuid(), ''test'', ''android'', ''0'', now())');
+    '(id, device_id, name, platform, app_version, occurred_at) '
+    'values (gen_random_uuid(), gen_random_uuid(), ''test'', ''android'', ''0'', now())');
   perform pg_temp.expect('7.3 de 121e app_event vanaf hetzelfde IP geweigerd',
     'rw_rate_limited:app_events:sender', l_got);
 end $$;
