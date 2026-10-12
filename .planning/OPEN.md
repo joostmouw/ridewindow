@@ -35,6 +35,38 @@ en wat de volgende stap is.
 
 ---
 
+## Fase 38 af, 0016 live; wat nu ligt (2026-10-12, ochtend)
+
+**Fase 38 (Open deuren begrensd) is dicht.** 0016 staat live, het testscript
+gaf 27/27 en de PostgREST-probe bewees de grens langs het pad van build 70.
+Alles staat in `.planning/phases/38-open-deuren-begrensd/38-03-SUMMARY.md`.
+Main is gepusht, dus de PWA is opnieuw gedeployed: nog steeds versie 70, maar
+met andere bytes.
+
+Volgende stappen, in volgorde:
+
+1. **Release 71.** Bump `pubspec.yaml` en `lib/core/app_version.dart`
+   samen. Inhoud: de 38-02-melding (feedback blijft bewaard boven de
+   daglimiet). Route: `docs/RELEASE-ROUTE.md`. Pas na 71 komt de melding bij
+   testers.
+2. **Fase 39 (Codes en grenzen per account)** plannen. Volgt net als 38 uit de
+   nulmeting van 37.
+3. **Route-epic (#96):** de keuzes (privé-tour-test, eerst het silhouet,
+   CARTO-sleutel) liggen bij Joost.
+4. **Fase 40 (AFR-02):** CLAUDE.md en AGENTS.md tellen nog dertien
+   server-functies. Met `usage_daily_counts` (0014) en
+   `enforce_insert_rate_limit` (0016) zijn het er vijftien.
+
+**Lessen voor SQL-testscripts** (staat ook in 38-03-SUMMARY):
+- De SQL Editor ziet in de laatste select geen tijdelijke tabel. Gebruik het
+  `rw_test.results`-patroon uit `supabase/tests/rate_limits_test.sql`.
+- Draai een nieuw script eerst lokaal tegen PGlite. Dat is `npm i
+  @electric-sql/pglite` in een tijdelijke map, met een klein stub-schema. Zo
+  komen schemagaten zoals een ontbrekend `id` boven water vóórdat Joost moet
+  plakken.
+
+---
+
 ## 1.0.59 (70) ter productiereview; edge-to-edge-advies beoordeeld (2026-10-11, laat)
 
 **70 staat ter review op productie.** Volledige uitrol, alle landen, managed

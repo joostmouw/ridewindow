@@ -22,7 +22,7 @@ progress:
 | Supabase | **0016_rate_limits live** (toegepast 2026-10-12): dagplafonds feedback 30/account, 20/toestel, 20/afzender; app_events 120/toestel en /afzender; NOT VALID lengte-CHECKs op feedback. Server-functie nr. 15: `enforce_insert_rate_limit()` (CLAUDE.md/AGENTS.md tellen nog dertien; bijwerken in fase 40, AFR-02) |
 | Bewijs | `rate_limits_test.sql` live 27/27 ok; PostgREST-probe met de publieke sleutel 06:37 UTC: build-70-vorm 20x aangenomen, 21e geweigerd, roterend device_id helpt niet, app_events 120/121. Proberijen en tellers van vandaag opgeruimd |
 | App | 38-02 (toestel-id bij feedback, weigering blijft pending, één melding) zit in main, **nog in geen enkele build**: gaat mee met de eerstvolgende release (dan ook bumpen, zie hieronder) |
-| main | **Niet gepusht**: 11+ commits boven `4335302` (37-06-docs, route-epic, fase 38) |
+| main | **Gepusht** op 2026-10-12, met daarin 37-06-docs, de voorbereiding van de route-epic en heel fase 38. De push heeft de PWA opnieuw gedeployed (nog 70, andere bytes), dus bij de volgende release bumpen naar 71 |
 
 **Gevonden onderweg:** de Supabase SQL Editor vindt in de slotselect geen
 tijdelijke tabel uit hetzelfde script (42P01, ook in een kaal script van vijf
