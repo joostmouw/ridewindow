@@ -34,8 +34,8 @@
 --
 -- HOE HET RESULTAAT TE LEZEN
 --   De SQL Editor toont geen notices (alleen fouten). Daarom komt elke check
---   als rij in een tijdelijke tabel, en het script eindigt met een gewone
---   select:
+--   als JSON in een transactie-lokale instelling (rw_test.results), en het
+--   script eindigt met een gewone select die die instelling uitpakt:
 --
 --     seq | check_name | want | got | ok
 --
@@ -67,7 +67,7 @@
 --      gaat terug naar postgres, voor seed en voor controles die door RLS
 --      heen moeten kijken (bijv. "X is GEEN lid": X zelf ziet de ledenlijst
 --      niet, dus alleen postgres kan dat echt vaststellen).
---   4. Elke check roept pg_temp.expect aan, die een rij schrijft en NIET
+--   4. Elke check roept pg_temp.expect aan, die de check vastlegt en NIET
 --      stopt. Handelingen lopen via pg_temp.try_value / try_exec / try_rows in
 --      een eigen subtransactie: een geweigerde handeling laat niets na. Pas
 --      helemaal aan het eind beslist één blok: iets mislukt -> exception.
@@ -101,28 +101,43 @@ begin;
 -- Raamwerk
 -- ---------------------------------------------------------------------------
 
-create temporary table club_request_results (
-  seq        serial,
-  check_name text,
-  want       text,
-  got        text,
-  ok         boolean
-) on commit drop;
-
--- De checks draaien als authenticated, dus die rol moet in de tabel kunnen
--- schrijven. Het temp-schema van deze sessie is voor elke rol bruikbaar.
-grant select, insert on club_request_results to authenticated;
-grant usage on sequence club_request_results_seq_seq to authenticated;
+-- Geen tijdelijke tabel: in de SQL Editor gaf de slotselect op een
+-- temp-tabel uit hetzelfde script altijd 42P01, ook in een kaal script van
+-- vijf regels (2026-10-12), terwijl een transactie-lokale instelling daar
+-- wél zichtbaar bleek. De rollback ruimt die net zo grondig op. Grants zijn
+-- ook niet meer nodig: de checks draaien als authenticated, en een eigen
+-- instelling als rw_test.results mag elke rol zetten.
 
 -- Legt een check vast. Stopt nooit: de eindcontrole beslist.
 create function pg_temp.expect(p_name text, p_want text, p_got text)
 returns void
 language plpgsql
 as $$
+declare
+  l_all jsonb := coalesce(nullif(current_setting('rw_test.results', true), ''),
+                          '[]')::jsonb;
 begin
-  insert into pg_temp.club_request_results (check_name, want, got, ok)
-  values (p_name, p_want, p_got, p_want is not distinct from p_got);
+  perform set_config('rw_test.results',
+    (l_all || jsonb_build_array(jsonb_build_object(
+       'seq', jsonb_array_length(l_all) + 1,
+       'check_name', p_name,
+       'want', p_want,
+       'got', p_got,
+       'ok', p_want is not distinct from p_got)))::text,
+    true);
 end;
+$$;
+
+-- Leest de checks terug, voor de eindcontrole.
+create function pg_temp.results()
+returns table (seq int, check_name text, want text, got text, ok boolean)
+language sql
+as $$
+  select r.seq, r.check_name, r.want, r.got, r.ok
+    from jsonb_to_recordset(
+           coalesce(nullif(current_setting('rw_test.results', true), ''),
+                    '[]')::jsonb)
+         as r(seq int, check_name text, want text, got text, ok boolean)
 $$;
 
 -- Eén waarde (een telling, een naam, een status). Bij een fout: de sleutel of
@@ -710,19 +725,27 @@ begin
                            coalesce(want, 'null'), coalesce(got, 'null')),
                     '; ' order by seq)
     into v_failed
-  from pg_temp.club_request_results
+  from pg_temp.results()
   where not ok;
 
   if v_failed is not null then
     raise exception 'CLUBS REQUESTS DENY-TEST FAILED: %', v_failed;
   end if;
 
-  select count(*) into v_total from pg_temp.club_request_results;
+  select count(*) into v_total from pg_temp.results();
   if v_total <> 62 then
     raise exception 'CLUBS REQUESTS DENY-TEST FAILED: % checks geschreven, 62 verwacht', v_total;
   end if;
 end $$;
 
-select seq, check_name, want, got, ok from pg_temp.club_request_results order by seq;
+-- Bewust zonder pg_temp-functie en met een lege terugval: als de editor
+-- deze select ook buiten de sessie van het script uitvoert, levert dat een
+-- lege set op in plaats van een fout die het echte resultaat verdringt.
+select r.seq, r.check_name, r.want, r.got, r.ok
+  from jsonb_to_recordset(
+         coalesce(nullif(current_setting('rw_test.results', true), ''),
+                  '[]')::jsonb)
+       as r(seq int, check_name text, want text, got text, ok boolean)
+ order by r.seq;
 
 rollback;

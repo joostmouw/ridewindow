@@ -30,8 +30,8 @@
 --
 -- HOE HET RESULTAAT TE LEZEN
 --   De SQL Editor toont geen notices (alleen fouten). Daarom komt elke check
---   als rij in een tijdelijke tabel, en het script eindigt met een gewone
---   select:
+--   als JSON in een transactie-lokale instelling (rw_test.results), en het
+--   script eindigt met een gewone select die die instelling uitpakt:
 --
 --     seq | check_name | want | got | ok
 --
@@ -68,23 +68,41 @@ begin;
 -- Raamwerk
 -- ---------------------------------------------------------------------------
 
-create temporary table usage_test_results (
-  seq        serial,
-  check_name text,
-  want       text,
-  got        text,
-  ok         boolean
-) on commit drop;
+-- Geen tijdelijke tabel: in de SQL Editor gaf de slotselect op een
+-- temp-tabel uit hetzelfde script altijd 42P01, ook in een kaal script van
+-- vijf regels (2026-10-12), terwijl een transactie-lokale instelling daar
+-- wél zichtbaar bleek. De rollback ruimt die net zo grondig op.
 
 -- Legt een check vast. Stopt nooit: de eindcontrole beslist.
 create function pg_temp.expect (p_name text, p_want text, p_got text)
 returns void
 language plpgsql
 as $$
+declare
+  l_all jsonb := coalesce(nullif(current_setting('rw_test.results', true), ''),
+                          '[]')::jsonb;
 begin
-  insert into pg_temp.usage_test_results (check_name, want, got, ok)
-  values (p_name, p_want, p_got, p_want is not distinct from p_got);
+  perform set_config('rw_test.results',
+    (l_all || jsonb_build_array(jsonb_build_object(
+       'seq', jsonb_array_length(l_all) + 1,
+       'check_name', p_name,
+       'want', p_want,
+       'got', p_got,
+       'ok', p_want is not distinct from p_got)))::text,
+    true);
 end;
+$$;
+
+-- Leest de checks terug, voor de eindcontrole.
+create function pg_temp.results()
+returns table (seq int, check_name text, want text, got text, ok boolean)
+language sql
+as $$
+  select r.seq, r.check_name, r.want, r.got, r.ok
+    from jsonb_to_recordset(
+           coalesce(nullif(current_setting('rw_test.results', true), ''),
+                    '[]')::jsonb)
+         as r(seq int, check_name text, want text, got text, ok boolean)
 $$;
 
 -- Eén waarde. Bij een fout: de SQLSTATE (of de sleutel bij P0001).
@@ -305,19 +323,27 @@ begin
                            coalesce(want, 'null'), coalesce(got, 'null')),
                     '; ' order by seq)
     into v_failed
-  from pg_temp.usage_test_results
+  from pg_temp.results()
   where not ok;
 
   if v_failed is not null then
     raise exception 'USAGE-TEST FAILED: %', v_failed;
   end if;
 
-  select count(*) into v_total from pg_temp.usage_test_results;
+  select count(*) into v_total from pg_temp.results();
   if v_total <> 19 then
     raise exception 'USAGE-TEST FAILED: % checks geschreven, 19 verwacht', v_total;
   end if;
 end $$;
 
-select seq, check_name, want, got, ok from pg_temp.usage_test_results order by seq;
+-- Bewust zonder pg_temp-functie en met een lege terugval: als de editor
+-- deze select ook buiten de sessie van het script uitvoert, levert dat een
+-- lege set op in plaats van een fout die het echte resultaat verdringt.
+select r.seq, r.check_name, r.want, r.got, r.ok
+  from jsonb_to_recordset(
+         coalesce(nullif(current_setting('rw_test.results', true), ''),
+                  '[]')::jsonb)
+       as r(seq int, check_name text, want text, got text, ok boolean)
+ order by r.seq;
 
 rollback;

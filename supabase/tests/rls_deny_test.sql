@@ -16,7 +16,8 @@
 -- 'PASS: ...'` lines, which meant a passing run looked identical to a run
 -- that silently did nothing — there was no way to see the individual
 -- check results, only "no error occurred". This version instead collects
--- each check into a temp table and ends with a plain `select`, so
+-- each check as JSON in a transaction-local setting (rw_test.results) and
+-- ends with a plain `select` that unpacks it, so
 -- the four rows below are the actual query result you see in the Editor,
 -- not something you have to dig for in a logs panel. `raise exception` on
 -- FAILED is still kept as a hard stop for automation/CI use.
@@ -42,7 +43,7 @@
 --     request.jwt.claims->>'sub', and `set role authenticated` makes RLS
 --     actually apply, since the SQL Editor's own connecting role is a
 --     superuser that bypasses RLS (and grants) by default.
---  3. Assert, via a temp results table plus `raise exception` with the
+--  3. Assert, via the rw_test.results setting plus `raise exception` with the
 --     literal message prefix `RLS DENY-CASE FAILED:` on any unexpected
 --     result, that: user B's select/update/delete against user A's row
 --     all affect zero rows (the deny case), and user A's select of their
@@ -50,11 +51,28 @@
 
 begin;
 
-create temporary table rls_test_results (
-  seq        serial,
-  check_name text,
-  rows_seen  int
-) on commit drop;
+-- Geen tijdelijke tabel: in de SQL Editor gaf de slotselect op een
+-- temp-tabel uit hetzelfde script altijd 42P01, ook in een kaal script van
+-- vijf regels (2026-10-12), terwijl een transactie-lokale instelling daar
+-- wél zichtbaar bleek. De rollback ruimt die net zo grondig op, en de
+-- helper werkt ook als authenticated: een eigen instelling mag elke rol
+-- zetten.
+create function pg_temp.record(p_name text, p_rows int)
+returns void
+language plpgsql
+as $$
+declare
+  l_all jsonb := coalesce(nullif(current_setting('rw_test.results', true), ''),
+                          '[]')::jsonb;
+begin
+  perform set_config('rw_test.results',
+    (l_all || jsonb_build_array(jsonb_build_object(
+       'seq', jsonb_array_length(l_all) + 1,
+       'check_name', p_name,
+       'rows_seen', p_rows)))::text,
+    true);
+end;
+$$;
 
 -- Seed user A's row, bypassing the auth.users FK check.
 set local session_replication_role = replica;
@@ -88,7 +106,7 @@ begin
   from public.profiles
   where user_id = '11111111-1111-1111-1111-111111111111';
 
-  insert into rls_test_results (check_name, rows_seen) values ('B select of A row (want 0)', seen_rows);
+  perform pg_temp.record('B select of A row (want 0)', seen_rows);
   if seen_rows <> 0 then
     raise exception 'RLS DENY-CASE FAILED: user B selected % row(s) of user A''s profile', seen_rows;
   end if;
@@ -99,7 +117,7 @@ begin
   where user_id = '11111111-1111-1111-1111-111111111111';
 
   get diagnostics affected_rows = row_count;
-  insert into rls_test_results (check_name, rows_seen) values ('B update of A row (want 0)', affected_rows);
+  perform pg_temp.record('B update of A row (want 0)', affected_rows);
   if affected_rows <> 0 then
     raise exception 'RLS DENY-CASE FAILED: user B updated % row(s) of user A''s profile', affected_rows;
   end if;
@@ -109,7 +127,7 @@ begin
   where user_id = '11111111-1111-1111-1111-111111111111';
 
   get diagnostics affected_rows = row_count;
-  insert into rls_test_results (check_name, rows_seen) values ('B delete of A row (want 0)', affected_rows);
+  perform pg_temp.record('B delete of A row (want 0)', affected_rows);
   if affected_rows <> 0 then
     raise exception 'RLS DENY-CASE FAILED: user B deleted % row(s) of user A''s profile', affected_rows;
   end if;
@@ -131,12 +149,20 @@ begin
   from public.profiles
   where user_id = '11111111-1111-1111-1111-111111111111';
 
-  insert into rls_test_results (check_name, rows_seen) values ('A select of own row (want 1)', seen_rows);
+  perform pg_temp.record('A select of own row (want 1)', seen_rows);
   if seen_rows <> 1 then
     raise exception 'RLS DENY-CASE FAILED: user A selected % row(s) of their own profile (want 1)', seen_rows;
   end if;
 end $$;
 
-select check_name, rows_seen from pg_temp.rls_test_results order by seq;
+-- Bewust zonder pg_temp-functie en met een lege terugval: als de editor
+-- deze select ook buiten de sessie van het script uitvoert, levert dat een
+-- lege set op in plaats van een fout die het echte resultaat verdringt.
+select r.check_name, r.rows_seen
+  from jsonb_to_recordset(
+         coalesce(nullif(current_setting('rw_test.results', true), ''),
+                  '[]')::jsonb)
+       as r(seq int, check_name text, rows_seen int)
+ order by r.seq;
 
 rollback;
